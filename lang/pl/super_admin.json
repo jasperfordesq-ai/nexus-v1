@@ -222,7 +222,7 @@
       "grant_btn": "Nadaj uprawnienia Super Admina",
       "grant_confirm": "Nadać uprawnienia Super Admina?",
       "no_hub_text": "Nie można nadać uprawnień Super Admina, ponieważ :tenant_name nie jest organizacją Hub.",
-      "no_hub_move_text": "Użyj funkcji „Przenieś i nadaj uprawnienia Super Admina", aby przypisać tego użytkownika do organizacji Hub.",
+      "no_hub_move_text": "Użyj funkcji „Przenieś i nadaj uprawnienia Super Admina”, aby przypisać tego użytkownika do organizacji Hub.",
       "quick_links_card_title": "Szybkie łącza",
       "view_profile_btn": "Zobacz profil",
       "view_tenant_btn": "Zobacz organizację",

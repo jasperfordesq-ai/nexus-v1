@@ -9,6 +9,10 @@ import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
+import { languageDisplayName } from '@/lib/languageDisplayName';
+
+// Google API keys always use this invariant credential prefix.
+const GOOGLE_API_KEY_EXAMPLE_PREFIX = 'AIza…';
 import { adminConfig, adminSettings } from '../../api/adminApi';
 import type { TenantConfig } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
@@ -30,17 +34,17 @@ import type { TenantConfig } from '../../api/types';
 
 
 const PLATFORM_LANGUAGES = [
-  { code: 'en', label: 'English', short: 'EN' },
-  { code: 'ga', label: 'Gaeilge', short: 'GA' },
-  { code: 'de', label: 'Deutsch', short: 'DE' },
-  { code: 'fr', label: 'Français', short: 'FR' },
-  { code: 'it', label: 'Italiano', short: 'IT' },
-  { code: 'pt', label: 'Português', short: 'PT' },
-  { code: 'es', label: 'Español', short: 'ES' },
-  { code: 'nl', label: 'Nederlands', short: 'NL' },
-  { code: 'pl', label: 'Polski', short: 'PL' },
-  { code: 'ja', label: '日本語', short: 'JA' },
-  { code: 'ar', label: 'العربية', short: 'AR' },
+  { code: 'en', short: 'EN' },
+  { code: 'ga', short: 'GA' },
+  { code: 'de', short: 'DE' },
+  { code: 'fr', short: 'FR' },
+  { code: 'it', short: 'IT' },
+  { code: 'pt', short: 'PT' },
+  { code: 'es', short: 'ES' },
+  { code: 'nl', short: 'NL' },
+  { code: 'pl', short: 'PL' },
+  { code: 'ja', short: 'JA' },
+  { code: 'ar', short: 'AR' },
 ];
 
 interface PlatformInfrastructureProps {
@@ -49,7 +53,7 @@ interface PlatformInfrastructureProps {
 }
 
 export default function PlatformInfrastructure({ config: _config, onConfigChange: _onConfigChange }: PlatformInfrastructureProps) {
-  const { t } = useTranslation('admin_config');
+  const { t, i18n } = useTranslation('admin_config');
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage, hasFeature } = useTenant();
 
@@ -149,7 +153,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.success(t('tenant_features.language_settings_saved'));
       refreshTenant();
     } else {
-      toast.error(res.error || t('tenant_features.language_settings_save_failed'));
+      toast.error(t('tenant_features.language_settings_save_failed'));
     }
     setSavingLang(false);
   };
@@ -164,7 +168,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       refreshTenant();
     } else {
       setMapsEnabled(previous);
-      toast.error(res.error || t('tenant_features.maps_providers_save_failed'));
+      toast.error(t('tenant_features.maps_providers_save_failed'));
     }
     setSavingMaps(false);
   };
@@ -179,7 +183,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.success(t('tenant_features.maps_providers_saved'));
       refreshTenant();
     } else {
-      toast.error(res.error || t('tenant_features.maps_providers_save_failed'));
+      toast.error(t('tenant_features.maps_providers_save_failed'));
     }
     setSavingProviders(false);
   };
@@ -199,7 +203,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       setOsMapsKeyInput('');
       await loadSettings();
     } else {
-      toast.error(res.error || t('tenant_features.api_keys_save_failed'));
+      toast.error(t('tenant_features.api_keys_save_failed'));
     }
     setSavingKeys(false);
   };
@@ -211,7 +215,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.success(t('tenant_features.google_key_cleared'));
       await loadSettings();
     } else {
-      toast.error(res.error || t('tenant_features.clear_failed'));
+      toast.error(t('tenant_features.clear_failed'));
     }
     setSavingKeys(false);
   };
@@ -223,7 +227,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.success(t('tenant_features.maptiler_key_cleared'));
       await loadSettings();
     } else {
-      toast.error(res.error || t('tenant_features.clear_failed'));
+      toast.error(t('tenant_features.clear_failed'));
     }
     setSavingKeys(false);
   };
@@ -235,7 +239,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.success(t('tenant_features.os_maps_key_cleared'));
       await loadSettings();
     } else {
-      toast.error(res.error || t('tenant_features.clear_failed'));
+      toast.error(t('tenant_features.clear_failed'));
     }
     setSavingKeys(false);
   };
@@ -275,7 +279,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 size="sm"
               >
                 {PLATFORM_LANGUAGES.filter((l) => langSupported.includes(l.code)).map((lang) => (
-                  <SelectItem key={lang.code} id={lang.code}>{lang.label} ({lang.short})</SelectItem>
+                  <SelectItem key={lang.code} id={lang.code}>{languageDisplayName(lang.code, i18n.resolvedLanguage)} ({lang.short})</SelectItem>
                 ))}
               </Select>
             </div>
@@ -294,7 +298,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     onValueChange={(checked) => handleLangToggle(lang.code, checked)}
                   >
                     <span className="text-sm">
-                      {lang.label} ({lang.short})
+                      {languageDisplayName(lang.code, i18n.resolvedLanguage)} ({lang.short})
                       {lang.code === 'en' && (
                         <span className="ml-2 text-xs text-muted">{t('tenant_features.always_enabled')}</span>
                       )}
@@ -463,7 +467,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               <div className="flex gap-2">
                 <Input
                   aria-label={t('tenant_features.google_maps_api_key_label')}
-                  placeholder={googleMapsKeySet ? googleMapsKeyDisplay : 'AIza…'}
+                  placeholder={googleMapsKeySet ? googleMapsKeyDisplay : GOOGLE_API_KEY_EXAMPLE_PREFIX}
                   value={googleMapsKeyInput}
                   onValueChange={setGoogleMapsKeyInput}
                   type={showGoogleKey ? 'text' : 'password'}

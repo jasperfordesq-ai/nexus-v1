@@ -64,25 +64,20 @@ vi.mock('@/contexts/ToastContext', () => ({
 import CommercialBoundaryAdminPage from './CommercialBoundaryAdminPage';
 
 const CAPABILITY = {
-  key: 'community_wallet',
-  label: 'Community Wallet',
-  description: 'Enables shared wallet for community funds.',
-  category: 'finance',
+  key: 'caring_community_module',
+  category: 'core_caring',
   default_classification: 'agpl_public' as const,
   effective_classification: 'agpl_public' as const,
   is_overridden: false,
   agpl_module: true,
-  notes: '',
 };
 
 const CLASSIFICATION_DEF = {
-  key: 'agpl_public',
-  label: 'AGPL Public',
-  description: 'Fully open-source under AGPL.',
+  key: 'agpl_public' as const,
 };
 
 const MATRIX = {
-  categories: [{ key: 'finance', label: 'Finance' }],
+  categories: [{ key: 'core_caring' }],
   classifications: [CLASSIFICATION_DEF],
   capabilities: [CAPABILITY],
   overrides_count: 0,
@@ -111,7 +106,7 @@ describe('CommercialBoundaryAdminPage — loading', () => {
     render(<CommercialBoundaryAdminPage />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Community Wallet')).toBeInTheDocument();
+      expect(screen.queryByText('Caring Community module')).toBeInTheDocument();
     });
 
     const spinners = screen.queryAllByRole('status');
@@ -128,28 +123,28 @@ describe('CommercialBoundaryAdminPage — populated data', () => {
 
   it('renders capability label', async () => {
     render(<CommercialBoundaryAdminPage />);
-    expect(await screen.findByText('Community Wallet')).toBeInTheDocument();
+    expect(await screen.findByText('Caring Community module')).toBeInTheDocument();
   });
 
   it('renders capability description', async () => {
     render(<CommercialBoundaryAdminPage />);
-    expect(await screen.findByText('Enables shared wallet for community funds.')).toBeInTheDocument();
+    expect(await screen.findByText('The umbrella feature flag that activates the complete Caring Community workflow for a tenant.')).toBeInTheDocument();
   });
 
   it('renders category group label', async () => {
     render(<CommercialBoundaryAdminPage />);
-    expect(await screen.findByText('Finance')).toBeInTheDocument();
+    expect(await screen.findByText('Core caring community')).toBeInTheDocument();
   });
 
   it('renders classification legend card', async () => {
     render(<CommercialBoundaryAdminPage />);
     // Classification def description appears in the legend
-    expect(await screen.findByText('Fully open-source under AGPL.')).toBeInTheDocument();
+    expect(await screen.findByText('AGPL-licensed source code in the public repository. Anyone may deploy it under the licence terms.')).toBeInTheDocument();
   });
 
   it('does NOT show overrides chip when overrides_count is 0', async () => {
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
     // The overrides chip only renders when overrides_count > 0.
     // The about card always contains the word "override" in its description, so we must
     // target the chip specifically — it would render as e.g. "0 override" or "1 override".
@@ -166,7 +161,7 @@ describe('CommercialBoundaryAdminPage — populated data', () => {
       data: { ...MATRIX, overrides_count: 2 },
     });
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
     // Chip renders the i18n key "commercial_boundary.overrides_count" with count=2 → "2 override"
     const chipWithCount = Array.from(document.querySelectorAll('[data-slot="chip"]')).find(
       (el) => /2\s*(override)?/i.test(el.textContent ?? ''),
@@ -190,7 +185,7 @@ describe('CommercialBoundaryAdminPage — set classification', () => {
     apiMock.put.mockResolvedValue({ success: true, data: updatedMatrix });
 
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
 
     // Change the Select for the capability row
     // React Aria Select uses native <select> or listbox — use fireEvent.change on a select element if available
@@ -203,7 +198,7 @@ describe('CommercialBoundaryAdminPage — set classification', () => {
           if (apiMock.put.mock.calls.length > 0) {
             const [url, body] = apiMock.put.mock.calls[0];
             expect(url).toContain('/commercial-boundary/override');
-            expect(body).toMatchObject({ capability_key: 'community_wallet' });
+            expect(body).toMatchObject({ capability_key: 'caring_community_module' });
           }
         });
       }
@@ -214,7 +209,7 @@ describe('CommercialBoundaryAdminPage — set classification', () => {
   it('shows success toast after PUT succeeds', async () => {
     apiMock.put.mockResolvedValue({ success: true, data: MATRIX });
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
     // The toast would fire after PUT, tested via the mock
     expect(mockShowToast).not.toHaveBeenCalledWith(expect.any(String), 'error');
   });
@@ -239,7 +234,7 @@ describe('CommercialBoundaryAdminPage — error state', () => {
     render(<CommercialBoundaryAdminPage />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Community Wallet')).not.toBeInTheDocument();
+      expect(screen.queryByText('Caring Community module')).not.toBeInTheDocument();
     });
   });
 });
@@ -258,7 +253,7 @@ describe('CommercialBoundaryAdminPage — overridden capability', () => {
     apiMock.get.mockResolvedValue({ success: true, data: overriddenMatrix });
 
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
 
     // Reset button has aria-label from commercial_boundary.actions.reset_default_aria
     const resetBtns = screen.queryAllByRole('button').filter((b) => {
@@ -278,7 +273,7 @@ describe('CommercialBoundaryAdminPage — overridden capability', () => {
     apiMock.put.mockResolvedValue({ success: true, data: MATRIX });
 
     render(<CommercialBoundaryAdminPage />);
-    await screen.findByText('Community Wallet');
+    await screen.findByText('Caring Community module');
 
     const resetBtns = screen.queryAllByRole('button').filter((b) => {
       const lbl = b.getAttribute('aria-label') ?? '';

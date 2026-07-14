@@ -120,5 +120,17 @@
   "view_all_podcasts_other": "{{count}} 件のポッドキャストをすべて表示",
   "podcast_show_label": "ポッドキャスト番組",
   "podcast_episode_label": "{{show}} のエピソード",
-  "filter_podcasts": "ポッドキャスト"
+  "filter_podcasts": "ポッドキャスト",
+  "results_count_announcement_one": "{{count}} 件の結果が見つかりました",
+  "tab_all_one": "すべて ({{count}})",
+  "tab_listings_one": "リスト ({{count}})",
+  "tab_members_one": "メンバー ({{count}})",
+  "tab_events_one": "イベント ({{count}})",
+  "tab_groups_one": "グループ ({{count}})",
+  "section_listings_one": "リスト ({{count}})",
+  "section_members_one": "メンバー ({{count}})",
+  "section_events_one": "イベント ({{count}})",
+  "section_groups_one": "グループ ({{count}})",
+  "members_count_one": "{{count}} メンバーたち",
+  "saved_searches_one": "保存された検索 ({{count}})"
 }

@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,12 +67,12 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "Cargando estado del algoritmo...",
     "404_entry_dismissed": "404 entrada descartada",
     "a_i_settings_saved_successfully": "La configuración de IA se guardó correctamente",
@@ -121,7 +120,7 @@
     "copied": "copiado",
     "copy": "Copiar",
     "create_redirect": "Crear redireccionamiento",
-    "custom_robots_txt": "Robots personalizados.txt",
+    "custom_robots_txt": "Robots.txt personalizado",
     "delete": "Eliminar",
     "delete_redirect_message": "Eliminar redireccionamiento",
     "delete_redirect_title": "Eliminar redireccionamiento",
@@ -275,14 +274,13 @@
     "placeholder_exchange_skills_and_time_with_your_community": "Intercambia habilidades y tiempo con tu comunidad...",
     "placeholder_gocspx": "GOCSPX-xxxxx",
     "placeholder_my_timebank": "Mi banco de tiempo...",
-    "placeholder_noreply_example": "noreply@ejemplo.com",
-    "placeholder_robots_txt": "Agente de usuario: *\nNo permitir: /admin/",
+    "placeholder_noreply_example": "noreply@example.com",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxxx...",
     "placeholder_search_users_by_name_or_email": "Buscar usuarios por nombre o correo electrónico...",
-    "placeholder_smtpexamplecom": "Smtpexamplecom...",
     "placeholder_smtp_port": "587",
-    "placeholder_test_example": "prueba@ejemplo.com",
-    "placeholder_user_example": "usuario@ejemplo.com",
+    "placeholder_test_example": "test@example.com",
+    "placeholder_user_example": "user@example.com",
     "placeholder_welcome_to_our_community": "Bienvenido a Nuestra Comunidad...",
     "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
     "placeholder_your_timebank_name": "El nombre de tu banco de tiempo...",
@@ -410,7 +408,6 @@
     "label_ollama_host_url": "URL del host de Ollama",
     "last_run_label": "Última ejecución",
     "meta_description_count": "{{count}}/160 caracteres de meta descripción",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "Vista previa de la imagen OG",
     "param_activity_weight": "Peso de actividad",
     "param_activity_weight_desc": "¿Con qué fuerza la actividad reciente impulsa la clasificación?",
@@ -463,7 +460,6 @@
     "provider_gemini": "Google Géminis",
     "provider_gmail_api": "API de Gmail",
     "provider_ollama": "Ollama (autohospedado)",
-    "provider_openai": "AbiertoAI",
     "provider_platform_default": "Plataforma predeterminada",
     "provider_sendgrid": "EnviarGrid",
     "provider_smtp": "SMTP",
@@ -505,7 +501,6 @@
       "workflows": {
         "title": "¿Qué estás intentando hacer?",
         "description": "Comience con la tarea simple, luego use la pestaña que se abre. Esto mantiene el trabajo rutinario alejado de controles riesgosos.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "Actualizar un inquilino",
           "body": "Úselo cuando el contenido público haya cambiado para una sola comunidad. Ingrese su slug inquilino antes de hacer cola para trabajar."
@@ -525,21 +520,22 @@
         "check_tenant_safety": {
           "title": "Compruebe que un inquilino esté a salvo",
           "body": "Inspeccione exactamente lo que debería tener este inquilino, qué se guarda y si alguna instantánea pertenece a otro lugar."
-        }
+        },
+        "open": "Abierto"
       },
       "analytics": {
         "actions": {
           "reload": "Recargar"
         },
         "columns": {
-          "crawler": "CRAWLER",
-          "hits": "HITS",
-          "host": "HOST",
           "ip": "IP",
-          "status": "STATUS",
-          "time": "TIME",
           "uri": "URI",
-          "url": "URL"
+          "url": "URL",
+          "crawler": "Rastreador",
+          "hits": "Impactos",
+          "host": "Anfitrión",
+          "status": "Estado",
+          "time": "Tiempo"
         },
         "empty": "No hay análisis disponibles. El registro de acceso del bot puede estar vacío.",
         "empty_bot_traffic": "Aún no hay tráfico de bots",
@@ -598,13 +594,13 @@
           "refresh_all_stale_many": "Actualizar todo obsoleto ({{count}})"
         },
         "columns": {
-          "actions": "ACTIONS",
-          "asset": "ASSET",
-          "coverage": "COVERAGE",
-          "host": "HOST",
-          "missing": "MISSING",
-          "stale": "STALE",
-          "tenant": "TENANT"
+          "actions": "Acciones",
+          "asset": "Activo",
+          "coverage": "Cobertura",
+          "host": "Anfitrión",
+          "missing": "Faltante",
+          "stale": "Obsoleto",
+          "tenant": "Inquilino"
         },
         "confirm": {
           "queue_recache": "¿Recaché de cola para inquilinos de {{count}}?",
@@ -728,9 +724,17 @@
           "last_failed_pass": "Última ejecución fallida",
           "sched_prerender-detect-drift": "Latido del corazón del detector de deriva",
           "sched_prerender-auto-recache": "Latido del corazón de recuperación automática",
-          "sched_prerender-reap-stale": "Latido del corazón de limpieza de trabajos obsoletos"
+          "sched_prerender-reap-stale": "Latido del corazón de limpieza de trabajos obsoletos",
+          "unknown": "Comprobación desconocida"
         },
-        "issue_count_many": "Problemas con {{count}}"
+        "issue_count_many": "Problemas con {{count}}",
+        "statuses": {
+          "green": "Saludable",
+          "yellow": "Advertencia",
+          "red": "Crítico",
+          "unknown": "Estado desconocido"
+        },
+        "remediation": "Acción: {{detail}}"
       },
       "inventory": {
         "truncated": "El inventario alcanzó el límite de seguridad de {{count}} instantáneas. Restrinja el filtro de inquilinos antes de ejecutar una acción masiva.",
@@ -812,7 +816,6 @@
           "modified": "Modificado",
           "must_fix": "Debe arreglar ({{count}})",
           "no_structured_data": "Sin datos estructurados",
-          "no_type": "(sin @tipo)",
           "none": "(ninguno)",
           "old": "{{age}} antiguo",
           "open_graph": "Abrir gráfico",
@@ -832,7 +835,8 @@
           "must_fix_many": "Debe arreglar ({{count}})",
           "tips_many": "Consejos ({{count}})",
           "asset_references_many": "Referencias de activos ({{count}})",
-          "dead_assets_many": "{{count}} muerto"
+          "dead_assets_many": "{{count}} muerto",
+          "no_type": "(sin @type)"
         },
         "selected": "{{count}} seleccionado",
         "status": {
@@ -988,7 +992,6 @@
       "audit": {
         "actions": {
           "reset_all": "Restablecer y reconstruir todo",
-          "auto_recache": "Auto-recache",
           "cancel": "Cancelar trabajo",
           "detect_drift": "Detectar deriva",
           "enqueue": "Actualización de cola",
@@ -996,7 +999,9 @@
           "purge": "Eliminar instantáneas",
           "purge_unexpected": "Limpiar instantáneas inesperadas",
           "reset_breaker": "Restablecer el disyuntor de seguridad",
-          "reset_queue": "Reparar cola atascada"
+          "reset_queue": "Reparar cola atascada",
+          "unknown": "Acción desconocida",
+          "auto_recache": "Recache automático"
         },
         "buttons": {
           "export_csv": "Exportar CSV",
@@ -1026,9 +1031,10 @@
         },
         "table_aria": "Historial de auditoría",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "Resultado desconocido",
+          "denied": "Denegado",
+          "failed": "Fallido",
+          "ok": "Completado"
         },
         "details_empty": "Sin detalles adicionales"
       },
@@ -1071,7 +1077,6 @@
           "unexpected": "Instantáneas guardadas fuera de los planes de rutas actuales de los inquilinos",
           "active_jobs": "{{count}} activo",
           "aging": "Antigüedad del {{count}} (>7d)",
-          "asset_broken": "Referencias muertas /activos/*",
           "backoff_window": "En ventana de retroceso de 6h",
           "cache_age": "{{oldest}} más antiguo/{{newest}} más nuevo",
           "content_stale": "Contenido fuente más reciente que la instantánea",
@@ -1084,7 +1089,8 @@
           "active_jobs_one": "{{count}} activo",
           "active_jobs_other": "{{count}} activo",
           "aging_many": "Antigüedad del {{count}} (>7d)",
-          "active_jobs_many": "{{count}} activo"
+          "active_jobs_many": "{{count}} activo",
+          "asset_broken": "Referencias muertas /assets/*"
         },
         "kpi": {
           "age_stale": "Edad obsoleta (>14d)",
@@ -1105,8 +1111,8 @@
           "job_queued": "Tarea #{{id}} en cola"
         },
         "placeholders": {
-          "routes": "/acerca de,/blog (en blanco = todo)",
-          "tenant_slug": "p.ej. banco de horas (en blanco = todo)"
+          "tenant_slug": "p.ej. banco de horas (en blanco = todo)",
+          "routes": "/about,/blog (vacío = todos)"
         },
         "super_admin_only": "Solo superadministrador"
       },
@@ -1120,7 +1126,6 @@
           "continue_to_delete": "Continuar en vivo eliminar"
         },
         "description_middle": "para un segmento de ruta,",
-        "description_prefix": "Elimine instantáneas que coincidan con un patrón global. Usar",
         "description_suffix": "para cualquier descendiente. Ejemplos:",
         "all_tenants_warning": {
           "body": "Si deja el slug de inquilino en blanco, se eliminarán las instantáneas coincidentes de todos los inquilinos. Esto es sólo para la limpieza de toda la plataforma después de haber obtenido una vista previa de los archivos exactos.",
@@ -1171,7 +1176,8 @@
           "ready_one": "Se encontró una vista previa coincidente. La eliminación en vivo se limita a las instantáneas coincidentes {{count}} que se muestran en la vista previa.",
           "ready_other": "Se encontró una vista previa coincidente. La eliminación en vivo se limita a las instantáneas coincidentes {{count}} que se muestran en la vista previa.",
           "ready_many": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
-        }
+        },
+        "description_prefix": "Eliminar instantáneas guardadas HTML que coincidan con un patrón de ruta. Agregue un identificador de inquilino cuando la ruta pertenezca a un inquilino. Use"
       },
       "ttl_inspector": {
         "actions": {
@@ -1185,13 +1191,18 @@
         },
         "path_only": "Sólo ruta: sin esquema ni host",
         "placeholders": {
-          "route": "/blog/mi-publicación"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "partido: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (especificidad {{specificity}})",
           "other_patterns": "Otros patrones que coinciden con esta ruta:",
-          "ttl": "TTL: {{ttl}} ({{seconds}})"
+          "ttl": "TTL: {{ttl}} ({{seconds}})",
+          "sources": {
+            "default": "Regla predeterminada",
+            "pattern": "Patrón coincidente",
+            "unknown": "Fuente desconocida"
+          }
         },
         "title": "Inspector TTL",
         "units": {
@@ -1290,14 +1301,14 @@
           "needs_attention_many": "{{count}} item needs attention"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "Esperado",
+          "missing": "Faltante",
+          "unexpected": "Inesperado",
+          "stale": "Obsoleto",
+          "static": "Estático",
+          "sitemap": "Mapa del sitio",
+          "snapshots": "Guardado",
+          "asset_invalid": "Activos"
         },
         "sections": {
           "attention_limited": "Se muestran {{shown}} de {{total}} instantáneas guardadas que requieren atención.",
@@ -1307,10 +1318,10 @@
         "empty": "Ingrese un slug inquilino para inspeccionar su plan de ruta y las instantáneas guardadas.",
         "empty_attention": "A este inquilino no le faltan instantáneas, están obsoletas, tienen activos rotos o son inesperadas.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
-          "status": "Status",
-          "why": "¿Por qué está aquí?"
+          "why": "¿Por qué está aquí?",
+          "route": "Ruta",
+          "source": "Fuente",
+          "status": "Estado"
         },
         "tables": {
           "attention_aria": "Elementos de instantáneas de inquilinos que necesitan atención"
@@ -1318,12 +1329,12 @@
         "sources": {
           "static": "Ruta estática",
           "sitemap": "Ruta del mapa del sitio",
-          "unexpected": "Unexpected"
+          "unexpected": "Inesperado"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "Problema de activos",
-          "content": "Contenido obsoleto"
+          "content": "Contenido obsoleto",
+          "unexpected": "Inesperado"
         },
         "reasons": {
           "sitemap": "Publicado por este mapa del sitio de inquilinos como contenido público.",
@@ -1346,9 +1357,9 @@
           "body": "Las instantáneas inesperadas generalmente se pueden eliminar con la herramienta de limpieza en Descripción general. Primero obtenga una vista previa y luego aplique solo cuando la lista de inquilinos sea correcta."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "Fresco",
+          "stale": "Obsoleto",
+          "warn": "Envejecimiento"
         }
       }
     },
@@ -1382,13 +1393,12 @@
     "next_public": {
       "title": "Preparación de la interfaz pública de Next.js",
       "description": "Estado del modo sombra de solo lectura para la interfaz pública de Next.js. Esta página no habilita el enrutamiento público ni cambia el comportamiento previo al renderizado.",
-      "refresh": "Refresh",
       "loading": "Cargando la preparación de la interfaz pública de Next.js",
       "error": "No se pudo cargar la preparación de Next.js.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "Ruta de producción",
-        "prerender": "Reserva previa al renderizado"
+        "prerender": "Reserva previa al renderizado",
+        "mode": "Modo"
       },
       "values": {
         "shadow_mode": "Modo sombra",
@@ -1426,8 +1436,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "Ruta pública GET de Laravel",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "La ruta de Laravel no está registrada",
+        "auth": "La ruta de Laravel requiere autenticación"
       },
       "edge_canary": {
         "title": "Vista previa del canario de Edge",
@@ -1442,7 +1452,6 @@
         "included_by_deploy": "Incluido por implementación",
         "not_included_by_deploy": "No incluido por implementación",
         "route_audit_title": "Auditoría de ruta de plantilla",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "Sólo rutas públicas",
         "not_public_only": "No solo rutas públicas",
         "no_private_collisions": "Sin colisiones en rutas privadas",
@@ -1456,7 +1465,8 @@
         "preview_only": "Solo vista previa",
         "not_preview_only": "El modo de vista previa no está confirmado",
         "reviewed_config_required": "Se requiere configuración revisada",
-        "explicit_instruction_required": "Se requieren instrucciones de transición separadas"
+        "explicit_instruction_required": "Se requieren instrucciones de transición separadas",
+        "exact_path_count": "{{count}} rutas exactas"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1467,9 +1477,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "Se requieren instrucciones de transición explícitas",
         "next_shadow_checks_required": "Se requieren próximas comprobaciones paralelas",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "La reserva previa al renderizado debe permanecer"
+        "prerender_fallback_must_remain": "La reserva previa al renderizado debe permanecer",
+        "apache_configtest_required": "Se requiere prueba de configuración de Apache",
+        "react_private_regression_required": "Se requiere regresión de ruta privada en React"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "No edite vhosts de Plesk directamente",
@@ -1479,21 +1489,21 @@
       },
       "route_batches": {
         "title": "Preparación del lote de ruta",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} rutas"
       },
       "remaining_route_work": {
         "title": "Trabajos restantes en la vía pública",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} ruta respaldada por API",
         "api_backed_routes_plural": "{{count}} rutas respaldadas por API",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Los controles de activación están disponibles.",
-        "activation_unavailable": "Sin controles de activación"
+        "activation_unavailable": "Sin controles de activación",
+        "route_count": "{{count}} rutas",
+        "public_routes": "{{count}} ruta pública",
+        "public_routes_plural": "{{count}} rutas públicas",
+        "remaining_routes": "{{count}} ruta restante",
+        "remaining_routes_plural": "{{count}} rutas restantes",
+        "unclassified_routes": "{{count}} ruta no clasificada",
+        "unclassified_routes_plural": "{{count}} rutas no clasificadas"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "Rutas de revisión estática/manual",
@@ -1552,13 +1562,13 @@
       },
       "artifacts": {
         "title": "Inventario de artefactos de transición",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "Comandos requeridos",
         "required_before_cutover": "Requerido antes de la transición",
         "activation_available": "Los controles de activación están disponibles.",
-        "no_activation_control": "Sin controles de activación"
+        "no_activation_control": "Sin controles de activación",
+        "path": "Camino",
+        "present": "Presente",
+        "missing": "Faltante"
       },
       "artifact_items": {
         "route_ownership_manifest": "Manifiesto de propiedad de ruta",
@@ -1569,11 +1579,11 @@
         "prerender_fallback": "Reserva previa al renderizado"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "Configuración de borde",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "manifest": "Manifestar",
+        "runtime": "Tiempo de ejecución",
+        "guard": "Guardia",
+        "fallback": "Respaldo"
       },
       "production_effects": {
         "none": "Sin efecto de producción"
@@ -1582,13 +1592,13 @@
         "title": "Elegibilidad para la transición",
         "eligible": "Elegible para la transición",
         "blocked": "No elegible para la transición",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} rutas públicas respaldadas por API",
         "remaining_public_routes": "{{count}} rutas públicas restantes",
         "activation_available": "Controles de activación disponibles",
         "activation_unavailable": "Sin controles de activación",
-        "blockers": "Blockers",
-        "required_actions": "Acciones requeridas"
+        "required_actions": "Acciones requeridas",
+        "blockers": "Bloqueadores",
+        "public_routes": "{{count}} rutas públicas"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "La validación del manifiesto está bloqueada",
@@ -1623,15 +1633,15 @@
         "prerender_retained": "La reserva previa a la renderización actual se mantiene",
         "vite_private_routes_retained": "Se mantiene la propiedad de la ruta Private Vite",
         "public_edge_not_configured": "No hay ninguna ruta de borde de producción configurada para Next.js",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Aún se requieren pruebas de paridad antes de cualquier transición."
+        "parity_tests_required_before_cutover": "Aún se requieren pruebas de paridad antes de cualquier transición.",
+        "apache_canary_template_not_included": "La plantilla canaria de Apache no está incluida en el despliegue"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
-        "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "pass": "Pasar",
+        "blocker": "Bloqueador",
+        "info": "Información",
+        "fail": "Fallar",
+        "blocked": "Bloqueado"
       },
       "runtime": {
         "title": "Tiempo de ejecución de sombra",
@@ -1653,9 +1663,9 @@
         "monitor_and_keep_prerender_fallback": "Supervise las respuestas y mantenga la representación previa disponible como alternativa hasta que se demuestre la paridad."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} edición privada/creación de patrones"
+        "private_patterns": "{{count}} edición privada/creación de patrones",
+        "public_routes": "{{count}} rutas públicas",
+        "private_prefixes": "{{count}} prefijos privados"
       },
       "validation": {
         "title": "Validación manifiesta",
@@ -1721,7 +1731,8 @@
         "public_routes_only": "Sólo rutas públicas",
         "do_not_remove_prerender": "No elimine el respaldo previo a la renderización.",
         "rollback_path_required": "Se requiere ruta de reversión"
-      }
+      },
+      "refresh": "Actualizar"
     },
     "health_meta_description_length_one": "Caracteres{{count}}(ideal: 150–160)",
     "health_meta_description_length_other": "Caracteres{{count}}(ideal: 150–160)",
@@ -1758,7 +1769,94 @@
     "failed_count_with_value_many": "{{count}}falló",
     "match_count_many": "Partidos{{count}}",
     "top_matches_for_user_many": "Los mejores partidos de{{count}}para{{name}}",
-    "total_count_many": "totales: {{count}}"
+    "total_count_many": "totales: {{count}}",
+    "component_match_score_aria": "{{component}} puntuación: {{score}}%",
+    "placeholder_default_title_suffix": "| Mi banco de tiempo",
+    "placeholder_meta_keywords": "banco de tiempo, comunidad, intercambio",
+    "sitemap_content_type_unknown": "Otro contenido",
+    "sitemap_content_type_blog_posts": "Entradas de blog",
+    "sitemap_content_type_events": "Eventos",
+    "sitemap_content_type_groups": "Grupos",
+    "sitemap_content_type_jobs": "Empleos",
+    "sitemap_content_type_listings": "Listados",
+    "sitemap_content_type_members": "Miembros",
+    "sitemap_content_type_pages": "Páginas",
+    "sitemap_content_type_podcasts": "Podcasts",
+    "sitemap_content_type_resources": "Recursos",
+    "sitemap_content_type_volunteering": "Voluntariado",
+    "seo_audit_check_blog_meta_description_one": "Comprueba {{count}} publicación de blog publicada para títulos y descripciones meta",
+    "seo_audit_check_blog_meta_description_other": "Comprueba {{count}} publicaciones de blog publicadas para títulos y descripciones meta",
+    "seo_audit_check_blog_meta_name": "Metadatos de publicaciones de blog",
+    "seo_audit_check_canonical_urls_description": "Comprueba la configuración de URL canónica y reemplazos personalizados",
+    "seo_audit_check_canonical_urls_name": "URLs canónicas",
+    "seo_audit_check_content_quality_description": "Verifica contenido delgado, títulos faltantes y otros problemas de calidad de contenido",
+    "seo_audit_check_content_quality_name": "Señales de Calidad de Contenido",
+    "seo_audit_check_duplicate_titles_description": "Verifica títulos meta duplicados en contenido publicado",
+    "seo_audit_check_duplicate_titles_name": "Títulos Meta Únicos",
+    "seo_audit_check_kb_meta_description_one": "Verifica {{count}} artículo publicado en la base de conocimiento para un título válido",
+    "seo_audit_check_kb_meta_description_other": "Verifica los artículos de la base de conocimientos publicados {{count}} para títulos válidos",
+    "seo_audit_check_kb_meta_name": "Metadatos del artículo de la base de conocimientos",
+    "seo_audit_check_open_graph_description": "Verifica la configuración de Open Graph y Twitter Card",
+    "seo_audit_check_open_graph_name": "Metadatos para compartir en redes sociales",
+    "seo_audit_check_page_meta_description_one": "Verifica la página CMS publicada {{count}} para metadatos",
+    "seo_audit_check_page_meta_description_other": "Verifica {{count}} páginas publicadas de CMS para metadatos",
+    "seo_audit_check_page_meta_name": "Metadatos de la página CMS",
+    "seo_audit_check_redirect_health_description_one": "Verifica {{count}} redireccionamientos configurados por cadenas, bucles y auto-redirecciones",
+    "seo_audit_check_redirect_health_description_other": "Verifica {{count}} redireccionamientos configurados por cadenas, bucles y auto-redirecciones",
+    "seo_audit_check_redirect_health_name": "Salud de los redireccionamientos",
+    "seo_audit_check_seo_settings_description": "Verifica que las URLs canónicas, las etiquetas Open Graph y las Twitter Cards estén habilitadas",
+    "seo_audit_check_seo_settings_name": "Configuración SEO",
+    "seo_audit_check_sitemap_coverage_description_one": "Verifica la cobertura del mapa del sitio para la URL {{count}}",
+    "seo_audit_check_sitemap_coverage_description_other": "Verifica la cobertura del mapa del sitio para las URLs {{count}}",
+    "seo_audit_check_sitemap_coverage_name": "Cobertura del mapa del sitio",
+    "seo_audit_check_tenant_metadata_description": "Verifica el título meta, la descripción meta y el encabezado H1 de la página de inicio del arrendatario",
+    "seo_audit_check_tenant_metadata_name": "Metadatos de la página de inicio",
+    "seo_audit_check_unknown_description": "Esta verificación de auditoría no es compatible con esta versión del panel de administración",
+    "seo_audit_check_unknown_name": "Verificación de auditoría desconocida",
+    "seo_audit_issue_additional_results_truncated": "Pueden existir más problemas; solo se muestran los primeros {{limit}}.",
+    "seo_audit_issue_blog_post_meta_missing": "La entrada del blog “{{title}}” ({{path}}) carece de un título o descripción meta.",
+    "seo_audit_issue_canonical_generation_disabled": "La generación de URL canónicas está desactivada, lo que crea un riesgo de contenido duplicado.",
+    "seo_audit_issue_canonical_urls_not_enabled": "Las URL canónicas no están habilitadas.",
+    "seo_audit_issue_cms_page_meta_title_missing": "La página CMS “{{title}}” ({{path}}) carece de un título meta.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} la página tiene una URL canónica personalizada; confirme que todavía es válida.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} las páginas tienen URLs canónicas personalizadas; confirme que todavía son válidas.",
+    "seo_audit_issue_duplicate_meta_title_one": "El meta título “{{title}}” se usa {{count}} vez.",
+    "seo_audit_issue_duplicate_meta_title_other": "El meta título “{{title}}” se usa {{count}} veces.",
+    "seo_audit_issue_homepage_meta_title_too_long": "El meta título de la página de inicio tiene {{length}} caracteres; el máximo es {{max}}.",
+    "seo_audit_issue_kb_article_titles_missing_one": "El artículo de la base de conocimientos publicado {{count}} tiene un título vacío.",
+    "seo_audit_issue_kb_article_titles_missing_other": "Los artículos de la base de conocimientos publicados {{count}} tienen títulos vacíos.",
+    "seo_audit_issue_legacy_result_requires_rerun": "Este problema guardado utiliza un formato antiguo. Vuelva a ejecutar la auditoría para obtener todos los detalles.",
+    "seo_audit_issue_meta_description_too_long": "La meta descripción de la página de inicio tiene {{length}} caracteres; el máximo es {{max}}.",
+    "seo_audit_issue_meta_description_too_short": "La meta descripción de la página de inicio tiene {{length}} caracteres; el mínimo es {{min}}.",
+    "seo_audit_issue_missing_homepage_h1": "La página de inicio no tiene su encabezado H1.",
+    "seo_audit_issue_missing_homepage_meta_title": "La página de inicio no tiene su título meta predeterminado.",
+    "seo_audit_issue_missing_meta_description": "La página de inicio no tiene su meta descripción predeterminada.",
+    "seo_audit_issue_open_graph_default_image_missing": "No se ha configurado una imagen predeterminada de Open Graph, por lo que las comparticiones en redes sociales no incluirán una imagen.",
+    "seo_audit_issue_open_graph_not_enabled": "Las etiquetas de Open Graph no están habilitadas.",
+    "seo_audit_issue_open_graph_sharing_disabled": "Las etiquetas de Open Graph están deshabilitadas, por lo que las comparticiones en redes sociales usarán vistas previas genéricas.",
+    "seo_audit_issue_redirect_chain": "Cadena de redirección: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "Bucle de redirección: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "Auto-redirección: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "El mapa del sitio no contiene URL, por lo que no se está indexando contenido a partir de él.",
+    "seo_audit_issue_sitemap_low_coverage_one": "El mapa del sitio contiene solo {{count}} URL, lo que indica una cobertura muy baja.",
+    "seo_audit_issue_sitemap_low_coverage_other": "El mapa del sitio contiene solo {{count}} URL, lo que indica una cobertura muy baja.",
+    "seo_audit_issue_sitemap_profiles_missing": "El mapa del sitio no contiene perfiles de miembros, aunque se esperan algunos.",
+    "seo_audit_issue_sitemap_static_pages_missing": "El mapa del sitio no contiene páginas estáticas, aunque se esperan algunas.",
+    "seo_audit_issue_thin_blog_content_one": "La publicación de blog {{count}} tiene menos de {{minimum}} caracteres; el contenido escaso puede perjudicar el SEO.",
+    "seo_audit_issue_thin_blog_content_other": "Las publicaciones de blog {{count}} tienen menos de {{minimum}} caracteres; el contenido escaso puede perjudicar el SEO.",
+    "seo_audit_issue_title_suffix_missing": "No se ha configurado un sufijo de título, como “ | Nombre de la Comunidad”.",
+    "seo_audit_issue_twitter_cards_disabled": "Las tarjetas de Twitter están deshabilitadas.",
+    "seo_audit_issue_twitter_cards_not_enabled": "Las tarjetas de Twitter no están habilitadas.",
+    "seo_audit_issue_unknown": "Este problema de auditoría no es compatible con esta versión del panel de administración.",
+    "seo_audit_issue_untitled_published_pages_one": "La página publicada {{count}} no tiene título.",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} las páginas publicadas no tienen título.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "Cargando",
+    "no_audit_results_prompt": "No hay resultados de auditoría todavía",
+    "provider_openai": "OpenAI",
+    "placeholder_smtpexamplecom": "Smtpexamplecom..."
   },
   "email_deliverability": {
     "title": "Capacidad de entrega del correo electrónico",
@@ -2138,7 +2236,7 @@
       },
       "email_dispatch_missing_explicit_tenant": {
         "title": "Al correo electrónico del despachador le falta un inquilino explícito",
-        "body": "Los sitios de llamadas al despachador de correo electrónico {{count}} todavía dependen del contexto de inquilino inferido. Pase ident_id o id de inquilino explícitamente para que todos los envíos en cola, cron, webhook y entre inquilinos sean auditables."
+        "body": "{{count}} los puntos de llamada del despachador de correos electrónicos aún dependen del contexto del inquilino inferido. Pase tenant_id o tenantId explícitamente para que cada envío en cola, cron, webhook y entre inquilinos sea auditable."
       },
       "email_trigger_audit_failed": {
         "title": "Error en la auditoría de activación de correo electrónico",
@@ -2168,6 +2266,27 @@
     },
     "trigger_coverage_one": "Problemas de {{issues}} en los flujos monitoreados de {{count}}",
     "trigger_coverage_other": "Problemas de {{issues}} en los flujos monitoreados de {{count}}",
-    "trigger_coverage_many": "Problemas de {{issues}} en los flujos monitoreados de {{count}}"
+    "trigger_coverage_many": "Problemas de {{issues}} en los flujos monitoreados de {{count}}",
+    "categories": {
+      "billing": "Facturación",
+      "civic_digest": "Resumen cívico",
+      "donation_receipt": "Recibo de donación",
+      "event_reminder": "Recordatorio de evento",
+      "federation_connection": "Conexión de la federación",
+      "federation_message": "Mensaje de la federación",
+      "federation_review": "Reseña de la federación",
+      "federation_transaction": "Transacción de la federación",
+      "goal_reminder": "Recordatorio de objetivo",
+      "job_interview": "Entrevista de trabajo",
+      "listing_expiry": "Expiración del listado",
+      "marketplace_dispute": "Disputa en el mercado",
+      "marketplace_rating": "Calificación del mercado",
+      "newsletter": "Boletín informativo",
+      "safeguarding": "Protección",
+      "safeguarding_review": "Revisión de protección",
+      "volunteer_reminder": "Recordatorio para voluntarios",
+      "not_available": "No disponible",
+      "unknown": "Otra categoría de correo electrónico"
+    }
   }
 }

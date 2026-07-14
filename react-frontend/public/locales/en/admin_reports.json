@@ -142,6 +142,8 @@
     "group_by_daily": "Group by Daily",
     "group_by_monthly": "Group by Monthly",
     "group_by_weekly": "Group by Weekly",
+    "unknown_period": "Unknown period",
+    "week_period": "Week {{week}}, {{year}}",
     "hours": "Hours",
     "hours_reports_page_desc": "Analyse time credit exchange volume, member balances, and category trends.",
     "hours_reports_page_title": "Hours reports",
@@ -389,6 +391,7 @@
     },
     "values": {
       "hours": "{{count}}h",
+      "formatted_hours": "{{value}}h",
       "disabled": "Disabled",
       "activities": "{{count}} activities",
       "trend_detail": "{{participants}} participants, {{activities}} activities",
@@ -548,7 +551,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}% YoY"
+      "yoy_value": "{{value}} YoY"
     }
   }
 }

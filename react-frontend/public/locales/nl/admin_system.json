@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,21 +67,20 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "admin_settings": {
     "logo_uploaded": "Partnerlogo geüpload",
     "upload_failed": "Uploaden mislukt",
-    "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "Getoond in het linkergedeelte van de voettekst. PNG, JPEG, WebP of SVG — max. 2 MB.",
     "replace_image": "Afbeelding vervangen",
     "upload_image": "Afbeelding uploaden",
     "remove_light_image": "Verwijder de afbeelding in de lichtmodus",
     "remove_dark_image": "Afbeelding in donkere modus verwijderen",
     "remove_partner_logo": "Partnerlogo verwijderen",
-    "header_logo_section": "Header Logo",
     "header_colors_section": "Toegankelijke kopkleur",
     "header_colors_desc": "Kies de kleur van de toegankelijke sitekop (GOV.UK-stijl). Laat dit niet ingesteld om de standaard zwarte koptekst met de blauwe lijn te behouden.",
     "header_bg_color_label": "Achtergrondkleur van de kop",
@@ -90,7 +88,6 @@
     "header_accent_color_label": "Kleur van de accentlijn",
     "header_accent_color_hint": "De dunne lijn onder de kop. Laat dit leeg zodat het overeenkomt met de achtergrond (geen zichtbare lijn), of kies een contrasterende kleur, zoals wit.",
     "header_colors_reset": "Resetten naar standaard",
-    "header_colors_preview": "Preview",
     "header_logo_desc": "Upload een aangepast logo dat in de koptekst van de site wordt weergegeven in plaats van de initialen van uw community. Laat leeg om de standaard te gebruiken.",
     "header_logo_light_label": "Headerlogo (lichtmodus)",
     "header_logo_dark_label": "Headerlogo (donkere modus)",
@@ -99,29 +96,32 @@
     "header_logo_uploaded": "Headerlogo bijgewerkt",
     "header_logo_removed": "Headerlogo verwijderd",
     "remove_header_logo": "Koptekstlogo verwijderen",
-    "remove_header_logo_dark": "Verwijder het header-logo in de donkere modus"
+    "remove_header_logo_dark": "Verwijder het header-logo in de donkere modus",
+    "partner_logo_label": "Partnerlogo",
+    "header_logo_section": "Headerlogo",
+    "header_colors_preview": "Voorbeeld"
   },
   "operations": {
-    "title": "Operations",
     "description": "Cachestatistieken en taakcontroles op de achtergrond.",
-    "refresh": "Refresh",
-    "cache_heading": "Cache",
-    "bg_jobs_heading": "Background Jobs",
     "redis_label": "Redis",
-    "redis_connected": "Connected",
-    "redis_disconnected": "Disconnected",
     "memory_used": "Gebruikt geheugen",
-    "keys": "Keys",
     "clear_cache": "Tenantcache wissen",
     "cache_cleared": "Cache is succesvol gewist",
     "cache_clear_failed": "Kan de cache niet wissen",
     "job_triggered": "Taak is succesvol geactiveerd",
     "job_trigger_failed": "Kan taak niet activeren",
-    "run_job_label": "Run {{name}}",
-    "last_run": "Last run: {{date}}",
     "never_run": "Nooit rennen",
     "no_jobs": "Er zijn geen achtergrondtaken geconfigureerd",
-    "loading": "Loading"
+    "refresh": "Vernieuwen",
+    "keys": "Sleutels",
+    "loading": "Laden",
+    "title": "Operaties",
+    "bg_jobs_heading": "Achtergrondtaken",
+    "redis_connected": "Verbonden",
+    "redis_disconnected": "Verbroken",
+    "run_job_label": "Uitvoeren {{name}}",
+    "last_run": "Laatste uitvoering: {{date}}",
+    "cache_heading": "Cache"
   },
   "retention": {
     "page_title": "Gegevensbewaring",
@@ -160,7 +160,9 @@
     "type_vol_safeguarding_incidents": "Veiligheidsincidenten",
     "type_vol_safeguarding_incidents_desc": "Dossiers van veiligheidszaken. Alleen opgeloste of gesloten zaken worden verwijderd; controleer wettelijke bewaarplichten vóór inschakeling.",
     "type_vol_guardian_consents": "Toestemmingen van voogden",
-    "type_vol_guardian_consents_desc": "Toestemmingsrecords van voogden voor minderjarigen, verwijderd dit aantal dagen na het verlopen van de toestemming."
+    "type_vol_guardian_consents_desc": "Toestemmingsrecords van voogden voor minderjarigen, verwijderd dit aantal dagen na het verlopen van de toestemming.",
+    "status_unknown": "Onbekende status",
+    "type_unknown": "Onbekend gegevenstype"
   },
   "seed_generator": {
     "count_aria_label": "Aantal {{label}}",
@@ -183,62 +185,63 @@
     "option_messages_desc": "Genereer voorbeeldberichten van leden",
     "option_badges_label": "Insignes",
     "option_badges_desc": "Genereer voorbeeldbadges",
-    "warning_body": "Warning Body"
+    "warning_body": "Voer alleen zaadgeneratie uit in ontwikkel- of testomgevingen. Het maakt voorbeeldrecords aan en kan rapporten beïnvloeden."
   },
   "sso": {
-    "page_title": "Single Sign-On",
     "page_subtitle": "Configureer OpenID Connect-identiteitsproviders voor deze community",
     "loading": "SSO-providers laden",
     "load_failed": "Kan SSO-providers niet laden",
-    "refresh": "Refresh",
     "add_provider": "Aanbieder toevoegen",
     "intro": "Leden loggen in via de identiteitsprovider van uw organisatie met behulp van OpenID Connect. Er verschijnt een knop op de inlog- en registratiepagina's voor elke ingeschakelde provider.",
     "no_providers": "Er zijn nog geen SSO-providers geconfigureerd.",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "updated_at": "Updated {{date}}",
-    "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
     "preset_entra_hint": "Voor Microsoft Entra ID is de URL van de uitgever https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "Verbinding testen",
     "testing": "Testen…",
-    "test_ok": "Connection OK",
     "test_error": "Verbinding mislukt",
     "test_failed": "Test mislukt. Probeer het opnieuw.",
-    "edit": "Edit",
-    "edit_provider_title": "Edit {{name}}",
-    "delete": "Delete",
     "delete_title": "SSO-provider verwijderen",
     "delete_body": "'{{name}}' verwijderen? Leden kunnen niet meer inloggen bij deze aanbieder.",
-    "delete_confirm": "Delete",
     "deleted": "Aanbieder verwijderd",
     "delete_failed": "Kan provider niet verwijderen",
     "saved": "Aanbieder opgeslagen",
-    "save": "Save",
     "saving": "Besparing…",
     "save_failed": "Kan provider niet opslaan",
-    "cancel": "Cancel",
     "key_invalid": "De providersleutel moet uit 2 tot 20 tekens bestaan: kleine letters, cijfers, koppeltekens of onderstrepingstekens, beginnend met een letter of cijfer.",
     "field_key": "Providersleutel",
     "field_key_desc": "Korte unieke identificatie die wordt gebruikt in URL's (bijvoorbeeld Coventry). Kan later niet meer worden gewijzigd.",
     "field_display_name": "Weergavenaam",
     "field_display_name_desc": "Weergegeven op de inlogknop, b.v. \"Meld u aan bij de gemeenteraad van Coventry\".",
-    "field_preset": "Preset",
-    "field_issuer_url": "Issuer URL",
     "field_issuer_url_desc": "De OIDC-uitgever; Discovery wordt uitgevoerd tegen {issuer}/.well-known/openid-configuration.",
-    "field_client_id": "Client ID",
     "field_client_secret": "Klantgeheim",
     "secret_keep_placeholder": "Laat dit leeg om het huidige geheim te behouden",
     "secret_keep_desc": "Er wordt een geheim opgeslagen. Voer een nieuwe waarde in om deze te vervangen, of laat deze leeg om deze te behouden.",
-    "field_scopes": "Scopes",
     "field_scopes_desc": "Door de ruimte gescheiden OIDC-scopes. Standaard: openid profiel-e-mail",
     "field_domains": "Toegestane e-maildomeinen",
-    "field_domains_desc": "Door komma's gescheiden, b.v. coventry.gov.uk, voorbeeld.org. Laat dit leeg om elk domein toe te staan.",
+    "field_domains_desc": "Door komma's gescheiden, b.v. coventry.gov.uk, example.org. Laat dit leeg om elk domein toe te staan.",
     "field_auto_provision": "Accounts automatisch inrichten",
     "field_auto_provision_desc": "Maak automatisch een ledenaccount aan bij de eerste keer inloggen. Als deze optie is uitgeschakeld, kunnen alleen bestaande leden inloggen met SSO.",
-    "field_enabled": "Enabled",
-    "field_enabled_desc": "Toon deze aanbieder op de inlog- en registratiepagina's."
+    "field_enabled_desc": "Toon deze aanbieder op de inlog- en registratiepagina's.",
+    "preset_unknown": "Onbekende preset",
+    "refresh": "Vernieuwen",
+    "enabled": "Ingeschakeld",
+    "disabled": "Uitgeschakeld",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "updated_at": "Bijgewerkt {{date}}",
+    "preset_generic": "Algemene OIDC",
+    "test_ok": "Verbinding OK",
+    "edit_provider_title": "Bewerk {{name}}",
+    "delete_confirm": "Verwijderen",
+    "field_preset": "Voorinstelling",
+    "field_issuer_url": "Uitgever URL",
+    "field_client_id": "Cliënt-ID",
+    "field_scopes": "Reikwijdtes",
+    "field_enabled": "Ingeschakeld",
+    "page_title": "Single Sign-On"
   },
   "system": {
     "active": "Actief",
@@ -315,7 +318,6 @@
     "cron_success_title": "Dat is het!",
     "currency_aud": "AUD - Australische dollar",
     "currency_cad": "CAD - Canadese dollar",
-    "currency_eur": "EUR - Euro",
     "currency_gbp": "GBP - Brits pond",
     "currency_jpy": "JPY - Japanse yen",
     "currency_usd": "USD - Amerikaanse dollar",
@@ -325,7 +327,6 @@
     "platform_azure_vm": "Azure-VM",
     "platform_cpanel": "cPanel",
     "platform_docker": "Dokwerker",
-    "platform_gcp": "GCP",
     "platform_linux_vps": "Linux/VPS",
     "recommended": "Aanbevolen",
     "replace": "Vervangen",
@@ -455,7 +456,6 @@
       "apns_key_id": "APN-sleutel-ID",
       "apns_team_id": "APN's team-ID",
       "background_color": "Achtergrondkleur",
-      "browser": "Browser",
       "build_manifest_export_failed": "Kan het buildmanifest niet exporteren",
       "build_manifest_exported": "Buildmanifest geëxporteerd",
       "build_profile": "Profiel opbouwen",
@@ -511,7 +511,8 @@
       "tenant_branded_app": "App voor huurders",
       "tenant_branded_ready": "Klaar voor huurder",
       "tenant_channel_prefix": "Voorvoegsel van tenantkanaal",
-      "theme_color": "Thema kleur"
+      "theme_color": "Thema kleur",
+      "browser": "Browser"
     },
     "never": "Nooit",
     "next_run": "Volgende uitvoering",
@@ -576,12 +577,8 @@
       "preset_applied": "Voorinstelling toegepast",
       "preset_confirm": "Weet u zeker dat u deze voorinstelling wilt toepassen? Het overschrijft de huidige instellingen.",
       "preset_created_options": "Voorinstelling toegepast en opties gemaakt",
-      "preset_custom": "Custom",
       "preset_england_wales": "Engeland en Wales",
-      "preset_ireland": "Ireland",
-      "preset_northern_ireland": "Northern Ireland",
       "preset_note": "Als u een voorinstelling toepast, worden uw huidige registratiebeleidsinstellingen overschreven",
-      "preset_scotland": "Scotland",
       "profile_requirements": "Profielvereisten",
       "profile_requirements_desc": "Stel de minimale profielvereisten in waaraan leden moeten voldoen",
       "require_avatar_visibility": "Vereist zichtbaarheid van avatars",
@@ -626,7 +623,11 @@
       "your_community": "Jouw gemeenschap",
       "n_active_one": "{{count}}actief",
       "n_active_other": "{{count}}actief",
-      "preset_united_kingdom": "Verenigd Koninkrijk"
+      "preset_united_kingdom": "Verenigd Koninkrijk",
+      "preset_custom": "Aangepast",
+      "preset_ireland": "Ierland",
+      "preset_northern_ireland": "Noord-Ierland",
+      "preset_scotland": "Schotland"
     },
     "overdue_jobs": "Achterstallige banen",
     "page_title": "Systeem",
@@ -746,7 +747,6 @@
       "provider_idenfy": "Provider identificeren",
       "provider_jumio": "Aanbieder Jumio",
       "provider_onfido": "Aanbieder Onfido",
-      "provider_stripe": "Providerstreep",
       "provider_veriff": "Providerverificatie",
       "providers_available": "Aanbieders beschikbaar",
       "registration_method": "Registratiemethode",
@@ -756,14 +756,12 @@
       "require_email_desc": "Verplicht leden om hun e-mailadres te verifiëren voordat ze toegang krijgen tot het platform",
       "require_email_tooltip": "Alleen platformsuperbeheerders kunnen deze instelling wijzigen",
       "save_credentials": "Bewaar referenties",
-      "save_policy": "Save Policy",
       "show_api_key": "Toon API sleutel",
       "show_webhook": "Webhook weergeven",
       "tip_change_modes": "Het wijzigen van de registratiemodus wordt bij nieuwe registraties onmiddellijk van kracht",
       "total_codes": "Totaalcodes",
       "total_codes_count": "Totaal aantal codes: {{count}}",
       "unavailable": "Niet beschikbaar",
-      "understanding_modes": "Understanding Modes",
       "verification_settings": "Verificatie-instellingen",
       "verification_settings_desc": "Configureer vereisten voor identiteitsverificatie voor nieuwe ledenregistraties",
       "waitlist_info": "Leden op de wachtlijst worden handmatig goedgekeurd door een beheerder",
@@ -775,10 +773,12 @@
       "n_available_one": "{{count}} beschikbaar",
       "n_available_other": "{{count}} beschikbaar",
       "total_codes_count_one": "Totaal aantal codes: {{count}}",
-      "total_codes_count_other": "Totaal aantal codes: {{count}}"
+      "total_codes_count_other": "Totaal aantal codes: {{count}}",
+      "save_policy": "Registratiebeleid opslaan",
+      "understanding_modes": "Begrijpen van registratiemodi",
+      "provider_stripe": "Provider Stripe"
     },
     "registration_policy_saved_successfully": "Registratiebeleid succesvol opgeslagen",
-    "registration_policy_settings_title": "Registration Policy Settings",
     "run_now": "Ren nu",
     "running": "Rennen",
     "schedule": "Schema",
@@ -808,16 +808,13 @@
     "label_default_currency": "Standaardvaluta",
     "desc_default_currency": "Gebruikt voor abonnements- en marktplaatsprijzen",
     "section_branding_legal": "Branding en juridisch",
-    "powered_by_branding_section": "Powered By Branding",
     "powered_by_branding_desc": "Configureer het rechter 'Powered By'-slot van de voettekst. Wijzigingen zijn onmiddellijk van kracht. Alleen God.",
     "god_only_chip": "Alleen God",
     "label_partner_logo_label": "Partnerlogo-label",
-    "placeholder_partner_logo_label": "Community Partner",
     "desc_partner_logo_label": "Kort label weergegeven boven het partnerlogo (laat dit leeg om de standaardtekst 'Community Partner' te gebruiken)",
     "label_powered_by_label": "Labeltekst",
     "placeholder_powered_by_label": "Aangedreven door",
     "desc_powered_by_label": "Kort label weergegeven boven de afbeelding (laat dit leeg om de standaardtekst 'Powered by' te gebruiken)",
-    "label_powered_by_url": "Link URL",
     "placeholder_powered_by_url": "https://example.com",
     "desc_powered_by_url": "Maakt de afbeelding klikbaar. Laat dit leeg als er geen link is.",
     "label_powered_by_image_light": "Afbeelding in lichtmodus",
@@ -848,7 +845,6 @@
     "btn_export_csv": "CSV exporteren",
     "btn_clear_old_logs": "Wis oude logboeken",
     "btn_refresh": "Vernieuwen",
-    "filter_section_header": "Filters",
     "status_success": "Succes",
     "super_admin_only": "Alleen superbeheerder",
     "super_admin_only_tooltip": "Alleen platformsuperbeheerders kunnen deze instelling wijzigen",
@@ -879,9 +875,7 @@
     "advanced_custom_settings": "Geavanceerde aangepaste instellingen",
     "app_configuration_heading": "App-configuratie",
     "auto_convert_webp": "WebP automatisch converteren",
-    "auto_convert_webp_desc": "Auto Convert WebP.",
     "auto_resize": "Automatisch formaat wijzigen",
-    "auto_resize_desc": "Auto Resize.",
     "avg_completion_minutes": "Gem. voltooiingsminuten",
     "avg_completion_seconds": "Gem. voltooiingsseconden",
     "blog_restore_warning": "Waarschuwing blogherstel",
@@ -897,9 +891,6 @@
     "col_provider": "Aanbieder",
     "col_time": "Tijd",
     "conversion_failed": "Conversie mislukt",
-    "desc_comma_separated_emails": "Comma Separated Emails.",
-    "desc_job_will_run_when_enabled": "Job Will Run When Enabled.",
-    "desc_notify_on_failure": "Notify on Failure.",
     "enable_push_notifications": "Schakel pushmeldingen in",
     "enable_push_notifications_desc": "Schakel pushmeldingen in.",
     "failed_to_action_verification": "Kan verificatie niet uitvoeren",
@@ -907,7 +898,6 @@
     "failed_to_load_provider_health": "Kan de status van de provider niet laden",
     "failed_count": "{{count}}is mislukt",
     "generate_thumbnails": "Miniaturen genereren",
-    "generate_thumbnails_desc": "Generate Thumbnails.",
     "generated_data_for": "Gegevens gegenereerd voor {{count}} geselecteerde gegevenstypen",
     "health_check_complete": "Gezondheidscontrole voltooid",
     "health_check_failed": "Gezondheidscontrole mislukt",
@@ -938,7 +928,6 @@
     "n_hours_ago": "N uur geleden",
     "n_minutes_ago": "N minuten geleden",
     "n_sessions": "N sessies",
-    "no_backups_available": "No backups available found",
     "no_failed_sessions": "Geen mislukte sessies gevonden",
     "no_identity_providers": "Geen identiteitsproviders gevonden",
     "not_available_short": "N.v.t",
@@ -990,7 +979,6 @@
     "stat_pending": "Statistiek in behandeling",
     "stat_total": "Statistisch Totaal",
     "strip_exif": "Strip exif",
-    "strip_exif_desc": "Strip Exif.",
     "success_rate_label": "Succespercentage",
     "system_requirements_desc": "Systeemvereisten.",
     "system_requirements_title": "Systeemvereisten",
@@ -1022,8 +1010,6 @@
     "not_writable_status": "Niet beschrijfbaar",
     "search_extensions_placeholder": "Zoekextensies...",
     "some_warnings_detected": "Er zijn enkele waarschuwingen gedetecteerd",
-    "status_fail": "FAIL",
-    "status_ok": "OK",
     "writable_status": "Beschrijfbaar",
     "action": {
       "admin_approve_group_member": "Groepslid goedkeuren",
@@ -1113,9 +1099,9 @@
       "vetting_record_rejected": "Controlerecord afgewezen",
       "vetting_record_updated": "Controlerecord bijgewerkt",
       "vetting_record_verified": "Vettingsrecord geverifieerd",
-      "welcome_credits_issued": "Welkomstkrediet uitgegeven"
+      "welcome_credits_issued": "Welkomstkrediet uitgegeven",
+      "unknown": "Onbekende actie"
     },
-    "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optionele websitelink voor het partnerlogo in de voettekst.",
     "label_inactivity_timeout": "Inactiviteitstime-out (minuten)",
     "desc_inactivity_timeout": "Leden automatisch afmelden na dit aantal minuten zonder activiteit. 0 schakelt de time-out uit; het toegestane bereik is 5–480 minuten. Aanbevolen: 120.",
@@ -1147,8 +1133,251 @@
       "api_unavailable": "API voor statuscontrole niet beschikbaar",
       "run_all": "Alle tests uitvoeren",
       "suites": "Testsuites",
-      "unknown_test": "Diagnose: {{name}}"
-    }
+      "unknown_test": "Diagnose: {{name}}",
+      "tests": {
+        "api_health": "API-statuscontrole",
+        "database": "Databaseverbinding",
+        "redis": "Redis-verbinding",
+        "auth_token": "Authenticatietoken genereren",
+        "tenant_bootstrap": "Tenantinitialisatie",
+        "file_upload": "Bestandsupload (S3 of lokaal)",
+        "email_service": "E-mailservice",
+        "pusher": "Pusher WebSocket"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "Blogbericht #{{id}} aangemaakt: {{title}}",
+      "blog_post_updated": "Blogbericht #{{id}} bijgewerkt: {{title}}",
+      "blog_post_deleted": "Blogbericht #{{id}} verwijderd: {{title}}",
+      "blog_post_status_changed": "Status van blogbericht #{{id}} gewijzigd van {{old_status}} naar {{new_status}}.",
+      "blog_posts_bulk_deleted": "Blogberichten in bulk verwijderd: {{count}}",
+      "blog_posts_bulk_published": "Blogberichten in bulk gepubliceerd: {{count}}",
+      "unknown": "Activiteitsdetail: {{code}}"
+    },
+    "activity_status": {
+      "unknown": "Onbekende status",
+      "draft": "concept",
+      "published": "gepubliceerd"
+    },
+    "alert_status_healthy": "Gezond",
+    "alert_status_warning": "Waarschuwing",
+    "alert_status_critical": "Kritiek",
+    "verification_level_none": "Geen",
+    "verification_level_document_only": "Alleen document",
+    "verification_level_document_selfie": "Document en selfie",
+    "verification_level_reusable_digital_id": "Hergebruikbare digitale ID",
+    "verification_level_manual_review": "Handmatige beoordeling",
+    "verification_level_unknown": "Onbekend verificatieniveau",
+    "job_category_notifications": "Meldingen",
+    "job_category_newsletters": "Nieuwsbrieven",
+    "job_category_matching": "Matchen",
+    "job_category_geocoding": "Geocodering",
+    "job_category_maintenance": "Onderhoud",
+    "job_category_master": "Meester",
+    "job_category_groups": "Groepen",
+    "job_category_security": "Beveiliging",
+    "job_category_other": "Overig",
+    "job_category_unknown": "Onbekende categorie",
+    "cron_job_name_unknown": "Geplande taak",
+    "cron_job_description_unknown": "Voert een geplande achtergrondtaak uit.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "Master cron-runner",
+        "description": "Voert de juiste geplande taken uit voor de huidige tijd. Alle andere taken worden uitgevoerd via deze planningsinvoer."
+      },
+      "process_queue": {
+        "name": "Directe notificatie wachtrij",
+        "description": "Verwerkt in afwachting zijnde directe notificaties voor onmiddellijke levering."
+      },
+      "daily_digest": {
+        "name": "Dagelijks overzicht",
+        "description": "Verstuurt dagelijkse samenvattings-e-mails naar leden die dagelijkse levering hebben geselecteerd."
+      },
+      "weekly_digest": {
+        "name": "Maandelijkse samenvatting",
+        "description": "Verstuurt de maandelijkse samenvatting van meldingen op de eerste dag van elke maand."
+      },
+      "process_newsletters": {
+        "name": "Verwerk geplande nieuwsbrieven",
+        "description": "Zoekt nieuwsbrieven die klaar zijn voor levering en start het verzendproces."
+      },
+      "process_recurring": {
+        "name": "Verwerk terugkerende nieuwsbrieven",
+        "description": "Verwerkt terugkerende en geautomatiseerde nieuwsbrieven."
+      },
+      "process_newsletter_queue": {
+        "name": "Nieuwsbriefwachtrij processor",
+        "description": "Verwerkt geplande nieuwsbriefleveringen in batches."
+      },
+      "notify_hot_matches": {
+        "name": "Meldingen van hete wedstrijden",
+        "description": "Brengt leden op de hoogte van nieuwe hoog scorende matches."
+      },
+      "match_digest_daily": {
+        "name": "Dagelijkse matchsamenvatting",
+        "description": "Verstuurt dagelijkse matchaanbevelingen naar leden."
+      },
+      "match_digest_weekly": {
+        "name": "Wekelijkse matchsamenvatting",
+        "description": "Verstuurt een wekelijkse samenvatting van matchaanbevelingen."
+      },
+      "gamification_daily": {
+        "name": "Dagelijkse gamificatietaken",
+        "description": "Verwerkt terugstellingen van reeksen, dagelijkse bonussen en badgecontroles."
+      },
+      "gamification_campaigns": {
+        "name": "Verwerkt prestatiecampagnes",
+        "description": "Verwerkt terugkerende prestatiecampagnes."
+      },
+      "gamification_leaderboard": {
+        "name": "Leaderboard-snapshot",
+        "description": "Maakt dagelijks leaderboard-snapshots en maakt seizoenen af."
+      },
+      "gamification_challenges": {
+        "name": "Controleer het verlopen van uitdagingen",
+        "description": "Verloopt voltooide uitdagingen en werkt hun status bij."
+      },
+      "gamification_weekly_digest": {
+        "name": "Maandelijkse gamificatie samenvatting",
+        "description": "Verstuurt maandelijkse voortgangs-samenvattingsmails naar leden."
+      },
+      "gamification_streaks": {
+        "name": "Gamificatie reeksmijlpalen",
+        "description": "Controleert en beloont lidmaatschapsreeks-mijlpalen."
+      },
+      "gamification_cleanup": {
+        "name": "Gamificatie opruiming",
+        "description": "Verwijdert oude ervaringsmeldingen, campagnebeloningen en analysetgegevens."
+      },
+      "update_featured_groups": {
+        "name": "Werk uitgelichte groepen bij",
+        "description": "Werk uitgelichte groepen bij met gebruik van de rangschikkingsregels."
+      },
+      "group_weekly_digest": {
+        "name": "Maandelijkse groepssamenvattingen",
+        "description": "Verstuurt maandelijkse analysesamenvattings-e-mails naar groepsbeheerders."
+      },
+      "abuse_detection": {
+        "name": "Misbruikdetectie",
+        "description": "Controleert transacties op mogelijke misbruikpatronen."
+      },
+      "abuse_daily_report": {
+        "name": "Dagelijks misbruikrapport",
+        "description": "Verstuurt het dagelijkse misbruikdetectierapport naar beheerders."
+      },
+      "abuse_cleanup": {
+        "name": "Misbruikwaarschuwing opruimen",
+        "description": "Archiveert oude waarschuwingen en wijst automatisch items met lage ernst af."
+      },
+      "verification_reminders": {
+        "name": "Verificatie herinneringen",
+        "description": "Herinnert leden aan onvolledige identiteitsverificaties."
+      },
+      "expire_verifications": {
+        "name": "Laat achtergelaten verificaties verlopen",
+        "description": "Verloopt verificatiesessies die langer dan 72 uur zijn verlaten."
+      },
+      "purge_verification_sessions": {
+        "name": "Oude verificatiegegevens verwijderen",
+        "description": "Verwijdert voltooide en verlopen verificatiesessies na 180 dagen."
+      },
+      "volunteer_pre_shift": {
+        "name": "Herinneringen voor vrijwilligers voorafgaand aan dienst",
+        "description": "Verstuurt herinneringen voor vrijwillige diensten."
+      },
+      "volunteer_post_shift": {
+        "name": "Feedback van vrijwilliger na dienst",
+        "description": "Vraagt om feedback na voltooide vrijwilligersdiensten."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "Aanmaning voor inactieve vrijwilliger",
+        "description": "Herinnert vrijwilligers die de laatste tijd niet actief zijn geweest."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "Verloop van vrijwilligerscertificaat",
+        "description": "Waarschuwing voor vrijwilligers over certificeringen en trainingen die binnenkort verlopen."
+      },
+      "recurring_shifts": {
+        "name": "Genereer terugkerende diensten",
+        "description": "Genereert aankomende vrijwillige diensten uit terugkerende sjablonen."
+      },
+      "volunteer_expire_consents": {
+        "name": "Verloop van voogdijtoestemmingen",
+        "description": "Laat voogdijtoestemmingsgegevens verlopen na hun vervaldatum."
+      },
+      "cleanup": {
+        "name": "Systeemopruiming",
+        "description": "Verwijdert verlopen tokens, oude wachtrijvermeldingen, API-tokens en trackinggegevens."
+      },
+      "geocode_batch": {
+        "name": "Batch-geocodering",
+        "description": "Geocodeer-leden en vermeldingen die coördinaten missen."
+      },
+      "event_reminders": {
+        "name": "Herinneringen aan evenementen",
+        "description": "Stuurt herinneringen voor komende evenementen."
+      },
+      "inactive_members": {
+        "name": "Detectie van inactieve leden",
+        "description": "Vindt en markeert inactieve leden voor opvolging."
+      },
+      "listing_expiry": {
+        "name": "Verwerking van vervaldatum van advertenties",
+        "description": "Laat advertenties verlopen na hun vervaldatum."
+      },
+      "listing_expiry_reminders": {
+        "name": "Herinneringen voor vervaldatum van advertenties",
+        "description": "Waarschuwt eigenaren van advertenties voordat een advertentie verloopt."
+      },
+      "job_expiry": {
+        "name": "Verloop van vacature",
+        "description": "Verloopt vacatures na hun sluitingsdatum."
+      },
+      "federation_weekly_digest": {
+        "name": "Maandelijkse federatie-overzicht",
+        "description": "Stuurt een overzicht van federatie-activiteiten naar deelnemende gemeenschappen."
+      },
+      "balance_alerts": {
+        "name": "Saldo-waarschuwingen",
+        "description": "Controleert de walletsaldos van de organisatie en stuurt waarschuwingen bij een laag saldo."
+      },
+      "goal_reminders": {
+        "name": "Doelherinneringen",
+        "description": "Stuurt herinneringen voor doelen die verlopen zijn of achter schema liggen."
+      },
+      "retry_failed_webhooks": {
+        "name": "Probeert mislukte webhooks opnieuw",
+        "description": "Probeert webhookleveringen die eerder zijn mislukt opnieuw."
+      },
+      "digest_emails": {
+        "name": "E-mailoverzicht verzender"
+      },
+      "badge_checker": {
+        "name": "Badge-toekenningcontroleur"
+      },
+      "streak_updater": {
+        "name": "Inlogreeks bijwerker"
+      }
+    },
+    "partner_logo_link_url": "Partnerlogo-link URL",
+    "registration_policy_settings_title": "Registratie & Identiteitsverificatie",
+    "auto_convert_webp_desc": "Maak WebP-versies van ondersteunde uploads voor kleinere afbeeldingsdownloads.",
+    "auto_resize_desc": "Formaat afbeeldingen die de geconfigureerde maximale afmetingen overschrijden.",
+    "desc_comma_separated_emails": "Voer één of meer e-mailadressen in, gescheiden door komma's.",
+    "desc_job_will_run_when_enabled": "Deze taak zal worden uitgevoerd volgens het geconfigureerde schema wanneer ingeschakeld.",
+    "desc_notify_on_failure": "Verstuur een e-mailmelding wanneer deze taak mislukt.",
+    "generate_thumbnails_desc": "Genereer kleinere miniatuurvarianten voor lijstingen, profielen en kaarten.",
+    "no_backups_available": "Geen back-ups beschikbaar",
+    "strip_exif_desc": "Verwijder EXIF-metadata van geüploade afbeeldingen voordat ze worden opgeslagen.",
+    "status_fail": "MISLUKKING",
+    "status_ok": "OK",
+    "placeholder_partner_logo_label": "Gemeenschapspartner",
+    "label_powered_by_url": "Link URL",
+    "platform_gcp": "GCP",
+    "currency_eur": "EUR - Euro",
+    "filter_section_header": "Filters",
+    "job_category_gamification": "Gamificatie",
+    "powered_by_branding_section": "Aangedreven door branding"
   },
   "verification": {
     "approve": "Goedkeuren",
@@ -1216,7 +1445,20 @@
     "n_pending_one": "{{count}} in behandeling",
     "n_pending_other": "{{count}} in behandeling",
     "total_events_one": "{{count}}-evenementen",
-    "total_events_other": "{{count}}-evenementen"
+    "total_events_other": "{{count}}-evenementen",
+    "provider_mock": "Nepprovider",
+    "provider_stripe_identity": "Stripe Identiteit",
+    "provider_idenfy": "iDenfy",
+    "provider_unknown": "Onbekende aanbieder",
+    "actor_type_system": "Systeem",
+    "actor_type_user": "Gebruiker",
+    "actor_type_admin": "Beheerder",
+    "actor_type_webhook": "Webhook",
+    "actor_type_unknown": "Onbekende actor",
+    "status_unknown": "Onbekende status",
+    "provider_veriff": "Veriff",
+    "provider_jumio": "Jumio",
+    "provider_onfido": "Onfido"
   },
   "cancel": "Annuleer"
 }

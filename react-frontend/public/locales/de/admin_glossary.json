@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Schweizer Franken – die Währung für Berechnungen vermiedener Kosten formeller Pflege in Caring-Community-Installationen",
+    "fadp": "Bundesgesetz über den Datenschutz – revidiertes Schweizer Datenschutzrecht (in Kraft seit September 2023)",
+    "ndsg": "Neues Datenschutzgesetz – das revidierte Schweizer Bundesgesetz über den Datenschutz (Synonym für FADP)",
+    "dsg": "Datenschutzgesetz – siehe nDSG / FADP",
+    "gdpr": "Datenschutz-Grundverordnung – EU-Datenschutzrecht; Schweizer Installationen verwenden stattdessen FADP/nDSG",
+    "sla": "Service-Level-Agreement – die maximale zugesagte Antwort- oder Lösungszeit für jede Prioritätsstufe",
+    "agpl": "GNU Affero General Public License v3 – die Open-Source-Lizenz, unter der NEXUS veröffentlicht wird",
+    "kpi": "Key Performance Indicator – eine messbare Kennzahl zur Bewertung des Fortschritts in Richtung eines definierten Ziels",
+    "roi": "Return on Investment – hier: eingesparte formelle Pflegekosten pro ausgetauschter informeller Unterstützungsstunde",
+    "nexus": "Projekt NEXUS – die mandantenfähige Timebanking- und Community-Care-Plattform",
+    "agm": "Jahreshauptversammlung",
+    "xp": "Erfahrungspunkte – Gamification-Punkte, die für abgeschlossene Austausche und erreichte Meilensteine vergeben werden",
+    "isco": "Internationale Standardklassifikation der Berufe – wird zur Kategorisierung von Arten von Pflegedienstleistungen verwendet"
+  }
+}

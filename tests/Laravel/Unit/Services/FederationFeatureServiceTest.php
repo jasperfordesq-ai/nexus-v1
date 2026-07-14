@@ -113,6 +113,12 @@ class FederationFeatureServiceTest extends TestCase
         $definitions = $this->service->getTenantFeatureDefinitions();
         $this->assertArrayHasKey(FederationFeatureService::TENANT_FEDERATION_ENABLED, $definitions);
         $this->assertArrayHasKey(FederationFeatureService::TENANT_MESSAGING_ENABLED, $definitions);
+        foreach ($definitions as $definition) {
+            $this->assertArrayHasKey('label_code', $definition);
+            $this->assertArrayHasKey('description_code', $definition);
+            $this->assertArrayNotHasKey('label', $definition);
+            $this->assertArrayNotHasKey('description', $definition);
+        }
     }
 
     public function test_addToWhitelist_returns_true_on_success(): void

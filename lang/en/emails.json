@@ -16,9 +16,6 @@
     "title": "Safeguarding certification expired",
     "body": ":name's community safeguarding certification for :community expired on :date. It no longer authorises safeguarded member contact until a broker or administrator renews it."
   },
-  "vetting": {
-    "review_action": "Review certification"
-  },
   "gdpr_request": {
     "subject": "We've received your data request",
     "title": "Request received",
@@ -284,7 +281,8 @@
     "level_integrated": "Integrated"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Review certification"
   },
   "group_digest": {
     "subject": "Monthly Digest: {{group}}",

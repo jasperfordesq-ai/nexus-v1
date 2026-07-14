@@ -81,7 +81,7 @@ export function Segments() {
         onDeleteClose();
         setDeleteTarget(null);
       } else {
-        showError(res.error || t('common.an_unexpected_error'));
+        showError(t('common.an_unexpected_error'));
       }
     } catch {
       showError(t('common.an_unexpected_error'));

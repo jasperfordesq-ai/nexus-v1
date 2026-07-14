@@ -114,7 +114,7 @@ export function GdprBreaches() {
       sortable: true,
       render: (b) => (
         <Chip size="sm" variant="soft" color={severityColorMap[b.severity] || 'default'} className="capitalize">
-          {b.severity}
+          {t(`enterprise.gdpr_severity_${b.severity}`, { defaultValue: t('enterprise.gdpr_severity_unknown') })}
         </Chip>
       ),
     },

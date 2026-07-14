@@ -15,6 +15,7 @@ import { api,
   tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
+import { languageDisplayName } from '@/lib/languageDisplayName';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
 import { Button } from '@/components/ui/Button';
@@ -26,7 +27,6 @@ import {
 } from '@/components/ui/Dropdown';
 interface Language {
   code: string;
-  label: string;
   /** Short display label shown in the trigger button */
   short: string;
 }
@@ -36,17 +36,17 @@ interface Language {
  * supported_languages config will be shown to the user.
  */
 const ALL_LANGUAGES: Language[] = [
-  { code: 'en', label: 'English', short: 'EN' },
-  { code: 'ga', label: 'Gaeilge', short: 'GA' },
-  { code: 'de', label: 'Deutsch', short: 'DE' },
-  { code: 'fr', label: 'Français', short: 'FR' },
-  { code: 'it', label: 'Italiano', short: 'IT' },
-  { code: 'pt', label: 'Português', short: 'PT' },
-  { code: 'es', label: 'Español', short: 'ES' },
-  { code: 'nl', label: 'Nederlands', short: 'NL' },
-  { code: 'pl', label: 'Polski', short: 'PL' },
-  { code: 'ja', label: '日本語', short: 'JA' },
-  { code: 'ar', label: 'العربية', short: 'AR' },
+  { code: 'en', short: 'EN' },
+  { code: 'ga', short: 'GA' },
+  { code: 'de', short: 'DE' },
+  { code: 'fr', short: 'FR' },
+  { code: 'it', short: 'IT' },
+  { code: 'pt', short: 'PT' },
+  { code: 'es', short: 'ES' },
+  { code: 'nl', short: 'NL' },
+  { code: 'pl', short: 'PL' },
+  { code: 'ja', short: 'JA' },
+  { code: 'ar', short: 'AR' },
 ];
 
 interface LanguageSwitcherProps {
@@ -66,7 +66,8 @@ export function LanguageSwitcher({ compact = true, triggerClassName }: LanguageS
   // If current language isn't in the tenant's list, fall back to the first supported one
   const currentLang = supportedLanguages.find((l) => l.code === i18n.language)
     ?? supportedLanguages[0]
-    ?? { code: 'en', label: 'English', short: 'EN' };
+    ?? { code: 'en', short: 'EN' };
+  const currentLangLabel = languageDisplayName(currentLang.code, i18n.resolvedLanguage);
 
   const handleLanguageChange = (code: string) => {
     i18n.changeLanguage(code);
@@ -89,13 +90,13 @@ export function LanguageSwitcher({ compact = true, triggerClassName }: LanguageS
           variant="light"
           size="sm"
           className={triggerClassName ?? 'text-theme-muted hover:text-theme-primary gap-1 min-w-0'}
-          aria-label={t('aria.current_language', { language: currentLang.label })}
+          aria-label={t('aria.current_language', { language: currentLangLabel })}
           startContent={<Globe className="w-4 h-4 shrink-0" aria-hidden="true" />}
         >
           {compact ? (
             <span className="text-xs font-medium">{currentLang.short}</span>
           ) : (
-            <span className="text-sm">{currentLang.label}</span>
+            <span className="text-sm">{currentLangLabel}</span>
           )}
         </Button>
       </DropdownTrigger>
@@ -114,7 +115,7 @@ export function LanguageSwitcher({ compact = true, triggerClassName }: LanguageS
             className={lang.code === currentLang.code ? 'bg-theme-active' : ''}
           >
             <span className="font-medium text-xs text-theme-subtle me-2">{lang.short}</span>
-            <span>{lang.label}</span>
+            <span>{languageDisplayName(lang.code, i18n.resolvedLanguage)}</span>
           </DropdownItem>
         ))}
       </DropdownMenu>

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,12 +67,12 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "Algartam sláinte á lódáil...",
     "404_entry_dismissed": "Briseadh 404 iontráil",
     "a_i_settings_saved_successfully": "D'éirigh le Socruithe AI a shábháil",
@@ -121,7 +120,7 @@
     "copied": "Cóipeáladh",
     "copy": "Cóip",
     "create_redirect": "Cruthaigh Atreorú",
-    "custom_robots_txt": "Robots Saincheaptha.txt",
+    "custom_robots_txt": "Robots.txt Saincheaptha",
     "delete": "Scrios",
     "delete_redirect_message": "Scrios Atreorú",
     "delete_redirect_title": "Scrios Atreorú",
@@ -166,7 +165,6 @@
     "failed_to_save_feed_algorithm_settings": "Theip ar shábháil socruithe algartam fothaí",
     "failed_to_save_s_e_o_settings": "Theip ar shábháil socruithe Sinsearach",
     "failed_to_send_test_email": "Theip ar sheoladh ríomhphoist tástála",
-    "feature_ai_analytics": "AI Analytics",
     "feature_ai_analytics_desc": "Léargais a ghin an AI ó ghníomhaíocht phobail",
     "feature_ai_chat": "Cúntóir Comhrá AI",
     "feature_ai_chat_desc": "Comhrá AI in-ardán do chomhaltaí",
@@ -225,7 +223,6 @@
     "label_model": "Múnla",
     "label_open_graph": "Oscail Graf",
     "label_password": "Pasfhocal",
-    "label_port": "Port",
     "label_refresh_token": "Comhartha Athnuaigh",
     "label_reload_matches": "Athlódáil Meaitseanna",
     "label_search_users": "Cuardaigh Úsáideoirí",
@@ -276,13 +273,12 @@
     "placeholder_gocspx": "GOCSPX-xxxxxx",
     "placeholder_my_timebank": "Mo Bhanc Ama...",
     "placeholder_noreply_example": "noreply@example.com",
-    "placeholder_robots_txt": "Gníomhaire Úsáideora: *\nDícheadaigh: /admin/",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxxx...",
     "placeholder_search_users_by_name_or_email": "Cuardaigh Úsáideoirí de réir Ainm nó Ríomhphost...",
-    "placeholder_smtpexamplecom": "Smtpexamplecom...",
     "placeholder_smtp_port": "587",
-    "placeholder_test_example": "tástáil@example.com",
-    "placeholder_user_example": "úsáideoir@sampla.com",
+    "placeholder_test_example": "test@example.com",
+    "placeholder_user_example": "user@example.com",
     "placeholder_welcome_to_our_community": "Fáilte go dtí ár bPobal...",
     "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
     "placeholder_your_timebank_name": "D'ainm Banc Ama...",
@@ -410,7 +406,6 @@
     "label_ollama_host_url": "URL Óstach Olama",
     "last_run_label": "Rith Last",
     "meta_description_count": "{{count}}/160 carachtar meiti-thuairisce",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "Réamhamharc Íomhá OG",
     "param_activity_weight": "Gníomhaíocht Meáchan",
     "param_activity_weight_desc": "Cé chomh láidir is a threisíonn gníomhaíocht le déanaí rangú",
@@ -460,10 +455,8 @@
     "placeholder_current_key": "Cuir isteach reatha:{{masked}}",
     "provider_configuration_heading": "Cumraíocht Soláthraí",
     "provider_anthropic": "Antraipeach (Claude)",
-    "provider_gemini": "Google Gemini",
     "provider_gmail_api": "Gmail API",
     "provider_ollama": "Ollama (féin-óstach)",
-    "provider_openai": "Oscail AI",
     "provider_platform_default": "Réamhshocrú Ardán",
     "provider_sendgrid": "SeolGrid",
     "provider_smtp": "SMTP",
@@ -505,7 +498,6 @@
       "workflows": {
         "title": "Cad atá tú ag iarraidh a dhéanamh?",
         "description": "Tosaigh leis an tasc simplí, ansin bain úsáid as an táb a osclaíonn sé. Coinníonn sé seo gnáthobair ar shiúl ó na rialuithe contúirteacha.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "Tionónta amháin a athnuachan",
           "body": "Úsáid nuair a d’athraigh ábhar poiblí do phobal amháin. Cuir isteach a seilide tionónta roimh obair scuaine."
@@ -525,21 +517,22 @@
         "check_tenant_safety": {
           "title": "Seiceáil go bhfuil tionónta amháin sábháilte",
           "body": "Scrúdaigh go díreach cad ba cheart a bheith ag an tionónta seo, cad a shábháiltear, agus an mbaineann aon phictiúir in áit eile."
-        }
+        },
+        "open": "Oscailte"
       },
       "analytics": {
         "actions": {
           "reload": "Athlódáil"
         },
         "columns": {
-          "crawler": "CRAWLER",
-          "hits": "HITS",
-          "host": "HOST",
           "ip": "IP",
-          "status": "STATUS",
-          "time": "TIME",
           "uri": "URI",
-          "url": "URL"
+          "url": "URL",
+          "crawler": "Cráifeachán",
+          "hits": "Buillí",
+          "host": "Óstach",
+          "status": "Stádas",
+          "time": "Am"
         },
         "empty": "Níl aon anailísíocht ar fáil. Seans go bhfuil loga rochtana bot folamh.",
         "empty_bot_traffic": "Níl aon trácht bot fós",
@@ -604,13 +597,13 @@
           "refresh_all_stale_two": "Athnuaigh an seanscéal ({{count}})"
         },
         "columns": {
-          "actions": "ACTIONS",
-          "asset": "ASSET",
-          "coverage": "COVERAGE",
-          "host": "HOST",
-          "missing": "MISSING",
-          "stale": "STALE",
-          "tenant": "TENANT"
+          "actions": "Gníomhartha",
+          "asset": "Sócmhainn",
+          "coverage": "Clúdach",
+          "host": "Óstach",
+          "missing": "Ar cailleadh",
+          "stale": "Seanaim",
+          "tenant": "Tiarnóir"
         },
         "confirm": {
           "queue_recache": "Reache scuaine do thionóntaí {{count}}?",
@@ -750,11 +743,19 @@
           "last_failed_pass": "An rith dheireanach ar theip air",
           "sched_prerender-detect-drift": "Buille croí braite sruth",
           "sched_prerender-auto-recache": "Buille croí uathoibríoch-recache",
-          "sched_prerender-reap-stale": "Buille croí glanta seanphoist"
+          "sched_prerender-reap-stale": "Buille croí glanta seanphoist",
+          "unknown": "Seiceáil anaithnid"
         },
         "issue_count_few": "{{count}} saincheisteanna",
         "issue_count_many": "{{count}} saincheisteanna",
-        "issue_count_two": "{{count}} saincheisteanna"
+        "issue_count_two": "{{count}} saincheisteanna",
+        "remediation": "Gníomh: {{detail}}",
+        "statuses": {
+          "green": "Sláintiúil",
+          "yellow": "Rabhadh",
+          "red": "Criticiúil",
+          "unknown": "Stádas anaithnid"
+        }
       },
       "inventory": {
         "truncated": "Shroich an fardal teorainn sábháilteachta {{count}} cóip. Cúngaigh scagaire na dtionóntaí sula ndéanann tú ollghníomh.",
@@ -821,7 +822,6 @@
           "age": "Aois",
           "all_valid": "ar fad bailí",
           "asset_references": "Tagairtí sócmhainní ({{count}})",
-          "canonical": "Canonical",
           "dead_assets": "{{count}} marbh",
           "flags": "Bratacha",
           "h1_count": "H1 (comhaireamh)",
@@ -840,7 +840,6 @@
           "modified": "Athraithe",
           "must_fix": "Ní mór a shocrú ({{count}})",
           "no_structured_data": "Gan sonraí struchtúrtha",
-          "no_type": "(gan @cineál)",
           "none": "(aon cheann)",
           "old": "{{age}} d'aois",
           "open_graph": "Oscail Graf",
@@ -868,7 +867,9 @@
           "dead_assets_many": "{{count}} marbh",
           "dead_assets_one": "{{count}} marbh",
           "dead_assets_other": "{{count}} marbh",
-          "dead_assets_two": "{{count}} marbh"
+          "dead_assets_two": "{{count}} marbh",
+          "no_type": "(níl @type)",
+          "canonical": "Canonach"
         },
         "selected": "{{count}} roghnaithe",
         "status": {
@@ -1030,7 +1031,6 @@
       "audit": {
         "actions": {
           "reset_all": "Athshocraigh agus atóg iad uile",
-          "auto_recache": "Auto-recache",
           "cancel": "Cealaigh post",
           "detect_drift": "Braith sruth",
           "enqueue": "Athnuachan scuaine",
@@ -1038,7 +1038,9 @@
           "purge": "Scrios grianghraif",
           "purge_unexpected": "Glan pictiúir gan choinne",
           "reset_breaker": "Athshocraigh breaker sábháilteachta",
-          "reset_queue": "Deisiúchán scuaine bhfostú"
+          "reset_queue": "Deisiúchán scuaine bhfostú",
+          "unknown": "Gníomh anaithnid",
+          "auto_recache": "Uathoibríoch-athchaighdeánú"
         },
         "buttons": {
           "export_csv": "Easpórtáil CSV",
@@ -1068,9 +1070,10 @@
         },
         "table_aria": "Stair iniúchta",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "Toradh anaithnid",
+          "denied": "Diúltaithe",
+          "failed": "Theip",
+          "ok": "Críochnaithe"
         },
         "details_empty": "Gan sonraí breise"
       },
@@ -1117,7 +1120,6 @@
           "unexpected": "Cóipeanna sábháilte lasmuigh de phleananna bealaí reatha na dtionóntaí",
           "active_jobs": "{{count}} gníomhach",
           "aging": "{{count}} ag dul in aois (>7d)",
-          "asset_broken": "Tagairtí marbh /sócmhainní/*",
           "backoff_window": "I bhfuinneog chúltaca 6h",
           "cache_age": "{{oldest}} is sine / {{newest}} is nuaí",
           "content_stale": "Bunábhar níos nuaí ná an pictiúr",
@@ -1134,7 +1136,8 @@
           "active_jobs_many": "{{count}} gníomhach",
           "active_jobs_one": "{{count}} gníomhach",
           "active_jobs_other": "{{count}} gníomhach",
-          "active_jobs_two": "{{count}} gníomhach"
+          "active_jobs_two": "{{count}} gníomhach",
+          "asset_broken": "Tagairtí marbh /assets/*"
         },
         "kpi": {
           "age_stale": "Aois sean (>14d)",
@@ -1155,8 +1158,8 @@
           "job_queued": "Cuireadh jab #{{id}} sa scuaine"
         },
         "placeholders": {
-          "routes": "/faoi,/blog (bán = uile)",
-          "tenant_slug": "e.g. banc uair-ama (bán = uile)"
+          "tenant_slug": "e.g. banc uair-ama (bán = uile)",
+          "routes": "/about,/blog (folamh = uile)"
         },
         "super_admin_only": "Sár-riarachán amháin"
       },
@@ -1170,7 +1173,6 @@
           "continue_to_delete": "Lean ar aghaidh ag craoladh beo"
         },
         "description_middle": "do mhír cosáin amháin,",
-        "description_prefix": "Scrios pictiúir a thagann le patrún glob. Úsáid",
         "description_suffix": "do shliocht ar bith. Samplaí:",
         "all_tenants_warning": {
           "body": "Má fhágtar seilide tionóntaí bán, scriosfar na pictiúir chomhoiriúnaithe thar gach tionónta. Níl sé seo ach le haghaidh glanta ar fud an ardáin tar éis duit réamhamharc a dhéanamh ar na comhaid chruinne.",
@@ -1231,7 +1233,8 @@
           "ready_one": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
           "ready_other": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
           "ready_two": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc."
-        }
+        },
+        "description_prefix": "Scrios na splancphictiúir HTML sábháilte a oireann don phatrún bealaigh. Cuir sloic tenant nuair a bhaineann an t-iompar le tenant amháin. Úsáid"
       },
       "ttl_inspector": {
         "actions": {
@@ -1245,13 +1248,18 @@
         },
         "path_only": "Conair amháin - gan aon scéim nó óstach",
         "placeholders": {
-          "route": "/blog/mo-phost"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "mheaitseáil: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (sonraíocht {{specificity}})",
           "other_patterns": "Patrúin eile a mheaitseálann an bealach seo:",
-          "ttl": "TTL:{{ttl}}({{seconds}}s)"
+          "ttl": "TTL:{{ttl}}({{seconds}}s)",
+          "sources": {
+            "default": "Riail réamhshocraithe",
+            "pattern": "Paitearn ag teacht",
+            "unknown": "Foinse anaithnid"
+          }
         },
         "title": "TTL cigire",
         "units": {
@@ -1364,14 +1372,14 @@
           "needs_attention_two": "Ní mór aird a thabhairt ar mhír {{count}}"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "Beartaithe",
+          "missing": "Ar cailleadh",
+          "unexpected": "Neamhghnách",
+          "stale": "Seanaim",
+          "static": "Statach",
+          "sitemap": "Suíomhléarscáil",
+          "snapshots": "Sábháilte",
+          "asset_invalid": "Sócmhainní"
         },
         "sections": {
           "attention_limited": "Tá {{shown}} as {{total}} cóip shábháilte a bhfuil aird de dhíth orthu á dtaispeáint.",
@@ -1381,10 +1389,10 @@
         "empty": "Cuir isteach slug tionónta chun a phlean bealaigh a iniúchadh agus pictiúir shábháilte.",
         "empty_attention": "Níl aon phictiúir in easnamh, sean, sócmhainní-briste nó gan choinne ag an tionónta seo.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
-          "status": "Status",
-          "why": "Cén fáth go bhfuil sé anseo"
+          "why": "Cén fáth go bhfuil sé anseo",
+          "route": "Bealach",
+          "source": "Foinse",
+          "status": "Stádas"
         },
         "tables": {
           "attention_aria": "Míreanna seat de thionóntaí ar gá aird a thabhairt orthu"
@@ -1392,12 +1400,12 @@
         "sources": {
           "static": "Bealach statach",
           "sitemap": "Bealach léarscáil an tsuímh",
-          "unexpected": "Unexpected"
+          "unexpected": "Neamhghnách"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "Eisiúint sócmhainní",
-          "content": "Ábhar seanchaite"
+          "content": "Ábhar seanchaite",
+          "unexpected": "Neamhghnách"
         },
         "reasons": {
           "sitemap": "Arna fhoilsiú ag an mapa suímh tionónta seo mar ábhar poiblí.",
@@ -1420,9 +1428,9 @@
           "body": "Is féidir pictiúir gan choinne a bhaint de ghnáth leis an uirlis glanta in Forbhreathnú. Réamhamharc ar dtús, mar sin ná cuir i bhfeidhm ach amháin nuair atá an liosta tionóntaí i gceart."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "Nua",
+          "stale": "Seanaim",
+          "warn": "Seanú"
         }
       }
     },
@@ -1456,13 +1464,12 @@
     "next_public": {
       "title": "Next.js ullmhacht aghaidh phoiblí",
       "description": "Stádas scáthmhóid inléite amháin don aghaidh phoiblí Next.js. Ní chumasaíonn an leathanach seo ródú poiblí ná ní athraíonn sé iompar réamhthairisceana.",
-      "refresh": "Refresh",
       "loading": "Réiteach aghaidh phoiblí Next.js á lódáil",
       "error": "Níorbh fhéidir ullmhacht Next.js a luchtú.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "Ródú táirgeachta",
-        "prerender": "Cúltaca réamhshocraithe"
+        "prerender": "Cúltaca réamhshocraithe",
+        "mode": "Mód"
       },
       "values": {
         "shadow_mode": "Mod scáth",
@@ -1500,8 +1507,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "Bealach poiblí Laravel GET",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "Níl bealach Laravel cláraithe",
+        "auth": "Éilíonn bealach Laravel fíordheimhniú"
       },
       "edge_canary": {
         "title": "Réamhamharc imeall chanáracha",
@@ -1516,7 +1523,6 @@
         "included_by_deploy": "Áirithe ag imscaradh",
         "not_included_by_deploy": "Nach n-áirítear trí imscaradh",
         "route_audit_title": "Iniúchadh bealaigh teimpléad",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "Bealaí poiblí amháin",
         "not_public_only": "Ní bealaí poiblí amháin iad",
         "no_private_collisions": "Gan imbhuailtí ar bhealach príobháideach",
@@ -1530,7 +1536,8 @@
         "preview_only": "Réamhamharc amháin",
         "not_preview_only": "Níl an modh réamhamhairc deimhnithe",
         "reviewed_config_required": "Cumraíocht athbhreithnithe ag teastáil",
-        "explicit_instruction_required": "Teagasc gearrtha ar leith ag teastáil"
+        "explicit_instruction_required": "Teagasc gearrtha ar leith ag teastáil",
+        "exact_path_count": "{{count}} cosáin chruinne"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1541,9 +1548,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil",
         "next_shadow_checks_required": "Seiceálacha scáth seo chugainn ag teastáil",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Ní mór go bhfanfadh cúltaca réamhthairisceora"
+        "prerender_fallback_must_remain": "Ní mór go bhfanfadh cúltaca réamhthairisceora",
+        "apache_configtest_required": "Tástáil cumraíochta Apache riachtanach",
+        "react_private_regression_required": "Riachtanach athfhillteachais bealach-príobháideach React"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Ná cuir vhosts Plesk in eagar go díreach",
@@ -1553,21 +1560,21 @@
       },
       "route_batches": {
         "title": "Ullmhacht bhaisc bealaigh",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} bealaí"
       },
       "remaining_route_work": {
         "title": "Obair bealaí poiblí atá fágtha",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} Bealach le tacaíocht API",
         "api_backed_routes_plural": "{{count}} Bealaí a bhfuil tacaíocht API acu",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
-        "activation_unavailable": "Gan rialuithe gníomhachtaithe"
+        "activation_unavailable": "Gan rialuithe gníomhachtaithe",
+        "route_count": "{{count}} bealaí",
+        "public_routes": "{{count}} bealach poiblí",
+        "public_routes_plural": "{{count}} bealaí poiblí",
+        "remaining_routes": "{{count}} bealach fós",
+        "remaining_routes_plural": "{{count}} bealaí fós",
+        "unclassified_routes": "{{count}} slí neamhghnách",
+        "unclassified_routes_plural": "{{count}} srlí neamhghnácha"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "Bealaí statacha/athbhreithnithe láimhe",
@@ -1626,13 +1633,13 @@
       },
       "artifacts": {
         "title": "Fardal déantán réitithe",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "Orduithe riachtanacha",
         "required_before_cutover": "Ag teastáil roimh réitithe",
         "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
-        "no_activation_control": "Gan rialuithe gníomhachtaithe"
+        "no_activation_control": "Gan rialuithe gníomhachtaithe",
+        "path": "Cosán",
+        "present": "I láthair",
+        "missing": "Ar cailleadh"
       },
       "artifact_items": {
         "route_ownership_manifest": "Léiriú ar úinéireacht bealaigh",
@@ -1643,11 +1650,11 @@
         "prerender_fallback": "Cúltaca réamhshocraithe"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "Cumraíocht Imeall",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "manifest": "Faisnéis",
+        "runtime": "Am Rithe",
+        "guard": "Garda",
+        "fallback": "Eileamh"
       },
       "production_effects": {
         "none": "Gan éifeacht táirgeachta"
@@ -1656,13 +1663,13 @@
         "title": "Incháilitheacht aisíocaíocht",
         "eligible": "Incháilithe le haghaidh réitithe",
         "blocked": "Níl sé incháilithe le haghaidh gearrtha siar",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} Bealaí poiblí a bhfuil tacaíocht API acu",
         "remaining_public_routes": "{{count}} na bealaí poiblí atá fágtha",
         "activation_available": "Rialuithe gníomhachtaithe ar fáil",
         "activation_unavailable": "Gan rialuithe gníomhachtaithe",
-        "blockers": "Blockers",
-        "required_actions": "Gníomhartha riachtanacha"
+        "required_actions": "Gníomhartha riachtanacha",
+        "blockers": "Bacáin",
+        "public_routes": "{{count}} bealaí poiblí"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "Tá bac ar bhailíochtú follasach",
@@ -1697,15 +1704,15 @@
         "prerender_retained": "Coinnítear an t-aischur réamhthairisceana reatha",
         "vite_private_routes_retained": "Tá úinéireacht bhealaigh phríobháideach Vite fós i gcónaí",
         "public_edge_not_configured": "Níl aon bhealach imeall táirgeachta cumraithe le haghaidh Next.js",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Tá tástálacha paireacht fós ag teastáil roimh aon athrúchán"
+        "parity_tests_required_before_cutover": "Tá tástálacha paireacht fós ag teastáil roimh aon athrúchán",
+        "apache_canary_template_not_included": "Níl an teimpléad canar Apache á áireamh ag an imscaradh"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
-        "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "pass": "Pas",
+        "blocker": "Bac",
+        "info": "Eolas",
+        "fail": "Theip",
+        "blocked": "Blocáilte"
       },
       "runtime": {
         "title": "Am rite scáth",
@@ -1727,9 +1734,9 @@
         "monitor_and_keep_prerender_fallback": "Monatóireacht a dhéanamh ar fhreagraí agus coinnigh réamhléiritheoir ar fáil mar chúltaca go dtí go gcruthófar paireacht."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} cuir in eagar/cruthaigh patrúin go príobháideach"
+        "private_patterns": "{{count}} cuir in eagar/cruthaigh patrúin go príobháideach",
+        "public_routes": "{{count}} bealaí poiblí",
+        "private_prefixes": "{{count}} réamhfhocail phríobháideacha"
       },
       "validation": {
         "title": "Bailíochtú follasach",
@@ -1795,7 +1802,8 @@
         "public_routes_only": "Bealaí poiblí amháin",
         "do_not_remove_prerender": "Ná bain an réamhbhabhta ar ais.",
         "rollback_path_required": "Tá gá le cosán aisfhillte"
-      }
+      },
+      "refresh": "Athnuaigh"
     },
     "health_meta_description_length_few": "Carachtair{{count}}(idéalach: 150–160)",
     "health_meta_description_length_many": "Carachtair{{count}}(idéalach: 150–160)",
@@ -1858,7 +1866,97 @@
     "total_count_one": "Iomlán: {{count}}",
     "total_count_other": "Iomlán: {{count}}",
     "total_count_two": "Iomlán: {{count}}",
-    "score_out_of": "as {{maximum}}"
+    "score_out_of": "as {{maximum}}",
+    "component_match_score_aria": "{{component}} scór: {{score}}%",
+    "placeholder_default_title_suffix": "| Mo Bhangar Ama",
+    "placeholder_meta_keywords": "bangaireacht ama, pobal, malartú",
+    "sitemap_content_type_unknown": "Ábhar eile",
+    "sitemap_content_type_blog_posts": "Postaí blag",
+    "sitemap_content_type_events": "Imeachtaí",
+    "sitemap_content_type_groups": "Grúpaí",
+    "sitemap_content_type_jobs": "Postanna",
+    "sitemap_content_type_listings": "Liostálacha",
+    "sitemap_content_type_members": "Baill",
+    "sitemap_content_type_pages": "Leathanaigh",
+    "sitemap_content_type_podcasts": "Podchraoltaí",
+    "sitemap_content_type_resources": "Acmhainní",
+    "sitemap_content_type_volunteering": "Deonú",
+    "seo_audit_check_blog_meta_description_one": "Seiceálann {{count}} post bhlag foilsithe do teidil agus tuairiscí meta",
+    "seo_audit_check_blog_meta_description_other": "Seiceálann {{count}} poist bhlag foilsithe do theidil agus tuairiscí meta",
+    "seo_audit_check_blog_meta_name": "Meiteashonraí Post Bhlag",
+    "seo_audit_check_canonical_urls_description": "Seiceálann comhdhéanamh URL canónach agus sármhíniú saincheaptha",
+    "seo_audit_check_canonical_urls_name": "URLanna Canónacha",
+    "seo_audit_check_content_quality_description": "Seiceanna le haghaidh ábhar tanaí, teidil atá ar iarraidh, agus saincheisteanna eile maidir le cáilíocht ábhair",
+    "seo_audit_check_content_quality_name": "Comharthaí Cáilíochta Ábhair",
+    "seo_audit_check_duplicate_titles_description": "Seiceanna le haghaidh teidil meta dúblacha ar fud an ábhair fhoilsithe",
+    "seo_audit_check_duplicate_titles_name": "Teidil Meta Uathúla",
+    "seo_audit_check_kb_meta_description_one": "Seiceanna {{count}} alt bunachar eolais foilsithe le haghaidh teideal bailí",
+    "seo_audit_check_kb_meta_description_other": "Seiceálann {{count}} ailt bhunachar eolais foilsithe le teidil bhailí",
+    "seo_audit_check_kb_meta_name": "Méadracht Eolais Altan Bhunachar",
+    "seo_audit_check_open_graph_description": "Seiceálann Socrú Grafaic Oscailte agus Cárta Twitter",
+    "seo_audit_check_open_graph_name": "Méadracht Roinnt Sóisialta",
+    "seo_audit_check_page_meta_description_one": "Seiceálann {{count}} leathanach CMS foilsithe le méadracht",
+    "seo_audit_check_page_meta_description_other": "Seiceálann {{count}} leathanaigh fhoilsithe CMS maidir le meiteashonraí",
+    "seo_audit_check_page_meta_name": "Meiteashonraí Leathanach CMS",
+    "seo_audit_check_redirect_health_description_one": "Seiceálann {{count}} atreoruithe cumraithe do shlabhraí, lúibíní, agus féinatreoruithe",
+    "seo_audit_check_redirect_health_description_other": "Seiceálann {{count}} atreoruithe cumraithe do shlabhraí, lúibíní, agus féinatreoruithe",
+    "seo_audit_check_redirect_health_name": "Sláinte Atreoruithe",
+    "seo_audit_check_seo_settings_description": "Seiceálann sé an bhfuil URLanna cannóin, clibeanna Open Graph, agus Cártaí Twitter cumasaithe",
+    "seo_audit_check_seo_settings_name": "Cumraíocht SEO",
+    "seo_audit_check_sitemap_coverage_description_one": "Seiceálann sé clúdach léarscáil láithreáin le haghaidh URL {{count}}",
+    "seo_audit_check_sitemap_coverage_description_other": "Seiceálann sé clúdach léarscáil láithreáin le haghaidh URLanna {{count}}",
+    "seo_audit_check_sitemap_coverage_name": "Clúdach Léarscáil Láithreáin",
+    "seo_audit_check_tenant_metadata_description": "Seiceálann teideal meite, cur síos meite, agus teideal H1 leathanach baile an tionónta",
+    "seo_audit_check_tenant_metadata_name": "Meiteashonraí Leathanach Baile",
+    "seo_audit_check_unknown_description": "Ní thacaítear leis an seiceáil iniúchta seo sa leagan seo den phainéal riaracháin",
+    "seo_audit_check_unknown_name": "Seiceáil Iniúchta Anaithnid",
+    "seo_audit_issue_additional_results_truncated": "B'fhéidir go bhfuil níos mó fadhbanna ann; ní léirítear ach na chéad {{limit}}.",
+    "seo_audit_issue_blog_post_meta_missing": "Tá teideal meta nó tuairisc ar blogphost “{{title}}” ({{path}}) in easnamh.",
+    "seo_audit_issue_canonical_generation_disabled": "Tá gléasú URL canonach faoi mhúchadh, rud a chruthaíonn riosca ábhar dúblach.",
+    "seo_audit_issue_canonical_urls_not_enabled": "Níl URLanna canónacha cumasaithe.",
+    "seo_audit_issue_cms_page_meta_title_missing": "Tá teideal meta ar leathanach CMS “{{title}}” ({{path}}) in easnamh.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "Tá URL chanta féin ag leathanach {{count}}; dearbhaigh go bhfuil sé fós bailí.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "Tá URLanna chanta féin ag leathanacha {{count}}; dearbhaigh go bhfuil siad fós bailí.",
+    "seo_audit_issue_duplicate_meta_title_one": "Tá an teideal meta “{{title}}” á úsáid {{count}} uair.",
+    "seo_audit_issue_duplicate_meta_title_other": "Tá an teideal meta “{{title}}” á úsáid {{count}} uaireanta.",
+    "seo_audit_issue_homepage_meta_title_too_long": "Tá fad {{length}} carachtar ag teideal meta an leathanaigh bhaile; is é {{max}} an fad uasta.",
+    "seo_audit_issue_kb_article_titles_missing_one": "Tá teideal folamh ag alt eolais fhoilsithe {{count}}.",
+    "seo_audit_issue_kb_article_titles_missing_other": "Tá teidil fholamh ag alt eolais fhoilsithe {{count}}.",
+    "seo_audit_issue_legacy_result_requires_rerun": "Úsáideann an saincheist shábháilte seo sean-fhormáid. Rith an iniúchadh arís chun na sonraí iomlána a fháil.",
+    "seo_audit_issue_meta_description_too_long": "Tá fad {{length}} carachtar ag cur síos meta na leathanach baile; is é {{max}} an fad uasta.",
+    "seo_audit_issue_meta_description_too_short": "Tá fad {{length}} carachtar ag cur síos meta na leathanach baile; is é {{min}} an fad íosta.",
+    "seo_audit_issue_missing_homepage_h1": "Tá ceannlíne H1 in easnamh ar an leathanach baile.",
+    "seo_audit_issue_missing_homepage_meta_title": "Tá teideal meta réamhshocraithe in easnamh ar an leathanach baile.",
+    "seo_audit_issue_missing_meta_description": "Tá cur síos réamhshocraithe meta ar an láithreán baile ar iarraidh.",
+    "seo_audit_issue_open_graph_default_image_missing": "Níl íomhá réamhshocraithe Open Graph cumraithe, mar sin ní bheidh íomhá le feiceáil i roinnt sóisialta.",
+    "seo_audit_issue_open_graph_not_enabled": "Níl na clibeanna Open Graph cumasaithe.",
+    "seo_audit_issue_open_graph_sharing_disabled": "Tá clibeanna Open Graph díchumasaithe, mar sin úsáidfear réamhamharcanna ginearálta i roinnt sóisialta.",
+    "seo_audit_issue_redirect_chain": "Slabhra athstoinne: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "Fáinne athmharaithe: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "Athmharú féin: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "Níl aon URLanna sa léarscáil láithreáin, mar sin níl aon ábhar á innéacsú uaidh.",
+    "seo_audit_issue_sitemap_low_coverage_one": "Tá ach {{count}} URL sa léarscáil láithreáin, rud a léiríonn clúdach an-íseal.",
+    "seo_audit_issue_sitemap_low_coverage_other": "Tá ach {{count}} URLanna sa léarscáil láithreáin, rud a léiríonn clúdach an-íseal.",
+    "seo_audit_issue_sitemap_profiles_missing": "Níl aon phróifílí ball sa léarscáil shuímh, cé go bhfuilthar súil go mbeadh roinnt ann.",
+    "seo_audit_issue_sitemap_static_pages_missing": "Níl aon leathanaigh shocra sa léarscáil shuímh, cé go bhfuilthar súil go mbeadh roinnt ann.",
+    "seo_audit_issue_thin_blog_content_one": "Tá níos lú ná {{minimum}} carachtar sa phost blag foilsithe ag {{count}}; is féidir le hábhar tanaí dochar a dhéanamh don Sinsearach.",
+    "seo_audit_issue_thin_blog_content_other": "Tá níos lú ná {{minimum}} carachtar sna poist blag foilsithe ag {{count}}; is féidir le hábhar tanaí dochar a dhéanamh don Sinsearach.",
+    "seo_audit_issue_title_suffix_missing": "Níl aon iarscríbhinn teidil cumraithe, mar shampla “ | Ainm an Phobail”.",
+    "seo_audit_issue_twitter_cards_disabled": "Tá Twitter Cards dífhorchraithe.",
+    "seo_audit_issue_twitter_cards_not_enabled": "Níl Twitter Cards cumasaithe.",
+    "seo_audit_issue_unknown": "Ní thugann an leagan seo den phainéal riaracháin tacaíocht don fhadhb iniúchta seo.",
+    "seo_audit_issue_untitled_published_pages_one": "Níl teideal ag an leathanach a fhoilsíodh le {{count}}.",
+    "seo_audit_issue_untitled_published_pages_other": "Níl teideal ag leathanaigh fhoilsithe {{count}}.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "Luchtú",
+    "no_audit_results_prompt": "Níl torthaí iniúchta fós",
+    "provider_openai": "OpenAI",
+    "feature_ai_analytics": "AI Anailísíocht",
+    "label_port": "Port",
+    "placeholder_smtpexamplecom": "Smtpexamplecom...",
+    "provider_gemini": "Google Géimini"
   },
   "email_deliverability": {
     "title": "Inseachadacht Ríomhphoist",
@@ -2274,6 +2372,27 @@
     "trigger_coverage_many": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
     "trigger_coverage_one": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
     "trigger_coverage_other": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
-    "trigger_coverage_two": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}"
+    "trigger_coverage_two": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "categories": {
+      "billing": "Billeáil",
+      "civic_digest": "Achoimre cathartha",
+      "donation_receipt": "Slánú deonach",
+      "event_reminder": "Meabhrúchán imeachta",
+      "federation_connection": "Nasc na Comhdhála",
+      "federation_message": "Teachtaireacht na Comhdhála",
+      "federation_review": "Athbhreithniú na Comhdhála",
+      "federation_transaction": "Idirbheart na Comhdhála",
+      "goal_reminder": "Meabhrúchán sprioc",
+      "job_interview": "Agallamh poist",
+      "listing_expiry": "Éagtha liosta",
+      "marketplace_dispute": "Díospóid mhargaidh",
+      "marketplace_rating": "Rátáil mhargaidh",
+      "newsletter": "Nuachtlitir",
+      "safeguarding": "Cosaint",
+      "safeguarding_review": "Athbhreithniú cosanta",
+      "volunteer_reminder": "Cuimhneamh deonach",
+      "not_available": "Ní ar fáil",
+      "unknown": "Catagóir ríomhphoist eile"
+    }
   }
 }

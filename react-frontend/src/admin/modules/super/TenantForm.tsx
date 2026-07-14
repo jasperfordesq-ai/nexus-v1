@@ -34,6 +34,7 @@ import Eye from 'lucide-react/icons/eye';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { languageDisplayName } from '@/lib/languageDisplayName';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { SuperAdminTenant, SuperAdminTenantDetail, CreateTenantPayload } from '../../api/types';
@@ -65,17 +66,17 @@ const COUNTRY_CODES = [
 const SERVICE_AREAS = ['local', 'regional', 'national', 'international'];
 
 const PLATFORM_LANGUAGES = [
-  { code: 'en', label: 'English', short: 'EN' },
-  { code: 'ga', label: 'Gaeilge', short: 'GA' },
-  { code: 'de', label: 'Deutsch', short: 'DE' },
-  { code: 'fr', label: 'Français', short: 'FR' },
-  { code: 'it', label: 'Italiano', short: 'IT' },
-  { code: 'pt', label: 'Português', short: 'PT' },
-  { code: 'es', label: 'Español', short: 'ES' },
+  { code: 'en', short: 'EN' },
+  { code: 'ga', short: 'GA' },
+  { code: 'de', short: 'DE' },
+  { code: 'fr', short: 'FR' },
+  { code: 'it', short: 'IT' },
+  { code: 'pt', short: 'PT' },
+  { code: 'es', short: 'ES' },
 ];
 
 export function TenantForm() {
-  const { t } = useTranslation('admin_super');
+  const { t, i18n } = useTranslation('admin_super');
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!id;
@@ -292,7 +293,7 @@ export function TenantForm() {
           navigate(tenantPath(newId ? `/super-admin/tenants/${newId}` : '/super-admin/tenants'));
         }
       } else {
-        toast.error(res.error || (isEdit ? t('tenant_form.failed_to_update_tenant') : t('tenant_form.failed_to_create_tenant')));
+        toast.error(isEdit ? t('tenant_form.failed_to_update_tenant') : t('tenant_form.failed_to_create_tenant'));
       }
     } catch {
       toast.error(t('tenant_form.an_error_occurred'));
@@ -663,7 +664,7 @@ export function TenantForm() {
                   form.supported_languages.includes(l.code)
                 ).map((lang) => (
                   <SelectItem key={lang.code} id={lang.code}>
-                    {lang.label} ({lang.short})
+                    {languageDisplayName(lang.code, i18n.resolvedLanguage)} ({lang.short})
                   </SelectItem>
                 ))}
               </Select>
@@ -690,7 +691,7 @@ export function TenantForm() {
                       }}
                     >
                       <span className="text-sm">
-                        {lang.label} ({lang.short})
+                        {languageDisplayName(lang.code, i18n.resolvedLanguage)} ({lang.short})
                         {lang.code === 'en' && (
                           <span className="ml-2 text-xs text-muted">{t('tenant_form.always_enabled')}</span>
                         )}

@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -126,10 +126,31 @@
       "reports": "Denuncias abiertas"
     },
     "review_values": {
-      "visibility": { "public": "Público", "members": "Miembros", "private": "Privado", "inherit": "Heredar del programa" },
-      "media_scan": { "pending": "Análisis pendiente", "clean": "Limpio", "infected": "Infectado", "scan_unavailable": "Analizador no disponible", "not_required": "No requerido" },
-      "media_processing": { "pending": "Pendiente", "ready_for_processing": "Listo para procesar", "complete": "Completado", "failed": "Fallido" },
-      "report_status": { "open": "Abierto", "resolved": "Resuelto", "dismissed": "Descartado", "escalated": "Escalado" }
+      "visibility": {
+        "public": "Público",
+        "members": "Miembros",
+        "private": "Privado",
+        "inherit": "Heredar del programa"
+      },
+      "media_scan": {
+        "pending": "Análisis pendiente",
+        "clean": "Limpio",
+        "infected": "Infectado",
+        "scan_unavailable": "Analizador no disponible",
+        "not_required": "No requerido"
+      },
+      "media_processing": {
+        "pending": "Pendiente",
+        "ready_for_processing": "Listo para procesar",
+        "complete": "Completado",
+        "failed": "Fallido"
+      },
+      "report_status": {
+        "open": "Abierto",
+        "resolved": "Resuelto",
+        "dismissed": "Descartado",
+        "escalated": "Escalado"
+      }
     },
     "readiness": {
       "moderation": "Moderación",
@@ -167,7 +188,8 @@
       "missing_artwork": "Añade una imagen al programa para que esté listo para los directorios de pódcasts.",
       "episode_missing_audio_url": "A un episodio le falta una URL HTTP de audio válida.",
       "episode_missing_audio_length": "A un episodio le falta el tamaño del archivo de audio.",
-      "episode_missing_audio_mime": "A un episodio le falta el tipo MIME del audio."
+      "episode_missing_audio_mime": "A un episodio le falta el tipo MIME del audio.",
+      "unknown": "El feed tiene un problema no reconocido."
     },
     "columns": {
       "title": "Título",
@@ -192,7 +214,8 @@
       "safety": "Seguridad o daño",
       "spam": "Spam o contenido engañoso",
       "rights": "Problema de derechos de autor u otros derechos",
-      "other": "Otro"
+      "other": "Otro",
+      "unknown": "Razón no reconocida"
     },
     "stats": {
       "total_shows": "Programas",

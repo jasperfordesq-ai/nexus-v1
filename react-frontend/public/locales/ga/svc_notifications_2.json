@@ -169,7 +169,7 @@
     "item_not_found": "Níor aimsíodh an scuaine modhnóireachta.",
     "already_reviewed": "Tá athbhreithniú déanta ar an mír seo cheana féin.",
     "rejection_reason_required": "Tá cúis diúltaithe ag teastáil.",
-    "content_decision": "Ábhar: Cinneadh."
+    "content_decision": "Tá an t-ábhar :decision."
   },
   "tenant_settings": {
     "pending_verification": "Tá d'fhíorú aitheantais ar feitheamh. Fan le faomhadh.",
@@ -182,9 +182,9 @@
     "connection_successful": "Ceangal rathúil",
     "ollama_not_configured": "URL óstaigh Ollama gan a bheith cumraithe",
     "ollama_cannot_connect": "Ní féidir ceangal le Ollama: :error",
-    "ollama_connected": "Ceangailte le hOllama (:samhlacha comhairimh ar fáil)",
     "ollama_http_error": "Chuir Ollama HTTP :code ar ais",
-    "provider_error": "Tharla earráid agus d'iarratas AI á phróiseáil. Bain triail eile as."
+    "provider_error": "Tharla earráid agus d'iarratas AI á phróiseáil. Bain triail eile as.",
+    "ollama_connected": "Ceangailte le Ollama (tá :count samhlacha ar fáil)"
   },
   "report_export": {
     "no_data": "Níor aimsíodh aon sonraí don tuarascáil agus do na scagairí roghnaithe."

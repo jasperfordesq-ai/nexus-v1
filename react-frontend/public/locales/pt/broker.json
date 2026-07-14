@@ -321,7 +321,10 @@
     "members_error_title": "Não foi possível carregar os membros pendentes",
     "members_error_hint": "A fila de aprovação falhou ao carregar. Tente novamente para a obter.",
     "retry": "Tentar novamente",
-    "empty_pending_title": "Tudo em dia"
+    "empty_pending_title": "Tudo em dia",
+    "stage_first_listing": "Primeira Listagem",
+    "stage_repeat_user": "Usuário Recorrente",
+    "stage_unknown": "Estágio desconhecido"
   },
   "safeguarding": {
     "title": "Proteção",
@@ -1128,7 +1131,7 @@
     "field_show_broker_name_help": "Mostrar o nome do mediador atribuído aos membros.",
     "field_broker_contact_email_label": "E-mail de contacto do mediador",
     "field_broker_contact_email_help": "E-mail público de contacto para pedidos ao mediador.",
-    "field_broker_contact_email_placeholder": "corretor@exemplo.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "E-mail de contacto do mediador",
     "field_broker_approval_required_label": "Aprovação do mediador obrigatória",
     "field_broker_approval_required_help": "Exigir a aprovação do mediador antes de as trocas poderem prosseguir.",
@@ -1290,7 +1293,8 @@
     "pending_confirmation": "Aguarda confirmação",
     "confirmed": "Confirmado",
     "review_requested": "Revisão solicitada",
-    "not_confirmed": "Não confirmado"
+    "not_confirmed": "Não confirmado",
+    "unknown": "Desconhecido"
   },
   "common": {
     "loading": "Carregando...",

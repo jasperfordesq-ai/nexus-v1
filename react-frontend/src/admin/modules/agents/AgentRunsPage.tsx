@@ -122,13 +122,13 @@ export default function AgentRunsPage() {
                   onClick={() => setExpanded(expanded === r.id ? null : r.id)}
                 >
                   <TableCell>{r.id}</TableCell>
-                  <TableCell>{r.agent_type}</TableCell>
+                  <TableCell>{t(`agents.agent_type.${r.agent_type}`, { defaultValue: t('common.unknown') })}</TableCell>
                   <TableCell>
                     {r.started_at ? new Date(r.started_at).toLocaleString(getFormattingLocale()) : t('agents.common.empty_dash')}
                   </TableCell>
                   <TableCell>
                     <Chip size="sm" variant="soft" color={statusColor(r.status)}>
-                      {t(`agents.run_status.${r.status}`, r.status)}
+                      {t(`agents.run_status.${r.status}`, { defaultValue: t('common.unknown') })}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -138,8 +138,12 @@ export default function AgentRunsPage() {
                     })}
                   </TableCell>
                   <TableCell>{r.llm_input_tokens} / {r.llm_output_tokens}</TableCell>
-                  <TableCell>${(r.cost_cents / 100).toFixed(4)}</TableCell>
-                  <TableCell>{r.triggered_by ?? t('agents.common.empty_dash')}</TableCell>
+                  <TableCell>{new Intl.NumberFormat(getFormattingLocale(), { style: 'currency', currency: 'USD', minimumFractionDigits: 4 }).format(r.cost_cents / 100)}</TableCell>
+                  <TableCell>
+                    {r.triggered_by
+                      ? t(`agents.triggered_by.${r.triggered_by}`, { defaultValue: t('common.unknown') })
+                      : t('agents.common.empty_dash')}
+                  </TableCell>
                 </TableRow>,
               ];
               if (expanded === r.id) {

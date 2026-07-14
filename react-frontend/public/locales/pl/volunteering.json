@@ -837,7 +837,7 @@
     "add_group_member": "Dodaj członka grupy",
     "add_member_description": "Wpisz adres e-mail osoby, którą chcesz dodać do tej rezerwacji grupowej. Otrzymają zaproszenie do przyłączenia się.",
     "email_label": "Adres e-mail",
-    "email_placeholder": "członek@przyklad.com",
+    "email_placeholder": "member@example.com",
     "searching": "Badawczy...",
     "lookup_error": "Nie można wyszukać członka. Spróbuj ponownie.",
     "no_member_found": "Nie znaleziono żadnego członka o tym adresie e-mail.",

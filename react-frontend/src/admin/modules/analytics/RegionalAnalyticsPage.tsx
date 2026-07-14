@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentRatio, formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,12 +104,21 @@ type TabData =
   | HelpRequestData
   | { error: string };
 
+type AnalyticsLoadError = 'data_unavailable' | 'load_failed';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
 function isError(data: unknown): data is { error: string } {
-  return typeof data === 'object' && data !== null && 'error' in data;
+  return typeof data === 'object'
+    && data !== null
+    && 'error' in data
+    && typeof (data as { error?: unknown }).error === 'string';
+}
+
+function getLoadErrorCode(data: { error: string }): AnalyticsLoadError {
+  return data.error === 'data_unavailable' ? 'data_unavailable' : 'load_failed';
 }
 
 const AGE_GROUP_LABEL_KEYS: Record<string, string> = {
@@ -128,7 +137,7 @@ const AGE_GROUP_ORDER = ['under_25', '25_34', '35_44', '45_54', '55_64', '65_plu
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TabPanel({ loading, error, t, children }: { loading: boolean; error: string | null; t: AdminT; children: React.ReactNode }) {
+function TabPanel({ loading, error, t, children }: { loading: boolean; error: AnalyticsLoadError | null; t: AdminT; children: React.ReactNode }) {
   if (loading) {
     return (
       <div role="status" aria-busy="true" aria-label={t('analytics.regional.loading.section')} className="flex items-center justify-center py-16">
@@ -141,7 +150,7 @@ function TabPanel({ loading, error, t, children }: { loading: boolean; error: st
       <div role="alert" className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
         {error === 'data_unavailable'
           ? t('analytics.regional.errors.data_unavailable')
-          : t('analytics.regional.errors.load_data', { error })}
+          : t('analytics.regional.errors.failed_to_load_data')}
       </div>
     );
   }
@@ -158,7 +167,7 @@ function PercentBar({ label, value, total, color = 'bg-accent' }: { label: strin
         <div className={`h-full rounded-full ${color}`} style={{ width: `${width}%`, minWidth: width > 0 ? 4 : 0 }} />
       </div>
       <div className="w-20 shrink-0 text-sm text-muted">
-        {value.toLocaleString(getFormattingLocale())} ({width}%)
+        {value.toLocaleString(getFormattingLocale())} ({formatPercentValue(width)})
       </div>
     </div>
   );
@@ -248,7 +257,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
           {data.languages.slice(0, 12).map((l) => (
             <PercentBar
               key={l.language}
-              label={l.language.toUpperCase()}
+              label={new Intl.DisplayNames([getFormattingLocale()], { type: 'language' }).of(l.language) ?? t('analytics.regional.demographics.unknown_language')}
               value={l.count}
               total={totalLang}
               color="bg-surface-tertiary"
@@ -389,7 +398,7 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
           <CardBody className="p-4">
             <p className="text-xs text-muted">{t('analytics.regional.volunteer.reciprocity_ratio')}</p>
             <p className="text-2xl font-bold text-accent">
-              {(data.reciprocity_ratio * 100).toFixed(1)}%
+              {formatPercentRatio(data.reciprocity_ratio)}
             </p>
             <p className="text-xs text-muted">{t('analytics.regional.volunteer.reciprocity_description')}</p>
           </CardBody>
@@ -445,7 +454,9 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
             <TableBody>
               {data.by_category.map((row) => (
                 <TableRow key={row.category}>
-                  <TableCell className="font-medium capitalize">{row.category}</TableCell>
+                  <TableCell className="font-medium">
+                    {t(`analytics.regional.help.categories.${row.category}`, { defaultValue: t('analytics.regional.help.categories.unknown') })}
+                  </TableCell>
                   <TableCell>{row.total.toLocaleString(getFormattingLocale())}</TableCell>
                   <TableCell>{row.resolved_count.toLocaleString(getFormattingLocale())}</TableCell>
                   <TableCell>
@@ -454,7 +465,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
                       variant="tertiary"
                     >
-                      {row.resolution_rate}%
+                      {formatPercentValue(row.resolution_rate)}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -495,7 +506,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
                       variant="tertiary"
                     >
-                      {row.resolution_rate}%
+                      {formatPercentValue(row.resolution_rate)}
                     </Chip>
                   </TableCell>
                 </TableRow>
@@ -523,13 +534,13 @@ export default function RegionalAnalyticsPage() {
   const [period, setPeriod] = useState<Period>('last_30d');
   const [overviewData, setOverviewData] = useState<OverviewData | null>(null);
   const [overviewLoading, setOverviewLoading] = useState(false);
-  const [overviewError, setOverviewError] = useState<string | null>(null);
+  const [overviewError, setOverviewError] = useState<AnalyticsLoadError | null>(null);
   const [invalidating, setInvalidating] = useState(false);
 
   // Per-tab data state
   const [tabData, setTabData] = useState<Record<string, TabData | null>>({});
   const [tabLoading, setTabLoading] = useState<Record<string, boolean>>({});
-  const [tabError, setTabError] = useState<Record<string, string | null>>({});
+  const [tabError, setTabError] = useState<Record<string, AnalyticsLoadError | null>>({});
 
   // Track which tabs have been loaded for the current period
   const loadedTabs = useRef<Set<string>>(new Set());
@@ -544,16 +555,16 @@ export default function RegionalAnalyticsPage() {
       const res = await api.get(`${BASE}/overview`);
       const data = (res.data as Record<string, unknown>)?.data ?? res.data;
       if (isError(data)) {
-        setOverviewError(data.error);
+        setOverviewError(getLoadErrorCode(data));
       } else {
         setOverviewData(data as OverviewData);
       }
     } catch {
-      setOverviewError(t('analytics.regional.errors.load_overview'));
+      setOverviewError('load_failed');
     } finally {
       setOverviewLoading(false);
     }
-  }, [t]);
+  }, []);
 
   // Load a specific tab's data
   const loadTab = useCallback(async (tabKey: string) => {
@@ -580,16 +591,16 @@ export default function RegionalAnalyticsPage() {
       const res = await api.get(endpoint);
       const data = (res.data as Record<string, unknown>)?.data ?? res.data;
       if (isError(data)) {
-        setTabError((prev) => ({ ...prev, [tabKey]: data.error }));
+        setTabError((prev) => ({ ...prev, [tabKey]: getLoadErrorCode(data) }));
       } else {
         setTabData((prev) => ({ ...prev, [tabKey]: data as TabData }));
       }
     } catch {
-      setTabError((prev) => ({ ...prev, [tabKey]: t('analytics.regional.errors.failed_to_load_data') }));
+      setTabError((prev) => ({ ...prev, [tabKey]: 'load_failed' }));
     } finally {
       setTabLoading((prev) => ({ ...prev, [tabKey]: false }));
     }
-  }, [period, t]);
+  }, [period]);
 
   // Initial load
   useEffect(() => {
@@ -736,7 +747,7 @@ export default function RegionalAnalyticsPage() {
         <div role="alert" className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
           {overviewError === 'data_unavailable'
             ? t('analytics.regional.errors.data_unavailable')
-            : overviewError}
+            : t('analytics.regional.errors.load_overview')}
         </div>
       )}
 

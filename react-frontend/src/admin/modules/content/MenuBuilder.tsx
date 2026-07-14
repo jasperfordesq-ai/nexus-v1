@@ -750,7 +750,7 @@ export function MenuBuilder() {
           })),
         );
         if (!res?.success) {
-          toast.error(res?.error || t('menu_builder.failed_to_save_reorder'));
+          toast.error(t('menu_builder.failed_to_save_reorder'));
           // Revert the optimistic reorder to the server's saved order
           await loadMenu();
         }
@@ -1013,7 +1013,9 @@ export function MenuBuilder() {
                   {(editForm.type === 'link' || editForm.type === 'external' || !editForm.type) && (
                     <Input
                       label={t('menu_builder.url')}
-                      placeholder={editForm.type === 'external' ? 'https://example.com' : '/dashboard'}
+                      placeholder={editForm.type === 'external'
+                        ? t('menu_builder.placeholder_external_url')
+                        : t('menu_builder.placeholder_internal_route')}
                       variant="secondary"
                       size="sm"
                       value={editForm.url || ''}

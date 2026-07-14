@@ -96,13 +96,13 @@ export default function ProjectAnnouncementsAdminPage() {
         `/v2/admin/caring-community/projects${suffix}`,
       );
       if (!res.success) {
-        setError(res.error ?? t('errors.load'));
+        setError(t('errors.load'));
         return;
       }
       setProjects(unwrapData<ProjectAnnouncement[]>(res.data ?? []) ?? []);
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.fetchProjects', err);
-      setError(err instanceof Error ? err.message : t('errors.load'));
+      setError(t('errors.load'));
     } finally {
       setLoading(false);
     }
@@ -136,14 +136,14 @@ export default function ProjectAnnouncementsAdminPage() {
         status: publishNow ? 'active' : 'draft',
       });
       if (!res.success) {
-        setError(res.error ?? t('errors.create'));
+        setError(t('errors.create'));
         return;
       }
       createModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.createProject', err);
-      setError(err instanceof Error ? err.message : t('errors.create'));
+      setError(t('errors.create'));
     } finally {
       setSubmitting(false);
     }
@@ -173,14 +173,14 @@ export default function ProjectAnnouncementsAdminPage() {
         status: publishUpdateNow ? 'published' : 'draft',
       });
       if (!res.success) {
-        setError(res.error ?? t('errors.update'));
+        setError(t('errors.update'));
         return;
       }
       updateModal.onClose();
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.createUpdate', err);
-      setError(err instanceof Error ? err.message : t('errors.update'));
+      setError(t('errors.update'));
     } finally {
       setSubmitting(false);
     }
@@ -191,13 +191,13 @@ export default function ProjectAnnouncementsAdminPage() {
     try {
       const res = await api.post(`/v2/admin/caring-community/projects/${projectId}/publish`);
       if (!res.success) {
-        setError(res.error ?? t('errors.publish'));
+        setError(t('errors.publish'));
         return;
       }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.publishProject', err);
-      setError(err instanceof Error ? err.message : t('errors.publish'));
+      setError(t('errors.publish'));
     } finally {
       setActionId(null);
     }
@@ -208,13 +208,13 @@ export default function ProjectAnnouncementsAdminPage() {
     try {
       const res = await api.put(`/v2/admin/caring-community/projects/${project.id}`, { status });
       if (!res.success) {
-        setError(res.error ?? t('errors.status'));
+        setError(t('errors.status'));
         return;
       }
       await fetchProjects();
     } catch (err: unknown) {
       logError('ProjectAnnouncementsAdminPage.setProjectStatus', err);
-      setError(err instanceof Error ? err.message : t('errors.status'));
+      setError(t('errors.status'));
     } finally {
       setActionId(null);
     }

@@ -78,7 +78,7 @@ class SuccessStoryAdminController extends BaseApiController
         $result = $this->service->updateStory(TenantContext::getId(), $storyId, $payload);
 
         if (isset($result['error']) && $result['error'] === 'not_found') {
-            return $this->respondNotFound('Success story not found.');
+            return $this->respondNotFound(__('api.success_story_not_found'));
         }
 
         if (isset($result['errors']) && $result['errors'] !== []) {
@@ -101,7 +101,7 @@ class SuccessStoryAdminController extends BaseApiController
         $result = $this->service->deleteStory(TenantContext::getId(), $storyId);
 
         if (isset($result['error']) && $result['error'] === 'not_found') {
-            return $this->respondNotFound('Success story not found.');
+            return $this->respondNotFound(__('api.success_story_not_found'));
         }
 
         return $this->respondWithData(['ok' => true]);
@@ -120,7 +120,7 @@ class SuccessStoryAdminController extends BaseApiController
         if (isset($result['error']) && $result['error'] === 'already_seeded') {
             return $this->respondWithError(
                 'ALREADY_SEEDED',
-                'Stories already exist — refusing to seed demo cards.',
+                __('api.success_stories_already_seeded'),
                 null,
                 409,
             );
@@ -143,20 +143,20 @@ class SuccessStoryAdminController extends BaseApiController
 
         if (isset($result['error'])) {
             return match ($result['error']) {
-                'not_found' => $this->respondNotFound('Success story not found.'),
+                'not_found' => $this->respondNotFound(__('api.success_story_not_found')),
                 'manual_metric' => $this->respondWithError(
                     'MANUAL_METRIC',
-                    'This story has a manual metric — there is nothing to refresh.',
+                    __('api.success_story_manual_metric'),
                     null,
                     422,
                 ),
                 'metric_unavailable' => $this->respondWithError(
                     'METRIC_UNAVAILABLE',
-                    'Live metric value is currently unavailable for this story.',
+                    __('api.success_story_metric_unavailable'),
                     null,
                     503,
                 ),
-                default => $this->respondServerError('Failed to refresh metric.'),
+                default => $this->respondServerError(__('api.success_story_metric_refresh_failed')),
             };
         }
 
@@ -174,7 +174,7 @@ class SuccessStoryAdminController extends BaseApiController
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
-            return $this->respondForbidden('Caring Community feature is not enabled for this tenant.');
+            return $this->respondForbidden(__('api.caring_community_feature_disabled'));
         }
 
         return null;

@@ -203,9 +203,7 @@ export function CategoriesAdmin() {
         closeModal();
         loadCategories();
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('categories.failed_to_load_categories');
+        const errorMsg = t('categories.failed_to_save_category');
         toast.error(errorMsg);
       }
     } else {
@@ -221,9 +219,7 @@ export function CategoriesAdmin() {
         closeModal();
         loadCategories();
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('categories.failed_to_load_categories');
+        const errorMsg = t('categories.failed_to_save_category');
         toast.error(errorMsg);
       }
     }
@@ -426,19 +422,19 @@ export function CategoriesAdmin() {
                       className="h-3 w-3 rounded-full"
                       style={{ '--swatch-color': String(item.key), backgroundColor: 'var(--swatch-color)' } as CSSProperties}
                     />
-                    <span className="capitalize">{String(item.key)}</span>
+                    <span>{t(`categories.color_${String(item.key)}`, { defaultValue: t('categories.color_unknown') })}</span>
                   </div>
                 ));
               }}
             >
               {COLOR_OPTIONS.map((color) => (
-                <SelectItem key={color} id={color} textValue={color}>
+                <SelectItem key={color} id={color} textValue={t(`categories.color_${color}`)}>
                   <div className="flex items-center gap-2">
                     <div
                       className="h-3 w-3 rounded-full"
                       style={{ '--swatch-color': color, backgroundColor: 'var(--swatch-color)' } as CSSProperties}
                     />
-                    <span className="capitalize">{color}</span>
+                    <span>{t(`categories.color_${color}`)}</span>
                   </div>
                 </SelectItem>
               ))}

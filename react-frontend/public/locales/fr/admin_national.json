@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,15 +67,15 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "national": {
     "trend_chart_aria": "Graphique montrant les tendances de l'activité communautaire au fil du temps"
   },
   "national_kiss_dashboard": {
-    "loading": "Loading",
     "meta": {
       "page_title": "Caring Community – Tableau de bord national",
       "title": "Caring Community – Tableau de bord national",
@@ -141,7 +140,8 @@
       "hours_axis": "Heures",
       "cooperatives_axis": "Coopératives",
       "active_cooperatives": "Coopératives actives",
-      "total_hours_all": "Heures totales (toutes les coopératives)"
+      "total_hours_all": "Heures totales (toutes les coopératives)",
+      "unknown_period": "Période inconnue"
     },
     "comparative": {
       "title": "Mesures comparatives",
@@ -160,12 +160,12 @@
       "recipients_title": "Bénéficiaires de soins atteints (tranche de protection de la vie privée)",
       "recipients": "Destinataires",
       "tandems_title": "Paires assistant/bénéficiaire récurrentes avec plus de 2 échanges terminés",
-      "tandems_sort": "Tandems <->",
       "retention_title": "% de membres actifs à la fois pendant cette période et la période équivalente précédente",
       "retention_sort": "Rétention <->",
       "reciprocity_title": "% de supporters qui ont également reçu des heures au cours de la période - indique la santé des échanges mutuels",
       "reciprocity_sort": "Réciprocité <->",
-      "status": "Statut"
+      "status": "Statut",
+      "tandems_sort": "Tandems <->"
     },
     "leaderboards": {
       "top_title": "Top 5 par heures",
@@ -181,6 +181,7 @@
     },
     "toasts": {
       "load_failed": "Échec du chargement du tableau de bord"
-    }
+    },
+    "loading": "Chargement"
   }
 }

@@ -88,6 +88,10 @@ export function FederationAuditLog() {
   const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
 
+  const actionLabel = (action: string) => t(`super.audit_action_${action}`, {
+    defaultValue: t('super.audit_action_unknown'),
+  });
+
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -262,7 +266,7 @@ export function FederationAuditLog() {
       key: 'description',
       label: t('super.label_description'),
       render: (entry) => (
-        <span className="text-sm">{entry.description || entry.action_type}</span>
+        <span className="text-sm">{entry.description || actionLabel(entry.action_type)}</span>
       ),
     },
     {

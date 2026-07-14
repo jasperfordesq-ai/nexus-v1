@@ -257,7 +257,7 @@ export function AiSettings() {
           setDirtyKeys(new Set());
         }
       } else {
-        const error = (res as { error?: string }).error || t('save_failed');
+        const error = t('save_failed');
         toast.error(error);
       }
     } catch {

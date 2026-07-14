@@ -740,7 +740,9 @@ class AdminConfigControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/background-jobs');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['*' => ['id', 'translation_key', 'status']]]);
+        $this->assertSame('digest_emails', $response->json('data.0.translation_key'));
+        $this->assertArrayNotHasKey('name', $response->json('data.0'));
     }
 
     // ================================================================
@@ -975,7 +977,12 @@ class AdminConfigControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/system/cron-jobs');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['*' => [
+            'id', 'slug', 'translation_key', 'command', 'schedule', 'status', 'category',
+        ]]]);
+        $this->assertSame('run_all', $response->json('data.0.translation_key'));
+        $this->assertArrayNotHasKey('name', $response->json('data.0'));
+        $this->assertArrayNotHasKey('description', $response->json('data.0'));
     }
 
     public function test_get_cron_jobs_returns_401_for_unauthenticated(): void

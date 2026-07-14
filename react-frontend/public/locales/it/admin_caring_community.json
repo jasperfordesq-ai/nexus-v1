@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,9 +67,10 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "admin": {
     "providers": {
@@ -396,10 +396,10 @@
       },
       "messages": {
         "recomputed": "Livelli di fiducia ricalcolati per {{count}} membri.",
-        "saved": "Trust tier settings saved.",
         "recomputed_one": "Livelli di fiducia ricalcolati per {{count}} membri.",
         "recomputed_other": "Livelli di fiducia ricalcolati per {{count}} membri.",
-        "recomputed_many": "Livelli di fiducia ricalcolati per {{count}} membri."
+        "recomputed_many": "Livelli di fiducia ricalcolati per {{count}} membri.",
+        "saved": "Configurazione del livello di fiducia salvata. Le modifiche saranno applicate al prossimo processo di ricalcolo."
       },
       "recompute_confirm": "Ricalcolare i livelli di fiducia per tutti i membri? L'operazione potrebbe richiedere alcuni minuti."
     },
@@ -631,10 +631,10 @@
     "intro": {
       "title": "Informazioni su questa pagina: da usare con cautela",
       "body": "Gli avvisi di emergenza sono trasmissioni urgenti inviate immediatamente a tutti i membri (o a un sottogruppo mirato). Utilizzalo solo in caso di emergenze reali: condizioni meteorologiche avverse, incidenti legati alla sicurezza della comunità o lacune nella copertura delle cure urgenti. Gli avvisi vengono inviati come notifiche push e banner in-app. Non possono essere annullati una volta spediti.",
-      "targeting_label": "Targeting",
       "targeting_body": "Selezionando la gravità \"Pericolo\" o \"Avvertenza\" si invia a tutti i membri. Redigere attentamente: non è previsto alcun richiamo una volta trasmesso.",
       "delivery_label": "Consegna",
-      "delivery_body": "Gli avvisi vengono consegnati entro 60 secondi dall'invio."
+      "delivery_body": "Gli avvisi vengono consegnati entro 60 secondi dall'invio.",
+      "targeting_label": "Targeting"
     },
     "actions": {
       "open_send_modal": "Invia avviso di emergenza",
@@ -691,8 +691,8 @@
   "caring_workflow": {
     "meta": {
       "page_title": "Flusso di lavoro della comunità premurosa",
-      "title": "Caring Community Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "title": "Flusso di lavoro della Comunità Accogliente",
+      "description": "Questa è la tua dashboard operativa giornaliera. Usala per rivedere le approvazioni delle ore in sospeso, monitorare gli elementi scaduti, gestire le assegnazioni dei coordinatori, generare rendiconti dei membri e configurare le politiche di flusso di lavoro. Gli elementi in sospeso che hanno superato il loro SLA appaiono evidenziati in ambra."
     },
     "actions": {
       "refresh": "Aggiorna",
@@ -708,7 +708,7 @@
       "workflow": "Caricamento del flusso di lavoro della comunità di cura..."
     },
     "toast": {
-      "load_failed": "Failed to load Caring Community workflow data."
+      "load_failed": "Impossibile caricare il flusso di lavoro della comunità premurosa."
     },
     "empty": {
       "value": "-",
@@ -717,8 +717,8 @@
     "stats": {
       "pending_reviews": "Revisioni in attesa",
       "pending_hours": "Ore pendenti",
-      "approved_30d": "Approved in 30 days",
-      "coordinators": "Coordinatori"
+      "coordinators": "Coordinatori",
+      "approved_30d": "Approvato (30g)"
     },
     "pending": {
       "title": "Recensioni in attesa",
@@ -759,30 +759,30 @@
       "age_days_many": "{{count}} giorno fa"
     },
     "paper_onboarding": {
-      "title": "Paper Form Intake",
-      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
-      "file_label": "Scanned form",
-      "name_label": "Extracted full name",
-      "name_placeholder": "Name on the paper form",
       "dob_label": "Data di nascita",
-      "email_label": "Extracted email",
-      "email_placeholder": "membro@esempio.com",
-      "phone_label": "Extracted phone",
-      "phone_placeholder": "+41 79 123 45 67",
-      "address_label": "Extracted address",
-      "address_placeholder": "Street, postcode, municipality",
-      "note_label": "Review note",
-      "note_placeholder": "What did the coordinator verify before creating the account?",
-      "upload_cta": "Upload For Review",
-      "confirm_cta": "Confirm And Create Account",
+      "email_placeholder": "member@example.com",
+      "phone_placeholder": "+1 555 123 4567",
       "review_cta": "Recensione",
-      "no_email": "No email captured",
-      "file_required": "Choose a scanned form first.",
       "load_failed": "Impossibile caricare le immissioni di onboarding della carta.",
       "upload_success": "Caricamento carta caricato.",
-      "upload_failed": "Could not upload the paper form.",
       "confirm_success": "Membro confermato e account creato.",
-      "confirm_failed": "Could not confirm this paper onboarding intake."
+      "title": "Onboarding cartaceo (OCR)",
+      "description": "Carica un modulo scansionato o una foto. Estrarremo i campi e ti permetteremo di verificare prima di creare l'account.",
+      "file_label": "Modulo scansionato o foto",
+      "name_label": "Nome completo",
+      "name_placeholder": "Come scritto sul modulo",
+      "email_label": "Email",
+      "phone_label": "Telefono",
+      "address_label": "Indirizzo",
+      "address_placeholder": "Via, città, codice postale",
+      "note_label": "Nota del coordinatore",
+      "note_placeholder": "Contesto opzionale per questa richiesta",
+      "upload_cta": "Carica e estrai",
+      "confirm_cta": "Conferma e crea account",
+      "no_email": "Nessuna email",
+      "file_required": "Scegli prima un file da caricare.",
+      "upload_failed": "Impossibile caricare la richiesta su carta.",
+      "confirm_failed": "Non è stato possibile confermare l'accettazione del documento."
     },
     "tandem": {
       "title": "Tandem Suggerimenti",
@@ -799,7 +799,17 @@
       "shared_interests": "Interessi condivisi",
       "score": "Punteggio {{value}}%",
       "dismiss": "Congedare",
-      "create": "Crea Tandem"
+      "create": "Crea Tandem",
+      "reason_join": "{{previous}}; {{next}}",
+      "reasons": {
+        "distance": "Vive a {{distance_km}} km di distanza",
+        "shared_language": "Condivide una lingua",
+        "complementary_skills": "Ha competenze complementari",
+        "availability_overlap": "Ha disponibilità compatibile",
+        "shared_interests": "Condivide interessi",
+        "intergenerational": "Offre un abbinamento intergenerazionale",
+        "overall_fit": "Mostra una compatibilità generale ragionevole"
+      }
     },
     "safeguarding": {
       "title": "Rapporti di salvaguardia",
@@ -839,7 +849,27 @@
       "age_days_one": "{{count}}d",
       "age_days_other": "{{count}}d",
       "age_hours_many": "{{count}}h",
-      "age_days_many": "{{count}}d"
+      "age_days_many": "{{count}}d",
+      "categories": {
+        "exploitation": "Sfruttamento",
+        "financial_concern": "Preoccupazione finanziaria",
+        "inappropriate_behavior": "Comportamento inadeguato",
+        "medical_concern": "Preoccupazione medica",
+        "neglect": "Trascuratezza",
+        "other": "Altro",
+        "unknown": "Categoria sconosciuta"
+      },
+      "history_actions": {
+        "assigned": "Assegnato",
+        "created": "Creato",
+        "dismissed": "Respinto",
+        "escalated": "Inoltrato",
+        "note_added": "Nota aggiunta",
+        "resolved": "Risolto",
+        "status_changed": "Stato cambiato",
+        "unknown": "Azione sconosciuta",
+        "triaged": "Smistato"
+      }
     },
     "role_pack": {
       "title": "Preimpostazioni di ruolo",
@@ -885,62 +915,62 @@
     },
     "policy": {
       "title": "Politica del flusso di lavoro",
-      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
       "save": "Salva politica",
-      "review_sla_days": "Review SLA days",
       "review_sla_days_description": "Le ore non riviste entro questo numero di giorni verranno contrassegnate come scadute in coda.",
-      "escalation_sla_days": "Escalation SLA days",
       "escalation_sla_days_description": "Gli articoli scaduti non trattati entro questo numero di giorni aggiuntivi verranno automaticamente riassegnati.",
-      "monthly_statement_day": "Statement day",
       "monthly_statement_day_description": "Giorno del mese in cui vengono generati gli estratti conto (es. 1 = 1 di ogni mese).",
-      "default_hour_value_chf": "Hour value CHF",
       "default_hour_value_chf_description": "Utilizzato per calcolare la stima del valore sociale su rendiconti e relazioni comunali.",
       "municipal_report_default_period": "Periodo di rapporto predefinito",
-      "approval_required": "Require hour approval",
-      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
       "auto_approve_trusted_reviewers": "Approva automaticamente i revisori attendibili",
-      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
-      "allow_member_self_log": "Allow member self logging",
-      "allow_member_self_log_description": "Members can record their own support activity before review.",
-      "require_organisation_for_partner_hours": "Require partner organisation",
-      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
       "include_social_value_estimate": "Includere la stima del valore sociale",
-      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
       "save_success": "Criterio del flusso di lavoro salvato.",
-      "save_failed": "Failed to save workflow policy.",
       "periods": {
         "last_30_days": "Ultimi 30 giorni",
         "last_90_days": "Ultimi 90 giorni",
         "year_to_date": "Anno fino ad oggi",
         "previous_quarter": "Trimestre precedente"
-      }
+      },
+      "review_sla_days": "Rivedi SLA (giorni)",
+      "escalation_sla_days": "Escalation SLA (giorni)",
+      "description": "Configura SLA, regole di approvazione e impostazioni predefinite per i rapporti. Le modifiche hanno effetto immediato al salvataggio e si applicano a tutte le nuove ore inserite da quel momento in poi.",
+      "monthly_statement_day": "Giorno del rendiconto mensile",
+      "default_hour_value_chf": "Valore predefinito delle ore (CHF)",
+      "approval_required": "Approvazione richiesta",
+      "approval_required_description": "Richiedere l'approvazione del coordinatore prima che le ore vengano aggiunte ai portafogli.",
+      "auto_approve_trusted_reviewers_description": "Saltare la coda per le ore registrate dai revisori fidati.",
+      "allow_member_self_log": "Consentire l'autoregistrazione dei membri",
+      "allow_member_self_log_description": "Permettere ai membri di registrare le proprie ore di supporto senza l'inserimento del coordinatore.",
+      "require_organisation_for_partner_hours": "Richiedere l'organizzazione per le ore dei partner",
+      "require_organisation_for_partner_hours_description": "Le ore fornite a nome dei partner devono essere collegate a un'organizzazione.",
+      "include_social_value_estimate_description": "Mostra il valore sociale stimato (CHF) su estratti conto e rapporti.",
+      "save_failed": "Impossibile salvare la politica del flusso di lavoro."
     },
     "member_statement": {
-      "title": "Member statements",
-      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
       "member_id": "ID membro",
-      "start_date": "From",
-      "end_date": "To",
       "preview": "Anteprima",
       "export_csv": "Esporta CSV",
       "approved_support_hours": "Orari di supporto approvati",
       "pending_support_hours": "Orari di supporto in sospeso",
       "wallet_hours_earned": "Ore di portafoglio guadagnate",
       "wallet_hours_spent": "Ore di portafoglio trascorse",
-      "empty": "Enter a member ID to generate a statement.",
       "chf_value": "Valore sociale stimato: CHF{{value}}",
       "invalid_member": "Inserisci un ID membro valido.",
-      "load_failed": "Failed to load the member statement.",
-      "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "title": "Estratti conto dei membri",
+      "description": "Genera una dichiarazione di ore e impatto per un singolo membro. Utilizza questo per condividere un registro formale delle loro ore di supporto, saldo del portafoglio e valore sociale stimato - utile per domande di sovvenzione, revisioni o richieste dei membri. Inserisci un ID membro e un intervallo di date opzionale, quindi anteprima o esporta in CSV.",
+      "start_date": "Data di inizio",
+      "end_date": "Data di fine",
+      "empty": "Inserisci un ID membro e premi Anteprima per visualizzare la loro dichiarazione.",
+      "load_failed": "Impossibile caricare l'estratto conto del membro.",
+      "export_success": "Estratto conto esportato.",
+      "export_failed": "Impossibile esportare l'estratto conto."
     },
     "signals": {
       "title": "Segnali del coordinatore",
-      "description": "Quick operating indicators for matching, oversight, and partner activity.",
-      "active_requests": "Active requests",
-      "active_offers": "Active offers",
       "trusted_organisations": "Organizzazioni fidate",
-      "declined_30d": "Declined in 30 days"
+      "active_requests": "Richieste di supporto attive",
+      "active_offers": "Offerte di supporto attivo",
+      "description": "Una panoramica in tempo reale delle attività che potrebbero richiedere l'attenzione del coordinatore - richieste aperte, offerte disponibili, organizzazioni fidate e rifiuti recenti.",
+      "declined_30d": "Rifiutato (30 giorni)"
     },
     "favours": {
       "title": "Bomboniere informali",
@@ -952,27 +982,36 @@
       "unknown": "Sconosciuto",
       "total_recorded_one": "{{count}} totale registrato",
       "total_recorded_other": "{{count}} totale registrato",
-      "total_recorded_many": "{{count}} totale registrato"
+      "total_recorded_many": "{{count}} totale registrato",
+      "categories": {
+        "transport": "Trasporto",
+        "companionship": "Compagnia",
+        "household": "Aiuto domestico",
+        "technology": "Aiuto con la tecnologia",
+        "other": "Altro",
+        "unknown": "Non categorizzato",
+        "shopping": "Shopping"
+      }
     },
     "assisted_onboarding": {
-      "title": "Assisted Onboarding",
-      "description": "Create a member account on behalf of a participant who cannot self-register.",
       "name_label": "Nome completo",
-      "name_placeholder": "e.g. Marie Curie",
-      "email_label": "Email address",
-      "email_placeholder": "membro@esempio.com",
+      "email_placeholder": "member@example.com",
       "phone_label": "Telefono (facoltativo)",
-      "phone_placeholder": "+41 79 123 45 67",
+      "phone_placeholder": "+1 555 123 4567",
       "note_label": "Nota del coordinatore (facoltativa)",
-      "note_placeholder": "e.g. Met at Tuesday drop-in",
-      "create_cta": "Create Member Account",
       "required": "Nome ed email sono obbligatori.",
-      "created": "Member account created successfully.",
-      "create_failed": "Could not create member account. Please check the email is not already registered.",
-      "created_for": "Account created for {{name}} ({{email}})",
-      "password_note": "The member should change this password on first login.",
       "copy": "Copia",
-      "copied": "Copiato!"
+      "copied": "Copiato!",
+      "title": "Onboarding assistito",
+      "description": "Crea un account per conto di un membro che non può registrarsi da solo, quindi condividi la sua password temporanea.",
+      "name_placeholder": "Nome completo del membro",
+      "email_label": "Email",
+      "note_placeholder": "Qualsiasi cosa il coordinatore dovrebbe ricordare",
+      "create_cta": "Crea account membro",
+      "created": "Account membro creato.",
+      "create_failed": "Impossibile creare l'account membro.",
+      "created_for": "Account creato per {{name}} ({{email}}).",
+      "password_note": "Condividi questa password temporanea con il membro. Verrà richiesto di cambiarla al primo accesso."
     },
     "invite_codes": {
       "title": "Codici di invito",
@@ -1006,28 +1045,28 @@
       }
     },
     "stages": {
-      "title": "Caring Community operating model",
-      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
       "intake": {
         "title": "Assunzione",
-        "description": "A member, family, organisation, or coordinator records a need or offer."
+        "description": "Accogliere i nuovi membri e raccogliere le loro esigenze di supporto."
       },
       "match": {
         "title": "Partita",
-        "description": "Coordinators connect people, organisations, or trusted volunteers."
+        "description": "Abbinare sostenitori e destinatari in base alle competenze e alla disponibilità."
       },
       "log": {
-        "title": "Log hours",
-        "description": "Support time is recorded against the member, organisation, or activity."
+        "title": "Registrare le ore",
+        "description": "Raccogliere le ore di supporto man mano che si verificano."
       },
       "verify": {
         "title": "Verifica",
-        "description": "A trusted coordinator approves or declines the logged hours."
+        "description": "I coordinatori revisionano e approvano le ore registrate."
       },
       "statement": {
         "title": "Dichiarazione",
-        "description": "Accepted hours feed member statements and municipal evidence packs."
-      }
+        "description": "Emettere estratti conto mensili e rapporti di impatto."
+      },
+      "title": "Fasi del flusso di lavoro",
+      "description": "La pipeline della comunità premurosa in cinque fasi a colpo d'occhio."
     },
     "predictive": {
       "title": "Approfondimenti predittivi",
@@ -1079,6 +1118,51 @@
         "critical": "Critico",
         "warning": "Avvertimento",
         "info": "Informazioni"
+      },
+      "load_failed": "Impossibile caricare le previsioni.",
+      "confidence_levels": {
+        "high": "Alto",
+        "medium": "Medio",
+        "low": "Basso"
+      },
+      "alert_actions": {
+        "see_suggestions": "Vedi suggerimenti",
+        "view_members": "Visualizza membri",
+        "review_now": "Revisiona ora",
+        "reassign_reviews": "Riassegna revisioni",
+        "open_reports": "Apri report",
+        "view_tandems": "Visualizza tandem",
+        "view_listings": "Visualizza annunci"
+      },
+      "alerts": {
+        "recipients_without_tandem": {
+          "title": "Destinatari senza un sostenitore abituale",
+          "message": "Questi membri hanno ricevuto aiuto negli ultimi sei mesi ma non hanno un tandem ricorrente attivo. Abbinali a un sostenitore stabile per rafforzare la continuità."
+        },
+        "inactive_members": {
+          "title": "I membri precedentemente attivi sono diventati silenziosi",
+          "message": "Questi membri hanno registrato ore negli ultimi sei mesi ma non negli ultimi 30 giorni. Un controllo amichevole potrebbe aiutarli a ri-coinvolgersi."
+        },
+        "overdue_reviews": {
+          "title": "Le revisioni delle ore hanno superato il livello di servizio.",
+          "message": "Queste registrazioni di ore in sospeso hanno più di {{sla}} giorni. Approvale o escalale in modo che i membri ricevano il loro credito."
+        },
+        "coordinators_overloaded": {
+          "title": "I coordinatori sono sovraccarichi",
+          "message": "Uno o più coordinatori hanno più di 10 revisioni in sospeso. Riassegna il lavoro prima che si sviluppi un collo di bottiglia."
+        },
+        "retention_dropping": {
+          "title": "La partecipazione attiva dei membri sta diminuendo",
+          "message": "Il numero di membri attivi di questo mese ({{current}}) è inferiore al {{threshold_percent}}% della media recente degli ultimi {{months}} mesi ({{average}}). Considera un invito mirato per il coinvolgimento."
+        },
+        "overdue_check_ins": {
+          "title": "I check-in in tandem sono in ritardo",
+          "message": "Queste relazioni ricorrenti attive hanno superato il loro check-in programmato. Contatta entrambi i partecipanti per confermare che stanno bene."
+        },
+        "low_supply": {
+          "title": "Le categorie hanno domanda insoddisfatta",
+          "message": "Le richieste attive superano le offerte disponibili in queste categorie. Evidenziale ai potenziali sostenitori."
+        }
       }
     },
     "relationships": {
@@ -1132,10 +1216,10 @@
       }
     },
     "invite_card": {
-      "brand": "Community Caring",
       "subtitle": "Invito da vicino a vicino",
       "instructions": "Inserisci questo codice o visita il link sottostante per iscriverti.",
-      "valid_until": "Valido fino al {{date}}"
+      "valid_until": "Valido fino al {{date}}",
+      "brand": "Cura della Comunità"
     }
   },
   "category_coefficients": {
@@ -1254,7 +1338,174 @@
     },
     "overrides_count_one": "{{count}} ignora",
     "overrides_count_other": "{{count}} ignora",
-    "overrides_count_many": "{{count}} ignora"
+    "overrides_count_many": "{{count}} ignora",
+    "capabilities": {
+      "caring_help_requests": {
+        "notes": "",
+        "label": "Richieste di aiuto",
+        "description": "Il flusso di lavoro delle richieste di aiuto di cura, comprese le richieste di caregiver effettuate per conto di un'altra persona, l'abbinamento e l'accettazione."
+      },
+      "caring_support_relationships": {
+        "notes": "",
+        "label": "Relazioni di supporto",
+        "description": "Relazioni di assistenza a lungo termine tra un destinatario e uno o più sostenitori, con controlli ricorrenti."
+      },
+      "caring_caregiver_links": {
+        "notes": "",
+        "label": "Collegamenti con il caregiver",
+        "description": "Un collegamento verificato tra un caregiver informale e la persona che assiste, che consente di fare richieste per conto di quella persona."
+      },
+      "caring_substitute_cover": {
+        "notes": "",
+        "label": "Sostituzione e copertura della pianificazione",
+        "description": "Trovare caregiver sostitutivi quando il sostenitore principale non è disponibile, con rilevamento dei conflitti e conferma."
+      },
+      "caring_warmth_pass": {
+        "notes": "",
+        "label": "Pass Caloroso",
+        "description": "Un livello di dignità controllato dal destinatario che regola chi può vedere le loro necessità e supporta introduzioni basate sul consenso."
+      },
+      "caring_emergency_alerts": {
+        "notes": "",
+        "label": "Allerte di emergenza",
+        "description": "Trasmissioni di emergenza da un destinatario o caregiver a un raggio verificato di vicini fidati."
+      },
+      "caring_sub_regions": {
+        "notes": "",
+        "label": "Sottoregioni di assistenza",
+        "description": "Cellule regionali all'interno di un tenant, come distretti o quartieri, con il proprio coordinatore e riepilogo KPI."
+      },
+      "caring_research_consent": {
+        "notes": "",
+        "label": "Flag di consenso alla ricerca",
+        "description": "Un membro può scegliere di partecipare all'inclusione in set di dati di ricerca anonimi condivisi con partner accademici o municipali."
+      },
+      "caring_municipal_roi": {
+        "notes": "",
+        "label": "Rapporto sul ritorno sugli investimenti municipale",
+        "description": "Un rapporto sui compensi dei costi dell'assistenza formale e sul valore della prevenzione per le discussioni sugli appalti del settore pubblico."
+      },
+      "caring_pilot_scoreboard": {
+        "notes": "",
+        "label": "Cruscotto del progetto pilota",
+        "description": "Un pacchetto KPI dal vivo per riunioni pilota e revisioni dei progressi rivolte ai finanziatori."
+      },
+      "caring_disclosure_pack": {
+        "notes": "",
+        "label": "Pacchetto di divulgazione FADP/nDSG",
+        "description": "Un pacchetto di divulgazione sulla protezione dei dati svizzera modificabile per revisione legale prima dell'onboarding dei residenti."
+      },
+      "caring_operating_policy": {
+        "notes": "",
+        "label": "Workshop sulla politica operativa",
+        "description": "Una politica guidata da schema che copre l'autorità di approvazione, i livelli di servizio, la liquidazione delle ore precedenti, le tariffe e la cadenza delle revisioni."
+      },
+      "safeguarding_reports": {
+        "notes": "",
+        "label": "Protezione dei rapporti",
+        "description": "Un flusso di lavoro per le preoccupazioni di protezione da membro a coordinatore con tracciamento delle verifiche e instradamento delle escalation."
+      },
+      "trust_tier_system": {
+        "notes": "",
+        "label": "Sistema di livello di fiducia",
+        "description": "Progressione della fiducia dei membri che controlla quali azioni di cura un nuovo membro, fidato o verificato può eseguire."
+      },
+      "municipal_verification": {
+        "notes": "",
+        "label": "Badge di verifica comunale",
+        "description": "Un marcatore di verifica comunale opzionale sul profilo di un membro, basato sulla residenza o sui controlli dei precedenti."
+      },
+      "xp_badges_journeys": {
+        "notes": "",
+        "label": "XP, badge e percorsi",
+        "description": "Un livello di coinvolgimento con XP, badge, percorsi e sfide che riconosce la partecipazione premurosa."
+      },
+      "appreciation_messages": {
+        "notes": "",
+        "label": "Messaggi di apprezzamento",
+        "description": "Un flusso di ringraziamento leggero che permette ai destinatari di riconoscere pubblicamente i sostenitori."
+      },
+      "premium_member_tier": {
+        "notes": "",
+        "label": "Livello di membro premium",
+        "description": "Un livello di abbonamento a pagamento opzionale con benefici aggiuntivi, gestito a discrezione dell'inquilino."
+      },
+      "merchant_loyalty_coupons": {
+        "notes": "",
+        "label": "Fedeltà del commerciante e coupon",
+        "description": "Carte fedeltà dei commercianti locali e riscatto dei coupon collegati ai saldi dei crediti-tempo."
+      },
+      "smart_matching_engine": {
+        "notes": "",
+        "label": "Motore di corrispondenza intelligente",
+        "description": "Un matcher euristico che abbina le richieste di aiuto con i sostenitori più probabili utilizzando competenze, distanza e storico."
+      },
+      "caring_community_module": {
+        "label": "Modulo Comunità Attenta",
+        "description": "La funzionalità a ombrello che attiva l'intero flusso di lavoro della Comunità di Cura per un tenant.",
+        "notes": "Questa è la porta principale per le altre funzionalità di cura."
+      },
+      "local_advertising_campaigns": {
+        "label": "Campagne pubblicitarie locali",
+        "description": "Posizionamenti in-app venduti ai commercianti locali. Il codice è con licenza AGPL, la partecipazione è controllata dall'inquilino e i ricavi restano al deployer.",
+        "notes": "Opt-in per ogni inquilino; il codice pubblico non impone una quota di ricavi all'operatore della piattaforma."
+      },
+      "paid_push_campaigns": {
+        "label": "Campagne push a pagamento",
+        "description": "Campagne di push-notification mirate che i commercianti possono acquistare per raggiungere i membri opt-in.",
+        "notes": "L'inquilino deve abilitare la funzione e accettare la responsabilità dei costi di consegna push."
+      },
+      "verein_dues_collection": {
+        "label": "Quote associative",
+        "description": "Raccolta ricorrente delle quote associative tramite Stripe, con rendiconti dei membri e riconciliazione.",
+        "notes": "L'account Stripe è un'infrastruttura operativa; il codice dell'applicazione rimane con licenza AGPL."
+      },
+      "ki_agenten_framework": {
+        "label": "Framework KI-Agenten",
+        "description": "Un runtime per agenti per singolo tenant che permette ai coordinatori di definire assistenti strutturati per flussi di lavoro ripetibili.",
+        "notes": "Il codice è con licenza AGPL; ogni tenant fornisce le proprie credenziali API del modello linguistico e paga direttamente il fornitore."
+      },
+      "ai_chat_assistant": {
+        "label": "Assistente chat AI",
+        "description": "Un assistente per i membri basato sulla knowledge base del tenant per supporto e onboarding.",
+        "notes": "Ogni tenant fornisce le proprie credenziali API di OpenAI."
+      },
+      "embedding_recommendations": {
+        "label": "Raccomandazioni basate su embedding",
+        "description": "I modelli di embedding alimentano le raccomandazioni di annunci, membri e gruppi su tutta la piattaforma.",
+        "notes": "Ogni tenant è responsabile dei costi di utilizzo del fornitore di embedding."
+      },
+      "tenant_branded_native_app": {
+        "label": "App nativa con brand del tenant",
+        "description": "Un'app Capacitor per iOS e Android pubblicata sotto il marchio del tenant. Il codice sorgente è rilasciato sotto licenza AGPL; l'infrastruttura di rilascio è di proprietà del tenant.",
+        "notes": "Account sviluppatore Apple e Google, chiavi di firma, pipeline di build e flussi di lavoro per la revisione sugli store sono responsabilità operative al di fuori del pacchetto."
+      },
+      "paid_regional_analytics": {
+        "label": "Analisi regionali a pagamento",
+        "description": "Analisi aggregate cross-tenant per gli acquisti regionali e municipali, offerte separatamente agli acquirenti del settore pubblico.",
+        "notes": "Questo è un prodotto separato del settore pubblico che richiede un accordo commerciale con l'operatore della piattaforma."
+      },
+      "partner_api_access": {
+        "label": "Accesso API per partner",
+        "description": "Un'API a traffico limitato per partner di ricerca, governativi e di integrazione che può includere query aggregate cross-tenant.",
+        "notes": "È necessario un accordo commerciale; questo accesso non è abilitato per i deployer AGPL di default."
+      }
+    },
+    "classification_descriptions": {
+      "agpl_public": "Codice sorgente con licenza AGPL nel repository pubblico. Chiunque può eseguirlo secondo i termini della licenza.",
+      "tenant_config": "Funzionalità con licenza AGPL controllata dalla configurazione del tenant o da un interruttore di funzione.",
+      "private_deployment": "Un livello di distribuzione operativo come infrastruttura, account di build o proprietà della chiave di firma; questo non è un confine di licenza del codice.",
+      "commercial": "Un servizio contrattato separatamente che non è incluso nel pacchetto pubblico AGPL."
+    },
+    "categories": {
+      "core_caring": "Comunità centrale di cura",
+      "community_governance": "Governance della comunità",
+      "gamification_engagement": "Gamification e coinvolgimento",
+      "commercial_layer": "Livello commerciale",
+      "advanced_ai": "Intelligenza artificiale avanzata",
+      "mobile_native": "App mobili native",
+      "regional_intelligence": "Intelligenza regionale"
+    }
   },
   "data_quality": {
     "meta": {
@@ -1315,6 +1566,88 @@
     "toasts": {
       "load_failed": "Impossibile caricare il rapporto sulla qualità dei dati",
       "rows_failed": "Impossibile caricare le righe interessate"
+    },
+    "checks": {
+      "duplicate_emails": {
+        "label": "Indirizzi email duplicati",
+        "schema_unavailable": "La tabella utenti o la colonna email non sono disponibili in questo schema tenant.",
+        "found": "Più utenti condividono lo stesso indirizzo email. Unire o rimuovere gli account duplicati prima del lancio.",
+        "clear": "Non sono stati rilevati indirizzi email duplicati."
+      },
+      "duplicate_phones": {
+        "label": "Numeri di telefono duplicati",
+        "schema_unavailable": "La tabella utenti o la colonna telefono non sono disponibili in questo schema del tenant.",
+        "found": "Diversi membri condividono lo stesso numero di telefono. Confermare se sono residenti diversi.",
+        "clear": "Non sono stati rilevati numeri di telefono duplicati."
+      },
+      "missing_preferred_language": {
+        "label": "Membri senza una lingua preferita",
+        "schema_unavailable": "Il campo della lingua preferita non è disponibile in questo schema del tenant.",
+        "found": "Alcuni membri non hanno selezionato una lingua preferita. Impostane una prima di inviare comunicazioni ai residenti.",
+        "clear": "Ogni membro ha una lingua preferita."
+      },
+      "missing_sub_region": {
+        "label": "Membri senza una sotto-regione",
+        "regions_unavailable": "Le sotto-regioni non sono disponibili in questo schema tenant, quindi questo controllo non si applica.",
+        "column_unavailable": "Gli assegnamenti delle sotto-regioni dei membri non sono disponibili in questo schema tenant, quindi questo controllo non si applica.",
+        "no_regions": "Non sono state configurate sotto-regioni, quindi questo controllo non si applica.",
+        "found": "I membri senza una sotto-regione non appariranno nei feed a livello di quartiere.",
+        "clear": "Ogni membro è assegnato a una sotto-regione."
+      },
+      "missing_coordinator_assignment": {
+        "label": "Relazioni di cura senza un coordinatore",
+        "table_unavailable": "Le relazioni di supporto alla cura non sono disponibili in questo schema del tenant.",
+        "column_unavailable": "Le assegnazioni dei coordinatori non sono disponibili in questo schema del tenant.",
+        "found": "Assegna un coordinatore a ogni relazione di cura attiva prima del lancio.",
+        "clear": "Ogni relazione premurosa ha un coordinatore."
+      },
+      "unverified_organisations": {
+        "label": "Organizzazioni non verificate",
+        "table_unavailable": "Le organizzazioni di volontariato non sono disponibili in questo schema tenant.",
+        "verification_unavailable": "I campi di verifica delle organizzazioni non sono disponibili in questo schema tenant.",
+        "found": "Approva o respingi ogni organizzazione in sospeso affinché i membri possano fidarsi delle sue inserzioni.",
+        "clear": "Ogni organizzazione è stata esaminata."
+      },
+      "seed_marker_users": {
+        "label": "Account demo o di prova",
+        "table_unavailable": "I membri non sono disponibili in questo schema tenant.",
+        "found": "Account demo o di prova sono ancora presenti. Rimuovili prima di registrare residenti reali.",
+        "clear": "Nessun account demo o di prova è stato rilevato."
+      },
+      "unanswered_help_requests": {
+        "label": "Richieste di aiuto senza risposta più vecchie di 30 giorni",
+        "table_unavailable": "Le richieste di aiuto premurose non sono disponibili in questo schema del tenant.",
+        "found": "Le vecchie richieste di aiuto in sospeso minano la fiducia. Chiudi, rifiuta o abbina ciascuna.",
+        "clear": "Non ci sono richieste di aiuto in sospeso."
+      },
+      "members_without_role": {
+        "label": "Membri senza un ruolo",
+        "schema_unavailable": "I ruoli dei membri non sono disponibili in questo schema del tenant.",
+        "found": "Assegna a ogni membro un ruolo affinché i loro permessi vengano risolti correttamente.",
+        "clear": "Ogni membro ha un ruolo."
+      },
+      "tenant_setting_completeness": {
+        "label": "Completezza delle impostazioni del tenant",
+        "table_unavailable": "Le impostazioni del tenant non sono disponibili in questo schema del tenant.",
+        "found": "Una o più impostazioni pre-lancio sono mancanti. Riesaminare il pacchetto di divulgazione AG80 e la politica operativa AG81.",
+        "clear": "Ogni impostazione del tenant richiesta pre-lancio è configurata."
+      }
+    },
+    "notes": {
+      "drilldown_not_available": "Non è disponibile un drill-down a livello di riga per questo controllo."
+    },
+    "identifiers": {
+      "user_id": "Utente #{{id}}"
+    },
+    "row_status": {
+      "active": "Attivo",
+      "approved": "Approvato",
+      "completed": "Completato",
+      "inactive": "Inattivo",
+      "pending": "In sospeso",
+      "rejected": "Rifiutato",
+      "unknown": "Stato sconosciuto",
+      "verified": "Verificato"
     }
   },
   "disclosure_pack": {
@@ -1408,6 +1741,84 @@
       "export_empty": "L'esportazione è tornata vuota",
       "exported": "Pacchetto di divulgazione esportato",
       "export_failed": "Impossibile esportare il pacchetto di divulgazione"
+    },
+    "export": {
+      "filename": "disclosure-pack.md"
+    },
+    "default_copy": {
+      "subprocessor_azure": "Microsoft Azure (hosting, UE)",
+      "subprocessor_cloudflare": "Cloudflare (CDN / WAF)",
+      "subprocessor_stripe": "Stripe (pagamenti e verifica dell'identità)",
+      "subprocessor_openai": "OpenAI (abbinamento e sintesi opzionali)",
+      "subprocessor_firebase": "Google Firebase Cloud Messaging (notifiche push)",
+      "isolated_node_description": "Distribuzione controllata dal Cantone con propria consegna di email, archiviazione e backup. La federazione può essere disabilitata completamente.",
+      "fadp_authority": "Commissione federale per la protezione dei dati e la trasparenza (FDPIC / EDÖB)",
+      "destination_eu_azure": "Unione Europea (Microsoft Azure)",
+      "destination_us_services": "Stati Uniti (Cloudflare, Stripe e OpenAI)",
+      "safeguard_scc": "Clausole contrattuali standard (SCC)",
+      "safeguard_swiss_us_framework": "Quadro sulla privacy dei dati Svizzera–USA, ove applicabile"
+    },
+    "structured": {
+      "fields": {
+        "identity": "Identità",
+        "profile": "Profilo",
+        "caring": "Attività di cura",
+        "time_credits": "Crediti di tempo",
+        "communications": "Comunicazioni",
+        "safeguarding": "Tutela",
+        "research_consent": "Consenso alla ricerca",
+        "active_account_data": "Dati del conto attivo",
+        "inactive_account_data": "Dati del conto inattivo",
+        "transactions": "Transazioni",
+        "help_requests": "Richieste di aiuto",
+        "safeguarding_reports": "Protezione dei rapporti",
+        "research_datasets": "Set di dati di ricerca",
+        "access": "Accesso",
+        "export": "Esporta",
+        "rectify": "Rettifica",
+        "erase": "Cancellazione",
+        "restrict": "Limitazione",
+        "object": "Obiezione",
+        "portability": "Portabilità",
+        "export_format": "Formato di esportazione"
+      },
+      "values": {
+        "name": "nome",
+        "email": "indirizzo email",
+        "phone": "numero di telefono",
+        "date_of_birth": "data di nascita",
+        "biography": "biografia",
+        "photo": "foto",
+        "skills": "competenze",
+        "preferred_language": "lingua preferita",
+        "help_requests": "richieste di aiuto",
+        "support_relationships": "relazioni di supporto",
+        "caregiver_links": "collegamenti con i caregiver",
+        "transactions": "transazioni",
+        "volunteer_logs": "registro dei volontari",
+        "wallet_balance": "bilancio del portafoglio",
+        "messages": "messaggi",
+        "notifications": "notifiche",
+        "announcements": "annunci",
+        "reports": "rapporti",
+        "flags": "bandiere",
+        "verification_status": "stato di verifica",
+        "flag": "indicatore di consenso",
+        "aggregate_dataset_inclusion": "inclusione nel set di dati aggregato",
+        "contract": "Contratto",
+        "consent": "Consenso",
+        "legitimate_interest": "Interesse legittimo",
+        "lifetime_of_membership": "Durata della membership",
+        "24_months_then_anonymise": "24 mesi, poi anonimizzare",
+        "10_years_after_completion": "10 anni dopo il completamento",
+        "24_months_after_closure": "24 mesi dopo la chiusura",
+        "7_years_after_resolution": "7 anni dopo la risoluzione",
+        "24_months": "24 mesi",
+        "duration_of_research_partnership": "Durata della collaborazione di ricerca",
+        "json+csv": "JSON e CSV",
+        "no_personal_data_shared_outside_tenant": "Nessun dato personale condiviso al di fuori dell'inquilino",
+        "monthly": "Mensile"
+      }
     }
   },
   "external_integrations": {
@@ -1489,12 +1900,12 @@
       "owner_name": "Nome del proprietario",
       "owner_name_placeholder": "Nome completo del contatto esterno",
       "owner_email": "E-mail del proprietario",
-      "owner_email_placeholder": "contact@partner.esempio",
+      "owner_email_placeholder": "contact@partner.example",
       "interface_spec_url": "Specifica dell'interfaccia URL",
       "interface_spec_placeholder": "https://docs.partner.example/spec",
       "dsa_status": "Accordo di condivisione dei dati",
       "sandbox_url": "Sabbiera URL",
-      "sandbox_placeholder": "https://sandbox.partner.esempio",
+      "sandbox_placeholder": "https://sandbox.partner.example",
       "notes": "Note",
       "notes_placeholder": "Domande aperte, bloccanti, dipendenze, note contrattuali..."
     },
@@ -1514,6 +1925,32 @@
       "create_failed": "Creazione fallita",
       "removed": "Integrazione rimossa",
       "delete_failed": "Eliminazione non riuscita"
+    },
+    "default_items": {
+      "ahv_submission_gateway": {
+        "name": "Portale di invio AHV",
+        "notes": "Canale ufficiale per la segnalazione delle ore di volontariato rilevanti per l'AHV. L'interfaccia di invio canonica deve ancora essere confermata."
+      },
+      "spitex_handoff": {
+        "name": "Trasferimento della coordinazione delle cure Spitex",
+        "notes": "Passaggio bidirezionale con i fornitori Spitex cantonali per i circoli dei destinatari di assistenza. È necessario un accordo di condivisione dei dati e una specifica dell'interfaccia da ciascun fornitore."
+      },
+      "cantonal_master_data": {
+        "name": "Flusso di dati master cantonale",
+        "notes": "Dati sull'indirizzo e sul nucleo familiare sottoscritti dal registro cantonale per mantenere aggiornati i profili dei destinatari di assistenza."
+      },
+      "postfinance_payment": {
+        "name": "Integrazione dei pagamenti PostFinance",
+        "notes": "Partner bancario svizzero per operazioni di incasso e tesoreria. È necessario un accordo commerciale."
+      },
+      "twint_payment": {
+        "name": "Pagamento Twint",
+        "notes": "Accettazione Twint per quote associative e donazioni. È necessario l'onboarding commerciale tramite una banca partner."
+      },
+      "postal_address_verification": {
+        "name": "Verifica dell'indirizzo postale",
+        "notes": "Normalizzazione degli indirizzi e validazione rispetto alla directory della Posta Svizzera."
+      }
     }
   },
   "federation_peers_admin": {
@@ -1713,6 +2150,12 @@
     },
     "toasts": {
       "load_failed": "Impossibile caricare il dashboard SLA"
+    },
+    "status": {
+      "closed": "Chiuso",
+      "matched": "Corrispondenza",
+      "pending": "In sospeso",
+      "unknown": "Stato sconosciuto"
     }
   },
   "integration_showcase": {
@@ -1739,6 +2182,74 @@
     },
     "toasts": {
       "load_failed": "Impossibile caricare la vetrina dell'integrazione"
+    },
+    "manifest": {
+      "sections": {
+        "openapi": {
+          "title": "Specificazione OpenAPI",
+          "body": "Una specifica leggibile dalla macchina per ogni superficie API pubblica, generata dai controller forniti con questa piattaforma."
+        },
+        "partner_api": {
+          "title": "API Partner v1",
+          "body": "Un'API protetta da OAuth per integratori di terze parti, che copre membri, inserzioni, credito del portafoglio, aggregati della community e sottoscrizioni webhook."
+        },
+        "oauth": {
+          "title": "Credenziali client OAuth",
+          "body": "Il flusso standard OAuth 2.0 con credenziali client per server partner affidabili, inclusa la revoca dei token."
+        },
+        "webhooks": {
+          "title": "Sottoscrizioni webhook",
+          "body": "I partner si iscrivono agli argomenti degli eventi. Ogni payload è firmato con HMAC-SHA256 sull'intero corpo usando il segreto di quella sottoscrizione."
+        },
+        "federation": {
+          "title": "La federazione aggrega",
+          "body": "Ogni tenant espone un endpoint aggregato di sola lettura firmato. I payload contengono conteggi, intervalli, categorie principali e località, ma mai dati personali grezzi."
+        },
+        "sample_payloads": {
+          "title": "Esempi di payload",
+          "body": "Payload rappresentativi per un partner di integrazione. Questi esempi sono illustrativi e non contengono dati di tenant in tempo reale."
+        },
+        "partner_checklist": {
+          "title": "Cosa riceve un partner di integrazione",
+          "body": "Condividi questa checklist con un potenziale partner di integrazione prima che inizi l'implementazione."
+        }
+      },
+      "endpoints": {
+        "openapi_json": "Specifiche JSON",
+        "openapi_yaml": "Specifiche YAML",
+        "list_users": "Elenca utenti",
+        "show_user": "Mostra un utente",
+        "list_listings": "Elenca inserzioni",
+        "wallet_balance": "Leggi saldo del portafoglio",
+        "credit_wallet": "Accreditare un portafoglio",
+        "community_aggregates": "Leggi aggregati della comunità",
+        "list_subscriptions": "Elenca iscrizioni ai webhook",
+        "create_subscription": "Crea un abbonamento webhook",
+        "token_endpoint": "Emetti un token di accesso",
+        "revoke_endpoint": "Revoca un token di accesso",
+        "update_subscription": "Aggiorna un abbonamento webhook",
+        "delete_subscription": "Elimina un abbonamento webhook",
+        "tenant_aggregate": "Leggi un aggregato tenant"
+      },
+      "verification_notes": {
+        "webhook_signature": "Verifica l'intestazione X-NEXUS-Signature calcolando HMAC-SHA256 sull'intero corpo della richiesta con il secret di sottoscrizione, quindi confronta le firme in tempo costante. Rifiuta i payload più vecchi della finestra di replay configurata, che per default è di cinque minuti."
+      },
+      "samples": {
+        "federation_aggregate": "Aggregato di federazione — esempio di JSON firmato",
+        "webhook_event": "Evento webhook — esempio firmato con HMAC",
+        "partner_aggregates": "Aggregati della community API partner — esempio"
+      },
+      "checklist": {
+        "oauth_credentials": "Un ID client OAuth e un segreto client dedicati a questo partner",
+        "allowed_scopes": "Gli ambiti approvati, come read:users, read:listings e write:wallet",
+        "webhook_subscription": "Una sottoscrizione webhook, un segreto HMAC e un elenco consentiti di URL endpoint",
+        "openapi_spec": "L'URL della specifica OpenAPI in formato JSON o YAML",
+        "sandbox_tenant": "Uno slug del tenant sandbox per i test di integrazione",
+        "federation_public_key": "La chiave pubblica aggregata di firma della federazione, quando il partner partecipa alla federazione",
+        "rate_limit_headers": "Documentazione per le intestazioni X-RateLimit-Limit e X-RateLimit-Remaining",
+        "data_sharing_agreement": "Una bozza di accordo di condivisione dei dati e un referente nominato per la protezione dei dati",
+        "incident_runbook": "L'URL del runbook di risposta agli incidenti dal pacchetto di divulgazione AG80"
+      }
     }
   },
   "isolated_node": {
@@ -1824,6 +2335,63 @@
       "load_failed": "Impossibile caricare i dati del gate decisionale",
       "item_updated": "Elemento decisionale aggiornato",
       "save_failed": "Impossibile salvare l'elemento decisionale"
+    },
+    "items": {
+      "deployment_mode": {
+        "label": "Modalità di distribuzione",
+        "help": "Scegli se questo è un tenant ospitato condiviso, un tenant ospitato su dominio personalizzato o un nodo completamente isolato controllato dall'autorità regionale."
+      },
+      "hosting_owner": {
+        "label": "Proprietario dell'hosting",
+        "help": "Nomina l'organizzazione responsabile dei server del nodo, del dominio e della configurazione TLS."
+      },
+      "smtp_owner": {
+        "label": "Proprietario SMTP e della posta in uscita",
+        "help": "Indicare l'organizzazione responsabile della consegna delle email in uscita e il relativo account del provider di posta."
+      },
+      "storage_owner": {
+        "label": "Proprietario della memorizzazione",
+        "help": "Indicare l'organizzazione responsabile del caricamento dei file, degli allegati e della memorizzazione persistente degli oggetti."
+      },
+      "backup_owner": {
+        "label": "Proprietario del backup",
+        "help": "Nomina l'organizzazione responsabile dei backup giornalieri, della conservazione e dei ripristini di database testati."
+      },
+      "update_cadence": {
+        "label": "Cadenza di aggiornamento",
+        "help": "Scegli con quale frequenza il nodo riceve aggiornamenti dalla fonte NEXUS a monte."
+      },
+      "source_release_workflow": {
+        "label": "Flusso di lavoro della versione sorgente",
+        "help": "Descrivi come gli aggiornamenti del codice sorgente AGPL raggiungono il nodo isolato, inclusi mirror dei repository, tag firmati e revisione manuale."
+      },
+      "telemetry_default": {
+        "label": "Telemetria predefinita",
+        "help": "Scegli lo stato predefinito per la telemetria in uscita e la segnalazione degli errori su questo nodo."
+      },
+      "federation_key_exchange": {
+        "label": "Scambio di chiavi di federazione",
+        "help": "Descrivi se e come questo nodo si federi con i peer regionali, incluso il protocollo chiave di custodia e scambio."
+      },
+      "dpo_appointed": {
+        "label": "Responsabile della protezione dei dati",
+        "help": "Registra il responsabile della protezione dei dati nominato e i suoi dettagli di contatto per la distribuzione isolata."
+      },
+      "incident_runbook_url": {
+        "label": "URL del runbook degli incidenti",
+        "help": "Link al manuale operativo per tempi di inattività, violazioni, compromissioni chiave e esercitazioni di ripristino."
+      }
+    },
+    "choices": {
+      "hosted_tenant": "Tenant ospitato",
+      "hosted_custom_domain": "Tenant ospitato con dominio personalizzato",
+      "canton_isolated_node": "Nodo isolato controllato dalla regione",
+      "weekly": "Settimanale",
+      "monthly": "Mensile",
+      "quarterly": "Trimestrale",
+      "on_demand": "Su richiesta",
+      "enabled": "Abilitato",
+      "disabled": "Disabilitato"
     }
   },
   "kpi_baselines": {
@@ -2199,7 +2767,9 @@
     "status": {
       "verified": "Verificato",
       "pending_dns": "In attesa DNS",
-      "revoked": "Revocato"
+      "revoked": "Revocato",
+      "unverified": "Non verificato",
+      "unknown": "Stato sconosciuto"
     },
     "current": {
       "title": "Stato attuale",
@@ -2217,7 +2787,7 @@
     "fields": {
       "municipality_domain": "Dominio del Comune",
       "domain_or_organisation": "Dominio o organizzazione",
-      "domain_placeholder": "per esempio. zurigo.ch",
+      "domain_placeholder": "per esempio. zurich.ch",
       "attestation_note": "Nota di attestazione (facoltativa)",
       "attestation_description": "Perché lo attesti senza la verifica DNS? (Traccia di controllo.)"
     },
@@ -2292,7 +2862,12 @@
       "acknowledgement": "Riconoscimento del coordinatore",
       "pre_pilot_baseline": "Base del quadro di valutazione pre-pilota",
       "danger_checks": "Problemi di qualità dei dati",
-      "backlog_empty": "Arretrato di integrazione vuoto"
+      "backlog_empty": "Arretrato di integrazione vuoto",
+      "warning_checks": "Avvisi sulla qualità dei dati",
+      "quarterly_review": "Revisione trimestrale del cruscotto",
+      "blocked_integrations": "Integrazioni bloccate",
+      "undecided_items": "Elementi a nodo isolato indecisi",
+      "unknown": "Requisito sconosciuto"
     },
     "states": {
       "launched_title": "Lanciato il pilota",
@@ -2320,7 +2895,7 @@
     },
     "isolated_node": {
       "required": "Il gate del nodo isolato è attivo: questa distribuzione è configurata come nodo isolato dal cantone (AG85). Tutti gli articoli devono raggiungere lo stato Deciso prima del lancio.",
-      "informational": "Il gate del nodo isolato è informativo per le distribuzioni ospitate standard. Blocca l'avvio solo quando AG85 deploy_mode è impostato su canton_isolated_node. Se il tuo comune non ha specificato un requisito per i nodi isolati, puoi ignorare gli elementi in questa sezione."
+      "informational": "Il gateway a nodo isolato è informativo per le distribuzioni ospitate standard. Blocca il lancio solo quando AG85 deployment_mode è impostato su canton_isolated_node. Se il tuo comune non ha specificato un requisito di nodo isolato, puoi ignorare gli elementi in questa sezione."
     },
     "timestamps": {
       "last_updated": "Ultimo aggiornamento {{date}}",
@@ -2358,7 +2933,74 @@
     },
     "more_count_one": "+{{count}} altro",
     "more_count_other": "+{{count}} altro",
-    "more_count_many": "+{{count}} altro"
+    "more_count_many": "+{{count}} altro",
+    "section_labels": {
+      "disclosure_pack": "AG80 — Pacchetto di divulgazione FADP/nDSG",
+      "operating_policy": "AG81 — Politica operativa KISS",
+      "commercial_boundary": "AG82 — Mappa dei confini commerciali",
+      "pilot_scoreboard": "AG83 — Baseline del punteggio del pilota",
+      "data_quality": "AG84 — Qualità dei dati degli inquilini",
+      "isolated_node": "AG85 — Porta di decisione per nodo isolato",
+      "external_integrations": "AG87 — Arretrato di integrazione esterna"
+    },
+    "section_summaries": {
+      "disclosure_pack": {
+        "not_started": "Il pacchetto utilizza ancora i valori predefiniti della piattaforma e non ha un controller nominato.",
+        "needs_review": "Il titolare, il responsabile della protezione dei dati o il contatto per gli incidenti non è completo.",
+        "ready": "Il titolare, il responsabile della protezione dei dati e il contatto per gli incidenti sono registrati."
+      },
+      "operating_policy": {
+        "not_started": "La politica utilizza ancora i valori predefiniti della piattaforma. Pianifica il workshop sulla politica.",
+        "needs_review": "Il workshop è completo, ma l'URL dell'appendice o il responsabile della protezione mancano.",
+        "ready": "Il workshop sulla politica è completo, l'appendice è collegata e un responsabile della salvaguardia è assegnato."
+      },
+      "commercial_boundary": {
+        "needs_review": "Le classificazioni predefinite sono in vigore, ma un coordinatore non ha ancora riconosciuto la matrice.",
+        "ready_with_overrides": "L'override {{count}} è applicato e la matrice è stata rivista.",
+        "ready_with_overrides_one": "L'override {{count}} è applicato e la matrice è stata rivista.",
+        "ready_with_overrides_other": "Gli override {{count}} sono applicati e la matrice è stata rivista.",
+        "ready_default": "La matrice predefinita è stata riconosciuta."
+      },
+      "pilot_scoreboard": {
+        "not_started": "Non è stata catturata alcuna baseline pre-pilota, quindi un confronto prima e dopo non è ancora possibile.",
+        "needs_review": "La baseline pre-pilota è stata catturata, ma la revisione trimestrale è scaduta.",
+        "ready": "La baseline pre-pilota è stata catturata e la cadenza delle revisioni trimestrali è rispettata."
+      },
+      "data_quality": {
+        "blocked": "{{count}} problema bloccante rimane. Account duplicati o utenti seed sono ancora presenti.",
+        "blocked_one": "{{count}} problema bloccante rimane. Account duplicati o utenti seed sono ancora presenti.",
+        "blocked_other": "{{count}} problemi bloccanti rimangono. Account duplicati o utenti seed sono ancora presenti.",
+        "needs_review": "{{count}} avviso richiede revisione prima del lancio.",
+        "needs_review_one": "{{count}} avviso richiede revisione prima del lancio.",
+        "needs_review_other": "{{count}} avvisi richiedono revisione prima del lancio.",
+        "ready": "Tutti i controlli sono superati. I dati sono pronti per i residenti reali."
+      },
+      "isolated_node": {
+        "hosted_closed": "Il cancello è chiuso. Rimane informativo perché questo deployment è ospitato.",
+        "hosted_informational": "Il cancello non è richiesto per i deployment ospitati e rimane informativo.",
+        "blocked": "{{count}} ha bloccato la decisione impedendo il lancio del deployment isolato.",
+        "blocked_one": "{{count}} ha bloccato la decisione impedendo il lancio del deployment isolato.",
+        "blocked_other": "{{count}} decisioni bloccate impediscono il lancio del deployment isolato.",
+        "needs_review": "{{decided}} di {{total}} decisioni sono registrate. Un deployment isolato richiede che ogni decisione sia completa.",
+        "ready": "Ogni decisione dei gate è registrata. Il deployment isolato è pronto."
+      },
+      "external_integrations": {
+        "not_started": "Il backlog è vuoto. Imposta i valori predefiniti o conferma che non sono richieste integrazioni con partner.",
+        "blocked": "L'integrazione {{count}} è bloccata, quindi le funzionalità dipendenti dal partner non possono essere avviate.",
+        "blocked_one": "L'integrazione {{count}} è bloccata, quindi le funzionalità dipendenti dal partner non possono essere avviate.",
+        "blocked_other": "Le integrazioni {{count}} sono bloccate, quindi le funzionalità dipendenti dal partner non possono essere avviate.",
+        "ready": "L'elemento di integrazione {{count}} è tracciato e nessuno è bloccato.",
+        "ready_one": "L'elemento di integrazione {{count}} è tracciato e nessuno è bloccato.",
+        "ready_other": "Gli elementi di integrazione {{count}} sono tracciati e nessuno è bloccato."
+      }
+    },
+    "overall_summaries": {
+      "blocked": "Una o più sezioni sono bloccate, quindi l'avvio del pilota non è sicuro.",
+      "ready": "Ogni sezione è pronta e il pilota può essere avviato.",
+      "needs_review": "{{ready}} di {{total}} sezioni sono pronte. È necessaria una revisione del coordinatore prima dell'avvio.",
+      "not_started": "{{ready}} di {{total}} sezioni sono pronte. La valutazione end-to-end del pilota non è stata completata.",
+      "fallback": "{{ready}} di {{total}} sezioni sono pronte."
+    }
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2377,10 +3019,10 @@
       "title": "A proposito di questa pagina",
       "body": "Tutti i parametri utilizzano una finestra mobile di 90 giorni. Acquisisci una linea di base pre-pilota prima di inserire residenti reali, quindi esegui un'istantanea di revisione trimestrale ogni 3 mesi. La tabella di confronto mostra come si è spostata ciascuna metrica rispetto a quella base di riferimento.",
       "methodology_prefix": "La compensazione dei costi viene calcolata utilizzando il",
-      "age_stiftung": "Caring Community",
       "age_stiftung_title": "Fondazione per l'Alter",
       "methodology_middle": "metodologia: ore di assistenza informale x",
-      "methodology_suffix": "35/ora (tariffa assistente formale svizzero) x 2 (moltiplicatore della prevenzione che riflette i costi evitati dell'assistenza formale). Questa metodologia è riconosciuta dai servizi sociali cantonali svizzeri per i rapporti pilota."
+      "methodology_suffix": "35/ora (tariffa assistente formale svizzero) x 2 (moltiplicatore della prevenzione che riflette i costi evitati dell'assistenza formale). Questa metodologia è riconosciuta dai servizi sociali cantonali svizzeri per i rapporti pilota.",
+      "age_stiftung": "Comunità premurosa"
     },
     "quarterly": {
       "next_review": "Prossima revisione trimestrale:",
@@ -2396,8 +3038,8 @@
       "metric": "Metrico",
       "pre_pilot": "Pre-pilota",
       "current": "Attuale",
-      "delta": "Delta",
-      "change": "Modifica"
+      "change": "Modifica",
+      "delta": "Delta"
     },
     "metrics": {
       "active_members": "Membri attivi (90d)",
@@ -2432,9 +3074,9 @@
     "quarterly_modal": {
       "title": "Cattura la revisione trimestrale",
       "body": "Esegui ogni 3 mesi dopo il lancio del progetto pilota. Per impostazione predefinita, l'etichetta dell'istantanea corrisponde al trimestre corrente (ad esempio Q2_2026), ma puoi personalizzarla. Aggiungi note per registrare cosa è cambiato dall'ultima revisione: traguardi raggiunti, modifiche alle politiche, feedback dei residenti. L'istantanea copre la finestra di 90 giorni più recente a partire da oggi.",
-      "label_placeholder": "trimestrale_2026_07",
-      "label_description": "Utilizza un'etichetta riconoscibile come Q2_2026 o 2026_Q3. Il valore predefinito è trimestrale_AAAA_MM.",
-      "notes_placeholder": "Cosa è cambiato in questo trimestre, traguardi raggiunti..."
+      "notes_placeholder": "Cosa è cambiato in questo trimestre, traguardi raggiunti...",
+      "label_placeholder": "quarterly_2026_07",
+      "label_description": "Usa un'etichetta riconoscibile come Q2_2026 o 2026_Q3. Predefinito su quarterly_YYYY_MM."
     },
     "empty": {
       "value": "-"
@@ -2505,7 +3147,21 @@
       "rendered_markdown_other": "Resi Markdown ({{count}} caratteri)",
       "placeholder_count_many": "{{count}} segnaposto",
       "rendered_markdown_many": "Resi Markdown ({{count}} caratteri)",
-      "missing_placeholder_count_many": "{{count}} segnaposto mancanti"
+      "missing_placeholder_count_many": "{{count}} segnaposto mancanti",
+      "placeholders": {
+        "partner_name": "Nome del partner di ricerca",
+        "partner_institution": "Istituzione del partner di ricerca",
+        "tenant_name": "Nome della comunità",
+        "dpo_name": "Nome del responsabile della protezione dei dati",
+        "dpo_email": "Email del responsabile della protezione dei dati",
+        "period_start": "Data di inizio del periodo di rendicontazione",
+        "period_end": "Fine del periodo di rendicontazione",
+        "jurisdiction": "Giurisdizione competente",
+        "cohort_window_years": "Finestra della coorte in anni",
+        "pilot_region": "Regione pilota",
+        "study_title": "Titolo dello studio",
+        "unknown": "Valore del modello"
+      }
     },
     "exports": {
       "title": "Cronologia dell'esportazione del set di dati",
@@ -2521,8 +3177,8 @@
       "created": "Creato",
       "period": "Periodo",
       "rows": "Righe",
-      "hash": "Hash",
-      "actions": "Azioni"
+      "actions": "Azioni",
+      "hash": "Hash"
     },
     "fields": {
       "name": "Nome",
@@ -2635,7 +3291,8 @@
     },
     "status": {
       "sent": "Inviato",
-      "converted": "Convertito"
+      "converted": "Convertito",
+      "unknown": "Stato sconosciuto"
     },
     "dispatch_modal": {
       "title": "Inviare solleciti adesso?",
@@ -2792,10 +3449,10 @@
     "audience": {
       "all_residents": "Tutti i residenti",
       "municipality": "Comune",
-      "kanton": "Kanton",
       "verein_members": "Membri del Verein",
       "volunteers": "Volontari",
-      "recipients": "Destinatari delle cure"
+      "recipients": "Destinatari delle cure",
+      "kanton": "Cantone"
     },
     "editor": {
       "new_title": "Nuova storia di successo",
@@ -2807,7 +3464,6 @@
       "metric_source": "Fonte metrica",
       "metric_source_description": "pilot_scoreboard: estrae automaticamente da AG83; municipal_roi: prelievo automatico da AG76; manuale: si inseriscono i valori manualmente.",
       "metric_key": "Chiave metrica",
-      "metric_key_placeholder": "per esempio. approvate_ore, formal_care_offset_chf",
       "metric_key_description": "Obbligatorio per origini non manuali",
       "before_value": "Prima del valore",
       "after_value": "Dopo il valore",
@@ -2825,7 +3481,8 @@
       "demo_label": "Dimostrativo/illustrativo",
       "demo_description": "La scheda è etichettata come demo nella galleria",
       "published_label": "Pubblicato",
-      "published_description": "Visibile nella galleria rivolta ai membri"
+      "published_description": "Visibile nella galleria rivolta ai membri",
+      "metric_key_placeholder": "ad es. approved_hours, formal_care_offset_chf"
     },
     "delete_modal": {
       "title": "Rimuovere la storia di successo",
@@ -2845,6 +3502,38 @@
       "delete_failed": "Eliminazione non riuscita",
       "metric_refreshed": "Metrica in tempo reale aggiornata",
       "refresh_failed": "Aggiornamento non riuscito"
+    },
+    "demo_stories": {
+      "information_distribution": {
+        "title": "30% in meno di sforzo nella distribuzione delle informazioni",
+        "narrative": "I coordinatori impiegano circa un terzo in meno di tempo per distribuire gli aggiornamenti dopo il passaggio a NEXUS. Annunci, targeting dei segmenti di membri e tracciamento delle conferme sono consolidati in un unico luogo.",
+        "method_caveat": "Esempio illustrativo basato su una dichiarazione della comunità dei pari; non è stato misurato per questo inquilino.",
+        "evidence_source": "Pagina del comune pari (illustrativa)"
+      },
+      "volunteer_engagement": {
+        "title": "25% in più di coinvolgimento dei volontari",
+        "narrative": "Le comunità pilota riportano un quarto in più di partecipazione attiva dei volontari dopo l'adozione di NEXUS, supportata da un abbinamento più chiaro, una registrazione senza attriti e un riconoscimento visibile del Pass Calore.",
+        "method_caveat": "Esempio illustrativo basato su una dichiarazione della comunità dei pari; non è stato misurato per questo inquilino.",
+        "evidence_source": "Pagina del comune pari (illustrativa)"
+      },
+      "formal_care_offset": {
+        "title": "12.250 CHF di costi per assistenza formale compensati",
+        "narrative": "Le ore di volontariato coordinate tramite NEXUS rappresentano una compensazione di 12.250 CHF contro i costi di assistenza domiciliare formale durante il periodo pilota, valutate al tasso svizzero per assistenti di cura formale.",
+        "method_caveat": "Stima utilizzando 35 CHF all'ora per 350 ore; il confronto è effettuato solo rispetto alla baseline pre-pilota.",
+        "evidence_source": "Modello ROI municipale AG76 (illustrativo)"
+      }
+    }
+  },
+  "regional_points": {
+    "ledger_types": {
+      "admin_adjustment": "Adeguamento dell'amministratore",
+      "admin_issue": "Problema dell'amministratore",
+      "earned_for_hours": "Guadagnato per ore approvate",
+      "redemption": "Riscatto",
+      "reversal": "Annullamento",
+      "transfer_in": "Trasferimento ricevuto",
+      "transfer_out": "Trasferimento inviato",
+      "unknown": "Transazione sconosciuta"
     }
   }
 }

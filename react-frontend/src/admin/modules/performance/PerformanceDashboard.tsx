@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 
 import Activity from 'lucide-react/icons/activity';
@@ -51,9 +51,29 @@ interface PerformanceSummary {
 }
 
 const formatDuration = (ms: number) => {
-  if (ms < 1000) return `${Math.round(ms)}ms`;
-  return `${(ms / 1000).toFixed(2)}s`;
+  if (ms < 1000) {
+    return formatNumber(ms, {
+      style: 'unit',
+      unit: 'millisecond',
+      unitDisplay: 'short',
+      maximumFractionDigits: 0,
+    });
+  }
+
+  return formatNumber(ms / 1000, {
+    style: 'unit',
+    unit: 'second',
+    unitDisplay: 'short',
+    maximumFractionDigits: 2,
+  });
 };
+
+const formatMemory = (megabytes: number) => formatNumber(megabytes, {
+  style: 'unit',
+  unit: 'megabyte',
+  unitDisplay: 'short',
+  maximumFractionDigits: 2,
+});
 
 const getDurationColor = (ms: number) => {
   if (ms < 100) return 'success';
@@ -170,13 +190,13 @@ export default function PerformanceDashboard() {
                 <div className="flex items-center gap-4 text-sm text-muted">
                   <span>{formatTimestamp(request.timestamp)}</span>
                   <span>{t('performance.query_count')}</span>
-                  <span>{request.memory_mb.toFixed(2)} MB</span>
+                  <span>{formatMemory(request.memory_mb)}</span>
                 </div>
                 {request.warnings && request.warnings.length > 0 && (
                   <div className="flex gap-2 mt-2">
                     {request.warnings.map((warning) => (
                       <Chip key={warning} size="sm" color="warning" variant="soft">
-                        {warning.replace(/_/g, ' ')}
+                        {t(`performance.warning_${warning}`, { defaultValue: t('performance.warning_unknown') })}
                       </Chip>
                     ))}
                   </div>
@@ -263,7 +283,7 @@ export default function PerformanceDashboard() {
                 </div>
               </div>
               <Chip color="default" variant="soft" size="lg">
-                {spike.memory_mb.toFixed(2)} MB
+                {formatMemory(spike.memory_mb)}
               </Chip>
             </div>
           </Card>

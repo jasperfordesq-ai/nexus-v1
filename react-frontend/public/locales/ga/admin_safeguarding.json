@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "safeguarding": {
     "active": "Gníomhach",
@@ -329,9 +329,8 @@
     "pending": "Ar feitheamh",
     "placeholder_description_help": "Cur síos Cabhair...",
     "placeholder_display_label": "e.g. Seans go mbeidh tacaíocht bhreise de dhíth orm le linn malartuithe",
-    "placeholder_guardian_email": "caomhnóir@sampla.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "e.g. riachtanais_tacaíochta_bhreise",
     "placeholder_review_notes": "Nótaí Léirmheasa...",
     "placeholder_search_messages": "Cuardaigh Teachtaireachtaí...",
     "placeholder_ward_email": "ward@example.com",
@@ -368,7 +367,6 @@
     "ward": "Bharda",
     "aria_deactivate_option": "Rogha a dhíghníomhachtú",
     "aria_edit_option": "Cuir Rogha in Eagar",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Rochtain Ghrinnfhiosrúcháin Ni",
     "vetting_dbs_basic": "Dbs Bunúsach Grinnfhiosrúcháin",
     "vetting_dbs_enhanced": "Dbs Grinnfhiosrúcháin Feabhsaithe",
@@ -377,6 +375,11 @@
     "vetting_international": "Grinnfhiosrúchán Idirnáisiúnta",
     "vetting_other": "Grinnfhiosrúchán Eile",
     "vetting_pvg_scotland": "Grinnfhiosrúchán Pvg Albain",
-    "tabs_aria": "Rannóga cosanta"
+    "tabs_aria": "Rannóga cosanta",
+    "status_active": "Gníomhach",
+    "status_revoked": "Díghníomhaithe",
+    "status_expired": "Éagtha",
+    "deactivate_confirm_question": "Díchumasú",
+    "placeholder_option_key": "m.sh. needs_additional_support"
   }
 }

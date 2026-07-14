@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -259,6 +260,46 @@ class AdminToolsControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/tools/seo-audit');
 
         $response->assertStatus(200);
+    }
+
+    public function test_seo_audit_returns_localisable_result_contract(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('seo_audits')->insert([
+            'tenant_id' => $this->testTenantId,
+            'url' => '',
+            'results' => json_encode([
+                'checks' => [[
+                    'code' => 'sitemap_coverage',
+                    'params' => ['count' => 2],
+                    'status' => 'warning',
+                    'issues' => [[
+                        'code' => 'sitemap_low_coverage',
+                        'params' => ['count' => 2],
+                    ]],
+                    'issue_count' => 1,
+                    'points' => 5,
+                    'max_points' => 10,
+                ]],
+                'score' => 5,
+                'max_score' => 10,
+                'grade' => 'F',
+                'run_at' => '2026-01-01T00:00:00+00:00',
+            ]),
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/tools/seo-audit');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.checks.0.code', 'sitemap_coverage');
+        $response->assertJsonPath('data.checks.0.params.count', 2);
+        $response->assertJsonPath('data.checks.0.issues.0.code', 'sitemap_low_coverage');
+        $this->assertArrayNotHasKey('results', $response->json('data'));
+        $this->assertArrayNotHasKey('name', $response->json('data.checks.0'));
+        $this->assertArrayNotHasKey('description', $response->json('data.checks.0'));
     }
 
     // ================================================================

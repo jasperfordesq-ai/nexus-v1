@@ -595,7 +595,7 @@
     "modal_title": "Adicionar conta vinculada",
     "modal_description": "Introduza o endereço de email da pessoa que deseja vincular. Ela receberá uma notificação para aprovar o pedido.",
     "email_label": "Endereço de email",
-    "email_placeholder": "filho@exemplo.pt",
+    "email_placeholder": "child@example.com",
     "name_label": "Nome (opcional)",
     "name_placeholder": "Nome de apresentação",
     "cancel": "Cancelar",

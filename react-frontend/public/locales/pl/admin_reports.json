@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,12 +67,12 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Aktywni członkowie",
     "already_notified": "Już powiadomiony",
     "at_risk": "Ryzyko",
@@ -143,11 +142,7 @@
     "group_by_monthly": "Grupuj według miesiąca",
     "group_by_weekly": "Grupuj według tygodni",
     "hours": "Godziny",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "{{value}}godziny",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Aktywni członkowie",
     "label_approve": "Zatwierdź",
     "label_approved": "Zatwierdzone",
@@ -198,14 +193,10 @@
     "label_unique_categories": "Unikalne kategorie",
     "label_unique_givers": "Wyjątkowi Dawcy",
     "mark_as_notified": "Oznacz jako powiadomione",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Członkowie oznaczeni jako powiadomieni",
     "members_selected": "Członkowie wybrani",
     "members_selected_count": "Wybrano{{count}}",
     "moderation_pending": "Aż do",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Ustawienia moderacji",
     "moderation_settings_updated": "Zaktualizowano ustawienia moderacji",
     "never": "Nigdy",
@@ -284,7 +275,18 @@
     "days_count_few": "{{count}} dni",
     "days_count_many": "{{count}} dni",
     "days_count_one": "{{count}} dni",
-    "days_count_other": "{{count}} dni"
+    "days_count_other": "{{count}} dni",
+    "unknown_period": "Nieznany okres",
+    "week_period": "Tydzień {{week}}, {{year}}",
+    "active_30d_total": "Aktywne za 30 dni",
+    "hours_reports_page_desc": "Analizuj wolumen wymiany kredytów czasowych, saldo członków i trendy w kategoriach.",
+    "hours_reports_page_title": "Raporty godzin",
+    "inactive_members_page_desc": "Identyfikuj członków zagrożonych wycofaniem się i zarządzaj powiadomieniami follow-up.",
+    "inactive_members_page_title": "Nieaktywni członkowie",
+    "member_reports_page_desc": "Śledź aktywność członków, utrzymanie, zaangażowanie i wzorce wkładu.",
+    "member_reports_page_title": "Raporty członków",
+    "moderation_queue_page_desc": "Przeglądaj oczekującą i oznaczoną zawartość przed jej pojawieniem się w społeczności.",
+    "moderation_queue_page_title": "Kolejka moderacji"
   },
   "municipal_reports": {
     "meta": {
@@ -302,13 +304,13 @@
       "body_1_before_kiss": "Miejski Raport Oddziaływania to pakiet dowodów, który udostępniasz partnerom miejskim, kantonom i fundatorom, aby wykazać wartość programu. Pokazuje zweryfikowane godziny opieki, aktywnych członków, organizacje partnerskie i, korzystając z",
       "body_1_after_kiss": " metodologia, szacowany koszt usług opieki formalnej (",
       "body_1_after_chf": "wartość godzin x mnożnik zapobiegania).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Skorzystaj z",
       "body_2_after_audience": "przełącz, aby przełączyć oprawę narracji:",
       "body_2_after_canton": "agreguje wiele gmin i wykazuje unikanie kosztów w skali kantonu;",
       "body_2_after_municipality": "koncentruje się na lokalnych mieszkańcach i organizacjach partnerskich;",
-      "body_2_after_cooperative": "pokazuje retencję członków, wskaźnik wzajemności i obciążenie pracą koordynatora. Eksportuj jako PDF, aby wysłać do partnerów lub jako CSV w celu dalszej analizy. Zapisz szablony raportów, aby szybko odtworzyć tę samą konfigurację w przyszłych okresach."
+      "body_2_after_cooperative": "pokazuje retencję członków, wskaźnik wzajemności i obciążenie pracą koordynatora. Eksportuj jako PDF, aby wysłać do partnerów lub jako CSV w celu dalszej analizy. Zapisz szablony raportów, aby szybko odtworzyć tę samą konfigurację w przyszłych okresach.",
+      "kiss_abbr": "Troskliwa społeczność"
     },
     "actions": {
       "analytics": "Analityka społeczności",
@@ -403,7 +405,8 @@
       "activities_few": "{{count}} działania",
       "activities_many": "{{count}} działania",
       "activities_one": "{{count}} działania",
-      "activities_other": "{{count}} działania"
+      "activities_other": "{{count}} działania",
+      "formatted_hours": "{{value}}h"
     },
     "toast": {
       "load_failed": "Nie udało się załadować danych o wpływie na gminy.",
@@ -566,7 +569,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}% rok do roku"
+      "yoy_value": "{{value}} rok do roku"
     }
   }
 }

@@ -189,9 +189,8 @@ export function NationalKissDashboardPage() {
       setSummary(summaryRes.data ?? null);
       setComparative(comparativeRes.data?.rows ?? []);
       setTrend(trendRes.data?.trend ?? []);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : t('national_kiss_dashboard.toasts.load_failed');
-      showToast(message, 'error');
+    } catch {
+      showToast(t('national_kiss_dashboard.toasts.load_failed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -238,7 +237,12 @@ export function NationalKissDashboardPage() {
         size="sm"
       >
         {t('national_kiss_dashboard.metrics.yoy', {
-          value: `${positive ? '+' : ''}${pct.toFixed(1)}%`,
+          value: formatNumber(pct / 100, {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+            signDisplay: 'always',
+          }),
         })}
       </Chip>
     );
@@ -356,7 +360,7 @@ export function NationalKissDashboardPage() {
         />
         <StatCard
           label={t('national_kiss_dashboard.stats.total_hours')}
-          value={summary?.total_approved_hours_national.toFixed(1) ?? '—'}
+          value={summary ? formatNumber(summary.total_approved_hours_national, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—'}
           icon={Clock}
           color="default"
           loading={loading}
@@ -403,7 +407,16 @@ export function NationalKissDashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={trend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e5e7eb)" />
-                  <XAxis dataKey="month" stroke="var(--color-text-muted, #6b7280)" />
+                  <XAxis
+                    dataKey="month"
+                    tickFormatter={(month: string) => {
+                      const match = /^(\d{4})-(\d{2})$/.exec(month);
+                      return match
+                        ? new Date(Number(match[1]), Number(match[2]) - 1, 1).toLocaleDateString(getFormattingLocale(), { month: 'short', year: 'numeric' })
+                        : t('national_kiss_dashboard.trend.unknown_period');
+                    }}
+                    stroke="var(--color-text-muted, #6b7280)"
+                  />
                   <YAxis
                     yAxisId="left"
                     stroke="var(--color-text-muted, #6b7280)"
@@ -415,7 +428,7 @@ export function NationalKissDashboardPage() {
                     stroke="var(--color-text-muted, #6b7280)"
                     label={{ value: t('national_kiss_dashboard.trend.cooperatives_axis'), angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'var(--color-text-muted, #6b7280)' } }}
                   />
-                  <Tooltip />
+                  <Tooltip formatter={(value) => formatNumber(Number(value), { maximumFractionDigits: 1 })} />
                   <Legend />
                   <Area
                     yAxisId="right"
@@ -528,12 +541,12 @@ export function NationalKissDashboardPage() {
                 {sortedRows.map((row) => (
                   <TableRow key={row.tenant_id}>
                     <TableCell className="font-medium">{row.name}</TableCell>
-                    <TableCell className="text-right">{row.hours.toFixed(1)}</TableCell>
+                    <TableCell className="text-right">{formatNumber(row.hours, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
                     <TableCell><Chip variant="soft" size="sm">{row.members_bracket}</Chip></TableCell>
                     <TableCell><Chip variant="soft" size="sm">{row.recipients_bracket}</Chip></TableCell>
                     <TableCell className="text-right">{row.active_tandems}</TableCell>
-                    <TableCell className="text-right">{row.retention_rate_pct.toFixed(1)}%</TableCell>
-                    <TableCell className="text-right">{row.reciprocity_pct.toFixed(1)}%</TableCell>
+                    <TableCell className="text-right">{formatNumber(row.retention_rate_pct / 100, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
+                    <TableCell className="text-right">{formatNumber(row.reciprocity_pct / 100, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
                     <TableCell>
                       <Chip color={statusChip[row.status].color} variant="soft" size="sm">
                         {t(`national_kiss_dashboard.status.${row.status}`)}

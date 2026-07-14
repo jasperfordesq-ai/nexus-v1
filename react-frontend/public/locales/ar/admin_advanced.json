@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,12 +67,12 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "جارٍ تحميل سلامة الخوارزمية...",
     "404_entry_dismissed": "تم رفض 404 دخول",
     "a_i_settings_saved_successfully": "تم حفظ إعدادات الذكاء الاصطناعي بنجاح",
@@ -246,8 +245,6 @@
     "match_reasons": "أسباب المباراة",
     "match_count_one": "مباراة{{count}}",
     "match_count_other": "مباريات{{count}}",
-    "meilisearch_offline": "ميليسيرتش غير متصل",
-    "meilisearch_online": "ميليسيرتش على الانترنت",
     "member_transactions": "معاملات الأعضاء",
     "meta_tags_heading": "العلامات التعريفية",
     "missing_indexes_hint_prefix": "يجري",
@@ -276,7 +273,7 @@
     "placeholder_gocspx": "GOCSPX-xxxxxx",
     "placeholder_my_timebank": "بنك الوقت الخاص بي...",
     "placeholder_noreply_example": "noreply@example.com",
-    "placeholder_robots_txt": "وكيل المستخدم: *\nعدم السماح: /admin/",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "س جكسكسكسكس...",
     "placeholder_search_users_by_name_or_email": "البحث عن المستخدمين حسب الاسم أو البريد الإلكتروني...",
     "placeholder_smtpexamplecom": "سمتبيسامبلكوم...",
@@ -410,7 +407,6 @@
     "label_ollama_host_url": "عنوان URL لمضيف Olma",
     "last_run_label": "التشغيل الأخير",
     "meta_description_count": "{{count}}/160 حرفًا للوصف التعريفي",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "معاينة صورة OG",
     "param_activity_weight": "وزن النشاط",
     "param_activity_weight_desc": "مدى قوة النشاط الأخير في تعزيز التصنيف",
@@ -460,7 +456,6 @@
     "placeholder_current_key": "أدخل الحالي:{{masked}}",
     "provider_configuration_heading": "تكوين الموفر",
     "provider_anthropic": "أنثروبي (كلود)",
-    "provider_gemini": "جوجل الجوزاء",
     "provider_gmail_api": "واجهة برمجة تطبيقات جوجل",
     "provider_ollama": "أولاما (استضافة ذاتية)",
     "provider_openai": "OpenAI",
@@ -505,7 +500,6 @@
       "workflows": {
         "title": "ماذا تحاول أن تفعل؟",
         "description": "ابدأ بالمهمة البسيطة، ثم استخدم علامة التبويب التي تفتحها. وهذا يبقي العمل الروتيني بعيدًا عن الضوابط المحفوفة بالمخاطر.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "تحديث مستأجر واحد",
           "body": "يُستخدم عند تغيير المحتوى العام لمجتمع واحد. أدخل سبيكة المستأجر الخاصة به قبل الانتظار في العمل."
@@ -525,21 +519,22 @@
         "check_tenant_safety": {
           "title": "تحقق من أن أحد المستأجرين آمن",
           "body": "افحص بالضبط ما يجب أن يكون لدى هذا المستأجر، وما تم حفظه، وما إذا كانت أي لقطات تنتمي إلى مكان آخر."
-        }
+        },
+        "open": "مفتوح"
       },
       "analytics": {
         "actions": {
           "reload": "إعادة تحميل"
         },
         "columns": {
-          "crawler": "CRAWLER",
-          "hits": "HITS",
-          "host": "HOST",
           "ip": "IP",
-          "status": "STATUS",
-          "time": "TIME",
           "uri": "URI",
-          "url": "URL"
+          "url": "URL",
+          "crawler": "زاحف",
+          "hits": "الزيارات",
+          "host": "المضيف",
+          "status": "الحالة",
+          "time": "الوقت"
         },
         "empty": "لا توجد تحليلات متاحة. قد يكون سجل وصول الروبوت فارغًا.",
         "empty_bot_traffic": "لا توجد حركة مرور بوت حتى الآن",
@@ -607,13 +602,13 @@
           "refresh_all_stale_zero": "تحديث الكل القديم ({{count}})"
         },
         "columns": {
-          "actions": "ACTIONS",
-          "asset": "ASSET",
-          "coverage": "COVERAGE",
-          "host": "HOST",
-          "missing": "MISSING",
-          "stale": "STALE",
-          "tenant": "TENANT"
+          "actions": "الإجراءات",
+          "asset": "الأصل",
+          "coverage": "التغطية",
+          "host": "المضيف",
+          "missing": "مفقود",
+          "stale": "قديم",
+          "tenant": "المستأجر"
         },
         "confirm": {
           "queue_recache": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
@@ -761,12 +756,20 @@
           "last_failed_pass": "آخر عملية فاشلة",
           "sched_prerender-detect-drift": "كاشف نبضات القلب الانجراف",
           "sched_prerender-auto-recache": "استعادة نبضات القلب تلقائيًا",
-          "sched_prerender-reap-stale": "نبضات تنظيف مهمة قديمة"
+          "sched_prerender-reap-stale": "نبضات تنظيف مهمة قديمة",
+          "unknown": "فحص غير معروف"
         },
         "issue_count_few": "مشكلات {{count}}",
         "issue_count_many": "مشكلات {{count}}",
         "issue_count_two": "مشكلات {{count}}",
-        "issue_count_zero": "مشكلات {{count}}"
+        "issue_count_zero": "مشكلات {{count}}",
+        "remediation": "الإجراء: {{detail}}",
+        "statuses": {
+          "green": "سليم",
+          "yellow": "تحذير",
+          "red": "حرج",
+          "unknown": "حالة غير معروفة"
+        }
       },
       "inventory": {
         "truncated": "بلغ الجرد حد الأمان البالغ {{count}} لقطة. ضيّق عامل تصفية المستأجر قبل تنفيذ إجراء جماعي.",
@@ -854,7 +857,6 @@
           "modified": "معدل",
           "must_fix": "يجب إصلاح ({{count}})",
           "no_structured_data": "لا توجد بيانات منظمة",
-          "no_type": "(لا يوجد @نوع)",
           "none": "(لا أحد)",
           "old": "{{age}} قديم",
           "open_graph": "افتح الرسم البياني",
@@ -886,7 +888,8 @@
           "dead_assets_one": "{{count}} ميت",
           "dead_assets_other": "{{count}} ميت",
           "dead_assets_two": "{{count}} ميت",
-          "dead_assets_zero": "{{count}} ميت"
+          "dead_assets_zero": "{{count}} ميت",
+          "no_type": "(لا @type)"
         },
         "selected": "تم تحديد {{count}}",
         "status": {
@@ -1051,7 +1054,6 @@
       "audit": {
         "actions": {
           "reset_all": "إعادة ضبط الكل وإعادة بنائه",
-          "auto_recache": "Auto-recache",
           "cancel": "إلغاء المهمة",
           "detect_drift": "كشف الانجراف",
           "enqueue": "تحديث قائمة الانتظار",
@@ -1059,7 +1061,9 @@
           "purge": "حذف اللقطات",
           "purge_unexpected": "تنظيف اللقطات غير المتوقعة",
           "reset_breaker": "إعادة ضبط قاطع الأمان",
-          "reset_queue": "إصلاح قائمة الانتظار العالقة"
+          "reset_queue": "إصلاح قائمة الانتظار العالقة",
+          "unknown": "إجراء غير معروف",
+          "auto_recache": "إعادة التخزين التلقائية"
         },
         "buttons": {
           "export_csv": "تصدير CSV",
@@ -1089,9 +1093,10 @@
         },
         "table_aria": "تاريخ التدقيق",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "نتيجة غير معروفة",
+          "denied": "مرفوض",
+          "failed": "فشل",
+          "ok": "مكتمل"
         },
         "details_empty": "لا توجد تفاصيل اضافية"
       },
@@ -1140,7 +1145,6 @@
           "unexpected": "لقطات محفوظة خارج خطط المسارات الحالية للمستأجرين",
           "active_jobs": "{{count}} نشط",
           "aging": "تقادم {{count}} (> 7 أيام)",
-          "asset_broken": "المراجع الميتة /الأصول/*",
           "backoff_window": "في نافذة التراجع لمدة 6 ساعات",
           "cache_age": "أقدم {{oldest}} / أحدث {{newest}}",
           "content_stale": "محتوى المصدر أحدث من اللقطة",
@@ -1159,7 +1163,8 @@
           "active_jobs_one": "{{count}} نشط",
           "active_jobs_other": "{{count}} نشط",
           "active_jobs_two": "{{count}} نشط",
-          "active_jobs_zero": "{{count}} نشط"
+          "active_jobs_zero": "{{count}} نشط",
+          "asset_broken": "المراجع ميتة /assets/*"
         },
         "kpi": {
           "age_stale": "العمر قديم (> 14 يومًا)",
@@ -1180,8 +1185,8 @@
           "job_queued": "تمت جدولة المهمة #{{id}}"
         },
         "placeholders": {
-          "routes": "/حول،/مدونة (فارغ = الكل)",
-          "tenant_slug": "على سبيل المثال بنك الوقت للساعة (فارغ = الكل)"
+          "tenant_slug": "على سبيل المثال بنك الوقت للساعة (فارغ = الكل)",
+          "routes": "/about، /blog (فارغ = الكل)"
         },
         "super_admin_only": "المشرف المتميز فقط"
       },
@@ -1195,7 +1200,6 @@
           "continue_to_delete": "الاستمرار في حذف العيش"
         },
         "description_middle": "لجزء مسار واحد،",
-        "description_prefix": "حذف اللقطات المطابقة لنمط الكرة الأرضية. يستخدم",
         "description_suffix": "لأي نسل. أمثلة:",
         "all_tenants_warning": {
           "body": "سيؤدي ترك الارتباط الثابت للمستأجر فارغًا إلى حذف اللقطات المطابقة عبر كل مستأجر. هذا فقط للتنظيف على مستوى النظام الأساسي بعد معاينة الملفات الدقيقة.",
@@ -1261,7 +1265,8 @@
           "ready_other": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
           "ready_two": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
           "ready_zero": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة."
-        }
+        },
+        "description_prefix": "حذف لقطات HTML المحفوظة التي تطابق نمط المسار. أضف معرف المستأجر عندما يكون الطريق تابعًا لمستأجر واحد. استخدم"
       },
       "ttl_inspector": {
         "actions": {
@@ -1275,13 +1280,18 @@
         },
         "path_only": "المسار فقط - لا يوجد مخطط أو مضيف",
         "placeholders": {
-          "route": "/مدونة/مشاركتي"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "المباراة: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (خصوصية {{specificity}})",
           "other_patterns": "الأنماط الأخرى التي تتوافق مع هذا المسار:",
-          "ttl": "TTL:{{ttl}}({{seconds}}s)"
+          "ttl": "TTL:{{ttl}}({{seconds}}s)",
+          "sources": {
+            "default": "القاعدة الافتراضية",
+            "pattern": "نمط مطابق",
+            "unknown": "مصدر غير معروف"
+          }
         },
         "title": "مفتش TTL",
         "units": {
@@ -1401,14 +1411,14 @@
           "needs_attention_zero": "العنصر {{count}} يحتاج إلى الاهتمام"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "متوقع",
+          "missing": "مفقود",
+          "unexpected": "غير متوقع",
+          "stale": "قديم",
+          "static": "ثابت",
+          "sitemap": "خريطة الموقع",
+          "snapshots": "تم الحفظ",
+          "asset_invalid": "الأصول"
         },
         "sections": {
           "attention_limited": "يتم عرض {{shown}} من أصل {{total}} لقطة محفوظة تحتاج إلى اهتمام.",
@@ -1418,10 +1428,10 @@
         "empty": "أدخل سبيكة المستأجر لفحص خطة المسار واللقطات المحفوظة.",
         "empty_attention": "ليس لدى هذا المستأجر لقطات مفقودة أو قديمة أو معطلة أو غير متوقعة.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
-          "status": "Status",
-          "why": "لماذا هو هنا"
+          "why": "لماذا هو هنا",
+          "route": "المسار",
+          "source": "المصدر",
+          "status": "الحالة"
         },
         "tables": {
           "attention_aria": "عناصر لقطة المستأجر التي تحتاج إلى الاهتمام"
@@ -1429,12 +1439,12 @@
         "sources": {
           "static": "طريق ثابت",
           "sitemap": "مسار خريطة الموقع",
-          "unexpected": "Unexpected"
+          "unexpected": "غير متوقع"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "قضية الأصول",
-          "content": "المحتوى قديم"
+          "content": "المحتوى قديم",
+          "unexpected": "غير متوقع"
         },
         "reasons": {
           "sitemap": "تم النشر بواسطة خريطة موقع المستأجر كمحتوى عام.",
@@ -1457,9 +1467,9 @@
           "body": "يمكن عادةً إزالة اللقطات غير المتوقعة باستخدام أداة التنظيف الموجودة في \"نظرة عامة\". قم بالمعاينة أولاً، ثم قم بالتطبيق فقط عندما تكون قائمة المستأجرين صحيحة."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "جديد",
+          "stale": "قديم",
+          "warn": "الاهتراء"
         }
       }
     },
@@ -1493,13 +1503,12 @@
     "next_public": {
       "title": "Next.js جاهزية الواجهة الأمامية العامة",
       "description": "حالة وضع الظل للقراءة فقط للواجهة الأمامية العامة لـ Next.js. لا تعمل هذه الصفحة على تمكين التوجيه العام أو تغيير سلوك العرض المسبق.",
-      "refresh": "Refresh",
       "loading": "جارٍ تحميل جاهزية الواجهة الأمامية العامة لـ Next.js",
       "error": "تعذر تحميل جاهزية Next.js.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "توجيه الإنتاج",
-        "prerender": "العرض الاحتياطي"
+        "prerender": "العرض الاحتياطي",
+        "mode": "الوضع"
       },
       "values": {
         "shadow_mode": "وضع الظل",
@@ -1537,8 +1546,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "طريق Laravel GET العام",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "مسار Laravel غير مسجل",
+        "auth": "مسار Laravel يتطلب المصادقة"
       },
       "edge_canary": {
         "title": "معاينة حافة الكناري",
@@ -1553,7 +1562,6 @@
         "included_by_deploy": "متضمنة بواسطة النشر",
         "not_included_by_deploy": "لم يتم تضمينها عن طريق النشر",
         "route_audit_title": "تدقيق مسار القالب",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "الطرق العامة فقط",
         "not_public_only": "ليست الطرق العامة فقط",
         "no_private_collisions": "لا يوجد تصادمات على الطريق الخاص",
@@ -1567,7 +1575,8 @@
         "preview_only": "معاينة فقط",
         "not_preview_only": "لم يتم تأكيد وضع المعاينة",
         "reviewed_config_required": "التكوين المراجعة المطلوبة",
-        "explicit_instruction_required": "مطلوب تعليمات قطع منفصلة"
+        "explicit_instruction_required": "مطلوب تعليمات قطع منفصلة",
+        "exact_path_count": "{{count}} المسارات الدقيقة"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1578,9 +1587,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "مطلوب تعليمات قطع صريحة",
         "next_shadow_checks_required": "فحوصات الظل التالية مطلوبة",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "يجب أن يظل الإجراء الاحتياطي للعرض المسبق قائمًا"
+        "prerender_fallback_must_remain": "يجب أن يظل الإجراء الاحتياطي للعرض المسبق قائمًا",
+        "react_private_regression_required": "يتطلب تراجع مسار خاص في React",
+        "apache_configtest_required": "Apache اختبار التكوين مطلوب"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "لا تقم بتحرير Plesk vhosts مباشرة",
@@ -1590,21 +1599,21 @@
       },
       "route_batches": {
         "title": "جاهزية دفعة المسار",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} المسارات"
       },
       "remaining_route_work": {
         "title": "باقي أعمال الطريق العام",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} المسار المدعوم بواجهة برمجة التطبيقات (API).",
         "api_backed_routes_plural": "{{count}} المسارات المدعومة بواجهة برمجة التطبيقات (API).",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "ضوابط التنشيط متاحة",
-        "activation_unavailable": "لا توجد ضوابط التنشيط"
+        "activation_unavailable": "لا توجد ضوابط التنشيط",
+        "route_count": "{{count}} المسارات",
+        "public_routes": "{{count}} مسار عام",
+        "public_routes_plural": "{{count}} المسارات العامة",
+        "remaining_routes": "{{count}} المسار المتبقي",
+        "remaining_routes_plural": "{{count}} المسارات المتبقية",
+        "unclassified_routes": "{{count}} مسار غير مصنّف",
+        "unclassified_routes_plural": "{{count}} مسارات غير مصنّفة"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "طرق المراجعة الثابتة/اليدوية",
@@ -1663,13 +1672,13 @@
       },
       "artifacts": {
         "title": "قطع قطعة أثرية المخزون",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "الأوامر المطلوبة",
         "required_before_cutover": "مطلوب قبل القطع",
         "activation_available": "ضوابط التنشيط متاحة",
-        "no_activation_control": "لا توجد ضوابط التنشيط"
+        "no_activation_control": "لا توجد ضوابط التنشيط",
+        "path": "المسار",
+        "present": "حاضر",
+        "missing": "مفقود"
       },
       "artifact_items": {
         "route_ownership_manifest": "بيان ملكية الطريق",
@@ -1680,11 +1689,11 @@
         "prerender_fallback": "العرض الاحتياطي"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "تكوين الحافة",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "manifest": "بيان",
+        "runtime": "وقت التشغيل",
+        "guard": "حارس",
+        "fallback": "الرجوع الاحتياطي"
       },
       "production_effects": {
         "none": "لا يوجد تأثير الإنتاج"
@@ -1693,13 +1702,13 @@
         "title": "أهلية القطع",
         "eligible": "مؤهلة للقطع",
         "blocked": "غير مؤهل للتحويل",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} المسارات العامة المدعومة بواجهة برمجة التطبيقات (API).",
         "remaining_public_routes": "{{count}} المسارات العامة المتبقية",
         "activation_available": "ضوابط التنشيط المتاحة",
         "activation_unavailable": "لا توجد ضوابط التنشيط",
-        "blockers": "Blockers",
-        "required_actions": "الإجراءات المطلوبة"
+        "required_actions": "الإجراءات المطلوبة",
+        "blockers": "العوائق",
+        "public_routes": "{{count}} المسارات العامة"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "تم حظر التحقق من صحة البيان",
@@ -1734,15 +1743,15 @@
         "prerender_retained": "ويظل الإجراء الاحتياطي الحالي للعرض المسبق محتفظًا به",
         "vite_private_routes_retained": "تظل ملكية مسار Vite الخاص محفوظة",
         "public_edge_not_configured": "لم يتم تكوين مسار حافة الإنتاج لـ Next.js",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "ولا تزال اختبارات التكافؤ مطلوبة قبل إجراء أي عملية تحويل"
+        "parity_tests_required_before_cutover": "ولا تزال اختبارات التكافؤ مطلوبة قبل إجراء أي عملية تحويل",
+        "apache_canary_template_not_included": "نموذج كناري Apache غير مضمن في النشر"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
-        "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "pass": "نجاح",
+        "blocker": "عائق",
+        "info": "معلومة",
+        "fail": "فشل",
+        "blocked": "محظور"
       },
       "runtime": {
         "title": "وقت تشغيل الظل",
@@ -1764,9 +1773,9 @@
         "monitor_and_keep_prerender_fallback": "راقب الاستجابات واحتفظ بالعرض المسبق متاحًا كإجراء احتياطي حتى يتم إثبات التكافؤ."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} تحرير/إنشاء أنماط خاصة"
+        "private_patterns": "{{count}} تحرير/إنشاء أنماط خاصة",
+        "public_routes": "{{count}} المسارات العامة",
+        "private_prefixes": "{{count}} بادئات خاصة"
       },
       "validation": {
         "title": "التحقق من صحة البيان",
@@ -1832,7 +1841,8 @@
         "public_routes_only": "الطرق العامة فقط",
         "do_not_remove_prerender": "لا تقم بإزالة الإجراء الاحتياطي للعرض المسبق.",
         "rollback_path_required": "مطلوب مسار التراجع"
-      }
+      },
+      "refresh": "تحديث"
     },
     "health_meta_description_length_few": "أحرف{{count}}(المثالي: 150-160)",
     "health_meta_description_length_many": "أحرف{{count}}(المثالي: 150-160)",
@@ -1908,7 +1918,95 @@
     "total_count_other": "المجموع: {{count}}",
     "total_count_two": "المجموع: {{count}}",
     "total_count_zero": "المجموع: {{count}}",
-    "score_out_of": "من {{maximum}}"
+    "score_out_of": "من {{maximum}}",
+    "component_match_score_aria": "{{component}} النتيجة: {{score}}%",
+    "placeholder_default_title_suffix": "| حسابي الزمني",
+    "placeholder_meta_keywords": "المصرف الزمني، المجتمع، التبادل",
+    "sitemap_content_type_unknown": "محتوى آخر",
+    "sitemap_content_type_blog_posts": "مقالات المدونة",
+    "sitemap_content_type_events": "الفعاليات",
+    "sitemap_content_type_groups": "المجموعات",
+    "sitemap_content_type_jobs": "وظائف",
+    "sitemap_content_type_listings": "القوائم",
+    "sitemap_content_type_members": "الأعضاء",
+    "sitemap_content_type_pages": "الصفحات",
+    "sitemap_content_type_podcasts": "البودكاست",
+    "sitemap_content_type_resources": "الموارد",
+    "sitemap_content_type_volunteering": "التطوع",
+    "seo_audit_check_blog_meta_description_one": "يفحص {{count}} المقالة المنشورة للعناوين والوصفات التعريفية",
+    "seo_audit_check_blog_meta_description_other": "يفحص {{count}} المقالات المنشورة للعناوين والوصفات التعريفية",
+    "seo_audit_check_blog_meta_name": "بيانات تعريف المقالات",
+    "seo_audit_check_canonical_urls_description": "يفحص إعدادات رابط كانوني والتجاوزات المخصصة",
+    "seo_audit_check_canonical_urls_name": "روابط كانونية",
+    "seo_audit_check_content_quality_description": "يتحقق من المحتوى الضعيف، والعناوين المفقودة، وغيرها من مشكلات جودة المحتوى",
+    "seo_audit_check_content_quality_name": "إشارات جودة المحتوى",
+    "seo_audit_check_duplicate_titles_description": "يتحقق من العناوين التعريفية المكررة عبر المحتوى المنشور",
+    "seo_audit_check_duplicate_titles_name": "عناوين تعريفية فريدة",
+    "seo_audit_check_kb_meta_description_one": "يتحقق {{count}} من مقالة قاعدة المعرفة المنشورة للحصول على عنوان صالح",
+    "seo_audit_check_kb_meta_description_other": "يفحص {{count}} مقالات قاعدة المعرفة المنشورة للعناوين الصالحة",
+    "seo_audit_check_kb_meta_name": "بيانات وصفية لمقالات قاعدة المعرفة",
+    "seo_audit_check_open_graph_description": "يفحص إعدادات Open Graph وTwitter Card",
+    "seo_audit_check_open_graph_name": "البيانات الوصفية لمشاركة وسائل التواصل الاجتماعي",
+    "seo_audit_check_page_meta_description_one": "يفحص {{count}} صفحة CMS المنشورة للبيانات الوصفية",
+    "seo_audit_check_page_meta_description_other": "يتحقق {{count}} من صفحات CMS المنشورة للبيانات الوصفية",
+    "seo_audit_check_page_meta_name": "بيانات وصفية لصفحة CMS",
+    "seo_audit_check_redirect_health_description_one": "يتحقق {{count}} من إعدادات إعادة التوجيه للسلاسل والحلقات وإعادة التوجيه الذاتي",
+    "seo_audit_check_redirect_health_description_other": "يتحقق {{count}} من إعدادات إعادة التوجيه للسلاسل والحلقات وإعادة التوجيه الذاتي",
+    "seo_audit_check_redirect_health_name": "صحة إعادة التوجيه",
+    "seo_audit_check_seo_settings_description": "يتحقق من تمكين عناوين URL القانونية وعلامات Open Graph وبطاقات Twitter",
+    "seo_audit_check_seo_settings_name": "تهيئة تحسين محركات البحث (SEO)",
+    "seo_audit_check_sitemap_coverage_description_one": "يتحقق من تغطية الخريطة لموقع {{count}} URL",
+    "seo_audit_check_sitemap_coverage_description_other": "يتحقق من تغطية الخريطة لعناوين URL {{count}}",
+    "seo_audit_check_sitemap_coverage_name": "تغطية خريطة الموقع",
+    "seo_audit_check_tenant_metadata_description": "يفحص عنوان الميتا ووصف الميتا وعنوان H1 لصفحة المستأجر الرئيسية",
+    "seo_audit_check_tenant_metadata_name": "بيانات تعريف الصفحة الرئيسية",
+    "seo_audit_check_unknown_description": "فحص التدقيق هذا غير مدعوم في هذا الإصدار من لوحة الإدارة",
+    "seo_audit_check_unknown_name": "فحص تدقيق غير معروف",
+    "seo_audit_issue_additional_results_truncated": "قد توجد مشكلات أخرى؛ يتم عرض أول {{limit}} فقط.",
+    "seo_audit_issue_blog_post_meta_missing": "مقال المدونة “{{title}}” ({{path}}) يفتقد إلى عنوان أو وصف ميتا.",
+    "seo_audit_issue_canonical_generation_disabled": "تم تعطيل إنشاء عنوان URL القانوني، مما يخلق خطر تكرار المحتوى.",
+    "seo_audit_issue_canonical_urls_not_enabled": "عناوين URL القانونية غير مفعلة.",
+    "seo_audit_issue_cms_page_meta_title_missing": "صفحة CMS “{{title}}” ({{path}}) تفتقد إلى عنوان ميتا.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} الصفحة تحتوي على عنوان قانوني مخصص؛ تأكد من أنه لا يزال صالحًا.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} الصفحات تحتوي على عناوين قانونية مخصصة؛ تأكد من أنها لا تزال صالحة.",
+    "seo_audit_issue_duplicate_meta_title_one": "عنوان الميتا \"{{title}}\" مستخدم {{count}} مرة.",
+    "seo_audit_issue_duplicate_meta_title_other": "عنوان الميتا \"{{title}}\" مستخدم {{count}} مرات.",
+    "seo_audit_issue_homepage_meta_title_too_long": "عنوان الميتا للصفحة الرئيسية يحتوي على {{length}} حرفاً؛ الحد الأقصى هو {{max}}.",
+    "seo_audit_issue_kb_article_titles_missing_one": "مقالة قاعدة المعرفة المنشورة {{count}} لها عنوان فارغ.",
+    "seo_audit_issue_kb_article_titles_missing_other": "مقالات قاعدة المعرفة المنشورة {{count}} لها عناوين فارغة.",
+    "seo_audit_issue_legacy_result_requires_rerun": "تستخدم هذه المشكلة المحفوظة صيغة قديمة. قم بتشغيل التدقيق مرة أخرى للحصول على التفاصيل الكاملة.",
+    "seo_audit_issue_meta_description_too_long": "وصف الميتا لصفحة البداية يحتوي على {{length}} أحرف؛ الحد الأقصى هو {{max}}.",
+    "seo_audit_issue_meta_description_too_short": "وصف الميتا لصفحة البداية يحتوي على {{length}} أحرف؛ الحد الأدنى هو {{min}}.",
+    "seo_audit_issue_missing_homepage_h1": "صفحة البداية تفتقد إلى عنوان H1.",
+    "seo_audit_issue_missing_homepage_meta_title": "صفحة البداية تفتقد إلى عنوان الميتا الافتراضي.",
+    "seo_audit_issue_missing_meta_description": "الصفحة الرئيسية تفتقد وصفها التعريفي الافتراضي.",
+    "seo_audit_issue_open_graph_default_image_missing": "لم يتم إعداد صورة Open Graph افتراضية، لذلك المشاركة على وسائل التواصل الاجتماعي لن تتضمن صورة.",
+    "seo_audit_issue_open_graph_not_enabled": "وسوم Open Graph غير مفعلة.",
+    "seo_audit_issue_open_graph_sharing_disabled": "وسوم Open Graph معطلة، لذا ستستخدم المشاركات على وسائل التواصل الاجتماعي معاينات عامة.",
+    "seo_audit_issue_redirect_chain": "سلسلة إعادة التوجيه: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "حلقة إعادة التوجيه: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "إعادة التوجيه الذاتي: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "خريطة الموقع لا تحتوي على أي روابط، لذلك لا يتم فهرسة أي محتوى منها.",
+    "seo_audit_issue_sitemap_low_coverage_one": "خريطة الموقع تحتوي على رابط واحد فقط {{count}}، مما يشير إلى تغطية منخفضة جدًا.",
+    "seo_audit_issue_sitemap_low_coverage_other": "خريطة الموقع تحتوي على روابط {{count}} فقط، مما يشير إلى تغطية منخفضة جدًا.",
+    "seo_audit_issue_sitemap_profiles_missing": "خريطة الموقع لا تحتوي على ملفات تعريف الأعضاء، على الرغم من توقع بعض منها.",
+    "seo_audit_issue_sitemap_static_pages_missing": "خريطة الموقع لا تحتوي على صفحات ثابتة، على الرغم من توقع بعض منها.",
+    "seo_audit_issue_thin_blog_content_one": "المقالة المنشورة بواسطة {{count}} تحتوي على أقل من {{minimum}} حرفًا؛ المحتوى القليل يمكن أن يضر بتحسين محركات البحث.",
+    "seo_audit_issue_thin_blog_content_other": "المقالات المنشورة بواسطة {{count}} تحتوي على أقل من {{minimum}} حرفًا؛ المحتوى القليل يمكن أن يضر بتحسين محركات البحث.",
+    "seo_audit_issue_title_suffix_missing": "لا يوجد لاحقة للعنوان مُعَدَّة، مثل \" | اسم المجتمع\".",
+    "seo_audit_issue_twitter_cards_disabled": "بطاقات تويتر معطلة.",
+    "seo_audit_issue_twitter_cards_not_enabled": "بطاقات تويتر غير مُمكَّنة.",
+    "seo_audit_issue_unknown": "هذه المشكلة في التدقيق غير مدعومة من قبل هذا الإصدار من لوحة الإدارة.",
+    "seo_audit_issue_untitled_published_pages_one": "{{count}} الصفحة المنشورة لا تحتوي على عنوان.",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} الصفحات المنشورة لا تحتوي على عنوان.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "جارٍ التحميل",
+    "no_audit_results_prompt": "لم تصدر بعد نتائج التدقيق",
+    "meilisearch_offline": "Meilisearch غير متصل",
+    "meilisearch_online": "Meilisearch متصل",
+    "provider_gemini": "Google جيميني"
   },
   "email_deliverability": {
     "title": "إمكانية تسليم البريد الإلكتروني",
@@ -2294,7 +2392,7 @@
       },
       "email_dispatch_missing_explicit_tenant": {
         "title": "البريد الإلكتروني للمرسل يفتقد مستأجرًا صريحًا",
-        "body": "لا تزال مواقع استدعاء مرسل البريد الإلكتروني {{count}} تعتمد على سياق المستأجر المستنتج. قم بتمرير Tenant_id أو TenantId بشكل صريح بحيث يكون كل إرسال في قائمة الانتظار، أو cron، أو webhook، أو عبر المستأجرين قابلاً للتدقيق."
+        "body": "{{count}} مواقع استدعاء موزع البريد الإلكتروني ما زالت تعتمد على سياق المستأجر المستنتج. مرر tenant_id أو tenantId بشكل صريح بحيث يكون كل إرسال في الطابور، الجدولة الزمنية، الويب هوك، والإرسال بين المستأجرين قابلاً للتدقيق."
       },
       "email_trigger_audit_failed": {
         "title": "فشل تدقيق مشغل البريد الإلكتروني",
@@ -2327,6 +2425,27 @@
     "trigger_coverage_one": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
     "trigger_coverage_other": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
     "trigger_coverage_two": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
-    "trigger_coverage_zero": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}"
+    "trigger_coverage_zero": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "categories": {
+      "billing": "الفوترة",
+      "civic_digest": "ملخص مدني",
+      "donation_receipt": "إيصال التبرع",
+      "event_reminder": "تذكير بالحدث",
+      "federation_connection": "اتصال الاتحاد",
+      "federation_message": "رسالة الاتحاد",
+      "federation_review": "مراجعة الاتحاد",
+      "federation_transaction": "معاملة الاتحاد",
+      "goal_reminder": "تذكير الهدف",
+      "job_interview": "مقابلة عمل",
+      "listing_expiry": "انتهاء صلاحية الإعلان",
+      "marketplace_dispute": "نزاع في السوق",
+      "marketplace_rating": "تقييم السوق",
+      "newsletter": "النشرة الإخبارية",
+      "safeguarding": "الحماية",
+      "safeguarding_review": "مراجعة الحماية",
+      "volunteer_reminder": "تذكير للمتطوعين",
+      "not_available": "غير متاح",
+      "unknown": "فئة بريد إلكتروني أخرى"
+    }
   }
 }

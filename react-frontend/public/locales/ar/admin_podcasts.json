@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,7 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
+    "loading": "تحميل",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,7 +68,7 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
+    "select_row": "اختر الصف {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
   },
@@ -92,18 +92,18 @@
       "notes_hint": "اشرح القرار حتى يتمكن المنشئ من إجراء التغييرات اللازمة.",
       "audio_unsupported": "لا يمكن لمتصفحك تشغيل هذا الصوت."
     },
-    "title": "Podcasts",
+    "title": "البودكاست",
     "description": "قم بمراجعة العروض والحلقات المجتمعية، بما في ذلك المحتوى المحفوظ للإشراف على المستأجر.",
     "load_failed": "تعذر تحميل الإشراف على البودكاست.",
     "action_failed": "تعذر تحديث الإشراف على البودكاست.",
     "empty_value": "-",
-    "count": "{{count}} items",
+    "count": "{{count}} العناصر",
     "actions": {
       "inspect": "المراجعة والإشراف",
-      "refresh": "Refresh",
-      "approve": "Approve",
-      "reject": "Reject",
-      "flag": "Flag",
+      "refresh": "تحديث",
+      "approve": "يعتمد",
+      "reject": "يرفض",
+      "flag": "علَم",
       "resolve_report": "حل التقرير",
       "dismiss_report": "رفض التقرير",
       "escalate_report": "تصعيد التقرير",
@@ -111,30 +111,51 @@
     },
     "filters": {
       "label": "مرشح الإشراف على البودكاست",
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "all": "الجميع",
+      "pending": "قيد الانتظار",
+      "approved": "موافقة",
+      "rejected": "مرفوض",
+      "flagged": "تم وضع علامة عليها"
     },
     "sections": {
-      "shows": "Shows",
-      "episodes": "Episodes",
       "top_episodes": "أعلى الحلقات",
       "client_breakdown": "انهيار العميل",
-      "retention": "Retention",
-      "reports": "فتح التقارير"
+      "retention": "حفظ",
+      "reports": "فتح التقارير",
+      "shows": "العروض",
+      "episodes": "الحلقات"
     },
     "review_values": {
-      "visibility": { "public": "عام", "members": "للأعضاء", "private": "خاص", "inherit": "موروث من البرنامج" },
-      "media_scan": { "pending": "بانتظار الفحص", "clean": "سليم", "infected": "مصاب", "scan_unavailable": "الماسح غير متاح", "not_required": "غير مطلوب" },
-      "media_processing": { "pending": "قيد الانتظار", "ready_for_processing": "جاهز للمعالجة", "complete": "مكتمل", "failed": "فشل" },
-      "report_status": { "open": "مفتوح", "resolved": "تم الحل", "dismissed": "مرفوض", "escalated": "تم التصعيد" }
+      "visibility": {
+        "public": "عام",
+        "members": "للأعضاء",
+        "private": "خاص",
+        "inherit": "موروث من البرنامج"
+      },
+      "media_scan": {
+        "pending": "بانتظار الفحص",
+        "clean": "سليم",
+        "infected": "مصاب",
+        "scan_unavailable": "الماسح غير متاح",
+        "not_required": "غير مطلوب"
+      },
+      "media_processing": {
+        "pending": "قيد الانتظار",
+        "ready_for_processing": "جاهز للمعالجة",
+        "complete": "مكتمل",
+        "failed": "فشل"
+      },
+      "report_status": {
+        "open": "مفتوح",
+        "resolved": "تم الحل",
+        "dismissed": "مرفوض",
+        "escalated": "تم التصعيد"
+      }
     },
     "readiness": {
-      "moderation": "Moderation",
-      "reports": "Reports",
-      "media": "Media",
+      "moderation": "الاعتدال",
+      "reports": "التقارير",
+      "media": "الوسائط",
       "rss": "RSS",
       "pending_items_one": "عنصر {{count}} في انتظار المراجعة",
       "pending_items_other": "{{count}} العناصر في انتظار المراجعة",
@@ -162,12 +183,12 @@
       "rss_ready_zero": "يمكن التحقق من العروض المنشورة {{count}}"
     },
     "feed_validation": {
-      "title": "التحقق من صحة آر إس إس",
       "subtitle": "آخر فحص لـ {{title}}",
-      "valid": "Ready",
+      "valid": "مستعد",
       "invalid": "يحتاج إلى عمل",
       "errors": "حظر القضايا",
-      "warnings": "الإصلاحات الموصى بها"
+      "warnings": "الإصلاحات الموصى بها",
+      "title": "التحقق من RSS"
     },
     "feed_issues": {
       "show_not_public": "يجب أن يكون العرض عامًا ومنشورًا ومعتمدًا قبل أن تتمكن الأدلة من قراءته.",
@@ -179,61 +200,62 @@
       "missing_artwork": "أضف عرضًا فنيًا لجاهزية دليل البودكاست.",
       "episode_missing_audio_url": "تفتقد إحدى الحلقات عنوان URL صالحًا لصوت HTTP.",
       "episode_missing_audio_length": "تفتقد إحدى الحلقات حجم الملف الصوتي.",
-      "episode_missing_audio_mime": "تفتقد إحدى الحلقات نوع MIME الصوتي."
+      "episode_missing_audio_mime": "تفتقد إحدى الحلقات نوع MIME الصوتي.",
+      "unknown": "تواجه الخلاصة مشكلة غير معروفة."
     },
     "columns": {
-      "title": "Title",
-      "owner": "Owner",
-      "show": "Show",
-      "author": "Author",
-      "status": "Status",
-      "moderation": "Moderation",
-      "updated": "Updated",
-      "actions": "Actions",
-      "listens": "Listens",
-      "client": "Client",
-      "bucket": "Bucket",
-      "episode": "Episode",
-      "reason": "Reason",
-      "details": "Details"
+      "title": "عنوان",
+      "owner": "مالك",
+      "author": "مؤلف",
+      "status": "حالة",
+      "moderation": "الاعتدال",
+      "updated": "تم التحديث",
+      "actions": "الإجراءات",
+      "listens": "مرات الاستماع",
+      "bucket": "دلو",
+      "reason": "سبب",
+      "details": "تفاصيل",
+      "show": "عرض",
+      "client": "العميل",
+      "episode": "حلقة"
     },
-    "report_unknown_episode": "Episode #{{id}}",
-    "reporter": "Reported by {{name}}",
+    "reporter": "تم الإبلاغ بواسطة {{name}}",
     "report_meta": "{{show}} · {{reporter}}",
     "report_reasons": {
       "safety": "سلامة أو ضرر",
       "spam": "محتوى غير مرغوب فيه أو مضلل",
       "rights": "حقوق الطبع والنشر أو القلق بشأن الحقوق",
-      "other": "Other"
+      "other": "أخرى",
+      "unknown": "سبب غير معروف"
     },
     "stats": {
-      "total_shows": "Shows",
       "published_shows": "العروض المنشورة",
       "pending_shows": "العروض المعلقة",
-      "total_episodes": "Episodes",
       "published_episodes": "الحلقات المنشورة",
       "pending_episodes": "حلقات في انتظار",
-      "total_listens": "Listens",
+      "total_listens": "مرات الاستماع",
       "completed_listens": "تم الاستماع",
       "completion_rate": "معدل الإنجاز",
       "unique_listeners": "مستمعون فريدون",
       "open_reports": "فتح التقارير",
-      "subscribers": "Followers",
+      "subscribers": "المتابعون",
       "pending_media_scans": "عمليات الفحص المعلقة",
       "media_scan_unavailable": "الماسح الضوئي غير متوفر",
       "pending_media_processing": "وظائف وسائل الإعلام في انتظار",
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "total_shows": "العروض",
+      "total_episodes": "الحلقات"
     },
     "status": {
-      "draft": "Draft",
-      "published": "Published",
-      "archived": "Archived"
+      "draft": "مسودة",
+      "published": "تم النشر",
+      "archived": "مؤرشف"
     },
     "moderation": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "قيد الانتظار",
+      "approved": "موافقة",
+      "rejected": "مرفوض",
+      "flagged": "تم وضع علامة عليها"
     },
     "empty": {
       "shows": "لا توجد عروض تتطابق مع عامل التصفية الحالي.",
@@ -286,6 +308,7 @@
     "count_one": "{{count}} العناصر",
     "count_other": "{{count}} العناصر",
     "count_two": "{{count}} items",
-    "count_zero": "{{count}} items"
+    "count_zero": "{{count}} items",
+    "report_unknown_episode": "الحلقة رقم {{id}}"
   }
 }

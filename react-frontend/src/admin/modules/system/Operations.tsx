@@ -25,6 +25,7 @@ import { useToast } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { CacheStats, BackgroundJob } from '../../api/types';
+import { getCronJobName } from './cronJobTranslations';
 
 export default function Operations() {
   const { t } = useTranslation('admin_system');
@@ -134,7 +135,7 @@ export default function Operations() {
             {jobs.length > 0 ? jobs.map((job) => (
               <div key={job.id} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">{job.name}</p>
+                  <p className="text-sm font-medium">{getCronJobName(t, job)}</p>
                   <p className="text-xs text-muted">
                     {job.last_run_at
                       ? t('operations.last_run', { date: new Date(job.last_run_at).toLocaleString(getFormattingLocale()) })
@@ -146,7 +147,7 @@ export default function Operations() {
                   size="sm"
                   variant="tertiary"
                   onPress={() => handleRunJob(job.id)}
-                  aria-label={t('operations.run_job_label', { name: job.name })}
+                  aria-label={t('operations.run_job_label', { name: getCronJobName(t, job) })}
                 >
                   <Play aria-hidden="true" size={14} />
                 </Button>

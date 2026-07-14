@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "safeguarding": {
     "active": "Aktiv",
@@ -329,9 +329,8 @@
     "pending": "Ausstehend",
     "placeholder_description_help": "Beschreibung Hilfe...",
     "placeholder_display_label": "z.B. Möglicherweise benötige ich beim Austausch zusätzliche Unterstützung",
-    "placeholder_guardian_email": "Guardian@example.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "z.B. braucht_zusätzliche_Unterstützung",
     "placeholder_review_notes": "Rezensionsnotizen...",
     "placeholder_search_messages": "Nachrichten durchsuchen...",
     "placeholder_ward_email": "ward@example.com",
@@ -368,7 +367,6 @@
     "ward": "Bezirk",
     "aria_deactivate_option": "Option deaktivieren",
     "aria_edit_option": "Option bearbeiten",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Überprüfung des Zugriffs Ni",
     "vetting_dbs_basic": "Überprüfung von Dbs Basic",
     "vetting_dbs_enhanced": "Dbs-Überprüfung verbessert",
@@ -377,6 +375,11 @@
     "vetting_international": "Internationale Überprüfung",
     "vetting_other": "Andere überprüfen",
     "vetting_pvg_scotland": "Überprüfung von Pvg Schottland",
-    "tabs_aria": "Abschnitte sichern"
+    "tabs_aria": "Abschnitte sichern",
+    "status_active": "Aktiv",
+    "status_revoked": "Zurückgezogen",
+    "status_expired": "Abgelaufen",
+    "deactivate_confirm_question": "Deaktivieren",
+    "placeholder_option_key": "z. B. needs_additional_support"
   }
 }

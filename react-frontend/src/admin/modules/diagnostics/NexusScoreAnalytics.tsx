@@ -8,6 +8,7 @@ import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
+import { formatPercentValue } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -87,7 +88,9 @@ export function NexusScoreAnalytics() {
         />
         <StatCard
           label={t('diagnostics.label_score_trend_30d')}
-          value={stats.score_trend_30d !== undefined ? `${stats.score_trend_30d > 0 ? '+' : ''}${stats.score_trend_30d}%` : String(stats.active_campaigns)}
+          value={stats.score_trend_30d !== undefined
+            ? formatPercentValue(stats.score_trend_30d, { signDisplay: stats.score_trend_30d > 0 ? 'always' : 'auto' })
+            : String(stats.active_campaigns)}
           icon={TrendingUp}
         />
       </div>
@@ -120,16 +123,16 @@ export function NexusScoreAnalytics() {
             <p className="text-xs text-muted mb-3">{t('diagnostics.score_factors_desc')}</p>
             <div className="space-y-3">
               {[
-                { factor: t('diagnostics.factor_transaction_activity'), weight: '25%' },
-                { factor: t('diagnostics.factor_social_engagement'), weight: '20%' },
-                { factor: t('diagnostics.factor_profile_completeness'), weight: '15%' },
-                { factor: t('diagnostics.factor_login_frequency'), weight: '15%' },
-                { factor: t('diagnostics.factor_community_participation'), weight: '15%' },
-                { factor: t('diagnostics.factor_review_quality'), weight: '10%' },
+                { factor: t('diagnostics.factor_transaction_activity'), weight: 25 },
+                { factor: t('diagnostics.factor_social_engagement'), weight: 20 },
+                { factor: t('diagnostics.factor_profile_completeness'), weight: 15 },
+                { factor: t('diagnostics.factor_login_frequency'), weight: 15 },
+                { factor: t('diagnostics.factor_community_participation'), weight: 15 },
+                { factor: t('diagnostics.factor_review_quality'), weight: 10 },
               ].map(({ factor, weight }) => (
                 <div key={factor} className="flex items-center justify-between py-1 border-b border-border last:border-0">
                   <span className="text-sm">{factor}</span>
-                  <span className="text-sm font-medium text-accent">{weight}</span>
+                  <span className="text-sm font-medium text-accent">{formatPercentValue(weight)}</span>
                 </div>
               ))}
             </div>

@@ -345,7 +345,10 @@
     "members_error_title": "تعذّر تحميل الأعضاء المعلقين",
     "members_error_hint": "فشل تحميل قائمة الموافقات. أعد المحاولة لجلبها مجددًا.",
     "retry": "إعادة المحاولة",
-    "empty_pending_title": "لا مزيد من المهام"
+    "empty_pending_title": "لا مزيد من المهام",
+    "stage_first_listing": "أول إدراج",
+    "stage_repeat_user": "مستخدم متكرر",
+    "stage_unknown": "المرحلة غير معروفة"
   },
   "safeguarding": {
     "title": "الحماية",
@@ -1161,7 +1164,7 @@
     "field_show_broker_name_help": "عرض اسم الوسيط المعيّن للأعضاء.",
     "field_broker_contact_email_label": "البريد الإلكتروني لجهة اتصال الوسيط",
     "field_broker_contact_email_help": "بريد إلكتروني عام للاتصال للاستفسارات الموجهة إلى الوسيط.",
-    "field_broker_contact_email_placeholder": "Broker@example.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "البريد الإلكتروني لجهة اتصال الوسيط",
     "field_broker_approval_required_label": "موافقة الوسيط مطلوبة",
     "field_broker_approval_required_help": "اشتراط موافقة الوسيط قبل أن تتمكن التبادلات من المتابعة.",
@@ -1323,7 +1326,8 @@
     "pending_confirmation": "بانتظار التأكيد",
     "confirmed": "مؤكد",
     "review_requested": "المراجعة مطلوبة",
-    "not_confirmed": "لم يتم تأكيده"
+    "not_confirmed": "لم يتم تأكيده",
+    "unknown": "مجهول"
   },
   "common": {
     "loading": "جارٍ التحميل...",

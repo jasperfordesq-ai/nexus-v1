@@ -5,9 +5,16 @@ import Play from 'lucide-react/icons/play';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { getFormattingLocale } from '@/lib/helpers';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components/PageHeader';
 import { adminTools } from '../../api/adminApi';
+import type { SeoAuditCheck } from '../../api/types';
+import {
+  getSeoAuditCheckDescriptionKey,
+  getSeoAuditCheckNameKey,
+  getSeoAuditIssueKey,
+} from './seoAuditTranslations';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,13 +26,6 @@ import { adminTools } from '../../api/adminApi';
  * Fetches real audit data from the API and supports triggering new audits.
  */
 
-
-interface AuditCheck {
-  name: string;
-  description: string;
-  status: 'pass' | 'warning' | 'fail';
-  details?: string;
-}
 
 const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   pass: 'success',
@@ -40,7 +40,7 @@ export function SeoAudit() {
   useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
 
-  const [checks, setChecks] = useState<AuditCheck[]>([]);
+  const [checks, setChecks] = useState<SeoAuditCheck[]>([]);
   const [lastRunAt, setLastRunAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
@@ -51,12 +51,8 @@ export function SeoAudit() {
     try {
       const res = await adminTools.getSeoAudit();
       if (res.success && res.data) {
-        const payload = res.data as unknown;
-        if (payload && typeof payload === 'object') {
-          const d = payload as { checks?: AuditCheck[]; last_run_at?: string | null };
-          setChecks(d.checks ?? []);
-          setLastRunAt(d.last_run_at ?? null);
-        }
+        setChecks(res.data.checks);
+        setLastRunAt(res.data.run_at);
       }
     } catch {
       // No previous audit results available - that is fine
@@ -77,16 +73,9 @@ export function SeoAudit() {
     try {
       const res = await adminTools.runSeoAudit();
       if (res.success && res.data) {
-        const payload = res.data as unknown;
-        let newChecks: AuditCheck[] = [];
-        if (Array.isArray(payload)) {
-          newChecks = payload;
-        } else if (payload && typeof payload === 'object') {
-          const d = payload as { checks?: AuditCheck[]; data?: AuditCheck[] };
-          newChecks = d.checks ?? d.data ?? [];
-        }
+        const newChecks = res.data.checks;
         setChecks(newChecks);
-        setLastRunAt(new Date().toISOString());
+        setLastRunAt(res.data.run_at);
 
         const passCount = newChecks.filter(c => c.status === 'pass').length;
         const warnCount = newChecks.filter(c => c.status === 'warning').length;
@@ -161,7 +150,7 @@ export function SeoAudit() {
           {failCount > 0 && <Chip color="danger" variant="soft">{t('failed_count_with_value', { count: failCount })}</Chip>}
           {lastRunAt && (
             <span className="text-xs text-muted ml-2">
-              {t('last_run')}
+              {t('last_run')}: {new Date(lastRunAt).toLocaleString(getFormattingLocale())}
             </span>
           )}
         </div>
@@ -183,12 +172,20 @@ export function SeoAudit() {
           ) : (
             <div className="space-y-3">
               {checks.map((check) => (
-                <div key={check.name} className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div key={check.code} className="flex items-start justify-between rounded-lg border border-border p-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium">{check.name}</p>
-                    <p className="text-xs text-muted">{check.description}</p>
-                    {check.details && (
-                      <p className="text-xs text-muted mt-1">{check.details}</p>
+                    <p className="font-medium">{t(getSeoAuditCheckNameKey(check.code), check.params)}</p>
+                    <p className="text-xs text-muted">
+                      {t(getSeoAuditCheckDescriptionKey(check.code), check.params)}
+                    </p>
+                    {check.issues.length > 0 && (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted">
+                        {check.issues.map((issue, index) => (
+                          <li key={`${issue.code}-${index}`}>
+                            {t(getSeoAuditIssueKey(issue.code), issue.params)}
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
                   <Chip

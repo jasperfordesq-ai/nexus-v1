@@ -115,7 +115,7 @@
     "invite": "دعوة",
     "invite_link_desc": "شارك رابط يمكن لأي شخص استخدامه للانضمام:",
     "invite_email_desc": "أو دعوة عبر البريد الإلكتروني (مفصولة بفواصل):",
-    "invite_email_placeholder": "email1@example.com، email2@example.com",
+    "invite_email_placeholder": "email1@example.com, email2@example.com",
     "invite_emails_aria": "عناوين البريد الإلكتروني للدعوة",
     "invite_message_label": "رسالة شخصية (اختياري)",
     "invite_message_placeholder": "انضم إلى مجموعتنا!",

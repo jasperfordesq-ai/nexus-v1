@@ -595,7 +595,7 @@
     "modal_title": "Ajouter un compte lié",
     "modal_description": "Entrez l'adresse e-mail de la personne que vous souhaitez lier. Elle recevra une notification pour approuver la demande.",
     "email_label": "Adresse e-mail",
-    "email_placeholder": "enfant@exemple.fr",
+    "email_placeholder": "child@example.com",
     "name_label": "Nom (optionnel)",
     "name_placeholder": "Nom d'affichage",
     "cancel": "Annuler",

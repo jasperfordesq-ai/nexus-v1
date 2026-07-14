@@ -47,7 +47,7 @@ function getPrivilegeLevel(user: SuperAdminUserDetail) {
   return { labelKey: 'super.privilege_regular_member', color: 'default' as const, level: 1 };
 }
 
-function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): string {
+function formatDate(dateStr: string | null | undefined, neverLabel: string): string {
   if (!dateStr) return neverLabel;
   return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -123,7 +123,7 @@ export function UserShow() {
       toast.success(t('super.user_updated_successfully'));
       loadUser();
     } else {
-      toast.error(res?.error || t('super.operation_failed'));
+      toast.error(t('super.operation_failed'));
     }
     setActionLoading(false);
     setConfirmAction(null);
@@ -139,7 +139,7 @@ export function UserShow() {
       setMoveTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_user'));
+      toast.error(t('super.failed_to_move_user'));
     }
     setMoveLoading(false);
   };
@@ -154,7 +154,7 @@ export function UserShow() {
       setPromoteTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_and_promote'));
+      toast.error(t('super.failed_to_move_and_promote'));
     }
     setPromoteLoading(false);
   };
@@ -284,14 +284,14 @@ export function UserShow() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
                     <Chip size="sm" variant="soft" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'accent' : 'default'}>
-                      {user.role}
+                      {t(`super.role_${user.role}`, { defaultValue: t('super.role_unknown') })}
                     </Chip>
                     <Chip
                       size="sm"
                       variant="soft"
                       color={user.status === 'active' ? 'success' : user.status === 'pending' ? 'warning' : 'danger'}
                     >
-                      {user.status}
+                      {t(`super.status_${user.status}`, { defaultValue: t('super.status_unknown') })}
                     </Chip>
                     {user.is_super_admin && (
                       <Chip size="sm" variant="soft" color="danger" startContent={<ShieldAlert aria-hidden="true" size={12} />}>

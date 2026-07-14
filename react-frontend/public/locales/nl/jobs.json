@@ -660,7 +660,7 @@
     "time_credits_label": "Tijdcredits Aangeboden",
     "time_credits_placeholder": "bijv. 5.00",
     "contact_email_label": "Contact E-mail",
-    "contact_email_placeholder": "contact@voorbeeld.com",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Contact Telefoon",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Aanmelddeadline",
@@ -1081,7 +1081,9 @@
     }
   },
   "jobs": {
-    "view_details": "Vacaturedetails bekijken"
+    "view_details": "Vacaturedetails bekijken",
+    "type_unknown": "Onbekend type",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Vacatures bekijken",
   "match_badge_one": "{{count}}% overeenkomst",

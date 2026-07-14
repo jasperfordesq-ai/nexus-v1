@@ -472,6 +472,29 @@ class AiModuleDocsServiceTest extends TestCase
 
     // ── seedDefaultsForTenant() ───────────────────────────────────────────────
 
+    public function test_listForTenant_marks_only_unchanged_seed_titles_with_a_stable_code(): void
+    {
+        $isolatedTenant = 999904;
+        $this->svc->seedDefaultsForTenant($isolatedTenant);
+
+        $overview = collect($this->svc->listForTenant($isolatedTenant))
+            ->first(fn ($row) => $row->module_slug === 'overview');
+
+        $this->assertNotNull($overview);
+        $this->assertSame('overview', $overview->default_title_code);
+
+        DB::table('ai_module_docs')
+            ->where('tenant_id', $isolatedTenant)
+            ->where('module_slug', 'overview')
+            ->update(['title' => 'Our community overview']);
+
+        $customOverview = collect($this->svc->listForTenant($isolatedTenant))
+            ->first(fn ($row) => $row->module_slug === 'overview');
+
+        $this->assertNotNull($customOverview);
+        $this->assertNull($customOverview->default_title_code);
+    }
+
     public function test_seedDefaultsForTenant_is_idempotent(): void
     {
         // Use an isolated tenant to avoid polluting tenant 2.

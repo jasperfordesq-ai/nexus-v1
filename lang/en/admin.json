@@ -3483,7 +3483,6 @@
         "hours_ago": "{{count}}h ago",
         "just_now": "Just now",
         "minutes_ago": "{{count}}m ago",
-        "never": "Never",
         "not_scheduled": "Not Scheduled",
         "onboarding": {
             "apply_country_preset": "Apply Country Preset",

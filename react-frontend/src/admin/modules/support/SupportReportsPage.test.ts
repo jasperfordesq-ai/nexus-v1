@@ -4,9 +4,23 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, expect, it } from 'vitest';
+import type { TFunction } from 'i18next';
 
 import type { AdminSupportReport } from '@/admin/api/types';
+import supportTranslations from '../../../../public/locales/en/admin_support.json';
 import { buildSupportReportHandoff } from './SupportReportsPage';
+
+const t = ((key: string, options?: Record<string, unknown>) => {
+  const value = key.split('.').reduce<unknown>((current, segment) => {
+    if (!current || typeof current !== 'object') return undefined;
+    return (current as Record<string, unknown>)[segment];
+  }, supportTranslations);
+
+  if (typeof value !== 'string') return key;
+  return value.replace(/{{(\w+)}}/g, (placeholder, token: string) =>
+    options?.[token] === undefined ? placeholder : String(options[token]),
+  );
+}) as unknown as TFunction<'admin_support'>;
 
 describe('buildSupportReportHandoff', () => {
   it('builds a coding-agent-ready report summary with diagnostics and links', () => {
@@ -41,10 +55,10 @@ describe('buildSupportReportHandoff', () => {
       assignee: null,
     };
 
-    const handoff = buildSupportReportHandoff(report);
+    const handoff = buildSupportReportHandoff(report, t);
 
     expect(handoff).toContain('Support report NXR-260527-RAASDS');
-    expect(handoff).toContain('Impact: major');
+    expect(handoff).toContain('Impact: Major');
     expect(handoff).toContain('Route: /hour-timebank/marketplace/42');
     expect(handoff).toContain('Reporter: Ada Lovelace <ada@example.test> (user 8)');
     expect(handoff).toContain('Sentry issue: https://sentry.example/issues/123');

@@ -689,7 +689,8 @@
         "answer_count_other": "إجابات{{count}}",
         "no_open_text": "لا توجد ردود نصية مفتوحة حتى الآن.",
         "modal_title": "التحليلات -{{title}}",
-        "empty": "لا توجد بيانات تحليلية متاحة حتى الآن."
+        "empty": "لا توجد بيانات تحليلية متاحة حتى الآن.",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "نعم",

@@ -161,7 +161,7 @@ describe('GamificationHub', () => {
     const recheckBtn = screen.getByRole('button', { name: /recheck/i });
     fireEvent.click(recheckBtn);
 
-    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Recheck failed'));
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Badge recheck failed'));
   });
 
   // ── Bulk Award Modal ──────────────────────────────────────────────────────

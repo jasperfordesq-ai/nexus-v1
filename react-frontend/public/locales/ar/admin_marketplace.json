@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,7 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
+    "loading": "تحميل",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,7 +68,7 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
+    "select_row": "اختر الصف {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
   },
@@ -208,7 +208,22 @@
     "verify_seller_title": "التحقق من البائع",
     "view_all": "عرض الكل",
     "moderation_tabs_aria": "مرشح حالة الإشراف على السوق",
-    "seller_tabs_aria": "مرشح حالة البائع"
+    "seller_tabs_aria": "مرشح حالة البائع",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "sold": "تم البيع",
+      "expired": "انتهت صلاحيتها",
+      "draft": "مسودة",
+      "unknown": "حالة قائمة أخرى"
+    },
+    "moderation_status": {
+      "approved": "موافق",
+      "pending": "في انتظار المراجعة",
+      "rejected": "مرفوض",
+      "flagged": "تم تمييزها",
+      "unknown": "حالة الإشراف الأخرى"
+    }
   },
   "bulk": {
     "selected_count": "تم تحديد {{count}}",

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "ai": {
     "common": {
@@ -134,7 +134,8 @@
       },
       "triggered_by": {
         "manual": "Lámhleabhar",
-        "scheduled": "Sceidealta"
+        "scheduled": "Sceidealta",
+        "schedule": "Sceideal"
       },
       "config": {
         "enable_title": "Cumasaigh KI-Agenten",
@@ -251,6 +252,13 @@
         "run_triggered_one": "Spreag an rith: Gineadh tograí {{count}}.",
         "run_triggered_other": "Spreag an rith: Gineadh tograí {{count}}.",
         "run_triggered_two": "Spreag an rith: Gineadh tograí {{count}}."
+      },
+      "unknown_identifier": "Anaithnid",
+      "proposal_types": {
+        "create_tandem": "Cruthaigh tandam",
+        "route_help_request": "Seol iarratas cabhrach",
+        "send_activity_summary": "Seol achoimre gníomhaíochta",
+        "send_nudge": "Seol brú"
       }
     },
     "module_docs": {
@@ -323,6 +331,122 @@
         "seeded_one": "Doiciméid réamhshocraithe {{count}} sílithe.",
         "seeded_other": "Doiciméid réamhshocraithe {{count}} sílithe.",
         "seeded_two": "Doiciméid réamhshocraithe {{count}} sílithe."
+      },
+      "defaults": {
+        "overview": {
+          "title": "Forbhreathnú ar an ardán — cad é seo"
+        },
+        "timebanking": {
+          "title": "Bunúsacha & fealsúnacht ama-bhaincéireachta"
+        },
+        "getting_started": {
+          "title": "Ag tosú — do chéad seachtain"
+        },
+        "safety": {
+          "title": "Sábháilteacht, muinín & treoirlínte pobal"
+        },
+        "listings": {
+          "title": "Liostálacha — tairiscintí agus iarratais"
+        },
+        "wallet": {
+          "title": "Sparán & cistí creidmheasa ama"
+        },
+        "messages": {
+          "title": "Teachtaireachtaí — comhráite príobháideacha"
+        },
+        "feed": {
+          "title": "Sreabhadh — sraidhpost gníomhaíochta pobail"
+        },
+        "dashboard": {
+          "title": "Painéal — do phointe tosaigh"
+        },
+        "profile": {
+          "title": "Próifíl & eolaire ball"
+        },
+        "notifications": {
+          "title": "Fógraí"
+        },
+        "settings": {
+          "title": "Socruithe — bainistigh do chuntas"
+        },
+        "events": {
+          "title": "Imeachtaí — cruinnithe pobail"
+        },
+        "groups": {
+          "title": "Grúpaí — faoisimh-phobail"
+        },
+        "volunteering": {
+          "title": "Deonú — deiseanna & troscán"
+        },
+        "jobs": {
+          "title": "Fócais poist"
+        },
+        "marketplace": {
+          "title": "Margadh — earraí, ní seirbhísí"
+        },
+        "blog": {
+          "title": "Blag — scéalta & nuacht an phobail"
+        },
+        "resources": {
+          "title": "Acmhainní — bunachar eolais & comhaid"
+        },
+        "polls": {
+          "title": "Vótálacha — cinntí pobail"
+        },
+        "ideation": {
+          "title": "Dúshláin smaointeoireachta — réiteach fadhbanna le chéile"
+        },
+        "organisations": {
+          "title": "Eagraíochtaí — próifílí comhpháirtithe"
+        },
+        "group_exchanges": {
+          "title": "Málaí grúpa — tionscadail il-duine le chéile"
+        },
+        "federation": {
+          "title": "Cumann — pobail a nascadh"
+        },
+        "gamification": {
+          "title": "Gamification — bráisléid, XP, agus aitheantas"
+        },
+        "goals": {
+          "title": "Cuspóirí — spriocanna pearsanta & pobail"
+        },
+        "connections": {
+          "title": "Naisc — do líonra"
+        },
+        "reviews": {
+          "title": "Athbhreithnithe & rátálacha"
+        },
+        "ai_chat": {
+          "title": "Cúntóir AI — an cnaipe comhrá"
+        },
+        "search": {
+          "title": "Cuardach — rud ar bith a aimsiú"
+        },
+        "caring_community": {
+          "title": "Pobal Cúramach — tacaíocht do bhaill leochaileacha"
+        },
+        "newsletter": {
+          "title": "Nuachtlitir & digistí ríomhphoist"
+        },
+        "account_security": {
+          "title": "Slándáil chuntais — pasfhocail, 2FA, eochracha pas"
+        },
+        "privacy_data": {
+          "title": "Príobháideachas & cearta sonraí (GDPR)"
+        },
+        "accessibility": {
+          "title": "Inrochtaineacht — téamaí, teangacha, teicneolaíocht chabhrach"
+        },
+        "mobile_pwa": {
+          "title": "Aip soghluaiste & PWA"
+        },
+        "troubleshooting": {
+          "title": "Ag réiteach fadhbanna coitianta"
+        },
+        "admin_overview": {
+          "title": "Do riarthóirí an phobail"
+        }
       }
     },
     "trace_metrics": {

@@ -165,7 +165,7 @@ export default function Partnerships() {
       setActionPartnership(null);
       toast.success(t('super.partnership_suspended'));
     } else {
-      toast.error(res.error || t('super.failed_to_suspend_partnership'));
+      toast.error(t('super.failed_to_suspend_partnership'));
     }
   };
 
@@ -180,7 +180,7 @@ export default function Partnerships() {
       setActionPartnership(null);
       toast.success(t('super.partnership_terminated'));
     } else {
-      toast.error(res.error || t('super.failed_to_terminate_partnership'));
+      toast.error(t('super.failed_to_terminate_partnership'));
     }
   };
 

@@ -156,7 +156,7 @@ export default function EmergencyAlertAdminPage() {
         expires_at: expiresAt || null,
       });
       if (!res.success) {
-        throw new Error(res.error ?? t('caring_emergency.errors.send_failed'));
+        throw new Error(t('caring_emergency.errors.send_failed'));
       }
       onClose();
       await fetchAlerts();
@@ -171,7 +171,7 @@ export default function EmergencyAlertAdminPage() {
     try {
       const res = await api.delete(`/v2/admin/caring-community/emergency-alerts/${id}`);
       if (!res.success) {
-        throw new Error(res.error ?? t('caring_emergency.errors.deactivate_failed'));
+        throw new Error(t('caring_emergency.errors.deactivate_failed'));
       }
       setDeactivatingId(null);
       await fetchAlerts();

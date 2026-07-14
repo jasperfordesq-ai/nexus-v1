@@ -103,13 +103,13 @@
       "table_aria": "Recurring supporters",
       "user_fallback": "User #{{id}}",
       "columns": {
-        "member": "MEMBER",
-        "email": "EMAIL",
-        "tier": "TIER",
-        "interval": "INTERVAL",
-        "status": "STATUS",
-        "next_billing": "NEXT BILLING",
-        "started": "STARTED"
+        "member": "Member",
+        "email": "Email",
+        "tier": "Tier",
+        "interval": "Interval",
+        "status": "Status",
+        "next_billing": "Next billing",
+        "started": "Started"
       },
       "status": {
         "active": "Active",

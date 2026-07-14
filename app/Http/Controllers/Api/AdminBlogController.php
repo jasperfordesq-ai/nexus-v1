@@ -220,7 +220,14 @@ class AdminBlogController extends BaseApiController
             );
         }
 
-        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_create_blog_post', 'details' => "Created blog post #{$newId}: {$title}"]);
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_create_blog_post',
+            'details' => $this->structuredActivityDetails('blog_post_created', [
+                'id' => (int) $newId,
+                'title' => $title,
+            ]),
+        ]);
         app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
             '/blog',
             "/blog/{$slug}",
@@ -339,7 +346,14 @@ class AdminBlogController extends BaseApiController
             );
         }
 
-        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_update_blog_post', 'details' => "Updated blog post #{$id}: " . ($data['title'] ?? $post->title)]);
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_update_blog_post',
+            'details' => $this->structuredActivityDetails('blog_post_updated', [
+                'id' => $id,
+                'title' => $data['title'] ?? $post->title,
+            ]),
+        ]);
         $newSlug = (string) ($updates['slug'] ?? $post->slug);
         app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, array_values(array_unique([
             '/blog',
@@ -370,7 +384,14 @@ class AdminBlogController extends BaseApiController
 
         DB::delete("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
-        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_delete_blog_post', 'details' => "Deleted blog post #{$id}: {$post->title}"]);
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_delete_blog_post',
+            'details' => $this->structuredActivityDetails('blog_post_deleted', [
+                'id' => $id,
+                'title' => $post->title,
+            ]),
+        ]);
         app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
             '/blog',
             "/blog/{$post->slug}",
@@ -403,7 +424,15 @@ class AdminBlogController extends BaseApiController
             [$newStatus, $id, $tenantId]
         );
 
-        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_toggle_blog_status', 'details' => "Changed blog post #{$id} status: {$post->status} -> {$newStatus}"]);
+        ActivityLog::create([
+            'user_id' => $adminId,
+            'action' => 'admin_toggle_blog_status',
+            'details' => $this->structuredActivityDetails('blog_post_status_changed', [
+                'id' => $id,
+                'old_status' => $post->status,
+                'new_status' => $newStatus,
+            ]),
+        ]);
         app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
             '/blog',
             "/blog/{$post->slug}",
@@ -489,7 +518,7 @@ class AdminBlogController extends BaseApiController
         ActivityLog::create([
             'user_id' => $adminId,
             'action' => 'admin_bulk_delete_blog_posts',
-            'details' => "Bulk deleted {$success} blog posts",
+            'details' => $this->structuredActivityDetails('blog_posts_bulk_deleted', ['count' => $success]),
         ]);
         app(AuditLogService::class)->log('admin_bulk_delete_blog_posts', null, $adminId, [
             'post_ids' => $touchedIds,
@@ -560,7 +589,7 @@ class AdminBlogController extends BaseApiController
         ActivityLog::create([
             'user_id' => $adminId,
             'action' => 'admin_bulk_publish_blog_posts',
-            'details' => "Bulk published {$success} blog posts",
+            'details' => $this->structuredActivityDetails('blog_posts_bulk_published', ['count' => $success]),
         ]);
         app(AuditLogService::class)->log('admin_bulk_publish_blog_posts', null, $adminId, [
             'post_ids' => $touchedIds,
@@ -575,5 +604,18 @@ class AdminBlogController extends BaseApiController
             'failed' => $failed,
             'skipped_ids' => $skippedIds,
         ]);
+    }
+
+    /**
+     * Store locale-neutral activity details for client-side rendering.
+     *
+     * @param array<string, int|string> $params
+     */
+    private function structuredActivityDetails(string $code, array $params): string
+    {
+        return json_encode(
+            ['code' => $code, 'params' => $params],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        );
     }
 }

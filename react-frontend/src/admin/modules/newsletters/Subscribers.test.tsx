@@ -33,19 +33,25 @@ vi.mock('papaparse', () => ({
 }));
 
 // ─── Admin components ─────────────────────────────────────────────────────────
-vi.mock('../../components', () => ({
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div data-testid="page-header">
       <h1>{title}</h1>
       <div>{actions}</div>
     </div>
   ),
+}));
+
+vi.mock('../../components/StatCard', () => ({
   StatCard: ({ label, value }: { label: string; value: number | string; icon?: unknown; color?: string; loading?: boolean }) => (
     <div data-testid="stat-card">
       <span>{label}</span>
       <span data-testid={`stat-value-${label.toLowerCase().replace(/\s+/g, '-')}`}>{value}</span>
     </div>
   ),
+}));
+
+vi.mock('../../components/ConfirmModal', () => ({
   ConfirmModal: ({
     isOpen,
     onClose,
@@ -350,7 +356,7 @@ describe('Subscribers', () => {
     render(<Subscribers />);
 
     await waitFor(() => {
-      expect(screen.getByText('active')).toBeInTheDocument();
+      expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
     });
   });
 

@@ -42,7 +42,7 @@ class MerchantCouponAdminController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$coupon) {
-            return $this->respondWithError('NOT_FOUND', 'Coupon not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.coupon_not_found'), null, 404);
         }
         $coupon->status = 'paused';
         $coupon->save();
@@ -60,7 +60,7 @@ class MerchantCouponAdminController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$coupon) {
-            return $this->respondWithError('NOT_FOUND', 'Coupon not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.coupon_not_found'), null, 404);
         }
         $coupon->delete();
         return $this->respondWithData(['deleted' => true]);

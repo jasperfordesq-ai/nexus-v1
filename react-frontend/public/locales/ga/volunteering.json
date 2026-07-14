@@ -848,7 +848,7 @@
     "add_group_member": "Cuir Ball den Ghrúpa leis",
     "add_member_description": "Cuir isteach seoladh ríomhphoist an duine ar mhaith leat a chur leis an áirithint ghrúpa seo. Gheobhaidh siad cuireadh chun páirt a ghlacadh.",
     "email_label": "Seoladh Ríomhphoist",
-    "email_placeholder": "ball@sampla.com",
+    "email_placeholder": "member@example.com",
     "searching": "Ag cuardach...",
     "lookup_error": "Ní féidir ball a chuardach. Bain triail eile as.",
     "no_member_found": "Níor aimsíodh aon bhall leis an seoladh ríomhphoist sin.",

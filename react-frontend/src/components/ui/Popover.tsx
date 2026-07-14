@@ -80,6 +80,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
 }
 
 function normalizePlacement(placement?: LegacyPlacement): HeroUIPopoverContentProps['placement'] | undefined {
+  // admin-i18n-ignore: converts a legacy placement token to HeroUI's protocol value; never rendered
   return placement?.replace('-', ' ') as HeroUIPopoverContentProps['placement'] | undefined;
 }
 

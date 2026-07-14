@@ -160,12 +160,12 @@ class AdminCrmController extends BaseApiController
 
         return $this->respondWithData([
             'stages' => [
-                ['name' => 'Registered', 'count' => $registered, 'color' => '#3b82f6'],
-                ['name' => 'Email Verified', 'count' => $emailVerified, 'color' => '#6366f1'],
-                ['name' => 'Profile Complete', 'count' => $profileCompleted, 'color' => '#8b5cf6'],
-                ['name' => 'First Listing', 'count' => $firstListing, 'color' => '#a855f7'],
-                ['name' => 'First Exchange', 'count' => $firstExchange, 'color' => '#d946ef'],
-                ['name' => 'Repeat User', 'count' => $repeatUser, 'color' => '#ec4899'],
+                ['code' => 'registered', 'count' => $registered, 'color' => '#3b82f6'],
+                ['code' => 'email_verified', 'count' => $emailVerified, 'color' => '#6366f1'],
+                ['code' => 'profile_complete', 'count' => $profileCompleted, 'color' => '#8b5cf6'],
+                ['code' => 'first_listing', 'count' => $firstListing, 'color' => '#a855f7'],
+                ['code' => 'first_exchange', 'count' => $firstExchange, 'color' => '#d946ef'],
+                ['code' => 'repeat_user', 'count' => $repeatUser, 'color' => '#ec4899'],
             ],
             'monthly_registrations' => $monthlyRegistrations,
         ]);
@@ -724,6 +724,7 @@ class AdminCrmController extends BaseApiController
         $safeDays = (int) $days;
         $useDayFilter = $safeDays > 0;
         $nullText = "CAST(NULL AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci";
+        $emptyDescriptionParams = "CONVERT('{}' USING utf8mb4) COLLATE utf8mb4_unicode_ci";
 
         // 1. Logins
         if (!$type || $type === 'login') {
@@ -731,7 +732,7 @@ class AdminCrmController extends BaseApiController
             $sql = "SELECT CONVERT('login' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
                      CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                      CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                     CONVERT('Logged in' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, {$activityAt} as created_at
+                     {$emptyDescriptionParams} as description_params, {$nullText} as metadata, {$activityAt} as created_at
                      FROM users u
                      LEFT JOIN user_presence up ON up.tenant_id = u.tenant_id AND up.user_id = u.id
                      WHERE u.tenant_id = ? AND {$activityAt} IS NOT NULL";
@@ -746,7 +747,7 @@ class AdminCrmController extends BaseApiController
             $sql = "SELECT CONVERT('signup' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
                      CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                      CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                     CONVERT('Registered an account' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, u.created_at as created_at
+                     {$emptyDescriptionParams} as description_params, {$nullText} as metadata, u.created_at as created_at
                      FROM users u WHERE u.tenant_id = ?";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
@@ -761,7 +762,7 @@ class AdminCrmController extends BaseApiController
                 $sql = "SELECT CONVERT('listing_created' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, l.user_id,
                          CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                          CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                         CONVERT(CONCAT('Created listing: ', COALESCE(l.title, '')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, l.created_at
+                         CONVERT(JSON_OBJECT('title', l.title) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description_params, {$nullText} as metadata, l.created_at
                          FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
@@ -777,7 +778,7 @@ class AdminCrmController extends BaseApiController
                 $sql = "SELECT CONVERT('exchange_completed' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, t.sender_id as user_id,
                          CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                          CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                         CONVERT(CONCAT('Completed exchange with ', COALESCE(r.name, 'Unknown member')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, t.created_at
+                         CONVERT(JSON_OBJECT('member_name', r.name) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description_params, {$nullText} as metadata, t.created_at
                          FROM transactions t LEFT JOIN users u ON u.id = t.sender_id LEFT JOIN users r ON r.id = t.receiver_id
                          WHERE t.tenant_id = ? AND t.status = 'completed'";
                 $p = [$tenantId]; $cp = [$tenantId];
@@ -794,7 +795,7 @@ class AdminCrmController extends BaseApiController
                 $sql = "SELECT CONVERT('note_added' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, mn.user_id,
                          CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                          CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                         CONVERT(CONCAT('Note added by ', COALESCE(a.name, 'System'), ': ', LEFT(COALESCE(mn.content, ''), 80)) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, mn.created_at
+                         CONVERT(JSON_OBJECT('author_name', a.name, 'content', LEFT(COALESCE(mn.content, ''), 80)) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description_params, {$nullText} as metadata, mn.created_at
                          FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
                          WHERE mn.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
@@ -811,7 +812,7 @@ class AdminCrmController extends BaseApiController
                 $sql = "SELECT CONVERT('task_created' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, ct.created_by as user_id,
                          CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                          CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                         CONVERT(CONCAT('Created task: ', COALESCE(ct.title, 'Untitled')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, ct.created_at
+                         CONVERT(JSON_OBJECT('title', ct.title) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description_params, {$nullText} as metadata, ct.created_at
                          FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
@@ -827,7 +828,7 @@ class AdminCrmController extends BaseApiController
                 $sql = "SELECT CONVERT('group_joined' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, gm.user_id,
                          CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                          CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                         CONVERT(CONCAT('Joined group: ', COALESCE(g.name, 'Unknown group')) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, gm.created_at
+                         CONVERT(JSON_OBJECT('group_name', g.name) USING utf8mb4) COLLATE utf8mb4_unicode_ci as description_params, {$nullText} as metadata, gm.created_at
                          FROM group_members gm LEFT JOIN users u ON u.id = gm.user_id
                          INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ? WHERE 1=1";
                 $p = [$tenantId]; $cp = [$tenantId];
@@ -842,7 +843,7 @@ class AdminCrmController extends BaseApiController
             $sql = "SELECT CONVERT('profile_updated' USING utf8mb4) COLLATE utf8mb4_unicode_ci as activity_type, u.id as user_id,
                      CONVERT(u.name USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_name,
                      CONVERT(u.avatar_url USING utf8mb4) COLLATE utf8mb4_unicode_ci as user_avatar,
-                     CONVERT('Updated their profile' USING utf8mb4) COLLATE utf8mb4_unicode_ci as description, {$nullText} as metadata, u.updated_at as created_at
+                     {$emptyDescriptionParams} as description_params, {$nullText} as metadata, u.updated_at as created_at
                      FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
@@ -864,7 +865,11 @@ class AdminCrmController extends BaseApiController
 
             foreach ($entries as $i => &$entry) {
                 $entry['id'] = ($page - 1) * $limit + $i + 1;
+                $entry['description_code'] = $entry['activity_type'];
+                $descriptionParams = json_decode((string) ($entry['description_params'] ?? '{}'), true);
+                $entry['description_params'] = is_array($descriptionParams) ? $descriptionParams : [];
             }
+            unset($entry);
 
             return $this->respondWithPaginatedCollection($entries, $total, $page, $limit);
         } catch (\Throwable $e) {

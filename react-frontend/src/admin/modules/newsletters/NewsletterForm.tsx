@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Input, Button, Chip, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -550,7 +550,10 @@ export function NewsletterForm() {
                       onValueChange={(v) => setAbSplitPercentage(Math.max(10, Math.min(90, Number(v) || 50)))}
                       variant="secondary"
                       size="sm"
-                      description={`A: ${abSplitPercentage}% / B: ${100 - abSplitPercentage}%`}
+                      description={t('newsletter_form.ab_split_description', {
+                        variantA: formatNumber(abSplitPercentage / 100, { style: 'percent', maximumFractionDigits: 0 }),
+                        variantB: formatNumber((100 - abSplitPercentage) / 100, { style: 'percent', maximumFractionDigits: 0 }),
+                      })}
                       isDisabled={isSent}
                     />
                     <Select
@@ -657,7 +660,7 @@ export function NewsletterForm() {
                   <div>
                     <p className="text-3xl font-bold text-accent">{recipientCount.toLocaleString(getFormattingLocale())}</p>
                     <p className="text-xs text-muted">
-                      {targetAudience === 'segment' ? t('newsletter_form.matching_segment_rules') : targetAudience.replace(/_/g, ' ')}
+                      {targetAudience === 'segment' ? t('newsletter_form.matching_segment_rules') : audienceLabel(targetAudience)}
                     </p>
                   </div>
                 ) : (

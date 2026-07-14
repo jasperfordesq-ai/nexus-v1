@@ -32,6 +32,24 @@
     "export_failed": "Export failed",
     "update_failed": "Failed to update"
   },
+  "api": {
+    "request_failed_title": "Request failed",
+    "request_failed": "The request could not be completed.",
+    "service_unavailable": "The service is temporarily unavailable. Please try again later.",
+    "invalid_response": "The server returned an invalid response.",
+    "request_timeout": "The request timed out. Please try again.",
+    "network_error": "Unable to connect. Please check your internet connection and try again.",
+    "invalid_request": "The request was invalid. Please check your input.",
+    "permission_denied": "You do not have permission to perform this action.",
+    "resource_not_found": "The requested resource was not found.",
+    "too_many_requests": "Too many requests. Please wait a moment and try again.",
+    "server_error": "An unexpected server error occurred. Please try again later.",
+    "download_failed_status": "Download failed (HTTP {{status}}).",
+    "upload_failed": "Upload failed.",
+    "upload_failed_retry": "Upload failed. Please try again.",
+    "upload_cancelled": "Upload cancelled.",
+    "upload_timeout": "The upload timed out. Please try again."
+  },
   "federation": {
     "feature_disabled": "Federation is not enabled for this community"
   },

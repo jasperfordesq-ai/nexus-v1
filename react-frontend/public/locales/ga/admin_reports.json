@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,12 +67,12 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Baill Gníomhacha",
     "already_notified": "Fógraithe Cheana",
     "at_risk": "I mBaol",
@@ -116,7 +115,6 @@
     "content_type_comment": "Trácht",
     "content_type_event": "Imeacht",
     "content_type_listing": "Liostú",
-    "content_type_post": "Post",
     "content_approved": "Ábhar Ceadaithe",
     "content_rejected": "Ábhar Diúltaithe",
     "days_count": "{{count}} lá",
@@ -143,11 +141,7 @@
     "group_by_monthly": "Grúpáil de réir Míosa",
     "group_by_weekly": "Grúpáil de réir Seachtaine",
     "hours": "Uaireanta",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "{{value}}uaireanta",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Baill Gníomhacha",
     "label_approve": "Cheadaigh",
     "label_approved": "Ceadaithe",
@@ -198,14 +192,10 @@
     "label_unique_categories": "Catagóirí Uathúla",
     "label_unique_givers": "Tabhartóirí Uathúla",
     "mark_as_notified": "Marcáil mar a Fógraíodh",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Marcáladh na baill mar a fógraíodh",
     "members_selected": "Baill Roghnaithe",
     "members_selected_count": "{{count}}roghnaithe",
     "moderation_pending": "Ar feitheamh",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Socruithe Modhnóireachta",
     "moderation_settings_updated": "Nuashonraíodh socruithe modhnóireachta",
     "never": "Riamh",
@@ -286,7 +276,19 @@
     "days_count_many": "{{count}} lá",
     "days_count_one": "{{count}} lá",
     "days_count_other": "{{count}} lá",
-    "days_count_two": "{{count}} lá"
+    "days_count_two": "{{count}} lá",
+    "unknown_period": "Tréimhse anaithnid",
+    "week_period": "Seachtain {{week}}, {{year}}",
+    "active_30d_total": "Gníomhach i 30 lá",
+    "hours_reports_page_desc": "Anailís a dhéanamh ar thrasnán trádála creidmheasa ama, ar iarmhéideanna na mball, agus ar threochtaí catagóirí.",
+    "hours_reports_page_title": "Tuarascálacha uaireanta",
+    "inactive_members_page_desc": "Bain amach baill atá i mbaol dícheangailt agus bainistigh fógraí leanúna.",
+    "inactive_members_page_title": "Baill neamhghníomhacha",
+    "member_reports_page_desc": "Rianú ar ghníomhaíocht, coinneála, rannpháirtíochta agus patrúin ranníocaíochta na mbaill.",
+    "member_reports_page_title": "Tuarascálacha baill",
+    "moderation_queue_page_desc": "Athbhreithniú ar ábhar atá ar feitheamh agus marcáilte sula bhfeictear é sa phobal.",
+    "moderation_queue_page_title": "Scair le haghaidh maoirseachta",
+    "content_type_post": "Postáil"
   },
   "municipal_reports": {
     "meta": {
@@ -304,13 +306,13 @@
       "body_1_before_kiss": "Is é atá sa Tuarascáil Tionchair Chathrach ná an pacáiste fianaise a roinneann tú le comhpháirtithe bardais, le cantainí agus le maoinitheoirí chun luach an chláir a léiriú. Taispeánann sé uaireanta cúraim fíoraithe, baill ghníomhacha, eagraíochtaí comhpháirtíochta, agus, ag baint úsáide as an",
       "body_1_after_kiss": " modheolaíocht, costas measta a fhritháireamh do sheirbhísí cúraim fhoirmiúla (",
       "body_1_after_chf": "luach na n-uaireanta x iolraitheoir coisc).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Bain úsáid as an",
       "body_2_after_audience": "scoránaigh chun an fráma insinte a athrú:",
       "body_2_after_canton": "comhiomlánaíonn sé bardais iolracha agus taispeánann sé seachaint costais ar scála cantonal;",
       "body_2_after_municipality": "dírítear ar chónaitheoirí áitiúla agus ar eagraíochtaí comhpháirtíochta;",
-      "body_2_after_cooperative": "léiríonn coinneáil ball, ráta cómhalartachta, agus ualach oibre an chomhordaitheora. Easpórtáil mar PDF le seoladh chuig comhpháirtithe nó mar CSV le haghaidh tuilleadh anailíse. Sábháil teimpléid tuairisce chun an chumraíocht chéanna a athghiniúint go tapa i dtréimhsí amach anseo."
+      "body_2_after_cooperative": "léiríonn coinneáil ball, ráta cómhalartachta, agus ualach oibre an chomhordaitheora. Easpórtáil mar PDF le seoladh chuig comhpháirtithe nó mar CSV le haghaidh tuilleadh anailíse. Sábháil teimpléid tuairisce chun an chumraíocht chéanna a athghiniúint go tapa i dtréimhsí amach anseo.",
+      "kiss_abbr": "Pobal Cúramach"
     },
     "actions": {
       "analytics": "Anailísíocht phobail",
@@ -407,7 +409,8 @@
       "activities_many": "{{count}} gníomhaíochtaí",
       "activities_one": "{{count}} gníomhaíochtaí",
       "activities_other": "{{count}} gníomhaíochtaí",
-      "activities_two": "{{count}} gníomhaíochtaí"
+      "activities_two": "{{count}} gníomhaíochtaí",
+      "formatted_hours": "{{value}}h"
     },
     "toast": {
       "load_failed": "Theip ar lódáil sonraí tionchair chathrach.",
@@ -450,9 +453,9 @@
       },
       "audiences": {
         "municipality": "Bardas",
-        "canton": "Canton",
         "cooperative": "Comharchumann",
-        "foundation": "Fondúireacht"
+        "foundation": "Fondúireacht",
+        "canton": "Cantún"
       },
       "delete_confirm": "Scrios teimpléad \"{{name}}\"? Ní féidir é seo a chealú."
     },
@@ -575,7 +578,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}% bliain ar bhliain"
+      "yoy_value": "{{value}} bliain ar bhliain"
     }
   }
 }

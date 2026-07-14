@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,9 +67,10 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "provisioning_requests": {
     "page_title": "Coda di provisioning",
@@ -102,7 +102,8 @@
       "approved": "Approvato",
       "provisioned": "Provvisto",
       "rejected": "Respinto",
-      "failed": "Fallito"
+      "failed": "Fallito",
+      "unknown": "Stato sconosciuto"
     },
     "fields": {
       "applicant": "Richiedente",
@@ -117,8 +118,27 @@
       "rejection_reason": "Motivo del rifiuto",
       "provisioning_log": "Registro del provisioning"
     },
-    "loading": "Caricamento delle richieste di provisioning…"
+    "loading": "Caricamento delle richieste di provisioning…",
+    "categories": {
+      "community": "Comunità",
+      "kiss_cooperative": "Cooperativa Comunità Premurosa",
+      "caring_community": "Comunità premurosa",
+      "agoris_node": "Nodo Agoris",
+      "foundation": "Fondazione",
+      "platform": "Piattaforma",
+      "unknown": "Altro tipo di comunità",
+      "timebank": "Banca del tempo"
+    },
+    "size_buckets": {
+      "under_50": "Meno di 50 membri",
+      "50_250": "50–250 membri",
+      "250_1000": "250–1.000 membri",
+      "1000_5000": "1.000–5.000 membri",
+      "5000_plus": "Più di 5.000 membri",
+      "50-200": "50–200 membri",
+      "unknown": "Dimensione non specificata"
+    }
   },
-  "loading": "Loading",
-  "refresh": "Aggiorna"
+  "refresh": "Aggiorna",
+  "loading": "Caricamento"
 }

@@ -859,7 +859,7 @@
     "add_group_member": "إضافة عضو المجموعة",
     "add_member_description": "أدخل عنوان البريد الإلكتروني للشخص الذي ترغب في إضافته إلى حجز المجموعة هذا. سوف يتلقون دعوة للانضمام.",
     "email_label": "عنوان البريد الإلكتروني",
-    "email_placeholder": "عضو@example.com",
+    "email_placeholder": "member@example.com",
     "searching": "جارٍ البحث...",
     "lookup_error": "غير قادر على البحث عن العضو. يرجى المحاولة مرة أخرى.",
     "no_member_found": "لم يتم العثور على عضو لديه عنوان البريد الإلكتروني هذا.",

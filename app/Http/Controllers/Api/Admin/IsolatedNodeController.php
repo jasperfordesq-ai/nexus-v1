@@ -74,7 +74,7 @@ class IsolatedNodeController extends BaseApiController
         if (!in_array($itemKey, $allowedKeys, true)) {
             return $this->respondWithError(
                 'INVALID_ITEM_KEY',
-                'Unknown decision-gate item: ' . $itemKey,
+                __('api.decision_gate_item_unknown', ['item' => $itemKey]),
                 'item_key',
                 404,
             );
@@ -92,7 +92,7 @@ class IsolatedNodeController extends BaseApiController
         if ($payload === []) {
             return $this->respondWithError(
                 'EMPTY_PAYLOAD',
-                'At least one of value, owner, status, or notes must be provided',
+                __('api.decision_gate_update_required'),
                 null,
                 422,
             );

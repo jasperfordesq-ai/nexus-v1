@@ -826,7 +826,7 @@
     "add_group_member": "Adicionar membro do grupo",
     "add_member_description": "Digite o endereço de e-mail da pessoa que você gostaria de adicionar a esta reserva de grupo. Eles receberão um convite para participar.",
     "email_label": "Endereço de email",
-    "email_placeholder": "membro@exemplo.com",
+    "email_placeholder": "member@example.com",
     "searching": "Procurando...",
     "lookup_error": "Não foi possível procurar membro. Por favor, tente novamente.",
     "no_member_found": "Nenhum membro encontrado com esse endereço de e-mail.",

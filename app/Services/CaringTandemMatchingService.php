@@ -97,7 +97,7 @@ class CaringTandemMatchingService
                     'recipient' => $this->presentUser($b),
                     'score' => round($score, 3),
                     'signals' => $signals,
-                    'reason' => $this->buildReason($signals),
+                    'reasons' => $this->buildReasons($signals),
                 ];
             }
         }
@@ -445,31 +445,34 @@ class CaringTandemMatchingService
     /**
      * @param array<string,mixed> $signals
      */
-    private function buildReason(array $signals): string
+    private function buildReasons(array $signals): array
     {
         $parts = [];
         if (isset($signals['distance_km'])) {
-            $km = (float) $signals['distance_km'];
-            $parts[] = $km < 1.0
-                ? sprintf('Lives %.1f km away', $km)
-                : sprintf('Lives %.1f km away', $km);
+            $parts[] = [
+                'code' => 'distance',
+                'params' => ['distance_km' => round((float) $signals['distance_km'], 1)],
+            ];
         }
         if (isset($signals['language_overlap']) && (float) $signals['language_overlap'] >= 0.6) {
-            $parts[] = 'Shares a language';
+            $parts[] = ['code' => 'shared_language', 'params' => []];
         }
         if (isset($signals['skill_complement']) && (float) $signals['skill_complement'] >= 0.6) {
-            $parts[] = 'Complementary skills';
+            $parts[] = ['code' => 'complementary_skills', 'params' => []];
         }
         if (isset($signals['availability_overlap']) && (float) $signals['availability_overlap'] >= 0.6) {
-            $parts[] = 'Availability lines up';
+            $parts[] = ['code' => 'availability_overlap', 'params' => []];
         }
         if (isset($signals['interest_overlap']) && (float) $signals['interest_overlap'] >= 0.5) {
-            $parts[] = 'Shared interests';
+            $parts[] = ['code' => 'shared_interests', 'params' => []];
         }
         if (!empty($signals['intergenerational'])) {
-            $parts[] = 'Intergenerational pairing';
+            $parts[] = ['code' => 'intergenerational', 'params' => []];
         }
-        return $parts === [] ? 'Reasonable overall fit' : implode(', ', $parts);
+
+        return $parts === []
+            ? [['code' => 'overall_fit', 'params' => []]]
+            : $parts;
     }
 
     /**

@@ -9,3 +9,13 @@ declare module 'grapesjs-plugin-forms';
 declare module 'grapesjs-tabs';
 declare module 'grapesjs-tooltip';
 declare module 'grapesjs-custom-code';
+
+declare module 'grapesjs/locale/*.js' {
+  const messages: unknown;
+  export default messages;
+}
+
+declare module 'grapesjs-mjml/locale/*.js' {
+  const messages: unknown;
+  export default messages;
+}

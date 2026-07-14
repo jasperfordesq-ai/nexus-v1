@@ -99,7 +99,7 @@ function AdminLayoutShell() {
         href="#main-content"
         className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[9999] focus-visible:rounded-lg focus-visible:bg-[var(--color-primary)] focus-visible:px-4 focus-visible:py-2 focus-visible:text-white focus-visible:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
-        {t('skip_to_main', 'Skip to main content')}
+        {t('skip_to_main')}
       </a>
       <AdminMetaTags />
       {/* Sidebar — hidden on mobile, shown on md+ */}
@@ -127,7 +127,7 @@ function AdminLayoutShell() {
         ref={drawerRef}
         role="dialog"
         aria-modal="true"
-        aria-label={t('admin_navigation', 'Admin navigation')}
+        aria-label={t('admin_navigation')}
         inert={!mobileDrawerOpen || undefined}
         className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-surface transition-transform duration-300 md:hidden ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >

@@ -34,7 +34,7 @@ class HelpRequestSlaController extends BaseApiController
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
-            return $this->respondForbidden('Caring Community feature is not enabled for this tenant.');
+            return $this->respondForbidden(__('api.caring_community_feature_disabled'));
         }
 
         return $this->respondWithData(

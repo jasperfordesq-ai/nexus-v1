@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Franco suizo: la moneda utilizada para los cálculos de compensación de costos de atención formal en implementaciones de Caring Community",
+    "fadp": "Ley federal de protección de datos: ley suiza revisada de protección de datos (en vigor desde septiembre de 2023)",
+    "ndsg": "Neues Datenschutzgesetz: la Ley Federal Suiza de Protección de Datos revisada (sinónimo de FADP)",
+    "dsg": "Datenschutzgesetz — ver nDSG / FADP",
+    "gdpr": "Reglamento general de protección de datos: ley de protección de datos de la UE; Las implementaciones suizas utilizan FADP/nDSG en su lugar",
+    "sla": "Acuerdo de nivel de servicio: el tiempo máximo comprometido de respuesta o resolución para cada nivel de prioridad",
+    "agpl": "Licencia pública general GNU Affero v3: la licencia de código abierto bajo la cual NEXUS se lanza públicamente",
+    "kpi": "Indicador clave de rendimiento: una métrica mensurable utilizada para evaluar el progreso hacia un objetivo definido",
+    "roi": "Retorno de la inversión: aquí: costo de atención formal evitado por hora de apoyo informal intercambiado",
+    "nexus": "Proyecto NEXUS: la plataforma de atención comunitaria y banco de tiempo para múltiples inquilinos",
+    "agm": "Reunión general anual",
+    "xp": "Puntos de experiencia: puntos de gamificación otorgados por completar intercambios y alcanzar hitos",
+    "isco": "Clasificación Internacional Uniforme de Ocupaciones: se utiliza para categorizar los tipos de servicios de atención"
+  }
+}

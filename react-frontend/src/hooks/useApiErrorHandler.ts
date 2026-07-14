@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { API_ERROR_EVENT, type ApiErrorEventDetail } from '@/lib/api';
 
@@ -18,14 +19,15 @@ import { API_ERROR_EVENT, type ApiErrorEventDetail } from '@/lib/api';
  */
 export function useApiErrorHandler() {
   const { error } = useToast();
+  const { t } = useTranslation('errors');
   const lastToastRef = useRef<{ key: string; at: number } | null>(null);
 
   useEffect(() => {
     function handleApiError(event: CustomEvent<ApiErrorEventDetail>) {
-      const { message, code } = event.detail;
+      const { code } = event.detail;
 
       // Map error codes to user-friendly messages
-      const userMessage = getErrorMessage(code, message);
+      const userMessage = getErrorMessage(code, t);
 
       // Session expiry has its own modal. Intentional caller/upload cancellation
       // is control flow, not a request failure, and must remain silent.
@@ -40,31 +42,35 @@ export function useApiErrorHandler() {
       }
       lastToastRef.current = { key, at: now };
 
-      error('Request Failed', userMessage);
+      error(t('api.request_failed_title'), userMessage);
     }
 
     window.addEventListener(API_ERROR_EVENT, handleApiError as EventListener);
     return () => window.removeEventListener(API_ERROR_EVENT, handleApiError as EventListener);
-  }, [error]);
+  }, [error, t]);
 }
 
 /**
  * Map error codes to user-friendly messages
  */
-function getErrorMessage(code: string, fallback: string): string {
-  const messages: Record<string, string> = {
-    NETWORK_ERROR: 'Unable to connect to the server. Please check your internet connection.',
-    PARSE_ERROR: 'Received an invalid response from the server.',
-    HTTP_400: 'The request was invalid. Please check your input.',
-    HTTP_403: 'You do not have permission to perform this action.',
-    HTTP_404: 'The requested resource was not found.',
-    HTTP_429: 'Too many requests. Please wait a moment and try again.',
-    HTTP_500: 'An unexpected server error occurred. Please try again later.',
-    HTTP_502: 'The server is temporarily unavailable. Please try again later.',
-    HTTP_503: 'The service is temporarily unavailable. Please try again later.',
-  };
+function getErrorMessage(
+  code: string,
+  t: ReturnType<typeof useTranslation<'errors'>>['t'],
+): string {
+  const messageKeys = {
+    NETWORK_ERROR: 'api.network_error',
+    PARSE_ERROR: 'api.invalid_response',
+    HTTP_400: 'api.invalid_request',
+    HTTP_403: 'api.permission_denied',
+    HTTP_404: 'api.resource_not_found',
+    HTTP_429: 'api.too_many_requests',
+    HTTP_500: 'api.server_error',
+    HTTP_502: 'api.service_unavailable',
+    HTTP_503: 'api.service_unavailable',
+  } as const;
 
-  return messages[code] || fallback;
+  const key = messageKeys[code as keyof typeof messageKeys];
+  return key ? t(key) : t('api.request_failed');
 }
 
 export default useApiErrorHandler;

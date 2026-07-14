@@ -124,10 +124,10 @@ export function TenantList() {
         setTenants(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(`${t('super.tenants')}: ${res.error || t('super.failed_to_load_tenant_list')}`);
+        toast.error(`${t('super.tenants')}: ${t('super.failed_to_load_tenant_list')}`);
       }
-    } catch (err) {
-      toast.error(`${t('super.tenants_error')}: ${err instanceof Error ? err.message : t('common.unknown')}`);
+    } catch {
+      toast.error(`${t('super.tenants_error')}: ${t('common.unknown')}`);
     }
     setLoading(false);
   }, [filter, search, t, toast])
@@ -160,7 +160,7 @@ export function TenantList() {
       toast.success(t('super.tenant_action_succeeded'));
       loadTenants();
     } else {
-      toast.error(res?.error || t('super.failed_to_action_tenant'));
+      toast.error(t('super.failed_to_action_tenant'));
     }
 
     setActionLoading(false);

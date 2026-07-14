@@ -123,7 +123,10 @@
     },
     "streak_value_other": "{{count}}回のチェックイン",
     "best_streak_other": "最高連続記録: {{count}}",
-    "checkins_value_other": "{{count}}件記録済み"
+    "checkins_value_other": "{{count}}件記録済み",
+    "streak_value_one": "{{count}} チェックイン",
+    "best_streak_one": "最高連続記録: {{count}}",
+    "checkins_value_one": "{{count}} 記録"
   },
   "template_picker": {
     "load_error": "テンプレートの読み込みに失敗しました。もう一度お試しください。",

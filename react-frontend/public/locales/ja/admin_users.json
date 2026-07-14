@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "users": {
     "action_approve": "承認する",
@@ -220,7 +220,9 @@
     "permissions_editor_unavailable_title": "この画面では権限は読み取り専用です",
     "permissions_editor_unavailable_desc": "このページではユーザーのロールと付与された権限を表示しますが、変更はできません。アクセス権はユーザー編集ページでロールを変更して管理してください。",
     "role_unknown": "不明なロール",
-    "role_tenant_super_admin": "テナントのスーパー管理者"
+    "role_tenant_super_admin": "テナントのスーパー管理者",
+    "role_super_admin_short": "スーパー管理者",
+    "reset_2fa_reason": "管理者によってリセットされました"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "同意あり",
       "not_consented": "同意されていません",
       "not_given": "同意が得られませんでした",
-      "withdrawn_on": "撤回日"
+      "withdrawn_on": "撤回日",
+      "type_unknown": "不明な同意タイプ"
     },
     "descriptions": {
       "balance_amount": "このメンバーから時間クレジットを差し引くには、負の値を使用してください",
@@ -433,12 +436,28 @@
       "decision_confirmed": "認証が確認されました",
       "decision_revoked": "認証が取り消されました",
       "decision_not_confirmed": "認証が確認されていません"
+    },
+    "insurance": {
+      "status_none": "なし",
+      "status_pending": "保留中",
+      "status_submitted": "提出済み",
+      "status_verified": "確認済み",
+      "status_expired": "期限切れ",
+      "status_rejected": "却下",
+      "status_revoked": "取り消し済み",
+      "status_unknown": "状態不明",
+      "type_public_liability": "公共賠償責任",
+      "type_professional_indemnity": "専門職賠償責任",
+      "type_employers_liability": "使用者賠償責任",
+      "type_product_liability": "製造物賠償責任",
+      "type_personal_accident": "個人事故",
+      "type_other": "その他",
+      "type_unknown": "不明な保険タイプ"
     }
   },
   "aria": {
     "breadcrumbs": "ブレッドクラム"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "居住確認",
     "page_desc": "メンバーが提出した居住申告を確認し、居住確認済みバッジを付与します。",
@@ -483,5 +502,6 @@
     "intelligence": "知能",
     "engagement": "婚約",
     "system": "システム"
-  }
+  },
+  "loading": "読み込み中"
 }

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,7 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
+    "loading": "Ag lódáil",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,7 +68,7 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
+    "select_row": "Roghnaigh sraith {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
   },
@@ -208,7 +208,22 @@
     "verify_seller_title": "Fíoraigh Díoltóir",
     "view_all": "Féach ar Uile",
     "moderation_tabs_aria": "Scagaire stádais modhnóireachta Marketplace",
-    "seller_tabs_aria": "Scagaire stádais díoltóra"
+    "seller_tabs_aria": "Scagaire stádais díoltóra",
+    "status": {
+      "active": "Gníomhach",
+      "inactive": "Neamhghníomhach",
+      "sold": "Díolta",
+      "expired": "Éagtha",
+      "draft": "Dréacht",
+      "unknown": "Stádas liosta eile"
+    },
+    "moderation_status": {
+      "approved": "Ceadaithe",
+      "pending": "Ag fanacht ar athbhreithniú",
+      "rejected": "Dhiúltódh",
+      "flagged": "Marcáilte",
+      "unknown": "Stádas maoirseachta eile"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} roghnaithe",

@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "provisioning_requests": {
     "page_title": "Kolejka zaopatrzenia",
@@ -102,7 +102,8 @@
       "approved": "Zatwierdzony",
       "provisioned": "Zapewnione",
       "rejected": "Odrzucony",
-      "failed": "Przegrany"
+      "failed": "Przegrany",
+      "unknown": "Nieznany status"
     },
     "fields": {
       "applicant": "Petent",
@@ -117,8 +118,27 @@
       "rejection_reason": "Powód odrzucenia",
       "provisioning_log": "Dziennik udostępniania"
     },
-    "loading": "Ładowanie żądań udostępnienia…"
+    "loading": "Ładowanie żądań udostępnienia…",
+    "categories": {
+      "community": "Społeczność",
+      "timebank": "Bank czasu",
+      "kiss_cooperative": "Kooperatywa Troskliwej Społeczności",
+      "caring_community": "Troskliwa społeczność",
+      "agoris_node": "Węzeł Agoris",
+      "foundation": "Fundacja",
+      "platform": "Platforma",
+      "unknown": "Inny typ społeczności"
+    },
+    "size_buckets": {
+      "under_50": "Mniej niż 50 członków",
+      "50_250": "50–250 członków",
+      "250_1000": "250–1 000 członków",
+      "1000_5000": "1 000–5 000 członków",
+      "5000_plus": "Ponad 5 000 członków",
+      "50-200": "50–200 członków",
+      "unknown": "Rozmiar nieokreślony"
+    }
   },
-  "loading": "Loading",
-  "refresh": "Odśwież"
+  "refresh": "Odśwież",
+  "loading": "Ładowanie"
 }

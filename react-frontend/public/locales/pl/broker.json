@@ -329,7 +329,10 @@
     "members_error_title": "Nie udało się załadować oczekujących członków",
     "members_error_hint": "Nie udało się załadować kolejki zatwierdzeń. Spróbuj ponownie, aby pobrać ją ponownie.",
     "retry": "Spróbuj ponownie",
-    "empty_pending_title": "Wszystko na bieżąco"
+    "empty_pending_title": "Wszystko na bieżąco",
+    "stage_first_listing": "Pierwsza oferta",
+    "stage_repeat_user": "Powtarzający się użytkownik",
+    "stage_unknown": "Nieznany etap"
   },
   "safeguarding": {
     "title": "Ochrona",
@@ -1301,7 +1304,8 @@
     "pending_confirmation": "Oczekuje na potwierdzenie",
     "confirmed": "Potwierdzone",
     "review_requested": "Zażądano przeglądu",
-    "not_confirmed": "Nie potwierdzone"
+    "not_confirmed": "Nie potwierdzone",
+    "unknown": "Nieznany"
   },
   "common": {
     "loading": "Ładowanie...",

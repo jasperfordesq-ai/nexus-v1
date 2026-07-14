@@ -7,8 +7,8 @@
  * BrokerStatusChip — one status → color/label mapping for the whole broker
  * panel, so "pending" is always warning-amber and "rejected" always danger-red
  * no matter which page renders it. Labels come from the broker.status.* i18n
- * namespace; unknown statuses fall back to a prettified string on a neutral
- * chip rather than crashing or leaking a raw snake_case key.
+ * namespace; unknown statuses use a localized generic label on a neutral chip
+ * rather than leaking a raw snake_case key.
  */
 
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ export function BrokerStatusChip({ status, size = 'sm', className }: BrokerStatu
   const { t } = useTranslation('broker');
   const normalized = (status || '').toLowerCase();
   const label = t(`status.${normalized}`, {
-    defaultValue: normalized.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    defaultValue: t('status.unknown'),
   });
 
   return (

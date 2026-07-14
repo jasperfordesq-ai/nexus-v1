@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "provisioning_requests": {
     "page_title": "File d'attente de provisionnement",
@@ -102,7 +102,8 @@
       "approved": "Approuvé",
       "provisioned": "Provisionné",
       "rejected": "Rejeté",
-      "failed": "Échoué"
+      "failed": "Échoué",
+      "unknown": "Statut inconnu"
     },
     "fields": {
       "applicant": "Demandeur",
@@ -117,8 +118,27 @@
       "rejection_reason": "Motif du refus",
       "provisioning_log": "Journal de provisionnement"
     },
-    "loading": "Chargement des demandes de provisionnement…"
+    "loading": "Chargement des demandes de provisionnement…",
+    "categories": {
+      "community": "Communauté",
+      "timebank": "Banque de temps",
+      "kiss_cooperative": "Coopérative Communauté bienveillante",
+      "caring_community": "Communauté bienveillante",
+      "agoris_node": "Nœud Agoris",
+      "foundation": "Fondation",
+      "platform": "Plateforme",
+      "unknown": "Autre type de communauté"
+    },
+    "size_buckets": {
+      "under_50": "Moins de 50 membres",
+      "50_250": "50–250 membres",
+      "250_1000": "250–1 000 membres",
+      "1000_5000": "1 000–5 000 membres",
+      "5000_plus": "Plus de 5 000 membres",
+      "50-200": "50–200 membres",
+      "unknown": "Taille non spécifiée"
+    }
   },
-  "loading": "Loading",
-  "refresh": "Actualiser"
+  "refresh": "Actualiser",
+  "loading": "Chargement"
 }

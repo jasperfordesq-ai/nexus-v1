@@ -32,7 +32,10 @@
   "error": {
     "title": "No se pudo cargar",
     "article_not_found": "Artículo no encontrado.",
-    "article_title": "No se pudo cargar el artículo"
+    "article_title": "No se pudo cargar el artículo",
+    "load_articles": "Error al cargar los artículos de la base de conocimientos.",
+    "load_retry": "Error al cargar los artículos. Inténtelo de nuevo.",
+    "article_load_retry": "Error al cargar el artículo. Inténtelo de nuevo."
   },
   "empty": {
     "title": "No se encontraron artículos",

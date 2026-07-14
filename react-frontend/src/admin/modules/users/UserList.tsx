@@ -315,7 +315,7 @@ export function UserList() {
 
   const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }, actionLabel: string) => {
     if (!res.success) {
-      toast.error(res.error || t('users.result_failed'));
+      toast.error(t('users.result_failed'));
       return;
     }
     const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
@@ -381,8 +381,7 @@ export function UserList() {
   };
 
   const roleLabel = (role: string) => {
-    const key = `users.role_${role}`;
-    return t(key, { defaultValue: role.replace(/_/g, ' ') });
+    return t(`users.role_${role}`, { defaultValue: t('users.role_unknown') });
   };
 
   const activeSearchChips = [
@@ -424,7 +423,7 @@ export function UserList() {
         loadUsers();
       }
     } else {
-      toast.error(res.error || t('users.import_failed'));
+      toast.error(t('users.import_failed'));
     }
     setImportLoading(false);
   };
@@ -460,7 +459,7 @@ export function UserList() {
         res = await adminUsers.delete(user.id);
         break;
       case 'reset2fa':
-        res = await adminUsers.reset2fa(user.id, 'Admin reset');
+        res = await adminUsers.reset2fa(user.id, t('users.reset_2fa_reason'));
         break;
       case 'impersonate': {
         res = await adminUsers.impersonate(user.id);
@@ -482,7 +481,7 @@ export function UserList() {
             toast.success(t('users.impersonate_started'));
           }
         } else {
-          toast.error(res?.error || t('users.impersonate_failed'));
+          toast.error(t('users.impersonate_failed'));
         }
         setActionLoading(false);
         setConfirmAction(null);
@@ -499,7 +498,7 @@ export function UserList() {
       }
       loadUsers();
     } else {
-      toast.error(res?.error || t('users.user_action_failed'));
+      toast.error(t('users.user_action_failed'));
     }
 
     setActionLoading(false);
@@ -552,11 +551,11 @@ export function UserList() {
             variant="soft"
             color={user.is_super_admin || user.role === 'super_admin' ? 'secondary' : user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}
           >
-            {user.role}
+            {roleLabel(user.role)}
           </Chip>
           {user.is_super_admin && (
             <Chip size="sm" variant="soft" color="warning" startContent={<Shield size={10} aria-hidden="true" />}>
-              SA
+              {t('users.role_super_admin_short')}
             </Chip>
           )}
         </div>

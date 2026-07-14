@@ -134,8 +134,8 @@ export function HelpFaqsAdmin() {
       } else if (res.success) {
         setFaqs([]);
       } else {
-        setLoadError(res.error || t('help_faqs.load_failed'));
-        toast.error(res.error || t('help_faqs.load_failed'));
+        setLoadError(t('help_faqs.load_failed'));
+        toast.error(t('help_faqs.load_failed'));
       }
     } catch {
       setLoadError(t('help_faqs.load_failed'));
@@ -188,7 +188,7 @@ export function HelpFaqsAdmin() {
     setSaving(true);
 
     const payload = {
-      category: formData.category.trim() || 'General',
+      category: formData.category.trim() || t('help_faqs.default_category'),
       question: formData.question.trim(),
       answer: formData.answer.trim(),
       sort_order: parseInt(formData.sort_order, 10) || 0,
@@ -205,7 +205,7 @@ export function HelpFaqsAdmin() {
       loadFaqs();
     } else {
       // Preserve form state so the admin can correct and retry.
-      toast.error(res.error || t('help_faqs.save_failed'));
+      toast.error(t('help_faqs.save_failed'));
     }
 
     setSaving(false);
@@ -221,7 +221,7 @@ export function HelpFaqsAdmin() {
       toast.success(t('help_faqs.updated_toast'));
     } else {
       setFaqs((prev) => prev.map((f) => (f.id === faq.id ? { ...f, is_published: !isPublished } : f)));
-      toast.error(res.error || t('help_faqs.save_failed'));
+      toast.error(t('help_faqs.save_failed'));
     }
   };
 
@@ -237,7 +237,7 @@ export function HelpFaqsAdmin() {
       setDeleteTarget(null);
       loadFaqs();
     } else {
-      toast.error(res.error || t('help_faqs.delete_failed'));
+      toast.error(t('help_faqs.delete_failed'));
     }
 
     setDeleting(false);
@@ -263,7 +263,7 @@ export function HelpFaqsAdmin() {
       sortable: true,
       render: (faq) => (
         <Chip size="sm" variant="soft" color="primary">
-          {faq.category}
+          {t('help_faqs.category_value', { category: faq.category })}
         </Chip>
       ),
     },

@@ -1161,7 +1161,9 @@
     }
   },
   "jobs": {
-    "view_details": "عرض تفاصيل الوظيفة"
+    "view_details": "عرض تفاصيل الوظيفة",
+    "type_unknown": "نوع غير معروف",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "عرض الوظائف",
   "deadline_countdown_few": "يغلق في {{count}} أيام",

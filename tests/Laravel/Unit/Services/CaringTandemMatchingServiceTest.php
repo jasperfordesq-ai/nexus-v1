@@ -142,7 +142,7 @@ class CaringTandemMatchingServiceTest extends TestCase
         $this->assertArrayHasKey('recipient', $first);
         $this->assertArrayHasKey('score', $first);
         $this->assertArrayHasKey('signals', $first);
-        $this->assertArrayHasKey('reason', $first);
+        $this->assertArrayHasKey('reasons', $first);
         $this->assertArrayHasKey('id', $first['supporter']);
         $this->assertArrayHasKey('name', $first['supporter']);
         $this->assertIsFloat($first['score']);
@@ -510,7 +510,8 @@ class CaringTandemMatchingServiceTest extends TestCase
             $intergenPair['signals']['intergenerational'],
             'intergenerational signal should be true for 40-year age gap',
         );
-        $this->assertStringContainsString('Intergenerational pairing', $intergenPair['reason']);
+        $reasonCodes = array_column($intergenPair['reasons'], 'code');
+        $this->assertContains('intergenerational', $reasonCodes);
     }
 
     // ── Wrong-tenant isolation ────────────────────────────────────────────────
@@ -541,7 +542,7 @@ class CaringTandemMatchingServiceTest extends TestCase
 
     // ── Reason string non-empty ───────────────────────────────────────────────
 
-    public function test_suggestTandems_reason_is_non_empty_string(): void
+    public function test_suggestTandems_reasons_are_non_empty_structured_codes(): void
     {
         $this->insertUser(['preferred_language' => 'en', 'availability' => 'weekdays']);
         $this->insertUser(['preferred_language' => 'en', 'availability' => 'weekdays']);
@@ -550,8 +551,12 @@ class CaringTandemMatchingServiceTest extends TestCase
 
         $this->assertNotEmpty($result);
         foreach ($result as $pair) {
-            $this->assertIsString($pair['reason']);
-            $this->assertNotSame('', $pair['reason']);
+            $this->assertNotEmpty($pair['reasons']);
+            foreach ($pair['reasons'] as $reason) {
+                $this->assertIsString($reason['code']);
+                $this->assertNotSame('', $reason['code']);
+                $this->assertIsArray($reason['params']);
+            }
         }
     }
 }

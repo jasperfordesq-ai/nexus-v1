@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatDateTime, formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Spinner, Progress, Tooltip } from '@/components/ui';
 import {
   useState,
@@ -88,16 +88,6 @@ function formatRelativeTime(dateStr: string | null, t: (key: string, options?: R
   }
 
   return date.toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-/**
- * Format a verification level slug to a readable label.
- */
-function formatLevel(level: string): string {
-  return level
-    .split('_')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
 }
 
 export function ProviderHealthDashboard() {
@@ -216,7 +206,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         <div className="flex flex-wrap gap-1">
           {provider.supported_levels.map((level) => (
             <Chip key={level} size="sm" variant="soft" className="text-xs">
-              {formatLevel(level)}
+              {t(`system.verification_level_${level}`, { defaultValue: t('system.verification_level_unknown') })}
             </Chip>
           ))}
         </div>
@@ -244,7 +234,9 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted">{t('system.success_rate_label')}</span>
             <span className="font-medium">
-              {stats.success_rate !== null ? `${stats.success_rate}%` : t('system.not_available_short')}
+              {stats.success_rate !== null
+                ? formatNumber(stats.success_rate / 100, { style: 'percent', maximumFractionDigits: 1 })
+                : t('system.not_available_short')}
             </span>
           </div>
           <Progress
@@ -261,27 +253,27 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
           <div className="flex items-center gap-1.5">
             <Activity size={14} className="text-muted" />
             <span className="text-muted">{t('system.stat_total')}</span>
-            <span className="ml-auto font-medium">{stats.total_sessions}</span>
+            <span className="ml-auto font-medium">{formatNumber(stats.total_sessions)}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <CheckCircle size={14} className="text-success" />
             <span className="text-muted">{t('system.stat_passed')}</span>
-            <span className="ml-auto font-medium">{stats.passed}</span>
+            <span className="ml-auto font-medium">{formatNumber(stats.passed)}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <XCircle size={14} className="text-danger" />
             <span className="text-muted">{t('system.stat_failed')}</span>
-            <span className="ml-auto font-medium">{stats.failed}</span>
+            <span className="ml-auto font-medium">{formatNumber(stats.failed)}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Clock size={14} className="text-warning" />
             <span className="text-muted">{t('system.stat_pending')}</span>
-            <span className="ml-auto font-medium">{stats.pending}</span>
+            <span className="ml-auto font-medium">{formatNumber(stats.pending)}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <AlertTriangle size={14} className="text-muted" />
             <span className="text-muted">{t('system.stat_expired')}</span>
-            <span className="ml-auto font-medium">{stats.expired}</span>
+            <span className="ml-auto font-medium">{formatNumber(stats.expired)}</span>
           </div>
         </div>
 
@@ -299,19 +291,19 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
 
         {/* Timestamps */}
         <div className="space-y-1 text-xs text-muted pt-1 border-t border-border">
-          <Tooltip content={stats.last_session_at || t('system.no_sessions_yet')}>
+          <Tooltip content={stats.last_session_at ? formatDateTime(stats.last_session_at) : t('system.no_sessions_yet')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_session_label')}</span>
               <span>{formatRelativeTime(stats.last_session_at, t)}</span>
             </div>
           </Tooltip>
-          <Tooltip content={stats.last_success_at || t('system.no_successful_sessions')}>
+          <Tooltip content={stats.last_success_at ? formatDateTime(stats.last_success_at) : t('system.no_successful_sessions')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_success_label')}</span>
               <span>{formatRelativeTime(stats.last_success_at, t)}</span>
             </div>
           </Tooltip>
-          <Tooltip content={stats.last_failure_at || t('system.no_failed_sessions')}>
+          <Tooltip content={stats.last_failure_at ? formatDateTime(stats.last_failure_at) : t('system.no_failed_sessions')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_failure_label')}</span>
               <span>{formatRelativeTime(stats.last_failure_at, t)}</span>

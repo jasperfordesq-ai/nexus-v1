@@ -162,5 +162,8 @@
   "transfer_summary": "{{amount}} {{unit}}を {{name}} に送ろうとしています",
   "pending_in_other": "+{{count}}時間の保留中",
   "signed_hours_value_other": "{{sign}}{{count}}h",
-  "hours_value_other": "{{count}}h"
+  "hours_value_other": "{{count}}h",
+  "pending_in_one": "+{{count}}時間 保留中",
+  "signed_hours_value_one": "{{sign}}{{count}}時間",
+  "hours_value_one": "{{count}}h"
 }

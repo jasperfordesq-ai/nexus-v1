@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "crm": {
     "action_cancel": "キャンセル",
@@ -344,7 +344,6 @@
     "status_pending": "保留中",
     "days_ago": "{{count}} 日前",
     "hours_ago": "{{count}} 時間前",
-    "just_now": "Just Now",
     "minutes_ago": "{{count}} 分前",
     "activity_type_login": "ログイン",
     "activity_type_signup": "サインアップ",
@@ -360,6 +359,36 @@
     "lost_since_previous_stage_other": "{{count}}は前のステージから負けました",
     "members_lost_at_step_one": "{{count}} メンバーはこのステップで失われます。",
     "members_lost_at_step_other": "{{count}}メンバーはこのステップで失われます。",
-    "tasks_total_count_other": "{{count}}タスクの合計"
+    "tasks_total_count_other": "{{count}}タスクの合計",
+    "activity_type_unknown": "不明なアクティビティ",
+    "admin_roles": {
+      "admin": "管理者",
+      "tenant_admin": "テナント管理者",
+      "super_admin": "プラットフォーム管理者",
+      "unknown": "管理者"
+    },
+    "funnel_stage_registered": "登録済み",
+    "funnel_stage_email_verified": "メール確認済み",
+    "funnel_stage_profile_complete": "プロフィール完成",
+    "funnel_stage_first_listing": "初めての出品",
+    "funnel_stage_first_exchange": "初めての取引",
+    "funnel_stage_repeat_user": "リピートユーザー",
+    "funnel_stage_unknown": "不明なステージ",
+    "activity_description_login": "ログイン済み",
+    "activity_description_signup": "アカウントを登録しました",
+    "activity_description_listing_created": "リストを作成しました: {{title}}",
+    "activity_description_exchange_completed": "{{member_name}}と交換を完了しました",
+    "activity_description_note_added": "{{author_name}}によってノートが追加されました: {{content}}",
+    "activity_description_task_created": "タスクを作成しました: {{title}}",
+    "activity_description_group_joined": "グループに参加しました: {{group_name}}",
+    "activity_description_profile_updated": "プロフィールを更新しました",
+    "activity_description_unknown": "アクティビティが記録されました",
+    "activity_value_untitled_listing": "タイトル未設定のリスト",
+    "activity_value_unknown_member": "不明なメンバー",
+    "activity_value_system": "システム",
+    "activity_value_untitled_task": "タイトル未設定のタスク",
+    "activity_value_unknown_group": "不明なグループ",
+    "tasks_total_count_one": "{{count}} タスク合計",
+    "just_now": "たった今"
   }
 }

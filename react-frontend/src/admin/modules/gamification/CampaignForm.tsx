@@ -9,6 +9,7 @@ import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import type { Campaign, BadgeDefinition } from '../../api/types';
+import { badgeDisplayName } from './badgeDisplay';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -144,24 +145,6 @@ export function CampaignForm() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /** Extract field-level errors from API response errors object */
-  function applyApiErrors(
-    resErrors: Record<string, string | string[]> | Array<{ message: string }> | undefined,
-  ): string | null {
-    if (!resErrors) return null;
-    if (Array.isArray(resErrors)) {
-      // Generic array of messages — no field to bind
-      return resErrors[0]?.message ?? null;
-    }
-    // Record<field, message> — bind per-field and return null (no generic toast)
-    const mapped: Record<string, string> = {};
-    for (const [field, msg] of Object.entries(resErrors)) {
-      mapped[field] = Array.isArray(msg) ? (msg[0] ?? '') : (msg ?? '');
-    }
-    setFieldErrors(mapped);
-    return null;
-  }
-
   const handleSave = async () => {
     setFieldErrors({});
 
@@ -189,9 +172,7 @@ export function CampaignForm() {
         toast.success(t('gamification.campaign_updated'));
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
-        const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
-        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_update_campaign');
-        if (genericMsg) toast.error(genericMsg);
+        toast.error(t('gamification.failed_to_update_campaign'));
       }
     } else {
       const res = await adminGamification.createCampaign(payload);
@@ -199,9 +180,7 @@ export function CampaignForm() {
         toast.success(t('gamification.campaign_created'));
         navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
-        const resAny = res as { error?: string; errors?: Record<string, string | string[]> | Array<{ message: string }> };
-        const genericMsg = applyApiErrors(resAny.errors) ?? resAny.error ?? t('gamification.failed_to_create_campaign');
-        if (genericMsg) toast.error(genericMsg);
+        toast.error(t('gamification.failed_to_create_campaign'));
       }
     }
 
@@ -298,10 +277,14 @@ export function CampaignForm() {
             placeholder={t('gamification.select_badge')}
           >
             {badges.map((badge) => (
-              <SelectItem key={badge.key} id={badge.key} textValue={badge.name}>
+              <SelectItem key={badge.key} id={badge.key} textValue={badgeDisplayName(t, badge)}>
                 <div className="flex items-center gap-2">
-                  <span>{badge.name}</span>
-                  <span className="text-xs text-muted">({badge.type})</span>
+                  <span>{badgeDisplayName(t, badge)}</span>
+                  <span className="text-xs text-muted">(
+                    {t(`gamification.badge_type_${badge.type}`, {
+                      defaultValue: t('gamification.badge_type_unknown'),
+                    })}
+                  )</span>
                 </div>
               </SelectItem>
             ))}

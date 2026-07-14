@@ -15,67 +15,66 @@
     "federation_audit": "تدقيق الاتحاد",
     "platform_admin": "مشرف المنصة",
     "back_to_platform_admin": "العودة إلى إدارة المنصة",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "استفسارات تجريبية",
+    "provisioning_queue": "قائمة الانتظار الخاصة بالتجهيز",
+    "billing_control": "التحكم بالفوترة",
+    "revenue_dashboard": "لوحة تحكم الإيرادات",
+    "regional_analytics": "التحليلات الإقليمية",
+    "national_dashboard": "لوحة التحكم الوطنية"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "جارٍ تحميل المسؤول الأعلى",
+    "skip_to_main": "تخطي إلى المحتوى الرئيسي",
+    "close_navigation": "إغلاق تنقل المسؤول الأعلى",
+    "navigation": "تنقل المسؤول الأعلى"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "العودة إلى الإدارة",
+    "toggle_sidebar": "تبديل الشريط الجانبي",
+    "notifications": "الإشعارات",
+    "my_profile": "ملفي الشخصي",
+    "sign_out": "تسجيل الخروج",
+    "user_fallback": "المشرف الأعلى",
+    "user_menu": "قائمة المسؤول الأعلى"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "نظرة عامة",
+    "section_tenants": "المستأجرون",
+    "section_federation": "اتحاد",
+    "section_commercial": "تجاري",
+    "expand": "توسيع الشريط الجانبي",
+    "collapse": "طي الشريط الجانبي",
+    "nav_label": "تنقل المسؤول الأعلى"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "المشرف الأعلى",
+    "tenants": "المستأجرون",
+    "create": "إنشاء",
+    "edit": "تحرير",
+    "hierarchy": "الهيكلية",
+    "users": "المستخدمون",
+    "federation": "اتحاد",
+    "whitelist": "القائمة البيضاء",
+    "partnerships": "الشراكات",
+    "tenant": "المستأجر",
+    "features": "الميزات",
+    "billing": "الفوترة",
+    "revenue": "الإيرادات",
+    "platform": "منصة",
+    "pilot_inquiries": "استفسارات تجريبية",
+    "provisioning_requests": "طلبات التزويد",
+    "national": "وطني",
+    "regional_analytics": "التحليلات الإقليمية",
+    "subscriptions": "الاشتراكات",
+    "aria_label": "فتات الخبز",
+    "bulk": "العمليات الجماعية",
+    "audit": "سجل التدقيق"
   },
   "dashboard": {
     "title": "لوحة البنية التحتية",
     "subtitle_global": "نظرة عامة شاملة على جميع المستأجرين والبنية التحتية",
-    "subtitle_scoped": "نظرة عامة على: Tenant_name والمستأجرين من الباطن",
     "create_tenant_btn": "إنشاء المستأجر",
     "stat_total_tenants": "إجمالي المستأجرين",
     "stat_active_tenants": "المستأجرون النشطون",
@@ -103,7 +102,8 @@
     "quick_actions_title": "إجراءات سريعة",
     "create_new_tenant": "إنشاء مستأجر جديد",
     "view_super_admins": "عرض المشرفين المميزين",
-    "back_to_platform_admin": "العودة إلى إدارة المنصة"
+    "back_to_platform_admin": "العودة إلى إدارة المنصة",
+    "subtitle_scoped": "نظرة عامة على :tenant_name والمستأجرين الفرعيين"
   },
   "common": {
     "active": "نشيط",
@@ -188,7 +188,6 @@
       "actions_card_title": "الإجراءات",
       "view_tenant_btn": "عرض المستأجر",
       "god_card_title": "المشرف العالمي الفائق (الله فقط)",
-      "god_warning": "WARNING:",
       "god_warning_text": "يمكن للمسؤولين المتميزين العالميين الوصول إلى جميع المستأجرين على النظام الأساسي.",
       "god_has_access": "يتمتع المستخدم بحق الوصول العالمي للمشرف المتميز",
       "god_revoke_btn": "إبطال المشرف العالمي المتميز",
@@ -206,12 +205,12 @@
       "stat_user_id": "معرف المستخدم",
       "stat_tenant_id": "معرف المستأجر",
       "stat_status": "حالة",
-      "stat_approved": "موافقة"
+      "stat_approved": "موافقة",
+      "god_warning": "تحذير:"
     },
     "create": {
       "breadcrumb_create": "يخلق",
       "title": "إنشاء مستخدم جديد",
-      "subtitle_selected": "إنشاء مستخدم لـ:tenant_name",
       "subtitle_default": "حدد مستأجرًا لإنشاء مستخدم جديد",
       "card_title": "تفاصيل المستخدم",
       "tenant_label": "مستأجر",
@@ -229,7 +228,8 @@
       "super_admin_label": "منح امتيازات المشرف المتميز",
       "super_admin_help": "يمكن للمسؤولين المتميزين الوصول إلى لوحة الإدارة المتميزة وإدارة المستأجرين الفرعيين التابعين لهم. متاح فقط للمستأجرين المحوريين (المستأجرين الذين يتمتعون بإمكانية المستأجر الفرعي).",
       "submit_btn": "إنشاء مستخدم",
-      "cancel_btn": "يلغي"
+      "cancel_btn": "يلغي",
+      "subtitle_selected": "إنشاء مستخدم لـ :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "يحرر",
@@ -254,7 +254,6 @@
       "assign_what_happens": "ماذا يحدث:",
       "assign_step1": "يتم نقل المستخدم إلى مستأجر Hub المحدد",
       "assign_step2": "يتم منح المستخدم is_tenant_super_admin = 1",
-      "assign_step3": "تم تعيين دور المستخدم على Tenant_admin",
       "assign_step4": "يمكن للمستخدم الآن الوصول إلى /super-admin من خلال عرض محدد النطاق",
       "hub_tenant_label": "حدد مستأجر المحور لتعيينه",
       "hub_tenant_placeholder": "-- حدد مستأجرًا مركزيًا --",
@@ -272,23 +271,23 @@
       "stat_active": "نشيط",
       "stat_pending": "قيد الانتظار",
       "super_admin_card_title": "حالة المشرف المتميز",
-      "super_admin_toggle_desc": "تبديل المشرف المتميز لـ:tenant_name",
       "revoke_btn": "إبطال المشرف المتميز",
       "revoke_confirm": "هل تريد إلغاء امتيازات المشرف المتميز؟",
       "grant_btn": "غرانت سوبر المشرف",
       "grant_confirm": "منح امتيازات المشرف المتميز؟",
-      "no_hub_text": "لا يمكن منح المشرف المتميز لأن:tenant_name ليس مستأجر Hub.",
       "no_hub_move_text": "استخدم ميزة \"نقل ومنح المشرف المتميز\" لتعيين هذا المستخدم لمستأجر Hub.",
       "quick_links_card_title": "روابط سريعة",
       "view_profile_btn": "عرض الملف الشخصي",
       "view_tenant_btn": "عرض المستأجر",
-      "tenant_users_btn": "المستخدمين المستأجرين"
+      "tenant_users_btn": "المستخدمين المستأجرين",
+      "assign_step3": "تم تعيين دور المستخدم إلى tenant_admin",
+      "super_admin_toggle_desc": "تبديل المسؤول الأعلى لـ :tenant_name",
+      "no_hub_text": "لا يمكن منح المسؤول الأعلى لأن :tenant_name ليس مستأجرًا في Hub."
     }
   },
   "tenants": {
     "index": {
       "title": "إدارة المستأجرين",
-      "subtitle": ":عد المستأجر (المستأجرين) في نطاقك",
       "create_btn": "إنشاء المستأجر",
       "filter_search_placeholder": "بحث عن المستأجرين...",
       "filter_hub_label": "المستأجرين المحور فقط",
@@ -304,9 +303,10 @@
       "col_status": "حالة",
       "col_actions": "الإجراءات",
       "parent_root": "جذر",
-      "level_label": "المستوى: العمق",
       "you_badge": "أنت",
-      "no_tenants": "لم يتم العثور على المستأجرين"
+      "no_tenants": "لم يتم العثور على المستأجرين",
+      "subtitle": ":count المستأجر(ون) في نطاقك",
+      "level_label": "المستوى :depth"
     },
     "show": {
       "breadcrumb_tenants": "المستأجرين",
@@ -319,11 +319,9 @@
       "field_slug": "سبيكة",
       "field_domain": "اِختِصاص",
       "field_hierarchy_level": "المستوى الهرمي",
-      "field_level": "المستوى: العمق",
       "field_parent": "الوالد",
       "field_total_users": "إجمالي المستخدمين",
       "field_sub_tenants": "المستأجرين من الباطن",
-      "field_sub_tenants_direct": ": العد المباشر",
       "field_description": "وصف",
       "not_configured": "لم يتم تكوينه",
       "root_tenant": "المستأجر الجذر",
@@ -355,18 +353,18 @@
       "reactivate_card_title": "إعادة تنشيط المستأجر",
       "reactivate_desc": "هذا المستأجر غير نشط حاليا. ستؤدي إعادة التنشيط إلى استعادة وصول المستخدم.",
       "reactivate_btn": "إعادة تنشيط المستأجر",
-      "tenant_id_label": "معرف المستأجر::id | المسار:: المسار"
+      "field_level": "المستوى :depth",
+      "field_sub_tenants_direct": ":count مباشر",
+      "tenant_id_label": "معرّف المستأجر: :id | المسار: :path"
     },
     "create": {
       "breadcrumb_create": "يخلق",
       "title": "إنشاء مستأجر جديد",
-      "subtitle_selected": "إنشاء مستأجر فرعي تحت:parent_name",
       "subtitle_default": "حدد مستأجرًا أصليًا لإنشاء مستأجر فرعي جديد",
       "card_title": "تفاصيل المستأجر",
       "parent_label": "المستأجر الوالد",
       "parent_placeholder": "-- اختر المستأجر الأصلي --",
       "parent_help": "يتم عرض المستأجرين الذين لديهم إمكانية المستأجر الفرعي فقط. سيتم إنشاء المستأجر الجديد باعتباره تابعًا للوالد المحدد.",
-      "depth_label": "(العمق::العمق)",
       "name_label": "اسم المستأجر",
       "slug_label": "سبيكة",
       "slug_help": "الحروف الصغيرة والأرقام والواصلات فقط",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "غير محدود",
       "max_depth_help": "تحديد عدد مستويات المستأجرين الفرعيين التي يمكن إنشاؤها أسفل هذا المستأجر (ينطبق فقط في حالة تمكين المحور)",
       "submit_btn": "إنشاء المستأجر",
-      "cancel_btn": "يلغي"
+      "cancel_btn": "يلغي",
+      "depth_label": "(العمق: :depth)",
+      "subtitle_selected": "إنشاء مستأجر فرعي تحت :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "يحرر",
       "title": "تحرير المستأجر",
-      "subtitle": "تعديل::name (المستوى:عمق)",
       "back_btn": "العودة إلى التفاصيل",
       "details_card_title": "تفاصيل المستأجر",
       "name_label": "اسم المستأجر",
@@ -403,7 +402,6 @@
       "save_btn": "حفظ التغييرات",
       "cancel_btn": "يلغي",
       "seo_card_title": "إعدادات تحسين محركات البحث",
-      "seo_preview_label": "معاينة بحث جوجل",
       "meta_title_label": "عنوان ميتا",
       "meta_title_placeholder": "يوصى باستخدام 50-60 حرفًا",
       "meta_title_help": "العنوان المعروض في نتائج البحث (50-60 حرفًا)",
@@ -461,7 +459,6 @@
       "standard_tenant_badge": "المستأجر القياسي",
       "max_depth_label": "أقصى عمق للمستأجر الفرعي",
       "max_depth_unlimited": "غير محدود",
-      "max_depth_levels": ":مستويات العد",
       "disable_hub_btn": "تعطيل المحور",
       "disable_hub_confirm": "سيؤدي هذا إلى منع إنشاء مستأجرين فرعيين جدد. سيبقى المستأجرون من الباطن الحاليون.",
       "enable_hub_btn": "تمكين المحور",
@@ -483,7 +480,10 @@
       "deactivate_confirm": "هل أنت متأكد أنك تريد إلغاء تنشيط هذا المستأجر؟ سوف يفقد المستخدمون إمكانية الوصول.",
       "reactivate_card_title": "إعادة تنشيط المستأجر",
       "reactivate_desc": "هذا المستأجر غير نشط حاليا. ستؤدي إعادة التنشيط إلى استعادة وصول المستخدم.",
-      "reactivate_btn": "إعادة تنشيط المستأجر"
+      "reactivate_btn": "إعادة تنشيط المستأجر",
+      "subtitle": "تعديل: :name (المستوى :depth)",
+      "seo_preview_label": "Google معاينة البحث",
+      "max_depth_levels": ":count مستويات"
     },
     "hierarchy": {
       "breadcrumb_tenants": "المستأجرين",
@@ -577,7 +577,6 @@
     "source_tenant_all": "جميع المستأجرين",
     "user_selection_label": "حدد المستخدمين",
     "user_select_hint": "حدد مستأجر مصدر لتحميل المستخدمين",
-    "users_selected": ":عدد المستخدمين (المستخدمين) المحددين",
     "target_tenant_label": "المستأجر المستهدف",
     "target_tenant_placeholder": "-- اختر الهدف --",
     "grant_super_admin_label": "منح المشرف المتميز لجميع المستخدمين المنقولين",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "عمليات المستأجر بالجملة",
     "bulk_tenants_desc": "تمكين/تعطيل العديد من المستأجرين أو تبديل قدرة المحور بشكل مجمّع.",
     "select_tenants_label": "حدد المستأجرين",
-    "tenants_selected": ":عدد المستأجرين (المستأجرين) المحدد",
     "select_all": "حدد الكل",
     "deselect_all": "قم بإلغاء تحديد الكل",
     "action_label": "فعل",
@@ -595,7 +593,9 @@
     "action_enable_hub": "تمكين المحور",
     "action_disable_hub": "تعطيل المحور",
     "apply_btn": "تنطبق على المحدد",
-    "apply_confirm": "هل تريد تطبيق هذا الإجراء على جميع المستأجرين المحددين؟"
+    "apply_confirm": "هل تريد تطبيق هذا الإجراء على جميع المستأجرين المحددين؟",
+    "users_selected": ":count مستخدم(ين) تم اختياره",
+    "tenants_selected": ":count مستأجر(ين) تم اختياره"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "النشاط الأخير",
       "full_log_btn": "سجل كامل",
       "no_federation_activity": "لا يوجد أي نشاط للاتحاد حتى الآن",
-      "by_label": "by",
       "activity_title": "نشاط الاتحاد (30 يومًا)",
       "stat_total_actions": "إجمالي الإجراءات",
       "stat_messages": "رسائل",
@@ -640,7 +639,8 @@
       "stat_critical_events": "الأحداث الحاسمة",
       "most_active_partnerships": "الشراكات الأكثر نشاطا",
       "quick_nav_title": "التنقل السريع",
-      "tenant_whitelist_btn": "القائمة البيضاء للمستأجر"
+      "tenant_whitelist_btn": "القائمة البيضاء للمستأجر",
+      "by_label": "بواسطة"
     },
     "system_controls": {
       "title": "ضوابط نظام الاتحاد",

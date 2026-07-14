@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import {
   useState,
@@ -51,7 +51,7 @@ export default function LegalDocComplianceDashboard() {
       if (response.success && response.data) {
         setStats(response.data);
       } else {
-        error(response.error || t('enterprise.failed_to_load_compliance_stats'));
+        error(t('enterprise.failed_to_load_compliance_stats'));
       }
     } catch {
       error(t('enterprise.failed_to_load_compliance_stats'));
@@ -75,7 +75,7 @@ export default function LegalDocComplianceDashboard() {
         setSelectedDocId(docId);
         setShowAcceptancesModal(true);
       } else {
-        error(response.error || t('enterprise.failed_to_load_acceptances'));
+        error(t('enterprise.failed_to_load_acceptances'));
       }
     } catch {
       error(t('enterprise.failed_to_load_acceptances'));
@@ -111,7 +111,7 @@ export default function LegalDocComplianceDashboard() {
 
         success(t('enterprise.export_downloaded_successfully'));
       } else {
-        error(response.error || t('enterprise.failed_to_export_acceptances'));
+        error(t('enterprise.failed_to_export_acceptances'));
       }
     } catch {
       error(t('enterprise.failed_to_export_acceptances'));
@@ -203,7 +203,7 @@ export default function LegalDocComplianceDashboard() {
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.overall_compliance')}</p>
-                <p className="text-2xl font-bold">{stats.overall_compliance_rate.toFixed(1)}%</p>
+                <p className="text-2xl font-bold">{formatPercentValue(stats.overall_compliance_rate)}</p>
               </div>
             </div>
           </CardBody>
@@ -260,7 +260,7 @@ export default function LegalDocComplianceDashboard() {
                             aria-label={t('enterprise.col_acceptance_rate')}
                           />
                           <span className="text-sm font-medium w-12 text-right">
-                            {doc.acceptance_rate.toFixed(1)}%
+                            {formatPercentValue(doc.acceptance_rate)}
                           </span>
                         </div>
                       </div>

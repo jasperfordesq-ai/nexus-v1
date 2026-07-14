@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -156,6 +156,10 @@ const DEVICE_ICONS: Record<string, typeof Monitor> = {
   tablet: Tablet,
   unknown: HelpCircle,
 };
+
+function formatRate(rate: number, maximumFractionDigits = 2): string {
+  return formatNumber(rate / 100, { style: 'percent', maximumFractionDigits });
+}
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -356,7 +360,7 @@ export function NewsletterStats() {
               color={newsletter.status === 'sent' ? 'success' : newsletter.status === 'draft' ? 'default' : 'warning'}
               variant="soft"
             >
-              {newsletter.status}
+              {t(`newsletters.status_${newsletter.status}`, { defaultValue: t('common.unknown') })}
             </Chip>
             {newsletter.ab_test_enabled && (
               <Chip size="sm" color="warning" variant="soft">
@@ -371,27 +375,27 @@ export function NewsletterStats() {
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={t('newsletters.label_success_rate')}
-          value={`${engagement.success_rate}%`}
+          value={formatNumber(engagement.success_rate / 100, { style: 'percent', maximumFractionDigits: 2 })}
           icon={CheckCircle}
           color="success"
           description={`${delivery.delivered.toLocaleString(getFormattingLocale())} ${t('newsletters.delivered_label')}`}
         />
         <StatCard
           label={t('newsletters.label_open_rate')}
-          value={`${engagement.open_rate}%`}
+          value={formatNumber(engagement.open_rate / 100, { style: 'percent', maximumFractionDigits: 2 })}
           icon={Eye}
           description={`${engagement.unique_opens.toLocaleString(getFormattingLocale())} ${t('newsletters.unique_opens_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_rate')}
-          value={`${engagement.click_rate}%`}
+          value={formatNumber(engagement.click_rate / 100, { style: 'percent', maximumFractionDigits: 2 })}
           icon={MousePointer}
           color="warning"
           description={`${engagement.unique_clicks.toLocaleString(getFormattingLocale())} ${t('newsletters.unique_clicks_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_to_open_rate')}
-          value={`${engagement.click_to_open_rate}%`}
+          value={formatNumber(engagement.click_to_open_rate / 100, { style: 'percent', maximumFractionDigits: 2 })}
           icon={BarChart3}
           description={`${engagement.total_clicks.toLocaleString(getFormattingLocale())} ${t('newsletters.total_clicks_desc')}`}
         />
@@ -497,7 +501,7 @@ export function NewsletterStats() {
                 {t('newsletters.ab_split_info')}
                 &bull; {t('newsletters.winning_metric')}: {ab_test.winner_metric === 'clicks' ? t('newsletters.label_click_rate') : t('newsletters.label_open_rate')}
                 {ab_test.winning_margin > 0 && (
-                  <> &bull; {t('newsletters.margin')}: {ab_test.winning_margin}%</>
+                  <> &bull; {t('newsletters.margin')}: {formatRate(ab_test.winning_margin)}</>
                 )}
               </span>
               {!ab_test.winner && (
@@ -556,7 +560,7 @@ export function NewsletterStats() {
                       formatter={(value, name) => {
                         const v = Number(value ?? 0);
                         return [
-                          `${v.toLocaleString(getFormattingLocale())} (${deviceTotal > 0 ? Math.round((v / deviceTotal) * 100) : 0}%)`,
+                          `${v.toLocaleString(getFormattingLocale())} (${formatNumber(deviceTotal > 0 ? v / deviceTotal : 0, { style: 'percent', maximumFractionDigits: 0 })})`,
                           String(name ?? ''),
                         ] as [string, string];
                       }}
@@ -568,12 +572,12 @@ export function NewsletterStats() {
                 {Object.entries(device_stats || {}).map(([device, count]) => {
                   if (count === 0) return null;
                   const Icon = DEVICE_ICONS[device] || HelpCircle;
-                  const pct = deviceTotal > 0 ? Math.round((count / deviceTotal) * 100) : 0;
+                  const share = deviceTotal > 0 ? count / deviceTotal : 0;
                   return (
                     <div key={device} className="flex items-center gap-2 text-sm">
                       <Icon aria-hidden="true" size={14} style={{ '--device-color': DEVICE_COLORS[device], color: 'var(--device-color)' } as CSSProperties} />
                       <span className="capitalize text-foreground">{t(`newsletters.device_${device}`)}</span>
-                      <span className="ml-auto font-semibold">{pct}%</span>
+                      <span className="ml-auto font-semibold">{formatNumber(share, { style: 'percent', maximumFractionDigits: 0 })}</span>
                     </div>
                   );
                 })}
@@ -656,10 +660,10 @@ export function NewsletterStats() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
               {emailClients.map((ec) => {
                 const ecTotal = emailClients.reduce((s, c) => s + c.count, 0);
-                const pct = ecTotal > 0 ? Math.round((ec.count / ecTotal) * 100) : 0;
+                const share = ecTotal > 0 ? ec.count / ecTotal : 0;
                 return (
                   <div key={ec.client} className="text-center">
-                    <p className="text-2xl font-bold text-foreground">{pct}%</p>
+                    <p className="text-2xl font-bold text-foreground">{formatNumber(share, { style: 'percent', maximumFractionDigits: 0 })}</p>
                     <p className="text-sm text-muted">{ec.client}</p>
                     <p className="text-xs text-muted">{ec.count.toLocaleString(getFormattingLocale())} {t('newsletters.opens_label')}</p>
                   </div>
@@ -857,7 +861,7 @@ function FunnelBar({
         <span className="text-foreground">{label}</span>
         <span className="font-semibold text-foreground">
           {value.toLocaleString(getFormattingLocale())}
-          {rate !== undefined && <span className="ml-1 text-muted">({rate}%)</span>}
+          {rate !== undefined && <span className="ml-1 text-muted">({formatRate(rate)})</span>}
         </span>
       </div>
       <Progress
@@ -943,11 +947,11 @@ function AbVariantCard({
         <p className="text-sm italic text-foreground">&quot;{subject}&quot;</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-2xl font-bold text-accent">{openRate}%</p>
+            <p className="text-2xl font-bold text-accent">{formatRate(openRate)}</p>
             <p className="text-xs text-muted">{tLocal('newsletters.label_open_rate')}</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-success">{clickRate}%</p>
+            <p className="text-2xl font-bold text-success">{formatRate(clickRate)}</p>
             <p className="text-xs text-muted">{tLocal('newsletters.label_click_rate')}</p>
           </div>
           <div>

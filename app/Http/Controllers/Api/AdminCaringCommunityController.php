@@ -2500,7 +2500,7 @@ class AdminCaringCommunityController extends BaseApiController
             if ($code === 'STORAGE_UNAVAILABLE') {
                 return $this->respondWithError(
                     'STORAGE_UNAVAILABLE',
-                    'Tenant settings storage is not available.',
+                    __('api.tenant_settings_storage_unavailable'),
                     null,
                     503,
                 );
@@ -2509,7 +2509,7 @@ class AdminCaringCommunityController extends BaseApiController
             if ($code === 'ALREADY_LAUNCHED') {
                 return $this->respondWithError(
                     'ALREADY_LAUNCHED',
-                    'This pilot has already been launched.',
+                    __('api.caring_pilot_already_launched'),
                     null,
                     422,
                 );
@@ -2532,7 +2532,7 @@ class AdminCaringCommunityController extends BaseApiController
                 ], 422);
             }
 
-            return $this->respondWithError($code, 'Launch failed.', null, 422);
+            return $this->respondWithError($code, __('api.caring_pilot_launch_failed'), null, 422);
         }
 
         try {

@@ -687,7 +687,8 @@
         "answer_count_other": "Odpowiedzi{{count}}",
         "no_open_text": "Nie ma jeszcze odpowiedzi w formie otwartego tekstu.",
         "modal_title": "Analityka —{{title}}",
-        "empty": "Nie są jeszcze dostępne żadne dane analityczne."
+        "empty": "Nie są jeszcze dostępne żadne dane analityczne.",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "Tak",

@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,83 +67,81 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "Esamina le segnalazioni di bug inviate dai membri con diagnostica della pagina, ID evento Sentry e note di valutazione.",
     "loading": "Caricamento dei rapporti di supporto...",
     "empty": "Nessun rapporto di supporto corrisponde a questi filtri.",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "Apri pagina",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "Copia la diagnostica",
       "copy_handoff": "Copia di trasferimento tecnico",
-      "close": "Close",
-      "save": "Salva il triage"
+      "save": "Salva il triage",
+      "refresh": "Aggiorna",
+      "search": "Cerca",
+      "clear": "Cancella",
+      "review": "Revisione",
+      "open_sentry": "Apri Sentry",
+      "close": "Chiudi"
     },
     "stats": {
-      "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "open": "Aperto",
+      "blocked": "Bloccato",
+      "unassigned": "Non assegnato",
+      "triaged": "Smistato"
     },
     "filters": {
       "search": "Cerca riferimento, percorso, giornalista o riepilogo",
-      "status": "Status",
-      "impact": "Impact"
+      "status": "Stato",
+      "impact": "Impatto"
     },
     "status": {
       "all": "Tutti gli stati",
-      "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "open": "Aperto",
+      "resolved": "Risolto",
+      "closed": "Chiuso",
+      "triaged": "Smistato"
     },
     "impact": {
       "all": "Tutti gli impatti",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "Bloccato",
+      "major": "Maggiore",
+      "minor": "Minore",
+      "cosmetic": "Estetico"
     },
     "table": {
       "aria": "Rapporti di supporto",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
-      "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reference": "Riferimento",
+      "summary": "Sommario",
+      "impact": "Impatto",
+      "status": "Stato",
+      "reporter": "Segnalatore",
+      "assignee": "Assegnatario",
+      "created": "Creato",
+      "actions": "Azioni"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "Caricamento rapporto...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "Agente utente",
       "sentry_event": "Evento sentinella",
-      "diagnostics": "Diagnostics"
+      "summary": "Sommario",
+      "description": "Descrizione",
+      "reporter": "Segnalatore",
+      "page": "Pagina",
+      "created": "Creato",
+      "diagnostics": "Diagnostica",
+      "title": "Rapporto {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "URL del problema della sentinella",
-      "triage_notes": "Note sul triage"
+      "triage_notes": "Note sul triage",
+      "status": "Stato",
+      "assignee": "Assegnatario"
     },
     "messages": {
       "saved": "Rapporto di supporto aggiornato.",
@@ -157,6 +154,37 @@
       "save": "Impossibile salvare il rapporto di supporto.",
       "copy": "Impossibile copiare la diagnostica.",
       "copy_handoff": "Impossibile copiare il trasferimento tecnico."
-    }
+    },
+    "handoff": {
+      "title": "Rapporto di supporto {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (utente {{id}})",
+      "reporter_without_email": "{{name}} (utente {{id}})",
+      "unknown_reporter": "Reporter sconosciuto",
+      "no_diagnostics": "Nessuna diagnostica inclusa.",
+      "not_provided": "Non fornito",
+      "none_yet": "Ancora nessuno.",
+      "labels": {
+        "tenant": "Comunità",
+        "impact": "Impatto",
+        "status": "Stato",
+        "created": "Creato",
+        "reporter": "Segnalatore",
+        "route": "Percorso",
+        "page_url": "URL della pagina",
+        "user_agent": "Agente utente",
+        "sentry_event": "Evento Sentry",
+        "sentry_issue": "Problema Sentry"
+      },
+      "headings": {
+        "summary": "Sommario:",
+        "user_description": "Descrizione utente:",
+        "triage_notes": "Note di triage:",
+        "diagnostics": "Diagnostica:"
+      }
+    },
+    "unassigned": "Non assegnato",
+    "meta_title": "Rapporti di supporto",
+    "title": "Rapporti di supporto"
   }
 }

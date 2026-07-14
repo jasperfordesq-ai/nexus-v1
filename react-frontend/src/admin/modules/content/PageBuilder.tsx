@@ -159,7 +159,7 @@ export function PageBuilder() {
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
+          toast.error(t('content.an_unexpected_error_occurred'));
         }
       } else {
         const res = await adminPages.create(payload);
@@ -168,7 +168,7 @@ export function PageBuilder() {
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
+          toast.error(t('content.an_unexpected_error_occurred'));
         }
       }
     } catch {

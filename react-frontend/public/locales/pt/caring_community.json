@@ -686,7 +686,8 @@
         "answer_count_other": "{{count}}responde",
         "no_open_text": "Ainda não há respostas em texto aberto.",
         "modal_title": "Análise -{{title}}",
-        "empty": "Nenhum dado analítico disponível ainda."
+        "empty": "Nenhum dado analítico disponível ainda.",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "Sim",

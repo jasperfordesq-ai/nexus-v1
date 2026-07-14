@@ -30,10 +30,8 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
 
   const nameKey = `config.module_name_${module.id}`;
   const descKey = `config.module_desc_${module.id}`;
-  const translatedName = t(nameKey);
-  const translatedDesc = t(descKey);
-  const moduleName = translatedName === nameKey ? module.name : translatedName;
-  const moduleDesc = translatedDesc === descKey ? module.description : translatedDesc;
+  const moduleName = t(nameKey);
+  const moduleDesc = t(descKey);
 
   return (
     <Card  className="h-full">

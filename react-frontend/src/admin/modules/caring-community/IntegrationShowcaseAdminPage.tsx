@@ -28,13 +28,13 @@ import { PageHeader } from '../../components/PageHeader';
 // See NOTICE file for attribution and acknowledgements.
 
 interface ShowcaseItem {
-  label: string;
+  code: string;
   path: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
 }
 
 interface SamplePayload {
-  label: string;
+  code: string;
   kind: 'json' | 'curl';
   body: string;
   headers?: string[];
@@ -42,15 +42,13 @@ interface SamplePayload {
 
 interface Section {
   id: string;
-  title: string;
   icon: string;
-  body: string;
   items?: ShowcaseItem[];
   samples?: SamplePayload[];
-  checklist?: string[];
+  checklist_codes?: string[];
   docs_link?: string;
   sample_request?: { curl: string };
-  verification_note?: string;
+  verification_note_code?: string;
 }
 
 interface Showcase {
@@ -74,6 +72,20 @@ const METHOD_COLOUR: Record<string, 'success' | 'primary' | 'warning' | 'danger'
   PUT: 'warning',
   DELETE: 'danger',
 };
+
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
+
+const sectionTitle = (t: AdminT, sectionId: string) =>
+  t(`integration_showcase.manifest.sections.${sectionId}.title`);
+
+const sectionBody = (t: AdminT, sectionId: string) =>
+  t(`integration_showcase.manifest.sections.${sectionId}.body`);
+
+const endpointLabel = (t: AdminT, code: string) =>
+  t(`integration_showcase.manifest.endpoints.${code}`);
+
+const sampleLabel = (t: AdminT, code: string) =>
+  t(`integration_showcase.manifest.samples.${code}`);
 
 export default function IntegrationShowcaseAdminPage() {
   const { t } = useTranslation('admin_caring_community');
@@ -151,19 +163,20 @@ export default function IntegrationShowcaseAdminPage() {
         <Accordion variant="splitted" selectionMode="multiple" defaultExpandedKeys={['openapi', 'partner_api']}>
           {data.sections.map((section) => {
             const Icon = ICON_MAP[section.icon] ?? Plug;
+            const title = sectionTitle(t, section.id);
             return (
               <AccordionItem
                 key={section.id} id={section.id}
-                aria-label={section.title}
+                aria-label={title}
                 title={
                   <span className="flex items-center gap-2 font-semibold">
                     <Icon size={16} />
-                    {section.title}
+                    {title}
                   </span>
                 }
               >
                 <div className="space-y-4 pb-2">
-                  <p className="text-sm text-muted">{section.body}</p>
+                  <p className="text-sm text-muted">{sectionBody(t, section.id)}</p>
 
                   {section.items && section.items.length > 0 && (
                     <div className="space-y-2">
@@ -181,7 +194,7 @@ export default function IntegrationShowcaseAdminPage() {
                             {item.method}
                           </Chip>
                           <code className="flex-1 text-xs font-mono text-foreground">{item.path}</code>
-                          <span className="text-xs text-muted">{item.label}</span>
+                          <span className="text-xs text-muted">{endpointLabel(t, item.code)}</span>
                         </div>
                       ))}
                     </div>
@@ -204,9 +217,11 @@ export default function IntegrationShowcaseAdminPage() {
                     </Card>
                   )}
 
-                  {section.verification_note && (
+                  {section.verification_note_code && (
                     <Card className="border border-warning bg-warning/10">
-                      <CardBody className="py-2 text-xs">{section.verification_note}</CardBody>
+                      <CardBody className="py-2 text-xs">
+                        {t(`integration_showcase.manifest.verification_notes.${section.verification_note_code}`)}
+                      </CardBody>
                     </Card>
                   )}
 
@@ -215,7 +230,7 @@ export default function IntegrationShowcaseAdminPage() {
                       {section.samples.map((sample, i) => (
                         <Card key={`${section.id}-sample-${i}`} className="border border-[var(--color-border)]">
                           <CardHeader className="pb-1 flex items-center justify-between">
-                            <span className="text-xs font-semibold">{sample.label}</span>
+                            <span className="text-xs font-semibold">{sampleLabel(t, sample.code)}</span>
                             <Chip size="sm" variant="soft">{sample.kind.toUpperCase()}</Chip>
                           </CardHeader>
                           <CardBody className="pt-0 space-y-2">
@@ -239,10 +254,12 @@ export default function IntegrationShowcaseAdminPage() {
                     </div>
                   )}
 
-                  {section.checklist && section.checklist.length > 0 && (
+                  {section.checklist_codes && section.checklist_codes.length > 0 && (
                     <ul className="list-disc pl-5 text-sm text-foreground space-y-1">
-                      {section.checklist.map((c, i) => (
-                        <li key={`${section.id}-cl-${i}`}>{c}</li>
+                      {section.checklist_codes.map((code) => (
+                        <li key={`${section.id}-cl-${code}`}>
+                          {t(`integration_showcase.manifest.checklist.${code}`)}
+                        </li>
                       ))}
                     </ul>
                   )}

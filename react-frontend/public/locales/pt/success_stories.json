@@ -8,5 +8,33 @@
   "after_label": "Depois",
   "caveat_label": "Método",
   "evidence_label": "Evidência",
-  "error_loading": "Não conseguimos carregar as histórias de sucesso agora. Tente novamente em instantes."
+  "error_loading": "Não conseguimos carregar as histórias de sucesso agora. Tente novamente em instantes.",
+  "audiences": {
+    "all_residents": "Todos os moradores",
+    "municipality": "Município",
+    "kanton": "Cantão",
+    "verein_members": "Membros da associação",
+    "volunteers": "Voluntários",
+    "recipients": "Beneficiários de cuidados"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% menos esforço na distribuição de informações",
+      "narrative": "Os coordenadores passam aproximadamente um terço menos de tempo distribuindo atualizações após a mudança para o NEXUS. Anúncios, segmentação de membros e rastreamento de confirmações estão consolidados em um só lugar.",
+      "method_caveat": "Exemplo ilustrativo baseado em uma reivindicação da comunidade de pares; não foi medido para este locatário.",
+      "evidence_source": "Página do município par (ilustrativa)"
+    },
+    "volunteer_engagement": {
+      "title": "25% mais engajamento de voluntários",
+      "narrative": "Comunidades-piloto relatam um quarto a mais de participação ativa de voluntários após adotar o NEXUS, apoiadas por correspondência mais clara, inscrição sem atritos e reconhecimento visível do Passaporte de Calor.",
+      "method_caveat": "Exemplo ilustrativo baseado em uma reivindicação da comunidade de pares; não foi medido para este locatário.",
+      "evidence_source": "Página do município par (ilustrativa)"
+    },
+    "formal_care_offset": {
+      "title": "CHF 12.250 em custos de cuidados formais compensados",
+      "narrative": "As horas de voluntariado coordenadas pelo NEXUS representam uma compensação de CHF 12.250 contra os custos de cuidados domiciliares formais durante o período piloto, avaliadas à taxa suíça de assistente de cuidados formais.",
+      "method_caveat": "Estimativa usando CHF 35 por hora ao longo de 350 horas; a comparação é feita apenas com a linha de base pré-piloto.",
+      "evidence_source": "Modelo de ROI municipal AG76 (ilustrativo)"
+    }
+  }
 }

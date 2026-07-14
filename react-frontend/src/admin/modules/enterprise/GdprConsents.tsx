@@ -58,8 +58,8 @@ export function GdprConsents() {
       label: t('enterprise.gdpr_type'),
       sortable: true,
       render: (c) => (
-        <Chip size="sm" variant="soft" className="capitalize">
-          {c.consent_type}
+        <Chip size="sm" variant="soft">
+          {c.consent_type_name || t('enterprise.gdpr_consent_type_unknown')}
         </Chip>
       ),
     },

@@ -9,9 +9,9 @@
  * alpha UI is fully user-facing.
  */
 
-import { execFileSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { loadPhpArray } from './lib/load-php-array.mjs';
 
 const LANG_DIR = join(process.cwd(), 'lang');
 const SOURCE_LOCALE = 'en';
@@ -41,16 +41,6 @@ const LEGAL_OR_BRAND_TOKENS = new Set([
   'hOUR Timebank CLG',
   'WCAG 2.2 Level AA',
 ]);
-
-function loadPhpArray(file) {
-  const out = execFileSync(
-    'php',
-    ['-d', 'display_errors=stderr', '-r', 'echo json_encode(require $argv[1], JSON_UNESCAPED_UNICODE);', file],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-  );
-
-  return JSON.parse(out);
-}
 
 function flatten(value, prefix = '', out = new Map()) {
   if (Array.isArray(value)) {

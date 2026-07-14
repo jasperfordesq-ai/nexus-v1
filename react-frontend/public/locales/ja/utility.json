@@ -64,7 +64,8 @@
     "contact_support": "サポートに連絡",
     "load_error_title": "よくある質問を読み込めませんでした",
     "load_error_description": "ページを更新するか、サポートにお問い合わせください。",
-    "articles_count_other": "{{count}}件の記事"
+    "articles_count_other": "{{count}}件の記事",
+    "articles_count_one": "{{count}} 記事"
   },
   "resources": {
     "page_title": "リソース",

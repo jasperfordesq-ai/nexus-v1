@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Progress } from '@/components/ui';
 import {
   useState,
@@ -178,7 +178,7 @@ export function NewsletterDiagnostics() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-foreground">{t('newsletter_diagnostics.success_rate')}</span>
-                      <span className="text-sm font-semibold">{queueHealth.toFixed(1)}%</span>
+                      <span className="text-sm font-semibold">{formatNumber(queueHealth / 100, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                     </div>
                     <Progress
                       value={queueHealth}
@@ -221,7 +221,7 @@ export function NewsletterDiagnostics() {
                     <p className="text-sm text-foreground mb-2">{t('newsletter_diagnostics.bounce_rate')}</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold">
-                        {data?.bounce_rate?.toFixed(2) || '0.00'}%
+                        {formatNumber((data?.bounce_rate ?? 0) / 100, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       {data && data.bounce_rate < 5 && (
                         <Chip size="sm" color="success" variant="soft">{t('newsletter_diagnostics.bounce_chip_good')}</Chip>
@@ -239,7 +239,18 @@ export function NewsletterDiagnostics() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-foreground">{t('newsletter_diagnostics.health')}</span>
                       <span className="text-sm font-semibold">
-                        {data && data.bounce_rate < 5 ? '95%+' : data && data.bounce_rate < 10 ? '85-95%' : '<85%'}
+                        {data && data.bounce_rate < 5
+                          ? t('newsletter_diagnostics.health_at_least', {
+                              value: formatNumber(0.95, { style: 'percent' }),
+                            })
+                          : data && data.bounce_rate < 10
+                            ? t('newsletter_diagnostics.health_range', {
+                                min: formatNumber(0.85, { style: 'percent' }),
+                                max: formatNumber(0.95, { style: 'percent' }),
+                              })
+                            : t('newsletter_diagnostics.health_below', {
+                                value: formatNumber(0.85, { style: 'percent' }),
+                              })}
                       </span>
                     </div>
                     <Progress

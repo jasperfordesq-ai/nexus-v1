@@ -265,13 +265,11 @@ export default function OnboardingPage() {
   const stages = funnel?.stages ?? [];
   const maxCount = stages.length > 0 ? (stages[0]?.count ?? 1) : 1;
 
-  // Stage labels mapped from translation keys
-  const stageLabels: Record<string, string> = {
-    Registered: t('onboarding.stage_registered'),
-    'Email Verified': t('onboarding.stage_email_verified'),
-    'Profile Complete': t('onboarding.stage_profile_complete'),
-    'First Exchange': t('onboarding.stage_first_exchange'),
-  };
+  const getStageCode = (stage: CrmFunnelStage) => stage.code || 'unknown';
+  const getStageLabel = (stage: CrmFunnelStage) =>
+    t(`onboarding.stage_${getStageCode(stage)}`, {
+      defaultValue: t('onboarding.stage_unknown'),
+    });
 
   const firstStage = stages[0];
   const lastStage = stages[stages.length - 1];
@@ -288,7 +286,7 @@ export default function OnboardingPage() {
     if (prev && prev.count > 0 && cur) {
       const rate = Math.round((cur.count / prev.count) * 1000) / 10;
       if (biggestDropoff === null || rate < biggestDropoff.rate) {
-        biggestDropoff = { name: stageLabels[cur.name] || cur.name, rate };
+        biggestDropoff = { name: getStageLabel(cur), rate };
       }
     }
   }
@@ -489,11 +487,11 @@ export default function OnboardingPage() {
                     prevStage && prevStage.count > 0
                       ? Math.round((stage.count / prevStage.count) * 1000) / 10
                       : null;
-                  const label = stageLabels[stage.name] || stage.name;
+                  const label = getStageLabel(stage);
                   const tone = shareTone(pct);
 
                   return (
-                    <div key={stage.name}>
+                    <div key={getStageCode(stage)}>
                       {/* Conversion rate between stages */}
                       {index > 0 && (
                         <div className="flex items-center justify-center gap-2 py-1.5">
@@ -547,11 +545,11 @@ export default function OnboardingPage() {
                   <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-divider/70 bg-surface-secondary/60 px-4 py-3">
                     <div className="flex min-w-0 items-center gap-2 text-sm text-muted">
                       <span className="truncate">
-                        {stageLabels[firstStage.name] || firstStage.name}
+                        {getStageLabel(firstStage)}
                       </span>
                       <ArrowRight size={14} aria-hidden="true" className="shrink-0" />
                       <span className="truncate">
-                        {stageLabels[lastStage.name] || lastStage.name}
+                        {getStageLabel(lastStage)}
                       </span>
                     </div>
                     <div className="flex items-baseline gap-2">

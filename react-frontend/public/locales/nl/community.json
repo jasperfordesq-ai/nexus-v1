@@ -165,7 +165,7 @@
     "form_description_required": "Beschrijving is vereist",
     "form_description_min_length": "Beschrijving moet minimaal 20 tekens bevatten",
     "form_email_label": "Neem contact op met E-mail",
-    "form_email_placeholder": "contact@uworg.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "E-mailadres voor contact is vereist",
     "form_email_invalid": "Voer een geldig e-mailadres in",
     "form_website_label": "Website (optioneel)",
@@ -273,7 +273,7 @@
     "add_member_heading": "Groepslid toevoegen",
     "add_member_desc": "Voer het e-mailadres in van de persoon die u aan deze groepsreservering wilt toevoegen. Zij ontvangen een uitnodiging om lid te worden.",
     "email_label": "E-mailadres",
-    "email_placeholder": "lid@voorbeeld.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Annuleren",
     "add_member_failed": "Kan lid niet toevoegen. Mogelijk zitten ze al in de groep of is de e-mail ongeldig.",
     "add_member_error": "Kan lid niet toevoegen. Controleer de e-mail en probeer het opnieuw."

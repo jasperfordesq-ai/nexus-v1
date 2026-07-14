@@ -11,7 +11,7 @@
  * Backend: GET /v2/admin/search/{analytics,trending,zero-results}
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -92,8 +92,8 @@ export function SearchAnalytics() {
       if (summaryRes.success && summaryRes.data) {
         setSummary(summaryRes.data);
       } else {
-        setLoadError(summaryRes.error || t('search_analytics.load_failed'));
-        toast.error(summaryRes.error || t('search_analytics.load_failed'));
+        setLoadError(t('search_analytics.load_failed'));
+        toast.error(t('search_analytics.load_failed'));
       }
 
       setTrending(trendingRes.success && Array.isArray(trendingRes.data) ? trendingRes.data : []);
@@ -180,7 +180,7 @@ export function SearchAnalytics() {
             />
             <StatCard
               label={t('search_analytics.zero_result_rate')}
-              value={`${summary.zero_result_rate}%`}
+              value={formatPercentValue(summary.zero_result_rate)}
               icon={Percent}
               color={summary.zero_result_rate > 25 ? 'danger' : summary.zero_result_rate > 10 ? 'warning' : 'success'}
             />
@@ -251,7 +251,9 @@ export function SearchAnalytics() {
                 <div className="flex flex-wrap gap-2">
                   {summary.searches_by_type.map((entry) => (
                     <Chip key={entry.type ?? 'unknown'} size="md" variant="soft" color="primary">
-                      {(entry.type || t('common.unknown'))}: {entry.count.toLocaleString(getFormattingLocale())}
+                      {entry.type
+                        ? t(`search_analytics.result_types.${entry.type}`, { defaultValue: t('common.unknown') })
+                        : t('common.unknown')}: {entry.count.toLocaleString(getFormattingLocale())}
                     </Chip>
                   ))}
                 </div>

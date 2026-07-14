@@ -158,8 +158,8 @@ function getPathAndQuery(href: string) {
   return { path, rawQuery };
 }
 
-function keyword(...words: string[]): string[] {
-  return words;
+function keyword(translatedKeywords: string): string[] {
+  return translatedKeywords.split('|').map((word) => word.trim()).filter(Boolean);
 }
 
 function useAdminNav(): NavSection[] {
@@ -175,16 +175,16 @@ function useAdminNav(): NavSection[] {
   return useMemo(() => {
     const communityItems: NavItem[] = [
       ...(hasFeature('groups') ? [
-        { label: t('groups'), href: '/admin/groups', icon: Users, keywords: keyword('clubs', 'circles', 'communities') },
+        { label: t('groups'), href: '/admin/groups', icon: Users, keywords: keyword(t('search_keywords.groups')) },
         { label: t('group_types'), href: '/admin/groups/types', icon: FolderTree },
         { label: t('group_recommendations'), href: '/admin/groups/recommendations', icon: Brain },
         { label: t('group_ranking'), href: '/admin/groups/ranking', icon: Trophy },
-        { label: t('group_organization'), href: '/admin/groups/organization', icon: Tags, keywords: keyword('tags', 'collections', 'auto-assign', 'bundles') },
+        { label: t('group_organization'), href: '/admin/groups/organization', icon: Tags, keywords: keyword(t('search_keywords.group_organization')) },
       ] : []),
       ...(hasFeature('events') ? [{ label: t('events'), href: '/admin/events', icon: Calendar }] : []),
       ...(hasFeature('polls') ? [{ label: t('polls'), href: '/admin/polls', icon: BarChart2 }] : []),
       ...(hasFeature('goals') ? [{ label: t('goals'), href: '/admin/goals', icon: Target }] : []),
-      ...(hasFeature('podcasts') ? [{ label: t('podcasts'), href: '/admin/podcasts', icon: Podcast, keywords: keyword('audio', 'shows', 'episodes') }] : []),
+      ...(hasFeature('podcasts') ? [{ label: t('podcasts'), href: '/admin/podcasts', icon: Podcast, keywords: keyword(t('search_keywords.podcasts')) }] : []),
       ...(hasFeature('ideation_challenges') ? [{ label: t('ideation_challenges'), href: '/admin/ideation', icon: Lightbulb }] : []),
       ...(hasFeature('volunteering') ? [{ label: t('volunteering'), href: '/admin/volunteering', icon: Heart }] : []),
     ];
@@ -230,9 +230,9 @@ function useAdminNav(): NavSection[] {
         icon: Users,
         zone: 'people',
         items: [
-          { label: t('all_users'), href: '/admin/users', icon: Users, keywords: keyword('members', 'accounts') },
-          { label: t('pending_approvals'), href: '/admin/users?filter=pending', icon: UserCheck, keywords: keyword('approval', 'waiting') },
-          ...(hasFeature('caring_community') ? [{ label: t('residency_verifications'), href: '/admin/residency-verifications', icon: MapPin, keywords: keyword('residency', 'address', 'municipality', 'verification', 'attest') }] : []),
+          { label: t('all_users'), href: '/admin/users', icon: Users, keywords: keyword(t('search_keywords.all_users')) },
+          { label: t('pending_approvals'), href: '/admin/users?filter=pending', icon: UserCheck, keywords: keyword(t('search_keywords.pending_approvals')) },
+          ...(hasFeature('caring_community') ? [{ label: t('residency_verifications'), href: '/admin/residency-verifications', icon: MapPin, keywords: keyword(t('search_keywords.residency_verifications')) }] : []),
         ],
       },
       {
@@ -283,7 +283,7 @@ function useAdminNav(): NavSection[] {
           ...(isGod ? [{ label: t('menus'), href: '/admin/menus', icon: Menu }] : []),
           { label: t('categories'), href: '/admin/categories', icon: FolderTree },
           { label: t('attributes'), href: '/admin/attributes', icon: Tags },
-          { label: t('help_faqs'), href: '/admin/help/faqs', icon: HelpCircle, keywords: keyword('faq', 'questions', 'help centre', 'answers') },
+          { label: t('help_faqs'), href: '/admin/help/faqs', icon: HelpCircle, keywords: keyword(t('search_keywords.help_faqs')) },
         ],
       },
       ...(hasFeature('job_vacancies') ? [{
@@ -314,9 +314,9 @@ function useAdminNav(): NavSection[] {
         icon: Mail,
         zone: 'communications' as const,
         items: [
-          { label: t('email_settings'), href: '/admin/email-settings', icon: Mail, keywords: keyword('smtp', 'mail', 'sendgrid', 'from address') },
-          { label: t('email_deliverability'), href: '/admin/email-deliverability', icon: Mail, keywords: keyword('mail failed', 'smtp health', 'delivery') },
-          { label: t('deliverability'), href: '/admin/deliverability', icon: Mail, keywords: keyword('deliverables', 'scheduled email') },
+          { label: t('email_settings'), href: '/admin/email-settings', icon: Mail, keywords: keyword(t('search_keywords.email_settings')) },
+          { label: t('email_deliverability'), href: '/admin/email-deliverability', icon: Mail, keywords: keyword(t('search_keywords.email_deliverability')) },
+          { label: t('deliverability'), href: '/admin/deliverability', icon: Mail, keywords: keyword(t('search_keywords.deliverability')) },
         ],
       }] : []),
       {
@@ -329,7 +329,7 @@ function useAdminNav(): NavSection[] {
             { label: t('newsletters'), href: '/admin/newsletters', icon: Megaphone },
             { label: t('subscribers'), href: '/admin/newsletters/subscribers', icon: Users },
             { label: t('templates'), href: '/admin/newsletters/templates', icon: FileText },
-            { label: t('bounces'), href: '/admin/newsletters/bounces', icon: AlertTriangle, keywords: keyword('email failed', 'mail returned') },
+            { label: t('bounces'), href: '/admin/newsletters/bounces', icon: AlertTriangle, keywords: keyword(t('search_keywords.bounces')) },
             { label: t('send_time_optimizer'), href: '/admin/newsletters/send-time-optimizer', icon: Clock },
             { label: t('diagnostics'), href: '/admin/newsletters/diagnostics', icon: Stethoscope },
           ] : []),
@@ -377,9 +377,9 @@ function useAdminNav(): NavSection[] {
         zone: 'growth',
         items: [
           { label: t('seo_overview'), href: '/admin/seo', icon: Search },
-          { label: t('search_analytics'), href: '/admin/search-analytics', icon: BarChart3, keywords: keyword('queries', 'zero results', 'trending', 'meilisearch') },
+          { label: t('search_analytics'), href: '/admin/search-analytics', icon: BarChart3, keywords: keyword(t('search_keywords.search_analytics')) },
           ...(isPlatformSuperAdmin ? [{ label: t('prerender_engine'), href: '/admin/seo/prerender', icon: Zap }] : []),
-          { label: t('error_404_tracking'), href: '/admin/404-errors', icon: AlertTriangle, keywords: keyword('not found', 'broken links') },
+          { label: t('error_404_tracking'), href: '/admin/404-errors', icon: AlertTriangle, keywords: keyword(t('search_keywords.error_404_tracking')) },
         ],
       },
       {
@@ -396,7 +396,7 @@ function useAdminNav(): NavSection[] {
             { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
           ] : []),
           ...(hasFeature('volunteering') ? [
-            { label: t('donation_refunds'), href: '/admin/volunteering/donations', icon: HandCoins, keywords: keyword('donations', 'refund', 'stripe', 'giving') },
+            { label: t('donation_refunds'), href: '/admin/volunteering/donations', icon: HandCoins, keywords: keyword(t('search_keywords.donation_refunds')) },
           ] : []),
           ...(isGod ? [
             { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
@@ -429,11 +429,11 @@ function useAdminNav(): NavSection[] {
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Heart },
           ...(isSuperAdmin ? [{ label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle }] : []),
           { label: t('operations'), href: '/admin/operations', icon: Activity },
-          { label: t('support_reports'), href: '/admin/support-reports', icon: Bug, keywords: keyword('bugs', 'feedback', 'diagnostics', 'sentry') },
+          { label: t('support_reports'), href: '/admin/support-reports', icon: Bug, keywords: keyword(t('search_keywords.support_reports')) },
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
           { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
-          { label: t('retention_policies'), href: '/admin/retention', icon: Activity, keywords: keyword('retention', 'gdpr', 'disposal', 'purge', 'archive') },
-          { label: t('sso_providers'), href: '/admin/sso', icon: KeyIcon, keywords: keyword('sso', 'oidc', 'single sign-on', 'entra', 'identity', 'login') },
+          { label: t('retention_policies'), href: '/admin/retention', icon: Activity, keywords: keyword(t('search_keywords.retention_policies')) },
+          { label: t('sso_providers'), href: '/admin/sso', icon: KeyIcon, keywords: keyword(t('search_keywords.sso_providers')) },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
           { label: t('cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },

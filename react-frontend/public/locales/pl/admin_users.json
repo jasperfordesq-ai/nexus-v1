@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "users": {
     "action_approve": "Zatwierdź",
@@ -135,7 +135,6 @@
     "import_errors": "Błędy importu",
     "import_failed": "Import nie powiódł się",
     "import_imported": "Importuj Zaimportowano",
-    "import_role_broker": "Broker",
     "import_role_coordinator": "Koordynator",
     "import_role_member": "Członek",
     "import_skipped": "Import pominięty",
@@ -143,7 +142,6 @@
     "import_title": "Importuj",
     "import_total_rows": "Suma wierszy",
     "label_amount": "Kwota",
-    "label_bio": "Bio",
     "label_email": "E-mail",
     "label_first_name": "Imię",
     "label_last_name": "Nazwisko",
@@ -168,7 +166,7 @@
     "placeholder_a_short_biography_for_this_user": "Krótka biografia tego użytkownika...",
     "placeholder_eg_community_centre": "Np. Centrum Społeczności...",
     "placeholder_eg_community_volunteer": "Np. wolontariusz społeczny...",
-    "placeholder_email": "e-mail@example.com",
+    "placeholder_email": "email@example.com",
     "placeholder_first_name": "Imię...",
     "placeholder_enter_first_name": "Wpisz imię...",
     "placeholder_enter_last_name": "Wpisz nazwisko...",
@@ -197,7 +195,6 @@
     "role_admin": "Administrator",
     "role_broker": "Pośrednik",
     "role_member": "Członek",
-    "role_moderator": "Moderator",
     "role_newsletter_admin": "Administrator biuletynu",
     "role_tenant_admin": "Administrator najemcy",
     "send_welcome_email": "Wyślij e-mail powitalny",
@@ -220,7 +217,12 @@
     "permissions_editor_unavailable_title": "Uprawnienia są tutaj tylko do odczytu",
     "permissions_editor_unavailable_desc": "Ta strona pokazuje rolę użytkownika i przyznane uprawnienia, ale nie pozwala ich zmieniać. Zarządzaj dostępem, zmieniając rolę użytkownika na stronie edycji.",
     "role_unknown": "Nieznana rola",
-    "role_tenant_super_admin": "Superadministrator dzierżawcy"
+    "role_tenant_super_admin": "Superadministrator dzierżawcy",
+    "role_super_admin_short": "Super Administrator",
+    "reset_2fa_reason": "Zresetowane przez administratora",
+    "import_role_broker": "Pośrednik",
+    "label_bio": "Bio",
+    "role_moderator": "Moderator"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "Wyrażono zgodę",
       "not_consented": "Brak zgody",
       "not_given": "Nie wyrażono zgody",
-      "withdrawn_on": "Wycofane"
+      "withdrawn_on": "Wycofane",
+      "type_unknown": "Nieznany typ zgody"
     },
     "descriptions": {
       "balance_amount": "Użyj wartości ujemnych, aby odliczyć kredyty czasowe od tego członka",
@@ -280,7 +283,6 @@
     "fields": {
       "amount": "Kwota",
       "balance": "Balansować",
-      "bio": "Bio",
       "current_balance": "Aktualne saldo",
       "email": "E-mail",
       "email_activation_status": "Status aktywacji e-mail",
@@ -297,7 +299,8 @@
       "role": "Rola",
       "status": "Stan",
       "tagline": "Hasło",
-      "tenant_super_admin": "Superadministrator najemcy"
+      "tenant_super_admin": "Superadministrator najemcy",
+      "bio": "Bio"
     },
     "loading": {
       "compliance": "Zgodność ładowania",
@@ -326,7 +329,7 @@
       "balance_amount": "np. 2 lub -1,5",
       "balance_reason": "Dlaczego korygujesz tę równowagę?",
       "bio": "Krótka biografia tego użytkownika...",
-      "email": "użytkownik@example.com",
+      "email": "user@example.com",
       "first_name": "Wpisz imię...",
       "last_name": "Wpisz nazwisko...",
       "location": "np. Nowy Jork, USA",
@@ -346,9 +349,9 @@
       "admin": "Administrator",
       "broker": "Pośrednik",
       "member": "Członek",
-      "moderator": "Moderator",
       "newsletter_admin": "Administrator biuletynu",
-      "tenant_admin": "Administrator najemcy"
+      "tenant_admin": "Administrator najemcy",
+      "moderator": "Moderator"
     },
     "sections": {
       "account_actions": "Działania na koncie",
@@ -433,12 +436,28 @@
       "decision_confirmed": "Zaświadczenie potwierdzone",
       "decision_revoked": "Zaświadczenie cofnięte",
       "decision_not_confirmed": "Zaświadczenie niepotwierdzone"
+    },
+    "insurance": {
+      "status_none": "Brak",
+      "status_pending": "Oczekujące",
+      "status_submitted": "Złożone",
+      "status_verified": "Zweryfikowane",
+      "status_expired": "Wygasło",
+      "status_rejected": "Odrzucone",
+      "status_revoked": "Cofnięte",
+      "status_unknown": "Nieznany status",
+      "type_public_liability": "Odpowiedzialność cywilna",
+      "type_professional_indemnity": "Ubezpieczenie zawodowe",
+      "type_employers_liability": "Odpowiedzialność pracodawcy",
+      "type_product_liability": "Odpowiedzialność za produkt",
+      "type_personal_accident": "Ubezpieczenie osobiste od następstw nieszczęśliwych wypadków",
+      "type_other": "Inne",
+      "type_unknown": "Nieznany rodzaj ubezpieczenia"
     }
   },
   "aria": {
     "breadcrumbs": "Bułka tarta"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "Weryfikacje miejsca zamieszkania",
     "page_desc": "Przeglądaj deklaracje miejsca zamieszkania przesłane przez członków i przyznawaj odznakę zweryfikowanego miejsca zamieszkania.",
@@ -483,5 +502,6 @@
     "intelligence": "Inteligencja",
     "engagement": "Zaręczyny",
     "system": "Systemu"
-  }
+  },
+  "loading": "Ładowanie"
 }

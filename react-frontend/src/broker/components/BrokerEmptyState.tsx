@@ -58,6 +58,7 @@ export function BrokerEmptyState({
       </div>
       <p className="font-medium text-foreground">{title}</p>
       {hint && <p className="mt-1 max-w-sm text-sm text-muted">{hint}</p>}
+      {/* admin-i18n-ignore: action is a caller-supplied ReactNode, not a raw status/action enum */}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

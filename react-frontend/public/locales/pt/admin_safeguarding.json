@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "safeguarding": {
     "active": "Ativo",
@@ -329,12 +329,11 @@
     "pending": "Pendente",
     "placeholder_description_help": "Descrição Ajuda...",
     "placeholder_display_label": "por exemplo Posso precisar de suporte adicional durante as trocas",
-    "placeholder_guardian_email": "guardião@exemplo.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "por exemplo precisa_de_suporte_adicional",
     "placeholder_review_notes": "Revisar notas...",
     "placeholder_search_messages": "Pesquisar mensagens...",
-    "placeholder_ward_email": "ala@exemplo.com",
+    "placeholder_ward_email": "ward@example.com",
     "reason": "Razão",
     "refresh": "Atualizar",
     "required": "Obrigatório",
@@ -368,7 +367,6 @@
     "ward": "Ala",
     "aria_deactivate_option": "Desativar opção",
     "aria_edit_option": "Editar opção",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Acesso de verificação Ni",
     "vetting_dbs_basic": "Verificação de Dbs Básico",
     "vetting_dbs_enhanced": "Verificação de Dbs aprimorado",
@@ -377,6 +375,11 @@
     "vetting_international": "Verificação Internacional",
     "vetting_other": "Verificação de outros",
     "vetting_pvg_scotland": "Verificando Pvg Escócia",
-    "tabs_aria": "Protegendo seções"
+    "tabs_aria": "Protegendo seções",
+    "status_active": "Ativo",
+    "status_revoked": "Revogado",
+    "status_expired": "Expirado",
+    "deactivate_confirm_question": "Desativar",
+    "placeholder_option_key": "ex. needs_additional_support"
   }
 }

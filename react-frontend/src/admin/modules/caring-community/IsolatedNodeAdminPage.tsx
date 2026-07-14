@@ -26,10 +26,10 @@ type ItemType = 'enum' | 'text' | 'url' | 'choice';
 
 interface DecisionItem {
   key: string;
-  label: string;
+  label_code: string;
   type: ItemType;
   choices: string[] | null;
-  help: string;
+  help_code: string;
   value: string | null;
   owner: string | null;
   status: ItemStatus;
@@ -81,14 +81,22 @@ function buildDraft(item: DecisionItem): DraftState {
   };
 }
 
-const renderValueChip = (item: DecisionItem) => {
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
+
+const itemLabel = (item: DecisionItem, t: AdminT) =>
+  t(`isolated_node.items.${item.label_code}.label`);
+
+const itemHelp = (item: DecisionItem, t: AdminT) =>
+  t(`isolated_node.items.${item.help_code}.help`);
+
+const renderValueChip = (item: DecisionItem, t: AdminT) => {
   if (!item.value) {
     return <span className="text-muted text-sm italic">—</span>;
   }
   if (item.type === 'enum' || item.type === 'choice') {
     return (
       <Chip size="sm" variant="soft">
-        {item.value}
+        {t(`isolated_node.choices.${item.value}`)}
       </Chip>
     );
   }
@@ -189,7 +197,7 @@ export default function IsolatedNodeAdminPage() {
       return (
         <Select
           label={t('isolated_node.fields.value')}
-          description={editingItem.help}
+          description={itemHelp(editingItem, t)}
           selectedKeys={draft.value ? [draft.value] : []}
           onSelectionChange={(keys) => {
             const next = Array.from(keys)[0];
@@ -199,7 +207,7 @@ export default function IsolatedNodeAdminPage() {
           }}
         >
           {(editingItem.choices ?? []).map((opt) => (
-            <SelectItem key={opt} id={opt}>{opt}</SelectItem>
+            <SelectItem key={opt} id={opt}>{t(`isolated_node.choices.${opt}`)}</SelectItem>
           ))}
         </Select>
       );
@@ -209,7 +217,7 @@ export default function IsolatedNodeAdminPage() {
       return (
         <Input
           label={t('isolated_node.fields.value')}
-          description={editingItem.help}
+          description={itemHelp(editingItem, t)}
           type="url"
           placeholder={t('isolated_node.fields.url_placeholder')}
           value={draft.value}
@@ -221,7 +229,7 @@ export default function IsolatedNodeAdminPage() {
     return (
       <Input
         label={t('isolated_node.fields.value')}
-        description={editingItem.help}
+        description={itemHelp(editingItem, t)}
         value={draft.value}
         onValueChange={(v) => setDraft({ ...draft, value: v })}
       />
@@ -354,8 +362,8 @@ export default function IsolatedNodeAdminPage() {
               <Card key={item.key} className="border border-[var(--color-border)]">
                 <CardHeader className="flex flex-wrap items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-sm">{item.label}</p>
-                    <p className="text-xs text-muted mt-0.5">{item.help}</p>
+                    <p className="font-semibold text-sm">{itemLabel(item, t)}</p>
+                    <p className="text-xs text-muted mt-0.5">{itemHelp(item, t)}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status]}>
@@ -375,7 +383,7 @@ export default function IsolatedNodeAdminPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                     <div>
                       <p className="text-xs uppercase tracking-wide text-muted">{t('isolated_node.fields.value')}</p>
-                      <div className="mt-1">{renderValueChip(item)}</div>
+                      <div className="mt-1">{renderValueChip(item, t)}</div>
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wide text-muted">{t('isolated_node.fields.owner')}</p>
@@ -419,7 +427,7 @@ export default function IsolatedNodeAdminPage() {
       <Modal isOpen={!!editingItem} onClose={closeModal} size="lg" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <span>{editingItem?.label ?? t('isolated_node.modal.edit_decision_item')}</span>
+            <span>{editingItem ? itemLabel(editingItem, t) : t('isolated_node.modal.edit_decision_item')}</span>
             <span className="text-xs font-normal text-muted">
               {t('isolated_node.modal.subtitle')}
             </span>

@@ -70,7 +70,7 @@ export function RegistrationBreakerCard() {
         toast.success(t('system.registration_breaker.resume_success'));
         await fetchStatus();
       } else {
-        toast.error(res.error ?? t('system.registration_breaker.resume_failed'));
+        toast.error(t('system.registration_breaker.resume_failed'));
       }
     } finally {
       setResuming(false);

@@ -155,7 +155,7 @@ export default function CareProviderAdminPage() {
     setError(null);
     try {
       const res = await api.get<DirectoryResponse>(`/v2/admin/caring-community/providers?page=${page}`);
-      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.load'));
+      if (!res.success) throw new Error(t('admin.providers.errors.load'));
       setProviders(res.data?.data ?? []);
       setTotal(res.data?.total ?? 0);
       setPerPage(res.data?.per_page ?? 20);
@@ -230,11 +230,11 @@ export default function CareProviderAdminPage() {
 
       if (editTarget) {
         const res = await api.put(`/v2/admin/caring-community/providers/${editTarget.id}`, payload);
-        if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.save'));
+        if (!res.success) throw new Error(t('admin.providers.errors.save'));
         showToast(t('admin.providers.messages.updated'), 'success');
       } else {
         const res = await api.post('/v2/admin/caring-community/providers', payload);
-        if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.save'));
+        if (!res.success) throw new Error(t('admin.providers.errors.save'));
         showToast(t('admin.providers.messages.created'), 'success');
       }
 
@@ -261,7 +261,7 @@ export default function CareProviderAdminPage() {
     }
     try {
       const res = await api.delete(`/v2/admin/caring-community/providers/${provider.id}`);
-      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.delete'));
+      if (!res.success) throw new Error(t('admin.providers.errors.delete'));
       showToast(t('admin.providers.messages.removed'), 'success');
       void fetchProviders();
     } catch (err) {
@@ -279,7 +279,7 @@ export default function CareProviderAdminPage() {
       const res = await api.get<DuplicatesResponse>(
         '/v2/admin/caring-community/providers/duplicates?threshold=0.65',
       );
-      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.duplicates'));
+      if (!res.success) throw new Error(t('admin.providers.errors.duplicates'));
       setDuplicates(res.data ?? { pairs: [], total: 0, scanned: 0 });
     } catch (err) {
       logError('CareProviderAdminPage.duplicates', err);
@@ -301,7 +301,7 @@ export default function CareProviderAdminPage() {
     }
     try {
       const res = await api.delete(`/v2/admin/caring-community/providers/${providerId}`);
-      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.deactivate'));
+      if (!res.success) throw new Error(t('admin.providers.errors.deactivate'));
       showToast(t('admin.providers.messages.deactivated', { name: providerName }), 'success');
       await loadDuplicates();
       void fetchProviders();
@@ -316,7 +316,7 @@ export default function CareProviderAdminPage() {
   async function handleVerify(provider: CareProvider) {
     try {
       const res = await api.post(`/v2/admin/caring-community/providers/${provider.id}/verify`, {});
-      if (!res.success) throw new Error(res.error ?? t('admin.providers.errors.verify'));
+      if (!res.success) throw new Error(t('admin.providers.errors.verify'));
       showToast(t('admin.providers.messages.verified', { name: provider.name }), 'success');
       void fetchProviders();
     } catch (err) {
@@ -420,7 +420,7 @@ export default function CareProviderAdminPage() {
                         {pair.provider_a.name}
                       </p>
                       <p className="text-xs text-muted">
-                        #{pair.provider_a.id} · {pair.provider_a.type}
+                        #{pair.provider_a.id} · {t(`admin.providers.types.${pair.provider_a.type}`, { defaultValue: tAdmin('common.unknown') })}
                       </p>
                     </div>
                     <div className="text-muted text-xs self-center">{t('admin.providers.duplicates.vs')}</div>
@@ -432,7 +432,7 @@ export default function CareProviderAdminPage() {
                         {pair.provider_b.name}
                       </p>
                       <p className="text-xs text-muted">
-                        #{pair.provider_b.id} · {pair.provider_b.type}
+                        #{pair.provider_b.id} · {t(`admin.providers.types.${pair.provider_b.type}`, { defaultValue: tAdmin('common.unknown') })}
                       </p>
                     </div>
                     <Chip

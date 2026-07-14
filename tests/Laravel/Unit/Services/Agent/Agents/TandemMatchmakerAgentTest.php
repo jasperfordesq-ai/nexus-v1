@@ -77,7 +77,7 @@ class TandemMatchmakerAgentTest extends TestCase
             'recipient' => ['id' => $recipientId, 'name' => 'Bob'],
             'score'     => $score,
             'signals'   => ['shared_language' => true],
-            'reason'    => 'Good match by profile.',
+            'reasons'   => [['code' => 'shared_language', 'params' => []]],
         ];
     }
 
@@ -254,7 +254,7 @@ class TandemMatchmakerAgentTest extends TestCase
     // Fallback reasoning when LLM unavailable (no API key)
     // -------------------------------------------------------------------------
 
-    public function test_fallback_reason_used_when_no_api_key(): void
+    public function test_no_fixed_english_fallback_is_used_when_no_api_key(): void
     {
         // NOTE: OpenAIProvider uses raw curl_exec, not Laravel's Http facade.
         // Http::fake does not intercept curl. When OPENAI_API_KEY is absent,
@@ -266,7 +266,6 @@ class TandemMatchmakerAgentTest extends TestCase
         $r = $this->insertUser('RecFb');
 
         $pair = $this->makePair($s, $r, 0.6);
-        $pair['reason'] = 'High compatibility based on profile signals.';
 
         $this->bindMatchingService([$pair]);
 
@@ -279,14 +278,14 @@ class TandemMatchmakerAgentTest extends TestCase
             ->first();
 
         $this->assertNotNull($proposal);
-        $this->assertSame('High compatibility based on profile signals.', $proposal->reasoning);
+        $this->assertNull($proposal->reasoning);
     }
 
     // -------------------------------------------------------------------------
     // Reasoning is non-empty even when pair has no 'reason' key
     // -------------------------------------------------------------------------
 
-    public function test_generic_fallback_reasoning_used_when_pair_has_no_reason_key(): void
+    public function test_semantic_reasons_are_preserved_without_free_form_reasoning(): void
     {
         putenv('OPENAI_API_KEY=');
 
@@ -294,7 +293,6 @@ class TandemMatchmakerAgentTest extends TestCase
         $r = $this->insertUser('RecNoReason');
 
         $pair = $this->makePair($s, $r, 0.65);
-        unset($pair['reason']); // no 'reason' key → uses generic string in generateReasoning
 
         $this->bindMatchingService([$pair]);
 
@@ -307,9 +305,9 @@ class TandemMatchmakerAgentTest extends TestCase
             ->first();
 
         $this->assertNotNull($proposal);
-        // The hardcoded fallback in generateReasoning: 'High compatibility based on profile signals.'
-        $this->assertNotEmpty($proposal->reasoning);
-        $this->assertSame('High compatibility based on profile signals.', $proposal->reasoning);
+        $this->assertNull($proposal->reasoning);
+        $proposalData = json_decode((string) $proposal->proposal_data, true);
+        $this->assertSame('shared_language', $proposalData['reasons'][0]['code']);
     }
 
     // -------------------------------------------------------------------------

@@ -32,7 +32,8 @@
     "view_all": "すべての通知を見る",
     "close": "通知を閉じる",
     "unread_dot_aria": "Unread",
-    "bell_unread_aria_other": "通知、{{count}} 件の未読"
+    "bell_unread_aria_other": "通知、{{count}} 件の未読",
+    "bell_unread_aria_one": "通知、{{count}} 未読"
   },
   "type": {
     "message": "Message",
@@ -100,5 +101,8 @@
   },
   "unread_badge_other": "{{count}} 件の新着",
   "filter_unread_other": "未読 ({{count}})",
-  "and_others_other": "他{{count}}件"
+  "and_others_other": "他{{count}}件",
+  "unread_badge_one": "{{count}} 新規",
+  "filter_unread_one": "未読 ({{count}})",
+  "and_others_one": "および {{count}} 他"
 }

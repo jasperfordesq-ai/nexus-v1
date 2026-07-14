@@ -47,8 +47,8 @@ const CACHE_DATA = {
 };
 
 const JOBS_DATA = [
-  { id: 'send-digest', name: 'Send Digest', last_run_at: '2026-06-21T08:00:00Z' },
-  { id: 'clean-logs', name: 'Clean Logs', last_run_at: null },
+  { id: 'digest_emails', translation_key: 'digest_emails', name: 'SERVER COPY MUST NOT RENDER', last_run_at: '2026-06-21T08:00:00Z' },
+  { id: 'badge_checker', translation_key: 'badge_checker', name: 'SERVER COPY MUST NOT RENDER', last_run_at: null },
 ];
 
 function setupHappyPath() {
@@ -96,9 +96,10 @@ describe('Operations', () => {
     render(<Operations />);
 
     await waitFor(() => {
-      expect(screen.getByText('Send Digest')).toBeInTheDocument();
+      expect(screen.getByText('Email digest sender')).toBeInTheDocument();
     });
-    expect(screen.getByText('Clean Logs')).toBeInTheDocument();
+    expect(screen.getByText('Badge award checker')).toBeInTheDocument();
+    expect(screen.queryByText('SERVER COPY MUST NOT RENDER')).not.toBeInTheDocument();
   });
 
   it('shows "never run" for a job with no last_run_at', async () => {
@@ -167,13 +168,13 @@ describe('Operations', () => {
     render(<Operations />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /run.*send digest/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /run.*email digest sender/i })).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /run.*send digest/i }));
+    await userEvent.click(screen.getByRole('button', { name: /run.*email digest sender/i }));
 
     await waitFor(() => {
-      expect(mockRunJob).toHaveBeenCalledWith('send-digest');
+      expect(mockRunJob).toHaveBeenCalledWith('digest_emails');
       expect(mockToast.success).toHaveBeenCalled();
     });
   });
@@ -185,10 +186,10 @@ describe('Operations', () => {
     render(<Operations />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /run.*send digest/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /run.*email digest sender/i })).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /run.*send digest/i }));
+    await userEvent.click(screen.getByRole('button', { name: /run.*email digest sender/i }));
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();

@@ -169,7 +169,7 @@
     "item_not_found": "لم يتم العثور على عنصر قائمة انتظار الإشراف.",
     "already_reviewed": "لقد تمت مراجعة هذا العنصر بالفعل.",
     "rejection_reason_required": "سبب الرفض مطلوب",
-    "content_decision": "المحتوى كان: القرار."
+    "content_decision": "تم :decision المحتوى."
   },
   "tenant_settings": {
     "pending_verification": "التحقق من هويتك معلق. يرجى الانتظار للحصول على الموافقة.",
@@ -182,9 +182,9 @@
     "connection_successful": "تم الاتصال بنجاح",
     "ollama_not_configured": "لم يتم تكوين عنوان URL لمضيف Olma",
     "ollama_cannot_connect": "لا يمكن الاتصال بـ Olma: :error",
-    "ollama_connected": "متصل بـ Ollama (: عدد النماذج المتاحة)",
     "ollama_http_error": "قام Olma بإرجاع HTTP :code",
-    "provider_error": "حدث خطأ أثناء معالجة طلب الذكاء الاصطناعي الخاص بك. يرجى المحاولة مرة أخرى."
+    "provider_error": "حدث خطأ أثناء معالجة طلب الذكاء الاصطناعي الخاص بك. يرجى المحاولة مرة أخرى.",
+    "ollama_connected": "متصل بـ Ollama (النماذج المتاحة: :count)"
   },
   "report_export": {
     "no_data": "لم يتم العثور على بيانات للتقرير والمرشحات المحددة."

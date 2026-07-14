@@ -72,7 +72,7 @@ export default function AdminCouponsPage() {
         toast.success(t('marketplace.coupons.suspended'));
         load();
       } else {
-        toast.error(res.error || t('marketplace.coupons.failed_suspend'));
+        toast.error(t('marketplace.coupons.failed_suspend'));
       }
     } catch {
       toast.error(t('marketplace.coupons.failed_suspend'));
@@ -92,7 +92,7 @@ export default function AdminCouponsPage() {
         toast.success(t('marketplace.coupons.deleted'));
         load();
       } else {
-        toast.error(res.error || t('marketplace.coupons.failed_delete'));
+        toast.error(t('marketplace.coupons.failed_delete'));
       }
     } catch {
       toast.error(t('marketplace.coupons.failed_delete'));

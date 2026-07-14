@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,21 +67,20 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "admin_settings": {
     "logo_uploaded": "تم تحميل شعار الشريك",
     "upload_failed": "فشل التحميل",
-    "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "تظهر في الفتحة اليسرى للتذييل. PNG أو JPEG أو WebP أو SVG — بحد أقصى 2 ميجابايت.",
     "replace_image": "استبدال الصورة",
     "upload_image": "تحميل الصورة",
     "remove_light_image": "إزالة صورة وضع الضوء",
     "remove_dark_image": "إزالة صورة الوضع المظلم",
     "remove_partner_logo": "إزالة شعار الشريك",
-    "header_logo_section": "Header Logo",
     "header_colors_section": "لون رأس يمكن الوصول إليه",
     "header_colors_desc": "اختر لون رأس الموقع الذي يمكن الوصول إليه (بنمط GOV.UK). اتركه بدون ضبط للحفاظ على الرأس الأسود القياسي بالخط الأزرق.",
     "header_bg_color_label": "لون خلفية الرأس",
@@ -90,7 +88,6 @@
     "header_accent_color_label": "لون خط التمييز",
     "header_accent_color_hint": "الخط الرفيع تحت الرأس. اتركه فارغًا ليتناسب مع الخلفية (لا يوجد خط مرئي)، أو اختر لونًا متباينًا مثل الأبيض.",
     "header_colors_reset": "إعادة التعيين إلى الوضع الافتراضي",
-    "header_colors_preview": "Preview",
     "header_logo_desc": "قم بتحميل شعار مخصص ليظهر في رأس الموقع بدلاً من الأحرف الأولى من اسم مجتمعك. اتركه فارغًا لاستخدام الإعداد الافتراضي.",
     "header_logo_light_label": "شعار الرأس (وضع الضوء)",
     "header_logo_dark_label": "شعار الرأس (الوضع المظلم)",
@@ -99,29 +96,32 @@
     "header_logo_uploaded": "تم تحديث شعار الرأس",
     "header_logo_removed": "تمت إزالة شعار الرأس",
     "remove_header_logo": "إزالة شعار الرأس",
-    "remove_header_logo_dark": "إزالة شعار رأس الوضع المظلم"
+    "remove_header_logo_dark": "إزالة شعار رأس الوضع المظلم",
+    "partner_logo_label": "شعار الشريك",
+    "header_logo_section": "شعار الرأس",
+    "header_colors_preview": "معاينة"
   },
   "operations": {
-    "title": "Operations",
     "description": "إحصائيات ذاكرة التخزين المؤقت وضوابط العمل في الخلفية.",
-    "refresh": "Refresh",
-    "cache_heading": "Cache",
-    "bg_jobs_heading": "Background Jobs",
     "redis_label": "Redis",
-    "redis_connected": "Connected",
-    "redis_disconnected": "Disconnected",
     "memory_used": "الذاكرة المستخدمة",
-    "keys": "Keys",
     "clear_cache": "مسح ذاكرة التخزين المؤقت للمستأجر",
     "cache_cleared": "تم مسح ذاكرة التخزين المؤقت بنجاح",
     "cache_clear_failed": "فشل في مسح ذاكرة التخزين المؤقت",
     "job_triggered": "تم تفعيل المهمة بنجاح",
     "job_trigger_failed": "فشل في تشغيل المهمة",
-    "run_job_label": "Run {{name}}",
-    "last_run": "Last run: {{date}}",
     "never_run": "لا تركض أبدًا",
     "no_jobs": "لم يتم تكوين أي مهام في الخلفية",
-    "loading": "Loading"
+    "refresh": "تحديث",
+    "keys": "المفاتيح",
+    "loading": "جارٍ التحميل",
+    "title": "العمليات",
+    "cache_heading": "الذاكرة المؤقتة",
+    "bg_jobs_heading": "مهام الخلفية",
+    "redis_connected": "متصل",
+    "redis_disconnected": "غير متصل",
+    "run_job_label": "تشغيل {{name}}",
+    "last_run": "آخر تشغيل: {{date}}"
   },
   "retention": {
     "page_title": "الاحتفاظ بالبيانات",
@@ -160,7 +160,9 @@
     "type_vol_safeguarding_incidents": "حوادث الحماية",
     "type_vol_safeguarding_incidents_desc": "سجلات قضايا الحماية. تُحذف فقط القضايا المحلولة أو المغلقة؛ تحقق من واجبات الاحتفاظ القانونية قبل التفعيل.",
     "type_vol_guardian_consents": "موافقات أولياء الأمور",
-    "type_vol_guardian_consents_desc": "سجلات موافقة أولياء الأمور للقاصرين، تُحذف بعد هذا العدد من الأيام من انتهاء صلاحية الموافقة."
+    "type_vol_guardian_consents_desc": "سجلات موافقة أولياء الأمور للقاصرين، تُحذف بعد هذا العدد من الأيام من انتهاء صلاحية الموافقة.",
+    "status_unknown": "حالة غير معروفة",
+    "type_unknown": "نوع بيانات غير معروف"
   },
   "seed_generator": {
     "count_aria_label": "عدد {{label}}",
@@ -183,62 +185,63 @@
     "option_messages_desc": "إنشاء نماذج لرسائل الأعضاء",
     "option_badges_label": "شارات",
     "option_badges_desc": "إنشاء نماذج لجوائز الشارة",
-    "warning_body": "Warning Body"
+    "warning_body": "قم بتشغيل إنشاء البذور فقط في بيئات التطوير أو الاختبار. إنه ينشئ سجلات نموذجية وقد يؤثر على التقارير."
   },
   "sso": {
-    "page_title": "Single Sign-On",
     "page_subtitle": "قم بتكوين موفري هوية OpenID Connect لهذا المجتمع",
     "loading": "جارٍ تحميل موفري خدمة الدخول الموحّد (SSO).",
     "load_failed": "فشل تحميل موفري خدمة الدخول الموحّد (SSO).",
-    "refresh": "Refresh",
     "add_provider": "إضافة مزود",
     "intro": "يقوم الأعضاء بتسجيل الدخول من خلال موفر الهوية الخاص بمؤسستك باستخدام OpenID Connect. يظهر زر على صفحات تسجيل الدخول والتسجيل لكل مزود ممكّن.",
     "no_providers": "لم يتم تكوين أي موفري خدمة SSO حتى الآن.",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "updated_at": "Updated {{date}}",
-    "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
     "preset_entra_hint": "بالنسبة لمعرف Microsoft Entra، عنوان URL لجهة الإصدار هو https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "اتصال الاختبار",
     "testing": "اختبار…",
-    "test_ok": "Connection OK",
     "test_error": "فشل الاتصال",
     "test_failed": "فشل الاختبار. يرجى المحاولة مرة أخرى.",
-    "edit": "Edit",
-    "edit_provider_title": "Edit {{name}}",
-    "delete": "Delete",
     "delete_title": "حذف موفر الدخول الموحد (SSO).",
     "delete_body": "هل تريد حذف \"{{name}}\"؟ لن يتمكن الأعضاء بعد الآن من تسجيل الدخول باستخدام هذا الموفر.",
-    "delete_confirm": "Delete",
     "deleted": "تم حذف الموفر",
     "delete_failed": "فشل في حذف الموفر",
     "saved": "تم حفظ الموفر",
-    "save": "Save",
     "saving": "توفير…",
     "save_failed": "فشل حفظ الموفر",
-    "cancel": "Cancel",
     "key_invalid": "يجب أن يتكون مفتاح الموفر من 2 إلى 20 حرفًا: أحرف صغيرة أو أرقام أو واصلات أو شرطات سفلية، تبدأ بحرف أو رقم.",
     "field_key": "مفتاح المزود",
     "field_key_desc": "معرف فريد قصير يستخدم في عناوين URL (مثل كوفنتري). لا يمكن تغييرها لاحقا.",
     "field_display_name": "اسم العرض",
     "field_display_name_desc": "يظهر على زر تسجيل الدخول، على سبيل المثال. “تسجيل الدخول مع مجلس مدينة كوفنتري”.",
-    "field_preset": "Preset",
-    "field_issuer_url": "Issuer URL",
     "field_issuer_url_desc": "جهة إصدار OIDC؛ يعمل الاكتشاف ضد {issuer}/.well-known/openid-configuration.",
-    "field_client_id": "Client ID",
     "field_client_secret": "سر العميل",
     "secret_keep_placeholder": "اتركه فارغًا للحفاظ على السر الحالي",
     "secret_keep_desc": "يتم تخزين سر. أدخل قيمة جديدة لاستبدالها، أو اتركها فارغة للاحتفاظ بها.",
-    "field_scopes": "Scopes",
     "field_scopes_desc": "نطاقات OIDC مفصولة بمساحة. الافتراضي: البريد الإلكتروني للملف الشخصي المفتوح",
     "field_domains": "مجالات البريد الإلكتروني المسموح بها",
     "field_domains_desc": "مفصولة بفواصل، على سبيل المثال coventry.gov.uk، example.org. اتركه فارغًا للسماح بأي مجال.",
     "field_auto_provision": "حسابات التوفير التلقائي",
     "field_auto_provision_desc": "إنشاء حساب عضو تلقائيًا عند تسجيل الدخول لأول مرة. عند إيقافه، يمكن للأعضاء الحاليين فقط تسجيل الدخول باستخدام تسجيل الدخول الموحّد (SSO).",
-    "field_enabled": "Enabled",
-    "field_enabled_desc": "إظهار هذا المزود على صفحات تسجيل الدخول والتسجيل."
+    "field_enabled_desc": "إظهار هذا المزود على صفحات تسجيل الدخول والتسجيل.",
+    "preset_unknown": "إعداد مسبق غير معروف",
+    "refresh": "تحديث",
+    "enabled": "مفعل",
+    "disabled": "معطل",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "page_title": "تسجيل الدخول الموحد",
+    "updated_at": "تم التحديث {{date}}",
+    "preset_generic": "OIDC عام",
+    "test_ok": "الاتصال بخير",
+    "edit_provider_title": "تحرير {{name}}",
+    "delete_confirm": "حذف",
+    "field_preset": "إعداد مسبق",
+    "field_issuer_url": "عنوان URL للجهة المصدرة",
+    "field_client_id": "معرف العميل",
+    "field_scopes": "النطاقات",
+    "field_enabled": "مفعل"
   },
   "system": {
     "active": "نشيط",
@@ -303,7 +306,7 @@
     "cron_cpanel_step_2_desc_prefix": "اضبط الجدول الزمني على",
     "cron_cpanel_step_2_desc_suffix": "مع الأمر:",
     "cron_cpanel_step_2_title": "الخطوة 2: إضافة وظيفة كرون جديدة",
-    "cron_docker_step_1_desc": "قم بتحرير المضيف crontab باستخدام Sudo crontab -e وأضف هذا السطر الفردي:",
+    "cron_docker_step_1_desc": "قم بتحرير ملف crontab للمضيف باستخدام `sudo crontab -e` وأضف هذا السطر فقط:",
     "cron_docker_step_1_title": "الخطوة 1: إضافة إدخال cron على المضيف",
     "cron_gcp_step_1_title": "الخطوة 1: SSH في المثيل الخاص بك",
     "cron_gcp_step_2_title": "الخطوة 2: إضافة إدخال crontab المضيف",
@@ -326,8 +329,6 @@
     "do_word": "يفعل",
     "not_word": "لا",
     "only_word": "فقط.",
-    "platform_azure_vm": "أزور VM",
-    "platform_cpanel": "لوحة التحكم",
     "platform_docker": "عامل ميناء",
     "platform_gcp": "Google Cloud Platform",
     "platform_linux_vps": "لينكس / فس",
@@ -397,7 +398,6 @@
     "label_app_name": "اسم التطبيق",
     "label_app_version": "إصدار التطبيق",
     "label_auto_resize": "تغيير الحجم التلقائي",
-    "label_auto_web_p": "ويب تلقائي",
     "label_contact_phone": "هاتف الاتصال",
     "label_copy_c_u_r_l_command": "انسخ أمر cURL",
     "label_copy_code": "نسخ الرمز",
@@ -450,8 +450,6 @@
     "native_app_settings_saved_successfully": "تم حفظ إعدادات التطبيق الأصلية بنجاح",
     "native_app_title": "التطبيق الأصلي",
     "native_app": {
-      "android_identity": "هوية الروبوت",
-      "android_play_store_id": "معرف متجر تطبيقات أندرويد",
       "any": "أي",
       "app_configuration": "تكوين التطبيق",
       "app_name": "اسم التطبيق",
@@ -491,7 +489,6 @@
       "push_routing": "دفع التوجيه",
       "push_sender_id": "دفع معرف المرسل",
       "pwa_settings": "إعدادات PWA",
-      "readiness_android_identity": "هوية الروبوت",
       "readiness_ios_identity": "هوية iOS",
       "readiness_push_routing": "دفع التوجيه",
       "readiness_store_metadata": "تخزين البيانات الوصفية",
@@ -515,7 +512,10 @@
       "tenant_branded_app": "التطبيق ذو العلامة التجارية للمستأجر",
       "tenant_branded_ready": "العلامة التجارية للمستأجر جاهزة",
       "tenant_channel_prefix": "بادئة قناة المستأجر",
-      "theme_color": "لون الموضوع"
+      "theme_color": "لون الموضوع",
+      "android_identity": "Android هوية",
+      "android_play_store_id": "Android معرف متجر بلاي",
+      "readiness_android_identity": "Android هوية"
     },
     "never": "أبداً",
     "next_run": "التشغيل التالي",
@@ -580,12 +580,8 @@
       "preset_applied": "تم تطبيق الإعداد المسبق",
       "preset_confirm": "هل أنت متأكد أنك تريد تطبيق هذا الإعداد المسبق؟ وسوف يحل محل الإعدادات الحالية.",
       "preset_created_options": "تم تطبيق الإعداد المسبق وتم إنشاء الخيارات",
-      "preset_custom": "Custom",
       "preset_england_wales": "إنجلترا وويلز",
-      "preset_ireland": "Ireland",
-      "preset_northern_ireland": "Northern Ireland",
       "preset_note": "سيؤدي تطبيق إعداد مسبق إلى استبدال إعدادات سياسة التسجيل الحالية",
-      "preset_scotland": "Scotland",
       "profile_requirements": "متطلبات الملف الشخصي",
       "profile_requirements_desc": "قم بتعيين الحد الأدنى من متطلبات الملف الشخصي التي يجب على الأعضاء إكمالها",
       "require_avatar_visibility": "تتطلب رؤية الصورة الرمزية",
@@ -634,7 +630,11 @@
       "n_active_other": "{{count}}نشط",
       "n_active_two": "{{count}}نشط",
       "n_active_zero": "{{count}}نشط",
-      "preset_united_kingdom": "??????? ???????"
+      "preset_united_kingdom": "??????? ???????",
+      "preset_custom": "مخصص",
+      "preset_ireland": "أيرلندا",
+      "preset_northern_ireland": "أيرلندا الشمالية",
+      "preset_scotland": "أسكتلندا"
     },
     "overdue_jobs": "الوظائف المتأخرة",
     "page_title": "نظام",
@@ -643,8 +643,6 @@
     "placeholder_choose_a_job_to_configure": "اختر وظيفة للتكوين...",
     "placeholder_community_timebanking_platform": "منصة بنك الوقت المجتمعية...",
     "placeholder_filter_by_job_i_d": "التصفية حسب معرف الوظيفة...",
-    "placeholder_project_nexus": "مشروع النكسس...",
-    "placeholder_project_n_e_x_u_s": "مشروع النكسس...",
     "please_select_a_date": "الرجاء تحديد التاريخ",
     "recent_failures": "الإخفاقات الأخيرة",
     "reg": {
@@ -754,7 +752,6 @@
       "provider_idenfy": "معرف الموفر",
       "provider_jumio": "مقدم جوميو",
       "provider_onfido": "مزود اونفيدو",
-      "provider_stripe": "شريط المزود",
       "provider_veriff": "التحقق من المزود",
       "providers_available": "مقدمي الخدمات المتاحة",
       "registration_method": "طريقة التسجيل",
@@ -764,14 +761,12 @@
       "require_email_desc": "اطلب من الأعضاء التحقق من عنوان بريدهم الإلكتروني قبل الوصول إلى المنصة",
       "require_email_tooltip": "يمكن فقط للمسؤولين المتميزين في النظام الأساسي تغيير هذا الإعداد",
       "save_credentials": "حفظ بيانات الاعتماد",
-      "save_policy": "Save Policy",
       "show_api_key": "إظهار مفتاح API",
       "show_webhook": "إظهار الرد التلقائي على الويب",
       "tip_change_modes": "يصبح تغيير وضع التسجيل ساري المفعول على الفور للتسجيلات الجديدة",
       "total_codes": "مجموع الرموز",
       "total_codes_count": "إجمالي الرموز: {{count}}",
       "unavailable": "غير متاح",
-      "understanding_modes": "Understanding Modes",
       "verification_settings": "إعدادات التحقق",
       "verification_settings_desc": "تكوين متطلبات التحقق من الهوية لتسجيلات الأعضاء الجدد",
       "waitlist_info": "تتم الموافقة على الأعضاء الموجودين في قائمة الانتظار يدويًا بواسطة المسؤول",
@@ -795,10 +790,12 @@
       "total_codes_count_one": "إجمالي الرموز: {{count}}",
       "total_codes_count_other": "إجمالي الرموز: {{count}}",
       "total_codes_count_two": "إجمالي الرموز: {{count}}",
-      "total_codes_count_zero": "إجمالي الرموز: {{count}}"
+      "total_codes_count_zero": "إجمالي الرموز: {{count}}",
+      "save_policy": "حفظ سياسة التسجيل",
+      "understanding_modes": "فهم أوضاع التسجيل",
+      "provider_stripe": "مزود Stripe"
     },
     "registration_policy_saved_successfully": "تم حفظ سياسة التسجيل بنجاح",
-    "registration_policy_settings_title": "Registration Policy Settings",
     "run_now": "تشغيل الآن",
     "running": "جري",
     "schedule": "جدول",
@@ -814,7 +811,6 @@
     "total_jobs": "إجمالي الوظائف",
     "twenty_four_h_failures": "24 ساعة الفشل",
     "webp_converter_desc": "قم بتحويل الصور التي تم تحميلها إلى تنسيق WebP للحصول على أداء أفضل",
-    "webp_converter_title": "محول ويب",
     "image_conversion": "تحويل الصور",
     "total_images": "إجمالي الصور",
     "already_webp": "بالفعل WebP",
@@ -828,16 +824,13 @@
     "label_default_currency": "العملة الافتراضية",
     "desc_default_currency": "تستخدم للاشتراك وتسعير السوق",
     "section_branding_legal": "العلامات التجارية والقانونية",
-    "powered_by_branding_section": "Powered By Branding",
     "powered_by_branding_desc": "قم بتكوين فتحة \"Powered By\" الموجودة على الجانب الأيمن من التذييل. التغييرات نافذة المفعول على الفور. الله فقط.",
     "god_only_chip": "الله فقط",
     "label_partner_logo_label": "تسمية شعار الشريك",
-    "placeholder_partner_logo_label": "Community Partner",
     "desc_partner_logo_label": "يظهر التصنيف القصير أعلى شعار الشريك (اتركه فارغًا لاستخدام النص الافتراضي \"شريك المجتمع\")",
     "label_powered_by_label": "نص التسمية",
     "placeholder_powered_by_label": "مدعوم من",
     "desc_powered_by_label": "علامة قصيرة تظهر أعلى الصورة (اتركها فارغة لاستخدام النص الافتراضي \"بدعم من\")",
-    "label_powered_by_url": "Link URL",
     "placeholder_powered_by_url": "https://example.com",
     "desc_powered_by_url": "يجعل الصورة قابلة للنقر. اتركه فارغًا لعدم وجود رابط.",
     "label_powered_by_image_light": "صورة وضع الضوء",
@@ -899,9 +892,7 @@
     "advanced_custom_settings": "الإعدادات المخصصة المتقدمة",
     "app_configuration_heading": "تكوين التطبيق",
     "auto_convert_webp": "تحويل تلقائي WebP",
-    "auto_convert_webp_desc": "Auto Convert WebP.",
     "auto_resize": "تغيير الحجم التلقائي",
-    "auto_resize_desc": "Auto Resize.",
     "avg_completion_minutes": "متوسط ​​دقائق الإنجاز",
     "avg_completion_seconds": "متوسط ​​ثواني الاكتمال",
     "blog_restore_warning": "تحذير بشأن استعادة المدونة",
@@ -917,9 +908,6 @@
     "col_provider": "مزود",
     "col_time": "وقت",
     "conversion_failed": "فشل التحويل",
-    "desc_comma_separated_emails": "Comma Separated Emails.",
-    "desc_job_will_run_when_enabled": "Job Will Run When Enabled.",
-    "desc_notify_on_failure": "Notify on Failure.",
     "enable_push_notifications": "تمكين دفع الإخطارات",
     "enable_push_notifications_desc": "تمكين دفع الإخطارات.",
     "failed_to_action_verification": "فشل في التحقق من الإجراء",
@@ -927,7 +915,6 @@
     "failed_to_load_provider_health": "فشل تحميل صحة الموفر",
     "failed_count": "فشل{{count}}",
     "generate_thumbnails": "إنشاء الصور المصغرة",
-    "generate_thumbnails_desc": "Generate Thumbnails.",
     "generated_data_for": "تم إنشاء بيانات لـ {{count}} من أنواع البيانات المحددة",
     "health_check_complete": "اكتمال التحقق من الصحة",
     "health_check_failed": "فشل التحقق من الصحة",
@@ -958,7 +945,6 @@
     "n_hours_ago": "منذ ساعات N",
     "n_minutes_ago": "منذ دقائق N",
     "n_sessions": "جلسات ن",
-    "no_backups_available": "No backups available found",
     "no_failed_sessions": "لم يتم العثور على جلسات فاشلة",
     "no_identity_providers": "لم يتم العثور على موفري الهوية",
     "not_available_short": "لا يوجد",
@@ -1010,7 +996,6 @@
     "stat_pending": "الإحصائيات معلقة",
     "stat_total": "إجمالي الإحصائيات",
     "strip_exif": "قطاع إكسيف",
-    "strip_exif_desc": "Strip Exif.",
     "success_rate_label": "معدل النجاح",
     "system_requirements_desc": "متطلبات النظام.",
     "system_requirements_title": "متطلبات النظام",
@@ -1042,8 +1027,6 @@
     "not_writable_status": "غير قابل للكتابة",
     "search_extensions_placeholder": "ملحقات البحث...",
     "some_warnings_detected": "تم اكتشاف بعض التحذيرات",
-    "status_fail": "FAIL",
-    "status_ok": "OK",
     "writable_status": "قابل للكتابة",
     "action": {
       "admin_approve_group_member": "الموافقة على عضو المجموعة",
@@ -1133,9 +1116,9 @@
       "vetting_record_rejected": "تم رفض سجل الفحص",
       "vetting_record_updated": "تم تحديث سجل الفحص",
       "vetting_record_verified": "تم التحقق من سجل الفحص",
-      "welcome_credits_issued": "تم إصدار الاعتمادات الترحيبية"
+      "welcome_credits_issued": "تم إصدار الاعتمادات الترحيبية",
+      "unknown": "إجراء غير معروف"
     },
-    "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "رابط موقع اختياري لشعار الشريك في التذييل.",
     "label_inactivity_timeout": "مهلة عدم النشاط (بالدقائق)",
     "desc_inactivity_timeout": "تسجيل خروج الأعضاء تلقائيًا بعد هذا العدد من الدقائق دون نشاط. القيمة 0 تعطّل المهلة؛ والنطاق المسموح به هو 5–480 دقيقة. الموصى به: 120.",
@@ -1215,8 +1198,254 @@
       "api_unavailable": "واجهة API لفحص الحالة غير متاحة",
       "run_all": "تشغيل جميع الاختبارات",
       "suites": "مجموعات الاختبار",
-      "unknown_test": "تشخيص: {{name}}"
-    }
+      "unknown_test": "تشخيص: {{name}}",
+      "tests": {
+        "api_health": "فحص حالة واجهة API",
+        "database": "اتصال قاعدة البيانات",
+        "redis": "اتصال Redis",
+        "auth_token": "إنشاء رمز المصادقة",
+        "tenant_bootstrap": "تهيئة المستأجر",
+        "file_upload": "تحميل الملفات (S3 أو محلي)",
+        "email_service": "خدمة البريد الإلكتروني",
+        "pusher": "اتصال Pusher WebSocket"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "تم إنشاء منشور المدونة رقم {{id}}: {{title}}",
+      "blog_post_updated": "تم تحديث منشور المدونة رقم {{id}}: {{title}}",
+      "blog_post_deleted": "تم حذف منشور المدونة رقم {{id}}: {{title}}",
+      "blog_post_status_changed": "تم تغيير حالة منشور المدونة رقم {{id}} من {{old_status}} إلى {{new_status}}.",
+      "blog_posts_bulk_deleted": "تم حذف منشورات المدونة دفعة واحدة: {{count}}",
+      "blog_posts_bulk_published": "تم نشر منشورات المدونة دفعة واحدة: {{count}}",
+      "unknown": "تفاصيل النشاط: {{code}}"
+    },
+    "activity_status": {
+      "unknown": "حالة غير معروفة",
+      "draft": "مسودة",
+      "published": "منشور"
+    },
+    "alert_status_healthy": "سليم",
+    "alert_status_warning": "تحذير",
+    "alert_status_critical": "حرج",
+    "verification_level_none": "لا شيء",
+    "verification_level_document_only": "وثيقة فقط",
+    "verification_level_document_selfie": "المستند والصورة الذاتية",
+    "verification_level_reusable_digital_id": "الهوية الرقمية القابلة لإعادة الاستخدام",
+    "verification_level_manual_review": "المراجعة اليدوية",
+    "verification_level_unknown": "مستوى التحقق غير معروف",
+    "job_category_notifications": "الإشعارات",
+    "job_category_newsletters": "النشرات الإخبارية",
+    "job_category_matching": "المطابقة",
+    "job_category_geocoding": "تحديد المواقع الجغرافية",
+    "job_category_maintenance": "الصيانة",
+    "job_category_master": "ماستر",
+    "job_category_gamification": "الألعاب التعليمية",
+    "job_category_groups": "المجموعات",
+    "job_category_security": "الأمن",
+    "job_category_other": "أخرى",
+    "job_category_unknown": "فئة غير معروفة",
+    "cron_job_name_unknown": "المهمة المجدولة",
+    "cron_job_description_unknown": "تشغيل مهمة خلفية مجدولة.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "مشغل كرون الرئيسي",
+        "description": "يقوم بتشغيل المهام المجدولة المناسبة للوقت الحالي. جميع المهام الأخرى تعمل من خلال هذا المدخل المجدول."
+      },
+      "process_queue": {
+        "name": "قائمة الإشعارات الفورية",
+        "description": "يعالج الإشعارات الفورية المعلقة للتسليم الفوري."
+      },
+      "daily_digest": {
+        "name": "ملخص يومي",
+        "description": "يرسل رسائل البريد الإلكتروني لملخص الإشعارات اليومية للأعضاء الذين اختاروا التسليم اليومي."
+      },
+      "weekly_digest": {
+        "name": "ملخص شهري",
+        "description": "يرسل ملخص الإشعارات الشهري في أول يوم من كل شهر."
+      },
+      "process_newsletters": {
+        "name": "معالجة النشرات الإخبارية المجدولة",
+        "description": "يبحث عن النشرات الإخبارية المقرر تسليمها ويبدأ عملية الإرسال."
+      },
+      "process_recurring": {
+        "name": "معالجة النشرات الإخبارية المتكررة",
+        "description": "يعالج النشرات الإخبارية المتكررة والآلية."
+      },
+      "process_newsletter_queue": {
+        "name": "معالج قائمة رسائل النشرة الإخبارية",
+        "description": "يعالج تسليم النشرات الإخبارية المجدولة على دفعات."
+      },
+      "notify_hot_matches": {
+        "name": "إشعارات المباريات الساخنة",
+        "description": "يُخطّر الأعضاء حول المباريات الجديدة عالية الدرجات."
+      },
+      "match_digest_daily": {
+        "name": "ملخص المباريات اليومي",
+        "description": "يرسل توصيات المباريات اليومية للأعضاء."
+      },
+      "match_digest_weekly": {
+        "name": "ملخص المباريات الأسبوعي",
+        "description": "يرسل ملخص توصيات المباريات الأسبوعية."
+      },
+      "gamification_daily": {
+        "name": "مهام التلعيب اليومية",
+        "description": "يعالج إعادة تعيين السلاسل والمكافآت اليومية وفحص الشارات."
+      },
+      "gamification_campaigns": {
+        "name": "معالجة حملات الإنجازات",
+        "description": "يعالج حملات الإنجازات المتكررة."
+      },
+      "gamification_leaderboard": {
+        "name": "لقطة لوحة الصدارة",
+        "description": "ينشئ لقطات يومية للوحة الصدارة ويختتم المواسم."
+      },
+      "gamification_challenges": {
+        "name": "تحقق من انتهاء التحديات",
+        "description": "ينهي التحديات المكتملة ويحدث حالاتهم."
+      },
+      "gamification_weekly_digest": {
+        "name": "ملخص التحفيز الشهري",
+        "description": "يرسل رسائل بريد إلكتروني شهرية لتلخيص التقدم للأعضاء."
+      },
+      "gamification_streaks": {
+        "name": "معالم سلسلة التحفيز gamification",
+        "description": "يفحص ويكافئ معالم سلسلة الأعضاء."
+      },
+      "gamification_cleanup": {
+        "name": "تنظيف التحفيز gamification",
+        "description": "يزيل إشعارات الخبرة القديمة، ومكافآت الحملة، وبيانات التحليلات."
+      },
+      "update_featured_groups": {
+        "name": "تحديث المجموعات المميزة",
+        "description": "يقوم بتحديث المجموعات المميزة باستخدام قواعد التصنيف."
+      },
+      "group_weekly_digest": {
+        "name": "ملخصات المجموعات الشهرية",
+        "description": "يرسل رسائل بريد إلكتروني تحتوي على ملخصات تحليلية شهرية إلى مالكي المجموعات."
+      },
+      "abuse_detection": {
+        "name": "كشف الإساءة",
+        "description": "يفحص المعاملات للبحث عن أنماط إساءة محتملة."
+      },
+      "abuse_daily_report": {
+        "name": "تقرير الإساءة اليومي",
+        "description": "يرسل تقرير اكتشاف الإساءة اليومي إلى المسؤولين."
+      },
+      "abuse_cleanup": {
+        "name": "تنظيف تنبيهات الإساءة",
+        "description": "يؤرشف التنبيهات القديمة ويتجاهل العناصر منخفضة الخطورة تلقائيًا."
+      },
+      "verification_reminders": {
+        "name": "تذكيرات التحقق",
+        "description": "يذكّر الأعضاء بالتحقق من الهوية غير المكتمل."
+      },
+      "expire_verifications": {
+        "name": "انتهاء صلاحية عمليات التحقق المهجورة",
+        "description": "تنتهي صلاحية جلسات التحقق المهجورة لأكثر من 72 ساعة."
+      },
+      "purge_verification_sessions": {
+        "name": "تنظيف بيانات التحقق القديمة",
+        "description": "يقوم بتنظيف جلسات التحقق المكتملة والمنتهية بعد 180 يومًا."
+      },
+      "volunteer_pre_shift": {
+        "name": "تذكيرات المتطوع قبل الوردية",
+        "description": "يرسل تذكيرات قبل ورديات المتطوع."
+      },
+      "volunteer_post_shift": {
+        "name": "تقييم المتطوع بعد الوردية",
+        "description": "يطلب تقديم تقييم بعد انتهاء ورديات المتطوع."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "تنبيه للمتطوع المتوقف عن النشاط",
+        "description": "يحرض المتطوعين الذين لم يكونوا نشطين مؤخرًا."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "انتهاء صلاحية اعتماد المتطوع",
+        "description": "يحذر المتطوعين بشأن الاعتمادات والتدريبات التي ستنتهي قريبًا."
+      },
+      "recurring_shifts": {
+        "name": "إنشاء نوبات متكررة",
+        "description": "ينشئ نوبات المتطوعين القادمة من القوالب المتكررة."
+      },
+      "volunteer_expire_consents": {
+        "name": "انتهاء موافقات الوصي",
+        "description": "تنتهي سجلات موافقة الوصي بعد تاريخ انتهاء صلاحيتها."
+      },
+      "cleanup": {
+        "name": "تنظيف النظام",
+        "description": "يزيل الرموز المنتهية الصلاحية، وإدخالات الانتظار القديمة، ورموز واجهة برمجة التطبيقات، وبيانات التتبع."
+      },
+      "geocode_batch": {
+        "name": "تحديد المواقع بالجملة",
+        "description": "يقوم بترميز المواقع للأعضاء والقوائم التي تفتقد الإحداثيات."
+      },
+      "event_reminders": {
+        "name": "تذكيرات الأحداث",
+        "description": "يُرسل تذكيرات قبل الأحداث القادمة."
+      },
+      "inactive_members": {
+        "name": "كشف الأعضاء غير النشطين",
+        "description": "يكتشف ويعلّم الأعضاء غير النشطين للمتابعة."
+      },
+      "listing_expiry": {
+        "name": "معالجة انتهاء صلاحية القوائم",
+        "description": "ينتهي صلاحية الإعلانات بعد تاريخ انتهائها."
+      },
+      "listing_expiry_reminders": {
+        "name": "تذكيرات بانتهاء صلاحية الإعلانات",
+        "description": "يحذر مالكي الإعلانات قبل انتهاء صلاحية الإعلان."
+      },
+      "job_expiry": {
+        "name": "انتهاء صلاحية الوظائف الشاغرة",
+        "description": "ينتهي صلاحية الوظائف الشاغرة بعد تاريخ إغلاقها."
+      },
+      "federation_weekly_digest": {
+        "name": "موجز الاتحاد الشهري",
+        "description": "يرسل موجز نشاط الاتحاد إلى المجتمعات المشاركة."
+      },
+      "balance_alerts": {
+        "name": "تنبيهات الرصيد",
+        "description": "يفحص أرصدة محفظة المنظمة ويرسل تنبيهات عند انخفاض الرصيد."
+      },
+      "goal_reminders": {
+        "name": "تذكيرات الأهداف",
+        "description": "يرسل تذكيرات للأهداف المستحقة أو المتأخرة عن الجدول."
+      },
+      "retry_failed_webhooks": {
+        "name": "إعادة محاولة الويب هوكس الفاشلة",
+        "description": "يعيد محاولة تسليم الويب هوكس التي فشلت سابقًا."
+      },
+      "digest_emails": {
+        "name": "مرسل الملخص البريدي"
+      },
+      "badge_checker": {
+        "name": "مدقق منح الشارات"
+      },
+      "streak_updater": {
+        "name": "مُحدّث سلسلة تسجيل الدخول"
+      }
+    },
+    "partner_logo_link_url": "رابط شعار الشريك",
+    "registration_policy_settings_title": "التسجيل والتحقق من الهوية",
+    "auto_convert_webp_desc": "إنشاء نسخ WebP من الملفات المرفوعة المدعومة لتقليل حجم تحميل الصور.",
+    "auto_resize_desc": "تغيير حجم الصور التي تتجاوز الأبعاد القصوى المحددة.",
+    "desc_comma_separated_emails": "أدخل عنوان بريد إلكتروني واحد أو أكثر مفصولين بفواصل.",
+    "desc_job_will_run_when_enabled": "سيتم تشغيل هذه المهمة وفق جدولها المحدد عند تمكينها.",
+    "desc_notify_on_failure": "إرسال إشعار عبر البريد الإلكتروني عند فشل هذه المهمة.",
+    "generate_thumbnails_desc": "إنشاء نسخ مصغرة أصغر للقوائم، والملفات الشخصية، والبطاقات.",
+    "no_backups_available": "لا توجد نسخ احتياطية متاحة",
+    "strip_exif_desc": "إزالة بيانات EXIF من الصور التي تم تحميلها قبل التخزين.",
+    "status_fail": "يفشل",
+    "status_ok": "OK",
+    "placeholder_partner_logo_label": "شريك المجتمع",
+    "label_powered_by_url": "رابط URL",
+    "platform_azure_vm": "Azure جهاز افتراضي",
+    "platform_cpanel": "cPanel",
+    "label_auto_web_p": "تلقائي WebP",
+    "placeholder_project_nexus": "مشروع NEXUS...",
+    "placeholder_project_n_e_x_u_s": "مشروع NEXUS...",
+    "webp_converter_title": "WebP المحول",
+    "powered_by_branding_section": "مدعوم بواسطة العلامة التجارية"
   },
   "verification": {
     "approve": "يعتمد",
@@ -1292,7 +1521,20 @@
     "total_events_one": "أحداث {{count}}",
     "total_events_other": "أحداث {{count}}",
     "total_events_two": "أحداث {{count}}",
-    "total_events_zero": "أحداث {{count}}"
+    "total_events_zero": "أحداث {{count}}",
+    "provider_mock": "مزود وهمي",
+    "provider_veriff": "فيريف",
+    "provider_jumio": "جوميو",
+    "provider_onfido": "أونفيدو",
+    "provider_unknown": "مزود غير معروف",
+    "actor_type_system": "النظام",
+    "actor_type_user": "المستخدم",
+    "actor_type_admin": "المسؤول",
+    "actor_type_webhook": "ويب هوك",
+    "actor_type_unknown": "الممثل غير المعروف",
+    "status_unknown": "حالة غير معروفة",
+    "provider_stripe_identity": "Stripe الهوية",
+    "provider_idenfy": "iDenfy"
   },
   "cancel": "يلغي"
 }

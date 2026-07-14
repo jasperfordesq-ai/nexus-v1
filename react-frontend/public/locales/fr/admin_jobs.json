@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "jobs": {
     "add_edit_notes": "Ajouter/Modifier des notes",
@@ -79,7 +79,6 @@
     "application_updated": "Application mise à jour",
     "applied_date": "Appliqué:",
     "col_actions": "Actions",
-    "col_applications": "Applications",
     "col_deadline": "Date limite",
     "col_featured": "En vedette",
     "col_organization": "Organisation",
@@ -131,7 +130,6 @@
     "stat_pending_offers": "{{count}}offres en attente",
     "stat_total_jobs": "Emplois totaux",
     "status_label": "Statut de la mise à jour",
-    "tab_applications": "Applications",
     "tab_listings": "Annonces",
     "toggle_notes": "Activer/désactiver les notes",
     "try_again": "Réessayez",
@@ -181,7 +179,6 @@
     "bias_job_id": "ID de travail",
     "bias_all_jobs_placeholder": "Tous les emplois",
     "bias_total_applications": "Total des demandes",
-    "bias_applications": "Applications",
     "bias_accepted": "Accepté",
     "bias_rejected": "Rejeté",
     "bias_total": "Total",
@@ -197,7 +194,6 @@
     "bias_avg_time_stage": "Temps moyen par étape",
     "bias_avg_time_stage_table": "Temps moyen par étape",
     "bias_source_effectiveness": "Efficacité des sources",
-    "bias_source_direct": "Direct",
     "bias_source_referral": "Référence",
     "bias_skills_accepted": "Compétences — Acceptées",
     "bias_skills_rejected": "Compétences — Rejeté",
@@ -265,7 +261,14 @@
     "stat_pending_offers_other": "{{count}}offres en attente",
     "pipeline_minutes_many": "{{count}}min",
     "pipeline_minutes_one": "{{count}}min",
-    "pipeline_minutes_other": "{{count}}min"
+    "pipeline_minutes_other": "{{count}}min",
+    "stage_unknown": "Autre étape",
+    "type_unknown": "Autre type de travail",
+    "category_value": "{{category}}",
+    "col_applications": "Applications",
+    "tab_applications": "Applications",
+    "bias_applications": "Applications",
+    "bias_source_direct": "Direct"
   },
   "moderation": {
     "action_failed": "Échec",
@@ -389,7 +392,6 @@
     "post_hidden_successfully": "Message masqué avec succès",
     "post_type_blog": "Article de blog",
     "post_type_challenge": "Défi",
-    "post_type_discussion": "Discussion",
     "post_type_goal": "Objectif",
     "post_type_job": "Emploi",
     "post_type_event": "Événement",
@@ -484,7 +486,8 @@
     "load_error": "Échec du chargement de la file d'attente de modération.",
     "pagination_label": "Pagination de la file de modération",
     "user_fallback": "Utilisateur inconnu",
-    "rating_aria": "{{n}} étoiles sur 5"
+    "rating_aria": "{{n}} étoiles sur 5",
+    "post_type_discussion": "Discussion"
   },
   "something_wrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
   "spam": {

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import i18n from '@/i18n';
 import { menuApi } from '@/lib/api';
 import type { ApiMenu, MenusByLocation } from '@/types/menu';
 
@@ -84,12 +85,12 @@ export function useMenus(
         );
         setHasCustomMenus(hasItems);
       } else {
-        setError(response.error ?? 'Failed to load menus');
+        setError(i18n.t('errors:api.request_failed'));
         setHasCustomMenus(false);
       }
     } catch {
       if (mountedRef.current) {
-        setError('Failed to load menus');
+        setError(i18n.t('errors:api.request_failed'));
         setHasCustomMenus(false);
       }
     } finally {

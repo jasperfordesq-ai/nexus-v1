@@ -139,7 +139,11 @@ export function PermissionBrowser() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
                     <Key size={16} className="text-accent" aria-hidden="true" />
                   </div>
-                  <h3 className="text-base font-semibold capitalize">{category}</h3>
+                  <h3 className="text-base font-semibold">
+                    {t(`enterprise.permission_categories.${category}`, {
+                      defaultValue: t('enterprise.permission_categories.unknown'),
+                    })}
+                  </h3>
                   <Chip
                     size="sm"
                     variant="soft"

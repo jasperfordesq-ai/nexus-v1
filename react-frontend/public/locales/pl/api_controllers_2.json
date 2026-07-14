@@ -179,5 +179,259 @@
     "provider_subject": "Project NEXUS — Test dostawcy e-mail",
     "provider_heading": "Test dostawcy e-mail",
     "body_tenant_ok": "Dostawca e-mail Twojego najemcy jest skonfigurowany i działa prawidłowo."
+  },
+  "help": {
+    "feedback_recorded": "Opinie zapisane",
+    "missing_article_slug": "Brak article_slug",
+    "article_not_found": "Nie znaleziono artykułu"
+  },
+  "job_vacancies": {
+    "job_not_found": "Nie znaleziono zadania",
+    "only_poster_can_rank": "Tylko osoba publikująca zadanie może oceniać kandydatów",
+    "ai_not_configured": "AI nie jest skonfigurowane",
+    "no_active_applications": "Brak aktywnych wniosków do oceny",
+    "ai_parse_error": "Nie udało się przetworzyć odpowiedzi oceny AI",
+    "ai_ranking_failed": "Ocena AI nie powiodła się",
+    "template_name_required": "Nazwa szablonu jest wymagana",
+    "template_not_found": "Szablon nie znaleziony",
+    "employer_id_required": "id_pracodawcy jest wymagany",
+    "rating_must_be_1_5": "Ocena musi wynosić 1-5",
+    "only_review_after_completing": "Możesz ocenić pracodawców tylko po ukończeniu z nimi pracy",
+    "already_reviewed_employer": "Już oceniłeś tego pracodawcę",
+    "interview_not_found": "Nie znaleziono rozmowy kwalifikacyjnej",
+    "access_denied": "Dostęp zabroniony",
+    "message_required": "Wiadomość jest wymagana",
+    "ai_chat_failed": "Czat AI nie powiódł się"
+  },
+  "knowledge_base": {
+    "feedback_submitted": "Opinie wysłane pomyślnie",
+    "article_not_found": "Nie znaleziono artykułu",
+    "attachment_not_found": "Załącznik nie został znaleziony",
+    "file_not_found_on_disk": "Plik nie został znaleziony na dysku"
+  },
+  "legal": {
+    "all_accepted": "Wszystkie dokumenty prawne zaakceptowane",
+    "acceptance_recorded": "Zaakceptowanie zarejestrowane"
+  },
+  "listings": {
+    "cannot_report_own": "Nie możesz zgłosić własnej oferty.",
+    "valid_reason_required": "Wymagany jest ważny powód.",
+    "details_max_500": "Szczegóły nie mogą przekraczać 500 znaków.",
+    "already_reported": "Już zgłosiłeś tę ofertę.",
+    "report_thank_you": "Dziękujemy za zgłoszenie. Nasz zespół je przeanalizuje.",
+    "no_images_uploaded": "Nie przesłano żadnych obrazów.",
+    "image_not_found": "Obraz nie znaleziony.",
+    "image_ids_non_empty": "image_ids musi być niepustą tablicą."
+  },
+  "marketplace_ai": {
+    "feature_disabled": "Funkcja rynku nie jest włączona dla tej społeczności.",
+    "auth_required": "Wymagana uwierzytelnienie.",
+    "listing_not_found": "Ogłoszenie nie znalezione.",
+    "only_owner_auto_reply": "Tylko właściciel ogłoszenia może generować automatyczne odpowiedzi."
+  },
+  "marketplace_delivery": {
+    "feature_disabled": "Funkcja rynku nie jest włączona dla tej społeczności.",
+    "auth_required": "Wymagana uwierzytelnienie.",
+    "offer_accepted": "Oferta dostawy zaakceptowana",
+    "delivery_confirmed": "Dostawa potwierdzona, przyznano kredyty czasowe"
+  },
+  "marketplace_listing": {
+    "feature_disabled": "Funkcja rynku nie jest włączona dla tej społeczności.",
+    "no_permission_modify": "Nie masz uprawnień do modyfikowania tej oferty.",
+    "not_found": "Nie znaleziono oferty na rynku.",
+    "create_failed": "Nie udało się utworzyć oferty. Spróbuj ponownie.",
+    "update_failed": "Nie udało się zaktualizować oferty. Proszę spróbować ponownie.",
+    "no_image_files": "Nie podano plików obrazów.",
+    "no_valid_images": "Nie można przesłać żadnych prawidłowych obrazów. Dozwolone: JPEG, PNG, GIF, WebP (maks. 10 MB).",
+    "image_not_found": "Nie znaleziono obrazu dla tej oferty.",
+    "no_video_file": "Nie podano pliku wideo.",
+    "invalid_video_type": "Nieprawidłowy typ wideo. Dozwolone: MP4, WebM, MOV.",
+    "video_too_large": "Plik wideo przekracza limit 50 MB.",
+    "ai_description_failed": "Nie udało się wygenerować opisu. Spróbuj ponownie lub napisz go ręcznie.",
+    "lat_lng_required": "Wymagana jest szerokość i długość geograficzna.",
+    "invalid_coordinates": "Nieprawidłowe współrzędne.",
+    "csv_read_failed": "Nie można odczytać pliku CSV.",
+    "csv_header_required": "Plik CSV musi mieć wiersz nagłówka i co najmniej jeden wiersz danych.",
+    "max_images_reached": "Osiągnięto maksymalną liczbę :max obrazów na ofertę.",
+    "csv_missing_column": "Plik CSV musi zawierać kolumnę ':col'.",
+    "imported_as_drafts": ":count oferta/y zaimportowana/e jako wersje robocze."
+  },
+  "marketplace_offer": {
+    "feature_disabled": "Funkcja rynku nie jest włączona dla tej społeczności.",
+    "not_own_listing": "Nie jesteś właścicielem tej oferty.",
+    "only_seller_accept": "Tylko sprzedawca może zaakceptować tę ofertę.",
+    "only_seller_decline": "Tylko sprzedawca może odrzucić tę ofertę.",
+    "only_seller_counter": "Tylko sprzedawca może przedstawić kontr-ofertę.",
+    "only_buyer_accept_counter": "Tylko kupujący może zaakceptować kontr-ofertę.",
+    "only_buyer_withdraw": "Tylko kupujący może wycofać swoją ofertę.",
+    "withdrawn": "Oferta została pomyślnie wycofana."
+  },
+  "marketplace_report": {
+    "feature_disabled": "Funkcja rynku nie jest włączona dla tej społeczności.",
+    "report_submitted": "Twój raport został przesłany. Przejrzymy go w ciągu 24 godzin, zgodnie z wymogami Dyrektywy o usługach cyfrowych."
+  },
+  "member_availability": {
+    "slot_deleted": "Slot został usunięty"
+  },
+  "menu": {
+    "cache_cleared": "Pamięć podręczna menu została pomyślnie wyczyszczona"
+  },
+  "newsletter": {
+    "already_unsubscribed": "Jesteś już wypisany."
+  },
+  "notifications": {
+    "deleted": "Powiadomienie usunięte"
+  },
+  "onboarding": {
+    "already_completed": "Proces wprowadzania już zakończony",
+    "safeguarding_saved": "Preferencje ochrony zapisane"
+  },
+  "openapi": {
+    "spec_not_found": "Specyfikacja OpenAPI nie znaleziona"
+  },
+  "identity": {
+    "dob_locked": "Twoje imię i nazwisko oraz data urodzenia są zablokowane po weryfikacji tożsamości.",
+    "dob_required": "Data urodzenia jest wymagana.",
+    "dob_invalid": "Proszę wprowadzić prawidłową datę urodzenia.",
+    "dob_must_be_past": "Data urodzenia musi być w przeszłości.",
+    "must_be_16": "Musisz mieć co najmniej 16 lat.",
+    "no_fee_required": "Opłata nie jest wymagana.",
+    "payment_failed": "Nie można przetworzyć płatności. Proszę spróbować ponownie.",
+    "user_not_found": "Użytkownik nie znaleziony.",
+    "provide_dob_first": "Proszę najpierw podać swoją datę urodzenia.",
+    "complete_payment_first": "Proszę najpierw dokonać płatności.",
+    "not_available": "Weryfikacja tożsamości jest obecnie niedostępna.",
+    "start_failed": "Nie można rozpocząć weryfikacji."
+  },
+  "password_reset": {
+    "link_sent": "Jeśli konto o tym adresie e-mail istnieje, link do resetowania hasła został wysłany.",
+    "updated": "Hasło zostało zaktualizowane pomyślnie. Zaloguj się proszę przy użyciu nowego hasła.",
+    "changed_bell": "Twoje hasło zostało zmienione. Jeśli nie zrobiłeś tego sam, skontaktuj się niezwłocznie z pomocą techniczną."
+  },
+  "peer_endorsement": {
+    "recorded": "Rekomendacja rówieśnicza zarejestrowana"
+  },
+  "push": {
+    "unsubscribed": "Rezygnacja z subskrypcji zakończona pomyślnie",
+    "no_subscribers": "Nie znaleziono subskrybentów",
+    "token_pending": "Token odebrany - zostanie powiązany przy logowaniu",
+    "device_registered": "Urządzenie zarejestrowane do powiadomień push"
+  },
+  "registration": {
+    "email_verified": "E-mail zweryfikowany pomyślnie",
+    "verification_sent": "E-mail weryfikacyjny wysłany, jeśli konto istnieje"
+  },
+  "resource_category": {
+    "reordered": "Zasoby zostały pomyślnie uporządkowane"
+  },
+  "skill_taxonomy": {
+    "category_deleted": "Kategoria usunięta",
+    "skill_removed": "Umiejętność usunięta"
+  },
+  "sub_account": {
+    "relationship_revoked": "Relacja cofnięta"
+  },
+  "two_factor": {
+    "disabled": "Uwierzytelnianie dwuskładnikowe zostało wyłączone",
+    "enabled_notification": "Uwierzytelnianie dwuskładnikowe zostało włączone na Twoim koncie.",
+    "disabled_notification": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie. Jeśli tego nie zrobiłeś, zabezpiecz swoje konto natychmiast.",
+    "disabled_email_title": "Uwierzytelnianie dwuskładnikowe wyłączone",
+    "disabled_email_preview": "2FA zostało wyłączone na Twoim koncie.",
+    "disabled_email_body": "Uwierzytelnianie dwuskładnikowe zostało wyłączone na Twoim koncie. Jeśli nie dokonałeś tej zmiany, zabezpiecz swoje konto natychmiast, zmieniając hasło i ponownie włączając 2FA.",
+    "disabled_email_subject": "Alert bezpieczeństwa: 2FA wyłączone — {{tenant}}"
+  },
+  "users": {
+    "theme_updated": "Preferencje motywu zostały zaktualizowane",
+    "password_updated": "Hasło zostało pomyślnie zaktualizowane",
+    "account_deleted": "Konto zostało pomyślnie usunięte",
+    "prefs_updated": "Preferencje powiadomień zostały zaktualizowane",
+    "notification_settings_update_failed": "Nie udało się zaktualizować ustawień powiadomień",
+    "invalid_context_type": "Nieprawidłowy typ kontekstu",
+    "invalid_frequency": "Nieprawidłowa częstotliwość",
+    "context_id_required": "Wymagane ID kontekstu",
+    "invalid_group_id": "Nieprawidłowe ID grupy",
+    "invalid_thread_id": "Nieprawidłowe ID wątku"
+  },
+  "volunteer_checkin": {
+    "checked_out": "Pomyślnie wypożyczono"
+  },
+  "volunteer_community": {
+    "joined_waitlist": "Pomyślnie dołączono do listy oczekujących",
+    "claimed_spot": "Pomyślnie zarezerwowano zmianę",
+    "swap_request_sent": "Wysłano prośbę o zamianę",
+    "swap_admin_pending": "Zamiana zaakceptowana, ale wymaga zatwierdzenia przez administratora",
+    "reserved_slots": "Zarezerwowane: :slots miejsc",
+    "member_added_reservation": "Członek dodany do rezerwacji grupowej",
+    "recurring_deactivated": "Wzorzec cykliczny został dezaktywowany",
+    "guardian_consent_granted": "Zgoda opiekuna została pomyślnie udzielona."
+  },
+  "volunteer": {
+    "access_denied": "Dostęp zabroniony",
+    "amount_gt_zero": "Kwota musi być większa niż 0",
+    "no_fields_to_update": "Brak pól do aktualizacji",
+    "signed_up_for_shift": "Pomyślnie zapisano się na zmianę",
+    "hours_logged_pending": "Godziny zostały pomyślnie zalogowane, oczekują na weryfikację",
+    "review_submitted": "Recenzja została pomyślnie przesłana"
+  },
+  "volunteer_wellbeing": {
+    "emergency_alert_sent": "Alert awaryjny wysłany"
+  },
+  "wallet": {
+    "donation_successful": "Darowizna udana. Dziękujemy!",
+    "category_deleted": "Kategoria usunięta",
+    "name_required": "Wymagana jest nazwa",
+    "create_category_failed": "Nie udało się utworzyć kategorii",
+    "update_category_failed": "Nie udało się zaktualizować kategorii",
+    "cannot_delete_category": "Nie można usunąć tej kategorii (może to być kategoria systemowa)",
+    "rating_required": "Ocena jest wymagana (1-5)",
+    "amount_required": "Kwota jest wymagana",
+    "starting_balance_failed": "Nie udało się zaktualizować salda początkowego",
+    "starting_balance_updated": "Saldo początkowe zaktualizowane",
+    "statement_exported": "Wyciąg wyeksportowany"
+  },
+  "webauthn": {
+    "passkey_registered": "Klucz dostępu został pomyślnie zarejestrowany",
+    "auth_successful": "Uwierzytelnianie zakończone sukcesem",
+    "credentials_removed": "Poświadczenie(a) zostało(usunięte)",
+    "all_removed": "Usunięto :count klucz(y) dostępu. Możesz teraz ponownie zarejestrować się na dowolnym urządzeniu.",
+    "passkey_removed_bell": "Klucz dostępu został usunięty z Twojego konta. Jeśli nie zrobiłeś tego, natychmiast zabezpiecz swoje konto.",
+    "all_passkeys_removed_bell": "Wszystkie klucze dostępu ({{count}}) zostały usunięte z Twojego konta. Jeśli tego nie zrobiłeś, natychmiast zabezpiecz swoje konto."
+  },
+  "maintenance": {
+    "under_maintenance": "Platforma jest obecnie w trakcie konserwacji. Proszę sprawdź ponownie wkrótce."
+  },
+  "block_user": {
+    "cannot_block_self": "Nie możesz zablokować samego siebie"
+  },
+  "group_conversation": {
+    "body_required": "Treść wiadomości jest wymagana",
+    "message_too_long": "Wiadomość jest zbyt długa"
+  },
+  "marketplace_group": {
+    "auth_required": "Wymagana uwierzytelnienie."
+  },
+  "connections": {
+    "accepted_connection": "Połączono",
+    "connection_accepted": "Połączenie zaakceptowane"
+  },
+  "admin_crm": {
+    "invalid_type": "Nieprawidłowy parametr typu"
+  },
+  "endorsement": {
+    "cannot_endorse_self": "Nie możesz samego siebie polecać",
+    "member_not_found": "Członek nie został znaleziony",
+    "already_endorsed": "Już poleciłeś tę umiejętność"
+  },
+  "feed": {
+    "content_or_image_required": "Post musi zawierać treść lub obraz",
+    "quoted_post_not_found": "Cytowany post nie został znaleziony",
+    "post_not_found_or_not_owned": "Post nie został znaleziony lub nie należy do Ciebie",
+    "must_be_group_member": "Musisz być członkiem grupy, aby publikować",
+    "create_post_failed": "Nie udało się utworzyć posta"
+  },
+  "verification_badge": {
+    "user_not_found": "Użytkownik nie został znaleziony",
+    "badge_already_active": "Odznaka już aktywna",
+    "invalid_badge_type": "Nieprawidłowy typ odznaki: :type"
   }
 }

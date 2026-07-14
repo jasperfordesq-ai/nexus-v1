@@ -16,40 +16,43 @@ const MOCK_REPORT = vi.hoisted(() => ({
   totals: { danger: 1, warning: 2, info: 1, ok: 3 },
   checks: [
     {
-      key: 'orphaned_transactions',
-      label: 'Orphaned Transactions',
+      key: 'duplicate_emails',
+      label_code: 'duplicate_emails',
       severity: 'danger' as const,
       count: 5,
-      message: 'Transactions without a linked user.',
+      message_code: 'duplicate_emails.found',
+      message_params: {},
       has_drilldown: true,
     },
     {
-      key: 'unverified_emails',
-      label: 'Unverified Emails',
+      key: 'duplicate_phones',
+      label_code: 'duplicate_phones',
       severity: 'warning' as const,
       count: 12,
-      message: 'Members who have not verified their email.',
+      message_code: 'duplicate_phones.found',
+      message_params: {},
       has_drilldown: false,
     },
     {
-      key: 'empty_profiles',
-      label: 'Empty Profiles',
+      key: 'seed_marker_users',
+      label_code: 'seed_marker_users',
       severity: 'ok' as const,
       count: 0,
-      message: 'All member profiles are complete.',
+      message_code: 'seed_marker_users.clear',
+      message_params: {},
       has_drilldown: false,
     },
   ],
 }));
 
 const MOCK_DRILLDOWN_ROWS = vi.hoisted(() => ({
-  check_key: 'orphaned_transactions',
+  check_key: 'duplicate_emails',
   limit: 50,
   rows: [
     { id: 101, identifier: 'TXN-101', name: null, status: 'pending', created_at: '2026-01-01T00:00:00Z' },
     { id: 102, identifier: 'TXN-102', name: null, status: 'completed', created_at: '2026-01-05T00:00:00Z' },
   ],
-  note: null,
+  note_code: null,
 }));
 
 // ── mock @/lib/api ────────────────────────────────────────────────────────────
@@ -117,10 +120,10 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
-    expect(screen.getByText('Unverified Emails')).toBeInTheDocument();
-    expect(screen.getByText('Empty Profiles')).toBeInTheDocument();
+    expect(screen.getByText('Duplicate phone numbers')).toBeInTheDocument();
+    expect(screen.getByText('Demo or seed accounts')).toBeInTheDocument();
   });
 
   it('renders check card count values', async () => {
@@ -136,7 +139,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Transactions without a linked user.')).toBeInTheDocument();
+      expect(screen.getByText('Multiple users share the same email address. Merge or remove duplicate accounts before launch.')).toBeInTheDocument();
     });
   });
 
@@ -147,7 +150,7 @@ describe('DataQualityAdminPage', () => {
       const drillBtns = screen.getAllByRole('button').filter(
         (b) => /view affected rows/i.test(b.textContent ?? ''),
       );
-      // Only 'orphaned_transactions' has has_drilldown=true
+      // Only duplicate_emails has has_drilldown=true.
       expect(drillBtns.length).toBe(1);
     });
   });
@@ -160,7 +163,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const drillBtn = screen.getByRole('button', { name: /view affected rows/i });
@@ -179,7 +182,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const drillBtn = screen.getByRole('button', { name: /view affected rows/i });
@@ -199,7 +202,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const drillBtn = screen.getByRole('button', { name: /view affected rows/i });
@@ -228,7 +231,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const drillBtn = screen.getByRole('button', { name: /view affected rows/i });
@@ -255,7 +258,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const drillBtn = screen.getByRole('button', { name: /view affected rows/i });
@@ -280,7 +283,7 @@ describe('DataQualityAdminPage', () => {
     render(<DataQualityAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     const refreshBtn = screen.getByRole('button', { name: /refresh/i });
@@ -310,7 +313,7 @@ describe('DataQualityAdminPage', () => {
 
     // Wait for data and then check chips exist
     await waitFor(() => {
-      expect(screen.getByText('Orphaned Transactions')).toBeInTheDocument();
+      expect(screen.getByText('Duplicate email addresses')).toBeInTheDocument();
     });
 
     // The summary section renders count chips using t('data_quality.summary.count', ...)

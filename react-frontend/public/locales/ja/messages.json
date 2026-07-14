@@ -259,5 +259,6 @@
   "composer_blocked_safeguarding_unavailable": "安全保護ポリシーがチェックされている間、ダイレクト メッセージングは​​一時停止されます。上記でもう一度「チェック」を使用します。",
   "aria_conversation_unread_one": "{{name}}、{{count}} との会話が未読",
   "aria_conversation_unread_other": "会話 {{name}} と {{count}} は未読です",
-  "selected_members_other": "選択済み ({{count}})"
+  "selected_members_other": "選択済み ({{count}})",
+  "selected_members_one": "選択済み ({{count}})"
 }

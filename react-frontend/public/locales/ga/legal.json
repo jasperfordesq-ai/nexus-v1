@@ -816,5 +816,8 @@
     "contact_cta_body": "Bí i dteagmháil agus gheobhaidh comhordaitheoir ar ais chugat. Freagraítear formhór na dteachtaireachtaí laistigh de lá oibre amháin.",
     "contact_cta_button": "Déan teagmháil linn",
     "community_guidelines_link": "Léigh na Treoirlínte Pobail"
+  },
+  "custom_document": {
+    "introduction": "Réamhrá"
   }
 }

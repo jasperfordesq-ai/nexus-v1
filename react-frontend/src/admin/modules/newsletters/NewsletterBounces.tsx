@@ -44,6 +44,18 @@ const getBadgeColor = (type: string) => {
   }
 };
 
+const formatWeekLabel = (value: string): string => {
+  const match = /^(\d{4})-W(\d{1,2})$/.exec(value);
+  if (!match) return value;
+  const year = Number(match[1]);
+  const week = Number(match[2]);
+  const januaryFourth = new Date(Date.UTC(year, 0, 4));
+  const isoDay = januaryFourth.getUTCDay() || 7;
+  const monday = new Date(januaryFourth);
+  monday.setUTCDate(januaryFourth.getUTCDate() - isoDay + 1 + ((week - 1) * 7));
+  return monday.toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric' });
+};
+
 export function NewsletterBounces() {
   const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.page_title'));
@@ -65,6 +77,9 @@ export function NewsletterBounces() {
   // Trend data
   const [trendData, setTrendData] = useState<{ week: string; hard: number; soft: number; complaint: number }[]>([]);
   const [reasonSummary, setReasonSummary] = useState<BounceReasonSummary[]>([]);
+  const bounceTypeLabel = (type: string) => t(`newsletter_bounces.bounce_type_${type}`, {
+    defaultValue: t('newsletter_bounces.bounce_type_unknown'),
+  });
 
   const loadBounces = useCallback(async () => {
     setLoading(true);
@@ -171,7 +186,7 @@ export function NewsletterBounces() {
         t('newsletter_bounces.col_date'),
       ].join(','),
       ...bounces.map(b =>
-        [b.email, b.bounce_type, b.bounce_reason || '', b.newsletter_subject || '', b.bounced_at]
+        [b.email, bounceTypeLabel(b.bounce_type), b.bounce_reason || '', b.newsletter_subject || '', b.bounced_at]
           .map(escapeCsvField).join(',')
       ),
     ].join('\n');
@@ -265,7 +280,7 @@ export function NewsletterBounces() {
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={trendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+                  <XAxis dataKey="week" tick={{ fontSize: 12 }} tickFormatter={formatWeekLabel} />
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
@@ -291,7 +306,7 @@ export function NewsletterBounces() {
                     <div key={`${r.bounce_type}-${r.reason}`} className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         <Chip size="sm" color={getBadgeColor(r.bounce_type)} variant="soft">
-                          {r.bounce_type}
+                          {bounceTypeLabel(r.bounce_type)}
                         </Chip>
                         <span className="text-xs text-muted truncate">{r.reason}</span>
                       </div>
@@ -361,7 +376,7 @@ export function NewsletterBounces() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={getBadgeColor(bounce.bounce_type)} variant="soft">
-                        {bounce.bounce_type}
+                        {bounceTypeLabel(bounce.bounce_type)}
                       </Chip>
                     </TableCell>
                     <TableCell>

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "crm": {
     "action_cancel": "Cealaigh",
@@ -344,7 +344,6 @@
     "status_pending": "Ar feitheamh",
     "days_ago": "{{count}} lá ó shin",
     "hours_ago": "{{count}} uair ó shin",
-    "just_now": "Just Now",
     "minutes_ago": "{{count}} nóiméad ó shin",
     "loss_between_stages_few": "{{count}}caillte idir céimeanna",
     "loss_between_stages_many": "{{count}}caillte idir céimeanna",
@@ -373,6 +372,35 @@
     "activity_type_note_added": "Nóta curtha leis",
     "activity_type_task_created": "Tasc cruthaithe",
     "activity_type_profile_updated": "Nuashonraíodh an phróifíl",
-    "activity_type_group_joined": "Chuaigh an grúpa isteach"
+    "activity_type_group_joined": "Chuaigh an grúpa isteach",
+    "activity_type_unknown": "Gníomhaíocht Anaithnid",
+    "admin_roles": {
+      "admin": "Riarthóir",
+      "tenant_admin": "Riarachán tionóil",
+      "super_admin": "Riarachán ardáin",
+      "unknown": "Riarthóir"
+    },
+    "funnel_stage_registered": "Cláraithe",
+    "funnel_stage_email_verified": "Ríomhphost Deimhnithe",
+    "funnel_stage_profile_complete": "Próifíl Cúite",
+    "funnel_stage_first_listing": "Liostú Ar an gcéad uair",
+    "funnel_stage_first_exchange": "Malartú Ar an gcéad uair",
+    "funnel_stage_repeat_user": "Úsáideoir Athfhillte",
+    "funnel_stage_unknown": "Céim Anaithnid",
+    "activity_description_login": "Logáilte isteach",
+    "activity_description_signup": "Cláraíodh cuntas",
+    "activity_description_listing_created": "Cruthaíodh liostú: {{title}}",
+    "activity_description_exchange_completed": "Críochnaíodh malartú le {{member_name}}",
+    "activity_description_note_added": "Nóta curtha leis ag {{author_name}}: {{content}}",
+    "activity_description_task_created": "Cruthaíodh tasc: {{title}}",
+    "activity_description_group_joined": "Bhí páirt ghlacadh i ngrúpa: {{group_name}}",
+    "activity_description_profile_updated": "Nuashonraíodh a bpróifíl",
+    "activity_description_unknown": "Gníomhaíocht taifeadta",
+    "activity_value_untitled_listing": "Liostú gan teideal",
+    "activity_value_unknown_member": "Ball anaithnid",
+    "activity_value_system": "Córas",
+    "activity_value_untitled_task": "Tasc gan teideal",
+    "activity_value_unknown_group": "Grúpa anaithnid",
+    "just_now": "Anois amháin"
   }
 }

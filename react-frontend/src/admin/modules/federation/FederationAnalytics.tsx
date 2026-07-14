@@ -90,7 +90,7 @@ export function FederationAnalytics() {
         setData(res.data);
       } else {
         setData(null);
-        toast.error(res.error || t('federation.failed_to_load_analytics'));
+        toast.error(t('federation.failed_to_load_analytics'));
       }
     } catch {
       if (!abortRef.current?.signal.aborted) {

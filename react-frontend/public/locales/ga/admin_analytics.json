@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "analytics": {
     "category_demand_title": "Éileamh Catagóire",
@@ -201,7 +201,8 @@
         "language_distribution": "Dáileadh teanga",
         "member_growth_12m": "Fás na mball, 12 mhí anuas",
         "total_with_data": "Baill {{total}} le sonraí déimeagrafacha",
-        "total_active_members": "{{total}} baill ghníomhacha"
+        "total_active_members": "{{total}} baill ghníomhacha",
+        "unknown_language": "Teanga anaithnid"
       },
       "volunteer": {
         "total_hours": "Uaireanta iomlána",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "Iarratais cabhrach de réir catagóire",
-        "resolution_trend_6m": "Treocht réitigh, 6 mhí seo caite"
+        "resolution_trend_6m": "Treocht réitigh, 6 mhí seo caite",
+        "categories": {
+          "either": "Fón nó teachtaireacht",
+          "message": "Teachtaireacht",
+          "phone": "Fón",
+          "unknown": "Roghchlár anaithnid"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -283,6 +290,17 @@
     "count_value_other": "{{count}}×",
     "count_value_few": "{{count}}×",
     "count_value_many": "{{count}}×",
-    "count_value_two": "{{count}}×"
+    "count_value_two": "{{count}}×",
+    "result_types": {
+      "blog": "Blag",
+      "events": "Imeachtaí",
+      "groups": "Grúpaí",
+      "jobs": "Postanna",
+      "listings": "Liostálacha",
+      "marketplace": "Margadh",
+      "members": "Baill",
+      "resources": "Acmhainní",
+      "volunteering": "Deonú"
+    }
   }
 }

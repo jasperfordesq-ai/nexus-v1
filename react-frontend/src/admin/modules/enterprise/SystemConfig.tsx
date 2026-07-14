@@ -118,7 +118,7 @@ function buildConfigSchema(t: (key: string, options?: Record<string, unknown>) =
       settings: [
         { key: 'starting_balance', label: t('enterprise.config_starting_balance'), description: t('enterprise.config_starting_balance_desc'), type: 'number', default: 0, validation: { min: 0 } },
         { key: 'max_transaction', label: t('enterprise.config_max_transaction'), description: t('enterprise.config_max_transaction_desc'), type: 'number', default: 0, validation: { min: 0 } },
-        { key: 'currency_name', label: t('enterprise.config_currency_name'), description: t('enterprise.config_currency_name_desc'), type: 'text', default: 'Hours' },
+        { key: 'currency_name', label: t('enterprise.config_currency_name'), description: t('enterprise.config_currency_name_desc'), type: 'text', default: t('enterprise.config_default_currency_name') },
         { key: 'currency_symbol', label: t('enterprise.config_currency_symbol'), description: t('enterprise.config_currency_symbol_desc'), type: 'text', default: 'h' },
       ],
     },
@@ -186,7 +186,7 @@ const STATIC_SETTINGS: StaticSettingDef[] = [
   { key: 'welcome_message', type: 'textarea', default: '' },
   { key: 'starting_balance', type: 'number', default: 0, validation: { min: 0 } },
   { key: 'max_transaction', type: 'number', default: 0, validation: { min: 0 } },
-  { key: 'currency_name', type: 'text', default: 'Hours' },
+  { key: 'currency_name', type: 'text', default: '' },
   { key: 'currency_symbol', type: 'text', default: 'h' },
   { key: 'auto_approve_listings', type: 'boolean', default: true },
   { key: 'auto_approve_blog', type: 'boolean', default: false },
@@ -310,10 +310,16 @@ function normalizeValue(raw: unknown, def: StaticSettingDef): unknown {
 }
 
 /** Normalize all schema keys in a loaded config object */
-function normalizeConfig(data: Record<string, unknown>): Record<string, unknown> {
+function normalizeConfig(
+  data: Record<string, unknown>,
+  localizedDefaults: ReadonlyMap<string, ConfigSettingDef['default']>,
+): Record<string, unknown> {
   const result = { ...data };
   for (const [key, def] of SCHEMA_MAP) {
-    result[key] = normalizeValue(result[key], def);
+    result[key] = normalizeValue(result[key], {
+      ...def,
+      default: localizedDefaults.get(key) ?? def.default,
+    });
   }
   return result;
 }
@@ -415,12 +421,17 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
     try {
       const res = await adminEnterprise.getConfig();
       if (!res.success || !res.data) {
-        toast.error(res.error || t('enterprise.failed_to_load_settings'));
+        toast.error(t('enterprise.failed_to_load_settings'));
         setLoadError(true);
         return;
       }
       const raw = res.data as unknown as Record<string, unknown>;
-      const data = normalizeConfig(raw);
+      const localizedDefaults = new Map(
+        buildConfigSchema(t)
+          .flatMap((group) => group.settings)
+          .map((setting) => [setting.key, setting.default] as const),
+      );
+      const data = normalizeConfig(raw, localizedDefaults);
       setConfig(data);
       setEdited({ ...data });
       setErrors({});
@@ -507,7 +518,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         await loadData();
         onAfterChange?.();
       } else {
-        toast.error(res.error || t('enterprise.failed_to_save_settings'));
+        toast.error(t('enterprise.failed_to_save_settings'));
       }
     } catch {
       toast.error(t('enterprise.failed_to_save_settings'));
@@ -528,7 +539,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         await loadData();
         onAfterChange?.();
       } else {
-        toast.error(res.error || t('enterprise.failed_to_reset_configuration'));
+        toast.error(t('enterprise.failed_to_reset_configuration'));
       }
     } catch {
       toast.error(t('enterprise.failed_to_reset_configuration'));

@@ -60,8 +60,8 @@ export function ConfirmModal({
   children,
 }: ConfirmModalProps) {
   const { t } = useTranslation('common');
-  const resolvedConfirmLabel = confirmLabel ?? t('confirm', 'Confirm');
-  const resolvedCancelLabel = cancelLabel ?? t('cancel', 'Cancel');
+  const resolvedConfirmLabel = confirmLabel ?? t('confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('cancel');
   // Synchronous double-click gate. `isLoading` becomes true after the parent
   // re-renders; in the microsecond window between the two clicks, the second
   // press still fires onConfirm. The ref blocks re-entry within the same

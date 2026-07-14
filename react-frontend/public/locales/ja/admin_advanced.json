@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,12 +67,12 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "アルゴリズムの健全性を読み込んでいます...",
     "404_entry_dismissed": "404 エントリが却下されました",
     "a_i_settings_saved_successfully": "AI設定が正常に保存されました",
@@ -121,7 +120,7 @@
     "copied": "コピーされました",
     "copy": "コピー",
     "create_redirect": "リダイレクトの作成",
-    "custom_robots_txt": "カスタムロボット.txt",
+    "custom_robots_txt": "カスタム Robots.txt",
     "delete": "削除",
     "delete_redirect_message": "リダイレクトの削除",
     "delete_redirect_title": "リダイレクトの削除",
@@ -246,8 +245,6 @@
     "match_reasons": "一致理由",
     "match_count_one": "{{count}}の一致",
     "match_count_other": "{{count}}の一致",
-    "meilisearch_offline": "メイリサーチオフライン",
-    "meilisearch_online": "メイリサーチオンライン",
     "member_transactions": "会員の取引",
     "meta_tags_heading": "メタタグ",
     "missing_indexes_hint_prefix": "走る",
@@ -275,8 +272,8 @@
     "placeholder_exchange_skills_and_time_with_your_community": "コミュニティとスキルや時間を交換しましょう...",
     "placeholder_gocspx": "GOCSPX-xxxxx",
     "placeholder_my_timebank": "私のタイムバンク...",
-    "placeholder_noreply_example": "Noreply@example.com",
-    "placeholder_robots_txt": "ユーザーエージェント: *\n許可しない: /admin/",
+    "placeholder_noreply_example": "noreply@example.com",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxx...",
     "placeholder_search_users_by_name_or_email": "名前またはメールアドレスでユーザーを検索...",
     "placeholder_smtpexamplecom": "smtpexamplecom...",
@@ -410,7 +407,6 @@
     "label_ollama_host_url": "オラマホストURL",
     "last_run_label": "ラストラン",
     "meta_description_count": "{{count}}/160 メタ記述文字",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "OG 画像プレビュー",
     "param_activity_weight": "アクティビティの重み",
     "param_activity_weight_desc": "最近のアクティビティがランキングをどれほど強く押し上げるか",
@@ -505,7 +501,6 @@
       "workflows": {
         "title": "何をしようとしているのですか？",
         "description": "シンプルなタスクから始めて、それが開いたタブを使用します。これにより、日常的な作業が危険な管理から遠ざけられます。",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "1 つのテナントを更新する",
           "body": "単一のコミュニティの公開コンテンツが変更された場合に使用します。作業をキューに入れる前にテナントスラッグを入力してください。"
@@ -525,21 +520,22 @@
         "check_tenant_safety": {
           "title": "1 つのテナントが安全であることを確認する",
           "body": "このテナントに何が必要か、何が保存されているか、スナップショットが別の場所に属しているかどうかを正確に検査します。"
-        }
+        },
+        "open": "未処理"
       },
       "analytics": {
         "actions": {
           "reload": "リロード"
         },
         "columns": {
-          "crawler": "NEXUSTERM20トークン",
-          "hits": "NEXUSTERM21トークン",
-          "host": "NEXUSTERM22トークン",
-          "ip": "NEXUSTERM14トークン",
-          "status": "NEXUSTERM23トークン",
-          "time": "NEXUSTERM24トークン",
-          "uri": "NEXUSTERM12トークン",
-          "url": "NEXUSTERM11トークン"
+          "ip": "IP",
+          "uri": "URI",
+          "url": "URL",
+          "crawler": "クローラー",
+          "hits": "ヒット",
+          "host": "ホスト",
+          "status": "ステータス",
+          "time": "時間"
         },
         "empty": "利用可能な分析はありません。ボットのアクセス ログが空である可能性があります。",
         "empty_bot_traffic": "ボットトラフィックはまだありません",
@@ -564,7 +560,8 @@
         },
         "labels": {
           "spoofed_count": "{{count}} がなりすましされました",
-          "spoofed_count_other": "{{count}} がなりすましされました"
+          "spoofed_count_other": "{{count}} がなりすましされました",
+          "spoofed_count_one": "{{count}} 偽装されました"
         },
         "log_summary": "ログ: {{size}} - {{time}} 以降",
         "sections": {
@@ -594,13 +591,13 @@
           "refresh_all_stale_other": "古いものをすべて更新 ({{count}})"
         },
         "columns": {
-          "actions": "NEXUSTERM25トークン",
-          "asset": "ANEXUSTERM19トークン",
-          "coverage": "NEXUSTERM27トークン",
-          "host": "NEXUSTERM22トークン",
-          "missing": "NEXUSTERM28トークン",
-          "stale": "NEXUSTERM29トークン",
-          "tenant": "NEXUSTERM30トークン"
+          "actions": "操作",
+          "asset": "資産",
+          "coverage": "カバレッジ",
+          "host": "ホスト",
+          "missing": "欠落",
+          "stale": "期限切れ",
+          "tenant": "テナント"
         },
         "confirm": {
           "queue_recache": "{{count}} 件のテナントの再キャッシュをキューに入れますか?",
@@ -716,7 +713,15 @@
           "last_failed_pass": "最後に失敗した実行",
           "sched_prerender-detect-drift": "ドリフト検出器のハートビート",
           "sched_prerender-auto-recache": "ハートビートの自動再キャッシュ",
-          "sched_prerender-reap-stale": "古いジョブのクリーンアップのハートビート"
+          "sched_prerender-reap-stale": "古いジョブのクリーンアップのハートビート",
+          "unknown": "不明な確認"
+        },
+        "remediation": "操作: {{detail}}",
+        "statuses": {
+          "green": "正常",
+          "yellow": "警告",
+          "red": "重大",
+          "unknown": "状態不明"
         }
       },
       "inventory": {
@@ -732,13 +737,14 @@
           "reload": "リロード",
           "select_all_visible": "表示されているものをすべて選択します",
           "select_snapshot": "{{path}}を選択します",
-          "recache_selected_other": "再キャッシュが選択されました ({{count}})"
+          "recache_selected_other": "再キャッシュが選択されました ({{count}})",
+          "recache_selected_one": "選択を再キャッシュ ({{count}})"
         },
         "columns": {
           "actions": "アクション",
           "age": "年",
           "host": "ホスト",
-          "http": "NEXUSTERM15トークン",
+          "http": "HTTP",
           "route": "ルート",
           "size": "サイズ",
           "status": "状態"
@@ -788,7 +794,7 @@
           "integrity_ok": "バイトはレンダリング時に書き込まれた sha256 と一致します",
           "integrity_status": "整合性: {{status}}",
           "integrity_unreadable": "sha256 サイドカーは存在しますが、形式が正しくありません",
-          "invalid_present": "INVALNEXUSTERM13トークンプレゼント",
+          "invalid_present": "無効な値あり",
           "json_ld": "JSON-LD ({{blocks}} ブロック、{{status}})",
           "meta_description": "メタディスクリプション",
           "missing": "- ない -",
@@ -808,7 +814,11 @@
           "must_fix_other": "修正する必要があります ({{count}})",
           "tips_other": "ヒント ({{count}})",
           "asset_references_other": "アセット参照 ({{count}})",
-          "dead_assets_other": "{{count}} が死亡しました"
+          "dead_assets_other": "{{count}} が死亡しました",
+          "must_fix_one": "修正が必要 ({{count}})",
+          "tips_one": "ヒント ({{count}})",
+          "asset_references_one": "アセット参照 ({{count}})",
+          "dead_assets_one": "{{count}} 死亡"
         },
         "selected": "{{count}} が選択されました",
         "status": {
@@ -818,7 +828,8 @@
         },
         "summary": "{{total}} スナップショットのうちの {{filtered}}",
         "table_aria": "スナップショットインベントリ",
-        "selected_other": "{{count}} が選択されました"
+        "selected_other": "{{count}} が選択されました",
+        "selected_one": "{{count}} 選択済み"
       },
       "jobs": {
         "actions": {
@@ -890,7 +901,8 @@
         },
         "result": {
           "invalid": "{{count}} 件が無効",
-          "invalid_other": "{{count}} 件が無効"
+          "invalid_other": "{{count}} 件が無効",
+          "invalid_one": "{{count}} 無効"
         },
         "scope": {
           "all_tenants": "すべてのテナント"
@@ -933,7 +945,8 @@
           "supersede": "置き換える",
           "unknown": "不明なイベント: {{event}}"
         },
-        "summary_other": "{{count}} イベント"
+        "summary_other": "{{count}} イベント",
+        "summary_one": "{{count}} イベント"
       },
       "failures": {
         "columns": {
@@ -958,7 +971,6 @@
       "audit": {
         "actions": {
           "reset_all": "すべてをリセットして再構築",
-          "auto_recache": "Auto-recache",
           "cancel": "ジョブをキャンセルする",
           "detect_drift": "ドリフトの検出",
           "enqueue": "キューの更新",
@@ -966,7 +978,9 @@
           "purge": "スナップショットの削除",
           "purge_unexpected": "予期しないスナップショットをクリーンアップする",
           "reset_breaker": "安全ブレーカーをリセットする",
-          "reset_queue": "スタックしたキューを修復する"
+          "reset_queue": "スタックしたキューを修復する",
+          "unknown": "未知の操作",
+          "auto_recache": "自動再キャッシュ"
         },
         "buttons": {
           "export_csv": "CSVをエクスポートする",
@@ -996,9 +1010,10 @@
         },
         "table_aria": "監査履歴",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "未知の結果",
+          "denied": "拒否されました",
+          "failed": "失敗しました",
+          "ok": "完了"
         },
         "details_empty": "追加の詳細はありません"
       },
@@ -1031,7 +1046,9 @@
           "missing": "{{count}} がありません",
           "stale": "{{count}} が古い",
           "missing_other": "{{count}} がありません",
-          "stale_other": "{{count}} が古い"
+          "stale_other": "{{count}} が古い",
+          "missing_one": "{{count}} 欠落",
+          "stale_one": "{{count}} 古い"
         },
         "hints": {
           "unexpected": "現在のテナントルートプラン外に保存されているスナップショット",
@@ -1046,7 +1063,9 @@
           "prometheus": "プロメテウスのテキスト形式",
           "tenants_routes": "{{tenants}} テナント x {{routes}} ルート",
           "aging_other": "{{count}} のエージング (7 日以上)",
-          "active_jobs_other": "{{count}} アクティブ"
+          "active_jobs_other": "{{count}} アクティブ",
+          "aging_one": "{{count}} 老化（>7日）",
+          "active_jobs_one": "{{count}} アクティブ"
         },
         "kpi": {
           "age_stale": "古い (>14 日)",
@@ -1082,7 +1101,6 @@
           "continue_to_delete": "ライブ削除を続行する"
         },
         "description_middle": "1 つのパス セグメントに対して、",
-        "description_prefix": "グロブパターンに一致するスナップショットを削除します。使用",
         "description_suffix": "あらゆる子孫のために。例:",
         "all_tenants_warning": {
           "body": "テナントのスラグを空白のままにすると、すべてのテナントにわたって一致するスナップショットが削除されます。これは、正確なファイルをプレビューした後のプラットフォーム全体のクリーンアップのみを目的としています。",
@@ -1106,7 +1124,8 @@
           "purged": "パージされた {{count}} スナップショット{{job}}",
           "dry_run_one": "ドライラン: {{count}} スナップショットはパージされます",
           "dry_run_other": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
-          "purged_other": "パージされた {{count}} スナップショット{{job}}"
+          "purged_other": "パージされた {{count}} スナップショット{{job}}",
+          "purged_one": "削除された {{count}} スナップショット{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* または /listings/**",
@@ -1117,7 +1136,8 @@
           "would_delete": "{{count}} 件のスナップショットが削除される見込みです",
           "would_delete_one": "{{count}} スナップショットを削除します",
           "would_delete_other": "{{count}} 件のスナップショットが削除される見込みです",
-          "deleted_other": "{{count}} 件のスナップショットを削除しました"
+          "deleted_other": "{{count}} 件のスナップショットを削除しました",
+          "deleted_one": "削除された {{count}} スナップショット"
         },
         "title": "ワイルドカードキャッシュのパージ",
         "preview_gate": {
@@ -1126,7 +1146,8 @@
           "ready": "一致するプレビューが見つかりました。ライブ削除は、プレビューに表示される {{count}} の一致するスナップショットに限定されます。",
           "ready_one": "一致するプレビューが見つかりました。ライブ削除は、プレビューに表示される {{count}} の一致するスナップショットに限定されます。",
           "ready_other": "一致するプレビューが見つかりました。ライブ削除は、プレビューに表示される {{count}} の一致するスナップショットに限定されます。"
-        }
+        },
+        "description_prefix": "保存されたHTMLスナップショットをパスパターンに一致するものから削除します。ルートが特定のテナントに属する場合は、テナントのスラッグを追加してください。使用する"
       },
       "ttl_inspector": {
         "actions": {
@@ -1140,13 +1161,18 @@
         },
         "path_only": "パスのみ - スキームやホストなし",
         "placeholders": {
-          "route": "/ブログ/私の投稿"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "一致: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (特異性 {{specificity}})",
           "other_patterns": "このルートに一致する他のパターン:",
-          "ttl": "TTL: {{ttl}} ({{seconds}})"
+          "ttl": "TTL: {{ttl}} ({{seconds}})",
+          "sources": {
+            "default": "デフォルトルール",
+            "pattern": "一致するパターン",
+            "unknown": "不明なソース"
+          }
         },
         "title": "TTL検査官",
         "units": {
@@ -1155,7 +1181,10 @@
           "minutes": "{{count}} 分",
           "minutes_other": "{{count}} 分",
           "hours_other": "{{count}}h",
-          "days_other": "{{count}} 日"
+          "days_other": "{{count}} 日",
+          "minutes_one": "{{count}} 分",
+          "hours_one": "{{count}} 時間",
+          "days_one": "{{count}} 日"
         }
       },
       "sitemap_explorer": {
@@ -1168,7 +1197,10 @@
           "total": "{{count}} 合計",
           "static_other": "{{count}} 静的",
           "dynamic_other": "{{count}} ダイナミック",
-          "total_other": "{{count}} 合計"
+          "total_other": "{{count}} 合計",
+          "static_one": "{{count}} 静的",
+          "dynamic_one": "{{count}} 動的",
+          "total_one": "{{count}} 合計"
         },
         "description_prefix": "エンジンがテナントに対してどのルートをレンダリングする予定であるかを正確に確認します - 静的フロア (機能/モジュール ゲート) と、からの動的 URL",
         "description_suffix": "Playwright ワーカーはこのリストにアクセスします。",
@@ -1232,14 +1264,14 @@
           "needs_attention_other": "{{count}} 項目には注意が必要です"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "予期される",
+          "missing": "欠落",
+          "unexpected": "予期しない",
+          "stale": "期限切れ",
+          "static": "静的",
+          "sitemap": "サイトマップ",
+          "snapshots": "保存済み",
+          "asset_invalid": "資産"
         },
         "sections": {
           "attention_limited": "対応が必要な保存済みスナップショット全 {{total}} 件のうち {{shown}} 件を表示しています。",
@@ -1249,10 +1281,10 @@
         "empty": "テナント スラグを入力して、そのルート プランと保存されたスナップショットを検査します。",
         "empty_attention": "このテナントには、欠落しているスナップショット、古いスナップショット、資産が破損しているスナップショット、または予期しないスナップショットはありません。",
         "columns": {
-          "route": "Route",
-          "source": "Source",
-          "status": "Status",
-          "why": "なぜここにあるのか"
+          "why": "なぜここにあるのか",
+          "route": "ルート",
+          "source": "ソース",
+          "status": "ステータス"
         },
         "tables": {
           "attention_aria": "注意が必要なテナントのスナップショット項目"
@@ -1260,12 +1292,12 @@
         "sources": {
           "static": "静的ルート",
           "sitemap": "サイトマップルート",
-          "unexpected": "Unexpected"
+          "unexpected": "予期しない"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "資産発行",
-          "content": "コンテンツが古い"
+          "content": "コンテンツが古い",
+          "unexpected": "予期しない"
         },
         "reasons": {
           "sitemap": "このテナント サイトマップによってパブリック コンテンツとして公開されます。",
@@ -1288,9 +1320,9 @@
           "body": "予期しないスナップショットは通常、「概要」のクリーンアップ ツールを使用して削除できます。最初にプレビューし、テナント リストが正しい場合にのみ適用します。"
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "新鮮",
+          "stale": "期限切れ",
+          "warn": "エイジング"
         }
       }
     },
@@ -1316,7 +1348,6 @@
     "status_pass": "合格",
     "status_warning": "警告",
     "sync_search_hint_prefix": "走る",
-    "sync_search_hint_suffix": "メイリサーチ開始後。",
     "unable_to_load_sitemap_stats": "サイトマップ統計を読み込めません",
     "usage_limits_heading": "使用制限",
     "top_matches_for_user_one": "{{name}}の上位{{count}}一致",
@@ -1324,13 +1355,12 @@
     "next_public": {
       "title": "Next.js パブリック フロントエンドの準備状況",
       "description": "Next.js パブリック フロントエンドの読み取り専用シャドウ モード ステータス。このページでは、パブリック ルーティングを有効にしたり、プリレンダリング動作を変更したりすることはありません。",
-      "refresh": "Refresh",
       "loading": "Next.js パブリック フロントエンドの準備を読み込み中",
       "error": "Next.js の準備をロードできませんでした。",
       "cards": {
-        "mode": "Mode",
         "production_routing": "生産ルーティング",
-        "prerender": "プリレンダーフォールバック"
+        "prerender": "プリレンダーフォールバック",
+        "mode": "モード"
       },
       "values": {
         "shadow_mode": "シャドウモード",
@@ -1368,8 +1398,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "LaravelのパブリックGETルート",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "Laravel ルートが登録されていません",
+        "auth": "Laravel ルートには認証が必要です"
       },
       "edge_canary": {
         "title": "Edge Canary プレビュー",
@@ -1384,7 +1414,6 @@
         "included_by_deploy": "デプロイに含まれる",
         "not_included_by_deploy": "デプロイには含まれていません",
         "route_audit_title": "テンプレートルート監査",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "公共ルートのみ",
         "not_public_only": "公共ルートのみではありません",
         "no_private_collisions": "プライベートルートの衝突なし",
@@ -1398,7 +1427,8 @@
         "preview_only": "プレビューのみ",
         "not_preview_only": "プレビューモードは未確認",
         "reviewed_config_required": "構成の確認が必要です",
-        "explicit_instruction_required": "別途カットオーバー指示が必要"
+        "explicit_instruction_required": "別途カットオーバー指示が必要",
+        "exact_path_count": "{{count}} の正確なパス"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1409,9 +1439,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "明示的なカットオーバー指示が必要です",
         "next_shadow_checks_required": "次のシャドウチェックが必要です",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "プリレンダー フォールバックはそのままにしておく必要があります"
+        "prerender_fallback_must_remain": "プリレンダー フォールバックはそのままにしておく必要があります",
+        "apache_configtest_required": "Apache 設定テストが必要",
+        "react_private_regression_required": "React プライベートルートの回帰が必要"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Plesk 仮想ホストを直接編集しないでください",
@@ -1421,21 +1451,21 @@
       },
       "route_batches": {
         "title": "ルートバッチの準備状況",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} ルート"
       },
       "remaining_route_work": {
         "title": "残りの公共ルート工事",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} API ベースのルート",
         "api_backed_routes_plural": "{{count}} API ベースのルート",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "アクティベーションコントロールが利用可能です",
-        "activation_unavailable": "アクティベーション制御なし"
+        "activation_unavailable": "アクティベーション制御なし",
+        "route_count": "{{count}} ルート",
+        "public_routes": "{{count}} パブリックルート",
+        "public_routes_plural": "{{count}} パブリックルート",
+        "remaining_routes": "{{count}} 残りのルート",
+        "remaining_routes_plural": "{{count}} 残りのルート",
+        "unclassified_routes": "{{count}} 未分類のルート",
+        "unclassified_routes_plural": "{{count}} 未分類のルート（複数）"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "静的/手動レビュー ルート",
@@ -1494,13 +1524,13 @@
       },
       "artifacts": {
         "title": "カットオーバーアーティファクトインベントリ",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "必要なコマンド",
         "required_before_cutover": "カットオーバー前に必要",
         "activation_available": "アクティベーションコントロールが利用可能です",
-        "no_activation_control": "アクティベーション制御なし"
+        "no_activation_control": "アクティベーション制御なし",
+        "path": "パス",
+        "present": "存在する",
+        "missing": "欠落"
       },
       "artifact_items": {
         "route_ownership_manifest": "ルート所有権マニフェスト",
@@ -1511,11 +1541,11 @@
         "prerender_fallback": "プリレンダーフォールバック"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "エッジ構成",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "manifest": "マニフェスト",
+        "runtime": "ランタイム",
+        "guard": "ガード",
+        "fallback": "フォールバック"
       },
       "production_effects": {
         "none": "生産効果なし"
@@ -1524,13 +1554,13 @@
         "title": "カットオーバーの適格性",
         "eligible": "カットオーバーの対象となる",
         "blocked": "カットオーバーの対象外",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} API ベースのパブリック ルート",
         "remaining_public_routes": "{{count}} 残りのパブリック ルート",
         "activation_available": "アクティベーションコントロールが利用可能",
         "activation_unavailable": "アクティベーション制御なし",
-        "blockers": "Blockers",
-        "required_actions": "必要なアクション"
+        "required_actions": "必要なアクション",
+        "blockers": "ブロッカー",
+        "public_routes": "{{count}} パブリックルート"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "マニフェスト検証がブロックされています",
@@ -1565,15 +1595,15 @@
         "prerender_retained": "現在のプリレンダー フォールバックは保持されたままになります",
         "vite_private_routes_retained": "プライベート Vite ルートの所有権は維持されます",
         "public_edge_not_configured": "Next.js に対して実稼働エッジ ルートが構成されていません",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "カットオーバーの前にはパリティ テストが引き続き必要です"
+        "parity_tests_required_before_cutover": "カットオーバーの前にはパリティ テストが引き続き必要です",
+        "apache_canary_template_not_included": "Apache のカナリアテンプレートはデプロイに含まれていません"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
-        "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "pass": "合格",
+        "blocker": "ブロッカー",
+        "info": "情報",
+        "fail": "失敗",
+        "blocked": "ブロック"
       },
       "runtime": {
         "title": "シャドウ ランタイム",
@@ -1595,9 +1625,9 @@
         "monitor_and_keep_prerender_fallback": "応答を監視し、パリティが証明されるまでプリレンダリングをフォールバックとして利用できるようにします。"
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} プライベート編集/パターンの作成"
+        "private_patterns": "{{count}} プライベート編集/パターンの作成",
+        "public_routes": "{{count}} パブリックルート",
+        "private_prefixes": "{{count}} プライベートプレフィックス"
       },
       "validation": {
         "title": "マニフェストの検証",
@@ -1663,7 +1693,8 @@
         "public_routes_only": "公共ルートのみ",
         "do_not_remove_prerender": "プリレンダー フォールバックは削除しないでください。",
         "rollback_path_required": "ロールバックパスが必要です"
-      }
+      },
+      "refresh": "更新"
     },
     "health_meta_description_length_other": "{{count}}文字 (理想: 150 ～ 160)",
     "health_auto_sitemap_active_count_one": "アクティブ — {{count}} の URL がインデックス付けされました",
@@ -1679,7 +1710,103 @@
     "warnings_count_with_value_other": "{{count}}の警告",
     "failed_count_with_value_other": "{{count}}が失敗しました",
     "total_count_other": "合計: {{count}}",
-    "score_out_of": "{{maximum}}点満点"
+    "score_out_of": "{{maximum}}点満点",
+    "component_match_score_aria": "{{component}} スコア: {{score}}%",
+    "placeholder_default_title_suffix": "| 私のタイムバンク",
+    "placeholder_meta_keywords": "タイムバンキング、コミュニティ、交換",
+    "sitemap_content_type_unknown": "その他のコンテンツ",
+    "sitemap_content_type_blog_posts": "ブログ投稿",
+    "sitemap_content_type_events": "イベント",
+    "sitemap_content_type_groups": "グループ",
+    "sitemap_content_type_jobs": "仕事",
+    "sitemap_content_type_listings": "リスティング",
+    "sitemap_content_type_members": "メンバー",
+    "sitemap_content_type_pages": "ページ",
+    "sitemap_content_type_podcasts": "ポッドキャスト",
+    "sitemap_content_type_resources": "リソース",
+    "sitemap_content_type_volunteering": "ボランティア",
+    "seo_audit_check_blog_meta_description_one": "公開された{{count}}のブログ投稿のメタタイトルと説明を確認",
+    "seo_audit_check_blog_meta_description_other": "公開された{{count}}のブログ投稿のメタタイトルと説明を確認",
+    "seo_audit_check_blog_meta_name": "ブログ投稿のメタデータ",
+    "seo_audit_check_canonical_urls_description": "カノニカルURLの設定とカスタムオーバーライドを確認",
+    "seo_audit_check_canonical_urls_name": "カノニカルURL",
+    "seo_audit_check_content_quality_description": "薄いコンテンツ、タイトルの欠落、その他のコンテンツの品質問題をチェックします",
+    "seo_audit_check_content_quality_name": "コンテンツ品質の指標",
+    "seo_audit_check_duplicate_titles_description": "公開済みコンテンツ間で重複しているメタタイトルをチェックします",
+    "seo_audit_check_duplicate_titles_name": "ユニークなメタタイトル",
+    "seo_audit_check_kb_meta_description_one": "{{count}} が公開したナレッジベース記事に有効なタイトルがあるかチェックします",
+    "seo_audit_check_kb_meta_description_other": "{{count}}が公開したナレッジベース記事の有効なタイトルをチェックします",
+    "seo_audit_check_kb_meta_name": "ナレッジベース記事のメタデータ",
+    "seo_audit_check_open_graph_description": "Open GraphおよびTwitterカードの設定をチェックします",
+    "seo_audit_check_open_graph_name": "ソーシャル共有メタデータ",
+    "seo_audit_check_page_meta_description_one": "{{count}}が公開したCMSページのメタデータをチェックします",
+    "seo_audit_check_page_meta_description_other": "{{count}}が公開したCMSページのメタデータをチェックします",
+    "seo_audit_check_page_meta_name": "CMSページのメタデータ",
+    "seo_audit_check_redirect_health_description_one": "{{count}}で設定されたリダイレクトのチェーン、ループ、自己リダイレクトをチェックします",
+    "seo_audit_check_redirect_health_description_other": "{{count}}で設定されたリダイレクトのチェーン、ループ、自己リダイレクトをチェックします",
+    "seo_audit_check_redirect_health_name": "リダイレクトの健全性",
+    "seo_audit_check_seo_settings_description": "正規のURL、Open Graphタグ、およびTwitterカードが有効になっているか確認します",
+    "seo_audit_check_seo_settings_name": "SEO設定",
+    "seo_audit_check_sitemap_coverage_description_one": "{{count}} のURLに対するサイトマップのカバレッジを確認します",
+    "seo_audit_check_sitemap_coverage_description_other": "{{count}} のURLに対するサイトマップのカバレッジを確認します",
+    "seo_audit_check_sitemap_coverage_name": "サイトマップのカバレッジ",
+    "seo_audit_check_tenant_metadata_description": "テナントのホームページのメタタイトル、メタディスクリプション、およびH1見出しを確認します",
+    "seo_audit_check_tenant_metadata_name": "ホームページのメタデータ",
+    "seo_audit_check_unknown_description": "この監査チェックは、このバージョンの管理パネルではサポートされていません",
+    "seo_audit_check_unknown_name": "不明な監査チェック",
+    "seo_audit_issue_additional_results_truncated": "他の問題も存在する可能性があります；最初の{{limit}}件のみが表示されます。",
+    "seo_audit_issue_blog_post_meta_missing": "ブログ記事「{{title}}」({{path}})にはメタタイトルまたは説明がありません。",
+    "seo_audit_issue_canonical_generation_disabled": "カノニカルURLの生成が無効になっており、重複コンテンツのリスクがあります。",
+    "seo_audit_issue_canonical_urls_not_enabled": "カノニカルURLが有効になっていません。",
+    "seo_audit_issue_cms_page_meta_title_missing": "CMSページ「{{title}}」({{path}})にはメタタイトルがありません。",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}}ページにはカスタムの正規URLがあります；それがまだ有効であることを確認してください。",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}}ページにはカスタムの正規URLがあります；それらがまだ有効であることを確認してください。",
+    "seo_audit_issue_duplicate_meta_title_one": "メタタイトル「{{title}}」は{{count}}回使用されています。",
+    "seo_audit_issue_duplicate_meta_title_other": "メタタイトル「{{title}}」は{{count}}回使用されています。",
+    "seo_audit_issue_homepage_meta_title_too_long": "ホームページのメタタイトルは{{length}}文字です。最大は{{max}}文字です。",
+    "seo_audit_issue_kb_article_titles_missing_one": "{{count}}件の公開されたナレッジベース記事のタイトルが空です。",
+    "seo_audit_issue_kb_article_titles_missing_other": "{{count}}件の公開されたナレッジベース記事のタイトルが空です。",
+    "seo_audit_issue_legacy_result_requires_rerun": "この保存された問題は古い形式を使用しています。詳細については、再度監査を実行してください。",
+    "seo_audit_issue_meta_description_too_long": "ホームページのメタディスクリプションは{{length}}文字です。最大{{max}}文字までです。",
+    "seo_audit_issue_meta_description_too_short": "ホームページのメタディスクリプションは{{length}}文字です。最低{{min}}文字必要です。",
+    "seo_audit_issue_missing_homepage_h1": "ホームページにH1見出しがありません。",
+    "seo_audit_issue_missing_homepage_meta_title": "ホームページにデフォルトのメタタイトルがありません。",
+    "seo_audit_issue_missing_meta_description": "ホームページにデフォルトのメタディスクリプションがありません。",
+    "seo_audit_issue_open_graph_default_image_missing": "デフォルトのOpen Graph画像が設定されていないため、ソーシャルシェアには画像が含まれません。",
+    "seo_audit_issue_open_graph_not_enabled": "Open Graphタグが有効になっていません。",
+    "seo_audit_issue_open_graph_sharing_disabled": "Open Graphタグが無効になっているため、ソーシャルシェアでは一般的なプレビューが使用されます。",
+    "seo_audit_issue_redirect_chain": "リダイレクトチェーン: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "リダイレクトループ: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "自己リダイレクト: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "サイトマップにはURLが含まれていないため、コンテンツがインデックスされていません。",
+    "seo_audit_issue_sitemap_low_coverage_one": "サイトマップには{{count}}のURLしか含まれておらず、カバレッジが非常に低いことを示しています。",
+    "seo_audit_issue_sitemap_low_coverage_other": "サイトマップには{{count}}のURLしか含まれておらず、カバレッジが非常に低いことを示しています。",
+    "seo_audit_issue_sitemap_profiles_missing": "サイトマップにはメンバープロフィールが含まれていませんが、いくつかは存在することが予想されます。",
+    "seo_audit_issue_sitemap_static_pages_missing": "サイトマップには固定ページが含まれていませんが、いくつかは存在することが予想されます。",
+    "seo_audit_issue_thin_blog_content_one": "{{count}} が公開したブログ記事は{{minimum}}文字未満です。内容が薄いとSEOに悪影響を与える可能性があります。",
+    "seo_audit_issue_thin_blog_content_other": "{{count}} が公開したブログ記事は{{minimum}}文字未満です。内容が薄いとSEOに悪影響を与える可能性があります。",
+    "seo_audit_issue_title_suffix_missing": "タイトルのサフィックスが設定されていません。「 | コミュニティ名」のようなものです。",
+    "seo_audit_issue_twitter_cards_disabled": "Twitterカードは無効になっています。",
+    "seo_audit_issue_twitter_cards_not_enabled": "Twitterカードは有効になっていません。",
+    "seo_audit_issue_unknown": "この監査問題は、このバージョンの管理パネルではサポートされていません。",
+    "seo_audit_issue_untitled_published_pages_one": "{{count}} が公開したページにはタイトルがありません。",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} が公開したページにはタイトルがありません。",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "health_meta_description_length_one": "{{count}} 文字（理想：150〜160）",
+    "pass_count_one": "{{count}} 合格",
+    "warning_count_one": "{{count}} 警告",
+    "fail_count_one": "{{count}} 不合格",
+    "passed_count_with_value_one": "{{count}} 合格済み",
+    "warnings_count_with_value_one": "{{count}} 警告複数",
+    "failed_count_with_value_one": "{{count}} 不合格済み",
+    "total_count_one": "合計: {{count}}",
+    "loading": "読み込み中",
+    "no_audit_results_prompt": "まだ監査結果はありません",
+    "meilisearch_offline": "Meilisearch オフライン",
+    "meilisearch_online": "Meilisearch オンライン",
+    "sync_search_hint_suffix": "Meilisearch が開始した後。"
   },
   "email_deliverability": {
     "title": "電子メールの到達性",
@@ -2086,6 +2213,27 @@
       "recent_failures": "最近の失敗"
     },
     "trigger_coverage_one": "{{count}} の監視対象フロー全体にわたる {{issues}} の問題",
-    "trigger_coverage_other": "{{count}} が監視するフロー全体にわたる {{issues}} の問題"
+    "trigger_coverage_other": "{{count}} が監視するフロー全体にわたる {{issues}} の問題",
+    "categories": {
+      "billing": "請求",
+      "civic_digest": "市民要約",
+      "donation_receipt": "寄付領収書",
+      "event_reminder": "イベントリマインダー",
+      "federation_connection": "連邦接続",
+      "federation_message": "連邦メッセージ",
+      "federation_review": "連邦レビュー",
+      "federation_transaction": "連邦取引",
+      "goal_reminder": "目標のリマインダー",
+      "job_interview": "就職面接",
+      "listing_expiry": "出品期限",
+      "marketplace_dispute": "マーケットプレイスの紛争",
+      "marketplace_rating": "マーケットプレイスの評価",
+      "newsletter": "ニュースレター",
+      "safeguarding": "保護",
+      "safeguarding_review": "保護レビュー",
+      "volunteer_reminder": "ボランティアのリマインダー",
+      "not_available": "利用不可",
+      "unknown": "その他のメールカテゴリー"
+    }
   }
 }

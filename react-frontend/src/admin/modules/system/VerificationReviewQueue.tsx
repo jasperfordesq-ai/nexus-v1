@@ -51,20 +51,6 @@ const formatDate = (dateStr: string): string => {
   return new Date(dateStr).toLocaleString(getFormattingLocale());
 };
 
-const formatProvider = (slug: string): string => {
-  return slug
-    .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-};
-
-const formatLevel = (level: string): string => {
-  return level
-    .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-};
-
 export function VerificationReviewQueue() {
   const { t } = useTranslation('admin_system');
   const toast = useToast();
@@ -118,7 +104,7 @@ export function VerificationReviewQueue() {
         confirmModal.onClose();
         fetchSessions();
       } else {
-        toast.error(res.error || t('verification.failed_to_action_verification'));
+        toast.error(t('verification.failed_to_action_verification'));
       }
     } catch {
       toast.error(t('verification.failed_to_action_verification_session'));
@@ -183,10 +169,14 @@ export function VerificationReviewQueue() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{formatProvider(session.provider_slug)}</span>
+                      <span className="text-sm">
+                        {t(`verification.provider_${session.provider_slug}`, { defaultValue: t('verification.provider_unknown') })}
+                      </span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{formatLevel(session.verification_level)}</span>
+                      <span className="text-sm">
+                        {t(`system.verification_level_${session.verification_level}`, { defaultValue: t('system.verification_level_unknown') })}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Chip
@@ -194,7 +184,7 @@ export function VerificationReviewQueue() {
                         color={STATUS_COLORS[session.status] || 'default'}
                         variant="soft"
                       >
-                        {t(`verification.status_${session.status}`)}
+                        {t(`verification.status_${session.status}`, { defaultValue: t('verification.status_unknown') })}
                       </Chip>
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-xs text-theme-muted">

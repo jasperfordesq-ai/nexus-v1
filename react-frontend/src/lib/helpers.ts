@@ -309,6 +309,46 @@ export function formatNumber(value: number, options?: Intl.NumberFormatOptions):
 }
 
 /**
+ * Format a ratio (where 1 is 100%) using the active interface locale.
+ */
+export function formatPercentRatio(
+  ratio: number,
+  options?: Omit<Intl.NumberFormatOptions, 'style'>
+): string {
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'percent',
+    maximumFractionDigits: 1,
+    ...options,
+  }).format(ratio);
+}
+
+/**
+ * Format a percentage value (where 100 is 100%) using the active interface locale.
+ */
+export function formatPercentValue(
+  percentage: number,
+  options?: Omit<Intl.NumberFormatOptions, 'style'>
+): string {
+  return formatPercentRatio(percentage / 100, options);
+}
+
+/**
+ * Format a measurement with a locale-aware unit label.
+ */
+export function formatUnit(
+  value: number,
+  unit: string,
+  options?: Omit<Intl.NumberFormatOptions, 'style' | 'unit'>
+): string {
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'unit',
+    unit,
+    unitDisplay: 'short',
+    ...options,
+  }).format(value);
+}
+
+/**
  * Format a locale-aware currency string.
  */
 export function formatCurrency(

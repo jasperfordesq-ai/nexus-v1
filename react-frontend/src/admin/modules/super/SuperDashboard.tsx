@@ -51,16 +51,16 @@ export function SuperDashboard() {
       if (dashRes.success && dashRes.data) {
         setStats(dashRes.data);
       } else if (!dashRes.success) {
-        toast.error(`${t('super.dashboard')}: ${dashRes.error || t('super.failed_to_load_stats')}`);
+        toast.error(`${t('super.dashboard')}: ${t('super.failed_to_load_stats')}`);
       }
 
       if (tenantsRes.success && tenantsRes.data) {
         setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : []);
       } else if (!tenantsRes.success) {
-        toast.error(`${t('super.tenants')}: ${tenantsRes.error || t('super.failed_to_load_tenant_list')}`);
+        toast.error(`${t('super.tenants')}: ${t('super.failed_to_load_tenant_list')}`);
       }
-    } catch (err) {
-      toast.error(`${t('super.dashboard_error')}: ${err instanceof Error ? err.message : t('common.unknown')}`);
+    } catch {
+      toast.error(`${t('super.dashboard_error')}: ${t('common.unknown')}`);
     } finally {
       setLoading(false);
     }

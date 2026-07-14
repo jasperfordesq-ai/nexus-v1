@@ -15,67 +15,66 @@
     "federation_audit": "Audit de la Fédération",
     "platform_admin": "Administrateur de la plateforme",
     "back_to_platform_admin": "Retour à l'administrateur de la plateforme",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Enquêtes Pilote",
+    "provisioning_queue": "File d'approvisionnement",
+    "billing_control": "Contrôle de facturation",
+    "revenue_dashboard": "Tableau de bord des revenus",
+    "regional_analytics": "Analytique régionale",
+    "national_dashboard": "Tableau de bord national"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Chargement de l'administrateur principal",
+    "skip_to_main": "Passer au contenu principal",
+    "close_navigation": "Fermer la navigation de l'administrateur principal",
+    "navigation": "Navigation de l'administrateur principal"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Retour à l'administration",
+    "toggle_sidebar": "Basculer la barre latérale",
     "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "my_profile": "Mon Profil",
+    "sign_out": "Se Déconnecter",
+    "user_fallback": "Super Administrateur",
+    "user_menu": "Menu de l'administrateur principal"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
+    "section_overview": "Aperçu",
+    "section_tenants": "Locataires",
+    "section_federation": "Fédération",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Développer la barre latérale",
+    "collapse": "Réduire la barre latérale",
+    "nav_label": "Navigation de l'administrateur principal"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Super Administrateur",
+    "tenants": "Locataires",
+    "create": "Créer",
+    "edit": "Modifier",
+    "hierarchy": "Hiérarchie",
+    "users": "Utilisateurs",
+    "federation": "Fédération",
+    "whitelist": "Liste Blanche",
+    "partnerships": "Partenariats",
+    "tenant": "Locataire",
+    "features": "Fonctionnalités",
+    "billing": "Facturation",
+    "revenue": "Revenus",
+    "platform": "Plateforme",
+    "pilot_inquiries": "Enquêtes Pilote",
+    "provisioning_requests": "Demandes de provisionnement",
+    "regional_analytics": "Analytique régionale",
+    "subscriptions": "Abonnements",
+    "aria_label": "Fil d'Ariane",
+    "bulk": "Opérations en masse",
+    "audit": "Journal d'audit",
+    "national": "National"
   },
   "dashboard": {
     "title": "Tableau de bord des infrastructures",
     "subtitle_global": "Aperçu global de tous les locataires et infrastructures",
-    "subtitle_scoped": "Présentation de:tenant_name et des sous-locataires",
     "create_tenant_btn": "Créer un locataire",
     "stat_total_tenants": "Total des locataires",
     "stat_active_tenants": "Locataires actifs",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Actions rapides",
     "create_new_tenant": "Créer un nouveau locataire",
     "view_super_admins": "Afficher les super administrateurs",
-    "back_to_platform_admin": "Retour à l'administrateur de la plateforme"
+    "back_to_platform_admin": "Retour à l'administrateur de la plateforme",
+    "subtitle_scoped": "Aperçu de :tenant_name et des sous-locataires"
   },
   "common": {
     "active": "Actif",
@@ -188,7 +188,6 @@
       "actions_card_title": "Actions",
       "view_tenant_btn": "Voir le locataire",
       "god_card_title": "Super administrateur mondial (Dieu uniquement)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Les super administrateurs mondiaux peuvent accéder à TOUS les locataires de la plateforme.",
       "god_has_access": "L'utilisateur dispose d'un accès super-administrateur GLOBAL",
       "god_revoke_btn": "Révoquer le super-administrateur global",
@@ -206,12 +205,12 @@
       "stat_user_id": "Identifiant utilisateur",
       "stat_tenant_id": "ID du locataire",
       "stat_status": "Statut",
-      "stat_approved": "Approuvé"
+      "stat_approved": "Approuvé",
+      "god_warning": "Avertissement :"
     },
     "create": {
       "breadcrumb_create": "Créer",
       "title": "Créer un nouvel utilisateur",
-      "subtitle_selected": "Création d'un utilisateur pour:tenant_name",
       "subtitle_default": "Sélectionnez un locataire pour créer un nouvel utilisateur",
       "card_title": "Détails de l'utilisateur",
       "tenant_label": "Locataire",
@@ -229,7 +228,8 @@
       "super_admin_label": "Accorder des privilèges de super-administrateur",
       "super_admin_help": "Les super-administrateurs peuvent accéder au panneau de super-administrateur et gérer les sous-locataires de leur locataire. Uniquement disponible pour les locataires Hub (locataires avec capacité de sous-locataire).",
       "submit_btn": "Créer un utilisateur",
-      "cancel_btn": "Annuler"
+      "cancel_btn": "Annuler",
+      "subtitle_selected": "Création d'un utilisateur pour :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Modifier",
@@ -272,23 +272,22 @@
       "stat_active": "Actif",
       "stat_pending": "En attente",
       "super_admin_card_title": "Statut de super-administrateur",
-      "super_admin_toggle_desc": "Activer/désactiver le super-administrateur pour:tenant_name",
       "revoke_btn": "Révoquer le super-administrateur",
       "revoke_confirm": "Révoquer les privilèges de super-administrateur ?",
       "grant_btn": "Accorder un super-administrateur",
       "grant_confirm": "Accorder les privilèges de super-administrateur ?",
-      "no_hub_text": "Impossible d'accorder Super Admin car:tenant_name n'est pas un locataire Hub.",
       "no_hub_move_text": "Utilisez la fonctionnalité « Déplacer et accorder un super-administrateur » pour attribuer cet utilisateur à un locataire Hub.",
       "quick_links_card_title": "Liens rapides",
       "view_profile_btn": "Voir le profil",
       "view_tenant_btn": "Voir le locataire",
-      "tenant_users_btn": "Utilisateurs locataires"
+      "tenant_users_btn": "Utilisateurs locataires",
+      "super_admin_toggle_desc": "Activer/Désactiver le Super Admin pour :tenant_name",
+      "no_hub_text": "Impossible d'accorder le rôle de Super Admin car :tenant_name n'est pas un locataire Hub."
     }
   },
   "tenants": {
     "index": {
       "title": "Gérer les locataires",
-      "subtitle": ": compter le(s) locataire(s) dans votre périmètre",
       "create_btn": "Créer un locataire",
       "filter_search_placeholder": "Rechercher des locataires...",
       "filter_hub_label": "Locataires du hub uniquement",
@@ -298,15 +297,16 @@
       "col_tenant": "Locataire",
       "col_slug": "Limace",
       "col_domain": "Domaine",
-      "col_parent": "Parent",
       "col_users": "Utilisateurs",
       "col_hub": "Centre",
       "col_status": "Statut",
       "col_actions": "Actions",
       "parent_root": "Racine",
-      "level_label": "Niveau:profondeur",
       "you_badge": "Vous",
-      "no_tenants": "Aucun locataire trouvé"
+      "no_tenants": "Aucun locataire trouvé",
+      "subtitle": ":count locataire(s) dans votre périmètre",
+      "level_label": "Niveau :depth",
+      "col_parent": "Parent"
     },
     "show": {
       "breadcrumb_tenants": "Locataires",
@@ -319,11 +319,8 @@
       "field_slug": "Limace",
       "field_domain": "Domaine",
       "field_hierarchy_level": "Niveau hiérarchique",
-      "field_level": "Niveau:profondeur",
-      "field_parent": "Parent",
       "field_total_users": "Nombre total d'utilisateurs",
       "field_sub_tenants": "Sous-locataires",
-      "field_sub_tenants_direct": ":compter directement",
       "field_description": "Descriptif",
       "not_configured": "Non configuré",
       "root_tenant": "Locataire racine",
@@ -355,18 +352,19 @@
       "reactivate_card_title": "Réactiver le locataire",
       "reactivate_desc": "Ce locataire est actuellement inactif. La réactivation restaurera l’accès des utilisateurs.",
       "reactivate_btn": "Réactiver le locataire",
-      "tenant_id_label": "ID du locataire::id | Chemin: chemin"
+      "field_level": "Niveau :depth",
+      "tenant_id_label": "ID du locataire : :id | Chemin : :path",
+      "field_parent": "Parent",
+      "field_sub_tenants_direct": ":count direct"
     },
     "create": {
       "breadcrumb_create": "Créer",
       "title": "Créer un nouveau locataire",
-      "subtitle_selected": "Création de sous-locataire sous:parent_name",
       "subtitle_default": "Sélectionnez un locataire parent pour créer un nouveau sous-locataire",
       "card_title": "Détails du locataire",
       "parent_label": "Parent Locataire",
       "parent_placeholder": "-- Sélectionnez le locataire parent --",
       "parent_help": "Seuls les locataires dotés d’une capacité de sous-locataire sont affichés. Le nouveau locataire sera créé en tant qu'enfant du parent sélectionné.",
-      "depth_label": "(Profondeur:: profondeur)",
       "name_label": "Nom du locataire",
       "slug_label": "Limace",
       "slug_help": "Lettres minuscules, chiffres et traits d'union uniquement",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Illimité",
       "max_depth_help": "Limiter le nombre de niveaux de sous-locataires pouvant être créés sous ce locataire (s'applique uniquement si Hub est activé)",
       "submit_btn": "Créer un locataire",
-      "cancel_btn": "Annuler"
+      "cancel_btn": "Annuler",
+      "depth_label": "(Profondeur : :depth)",
+      "subtitle_selected": "Création d'un sous-locataire sous :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "Modifier",
       "title": "Modifier le locataire",
-      "subtitle": "Modification::name (Niveau:profondeur)",
       "back_btn": "Retour aux détails",
       "details_card_title": "Détails du locataire",
       "name_label": "Nom du locataire",
@@ -430,8 +429,6 @@
       "location_name_placeholder": "Ville, Région",
       "country_code_label": "Indicatif du pays",
       "country_code_help": "Code pays ISO à 2 lettres",
-      "latitude_label": "Latitude",
-      "longitude_label": "Longitude",
       "service_area_label": "Zone de service",
       "save_contact_btn": "Enregistrer le contact et l'emplacement",
       "social_card_title": "Liens vers les réseaux sociaux",
@@ -461,7 +458,6 @@
       "standard_tenant_badge": "Locataire standard",
       "max_depth_label": "Profondeur maximale du sous-locataire",
       "max_depth_unlimited": "Illimité",
-      "max_depth_levels": ":compter les niveaux",
       "disable_hub_btn": "Désactiver le hub",
       "disable_hub_confirm": "Cela empêchera la création de nouveaux sous-locataires. Les sous-locataires existants resteront.",
       "enable_hub_btn": "Activer le hub",
@@ -483,7 +479,11 @@
       "deactivate_confirm": "Êtes-vous sûr de vouloir désactiver ce locataire ? Les utilisateurs perdront l'accès.",
       "reactivate_card_title": "Réactiver le locataire",
       "reactivate_desc": "Ce locataire est actuellement inactif. La réactivation restaurera l’accès des utilisateurs.",
-      "reactivate_btn": "Réactiver le locataire"
+      "reactivate_btn": "Réactiver le locataire",
+      "subtitle": "Modification : :name (Niveau :depth)",
+      "max_depth_levels": ":count niveaux",
+      "latitude_label": "Latitude",
+      "longitude_label": "Longitude"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Locataires",
@@ -577,7 +577,6 @@
     "source_tenant_all": "Tous les locataires",
     "user_selection_label": "Sélectionnez les utilisateurs",
     "user_select_hint": "Sélectionnez un locataire source pour charger les utilisateurs",
-    "users_selected": ": compter les utilisateurs sélectionnés",
     "target_tenant_label": "Locataire cible",
     "target_tenant_placeholder": "-- Sélectionnez la cible --",
     "grant_super_admin_label": "Accorder le super-administrateur à tous les utilisateurs déplacés",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Opérations groupées de locataires",
     "bulk_tenants_desc": "Activez/désactivez plusieurs locataires ou activez la fonctionnalité Hub en masse.",
     "select_tenants_label": "Sélectionnez les locataires",
-    "tenants_selected": ":compter le(s) locataire(s) sélectionné(s)",
     "select_all": "Sélectionner tout",
     "deselect_all": "Désélectionner tout",
     "action_label": "Action",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Activer le hub",
     "action_disable_hub": "Désactiver le hub",
     "apply_btn": "Appliquer à la sélection",
-    "apply_confirm": "Appliquer cette action à tous les locataires sélectionnés ?"
+    "apply_confirm": "Appliquer cette action à tous les locataires sélectionnés ?",
+    "users_selected": ":count utilisateur(s) sélectionné(s)",
+    "tenants_selected": ":count locataire(s) sélectionné(s)"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Activité récente",
       "full_log_btn": "Journal complet",
       "no_federation_activity": "Aucune activité de la fédération pour l'instant",
-      "by_label": "by",
       "activity_title": "Activité de la Fédération (30 jours)",
       "stat_total_actions": "Actions totales",
       "stat_messages": "Messages",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Événements critiques",
       "most_active_partnerships": "Partenariats les plus actifs",
       "quick_nav_title": "Navigation rapide",
-      "tenant_whitelist_btn": "Liste blanche des locataires"
+      "tenant_whitelist_btn": "Liste blanche des locataires",
+      "by_label": "par"
     },
     "system_controls": {
       "title": "Contrôles du système de fédération",

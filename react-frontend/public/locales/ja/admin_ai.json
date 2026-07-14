@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "ai": {
     "common": {
@@ -105,7 +105,8 @@
         "total_runs": "総実行数",
         "total_proposals": "トータル提案",
         "pending_review": "{{count}} の審査待ち",
-        "pending_review_other": "{{count}} の審査待ち"
+        "pending_review_other": "{{count}} の審査待ち",
+        "pending_review_one": "{{count}} レビュー待ち"
       },
       "agent_types": {
         "activity_summary": "活動の概要",
@@ -130,7 +131,8 @@
       },
       "triggered_by": {
         "manual": "マニュアル",
-        "scheduled": "予定されている"
+        "scheduled": "予定されている",
+        "schedule": "スケジュール"
       },
       "config": {
         "enable_title": "KI-Agenten を有効にする",
@@ -221,7 +223,8 @@
         "columns": {
           "subject": "主題"
         },
-        "proposals_count_other": "提案 ({{count}})"
+        "proposals_count_other": "提案 ({{count}})",
+        "proposals_count_one": "提案 ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "適格な提案を承認できませんでした。",
@@ -240,6 +243,13 @@
         "runs_load_failed": "実行のロードに失敗しました。",
         "run_triggered_one": "実行トリガー: {{count}} プロポーザルが生成されました。",
         "run_triggered_other": "実行がトリガーされました: {{count}} 件の提案が生成されました。"
+      },
+      "unknown_identifier": "不明",
+      "proposal_types": {
+        "create_tandem": "タンデムを作成",
+        "route_help_request": "ヘルプリクエストをルート",
+        "send_activity_summary": "アクティビティサマリーを送信",
+        "send_nudge": "ナッジを送信"
       }
     },
     "module_docs": {
@@ -309,6 +319,122 @@
         "updated": "ドキュメントが更新されました。",
         "seeded_one": "{{count}} のデフォルト ドキュメントがシードされました。",
         "seeded_other": "シードされた{{count}}のデフォルト・ドキュメント。"
+      },
+      "defaults": {
+        "overview": {
+          "title": "プラットフォーム概要 — これは何か"
+        },
+        "timebanking": {
+          "title": "タイムバンキングの基本と哲学"
+        },
+        "getting_started": {
+          "title": "はじめに — あなたの最初の週"
+        },
+        "safety": {
+          "title": "安全性、信頼、コミュニティガイドライン"
+        },
+        "listings": {
+          "title": "リスティング — 提供と依頼"
+        },
+        "wallet": {
+          "title": "ウォレットと時間クレジット残高"
+        },
+        "messages": {
+          "title": "メッセージ — プライベートな会話"
+        },
+        "feed": {
+          "title": "フィード — コミュニティの活動ストリーム"
+        },
+        "dashboard": {
+          "title": "ダッシュボード — あなたの出発点"
+        },
+        "profile": {
+          "title": "プロフィール & メンバー名簿"
+        },
+        "notifications": {
+          "title": "通知"
+        },
+        "settings": {
+          "title": "設定 — アカウントを管理"
+        },
+        "events": {
+          "title": "イベント — コミュニティの集まり"
+        },
+        "groups": {
+          "title": "グループ — サブコミュニティ"
+        },
+        "volunteering": {
+          "title": "ボランティア — 機会とシフト"
+        },
+        "jobs": {
+          "title": "求人情報"
+        },
+        "marketplace": {
+          "title": "マーケットプレイス — アイテム、サービスではなく"
+        },
+        "blog": {
+          "title": "ブログ — コミュニティのストーリーとニュース"
+        },
+        "resources": {
+          "title": "リソース — ナレッジベースとファイル"
+        },
+        "polls": {
+          "title": "投票 — コミュニティの意思決定"
+        },
+        "ideation": {
+          "title": "アイデア創出チャレンジ — 協働型問題解決"
+        },
+        "organisations": {
+          "title": "組織 — パートナープロフィール"
+        },
+        "group_exchanges": {
+          "title": "グループ交流 — 多対多の時間プロジェクト"
+        },
+        "federation": {
+          "title": "連合 — コミュニティをつなぐ"
+        },
+        "gamification": {
+          "title": "ゲーミフィケーション — バッジ、XP、そして認識"
+        },
+        "goals": {
+          "title": "目標 — 個人およびコミュニティのターゲット"
+        },
+        "connections": {
+          "title": "つながり — あなたのネットワーク"
+        },
+        "reviews": {
+          "title": "レビューと評価"
+        },
+        "ai_chat": {
+          "title": "AIアシスタント — チャットボタン"
+        },
+        "search": {
+          "title": "検索 — 何でも見つける"
+        },
+        "caring_community": {
+          "title": "思いやりのあるコミュニティ — 脆弱なメンバーへの支援"
+        },
+        "newsletter": {
+          "title": "ニュースレター & メールダイジェスト"
+        },
+        "account_security": {
+          "title": "アカウントのセキュリティ — パスワード、2FA、パスキー"
+        },
+        "privacy_data": {
+          "title": "プライバシー & データ権利（GDPR）"
+        },
+        "accessibility": {
+          "title": "アクセシビリティ — テーマ、言語、支援技術"
+        },
+        "mobile_pwa": {
+          "title": "モバイルアプリ & PWA"
+        },
+        "troubleshooting": {
+          "title": "よくある問題のトラブルシューティング"
+        },
+        "admin_overview": {
+          "title": "コミュニティ管理者向け"
+        }
       }
     },
     "trace_metrics": {

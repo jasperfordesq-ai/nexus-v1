@@ -283,6 +283,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     if (!response.success) {
+      const loginError = i18n.t('auth:login.failed');
       captureTelemetryAuthEvent('failed_login', undefined, {
         error: response.error,
         code: response.code,
@@ -290,9 +291,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setState((prev) => ({
         ...prev,
         status: 'error',
-        error: response.error ?? 'Login failed',
+        error: loginError,
       }));
-      return { success: false, requires2FA: false, error: response.error, errorCode: response.code };
+      return { success: false, requires2FA: false, error: loginError, errorCode: response.code };
     }
 
     const data = response.data;
@@ -325,7 +326,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         tokenManager.setAccessToken(setupToken);
       }
       setState((prev) => ({ ...prev, status: 'idle', error: null }));
-      return { success: false, requires2FA: false, requires2FASetup: true, error: 'Two-factor authentication is required for administrator accounts.' };
+      return {
+        success: false,
+        requires2FA: false,
+        requires2FASetup: true,
+        error: i18n.t('auth:login.admin_twofa_required'),
+      };
     }
 
     // Login successful without 2FA
@@ -393,6 +399,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return {
           success: false,
           requires2FA: false,
+          // admin-i18n-ignore: logging-only diagnostic; LoginPage localizes the stable errorCode
           error: result.errorCode === 'cancelled' ? undefined : result.error,
           errorCode: result.errorCode,
         };
@@ -496,7 +503,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setState((prev) => ({
         ...prev,
         status: 'error',
-        error: 'No 2FA session active',
+        error: i18n.t('auth:login.twofa_no_session'),
       }));
       return false;
     }
@@ -520,7 +527,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setState({
           user: null,
           status: 'idle',
-          error: response.error ?? '2FA session expired. Please log in again.',
+          error: i18n.t('auth:login.twofa_session_expired'),
           twoFactorToken: null,
           twoFactorMethods: [],
         });
@@ -528,7 +535,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setState((prev) => ({
           ...prev,
           status: 'requires_2fa',
-          error: response.error ?? 'Invalid code',
+          error: i18n.t('auth:login.twofa_invalid_code'),
         }));
       }
       return false;
@@ -594,14 +601,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     if (!response.success) {
+      const registrationError = i18n.t('auth:register.failed');
       setState((prev) => ({
         ...prev,
         status: 'error',
-        error: response.error ?? 'Registration failed',
+        error: registrationError,
       }));
       return {
         success: false,
-        error: response.error ?? 'Registration failed',
+        error: registrationError,
         errorCode: response.code,
       };
     }
@@ -745,7 +753,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setState({
           user: null,
           status: 'idle',
-          error: 'Your session has expired. Please log in again.',
+          error: i18n.t('errors:session_expired_message'),
           twoFactorToken: null,
           twoFactorMethods: [],
         });

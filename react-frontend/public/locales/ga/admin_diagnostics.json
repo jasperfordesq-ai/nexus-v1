@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "diagnostics": {
     "avg_match_score": "Meán Scór Meaitseála",
@@ -108,8 +108,10 @@
     "score_distribution": "Dáileadh Scór",
     "score_distribution_empty": "Níor aimsíodh dáileadh scór",
     "score_factors": "Fachtóirí Scór",
-    "score_factors_desc": "Score Factors.",
-    "user_prompt": "Cuir isteach ID úsáideora agus cliceáil Diagnose chun a n-anailís meaitseála a fheiceáil."
+    "user_prompt": "Cuir isteach ID úsáideora agus cliceáil Diagnose chun a n-anailís meaitseála a fheiceáil.",
+    "listing_id_placeholder": "m.sh., 105",
+    "user_id_placeholder": "m.sh., 42",
+    "score_factors_desc": "Is comharthaí meáite iad fachtóirí scór a úsáidtear chun rannpháirtíocht ball a ríomh."
   },
   "diagnostics_matching": {
     "avg_match_score": "Meán Scór Meaitseála",

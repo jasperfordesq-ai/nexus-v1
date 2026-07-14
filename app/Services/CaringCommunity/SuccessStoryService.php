@@ -31,6 +31,12 @@ class SuccessStoryService
 {
     public const SETTING_KEY = 'caring.success_stories';
 
+    private const DEMO_COPY_CODES = [
+        'information_distribution',
+        'volunteer_engagement',
+        'formal_care_offset',
+    ];
+
     public const METRIC_SOURCES = ['pilot_scoreboard', 'municipal_roi', 'manual'];
 
     /**
@@ -132,6 +138,12 @@ class SuccessStoryService
         $now = now()->toIso8601String();
 
         $merged = array_merge($existing, [
+            'copy_code' => array_key_exists('title', $payload)
+                || array_key_exists('narrative', $payload)
+                || array_key_exists('method_caveat', $payload)
+                || array_key_exists('evidence_source', $payload)
+                    ? null
+                    : ($existing['copy_code'] ?? null),
             'title' => isset($payload['title'])
                 ? trim((string) $payload['title'])
                 : ($existing['title'] ?? ''),
@@ -222,8 +234,7 @@ class SuccessStoryService
 
         $seeds = [
             [
-                'title' => '30% lower information distribution effort',
-                'narrative' => 'Coordinators spend roughly a third less time disseminating updates after switching to NEXUS. The platform consolidates announcements, member-segment targeting, and confirmation tracking into one place.',
+                'copy_code' => 'information_distribution',
                 'metric_source' => 'manual',
                 'metric_key' => null,
                 'before_value' => 100.0,
@@ -231,12 +242,9 @@ class SuccessStoryService
                 'unit' => '%',
                 'audience' => 'municipality',
                 'sub_region_id' => null,
-                'method_caveat' => 'Illustrative example based on a peer community claim; not measured on this tenant.',
-                'evidence_source' => 'Peer municipality page (illustrative)',
             ],
             [
-                'title' => '25% more volunteer engagement',
-                'narrative' => 'Pilot communities report a quarter more active volunteer participation after adopting NEXUS, driven by clearer matching, low-friction sign-up, and visible Warmth Pass recognition.',
+                'copy_code' => 'volunteer_engagement',
                 'metric_source' => 'manual',
                 'metric_key' => null,
                 'before_value' => 20.0,
@@ -244,12 +252,9 @@ class SuccessStoryService
                 'unit' => '%',
                 'audience' => 'verein_members',
                 'sub_region_id' => null,
-                'method_caveat' => 'Illustrative example based on a peer community claim; not measured on this tenant.',
-                'evidence_source' => 'Peer municipality page (illustrative)',
             ],
             [
-                'title' => 'CHF 12,250 in formal care costs offset',
-                'narrative' => 'Volunteer hours coordinated through NEXUS represent a CHF 12,250 offset against formal home-care costs in the pilot window, valued at the Swiss formal-care assistant rate.',
+                'copy_code' => 'formal_care_offset',
                 'metric_source' => 'municipal_roi',
                 'metric_key' => 'formal_care_offset_chf',
                 'before_value' => 0.0,
@@ -257,14 +262,16 @@ class SuccessStoryService
                 'unit' => 'CHF',
                 'audience' => 'municipality',
                 'sub_region_id' => null,
-                'method_caveat' => 'Estimate using CHF 35/hr × 350 hours; pre-pilot baseline only.',
-                'evidence_source' => 'AG76 MunicipalRoi (illustrative)',
             ],
         ];
 
         $newItems = [];
         foreach ($seeds as $seed) {
             $newItems[] = $this->makeStory(array_merge($seed, [
+                'title' => '',
+                'narrative' => '',
+                'method_caveat' => '',
+                'evidence_source' => '',
                 'is_demo' => true,
                 'is_published' => true,
             ]), $now);
@@ -464,6 +471,9 @@ class SuccessStoryService
 
         return [
             'id' => $this->generateId(),
+            'copy_code' => in_array(($payload['copy_code'] ?? null), self::DEMO_COPY_CODES, true)
+                ? (string) $payload['copy_code']
+                : null,
             'title' => trim((string) ($payload['title'] ?? '')),
             'narrative' => trim((string) ($payload['narrative'] ?? '')),
             'metric_source' => $metricSource,

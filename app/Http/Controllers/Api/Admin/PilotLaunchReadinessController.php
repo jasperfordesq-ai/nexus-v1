@@ -55,7 +55,7 @@ class PilotLaunchReadinessController extends BaseApiController
         if (isset($result['error'])) {
             return $this->respondWithError(
                 'STORAGE_UNAVAILABLE',
-                'Tenant settings storage is not available.',
+                __('api.tenant_settings_storage_unavailable'),
                 null,
                 503,
             );
@@ -72,7 +72,7 @@ class PilotLaunchReadinessController extends BaseApiController
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
-            return $this->respondForbidden('Caring Community feature is not enabled for this tenant.');
+            return $this->respondForbidden(__('api.caring_community_feature_disabled'));
         }
 
         return null;

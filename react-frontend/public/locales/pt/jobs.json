@@ -677,7 +677,7 @@
     "time_credits_label": "Créditos de Tempo Oferecidos",
     "time_credits_placeholder": "ex.: 5,00",
     "contact_email_label": "Email de Contacto",
-    "contact_email_placeholder": "contacto@exemplo.com",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Telefone de Contacto",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Prazo de Candidatura",
@@ -1101,7 +1101,9 @@
     }
   },
   "jobs": {
-    "view_details": "Ver detalhes da vaga"
+    "view_details": "Ver detalhes da vaga",
+    "type_unknown": "Tipo desconhecido",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Visualização de empregos",
   "deadline_countdown_many": "Fecha em {{count}} dias",

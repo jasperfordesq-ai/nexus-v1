@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "safeguarding": {
     "active": "Actief",
@@ -96,7 +96,6 @@
     "col_sender": "Afzender",
     "col_severity": "Ernst",
     "col_status": "Status",
-    "col_triggers": "Triggers",
     "col_ward": "Afdeling",
     "create_assignment": "Opdracht maken",
     "create_failed": "Maken mislukt",
@@ -165,7 +164,6 @@
         "intro_prefix": "Een beveiligingsoptie (gedefinieerd per huurder in",
         "safeguarding_options": "Beveiligingsopties",
         "intro_suffix": ") bevat een JSON-triggerblok. Wanneer een lid de optie selecteert, worden de relevante triggers geactiveerd:",
-        "col_effect": "Effect",
         "col_trigger_key": "Trigger-sleutel",
         "effects": {
           "notify_admin_on_selection": "Je krijgt een real-time melding zodra de optie is aangevinkt.",
@@ -176,7 +174,8 @@
           "vetting_type_required": "Specificeert welke doorlichting een contacterend lid moet hebben, bijvoorbeeld garda_vetting."
         },
         "table_aria": "Triggereffecten beschermen",
-        "merge_note": "Wanneer een lid meerdere opties selecteert, wordt OR-samenvoeging geactiveerd: de meest beschermende combinatie wint. Als u één optie intrekt, worden sommige beveiligingen opgeheven, maar blijven andere actief. Het systeem evalueert elke keer opnieuw."
+        "merge_note": "Wanneer een lid meerdere opties selecteert, wordt OR-samenvoeging geactiveerd: de meest beschermende combinatie wint. Als u één optie intrekt, worden sommige beveiligingen opgeheven, maar blijven andere actief. Het systeem evalueert elke keer opnieuw.",
+        "col_effect": "Effect"
       },
       "vetting": {
         "aria": "Poorten doorlichten",
@@ -329,12 +328,11 @@
     "pending": "In behandeling",
     "placeholder_description_help": "Beschrijving Help...",
     "placeholder_display_label": "bijv. Het kan zijn dat ik extra ondersteuning nodig heb tijdens uitwisselingen",
-    "placeholder_guardian_email": "voogd@voorbeeld.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "bijv. heeft_aanvullende_ondersteuning nodig",
     "placeholder_review_notes": "Beoordelingsopmerkingen...",
     "placeholder_search_messages": "Berichten zoeken...",
-    "placeholder_ward_email": "wijk@voorbeeld.com",
+    "placeholder_ward_email": "ward@example.com",
     "reason": "Reden",
     "refresh": "Vernieuwen",
     "required": "Vereist",
@@ -368,7 +366,6 @@
     "ward": "Afdeling",
     "aria_deactivate_option": "Optie deactiveren",
     "aria_edit_option": "Optie bewerken",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Toegang tot doorlichting Ni",
     "vetting_dbs_basic": "Dbs Basic doorlichten",
     "vetting_dbs_enhanced": "Controle van Dbs verbeterd",
@@ -377,6 +374,12 @@
     "vetting_international": "Vetting Internationaal",
     "vetting_other": "Controle anders",
     "vetting_pvg_scotland": "Controle Pvg Schotland",
-    "tabs_aria": "Beveiliging van secties"
+    "tabs_aria": "Beveiliging van secties",
+    "status_active": "Actief",
+    "status_revoked": "Ingetrokken",
+    "status_expired": "Verlopen",
+    "deactivate_confirm_question": "Deactiveren",
+    "placeholder_option_key": "bijv. needs_additional_support",
+    "col_triggers": "Triggers"
   }
 }

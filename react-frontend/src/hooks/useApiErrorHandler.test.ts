@@ -55,8 +55,8 @@ describe('useApiErrorHandler', () => {
     });
 
     expect(mockError).toHaveBeenCalledWith(
-      'Request Failed',
-      'Unable to connect to the server. Please check your internet connection.'
+      'Request failed',
+      'Unable to connect. Please check your internet connection and try again.'
     );
   });
 
@@ -91,7 +91,7 @@ describe('useApiErrorHandler', () => {
     });
 
     expect(mockError).toHaveBeenCalledWith(
-      'Request Failed',
+      'Request failed',
       'The requested resource was not found.'
     );
   });
@@ -108,7 +108,7 @@ describe('useApiErrorHandler', () => {
     });
 
     expect(mockError).toHaveBeenCalledWith(
-      'Request Failed',
+      'Request failed',
       'An unexpected server error occurred. Please try again later.'
     );
   });
@@ -125,7 +125,7 @@ describe('useApiErrorHandler', () => {
     });
 
     expect(mockError).toHaveBeenCalledWith(
-      'Request Failed',
+      'Request failed',
       'Too many requests. Please wait a moment and try again.'
     );
   });
@@ -158,7 +158,7 @@ describe('useApiErrorHandler', () => {
     expect(mockError).not.toHaveBeenCalled();
   });
 
-  it('uses fallback message for unknown error code', () => {
+  it('uses the localized generic message for an unknown error code', () => {
     renderHook(() => useApiErrorHandler());
 
     act(() => {
@@ -170,8 +170,8 @@ describe('useApiErrorHandler', () => {
     });
 
     expect(mockError).toHaveBeenCalledWith(
-      'Request Failed',
-      'Something weird happened'
+      'Request failed',
+      'The request could not be completed.'
     );
   });
 

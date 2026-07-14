@@ -125,6 +125,7 @@
     "content_type_post": "Post",
     "content_type_review": "Review",
     "content_type_user": "User",
+    "content_type_unknown": "Unknown content type",
     "delete": "Delete",
     "delete_comment": "Delete Comment",
     "delete_post": "Delete Post",

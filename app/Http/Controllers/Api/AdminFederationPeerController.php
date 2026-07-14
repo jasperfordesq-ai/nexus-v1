@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\CaringCommunity\FederationPeerService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use RuntimeException;
@@ -74,9 +75,17 @@ class AdminFederationPeerController extends BaseApiController
         try {
             $peer = $this->peers->create(TenantContext::getId(), $input);
         } catch (InvalidArgumentException $e) {
-            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+            Log::notice('Federation peer creation validation failed', [
+                'tenant_id' => TenantContext::getId(),
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.validation_failed'), null, 422);
         } catch (RuntimeException $e) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', $e->getMessage(), null, 503);
+            Log::warning('Federation peer creation failed', [
+                'tenant_id' => TenantContext::getId(),
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_peers_unavailable'), null, 503);
         }
 
         return $this->respondWithData($peer, null, 201);
@@ -100,9 +109,19 @@ class AdminFederationPeerController extends BaseApiController
         try {
             $peer = $this->peers->updateStatus(TenantContext::getId(), $id, (string) $input['status']);
         } catch (InvalidArgumentException $e) {
-            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+            Log::notice('Federation peer status validation failed', [
+                'tenant_id' => TenantContext::getId(),
+                'peer_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.validation_failed'), 'status', 422);
         } catch (RuntimeException $e) {
-            return $this->respondWithError('PEER_NOT_FOUND', $e->getMessage(), null, 404);
+            Log::notice('Federation peer was not found for status update', [
+                'tenant_id' => TenantContext::getId(),
+                'peer_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('PEER_NOT_FOUND', __('api.federation_peer_not_found'), null, 404);
         }
 
         return $this->respondWithData($peer);
@@ -118,7 +137,12 @@ class AdminFederationPeerController extends BaseApiController
         try {
             $peer = $this->peers->rotateSecret(TenantContext::getId(), $id);
         } catch (RuntimeException $e) {
-            return $this->respondWithError('PEER_NOT_FOUND', $e->getMessage(), null, 404);
+            Log::notice('Federation peer was not found for secret rotation', [
+                'tenant_id' => TenantContext::getId(),
+                'peer_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('PEER_NOT_FOUND', __('api.federation_peer_not_found'), null, 404);
         }
 
         return $this->respondWithData($peer);
@@ -134,7 +158,12 @@ class AdminFederationPeerController extends BaseApiController
         try {
             $this->peers->delete(TenantContext::getId(), $id);
         } catch (RuntimeException $e) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', $e->getMessage(), null, 503);
+            Log::warning('Federation peer deletion failed', [
+                'tenant_id' => TenantContext::getId(),
+                'peer_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_peers_unavailable'), null, 503);
         }
 
         return $this->respondWithData(['deleted' => true]);
@@ -149,7 +178,7 @@ class AdminFederationPeerController extends BaseApiController
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         if (! $this->peers->isAvailable()) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Federation peers table is not available.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_peers_unavailable'), null, 503);
         }
         return null;
     }

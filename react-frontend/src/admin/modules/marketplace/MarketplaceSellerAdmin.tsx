@@ -149,7 +149,7 @@ export function MarketplaceSellerAdmin() {
         toast.success(t('marketplace.seller_verified'));
         loadSellers();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_verify_seller'));
+        toast.error(t('marketplace.failed_verify_seller'));
       }
     } catch {
       toast.error(t('marketplace.unexpected_error'));
@@ -168,7 +168,7 @@ export function MarketplaceSellerAdmin() {
         toast.success(t('marketplace.seller_suspended'));
         loadSellers();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_suspend_seller'));
+        toast.error(t('marketplace.failed_suspend_seller'));
       }
     } catch {
       toast.error(t('marketplace.unexpected_error'));

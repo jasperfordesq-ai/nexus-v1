@@ -262,7 +262,7 @@ export function ModerationQueuePage() {
         await loadQueue();
         await loadStats();
       } else {
-        toast.error(res.error || t('reports.failed_to_approve_content'));
+        toast.error(t('reports.failed_to_approve_content'));
       }
     } catch {
       toast.error(t('reports.failed_to_approve_content'));
@@ -298,7 +298,7 @@ export function ModerationQueuePage() {
         await loadQueue();
         await loadStats();
       } else {
-        toast.error(res.error || t('reports.failed_to_reject_content'));
+        toast.error(t('reports.failed_to_reject_content'));
       }
     } catch {
       toast.error(t('reports.failed_to_reject_content'));
@@ -318,7 +318,7 @@ export function ModerationQueuePage() {
         await loadSettings();
         onSettingsClose();
       } else {
-        toast.error(res.error || t('reports.failed_to_update_settings'));
+        toast.error(t('reports.failed_to_update_settings'));
       }
     } catch {
       toast.error(t('reports.failed_to_update_settings'));

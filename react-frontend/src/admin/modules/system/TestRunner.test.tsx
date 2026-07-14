@@ -39,14 +39,14 @@ import { TestRunner } from './TestRunner';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 const ALL_PASS_RESULTS = [
-  { name: 'API Health Check', status: 'pass', duration_ms: 10 },
-  { name: 'Database Connection', status: 'pass', duration_ms: 20 },
-  { name: 'Redis Connection', status: 'pass', duration_ms: 5 },
-  { name: 'Auth Token Generation', status: 'pass', duration_ms: 15 },
-  { name: 'Tenant Bootstrap', status: 'pass', duration_ms: 30 },
-  { name: 'File Upload (S3/Local)', status: 'pass', duration_ms: 50 },
-  { name: 'Email Service', status: 'pass', duration_ms: 100 },
-  { name: 'Pusher WebSocket', status: 'pass', duration_ms: 200 },
+  { code: 'api_health', status: 'pass', duration_ms: 10 },
+  { code: 'database', status: 'pass', duration_ms: 20 },
+  { code: 'redis', status: 'pass', duration_ms: 5 },
+  { code: 'auth_token', status: 'pass', duration_ms: 15 },
+  { code: 'tenant_bootstrap', status: 'pass', duration_ms: 30 },
+  { code: 'file_upload', status: 'pass', duration_ms: 50 },
+  { code: 'email_service', status: 'pass', duration_ms: 100 },
+  { code: 'pusher', status: 'pass', duration_ms: 200 },
 ];
 
 const MIXED_RESULTS = ALL_PASS_RESULTS.map((r, i) =>
@@ -66,9 +66,9 @@ describe('TestRunner', () => {
 
   it('renders all 8 initial test names in pending state', () => {
     render(<TestRunner />);
-    expect(screen.getByText('API Health Check')).toBeInTheDocument();
-    expect(screen.getByText('Database Connection')).toBeInTheDocument();
-    expect(screen.getByText('Redis Connection')).toBeInTheDocument();
+    expect(screen.getByText('API health check')).toBeInTheDocument();
+    expect(screen.getByText('Database connection')).toBeInTheDocument();
+    expect(screen.getByText('Redis connection')).toBeInTheDocument();
     expect(screen.getByText('Pusher WebSocket')).toBeInTheDocument();
   });
 
@@ -80,7 +80,7 @@ describe('TestRunner', () => {
 
   // ── All-pass scenario ──────────────────────────────────────────────────────
   it('calls runHealthCheck when button is clicked', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: ALL_PASS_RESULTS });
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: ALL_PASS_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
@@ -91,7 +91,7 @@ describe('TestRunner', () => {
   });
 
   it('shows success toast when all checks pass', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: ALL_PASS_RESULTS });
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: ALL_PASS_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
@@ -102,7 +102,7 @@ describe('TestRunner', () => {
   });
 
   it('shows pass count chip after all tests pass', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: ALL_PASS_RESULTS });
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: ALL_PASS_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
@@ -113,7 +113,7 @@ describe('TestRunner', () => {
   });
 
   it('shows duration (ms) for each test result', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: ALL_PASS_RESULTS });
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: ALL_PASS_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
@@ -125,7 +125,7 @@ describe('TestRunner', () => {
 
   // ── Mixed pass/fail scenario ──────────────────────────────────────────────
   it('shows warning toast and fail chip when some tests fail', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: MIXED_RESULTS });
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: MIXED_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
@@ -137,14 +137,14 @@ describe('TestRunner', () => {
     expect(screen.getByText(/1 failed/i)).toBeInTheDocument();
   });
 
-  it('renders the error message for a failed test', async () => {
-    mockRunHealthCheck.mockResolvedValue({ data: MIXED_RESULTS });
+  it('renders a localized safe error for a failed test', async () => {
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: MIXED_RESULTS } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Connection refused')).toBeInTheDocument();
+      expect(screen.getByText('Health Check failed')).toBeInTheDocument();
     });
   });
 
@@ -189,14 +189,14 @@ describe('TestRunner', () => {
 
   // ── Extra results from API are appended ───────────────────────────────────
   it('appends extra API result names not in the initial list', async () => {
-    const extra = [...ALL_PASS_RESULTS, { name: 'Custom Integration', status: 'pass', duration_ms: 12 }];
-    mockRunHealthCheck.mockResolvedValue({ data: extra });
+    const extra = [...ALL_PASS_RESULTS, { code: 'custom_integration', status: 'pass', duration_ms: 12 }];
+    mockRunHealthCheck.mockResolvedValue({ data: { tests: extra } });
     render(<TestRunner />);
 
     await userEvent.click(screen.getByRole('button', { name: /run all tests/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Custom Integration')).toBeInTheDocument();
+      expect(screen.getByText('Diagnostic: custom_integration')).toBeInTheDocument();
     });
   });
 });

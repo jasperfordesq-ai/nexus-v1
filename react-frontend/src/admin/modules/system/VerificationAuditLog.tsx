@@ -171,8 +171,8 @@ export function VerificationAuditLog() {
                           {typeLabel}
                         </Chip>
                       </TableCell>
-                      <TableCell className="text-xs text-theme-muted capitalize">
-                        {event.actor_type}
+                      <TableCell className="text-xs text-theme-muted">
+                        {t(`verification.actor_type_${event.actor_type}`, { defaultValue: t('verification.actor_type_unknown') })}
                       </TableCell>
                       <TableCell className="text-xs text-theme-muted font-mono">
                         {event.ip_address || t('verification.empty_value')}

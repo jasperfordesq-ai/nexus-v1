@@ -82,6 +82,7 @@ describe('EnterpriseDashboard', () => {
     // User count and role count show up in the StatCards
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('Healthy')).toBeInTheDocument();
   });
 
   it('renders system health chips when stats are loaded', async () => {
@@ -101,7 +102,7 @@ describe('EnterpriseDashboard', () => {
     render(<EnterpriseDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('export')).toBeInTheDocument();
+      expect(screen.getByText('Exported')).toBeInTheDocument();
     });
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
   });
@@ -154,6 +155,6 @@ describe('EnterpriseDashboard', () => {
       expect(screen.queryAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true')).toBeUndefined();
     });
 
-    expect(screen.queryByText('export')).not.toBeInTheDocument();
+    expect(screen.queryByText('Exported')).not.toBeInTheDocument();
   });
 });

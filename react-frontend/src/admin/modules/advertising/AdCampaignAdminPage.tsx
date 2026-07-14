@@ -34,7 +34,7 @@ import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
 import { StatCard } from '../../components/StatCard';
@@ -132,12 +132,19 @@ const STATUS_LABEL_KEYS: Record<AdCampaign['status'], string> = {
 };
 
 function formatCents(cents: number): string {
-  return `€${(cents / 100).toFixed(2)}`;
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(cents / 100);
 }
 
 function ctr(impressions: number, clicks: number): string {
-  if (impressions === 0) return '0.00%';
-  return `${((clicks / impressions) * 100).toFixed(2)}%`;
+  const rate = impressions === 0 ? 0 : clicks / impressions;
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'percent',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(rate);
 }
 
 function formatDate(iso: string | null): string {
@@ -368,7 +375,9 @@ export function AdCampaignAdminPage() {
       render: (item) => (
         <div>
           <p className="font-medium text-foreground truncate max-w-[200px]">{item.name}</p>
-          <p className="text-xs text-muted capitalize">{item.advertiser_type}</p>
+          <p className="text-xs text-muted">
+            {t(`advertising.advertiser.${item.advertiser_type}`, { defaultValue: t('common.unknown') })}
+          </p>
         </div>
       ),
     },
@@ -607,7 +616,9 @@ export function AdCampaignAdminPage() {
                       </div>
                       <div>
                         <p className="mb-0.5 text-xs uppercase tracking-wide text-muted">{t('advertising.ad.fields.placement')}</p>
-                        <p className="text-foreground capitalize">{detailCampaign.placement}</p>
+                        <p className="text-foreground">
+                          {t(`advertising.ad.placement.${detailCampaign.placement}`, { defaultValue: t('common.unknown') })}
+                        </p>
                       </div>
                       <div>
                         <p className="mb-0.5 text-xs uppercase tracking-wide text-muted">{t('advertising.ad.fields.start_date')}</p>
@@ -641,7 +652,7 @@ export function AdCampaignAdminPage() {
                             <p className="mt-0.5 text-xs text-muted">{t('advertising.shared.columns.clicks')}</p>
                           </div>
                           <div className="rounded-lg bg-surface-secondary p-3 text-center">
-                            <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.ctr_percent.toFixed(2)}%</p>
+                            <p className="text-2xl font-bold text-foreground">{formatPercentValue(detailCampaign.stats.ctr_percent, { maximumFractionDigits: 2 })}</p>
                             <p className="mt-0.5 text-xs text-muted">{t('advertising.shared.columns.ctr')}</p>
                           </div>
                         </div>
@@ -844,7 +855,7 @@ export function AdCampaignAdminPage() {
 
                 <Textarea
                   label={t('advertising.ad.fields.audience_filters')}
-                  placeholder={`{"radius_km": 5, "lat": 47.1758, "lng": 8.4622, "interests": ["gardening"]}`}
+                  placeholder={t('advertising.ad.placeholders.audience_filters_json')}
                   value={createForm.audience_filters}
                   onValueChange={(v) => setCreateForm((f) => ({ ...f, audience_filters: v }))}
                   variant="secondary"

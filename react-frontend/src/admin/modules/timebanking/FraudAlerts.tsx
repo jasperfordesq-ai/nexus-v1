@@ -127,8 +127,8 @@ export function FraudAlerts() {
         label: t('timebanking.col_alert_type'),
         sortable: true,
         render: (alert) => (
-          <span className="text-sm capitalize">
-            {alert.alert_type.replace(/_/g, ' ')}
+          <span className="text-sm">
+            {t(`timebanking.alert_type_${alert.alert_type}`, { defaultValue: t('timebanking.alert_type_unknown') })}
           </span>
         ),
       },

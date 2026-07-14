@@ -16,7 +16,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execFileSync } from 'child_process';
+import { loadPhpArray } from './lib/load-php-array.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -60,13 +60,7 @@ function flattenPhpKeys(value, prefix = '', out = new Set()) {
 }
 
 function loadPhpLangFile(file) {
-  const out = execFileSync(
-    'php',
-    ['-d', 'display_errors=stderr', '-r', 'echo json_encode(require $argv[1], JSON_UNESCAPED_UNICODE);', file],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-  );
-
-  return JSON.parse(out);
+  return loadPhpArray(file, { root: ROOT });
 }
 
 function parsePhpReturnArray(text) {

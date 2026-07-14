@@ -23,7 +23,8 @@
     "escalated": "تم التصعيد",
     "resolved_buyer": "تم الحل لصالح المشتري",
     "resolved_seller": "تم الحل لصالح البائع",
-    "closed": "مغلق"
+    "closed": "مغلق",
+    "unknown": "حالة حالة أخرى"
   },
   "reason": {
     "counterfeit": "سلعة مقلدة",
@@ -37,7 +38,8 @@
     "payment_issue": "مشكلة في الدفع",
     "damaged": "سلعة تالفة",
     "fraud": "اشتباه في احتيال",
-    "other": "أخرى"
+    "other": "أخرى",
+    "unknown": "السبب الآخر"
   },
   "action": {
     "none": "لا إجراء تنفيذي",

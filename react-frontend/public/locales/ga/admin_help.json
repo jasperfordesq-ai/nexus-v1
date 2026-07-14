@@ -1,0 +1,1537 @@
+{
+  "articles": {
+    "caring": {
+      "title": "Pobal Cúraim — Ionad Modúil",
+      "summary": "Is é an modúl Pobal Cúramach an príomhphointe iontrála do gach gné comhoibritheach de Phobal Cúramach. Ó anseo is féidir leat nascleanúint a dhéanamh chuig gach fo-rannóg: sraitheanna muiníne baill, slándáil, tuairisciú ROI, réidhchumas piolótach, agus níos mó.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh sláinte an mhodúil ar an bpointe",
+          "detail": "Taispeánann an lárionad comhaireamh beo do bhaill ghníomhacha, iarratais cabhrach oscailte, tuairiscí slándála atá ar feitheamh, agus ráta comhlíonta SLA."
+        },
+        "1": {
+          "label": "Úsáid an greille nasc-gasta",
+          "detail": "Ceanglaíonn gach cárta go díreach lena réimse feidhmiúcháin. Teastaíonn aire láithreach do chártaí le bhlas dearg (m.sh. SLA ró-luathaithe, tuarascáil chosanta criticiúil)."
+        },
+        "2": {
+          "label": "Seiceáil an barra fógraí",
+          "detail": "Má tá fógra curtha suas ag do pháirtí cantúnais nó oifig náisiúnta an Phobail Cúraimí, beidh sé le feiceáil greamaithe ag barr an phríomhionaid."
+        }
+      },
+      "tips": {
+        "0": "Leabhar nótaí a chur ar an leathanach seo — is é seo an bealach is tapúla chun fadhbanna a fheiceáil a dteastaíonn d’aird orthu gan dul isteach i roghchláir dhomhain.",
+        "1": "Ní thaispeántar an modúl ach sa bharra taobh má tá an bratach ghné caring_community cumasaithe don tiontán seo."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Painéal Forbartha SLA"
+        },
+        "1": {
+          "label": "Cosaint"
+        },
+        "2": {
+          "label": "Réidh le Seoladh"
+        }
+      }
+    },
+    "caring_workflow": {
+      "title": "Painéal Oibre Chomhordaitheora",
+      "summary": "Bord stíl-Kanban i bhfíor-am ag taispeáint gach idirbheart cúraim atá ar siúl. Bogann idirbhearta trí stáitse: Iarratas → Comhtháite → Ar Siúl → Críochnaithe → Athbhreithnithe. Úsáideann comhordóirí an leathanach seo chun bacainní a aithint, idirbhearta a ath-dháileadh, agus iarratais a bhfuil siad sáinnithe a ardú.",
+      "steps": {
+        "0": {
+          "label": "Scag de réir stádas nó catagóire",
+          "detail": "Úsáid an bharra scagaire uachtarach chun é a laghdú go stát ar leith (m.sh. \"Comhtháite\" amháin) nó catagóir chúraim ar leith (m.sh. Iompair, Comhlachas)."
+        },
+        "1": {
+          "label": "Oscail cárta malairte",
+          "detail": "Cliceáil ar aon chárta chun an painéal mionsonraí iomlán a fheiceáil: próifílí ball, am aontaithe, nótaí comhordaitheora ar bith, agus rianú iniúchta."
+        },
+        "2": {
+          "label": "Athshannadh nó ardú",
+          "detail": "Bain úsáid as an roghchlár trí phonc ar chárta chun athshannadh chuig comhordaitheoir eile, nótaí a chur leis, nó marcáil mar ardaithe le haghaidh athbhreithnithe."
+        },
+        "3": {
+          "label": "Marcáil mar críochnaithe",
+          "detail": "Nuair a dheimhníonn an dá pháirtí, bain úsáid as \"Marcáil Críochnaithe\" chun an t-aistriú uaireanta-creidmheasa a chur ar siúl agus chun an cód tráchta athbhreithnithe a dhíchumasú do na baill araon."
+        }
+      },
+      "tips": {
+        "0": "Tá malartuithe a bhfuil siad 'Meaitseáilte' le níos mó ná 48 uair an chloig marcáilte i mbuí — déan leanúint suas leis an dá bhall.",
+        "1": "Scagann an ciorcal \"Mo Mhalartuithe\" chuig na malartuithe amháin ina bhfuil tú mar chomhordaitheoir ainmnithe.",
+        "2": "Déantar malartuithe críochnaithe nach ndearnadh athbhreithniú orthu i ndiaidh 7 lá a mharcáil — tá athbhreithnithe tábhachtach do shonraí bunlíne KPI."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Aistrithe Uaireanta"
+        },
+        "1": {
+          "label": "Painéal Forbartha SLA"
+        },
+        "2": {
+          "label": "Bunlíne KPI"
+        }
+      }
+    },
+    "caring_projects": {
+      "title": "Tionscadail Cúraim & Tionscnaimh Phobail",
+      "summary": "Is tionscnaimh phobail struchtúrtha iad tionscadail a bhailíonn roinnt malartuithe timpeall ar sprioc comhroinnte — mar shampla, \"Tacaíocht do na Comharsan i rith an Gheimhridh 2025\" nó \"Líonra Inaistritheacht d'Aosach\". Tá buiséad le haghaidh uaireanta ag gach tionscadal, comhordaitheoir aige, dátaí tosaigh/deiridh, agus chéadmhíleanna tuairiscithe.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh tionscadal nua",
+          "detail": "Cliceáil ar \"Tionscadal Nua\", tabhair ainm agus cur síos air, socraigh an buiséad uaireanta, agus ceadaigh comhordaitheoir ceannasach."
+        },
+        "1": {
+          "label": "Cuir baill rannpháirteacha leis",
+          "detail": "Bain úsáid as an gcuardach ball chun cúntóirí agus faighteoirí a chur leis. Is féidir le baill féin-chlárú freisin má tá an tionscadal marcáilte mar oscailte."
+        },
+        "2": {
+          "label": "Malartuithe nasctha leis an tionscadal",
+          "detail": "Agus malartú á chruthú nó á chur in eagar, bain úsáid as an anuas \"Tionscadal\" chun é a chomhcheangal. Tá gach malartán nasctha le feiceáil i dtuarascáil ar dhul chun cinn an tionscadail."
+        },
+        "3": {
+          "label": "Athbhreithnigh céimeanna dul chun cinn",
+          "detail": "Taispeánann leathanach mionsonraí an tionscadail na huaireanta seachadta i gcoinne an bhuiséid, na baill ghníomhacha, agus líne ama d’aistrithe críochnaithe."
+        },
+        "4": {
+          "label": "Dún agus tuairiscigh",
+          "detail": "Nuair a chríochnaíonn an tionscadal, bain úsáid as \"Gineach Tuairisc\" chun achoimre PDF a tháirgeadh atá oiriúnach d’úinéirí cantúna."
+        }
+      },
+      "tips": {
+        "0": "Tionscadail le malartuithe nialas tar éis 14 lá a mharcáil mar \"Stalled\" — smaoinigh ar cibé an bhfuil aidhm na mball tuillte go maith.",
+        "1": "Is treoir é an buiséad uair, ní teorann chruinn. Is féidir leat róchaitheamh; beidh an córas é a mharcáil ach ní bhacfaidh sé le malartuithe.",
+        "2": "Maidir le tionscadail atá maoinithe ag deontais, bí ag úsáid an réimse \"Tagairt Sheachtrach\" chun cód tionscadail an mhaoinitheora a stóráil."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Sreabhadh Oibre Comhordaithe"
+        },
+        "1": {
+          "label": "ROI Bailte"
+        }
+      }
+    },
+    "caring_trust_tier": {
+      "title": "Céimeanna Iontaobhais — Scála Clú",
+      "summary": "Céimeanna Iontaobhais rangaithe iontaofacht baill ar scála cúig leibhéal: Duine Nua (0) → Ball (1) → Iontaofa (2) → Fíoraithe (3) → Comhordaitheoir (4). Cinneann an chéim cad is féidir le ball a dhéanamh — mar shampla, ní féidir ach le baill Iontaofa+ Pas Teasa a easpórtáil nó malartuithe cúraim dhian a ghlacadh.",
+      "steps": {
+        "0": {
+          "label": "Féach dáileadh na céime",
+          "detail": "Taispeánann an t-ábhar achoimrí cé mhéad ball atá ag gach céim. Bíonn an-chuid baill ag Céim 1–2 i gcomhluadar sláintiúil."
+        },
+        "1": {
+          "label": "Athbhreithniú ar chur chun cinn céime atá ar feitheamh",
+          "detail": "Taispeántar na baill atá tar éis na critéir don chéad chéim eile a bhaint amach sa liosta \"Réidh le Cur Chun Cinn\". Athbhreithnigh a ngníomhaíocht agus ceadaigh nó cuir ar ceal."
+        },
+        "2": {
+          "label": "Céim a choigeartú de láimh",
+          "detail": "Faigh an ball, cliceáil ar a mbonn leibhéil reatha, agus roghnaigh an leibhéal nua. Scríobh nóta gearr ag míniú an choigeartaithe — déantar iniúchadh air seo."
+        },
+        "3": {
+          "label": "Cumraigh teorainneacha leibhéal",
+          "detail": "Faoi \"Socruithe Leibhéil\", coigeartaigh líon na mmalartuithe críochnaithe agus an meánscór athbhreithnithe is gá chun gach leibhéal a bhaint."
+        },
+        "4": {
+          "label": "Athbhreithnigh iarrthóirí laghdaithe leibhéil",
+          "detail": "Féadfaidh baill a bhfuil aird á tabhairt orthu mar gheall ar neamhghníomhaíocht fhada nó eachtraí sábháilteachta teacht chun athbhreithnithe sraithe. Seiceáil an chomhthéacs sula laghdaítear a gcatagóir."
+        }
+      },
+      "tips": {
+        "0": "Ní bhíonn ardú sraithe uathoibríoch de réir réamhshocraithe — caithfidh comhordaitheoir gach ardú a cheadú. Is féidir leat uathoibríocht a chur ar fáil do Ardú Sraithe 0→1 sna Socruithe Sraithe.",
+        "1": "Ní féidir le baill a scór uimhriúil sraithe a fheiceáil — feictear orthu bratach ainmniúil (m.sh. \"Ball Iontaofa\") ina ionad.",
+        "2": "Ba chóir go mbeadh leibhéal an Chomhordaitheora (4) annamh agus go gcuirfí i bhfeidhm é ach amháin ar dhaoine a láimhseáilíonn sábháilteacht nó malartuithe ard-luach."
+      },
+      "caution": "Déanann laghdú stádais ar bhall Iontaofa (leibhéal 2→1) Pas Teasa neamhbhailí láithreach ag gach suíomh comhoibritheach Pobail Tuisceana. Cuir an ball ar an eolas sula ndéanann tú é a laghdú.",
+      "related_paths": {
+        "0": {
+          "label": "Pas Teasa"
+        },
+        "1": {
+          "label": "Cosaint"
+        }
+      }
+    },
+    "caring_warmth_pass": {
+      "title": "Pas Teasa — Creidiúnacht Iontaobhais Inaistrithe",
+      "summary": "Is deimhniú criptaghrafaíochta sínithe é Pas Teasa a ligeann do bhall Iontaofa+ (céim 2+) a ndíoltas a thaispeáint ag aon chomhoibriú Pobal Aireach bainteach, ní hamháin a bpobal baile. Issítear é anseo agus is féidir é a chealú aon uair is mian.",
+      "steps": {
+        "0": {
+          "label": "Eisiúint Pas Teasa",
+          "detail": "Faigh an ball (caithfidh sé/céim 2+ a bheith aige/aici), cliceáil \"Eisigh Pas Teasa\". Cruthaíonn an córas token QR cód sínithe le bailíocht 12 mhí."
+        },
+        "1": {
+          "label": "Socraigh an tréimhse bailíochta",
+          "detail": "Is é 12 mhí an réamhshocrú. Is féidir leat í a ghiorrú go 3 nó 6 mhí do bhaill ar chur chun cinn triail."
+        },
+        "2": {
+          "label": "Ceadaigh pas a chealú",
+          "detail": "Cliceáil ar an pas gníomhach, ansin \"Cealaigh\". Scaipeann an cealú chuig na comhpháirtithe uile de Choibhneas Pobal Cúraim laistigh de chúpla nóiméad trí shioncrónú an chomhbhliana."
+        },
+        "3": {
+          "label": "Déan athbhreithniú ar úsáid pas",
+          "detail": "Taispeánann log iniúchta cathain agus cén chomharchumann a scannáladh pas. Ba chóir go spreagfadh patrúin suíomh neamhghnách athbhreithniú ó chomhordaitheoir."
+        }
+      },
+      "tips": {
+        "0": "Ní féidir le ball ach Pas Teasa gníomhach amháin a choinneáil ag an am céanna. Cuireann eisiúint nua ceann roimhe sin neamhbhailí.",
+        "1": "Déantar pasanna arna n-eisiúint do bhaill a bhfuil laghdú déanta orthu go Tiar 2 a chealú go huathoibríoch — ní gá duit é seo a dhéanamh de láimh.",
+        "2": "Tá an cód QR pas ar fáil i bpróifíl an bhaill mar PDF is féidir a íoslódáil."
+      },
+      "caution": "Ná tabhair pasanna do bhaill a bhfuil aon tuairiscí slándála neamhréitithe acu, fiú má chuireann a sraith leo cáilíocht teicniúil.",
+      "related_paths": {
+        "0": {
+          "label": "Sraitheanna Iontaobhais"
+        },
+        "1": {
+          "label": "Comhpháirtíochtaí Comharchumainn"
+        }
+      }
+    },
+    "caring_safeguarding": {
+      "title": "Slándáil — Tuairiscí Imeachtaí & SLAanna",
+      "summary": "Bainistíonn an leathanach seo tuairiscí uile eachtraí sábháilteachta a chuireadh ar fáil laistigh de do chomhcoiteann. Roinntear tuairiscí de réir tromchúis: Criticiúil (freagair laistigh de 1 uair an chloig), Ard (24 uair an chloig), Meánach (72 uair an chloig), Íseal (an chéad chruinniú sceidealta eile). Caithfidh comhordaitheoirí gach tuairisc a admháil agus gníomh a dhéanamh faoi choinníoll SLA.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh an tsraith eachtraí oscailte",
+          "detail": "Roinneann tuairiscí de réir tromchúis agus am a chaitear. Tá na rudaí dearga ag sárú nó tar éis sárú a SLA."
+        },
+        "1": {
+          "label": "Deimhnigh tuarascáil",
+          "detail": "Cliceáil ar an tuarascáil, ansin \"Deimhnigh\" chun stad a chur ar chlog SLA agus chun comhordanóir a thaispeáint atá tar éis úinéireacht a ghlacadh."
+        },
+        "2": {
+          "label": "Taifead do nótaí iniúchta",
+          "detail": "Bain úsáid as an réimse Nótaí chun céimeanna a glacadh, daoine a ghabháil i dteagmháil leo, agus torthaí a dhoiciméadú. Tá nótaí rúnda agus ní bhíonn siad le feiceáil ag baill."
+        },
+        "3": {
+          "label": "Díriú ar ghníomhaireachtaí seachtracha",
+          "detail": "I gcás eachtraí Criticiúla a bhaineann le riosca dochar, bain úsáid as \"Díriú go Seachtrach\" chun logáil go ndearna tú teagmháil leis na seirbhísí reachtúla (póilíní, obair shóisialta, srl.)."
+        },
+        "4": {
+          "label": "Dún an tuairisc",
+          "detail": "Nuair a réitíodh é, marcáil an tuairisc mar Dhúnta le achoimre réitithe. Tá tuarascálacha Dúnta a chartlannú ach riamh gan scriosadh."
+        }
+      },
+      "tips": {
+        "0": "Cuireann eachtraí le tromchúis criticiúil fógra brú láithreach ar fáil do gach ball le leibhéal Comhordaitheoir.",
+        "1": "Má tá tú cinnte faoi dhlús, déan iarracht ar Airde — is fearr freagairt ró-láithreach ná earráid a dhéanamh agus saincheist sábháilteachta fíor a chailliúint.",
+        "2": "Baintear gach sonraí eachtra as an Tuarascáil Tionchair Phoiblí — tá sí do chomhordaitheoirí amháin."
+      },
+      "caution": "Níor chóir tuairisc chosanta a dhúnadh riamh gan achoimre réitithe scríofa. Tá dhúnadh folamh marcáilte sa iniúchadh cáilíochta sonraí.",
+      "related_paths": {
+        "0": {
+          "label": "Painéal Forbartha SLA"
+        },
+        "1": {
+          "label": "Cáilíocht Sonraí"
+        }
+      }
+    },
+    "caring_category_coefficients": {
+      "title": "Cóimheas Ionadaíochta Catagóire",
+      "summary": "Tá cóifícint ionadaíochta ag gach catagóir cúraim a thiontaíonn uaireanta malairte pobail go comhionannaí cúraim fhoirmiúil. Ciallaíonn cóifícint de 1.0 go bhfuil uair amháin de chúram pobail á thugtar mar chomhionann le uair amháin de chúram gairmiúil (CHF 35/uair). D’fhéadfadh cúram pearsanta dian a bheith 2.0; d’fhéadfadh teagmháil shóisialta éadrom a bheith 0.5.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh na cóifícintí atá ann",
+          "detail": "Tugann an tábla gach catagóir cúraim ghníomhach le chéile lena cóimheas reatha agus an dáta ar aontaíodh í den chuid is déanaí le do pháirtí cantúnach."
+        },
+        "1": {
+          "label": "Cuir cóimheas in eagar",
+          "detail": "Cliceáil ar dheilbhín na peann luaidhe in aice leis an gcatagóir, cuir an luach nua isteach, cuir nóta fíorasach leis, agus sábháil. Tá an t-athrú leaganaithe."
+        },
+        "2": {
+          "label": "Cuir catagóir nua",
+          "detail": "Úsáid \"Cuir Catagóir Le Chéile\" chun cineál cúraim nua a chruthú (mar shampla \"Tacaíocht Fiseatréipe\") agus cuir cóimheas tosaigh air."
+        },
+        "3": {
+          "label": "Giniúint tuarascáil cóimheasa",
+          "detail": "Úsáid \"Easpórtáil PDF\" chun doiciméad formáidithe a thabhairt chun críche do cheadú do pháirtí canónach, ag liostáil gach catagóir agus a bhonn fianaise."
+        }
+      },
+      "tips": {
+        "0": "Éilíonn comhéadain os cionn 1.5 aontaí scríofa ó do pháirtí sláinte cantúineach — déan an rud seo a dhoiciméadú sa réimse cúisíochta.",
+        "1": "Ríomhann tuarascáil ROI na huaireanta iarbhír a seachadadh i ngach catagóir faoi réir comhéadain an chatagóire le costas iomlán cúram foirmiúil atá seachaint a bhaint.",
+        "2": "Déan athbhreithniú ar na comhéadain go léir ar a laghad uair sa bhliain — athraíonn caighdeáin cleachtais chúraim agus ba cheart go bhfanfaidh do bhunús cruthaithe reatha."
+      },
+      "caution": "Athraíonn cóimheas go díreach gach ríomh ROI sa todhchaí. Ní dhéanfar tuairiscí stairiúla a nuashonrú ar ais — tabhair faoi ndeara dáta an athraithe nuair a chuirtear sonraí ilbhliantúla i láthair.",
+      "related_paths": {
+        "0": {
+          "label": "Polasaí Oibriúcháin"
+        },
+        "1": {
+          "label": "ROI Bailte"
+        }
+      }
+    },
+    "caring_operating_policy": {
+      "title": "Polasaí Oibriúcháin — Paraiméadair Pobal Cúraim",
+      "summary": "Stórálann an Beartas Oibriúcháin na príomhtheicnící eacnamaíochta do do scaipeadh comhpháirteach: an ráta uaireanta cúraim fhoirmiúil i CHF, an iolraitheoir luachais-chostais, teorainneacha uasta fad malartaithe, agus srianta domhanda eile. Sreabhann na luachanna seo isteach i ngach ríomh ROI agus tionchair.",
+      "steps": {
+        "0": {
+          "label": "Socraigh an ráta uaireanta cúraim fhoirmiúil",
+          "detail": "Iontráil ráta reatha na cúraim ghairmiúla i CHF (caighdeán na hEilvéise ná CHF 35/uaire). Déan coigeartú do do réigiún nó do chineál cúraim más rud é go sonraíonn do chomhaontú cantúnaigh go difriúil."
+        },
+        "1": {
+          "label": "Socraigh an iolraitheoir cúltaca costais",
+          "detail": "Coigeartaíonn an t-iolraitheoir seo na huaireanta meánta cóffiicienta chun aghaidh a thabhairt ar riarachán, comhordú oibrithe deonacha, agus costais bhreise. Is é an réamhshocrú 0.8."
+        },
+        "2": {
+          "label": "Cumraigh teorainneacha malairte",
+          "detail": "Socraigh fad uasta malartaithe aonair (m.sh. 8 n-uaire) agus íosta (m.sh. 15 nóiméad). Éilíonn malartuithe taobh amuigh de na teorainneacha seo ceadú an chomhordaitheora."
+        },
+        "3": {
+          "label": "Socraigh dáta éifeachtaithe an bheartais",
+          "detail": "Sonraigh cathain a thagann na paraiméadair seo i bhfeidhm. Tá athruithe leaganaithe chun go mbeidh tuairiscí stairiúla cruinn."
+        },
+        "4": {
+          "label": "Foilsigh agus déan fógra",
+          "detail": "Úsáid \"Beartas Foilseacháin\" chun na luachanna nua a chur beo. Smaoinigh ar chomhordaitheoirí a chur ar an eolas trí fhógra."
+        }
+      },
+      "tips": {
+        "0": "Aontú le do pháirtí cantúnach ar na hathruithe paraiméadar go léir roimh fhoilsiú — féadfaidh athruithe aonfhoirmeacha do thuairisciú deontais a neamhbhailíochtú.",
+        "1": "Tá stair leagan an bheartais go hiomlán iniúchta — is féidir leat i gcónaí a fheiceáil cé na paraiméadair a bhí i bhfeidhm ar aon dáta ar leith."
+      },
+      "caution": "Málóidh athrú ar ráta uiliguaire cúraim fhoirmiúil i lár na piléadaíochta na tuarascálacha ROI go léir amach anseo. Comhaontú le do pháirtí cantúin ar dtús agus déan doiciméadú ar an gcúis atá leis an athrú.",
+      "related_paths": {
+        "0": {
+          "label": "Cóifisiúnta Catagóire"
+        },
+        "1": {
+          "label": "ROI Bailte"
+        }
+      }
+    },
+    "caring_isolated_node": {
+      "title": "Nód Aonair — Mód Soberanaint Sonraí",
+      "summary": "Socraíonn Mód Nóid Aonair an fheidhmiú seo chun gach sonraí pearsanta a stóráil taobh istigh de theorainn thíreolaíoch shainiúil agus é a dhíchumasú do shioncrónú sonraí comharbais le comhghuaillithe Pobail Cúraim seachtracha. Tá sé seo riachtanach do fheidhmiúcháin a chaithfidh cloí le FADP/nDSG na hEilvéise (An t-Acht Feidearálach um Chosaint Sonraí).",
+      "steps": {
+        "0": {
+          "label": "Cumasaigh Mód Nóid Aonair",
+          "detail": "Cas an lasc máistir air. Beifear ag iarraidh ort an teorainn gheografach a dhearbhú (m.sh. \"Kanton Bern\") agus an bhunús dlíthiúil don srianta a shonrú."
+        },
+        "1": {
+          "label": "Cumraigh sruthanna sonraí a cheadaítear",
+          "detail": "Is féidir roinnt sruthanna sonraí (m.sh. staitisticí comhiomlána anaithnidéanta don painéal náisiúnta) a chur ar an liosta bán. Déan athbhreithniú ar gach sruth agus ceadaigh nó blocáil é."
+        },
+        "2": {
+          "label": "Díchumasú sincrínithe ceannasachta",
+          "detail": "Nuair a bhíonn Nóid Aonair ghníomhach, cuirtear sos ar shioncrónú seadbhrais Pas Teasa agus ar na nascanna comhoibríocha idir comhghleacaithe. Feicfidh baill fógra ag míniú seo."
+        },
+        "3": {
+          "label": "Gineadh taifead toilteanais FADP",
+          "detail": "Úsáid \"Tuarascáil Comhlíonta a Ghiniúint\" chun taifead a tháirgeadh de theorainneacha sonraí, tréimhsí coinneála, agus bunús dlíthiúil oiriúnach le haghaidh iniúchadh FADP."
+        }
+      },
+      "tips": {
+        "0": "Ní chuireann mód Nód Aonair isteach ar oibríochtaí áitiúla — is féidir le baill uaireanta a mhalartú fós, badgaí a ghnóthú, agus gach gné laistigh den chomhlachas a úsáid.",
+        "1": "Má tá amhras ort an bhfuil mód Nód Aonair riachtanach do do shocruithe, leighis le foireann theicniúil an Phobail Cúraim sula ngníomhachtaíonn tú é."
+      },
+      "caution": "Má ghníomhachtaítear mód Nód Aonair, briseann sé inrochtaineacht an Phas Teasa do gach ball láithreach. Cuir ar an eolas iad sula ndearna tú é a chasadh air.",
+      "related_paths": {
+        "0": {
+          "label": "Teorainn Thráchtála"
+        },
+        "1": {
+          "label": "Pacáiste Nochtaithe"
+        },
+        "2": {
+          "label": "Comhpháirtíochtaí Comharchumainn"
+        }
+      }
+    },
+    "caring_commercial_boundary": {
+      "title": "Teorainn Thráchtála — Aicmiú Cumais AGPL",
+      "summary": "Déanaimid rangú ar gach cumas ardáin de réir anailís ar cibé an clúdaíonn ceadúnas foinse oscailte AGPL-3.0 é, an féidir é a chumrú do gach tiontóir, an bhfuil comhaontú tarchur pearsanta ag teastáil, nó an bhfuil sé ina bhreis thráchtála. Bain úsáid as seo mar thagairt agus tú ag plé ceadúnaithe le comhlachais nó le comhoibritheoirí áitiúla.",
+      "steps": {
+        "0": {
+          "label": "Brabhsáil an clár cumais",
+          "detail": "Tá gach gné liostaithe lena rangú AGPL (Poiblí / Cumraíocht Léasaí / Forbairt Phríobháideach / Tráchtála) agus le cur síos i dteanga shimplí."
+        },
+        "1": {
+          "label": "Scag de réir rangú",
+          "detail": "Úsáid na cluaisíní scagtha chun féachaint ar ghnéithe tráchtála amháin, nó ar ghnéithe AGPL-phoiblí amháin, ag brath ar a bhfuil uait a chur in iúl."
+        },
+        "2": {
+          "label": "Easpórtáil le haghaidh tagartha comhpháirtí",
+          "detail": "Úsáid \"Easpórtáil PDF\" chun doiciméad formáidithe a tháirgeadh is féidir leat a roinnt le comhlacht áitiúil nó le maoiní, a bhfuil gá acu a thuiscint cad atá foinse oscailte vs príobháideach."
+        }
+      },
+      "tips": {
+        "0": "Caithfidh gnéithe poiblí AGPL fanacht ar fáil go poiblí faoi AGPL-3.0 — ní féidir leat rochtain orthu a theorannú in aon imscaradh.",
+        "1": "Tá gá le comhaontú scríofa ar leith le Pobail Cúraim nó oibreoir an ardáin NEXUS chun gnéithe tráchtála."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nód Aonair"
+        },
+        "1": {
+          "label": "Pacáiste Nochtaithe"
+        }
+      }
+    },
+    "caring_disclosure_pack": {
+      "title": "Pacáiste Nochtaithe Cosanta Sonraí FADP/nDSG",
+      "summary": "Bailíonn an Pacáiste Nochtaithe gach doiciméad cosanta sonraí atá de dhíth faoi FADP/nDSG na hEilvéise: fógraí príobháideachta, comhaontuithe próiseála sonraí, sceidil coinnithe, liostaí fo-phróiseálaithe, agus an teimpléad freagartha ceart rochtana. Déan iad a ghiniúint agus a scrúdú sula mbeidh do chomhlachas beo le sonraí pearsanta.",
+      "steps": {
+        "0": {
+          "label": "Léigh na réimsí uathoibríocha líonta",
+          "detail": "Líonann an córas ainm na heagraíochta, sonraí an rialtóra sonraí, agus tréimhsí coinníollacha ó do Pholasaí Oibríochta. Seiceáil gach réimse le haghaidh cruinnis."
+        },
+        "1": {
+          "label": "Cuir fo-próiseálaithe leis",
+          "detail": "Léigh liosta de sheirbhísí tríú páirtí ar a bpróiseálann sonraí ball (m.sh. seirbhís ríomhphoist, soláthraí óstála). Éilíonn gach fo-próiseálaí ainm, suíomh, agus bonn dlí."
+        },
+        "2": {
+          "label": "Socraigh tréimhsí coinnithe",
+          "detail": "Déan athbhreithniú ar na tréimhsí coinnithe réamhshocraithe do gach catagóir sonraí (m.sh. taifid malartaithe: 7 mbliana le haghaidh cigireachta airgeadais; tuairiscí chosanta: 10 mbliana). Déan coigeartú má tá do riachtanais chaonta difriúil."
+        },
+        "3": {
+          "label": "Gineáil an pacáiste iomlán",
+          "detail": "Cliceáil ar \"Gineáil Pacáiste\" chun ZIP de dhoiciméid PDF a tháirgeadh. Roinn leis an oifigeach cosanta sonraí (nó údarás chaonta) le haghaidh síniú."
+        },
+        "4": {
+          "label": "Foilsigh fógra príobháideachais do chomhaltaí",
+          "detail": "Nuair a bheidh sé ceadaithe, bain úsáid as \"Foilsigh Fógra Príobháideachais\" chun an fógra a dhéanamh ar fáil ar leathanach Polasaí Príobháideachais do chomhpháirteachta."
+        }
+      },
+      "tips": {
+        "0": "Athghiniúint an phacáiste gach uair a chuireann tú fo-próiseálaí nua leis, má athraíonn tú tréimhsí coinnithe, nó má chumasófar modh Nód Aonair.",
+        "1": "Cuimsíonn an pacáiste teimpléad freagartha cearta-tar-aiste — bain úsáid as nuair a iarrann ball a shonraí faoi Airteagal 25 nDSG."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nód Aonair"
+        },
+        "1": {
+          "label": "Teorainn Thráchtála"
+        }
+      }
+    },
+    "caring_municipal_roi": {
+      "title": "Tuarascáil ROI Bhardasach/Cantúin",
+      "summary": "Gineann sé tuarascáil fhoirmiúil costais-aisghabhála do pháirtithe leasmhara cantúin ag taispeáint cé mhéad uair de chúram gairmiúil a bhí in áit malartuithe pobail, curtha in iúl i CHF. Is é seo an príomhdoiciméad fianaise airgeadais do athnuacháin deontas agus comhaontuithe comhpháirtíochta bhardasaí.",
+      "steps": {
+        "0": {
+          "label": "Roghnaigh an tréimhse tuairisce",
+          "detail": "Roghnaigh na dátaí tosaithe agus críochnaithe. Is iad tréimhsí tipiciúla ráithiúla nó bliantúla, ailínithe le do shaoráid tuairiscithe deontais."
+        },
+        "1": {
+          "label": "Roghnaigh modh lucht féachana",
+          "detail": "Taispeánann modh cantún figiúirí seachaint costais chontae. Díríonn modh na mBailte Fearainn ar thoradh páirtíochta áitiúil. Taispeánann modh comhpháirteach méadracht aisc agus coimeádta."
+        },
+        "2": {
+          "label": "Athbhreithnigh an rabhadh cáilíochta sonraí",
+          "detail": "Má tá scór cáilíochta sonraí faoi 80%, tagann rabhadh chun cinn. Athbhreithnigh an Leathanach Cáilíochta Sonraí sula ngineann tú tuarascáil fhoirmiúil."
+        },
+        "3": {
+          "label": "Gineann an tuarascáil",
+          "detail": "Cliceáil \"Gineann Tuarascáil\". Déanann an córas na ríomhanna: uaireanta malartaithe iomlána × cóigeach in aghaidh catagóire × ráta uaireanta cúraim fhoirmiúil (CHF 35 de réir réamhshocraithe)."
+        },
+        "4": {
+          "label": "Easpórtáil agus dáileadh",
+          "detail": "Íoslódáil mar PDF (formáidithe le húsáid oifigiúil) nó CSV (do na foirne airgeadais cantúineacha a bhfuil gá acu le sonraí amh)."
+        }
+      },
+      "tips": {
+        "0": "Dún paraiméadair bheartais oibríochta sula ngineann tú tuarascáil a chuirfidh tú isteach go hoifigiúil — déanann athruithe ina dhiaidh sin na huimhreacha neamhchomhleanúnach.",
+        "1": "Cuimsigh sleamhnán bonnlíne KPI i gcomhthéacs leis an tuarascáil ROI: conas a éirigh le rannpháirtíocht, le cáilíocht an tsaoil, agus le seachaint costais thar am?",
+        "2": "Rith an Seiceáil Cáilíochta Sonraí ar dtús — cuirfidh tuarascáil le bearnaí a bhfuil marcanna inti in olcas le muinín le comhpháirtithe cantúin."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Cóifisiúnta Catagóire"
+        },
+        "1": {
+          "label": "Polasaí Oibriúcháin"
+        },
+        "2": {
+          "label": "Bunlíne KPI"
+        },
+        "3": {
+          "label": "Cáilíocht Sonraí"
+        }
+      }
+    },
+    "caring_municipal_impact": {
+      "title": "Pacáiste Fianaise ar Thionchar na Bardasachta",
+      "summary": "Painéal sonraí idirghníomhach do pháirtithe comhairliúcháin bhailte, le trí mhodh lucht féachana — Canton (díriú ar costais a sheachaint), Municipality (díriú ar pháirtí áitiúil), agus Cooperative (díriú ar a mhalairt bhall). Léiríonn gach mód méadrachtaí agus léirithe éagsúla atá oiriúnach don lucht féachana sin.",
+      "steps": {
+        "0": {
+          "label": "Roghnaigh mód lucht féachana",
+          "detail": "Úsáid an roghnóir mód ag an mbarr: Canton do rannóga airgeadais/sláinte chontae, Municipality do pháirtithe comhairle áitiúla, Cooperative do do bhord féin."
+        },
+        "1": {
+          "label": "Athbhreithnigh na príomhmhéadair",
+          "detail": "Taispeánann gach modh a fhigiúirí is ábhartha: Feiceann Cantún coigilteas costais CHF; Feiceann an Bhoird Bhaile baill ghníomhacha agus minicíochta malairte; Feiceann na Comhpháirtíochtaí rátaí coimeádta agus frithghníomh."
+        },
+        "2": {
+          "label": "Druileáil isteach sna léaráidí",
+          "detail": "Tá na cairteacha idirghníomhach — cuir thar mhéadar le haghaidh leidleabhair, cliceáil chun scagadh de réir tréimhse ama, catagóire, nó fo-cheantar."
+        },
+        "3": {
+          "label": "Easpórtáil pacáiste priontála",
+          "detail": "Úsáid \"Easpórtáil le haghaidh Cur I Láthair\" chun PDF atá réidh le sleamhnán a chruthú leis na cairteacha ríthábhachtacha agus na príomh-uimhreacha do do mhód lucht féachana."
+        }
+      },
+      "tips": {
+        "0": "Tá an mód lucht féachana Canton nasctha go díreach le figiúirí tuarascála ROI na Comhairle Bhaile — ba chóir go mbeadh siad comhsheasmhach.",
+        "1": "Chun léiriú ar an gComhairle, aistrigh go mód na nBardas agus dírigh ar an rannóg \"Scéalta Ball\", a léiríonn scéalta ratha neamhainmnithe."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Bailte"
+        },
+        "1": {
+          "label": "Scéalta Ratha"
+        },
+        "2": {
+          "label": "Bunlíne KPI"
+        }
+      }
+    },
+    "caring_kpi_baselines": {
+      "title": "Líne Tosaigh KPI — Tomhas Tionchair Roimh/I ndiaidh",
+      "summary": "Gabhann Bonnlíne KPI greim ar leathanaigh de phríomh-tháscairí sláinte pobail ag pointe ama sainithe (de ghnáth seoladh na tástála). Déantar comparáid idir leathanaigh ina dhiaidh sin leis an mbunlíne chun athrú a thomhas — mar shampla, laghdú 15% ar uaigneas tuairiscithe nó méadú 20% ar naisc shóisialta.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh an bonnlíne seolta",
+          "detail": "Roimh do phiolótas dul beo, cliceáil \"Cruthaigh Snapchat Bonnlíne\". Tá sé seo ag glasáil na luachanna reatha do gach gné KPI (innéacs uaigneas, baill gníomhacha, malartuithe/séachtain, srl.)."
+        },
+        "1": {
+          "label": "Taifead snapchát comparáide",
+          "detail": "Ag gach míleata tuairiscithe (3 mhí, 6 mhí, 12 mhí), cruthaigh nua snapchát. Ríomhaíonn an córas go huathoibríoch an céatadán athraithe ón mbonnlíne."
+        },
+        "2": {
+          "label": "Cuir méadar a bhain le suirbhéanna leis",
+          "detail": "Dó KPIs a thagann ó shuirbhéanna baill (m.sh. scór folláine féin-aithris), bain úsáid as na réimsí iontrála láimhe chun na torthaí a chur isteach."
+        },
+        "3": {
+          "label": "Athbhreithnigh painéal athraithe",
+          "detail": "Taispeánann an tábla comparáide taobh le taobh gach KPI, a luach bunscoile, a luach reatha, agus treocht treorach (dearfach/diúltach)."
+        },
+        "4": {
+          "label": "Cuimsigh i dtuarascálacha",
+          "detail": "Is féidir Pacáiste Fianaise Tionchair agus Tuarascáil ROI Bardasach a chur isteach sa choibhéis bhunlíne araon. Úsáid \"Nasc go Pacáiste Tionchair\" chun é a áireamh."
+        }
+      },
+      "tips": {
+        "0": "Cruthaigh an bonnlíne seolta roimh duit aon bhaill a chlárú — ní tomhas réamh-shóisialta fíor é bonnlíne a tógadh tar éis do bhaill a bheith tar éis dul isteach.",
+        "1": "Maidir le KPIs an uaigneas agus le folláine, bain úsáid as scála aitheanta a dearbhaíodh (m.sh. Scála Uaigneas UCLA, Folláine ONS) chun creidiúnacht a bheith agat le comhpháirtithe acadúla nó sláinte."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Bailte"
+        },
+        "1": {
+          "label": "Painéal Tástála"
+        }
+      }
+    },
+    "caring_sla_dashboard": {
+      "title": "Painéal Rianaithe SLA Iarratais Chabhrach",
+      "summary": "Rianaíonn sé gach iarratas cabhrach oscailte i gcoinne a ngealltanas SLA ón bPolasaí Oibriúcháin: Criticiúil (1 uair), Ard (24 uair), Meánach (72 uair), Íseal (an chéad chruinniú sceidealta eile). Taispeánann cód-dath ag am le feiceáil go tapa an comhlíonadh.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh na cártaí achoimre SLA",
+          "detail": "Taispeánann na ceithre chárta ag an mhullach cé mhéad iarratas atá i ngach leibhéal tromchúis agus cé céatadán atá laistigh den SLA. Dearg = sáraithe; oráiste = laistigh de 20% den spriocdháta."
+        },
+        "1": {
+          "label": "Scag chun iarratais atá rómhoill a thaispeáint",
+          "detail": "Cliceáil ar \"Rómhoill Amháin\" chun na h-iarratais a bhfuil a SLA briste cheana féin a fheiceáil. Teastaíonn aird láithreach orthu seo."
+        },
+        "2": {
+          "label": "Sonraigh nó athshonraigh",
+          "detail": "Cliceáil ar aon iarratas chun an painéal sonraí a oscailt. Úsáid \"Sonraigh don Chó-Oirdhnóir\" chun freagracht a dháileadh. Faigheann an duine atá sonraithe fógra laistigh den aip."
+        },
+        "3": {
+          "label": "Codladh le cúis",
+          "detail": "Má ní féidir iarratas a chur i bhfeidhm fós (m.sh. ag fanacht le faisnéis sheachtrach), bain úsáid as \"Codladh\" agus scríobh cúis. Coscann iarratais chodlaithe clog SLA go sealadach."
+        },
+        "4": {
+          "label": "Tuarascáil comhlíonta onnmhairithe",
+          "detail": "Giniúint CSV comhlíonta SLA seachtainiúil do do thaifid bhainistíochta cáilíochta."
+        }
+      },
+      "tips": {
+        "0": "Athnuachann painéal SLA gach 60 soicind — níl aon gá le luchtú de láimh.",
+        "1": "Is minic a chruthaíonn tréimhsí arda toirt (geimhreadh, imeachtaí) strus ar SLA. Bain úsáid as Nudges Chliste chun cabhair a ghníomhachtú roimh ré sula mbailíonn iarratais."
+      },
+      "caution": "Tá iarratais snoozáilte le feiceáil fós ar an tuarascáil comhlíonta. Beidh snoozáil minic ar iarratais Riachtanach le feiceáil sa phróiseas iniúchta cáilíochta sonraí.",
+      "related_paths": {
+        "0": {
+          "label": "Cosaint"
+        },
+        "1": {
+          "label": "Nudges Chliste"
+        },
+        "2": {
+          "label": "Polasaí Oibriúcháin"
+        }
+      }
+    },
+    "caring_data_quality": {
+      "title": "Seiceálacha Cáilíochta Sonraí",
+      "summary": "Ritheann seiceálacha uathoibrithe trasna sonraí do chomhphobail agus tuairiscíonn fadhbanna de réir déine: Criticiúil (bacann tuairisciú), Ard (lailleann cruinneas tuairisce), Meánach (comhairleach), Íseal (cosmaideach). Déan fadhbanna Criticiúla agus Arda a shocrú sula ngineann tú aon tuarascáil do pháirtithe seachtracha.",
+      "steps": {
+        "0": {
+          "label": "Rith seiceáil cáilíochta iomlán",
+          "detail": "Cliceáil \"Rith Seiceáil Anois\". De ghnáth tógann an scanáil 30–60 soicind. Tá na torthaí stóráilte ar feadh 6 uair an chloig — rith arís más rud é gur rinne tú athruithe suntasacha ar shonraí."
+        },
+        "1": {
+          "label": "Athbhreithnigh saincheisteanna criticiúla ar dtús",
+          "detail": "Caithfidh saincheisteanna criticiúla (dearg) a bheith réitithe sula ngintear tuarascálacha bailte mhúnlacha. Cliceáil gach saincheist chun cur síos a fháil ar an bhfadhb agus nasc díreach chun í a shocrú."
+        },
+        "2": {
+          "label": "Déan oibriú trí Saincheisteanna Ard agus Meánach",
+          "detail": "Bíonn tionchar ag ceisteanna ard (oráiste) ar chruinneas ríomhanna ROI. Bíonn ceisteanna meánach (buí) ina gcomhairliúcháin — ceartigh iad nuair atá sé áisiúil."
+        },
+        "3": {
+          "label": "Marcáil dearbhaithe bréagacha",
+          "detail": "Má tá ceist a bhratach ní fadhb i ndáiríre (mar shampla, má tá comhaltas gan seoladh ríomhphoist go dleathach), bain úsáid as \"Marcáil mar Aithnithe\" le cúis. Silentóidh sé seo an bhratach."
+        },
+        "4": {
+          "label": "Rian do scór cáilíochta thar am",
+          "detail": "Cuideoidh an cairt treochtaí scóir cáilíochta (0–100) leat a aithint an bhfuil cáilíocht sonraí ag feabhsú tar éis duit gnóthachain a dhéanamh ar fhadhbanna."
+        }
+      },
+      "tips": {
+        "0": "Rith an seiceáil cáilíochta mar chuid de d’amhlaidh reatha míosúil mar chomhordaitheoir, ní díreach roimh thuarascálacha a ghiniúint.",
+        "1": "Tagann achoimre ar réiteach cosanta atá ar iarraidh i gcónaí mar Chriticiúil — féach ar leathanach na Cosanta chun iad a chur leis."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Bailte"
+        },
+        "1": {
+          "label": "Cosaint"
+        }
+      }
+    },
+    "caring_launch_readiness": {
+      "title": "Geata Ullmhachta Eitilt Phearsanta",
+      "summary": "Seicliosta dúnta de chritéir a chaithfidh gach ceann díobh a rith sula meastar go bhfuil do phíolótach réidh le dul beo. Déantar réamhullmhúchán a mheas tríd ceithre réimse comhartha: ailíniú luacha bailte, rannpháirtíocht phobail, líonra comhpháirtithe, agus cumas malartaithe áitiúil. Caithfidh gach ceann a bheith glas sula seolfar é.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh na ceithre chomhartha réamhullmhúcháin",
+          "detail": "Luach Bardasach, Rannpháirtíocht, Líonra Comhpháirtí, agus Malartán Áitiúil uile faoi scór 0–100. Ní mór do na ceithre cinn a gcuid teorainneacha cumraithe (réamhshocrú 70) a bhaint amach sula n-osclaítear an geata."
+        },
+        "1": {
+          "label": "Sraith isteach sna comharthaí nach n-éireoidh leo",
+          "detail": "Cliceáil ar aon chairt chomhartha buí nó dearg chun na fo-thréithe sonracha nach bhfuil bainte amach go fóill a fheiceáil, le treoir phoiblí ar conas aghaidh a thabhairt ar gach ceann."
+        },
+        "2": {
+          "label": "Uaslódáil fianaise thacúil",
+          "detail": "Éilíonn roinnt critéar fianaise a uaslódáil (m.sh. litir comhpháirtíochta báicmhaireacht sínithe, nó suirbhé bunlíne críochnaithe). Bain úsáid as an gcnaipe uaslódála ar an gcritéar ábhartha."
+        },
+        "3": {
+          "label": "Iarr athbhreithniú ó chomhordaitheoir",
+          "detail": "Nuair a chreideann tú go gcomhlíontar na critéir go léir, bain úsáid as \"Iarr Athbhreithniú\" chun comhordaitheoir sinsearach nó ionadaí náisiúnta Pobail Aireach a chur ar an eolas chun geata réidh a fhíorú."
+        },
+        "4": {
+          "label": "Díghlasáil an cur i bhfeidhm beo",
+          "detail": "Nuair a dhéanann an hathbhreithniú cead ar na critéir uile, éiríonn an cnaipe \"Téigh Beo\" ar fáil. Tugann sé seo an modúl Pobal Cúraim ar fáil do bhaill."
+        }
+      },
+      "tips": {
+        "0": "Is féidir leat obair ar na critéir i d'aon ord — níl aon seicheamh riachtanach ann.",
+        "1": "Tá na doiciméid fhianaise stóráilte go sábháilte agus tá rochtain ag Pobal Cúraim náisiúnta orthu chun a dtaifid féin.",
+        "2": "Is féidir geata réidhchláir a mheas arís ag am ar bith — má athraíonn cúinsí (m.sh. má tarraingíonn comhpháirtí contae siar), nuashonraítear stádas an gheata go huathoibríoch."
+      },
+      "caution": "Ná déan iarracht an geata réidhchláir a sheachbhóthar de láimh. Is féidir le seoladh gan na critéir go léir a bhaint amach taithí lag a sholáthar do bhaill agus laghdú ar fhreagracht an dfhaisnéise.",
+      "related_paths": {
+        "0": {
+          "label": "Painéal Tástála"
+        },
+        "1": {
+          "label": "Bunlíne KPI"
+        },
+        "2": {
+          "label": "Polasaí Oibriúcháin"
+        }
+      }
+    },
+    "caring_pilot_scoreboard": {
+      "title": "Painéal Scór Píolótach Pobail Cúraim",
+      "summary": "An scóirbhealach beo le haghaidh do thionscnaimh Phobal Cúraim, ag rianú dul chun cinn i gcoinne méadrachtaí modheolaíochta Phobal Cúraim. I measc na méadrachtaí tá toirte malairte, coinneáil bhall, cóimheas frithpháirtíochta (cabhairí atá freisin ina bhfaighteoirí), am freagartha comhordaitheora, agus ráta comhlíonta coimeádtha sábháilteachta.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithniú a dhéanamh ar an scóirlíne barr",
+          "detail": "Is meascán de na méadrachtaí uile feidhmeannaíochta é an scór tástála iomlán (0–100). Déan iarracht 75+ a bhaint amach chun cáilíocht 'Comhpháirtíocht Bhunaite' an Phobail Chúraim a bhaint."
+        },
+        "1": {
+          "label": "Tuig scóir mheáchain aonair",
+          "detail": "Tá raon spriocdháta sonraithe do gach méadracht sa Pholasaithe Oibríochta. Glas = ar sprioc; oráiste = laistigh de 10% den sprioc; dearg = faoi bhun an íoschaighdeáin."
+        },
+        "2": {
+          "label": "Déan comparáid le meastóireacht an Phobail Chúraim",
+          "detail": "Lascaine ‘Taispeáin Meastóireacht na Pobal Cúraim’ chun na scórais mheánacha anaithnid ó gach comharpobal Cúraim a chur thar láthair. Léiríonn sé seo conas a chuir tú i gcomparáid le comhghleacaithe."
+        },
+        "3": {
+          "label": "Íoslódáil an tuarascáil mhodhóireachta",
+          "detail": "Giniúint tuarascáil mhodhóireachta le formáid Pobal Cúraim le cur isteach chuig Pobal Cúraim i do scrúdú ráithiúil."
+        }
+      },
+      "tips": {
+        "0": "Tá cóimheas na malartach (an cóimheas de bhaill a thugann AGUS a fhaigheann) ar an tomhas aonair is tábhachtaí maidir le creidmheas Pobal Cóir — dírigh ar 60%+.",
+        "1": "Taispeánann scór am freagartha íseal an chomhordaitheora beagnach i gcónaí sárú SLA — seiceáil Painéal SLA chun an fhréamhchúis a fháil."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Bunlíne KPI"
+        },
+        "1": {
+          "label": "Painéal Forbartha SLA"
+        },
+        "2": {
+          "label": "Réidh le Seoladh"
+        }
+      }
+    },
+    "caring_nudges": {
+      "title": "Brúiteacha Cliste — Rannpháirtíocht Uathoibrithe",
+      "summary": "Is teachtaireachtaí uathoibrithe, phearsantaithe iad Smart Nudges a sheoltar chuig baill neamhghníomhacha nó i mbaol chun iad a mhealladh ar ais. Déantar rialacha a shainiú de réir leibhéal neamhghníomhaíochta, leibhéal muiníne an bhall, agus catagóir cúraim. Déantar réamhamharc ar gach nudges sula dtéann siad beo.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh rialachán nudge",
+          "detail": "Cliceáil \"Nudge Nua\". Socraigh an spreagthóir (m.sh. \"níl an ball logáilte isteach ar feadh 14 lá\"), an slatach spriocdhírithe (m.sh. Baill leibhéal 1+ sa chatagóir Iompair), agus an cainéal (ríomhphost / in-app)."
+        },
+        "1": {
+          "label": "Scríobh an teachtaireacht nudach",
+          "detail": "Úsáid an cúntóir Communication Copilot chun dréacht a dhéanamh de theachtaireacht thé agus phearsantaithe. Déantar ainm tosaigh an bhaill a chomhtháthú go huathoibríoch i gcónaí."
+        },
+        "2": {
+          "label": "Socraigh sceideal seolta",
+          "detail": "Roghnaigh cathain is féidir nudacha a sheoladh (m.sh. laethanta oibre 9am–6pm amháin) agus an minicíocht uasta (m.sh. ní níos mó ná uair amháin sa tseachtain in aghaidh an bhaill)."
+        },
+        "3": {
+          "label": "Réamhamharc agus gníomhachtú",
+          "detail": "Déan athbhreithniú ar liosta réamhamhairc na mball a gheobhfadh an t-iompar faoi láthair. Má tá an comhaireamh réasúnta, cas an riail go Gníomhach."
+        },
+        "4": {
+          "label": "Déan athbhreithniú ar fheidhmíocht an iompair",
+          "detail": "Taispeánann an painéal anailíse ráta oscailte, ráta cliceáil-trí, agus ráta athghníomhachta (baill a chríochnú malartán laistigh de 7 lá ón iompar)."
+        }
+      },
+      "tips": {
+        "0": "Tosaigh le minicíochta íseal — is gnách go leor amháin nudged gach coicíse. Má dhéanann tú ró-nudging, tá sé ag cruthú go dtéann daoine amach.",
+        "1": "Tá nudges is éifeachtaí do bhaill Tier 0–1 nach bhfuil a chéad mhalartú críochnaithe acu fós.",
+        "2": "Ná húsáid nudges riamh le haghaidh leanúnachas sábháilteachta — bain úsáid as an mhodúl Sábháilteachta chun é sin a dhéanamh."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Copilot Cumarsáide"
+        },
+        "1": {
+          "label": "Painéal Forbartha SLA"
+        }
+      }
+    },
+    "caring_emergency_alerts": {
+      "title": "Rabhlaí Éigeandála — Craoladh chuig Gach Ball",
+      "summary": "Seol rabhlacha práinneacha, ard-toiseach go tapa chuig gach ball de do chomharchumann. Úsáid é seo amháin le haghaidh éigeandála fíor: aimsir throm a théann i bhfeidhm ar thurais chuig malartuithe, fógraí poiblí a chosaint, nó comhairle sláinte phobail práinneach. Déantar logáil agus marcáil ama ar gach rabhla.",
+      "steps": {
+        "0": {
+          "label": "Roghnaigh an cineál rabhlach",
+          "detail": "Roghnaigh ó: Rabhadh Sábháilteachta, Rabhadh Aimsire, Cur isteach ar Sheirbhís, nó Éigeandáil Ginearálta. Socraíonn an cineál an stíl amhairc agus práinne an fógra brúigh."
+        },
+        "1": {
+          "label": "Scríobh an teachtaireacht rabhadh",
+          "detail": "Coinnigh é gearr (níos lú ná 160 carachtar le haghaidh comhoiriúnacht SMS). Déan cur síos ar an scéal, cad ba chóir do bhaill a dhéanamh, agus cathain a sholáthróidh tú nuashonrú."
+        },
+        "2": {
+          "label": "Roghnaigh bealaí seachadta",
+          "detail": "Roghnaigh: Bratach In-Aip, Ríomhphost, Fógra Push, nó Gach Cainéal. Tá Push láithreach; tógann ríomhphost suas le 5 nóiméad."
+        },
+        "3": {
+          "label": "Socraigh am éaga",
+          "detail": "Éiríonn fógraí as dáta go huathoibríoch tar éis an ama a shocraíonn tú (réamhshocrú 24 uair an chloig). Brúitear fógraí as dáta ó scáileáin na mball go huathoibríoch."
+        },
+        "4": {
+          "label": "Seol agus monatóireacht a dhéanamh",
+          "detail": "Cliceáil \"Seol Rabhadh\". Taispeánann painéal seachadta rátaí seolta/léite i bhfíor-am. Postáil teachtaireacht \"Gach rud Glan\" mar leanbh ar aghaidh nuair a réitítear an scéal."
+        }
+      },
+      "tips": {
+        "0": "Déan an córas rabhaidh a thástáil míosúil le rabhadh \"Mód Tástála\" (inléite amháin do bhaill den leibhéal Comhordaitheora) chun a dhearbhú go bhfuil gach cainéal ag obair.",
+        "1": "Má mhúnlaíonn an rabhadh ach cuid de do phobal, bain úsáid as Fo-Ranna chun faighteoirí a scagadh in áit gach duine a chur ar fáil."
+      },
+      "caution": "Ná húsáid Foláirimh Éigeandála le haghaidh cumarsáidí gnéis. Cruthóidh tuirse foláirimh go ndéanfaidh baill dearmad ar fhíor-fholáirimh sa todhchaí.",
+      "related_paths": {
+        "0": {
+          "label": "Fo-léinn"
+        },
+        "1": {
+          "label": "Copilot Cumarsáide"
+        }
+      }
+    },
+    "caring_surveys": {
+      "title": "Suirbhéanna Bardasacha",
+      "summary": "Cruthaigh agus scaip suirbhéanna chuig do theagmhálaithe bardasacha — oifigigh comhairle, fostaithe ranna sláinte, agus bodyanna maoinithe. Is féidir suirbhéanna a úsáid chun meastacháin riachtanas, aiseolas sásaimh, nó fianaise chun tuairisciú deontais a bhailiú.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh suirbhé nua",
+          "detail": "Cliceáil ar \"Suirbhé Nua\". Roghnaigh ó chineálacha ceisteanna: rogha ilroghnach, scála rátála (1–5 nó 1–10), téacs oscailte, agus sea/nó."
+        },
+        "1": {
+          "label": "Cuir faighteoirí ó do liosta teagmhálaithe bhaile",
+          "detail": "Tá an roghnóir faighteoirí ag tarraingt ó do liosta teagmhálaithe um Chothú Luaidhe. Scag de réir ról (m.sh. \"Oifigeach Sláinte Cantónach\") nó eagraíocht."
+        },
+        "2": {
+          "label": "Sceideal nó seol láithreach",
+          "detail": "Is féidir suirbhéanna a sheoladh láithreach nó a sceidealú do dháta áirithe (m.sh. roimh chruinniú athbhreithnithe ráithiúil)."
+        },
+        "3": {
+          "label": "Anailís a dhéanamh ar fhreagraí",
+          "detail": "Taispeánann painéal torthaí rátaí freagartha, scóranna comhlántacha, agus freagraí téacs oscailte fhocail faoi fhocal. Scagaire de réir ról freagróra nó eagraíocht."
+        },
+        "4": {
+          "label": "Easpórtáil do thuarascálacha",
+          "detail": "Úsáid \"Easpórtáil CSV\" do shonraí amh nó \"Easpórtáil Achoimre PDF\" do achoimre fhormáidithe atá oiriúnach le cur isteach i do dhoiciméadú tionchair."
+        }
+      },
+      "tips": {
+        "0": "Coinnigh suirbhéanna gearra (5 ceist nó níos lú). Tá naisc bhardasach gnóthach — faigheann suirbhéanna gearra rátaí críochnaithe i bhfad níos airde.",
+        "1": "Lean ar dhaoine nach bhfreagraíonn a haon tar éis 7 lá le meabhrán uathoibrithe. Ná seol níos mó ná meabhrán amháin."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Cúram Taiscint"
+        },
+        "1": {
+          "label": "Tionchar Bardasach"
+        }
+      }
+    },
+    "caring_copilot": {
+      "title": "Copilot Cumarsáide — Dréachtú Leis an AI",
+      "summary": "Cúntóir scríbhneoireachta AI oilte ar chaighdeáin cumarsáide phobal Caring Community. Glac le smaoineamh garbh agus filleann an Copilot ar thionscadal réamhchruinnithe i dton te, cuimsitheach atá oiriúnach do phobail ama bainc. Déan athbhreithniú agus eagarthóireacht sula seolann tú.",
+      "steps": {
+        "0": {
+          "label": "Roghnaigh an cineál cumarsáide",
+          "detail": "Roghnaigh as: Fógra Ball, Ríomhphost Fáilte, Achoimre Tuarascála Tionchair, Nuashonrú Comhpháirtí Bardasach, nó Dréacht Saor-réimse."
+        },
+        "1": {
+          "label": "Cur síos ar an méid atá tú ag iarraidh a rá",
+          "detail": "Scríobh 1–3 abairt ag cur síos ar na príomhphointí. Mar shampla: \"Rinneamar 120 malartú i mí an Mhárta. D'ardaigh na scóir uaigneas faoi 12%. Gabhaim buíochas le baill as a gcuid rannpháirtíochta.\""
+        },
+        "2": {
+          "label": "Giniúint agus athbhreithniú ar an dréacht",
+          "detail": "Cliceáil \"Giniúint Dréachta\". Léigh an toradh go cúramach — d’fhéadfadh mícheartuithe a bheith sna dréachtaí AI. Ceartaigh aon figiúirí nó ainmneacha roimh úsáid."
+        },
+        "3": {
+          "label": "Cuir an ton agus fad in oiriúint",
+          "detail": "Úsáid na sleamhnáin chun foirmiúlacht (neamhoifigiúil ↔ foirmiúil) agus fad (gonta ↔ mionsonraithe) a choigeartú. Athghiniúint go dtí go mbeidh tú sásta."
+        },
+        "4": {
+          "label": "Cóipeáil chuig do uirlis sheachadta",
+          "detail": "Úsáid \"Cóipeáil chuig Dochlár\" agus greamaigh isteach i do chliant ríomhphoist, cumadóir fógra, nó eagarthóir nuachtlitreach."
+        }
+      },
+      "tips": {
+        "0": "Oibríonn an Copilot is fearr le hionchuir shonracha — déanann treoracha doilíosacha dréachtaí ginearálta. Tabhair uimhreacha fíor agus torthaí ainmniúla dó.",
+        "1": "Seachain foclaíocht a tháirgtear ag AI a fhíorú i gcónaí. Ní féidir leis an Copilot rochtain a fháil ar shonraí beo — scríobhann sé bunaithe ar an méid a deir tú leis."
+      },
+      "caution": "Níor chóir duit dréacht Copilot a sheoladh chuig páirtithe seachtracha (cantain, meáin, maoinitheoirí) gan athbhreithniú daonna. Is féidir le AI uimhreacha a mhíriail nó frásaíocht neamh-oiriúnach a úsáid do chomhthéacsanna foirmiúla.",
+      "related_paths": {
+        "0": {
+          "label": "Nudges Chliste"
+        },
+        "1": {
+          "label": "Rabhadh Eigeandála"
+        },
+        "2": {
+          "label": "Achoimre Shibhialta"
+        }
+      }
+    },
+    "caring_civic_digest": {
+      "title": "Achoimre Shibhialta — Socruithe Achoimre Pearsantaithe Bhall",
+      "summary": "Is ríomhphost achoimre pearsantaithe é an Achoimre Shibhialta a sheoltar chuig gach ball bunaithe ar a leasanna, a ngníomhaíocht, agus a ról sa phobal. Rialáiltear socruithe domhanda an achoimre ar an leathanach seo: roghanna minicíochta, modúil ábhair le cur san áireamh, agus cén cineál achoimre a fhaigheann na deighiltí ball.",
+      "steps": {
+        "0": {
+          "label": "Socraigh minicíochtaí digest atá ar fáil",
+          "detail": "Roghnaigh cén minicíocht is féidir le baill páirt a ghlacadh inti: Laethúil, Seachtainiúil, Dá Sheachtain, Míosúil, nó Riamh. Is é Seachtainiúil an réamhshocrú do bhaill nua."
+        },
+        "1": {
+          "label": "Cumraigh modúil ábhair digest",
+          "detail": "Cuir lasc ar na bloic ábhair a thaispeántar: Tógaimh Chéadimeachta, Iarraidh Cabhrach Oscailte, Baill Nua le Fáiltiú, Achoimre Mo mMhalartaithe, Buaicphointí Painéal Scórála Pilóta, srl."
+        },
+        "2": {
+          "label": "Socraigh rialacha ar leith do gach seiclíne",
+          "detail": "Is féidir le comhordaitheoirí dígest saibhir a fháil le stádas SLA agus rabhaidh maidir le cáilíocht sonraí. Socraigh é seo faoi \"Cuirbreisiú Dígest an Chomhordaitheora\"."
+        },
+        "3": {
+          "label": "Réamhamharc ar an dígest",
+          "detail": "Cliceáil \"Réamhamharc\" chun féachaint ar shampla dígest a léiríodh do phróifíl ball tástála. Seiceáil leagan amach, naisc, agus ord ábhar."
+        },
+        "4": {
+          "label": "Seol dígest aon-uaire",
+          "detail": "Úsáid \"Seol Anois\" chun dígest a sheoladh lasmuigh den sceideal gnáth — úsáideach chun feachtas a sheoladh nó torthaí mórábhartha a roinnt."
+        }
+      },
+      "tips": {
+        "0": "Faigheann baill a roghnaigh \"Riamh\" Fógraí Éigeandála fós — ní dhéanann rogha dígest aon difear do chumarsáidí criticiúla.",
+        "1": "Is minic a fhaigheann meastacháin seachtainiúla a sheoltar ar maidin Dé Máirt nó Dé Céadaoin na rátaí oscailte is airde ar ardáin phobail."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nudges Chliste"
+        },
+        "1": {
+          "label": "Copilot Cumarsáide"
+        }
+      }
+    },
+    "caring_lead_nurture": {
+      "title": "Cothú Ceannaireachta — CRM Teagmháil Bhaile",
+      "summary": "Córas bainistíochta teagmhála éadrom le haghaidh comhráite a rianú le teagmhálaithe cathracha turgnamhacha féideartha — comhairleoirí áitiúla, oifigigh ranna sláinte, foireann chanúnta, agus fondúireachtaí pobail. Rianaigh céim fiosrúcháin, dáta an teagmháil deireanach, agus an chéad ghníomh don ceannaire gach ceann.",
+      "steps": {
+        "0": {
+          "label": "Cuir teagmháil leis",
+          "detail": "Cliceáil ar \"Teagmháil Nua\". Cuir isteach ainm, ról, eagraíocht, r-phost, agus cantún nó bainistíocht a léiríonn siad."
+        },
+        "1": {
+          "label": "Socraigh céim na fiosrúchán",
+          "detail": "Roghnaigh céim na píblíne: Dea-thuairim → Téacs tosaigh → Suim acu → Léarscáil Tairisceana Seolta → Pirseáilte aontaithe → Tionóladh isteach → Diúltaithe. Bog an chéim de réir a gcuirtear comhráite chun cinn."
+        },
+        "2": {
+          "label": "Taifead nóta teagmhála",
+          "detail": "Tar éis gach idirghníomhaíocht (riomhphost, glao, cruinniú), cuir nóta leis an dáta, a phléadh, agus an chéad ghníomh a aontaíodh. Tá nótaí príobháideach don choimisinéirí."
+        },
+        "3": {
+          "label": "Socraigh meabhrúchán leanúnaigh",
+          "detail": "Bain úsáid as \"Socraigh Meabhrúchán\" chun tasc a chruthú a thiocfaidh chun leasa i do dashboard coimisinéirí ar dháta roghnaithe."
+        },
+        "4": {
+          "label": "Nasc le tionóntán",
+          "detail": "Nuair a ghlacfaidh baile le triail a chur i bhfeidhm, bain úsáid as \"Nasc le Tionóntán\" chun an teagmháil a chur i mbaint leis an tionóntán NEXUS nua atá á chruthú dóibh."
+        }
+      },
+      "tips": {
+        "0": "Coinnigh nótaí gearra ach sonracha — is féidir le \"Ghlaoigh orm Maria, beidh sí ag athbhreithniú an togra faoi Dé hAoine 14 Feabhra\" níos úsáidí ná \"Ghlaoigh orm teagmhálaí\".",
+        "1": "Tá na daoine teagmhála atá sa chéim chéanna den phíblíne le 60 lá nó níos mó faoi bhraon — smaoinigh an bhfuil gá acu le cur chuige difriúil nó an cheart é a bhogadh go Diúltaithe."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Suirbhéanna Bardasacha"
+        },
+        "1": {
+          "label": "Fiosrúcháin Tástála"
+        }
+      }
+    },
+    "caring_success_stories": {
+      "title": "Scéalta Ratha — Cártaí Fianaise ar Thionchar",
+      "summary": "Bailigh agus bainistigh scéalta beaga anaithnide ó bhaill faoi na difríochtaí a rinne idirbheart cúraim ina saol. Úsáidtear scéalta i dtuarascálacha tionchair, i gcur i láthair bardasach, agus sa Phacáiste Fianaise Tionchair atá os comhair an phobail.",
+      "steps": {
+        "0": {
+          "label": "Bailigh scéal",
+          "detail": "Cliceáil \"Scéal Nua\". Iontráil pseudonym an bhaill (ní riamh a ainm ceart i n-ábhair phoiblí), cineál an idirbhearta, an toradh, agus luachan díreach (le cead scríofa gan ifreann)."
+        },
+        "1": {
+          "label": "Lipéadaigh de réir catagóire tionchair",
+          "detail": "Lipéadaigh gach scéal leis na téamaí tionchair ábhartha: Neamh-Aonar laghdaithe, Feabhsú Soghluaisteachta, Tacaíocht Phracticiúil, Nasc Idirghlúineach, srl. Cuireann siad seo le scagadh i dtuairiscí."
+        },
+        "2": {
+          "label": "Marcáil stádas toiliú",
+          "detail": "Ní mór go mbeadh taifead toiliú ag gach scéal sula bhféadfar é a fhoilsiú. Seiceáil \"Toiliú Béil Faighte\" nó uaslódáil foirm toiliú scríofa."
+        },
+        "3": {
+          "label": "Déan athbhreithniú agus foilsigh",
+          "detail": "Úsáid \"Foilsigh chuig Pacáiste Tionchair\" chun an scéal a chur ar fáil sa tábhla Tionchair Bhardasach agus in onnmhairí Pacáiste Fianaise."
+        },
+        "4": {
+          "label": "Cartlann scéalta atá as dáta",
+          "detail": "Ba chóir scéalta atá níos mó ná 2 bhliain d’aois a athbhreithniú chun a n-ábharthacht leanúnach a mheas. Déan cartlann de na cinn nach léiríonn oibríochtaí reatha níos mó."
+        }
+      },
+      "tips": {
+        "0": "Is iad na scéalta is mealltacha na cinn shonracha: \"Maria, 78, d’éirigh léi fanacht neamhspleách ar feadh 6 mhí eile mar gheall ar…\" is fearr ná ráitis ghinearálta faoi leas.",
+        "1": "Dírigh ar a laghad 3 scéal in aghaidh an chatagóir cúraim — tá tuairiscí tionchair níos iontaofa le raon fáiltí."
+      },
+      "caution": "Ná foilseachán scéal riamh gan taifead toiliú. Is sárú FADP/nDSG é foilsiú gan toiliú.",
+      "related_paths": {
+        "0": {
+          "label": "Tionchar Bardasach"
+        },
+        "1": {
+          "label": "Pacáiste Nochtaithe"
+        }
+      }
+    },
+    "caring_feedback": {
+      "title": "Bosca Isteach Aiseolais — Tréighe aiseolais na mBardas",
+      "summary": "Lárnach an aiseolais a chuir comhoibritheoirí agus páirtithe leasmhara na mbardas isteach — imní, ceisteanna, moltaí agus gearáin. Déantar gach mír a thréighe de réir déine, baintear é do chomhordaitheoir, agus déantar rianú air go dtí réiteach.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh míreanna nua aiseolais",
+          "detail": "Tá earraí nua le feiceáil ag barr an bhosca isteach. Léigh gach ceann acu agus meas an dán éadóchas atá ann: Criticiúil (teip seirbhíse / gearán foirmiúil), Ard (imní shuntasach), Meánach (ceist), Íseal (moladh)."
+        },
+        "1": {
+          "label": "Ceangail le comhordaitheoir",
+          "detail": "Úsáid \"Ceangail\" chun an t-ábhar a leithdháileadh don chomhordaitheoir is fearr chun freagra a thabhairt. Gheobhaidh siad fógra laistigh den aip."
+        },
+        "2": {
+          "label": "Dréachtaigh freagra",
+          "detail": "Úsáid an painéal \"Freagra\" chun do fhreagra a dhréachtú. Do mhíreanna Cirticiúla, bain úsáid as an Copilot Cumarsáide chun a chinntiú go bhfuil an tón oiriúnach."
+        },
+        "3": {
+          "label": "Seol agus logáil",
+          "detail": "Trí fhreagra a sheoladh logálann sé an snáithe iomlán i stair na míre. Faigheann an teagmháil bhaile do fhreagra trí ríomhphost."
+        },
+        "4": {
+          "label": "Dún nó díchumasaigh",
+          "detail": "Comharthaigh Mar Réitithe nuair a bheidh an cás críochnaithe, nó bain úsáid as \"Escalate to Caring Community National\" má tá an cheist thar cumhacht do chomharchumann a réiteach."
+        }
+      },
+      "tips": {
+        "0": "Dírigh ar aitheantas a thabhairt do bhreithmheas Criticiúil laistigh de 4 huaire an chloig fiú má thógann réiteach iomlán níos faide. Ní chuireann aitheantas amháin isteach ar dhul chun cinn.",
+        "1": "Aithint patrún: má bhaineann trí earraiseanna aiseolais nó níos mó le téama céanna (m.sh. \"freagra mall ó chomhordaitheoir\"), léiríonn sé fadhb chórasach le fiosrú."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Copilot Cumarsáide"
+        },
+        "1": {
+          "label": "Painéal Forbartha SLA"
+        }
+      }
+    },
+    "caring_verification": {
+      "title": "Fíorú Bardas — Braisle DNS/Teistiméireacht",
+      "summary": "Brathanna bardasacha fíoraithe a bhronnadh le braisle digiteach le taispeáint ar a bpróifíl phobail agus i dtuarascálacha tionchair. Éilíonn fíorú dearbhú taifead DNS (ag cruthú smacht ar sheoladh oifigiúil na bardas) agus litir teistiméireachta sínithe.",
+      "steps": {
+        "0": {
+          "label": "Tosaigh fíorú do bhardas",
+          "detail": "Faigh teagmhálaigh na cathrach i Cothú Ceannaireachta, cliceáil \"Tosú Fíoraithe\". Cruthaíonn an córas luach uathúil taifead DNS TXT dóibh a chur lena n-árasáin."
+        },
+        "1": {
+          "label": "Treoraigh foireann TF na cathrach",
+          "detail": "Roinn an treoirlínte DNS (PDF inaistrithe) le riarthóir gréasáin na cathrach. Cuirtear an taifead TXT leis an DNS."
+        },
+        "2": {
+          "label": "Cuir seiceáil DNS ar siúl",
+          "detail": "Nuair a dheimhníonn siad go bhfuil an taifead curtha leis, cliceáil ar \"Seiceáil DNS\". Déanann an córas fiosrú ar an domain go huathoibríoch. Tá an fíorú láithreach má aimsítear an taifead."
+        },
+        "3": {
+          "label": "Uaslódáil an litir dearbhaithe",
+          "detail": "Uaslódáil an litir dearbhaithe sínithe (ar cheannlitir oifigiúil, sínithe ag oifigeach freagrach). Cuirtear seo i gcoimeád mar chuid den taifead comhlíonta."
+        },
+        "4": {
+          "label": "Eisigh an badáiste",
+          "detail": "Nuair a dheimhnítear DNS agus dearbhú araon, cliceáil ar \"Eisigh Baisc Dheimhnithe\". Taispeántar an baisc ar phróifíl pháirtí na harmacháide láithreach."
+        }
+      },
+      "tips": {
+        "0": "Féadfaidh leathnú DNS suas le 48 uair an chloig a thógáil. Lig am go leor sula ndéanann tú an seiceáil — ná déan iarracht níos mó ná uair amháin sa uair an chloig.",
+        "1": "Déanfar an baisc a bhaint go huathoibríoch má scriostar an taifead DNS níos déanaí. Ba chóir comhairle a thabhairt do pháirtithe deimhnithe an taifead a choinneáil go buan."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Cúram Taiscint"
+        },
+        "1": {
+          "label": "Tionchar Bardasach"
+        }
+      }
+    },
+    "caring_hour_transfers": {
+      "title": "Aistrithe Creidmheas Uair Láimhe",
+      "summary": "Ligeann sé do chomhordaitheoirí creidmheas uaireanta a aistriú de láimh idir cuntais bhall taobh amuigh de mhalartú críochnaithe. Bain úsáid as seo le haghaidh ceartúchán, deontais creidmheasanna pobail, nó coigeartuithe riaracháin. Déantar iniúchadh buan ar gach aistriú.",
+      "steps": {
+        "0": {
+          "label": "Roghnaigh an ball foinse",
+          "detail": "Cuardaigh an ball a gearrfar a chuid uaireanta. Déan cinnte de a bhfilleann reatha sula leanfaidh tú ar aghaidh."
+        },
+        "1": {
+          "label": "Roghnaigh an ball ceann scríbe",
+          "detail": "Cuardaigh an ball faighinn. Réamh-mheabhraíonn an córas má tá an ball ceann scríbe ar tionónta difriúil."
+        },
+        "2": {
+          "label": "Cuir isteach an méid agus an chúis",
+          "detail": "Iontráil líon na n-uaireanta (is féidir deichiúidí, m.sh. 0.5 do 30 nóiméad). Scríobh cúis shoiléir — léiríonn sé seo i stair idirbheart an dá bhall."
+        },
+        "3": {
+          "label": "Deimhnigh agus déan feidhmiú",
+          "detail": "Athbhreithnigh an achoimre agus cliceáil \"Deimhnigh Aistriú\". Tá an coigeartú i bhfeidhm láithreach."
+        },
+        "4": {
+          "label": "Déan iniúchadh ar loga iniúchta",
+          "detail": "Seiceáil an iontráil loga iniúchta chun a dhearbhú go bhfuil an dá iarmhéid nuashonraithe i gceart."
+        }
+      },
+      "tips": {
+        "0": "Ní féidir leat iarmhéid cuntas ball a dhéanamh diúltach gan bratach sár-rialaithe — bain teagmháil le sár-rialtóir má tá iarmhéid diúltach ag teastáil i ndáiríre.",
+        "1": "Chun ceartuithe iomadúla (mar shampla tar éis earráide córais), bain úsáid as ionchur CSV chun aistrithe móra a dhéanamh seachas iad a dhéanamh ceann ar cheann."
+      },
+      "caution": "Ní féidir aistrithe láimhe a aisiompar go huathoibríoch. Seiceáil na suimeanna faoi dhó sula ndeimhníonn tú — éilíonn ceartúcháin aistriú láimhe eile sa treo difriúil.",
+      "related_paths": {
+        "0": {
+          "label": "Sreabhadh Oibre Comhordaithe"
+        },
+        "1": {
+          "label": "Dílseacht"
+        }
+      }
+    },
+    "caring_loyalty": {
+      "title": "Clár Dílseachta — Duaiseanna Ball",
+      "summary": "Cumasaigh an clár luaíochta dílseachta: bannaí, duaiseanna céime, bónas streak, agus aitheantas speisialta do bhaill fhadtéarmacha agus do rannpháirtithe is fearr. Spreagann meicnic na dílseachta rannpháirtíocht gan luach inmheánach na cúnamh frithpháirteach a chur ar lár.",
+      "steps": {
+        "0": {
+          "label": "Bhreithniú ar rialacha gníomhacha an luachais",
+          "detail": "Taispeánann an tábla rialacha gach spreagadh dílseachta gníomhach: céimeanna malartaithe (1ú, 5ú, 25ú malartú), bónas atreoraithe, creidmheasa breithe, srl."
+        },
+        "1": {
+          "label": "Cuir nó eagair riail",
+          "detail": "Cliceáil \"Riail Nua\". Socraigh cineál spreagtha (líon malartaithe, scór léirmheas, laethanta sraithe, eachtra saincheaptha), méid an duais i n-uaireanta, agus an bhfuil sé mar dhuaise aonuaire nó athfhillteach."
+        },
+        "2": {
+          "label": "Cumraigh bairr marcála céime",
+          "detail": "Ceangail bairr (a cruthaíodh i riarachán na mBairr) le cairt léannta iontaobhais ionas go bhfaigheann baill an dá duais uaireanta agus aitheantas infheicthe."
+        },
+        "3": {
+          "label": "Athbhreithniú a dhéanamh ar an gcéadchlár",
+          "detail": "Seiceáil an chéadchlár dílseachta chun na rannpháirtithe is fearr a fheiceáil an mhí seo. Smaoinigh ar buíochas pearsanta a thabhairt dóibh tríd an Communication Copilot."
+        },
+        "4": {
+          "label": "Iniúchadh a dhéanamh ar dháileadh luach saothair",
+          "detail": "Taispeánann an logáil dáileacháin gach luach saothair a tugadh, cé dó, agus cén fáth. Úsáid é seo chun neamhrialtachtaí a thabhairt faoi deara."
+        }
+      },
+      "tips": {
+        "0": "Buntáistí malartaithe (do bhaill a thugann agus a fhaigheann sa mhí chéanna) tá siad an-éifeachtach chun ráta malartaithe a fheabhsú ar an Scórbord Tástála.",
+        "1": "Coinnigh an clár simplí — cruthaíonn ró-mhór rialacha mearbhaint. Tá trí go cúig dhea-thuigte luach saothair níos fearr ná meisceán pointí casta."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Pointí Réigiúnacha"
+        },
+        "1": {
+          "label": "Painéal Tástála"
+        }
+      }
+    },
+    "caring_regional_points": {
+      "title": "Pointí Réigiúnacha — Leabhar Caitheamh Airgid Tríú",
+      "summary": "Is airgeadra comhlántach iad Pointí Réigiúnacha a sheasann taobh le creidmheasa uair. Cuirtear iad ar fáil ag comhlachtaí fo-réigiúnacha (comhairlí Ceantar, grúpaí comharsanachta) agus is féidir iad a chur ar ais ar earraí nó seirbhísí áitiúla nach bhfuil clúdaithe ag malartaithe uaireanta. Bainistíonn an leathanach seo leabhar cuntas na bpointí réigiúnacha.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh bileog chothromaíochta na bpointí réigiúnacha",
+          "detail": "Taispeánann an leabhar cuntas líon iomlán na bpointí atá i gcúrsaíocht, a eisíodh an mhí seo, a cuireadh ar ais an mhí seo, agus an fhiachmháil atá fosanta."
+        },
+        "1": {
+          "label": "Séan pointí a eisiúint",
+          "detail": "Úsáid \"Séan Pointí\" chun pointí a chur le cuntas ball nó grúpa ball. Iontráil an méid, fo-cheantar, agus an chúis (m.sh. \"Rannpháirtíocht i nglanadh na comharsanachta\")."
+        },
+        "2": {
+          "label": "Cumraigh roghanna aisíocaíochta",
+          "detail": "Faoi \"Catalóg Aisíocaíochta\", cuir míreanna ar fáil ar féidir le baill pointí a mhalartú astu (m.sh. \"Vóchaire bácála áitiúil — 50 pointe\"). Teastaíonn comhaireamh stoc nó lascgan teorainneacha neamh-theoranta do gach mír."
+        },
+        "3": {
+          "label": "Athbhreithnigh iarratais aistrithe",
+          "detail": "Taispeántar iarratais aistrithe atá fós le feidhmiú sa chríochnúchán. Faomh nó diúltaigh gach ceann acu, le cúis a thabhairt do na diúltaithe."
+        },
+        "4": {
+          "label": "Easpórtáil an leabhar leictreach",
+          "detail": "Gineann tuarascáil leabhair leictreach tréimhsiúil do do pháirtí fo-cheantarach ag taispeáint pointí a eisíodh agus a aistríodh."
+        }
+      },
+      "tips": {
+        "0": "Ba chóir go gcuirfeadh Pointí Réigiúnacha breise leis, ní comórtas leo, na creidmheasanna uair. Seachain mír inaisíoctha a bhunú a d'fhéadfaí a mhalartú freisin mar sheirbhísí creidmheasa uair.",
+        "1": "Coinnigh an fhreagracht (pointí neamhinhíoctha atá ar feitheamh) le feiceáil do do pháirtithe fo-réigiúnacha — léiríonn sé gealltanas fíor."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Fo-léinn"
+        },
+        "1": {
+          "label": "Dílseacht"
+        }
+      }
+    },
+    "caring_sub_regions": {
+      "title": "Fo-Réigiúin — Bainistíocht Fo-Rána Tíre",
+      "summary": "Roinnt-fhoirteachaíonn fo-iarratais limistéar geografach do chomharbaigh ina aonaid riaracháin níos lú mar Quartier (comharsanacht), Ortsteil (ceathrú ceantair), nó sráidbhaile. Is féidir baill a shannadh do fho-iarratais le haghaidh cumarsáide dírithe, tuairiscí áitiúla, agus bainistíocht Pointe Réigiúnacha.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh fo-iarratas",
+          "detail": "Cliceáil ar \"Fo-Iarratas Nua\". Cuir isteach an t-ainm (m.sh. \"Länggasse-Felsenau\"), an cineál (Quartier / Ortsteil / Sráidbhaile / Saincheaptha), agus cur síos roghnach ar an teorainn."
+        },
+        "1": {
+          "label": "Ainmnigh baill",
+          "detail": "Úsáid an uirlis ainmnithe go mórmhór chun baill a ainmniú bunaithe ar a bpoistchód/seoladh, nó ainmnigh baill ar leith de láimh."
+        },
+        "2": {
+          "label": "Socraigh comhordhnóir fo-cheantair",
+          "detail": "Ainmnigh ball le haghaidh leibhéal Comhordhnóra mar an teagmháil fhreagrach don fho-cheantar seo. Faigheann siad fógraí SLA agus dígest ar leith don fho-cheantar."
+        },
+        "3": {
+          "label": "Úsáid i nglacadh cumarsáide",
+          "detail": "Nuair a sheoltar Fógraí Éigeandála, Nudges Cliste, nó Digis Caitliceacha, scagadh fáilteoirí de réir fo-lárionad chun díriú ar na baill ábhartha amháin."
+        },
+        "4": {
+          "label": "Athbhreithniú ar shonraí fo-lárionad",
+          "detail": "Taispeánann an táb anailíse dlúthphointí malairte, ráta ball gníomhach, agus comhlíonadh SLA a bhriseadh síos de réir fo-lárionad."
+        }
+      },
+      "tips": {
+        "0": "Oibreoidh fo-cheantair is fearr nuair a dhéanann siad léarscáil ar fhíor-éachtaí pobail a aithníonn baill — bain úsáid as ainmneacha a n-úsáideann daoine i ndáiríre dá gcomharsanacht.",
+        "1": "Seachain ró-mhór líon na fo-cheantar (is gnách go mbíonn níos mó ná 10 ró-mhion le haghaidh comhphobal tástála)."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Pointí Réigiúnacha"
+        },
+        "1": {
+          "label": "Rabhadh Eigeandála"
+        }
+      }
+    },
+    "partner_timebanks_caring_peers": {
+      "title": "Comhphobail Páirtí - Cumann an Phobail aláraim",
+      "summary": "Bainistigh na nasc ama-bhainistíocht pháirtí idir do chomharchumann agus comharchumann eile Sohraith Phobail Cúraim. Tá an leathanach seo d’oidhreacht le haghaidh naisc iontaofa comharchumann-go-chomharchumann, ní do chliaint API ginearálta ná do chomhtháthú tríú páirtí.",
+      "steps": {
+        "0": {
+          "label": "Féach ar chomharchumainn pháirtí gníomhacha",
+          "detail": "Taispeánann an tábla gach comharchumann Sohraith Phobail Cúraim ceangailte, a URL aonaid, stádas, agus an seiceáil lámhaigh deireanach."
+        },
+        "1": {
+          "label": "Cuireadh a thabhairt do chomhoibriú nua",
+          "detail": "Cliceáil \"Cuireadh a thabhairt do Chomhoibriú Comhghleacaithe\". Cuir isteach URL a n-institiúid NEXUS. Faigheann siad cuireadh chun glacadh agus an comhaontú muiníne dhá-thaobhach a shíniú."
+        },
+        "2": {
+          "label": "Glac le cuireadh atá ag teacht isteach",
+          "detail": "Taispeántar cuireadh atá fós i bhfeidhm faoin táb \"Ag Teacht Isteach\". Déan athbhreithniú ar phróifíl an chomhoibrithe a d’iarr sula nglacann tú."
+        },
+        "3": {
+          "label": "Cumasaigh rialacha roinnte sonraí",
+          "detail": "Le haghaidh gach comhpháirtí, roghnaigh cé na sonraí a roinneann tú: Fíorú Pas Teasa amháin, nó staitisticí malartaithe foriomlána a roinnt freisin don painéal náisiúnta Pobail Cúraim."
+        },
+        "4": {
+          "label": "Seas nasc comhpháirtí",
+          "detail": "Má tá comhoibríocht ní gníomhach níos mó nó má tá saincheist shábháilteachta ann, bain úsáid as \"Seas\" chun an nasc cófhiontair a chur ar sos gan é a bhaint go buan."
+        }
+      },
+      "tips": {
+        "0": "Ceangail amháin leis na comhpháirtíochtaí a dheimhnigh tú go pearsanta nó trí líonra náisiúnta an Phobail chúraim — is féidir cuireadh spam uathoibrithe a tharlú.",
+        "1": "Nuair a bhíonn Mód Nód Aonair gníomhach, cuirtear comhréiteach sonraí uile comhpháirteach den fheidhmíocht ar sos go huathoibríoch. Cuir ar ais go haonarachtach tar éis iniúchadh a dhéanamh ar chomhlíonadh FADP."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Pas Teasa"
+        },
+        "1": {
+          "label": "Nód Aonair"
+        }
+      }
+    },
+    "caring_providers": {
+      "title": "Eolaire Soláthraí Cúraim",
+      "summary": "Eolaire cúram gairmiúil agus leath-ghairmiúil eagraithe a bhaineann le do chomhoibriú. Tá soláthraithe difriúil ó dheonaithe baill — is eagraíochtaí nó daoine aonair iad a sholáthraíonn seirbhísí cúraim shainiúla a chuirfidh le malartuithe pobail (m.sh. fisiteiripe gairmiúil, obair shóisialta leighis).",
+      "steps": {
+        "0": {
+          "label": "Cuir soláthraí leis",
+          "detail": "Cliceáil ar \"Soláthraí Nua\". Iontráil ainm na heagraíochta, sonraí teagmhála, speisialtachtaí cúraim, clúdach geografach, agus cibé an nglacann siad le tagairtí NEXUS."
+        },
+        "1": {
+          "label": "Déan an soláthraí a fhíorú",
+          "detail": "Uaslódáil fianaise ar chlárú nó ar aicmiú an tslánaí (m.sh. clárú KESB, ballraíocht i gcorp gairmiúil). Marcáil iad mar Fíoraithe nuair a dheimhnítear na doiciméid."
+        },
+        "2": {
+          "label": "Nasc le catagóirí cúraim",
+          "detail": "Baineann an soláthraí leis na catagóirí cúraim a chlúdaíonn siad. Cuidíonn sé seo leis an inneall meaitseála iad a mholadh nuair a sháraíonn iarratas cabhrach cumas na bhfóntais."
+        },
+        "3": {
+          "label": "Athbhreithníonn cumas an soláthraí",
+          "detail": "Is féidir le soláthraithe a gcumas atá ar fáil a nuashonrú (m.sh., \"ag glacadh tagairtí nua\", \"ag an acmhainn uasta\"). Seiceáil seo sula ndéantar tagairtí."
+        },
+        "4": {
+          "label": "Taifead toradh na dtagairtí",
+          "detail": "Tar éis ball a atreorú, déan torthaí na hadreoraithe a thaifeadadh i dtaifead malairte an bhall — cuirtear seo le sonraí KPI."
+        }
+      },
+      "tips": {
+        "0": "Ní gá do sholáthróirí cuntais NEXUS a bheith acu — baintear an eolaire faoi láidreacht an chomhordaitheora. Feiceann baill leagan simplí den eolaire ar a bpróifíl.",
+        "1": "Déan athbhreithniú ar an eolaire soláthróirí ar a laghad dhá uair sa bhliain chun eagraíochtaí atá dúnta nó a bhfuil a seirbhísí athraithe a bhaint."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Ciorcal Faighteoir Cúraim"
+        },
+        "1": {
+          "label": "Sreabhadh Oibre Comhordaithe"
+        }
+      }
+    },
+    "caring_recipient_circle": {
+      "title": "Ciorcail Faighteoirí Cúraim & Bainistíocht Socharóirí",
+      "summary": "Baineann ciorcal faighteora cúraim an líonra tacaíochta timpeall ar bhall pobail ar leith a bhfuil cúram rialta ag teastáil uaidh — mar shampla, duine scothaosta a fhaigheann cabhair ó thrí chomharsa, comhordaitheoir, agus altra gairmiúil. Cruthaíonn agus bainistíonn an leathanach seo na ciorcail sin.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh ciorcal do fhaighteoir",
+          "detail": "Cliceáil ar \"Ciorcal Nua\". Roghnaigh an duine a gheobhaidh cúram (caithfidh sé/sí a bheith ina bhall). Tabhair ainm tuairiscúil don chiorcal (m.sh. \"Hans S. — Grúpa Tacaíochta Maidin Mháirt\")."
+        },
+        "1": {
+          "label": "Cuir baill an chiorcail leis",
+          "detail": "Cuir cuidiú deonaithe, an comhordaitheoir ainmnithe, agus aon sholáthraithe gairmiúla leis. Tá ról ag gach ball (Cuiditheoir / Comhordaitheoir Ceannaire / Soláthraí Gairmiúil)."
+        },
+        "2": {
+          "label": "Socraigh plean cúraim",
+          "detail": "Úsáid an réimse Plean Cúraim chun gníomhaíochtaí tacaíochta atá aontaofa, minicíocht, agus aon nótaí sláinte nó sábháilteachta atá ábhartha do chabhair a dhoiciméadú."
+        },
+        "3": {
+          "label": "Naisc malartuithe leis an gciorcal",
+          "detail": "Is féidir malartuithe le haghaidh an duine a fhaigheann cúram a lipéadú leis an gciorcal. Tugann sé seo radharc comhtháite ar an tacaíocht uile a fhaigheann an duine sin."
+        },
+        "4": {
+          "label": "Athbhreithnigh gníomhaíocht an chiorcail",
+          "detail": "Taispeánann an líne ama ghníomhaíochta malartuithe le déanaí, nótaí, agus aon fhabhar coimirce maidir leis an bhfaighteoir seo."
+        }
+      },
+      "tips": {
+        "0": "Tá ábhar an phlana cúraim rúnda — ní féidir ach le baill an chiorcail agus le comhordaitheoirí é a fheiceáil.",
+        "1": "Nuair a fhágann ball den chiorcal (m.sh. má bhog deonach ón áit), cartlannigh iad ón gciorcal seachas ról a scriosadh — coinníonn sé seo stair na cúraim."
+      },
+      "caution": "D’fhéadfadh go mbeadh faisnéis íogair sláinte sna pleananna cúraim. Déan iad a chóireáil mar thaifid rúnda faoi FADP/nDSG.",
+      "related_paths": {
+        "0": {
+          "label": "Soláthraithe"
+        },
+        "1": {
+          "label": "Cosaint"
+        }
+      }
+    },
+    "caring_research": {
+      "title": "Comhpháirtíochtaí Taighde — Comhoibriú Acadúil",
+      "summary": "Bainistigh comhpháirteachais taighde foirmiúla le hollscoileanna, institiúidí sláinte poiblí, agus eagraíochtaí taighde sóisialta. Is féidir rochtain léitheoireachta amháin a thabhairt do pháirtithe ar shonraí comhiomlána anaithnid le haghaidh staidéir acadúla, faoi réir comhaontú sonraí sínithe.",
+      "steps": {
+        "0": {
+          "label": "Cruthaigh taifead comhpháirtíochta taighde",
+          "detail": "Cliceáil ar \"Comhpháirtíocht Nua\". Iontráil ainm an institiúide, príomhtaighdeoir, ceist taighde, tagairt faomhadh eiticiúil, agus scóip sonraí atá ceadaithe."
+        },
+        "1": {
+          "label": "Uaslódáil an comhaontú sonraí",
+          "detail": "Uaslódáil an comhaontú próiseála sonraí sínithe. Ní féidir comhpháirtíochtaí a ghníomhachtú go dtí go mbeidh comhaontú sínithe ar fáil sa chomhad."
+        },
+        "2": {
+          "label": "Cumraigh rochtain sonraí",
+          "detail": "Úsáid an roghnóir réimse sonraí chun a shonrú cén tacar sonraí anaithnid is féidir leis an bpáirtí rochtain a fháil orthu: meastacháin mhalartaithe, treochtaí KPI, torthaí suirbhé, briseadh síos daonra."
+        },
+        "3": {
+          "label": "Tabhair creidmheas rochtana don taighdeoir",
+          "detail": "Nuair a bheidh sé gníomhachtaithe, bain úsáid as \"Tabhair Rochtain\" chun eochair API léitheoireachta-aonair nó sceideal easpórtála sonraí a sheoladh chuig an taighdeoir."
+        },
+        "4": {
+          "label": "Athbhreithnigh agus athnuachan",
+          "detail": "Críochnaíonn comhpháirtnéireachtaí tar éis an téarma a d’aontaíodh (de ghnáth bliain acadúil amháin). Bain úsáid as an sreabhadh oibre athnuachana chun síneadh le ceadúnas nuashonraithe."
+        }
+      },
+      "tips": {
+        "0": "Níor cheart rochtain a thabhairt riamh ar shonraí ball nach bhfuil anonamaithe. Déanann an t-ardán na sonraí a anonamú go huathoibríoch don deireadh-easpórtála taighde, ach déan fíorú leis an oifigeach cosanta sonraí.",
+        "1": "Coinnigh uimhir tagartha eitice ar chomhad — d’fhéadfadh iniúchtaí seachtracha iarraidh ar fhianaise ar mhaoirseacht eiticiúil."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Bunlíne KPI"
+        },
+        "1": {
+          "label": "Pacáiste Nochtaithe"
+        }
+      }
+    },
+    "caring_external_integrations": {
+      "title": "Rianaitheoir Comhtháthú Comhpháirtíochta - Brathanna Amach Seachtracha",
+      "summary": "Rian comhtháthaithe atá ag brath ar pháirtí a bhfuil úinéir seachtrach, comhaontú roinnte sonraí, dánlann tástála, nó sonraíocht comhéadan de dhíth orthu sula bhféadfar iad a chur beo. Is rianóir réidh don leathanach seo, ní leathanach socraithe féderáilte Partner Timebanks é.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh stádas spleáchais",
+          "detail": "Taispeánann an liosta úinéir gach comhtháthaithe, catagóir, stádas oibríoch, stádas DSA, stádas dánlainne tástála, agus URL sonraíochta comhéadan."
+        },
+        "1": {
+          "label": "Cuir spleáchas rianaithe leis",
+          "detail": "Cliceáil ar \"Cuir leis\" nuair is gá do pháirtí seachtrach API, gamhacmhán, comhaontú sonraí, nó teagmháil oibríochtúil a sholáthar sula bhféadfaidh an seachadadh dul ar aghaidh."
+        },
+        "2": {
+          "label": "Scar réidhlá agus creidmheasanna",
+          "detail": "Úsáid an leathanach seo chun rianú a dhéanamh ar stádas réidh páirtí. Úsáid Comhpháirtithe API Insteach, Comhpháirtithe Prótacal Seachtracha, nó Webhooks nuair is gá creidmheasanna nó deireadhphointí a chumrú."
+        },
+        "3": {
+          "label": "Coinnigh nótaí suas chun dáta",
+          "detail": "Taifead na bacanna, na gníomhartha seo a leanas, agus nuashonruithe úinéara ionas gur féidir le páirtithe leasmhara a fheiceáil an bhfuil an moill teicniúil, dlíthiúil, nó seachtrach."
+        },
+        "4": {
+          "label": "Dún iontrálacha atá seanchaitheamh",
+          "detail": "Bain nó cartlann na spleáchais nach cuid de phlean seachadta an Phobail Aireacháin iad níos mó."
+        }
+      },
+      "tips": {
+        "0": "Ná greamaigh rúin ná ticéid OAuth isteach i nótaí. Stóráil cruthaitheachtaí ach amháin ar an leathanach cruthaitheacha cuí.",
+        "1": "Ní chiallaíonn sandbox glas go bhfuil an comhtháthú ceadaithe. Seiceáil DSA agus stádas úinéara sula gcaitear leis mar atá réidh."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Tagairt Comhtháthaithe Forbróirí"
+        },
+        "1": {
+          "label": "Pacáiste Nochtaithe"
+        }
+      }
+    },
+    "caring_integration_showcase": {
+      "title": "Tagairt Comhtháthaithe Forbróirí",
+      "summary": "Leathanach tagartha é do fhorbróirí do na heiseanphointí API Pobail Aireata atá ar fáil, scéimeanna imeachtaí webhook, cumraíocht OAuth, agus samplaí paiste. Déan é a úsáid chun sonraí cur i bhfeidhm a mhíniú tar éis an cineál comhtháthaithe ceart a roghnú.",
+      "steps": {
+        "0": {
+          "label": "Brabhsáil na heiseanphointí atá ar fáil",
+          "detail": "Úsáid an brabhsálaí heiseanphointí chun na bealaí REST API atá ar fáil a iniúchadh de réir réimse (Comhaltaí, Malartuithe, Sparán, Imeachtaí, srl.). Taispeánann gach iontráil an modh, an cosán, na paraiméadair, agus an scéim freagartha."
+        },
+        "1": {
+          "label": "Cóipeáil samplaí payload",
+          "detail": "Cliceáil ar \"Cóipeáil Sampla\" in aice le haon imeacht webhook chun sampla réalaíoch de payload JSON a fháil le húsáid i do chód comhtháthaithe nó tástála."
+        },
+        "2": {
+          "label": "Athbhreithnigh leathanacha OAuth",
+          "detail": "Taispeánann an tábla leathanacha OAuth na leathanacha cead ceadaithe ar fad, cén sonraí a thugann siad rochtain orthu, agus an leibhéal muiníne íosta atá riachtanach chun iad a údarú."
+        },
+        "3": {
+          "label": "Íoslódáil sonraíocht OpenAPI",
+          "detail": "Bain úsáid as \"Íoslódáil Sonraíocht OpenAPI 3.1\" chun an sainmhíniú API iomlán atá inchódaithe le meaisín a fháil, atá comhoiriúnach le Postman, Insomnia, agus uirlisí giniúna cód."
+        },
+        "4": {
+          "label": "Tástáil leis an sandbox API",
+          "detail": "Ligeann an sandbox ionsuite duit glaonna tástála údaraithe a dhéanamh i gcoinne sonraí staidéireachta do chomhoibriú gan taifead beo a mhodhnú."
+        }
+      },
+      "tips": {
+        "0": "Roinn an speic OpenAPI le forbróirí tríú páirtí seachas doiciméadú API lámhscríofa a scríobh — fanann sé suas chun dáta go huathoibríoch.",
+        "1": "Úsáideann an t-adhmadbhosca sraith ar leith de dhearbhú tástála ó do eochracha API beo — ná déan iad a mheascadh."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Rianaire Comhtháthú Comhpháirtí"
+        }
+      }
+    },
+    "super_admin_national_kiss": {
+      "title": "Pobal Cúramach — Painéal Náisiúnta Tras-Chomhpháirteach",
+      "summary": "Painéal pointí comhréire náisiúnta atá le feiceáil amháin ag foireann náisiúnta Cumann Cúraim agus super-riarthóirí. Comhcheanglaíonn sé príomhmhéadair ar fud na gcomhchomhlachtaí Cumann Cúraim uile atá gníomhach: líon uaireanta malartaithe iomlán, coigilteas costais CHF comhcheangailte, úsáid Pas Teasa tras-comhchomhalta, agus sláinte na feidhmchláir.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithnigh na cártaí achoimrimh náisiúnta",
+          "detail": "Taispeánann an chéad shraith: líon iomlán comhlachais gníomhacha, uaireanta iomlána malartaithe (mí/bliain), costais CHF comhcheangailte a sheachaint, agus líon iomlán baill uathúla trasna na gcomhlachais go léir."
+        },
+        "1": {
+          "label": "Druileáil isteach i gcomhlacht ar leith",
+          "detail": "Cliceáil ar aon shraith comhlachta sa tábla chun a ndashbord mionsonraithe a oscailt. Tá rochtain léitheoireachta amháin agat ar a gcuid sonraí."
+        },
+        "2": {
+          "label": "Athbhreithnigh sláinte na feidearálaí",
+          "detail": "Taispeánann léarscáil sláinte na fédarachta cé na comharbailte atá nasctha tríd an bhféadaracht Pas Teasa agus cé na cinn a bhí teip-sinc le déanaí."
+        },
+        "3": {
+          "label": "Easpórtáil an tuarascáil náisiúnta",
+          "detail": "Bain úsáid as \"Easpórtáil an Tuarascáil Náisiúnta\" chun PDF comhiomlán a chruthú do chruinnithe an Bhoird Phobail Chúraim nó chuig ionadaithe na húdaráis sláinte féideartha."
+        },
+        "4": {
+          "label": "Ardaigh foláireamh náisiúnta",
+          "detail": "Úsáid an “Fógra Náisiúnta” chun teachtaireacht a sheoladh chuig gach comhordaitheoir comhoibrithe go comhuaineach — mar shampla, nuashonrú ar mhodhóireacht nó fógra cothabhála córais."
+        }
+      },
+      "tips": {
+        "0": "Níl aon sonraí ball indíolta aonair sa phainéal náisiúnta — ach achoimre ar leibhéal na gcomhoibrithe amháin.",
+        "1": "Úsáid an “Radharc Comparáide” chun scór an Phhíolóta Pobail Cúraim de gach comhoibhrithe a thaispeáint in aice le meán náisiúnta."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Gníomhaireachtaí KI"
+        },
+        "1": {
+          "label": "Fiosrúcháin Tástála"
+        }
+      }
+    },
+    "admin_ki_agents": {
+      "title": "KI-Gníomhaireachtaí — Fráma Oibre Gníomhaire Neamhspleách",
+      "summary": "Ligeann fráma KI-Gníomhaireachtaí (Gníomhaire AI) do NEXUS le haghaidh gníomhartha uathoibrithe a mholadh bunaithe ar phatrúin sonraí — mar shampla, feachtas Smart Nudge a mholadh, ball atá i mbaol éirí as a bhrath, nó coigeartú comhghné a mholadh. Éilíonn gach moladh cead an duine sula bhfeidhmítear iad. Ní ghníomhaíonn gníomhaireachtaí riamh go haonair mura n-ardaíonn tú an leibhéal uathoibríoch iarratais go sainráite.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithniú a dhéanamh ar na moltaí atá le feiceáil",
+          "detail": "Taispeánann an t-ordlathas moltaí moladh gach gníomhaire, na sonraí fianaise atá taobh thiar de, agus an gníomh a mholtar. Léigh na fíricí le cúram sula n-urramaíonn tú iad."
+        },
+        "1": {
+          "label": "Urraigh nó diúltaigh do mholadh",
+          "detail": "Cliceáil \"Urramú\" chun an gníomh a chur i gníomh láithreach, \"Diúltú\" chun é a dhiúltú, nó \"Fánach\" chun machnamh a dhéanamh níos déanaí. Cuir nóta leis ag míniú do chinneadh."
+        },
+        "2": {
+          "label": "Cumasaigh an marc uathoibríoch a chur i bhfeidhm",
+          "detail": "I Socruithe Gníomhaire, is féidir leat marc muinín a shocrú os cionn a gcuirtear moltaí ísle-riosca i bhfeidhm go huathoibríoch (réamhshocraithe: faoi mhíchumas). Gníomhóidh é seo ach do chineálacha gníomhaíochta íseal-riosca ar leith."
+        },
+        "3": {
+          "label": "Athbhreithnigh feidhmíocht an ghníomhaire",
+          "detail": "Taispeánann cluaisín anailíse gníomhaire cé mhéad tairiscint a cuireadh isteach, a ceadaíodh, a dhiúltú, agus a chuirtear ar athló, chomh maith le torthaí na ngníomhartha ceadaithe (ar éirigh leo an éifeacht beartaithe a bhaint amach?)."
+        },
+        "4": {
+          "label": "Cuir cineálacha gníomhaire leis nó déan iad a dhíchumasú",
+          "detail": "Úsáid an Tírdhreach Gníomhaire chun cineálacha gníomhaire ar leith a chumasú nó a dhíchumasú. Tosaigh le grúpa beag agus leathnaigh de réir mar a bhíonn muinín agat ina moltaí."
+        }
+      },
+      "tips": {
+        "0": "Is meicníocht shábháilteachta intinneach é an múnla moltar-ansin-cheadaítear — ná déan é a dhíchumasú le haghaidh gníomhartha éifeachtacha (m.sh. ardaithe slándála, aistrithe móra creidmheasa).",
+        "1": "Foghlaimíonn na gníomhaire ó do chinnteoirí ceadaigh/diúltúcháin le himeacht ama. Is comhartha é diúltuithe comhsheasmhacha ar chineál gníomhaire áirithe chun a chumraíocht a athbhreithniú."
+      },
+      "caution": "Níor chóir an téarma uathoibríoch iarratais a ardú riamh do ghníomhaireachtaí a fhéadann aistrithe airgeadais, ardú sábháilteachta, nó athruithe céime bhaill a thosú. Ní mór dóibh seo go léir a éileamh iniúchadh daonna i gcónaí.",
+      "related_paths": {
+        "0": {
+          "label": "Nudges Chliste"
+        },
+        "1": {
+          "label": "Painéal Pobail Cúraim Náisiúnta"
+        }
+      }
+    },
+    "admin_pilot_inquiries": {
+      "title": "Fiosrúcháin Pailéad — Líne Onbordála le haghaidh Gemeinde",
+      "summary": "Bainistíonn sé an phróiseas iomlán don chumann áitiúil (Gemeinde) a léiríonn suim i bpilótáil NEXUS/Comhphobal Aireach. Déantar é a rianú ó theagmháil bhunúsach go dtí an comhaontú tástála agus seoladh comhpháirteach. Seo an pointe tosaigh do gach tionscnamh nua comhpháirteach.",
+      "steps": {
+        "0": {
+          "label": "Athbhreithniú a dhéanamh ar fiosrúcháin nua",
+          "detail": "Tagann fiosrúcháin nua isteach ón bhfoirm teagmhála os comhair an phobail, atreoruithe náisiúnta ón pobal Cóirímh, nó iontráil láimhe. Taispeánann gach ceann ainm na bailte, canún, duine teagmhála, agus nótaí faoin chéad fhiosrúchán."
+        },
+        "1": {
+          "label": "Cáiligh an fiosrúchán",
+          "detail": "Úsáid an seicliosta cáilithe chun measúnú a dhéanamh ar réamhullmhúchán: An bhfuil comhordaitheoir ainmnithe ann? An bhfuil tacaíocht ó chomhairle na bailte? An bhfuil líonra pobail atá oiriúnach ann cheana? Rangigh gach fachtóir."
+        },
+        "2": {
+          "label": "Gluaiseacht tríd an bpróiseas píblíne",
+          "detail": "Tarraing nó bog an fiosrúchán trí na céimeanna: Nua → Cáilitheach → Moladh Seolta → Comhaontú Píolóta → Tús Le Feidhmiú → Gníomhach. Tá gníomhartha riachtanacha do gach céim doiciméadaithe."
+        },
+        "3": {
+          "label": "Giniúint moladh píolóta",
+          "detail": "Ag an staid Seoladh Tairisceana, bain úsáid as \"Gineadh Tairisceana\" chun tairiscint PDF saincheaptha a chruthú ag úsáid sonraí an bhaile, ráta cúraim a cantúin, agus téarmaí modheolaíochta Caomhnaithe Pobal Caomhnaithe caighdeánacha."
+        },
+        "4": {
+          "label": "Tosaigh cruthú leasaí",
+          "detail": "Nuair a scríobhadh agus uaslódáladh comhaontú pilóta, bain úsáid as \"Cruthaigh Leasaí Comhpháirteach\" chun leasáí NEXUS nua a sholáthar dóibh. Tá sé seo ag nascadh an fiosrúcháin leis an ngeata Ullmhachta Tosaigh Beo."
+        }
+      },
+      "tips": {
+        "0": "De ghnáth, bíonn easpa laoch inmheánach na cathrach ag fiosrú atá ag stad ag \"Cáilithe\" ar feadh níos mó ná 30 lá — díríodh an tábhacht ar aimsiú urraitheora sinsearach.",
+        "1": "Tá radharc comhghleacaithe ag an bpíplíne ar Leathanach Cothú Ceannaireachta — bain úsáid as an radharc atá oiriúnach do do sreabhadh oibre, roinntear na sonraí céanna."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Cúram Taiscint"
+        },
+        "1": {
+          "label": "Réidh le Seoladh"
+        },
+        "2": {
+          "label": "Painéal Pobail Cúraim Náisiúnta"
+        }
+      }
+    }
+  }
+}

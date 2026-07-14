@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,7 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
+    "loading": "Laden",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,7 +68,7 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
+    "select_row": "Selecteer rij {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
   },
@@ -208,7 +208,22 @@
     "verify_seller_title": "Verkoper verifiëren",
     "view_all": "Bekijk alles",
     "moderation_tabs_aria": "Statusfilter voor marktplaatsmoderatie",
-    "seller_tabs_aria": "Verkoperstatusfilter"
+    "seller_tabs_aria": "Verkoperstatusfilter",
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief",
+      "sold": "Verkocht",
+      "expired": "Verlopen",
+      "draft": "Concept",
+      "unknown": "Andere vermeldingstatus"
+    },
+    "moderation_status": {
+      "approved": "Goedgekeurd",
+      "pending": "In afwachting van beoordeling",
+      "rejected": "Afgewezen",
+      "flagged": "Gemarkeerd",
+      "unknown": "Andere moderatiestatus"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} geselecteerd",

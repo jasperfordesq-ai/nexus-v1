@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,35 +67,33 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "Bekijk door leden ingediende bugrapporten met paginadiagnostiek, Sentry-gebeurtenis-ID's en triage-opmerkingen.",
     "loading": "Ondersteuningsrapporten laden...",
     "empty": "Er zijn geen ondersteuningsrapporten die overeenkomen met deze filters.",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "Pagina openen",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "Diagnostische gegevens kopiëren",
       "copy_handoff": "Kopieer de technische overdracht",
-      "close": "Close",
-      "save": "Triage opslaan"
+      "save": "Triage opslaan",
+      "refresh": "Vernieuwen",
+      "search": "Zoeken",
+      "clear": "Wissen",
+      "review": "Beoordeling",
+      "open_sentry": "Open Sentry",
+      "close": "Sluiten"
     },
     "stats": {
       "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "triaged": "Geprioriteerd",
+      "blocked": "Geblokkeerd",
+      "unassigned": "Niet toegewezen"
     },
     "filters": {
       "search": "Zoek referentie, route, verslaggever of samenvatting",
@@ -106,45 +103,45 @@
     "status": {
       "all": "Alle statussen",
       "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "triaged": "Geprioriteerd",
+      "resolved": "Opgelost",
+      "closed": "Gesloten"
     },
     "impact": {
       "all": "Alle gevolgen",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "Geblokkeerd",
+      "major": "Belangrijk",
+      "minor": "Klein",
+      "cosmetic": "Cosmetisch"
     },
     "table": {
       "aria": "Ondersteuningsrapporten",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
+      "reference": "Referentie",
+      "summary": "Samenvatting",
       "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reporter": "Rapporteur",
+      "assignee": "Toegewezen aan",
+      "created": "Gemaakt",
+      "actions": "Acties",
+      "impact": "Impact"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "Rapport laden...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "Gebruikersagent",
       "sentry_event": "Sentry-evenement",
-      "diagnostics": "Diagnostics"
+      "summary": "Samenvatting",
+      "description": "Beschrijving",
+      "reporter": "Rapporteur",
+      "page": "Pagina",
+      "created": "Gemaakt",
+      "diagnostics": "Diagnostiek",
+      "title": "Rapporteer {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "URL van Sentry-probleem",
-      "triage_notes": "Triage-aantekeningen"
+      "triage_notes": "Triage-aantekeningen",
+      "status": "Status",
+      "assignee": "Toegewezen aan"
     },
     "messages": {
       "saved": "Ondersteuningsrapport bijgewerkt.",
@@ -157,6 +154,37 @@
       "save": "Kan het ondersteuningsrapport niet opslaan.",
       "copy": "Kan diagnostische gegevens niet kopiëren.",
       "copy_handoff": "Kan de technische overdracht niet kopiëren."
-    }
+    },
+    "handoff": {
+      "title": "Ondersteuningsrapport {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (gebruiker {{id}})",
+      "reporter_without_email": "{{name}} (gebruiker {{id}})",
+      "unknown_reporter": "Onbekende melder",
+      "no_diagnostics": "Er zijn geen diagnostische gegevens bijgevoegd.",
+      "not_provided": "Niet opgegeven",
+      "none_yet": "Nog geen.",
+      "labels": {
+        "tenant": "Gemeenschap",
+        "status": "Status",
+        "created": "Gemaakt",
+        "reporter": "Rapporteur",
+        "page_url": "Pagina-URL",
+        "user_agent": "Gebruikersagent",
+        "sentry_event": "Sentry-gebeurtenis",
+        "sentry_issue": "Sentry-probleem",
+        "impact": "Impact",
+        "route": "Route"
+      },
+      "headings": {
+        "summary": "Samenvatting:",
+        "user_description": "Gebruikersbeschrijving:",
+        "triage_notes": "Triagenotities:",
+        "diagnostics": "Diagnostiek:"
+      }
+    },
+    "unassigned": "Niet toegewezen",
+    "meta_title": "Ondersteuningsrapporten",
+    "title": "Ondersteuningsrapporten"
   }
 }

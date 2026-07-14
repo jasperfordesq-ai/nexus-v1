@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Assinantes",
       "user_fallback": "Usuário #{{id}}",
       "columns": {
-        "member": "MEMBRO",
-        "email": "EMAIL",
-        "tier": "NÍVEL",
-        "interval": "INTERVALO",
-        "status": "STATUS",
-        "next_billing": "PRÓXIMO FATURAMENTO",
-        "started": "INICIADO"
+        "member": "Membro",
+        "email": "Email",
+        "tier": "Nível",
+        "interval": "Intervalo",
+        "status": "Status",
+        "next_billing": "Próxima cobrança",
+        "started": "Iniciado"
       },
       "status": {
         "active": "Ativo",
@@ -132,14 +132,14 @@
     "table": {
       "aria": "Camadas premium",
       "name": "NOME",
-      "slug": "SLUG",
       "price_month": "PREÇO / MÊS",
       "price_year": "PREÇO / ANO",
       "features": "CARACTERÍSTICAS",
       "status": "STATUS",
       "subscribers": "ASSINANTES",
       "stripe": "LISTRA",
-      "actions": "AÇÕES"
+      "actions": "AÇÕES",
+      "slug": "SLUG"
     },
     "status": {
       "active": "Ativo",
@@ -184,32 +184,32 @@
       "settings_save_failed": "Não foi possível salvar as configurações de roteamento de doações.",
       "onboarding_failed": "Não foi possível iniciar a integração do Stripe.",
       "finance_load_failed": "Não foi possível carregar as operações de financiamento de doações.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Não foi possível fazer download da exportação de recibo anual."
+      "annual_receipts_export_failed": "Não foi possível fazer download da exportação de recibo anual.",
+      "gift_aid_export_failed": "A exportação de Gift Aid não pôde ser baixada."
     },
     "settings": {
-      "title": "Roteamento de distribuição",
       "description": "Deixe em branco para usar a conta Stripe da plataforma com metadados de locatário. Conecte uma conta Stripe de locatário para enviar futuras doações únicas e regulares para essa conta de locatário.",
       "stripe_connect_account_id": "ID da conta do locatário Stripe Connect",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Alterar isso afeta futuras verificações de doações. Sincronize novamente os níveis de suporte após adicionar uma conta de locatário para que existam preços recorrentes nessa conta Stripe.",
       "route_platform_default": "Reserva de plataforma",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Inicie a integração do Stripe",
       "continue_onboarding": "Continuar a integração do Stripe",
       "requirements_due": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
       "save": "Salvar roteamento",
       "status": {
         "not_connected": "Não conectado",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Ação necessária",
-        "unknown": "Estado desconhecido"
+        "unknown": "Estado desconhecido",
+        "pending": "Pendente",
+        "ready": "Pronto"
       },
       "connect_fallback_active": "Uma conta Stripe Connect está configurada, mas ainda não está pronta para doações ao vivo. Os pagamentos usarão o substituto da plataforma até que a integração seja concluída.",
       "requirements_due_many": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
       "requirements_due_one": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
-      "requirements_due_other": "Requisitos de conta Stripe que precisam de atenção: {{count}}."
+      "requirements_due_other": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
+      "route_tenant_connect": "Conexão de Inquilino",
+      "title": "Stripe roteamento"
     },
     "finance": {
       "title": "Operações financeiras",
@@ -217,16 +217,9 @@
       "completed_volume": "Volume concluído",
       "platform_fallback_volume": "Volume de fallback da plataforma",
       "tenant_connect_volume": "Volume do Locatário Connect",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Disputas abertas",
       "active_recurring": "Ativo recorrente",
       "failed_receipts": "Recibos falhados",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Exportar receitas anuais",
       "empty": "Nenhuma atividade financeira foi registrada ainda.",
       "donation_count_many": "{{count}} donation",
@@ -235,7 +228,14 @@
       "declaration_count_one": "Declaração {{count}}",
       "past_due_count_many": "{{count}} past due",
       "past_due_count_one": "{{count}} vencido",
-      "past_due_count_other": "{{count}} vencido"
+      "past_due_count_other": "{{count}} vencido",
+      "gift_aid_ready": "Gift Aid pronto",
+      "export_gift_aid": "Exportar Gift Aid",
+      "donation_count": "Doação {{count}}",
+      "donation_count_other": "Doações {{count}}",
+      "declaration_count": "{{count}} declaração",
+      "declaration_count_other": "{{count}} declarações",
+      "past_due_count": "{{count}} vencido"
     }
   }
 }

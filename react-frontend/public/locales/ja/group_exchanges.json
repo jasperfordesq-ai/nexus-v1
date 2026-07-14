@@ -91,7 +91,9 @@
     "aria_exchange_participants": "交換参加者",
     "aria_hour_split": "時間分割",
     "participants_heading_other": "参加者 ({{count}})",
-    "hours_amount_other": "{{count}}時間"
+    "hours_amount_other": "{{count}}時間",
+    "participants_heading_one": "参加者 ({{count}})",
+    "hours_amount_one": "{{count}}h"
   },
   "create": {
     "page_title": "グループ交換を作成",
@@ -152,7 +154,9 @@
     "hours_suffix": "時間",
     "weight_suffix": "×",
     "providers_count_other": "提供者（{{count}}）",
-    "receivers_count_other": "受取人（{{count}}）"
+    "receivers_count_other": "受取人（{{count}}）",
+    "providers_count_one": "提供者 ({{count}})",
+    "receivers_count_one": "受信者 ({{count}})"
   },
   "toast": {
     "exchange_started": "交換を開始しました",

@@ -7,6 +7,7 @@ import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinne
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { Separator } from '@/components/ui';
 import Info from 'lucide-react/icons/info';
@@ -44,6 +45,7 @@ type IntegrationCategory =
 
 interface Integration {
   id: string;
+  copy_code?: string | null;
   name: string;
   category: IntegrationCategory;
   owner_name: string;
@@ -134,9 +136,21 @@ function emptyForm(): FormState {
   };
 }
 
-function fromIntegration(item: Integration): FormState {
+function integrationCopy(
+  item: Integration,
+  field: 'name' | 'notes',
+  t: TFunction,
+): string {
+  if (!item.copy_code) return item[field];
+
+  return t(`external_integrations.default_items.${item.copy_code}.${field}`, {
+    defaultValue: item[field],
+  });
+}
+
+function fromIntegration(item: Integration, t: TFunction): FormState {
   return {
-    name: item.name,
+    name: integrationCopy(item, 'name', t),
     category: item.category,
     owner_name: item.owner_name,
     owner_email: item.owner_email,
@@ -144,7 +158,7 @@ function fromIntegration(item: Integration): FormState {
     interface_spec_url: item.interface_spec_url,
     dsa_status: item.dsa_status,
     sandbox_url: item.sandbox_url,
-    notes: item.notes,
+    notes: integrationCopy(item, 'notes', t),
   };
 }
 
@@ -201,7 +215,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
 
   const openEdit = (item: Integration) => {
     setEditing(item);
-    setForm(fromIntegration(item));
+    setForm(fromIntegration(item, t));
     editModal.onOpen();
   };
 
@@ -222,7 +236,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
         setLastUpdatedAt(res.data.last_updated_at ?? null);
         showToast(t('external_integrations.toasts.seeded'), 'success');
       } else {
-        showToast(res.error ?? t('external_integrations.toasts.seed_failed'), 'error');
+        showToast(t('external_integrations.toasts.seed_failed'), 'error');
       }
     } catch {
       showToast(t('external_integrations.toasts.seed_failed'), 'error');
@@ -244,7 +258,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? t('external_integrations.toasts.update_failed'), 'error');
+          showToast(t('external_integrations.toasts.update_failed'), 'error');
         }
       } else {
         const res = await api.post<ItemResponse>(
@@ -256,7 +270,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? t('external_integrations.toasts.create_failed'), 'error');
+          showToast(t('external_integrations.toasts.create_failed'), 'error');
         }
       }
     } catch {
@@ -279,7 +293,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
         setTarget(null);
         await load();
       } else {
-        showToast(res.error ?? t('external_integrations.toasts.delete_failed'), 'error');
+        showToast(t('external_integrations.toasts.delete_failed'), 'error');
       }
     } catch {
       showToast(t('external_integrations.toasts.delete_failed'), 'error');
@@ -404,10 +418,10 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
                   <TableRow key={item.id}>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium">{item.name}</span>
-                        {item.notes && (
+                        <span className="font-medium">{integrationCopy(item, 'name', t)}</span>
+                        {integrationCopy(item, 'notes', t) && (
                           <span className="line-clamp-1 max-w-md text-xs text-muted">
-                            {item.notes}
+                            {integrationCopy(item, 'notes', t)}
                           </span>
                         )}
                       </div>
@@ -504,7 +518,9 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
       >
         <ModalContent>
           <ModalHeader>
-            {editing ? t('external_integrations.editor.edit_title', { name: editing.name }) : t('external_integrations.editor.add_title')}
+            {editing
+              ? t('external_integrations.editor.edit_title', { name: integrationCopy(editing, 'name', t) })
+              : t('external_integrations.editor.add_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
@@ -636,7 +652,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
               <div className="space-y-3">
                 <p className="text-sm">
                   {t('external_integrations.delete_modal.body_prefix')}{' '}
-                  <span className="font-semibold">{target.name}</span>.{' '}
+                  <span className="font-semibold">{integrationCopy(target, 'name', t)}</span>.{' '}
                   {t('external_integrations.delete_modal.body_suffix')}
                 </p>
                 <Separator />

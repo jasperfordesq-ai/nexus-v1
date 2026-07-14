@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Franco suíço — a moeda usada para cálculos de compensação de custos de cuidados formais em implantações da Comunidade de Cuidado",
+    "fadp": "Lei Federal de Proteção de Dados — lei suíça de proteção de dados revisada (em vigor desde setembro de 2023)",
+    "ndsg": "Neues Datenschutzgesetz — a Lei Federal Suíça de Proteção de Dados revisada (sinônimo de FADP)",
+    "dsg": "Datenschutzgesetz — ver nDSG / FADP",
+    "gdpr": "General Data Protection Regulation — lei de proteção de dados da UE; implementações suíças usam FADP/nDSG em vez disso",
+    "sla": "Service-level agreement — o tempo máximo de resposta ou resolução comprometido para cada nível de prioridade",
+    "agpl": "Licença Pública Geral GNU Affero v3 — a licença de código aberto sob a qual o NEXUS é lançado publicamente",
+    "kpi": "Indicador-chave de desempenho — uma métrica mensurável usada para avaliar o progresso em direção a um objetivo definido",
+    "roi": "Retorno sobre investimento — aqui: custo de cuidados formais evitado por hora de apoio informal trocado",
+    "nexus": "Projeto NEXUS — a plataforma de intercâmbio de tempo e cuidado comunitário multi-inquilino",
+    "agm": "Assembleia geral anual",
+    "xp": "Pontos de experiência — pontos de gamificação concedidos por completar trocas e alcançar marcos",
+    "isco": "Classificação Internacional Padrão de Ocupações — usada para categorizar tipos de serviços de cuidado"
+  }
+}

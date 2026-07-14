@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, useConfirm } from '@/components/ui';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -263,14 +263,16 @@ export default function MunicipalImpactReportsPage() {
   }, [loadTemplates]);
 
   const stats = summary?.stats ?? {};
-  const currencyFormatter = useMemo(() => new Intl.NumberFormat(undefined, {
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat(getFormattingLocale(), {
     style: 'currency',
     currency: summary?.currency ?? 'CHF',
     maximumFractionDigits: 0,
   }), [summary?.currency]);
 
   const metric = (key: string) => stats[key] ?? 0;
-  const formatHours = (value: number) => t('municipal_reports.values.hours', { count: Number(value.toFixed(1)) });
+  const formatHours = (value: number) => t('municipal_reports.values.formatted_hours', {
+    value: formatNumber(value, { maximumFractionDigits: 1 }),
+  });
   const templateOptions = useMemo(() => [
     { id: 'default', label: t('municipal_reports.templates.default_policy') },
     ...templates.map((template) => ({ id: String(template.id), label: template.name })),
@@ -325,7 +327,7 @@ export default function MunicipalImpactReportsPage() {
         toast.success(t('municipal_reports.toast.template_saved'));
         onClose();
       } else {
-        toast.error(res.error || t('municipal_reports.toast.template_save_failed'));
+        toast.error(t('municipal_reports.toast.template_save_failed'));
       }
     } catch {
       toast.error(t('municipal_reports.toast.template_save_failed'));
@@ -349,7 +351,7 @@ export default function MunicipalImpactReportsPage() {
         await loadTemplates();
         toast.success(t('municipal_reports.toast.template_deleted'));
       } else {
-        toast.error(res.error || t('municipal_reports.toast.template_delete_failed'));
+        toast.error(t('municipal_reports.toast.template_delete_failed'));
       }
     } catch {
       toast.error(t('municipal_reports.toast.template_delete_failed'));
@@ -425,8 +427,8 @@ export default function MunicipalImpactReportsPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_reports.about.title')}</p>
               <p className="text-foreground/70">
-                {t('municipal_reports.about.body_1_before_kiss')} <Abbr term={t('municipal_reports.about.kiss_abbr')}>{t('municipal_reports.about.kiss_abbr')}</Abbr>
-                {t('municipal_reports.about.body_1_after_kiss')} <Abbr term={t('municipal_reports.about.chf_abbr')}>{t('municipal_reports.about.chf_abbr')}</Abbr>
+                {t('municipal_reports.about.body_1_before_kiss')} {t('municipal_reports.about.kiss_abbr')}
+                {t('municipal_reports.about.body_1_after_kiss')} <Abbr term="CHF">{t('municipal_reports.about.chf_abbr')}</Abbr>
                 {t('municipal_reports.about.body_1_after_chf')}
               </p>
               <p className="text-muted">
@@ -918,7 +920,7 @@ function CantonNarrativeSection({
 }) {
   const { t } = useTranslation('admin_reports');
   const formatter = useMemo(
-    () => new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }),
+    () => new Intl.NumberFormat(getFormattingLocale(), { style: 'currency', currency, maximumFractionDigits: 0 }),
     [currency],
   );
 
@@ -943,8 +945,12 @@ function CantonNarrativeSection({
     ) : (
       <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="soft">
         {t('municipal_impact.portfolio.yoy_value', {
-          sign: yoy >= 0 ? '+' : '',
-          value: yoy.toFixed(1),
+          value: formatNumber(yoy / 100, {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+            signDisplay: 'always',
+          }),
         })}
       </Chip>
     );
@@ -979,7 +985,7 @@ function CantonNarrativeSection({
           <p className="mt-1 text-2xl font-semibold">{formatter.format(variant.est_cost_avoidance_chf)}</p>
           <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.canton.estimated_cost_avoidance_desc', {
-              multiplier: variant.cost_avoidance_multiplier.toFixed(1),
+              multiplier: formatNumber(variant.cost_avoidance_multiplier, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
             })}
           </p>
         </div>
@@ -1065,7 +1071,7 @@ function MunicipalityNarrativeSection({
                   <p className="text-xs text-muted">{t('municipal_reports.narrative.logs_count', { count: org.log_count })}</p>
                 </div>
                 <Chip size="sm" variant="soft" color="success">
-                  {t('municipal_reports.values.hours', { count: Number(org.hours.toFixed(1)) })}
+                  {t('municipal_reports.values.formatted_hours', { value: formatNumber(org.hours, { maximumFractionDigits: 1 }) })}
                 </Chip>
               </div>
             ))}
@@ -1086,7 +1092,7 @@ function MunicipalityNarrativeSection({
                   <p className="text-xs text-muted">{t('municipal_reports.values.activities', { count: cat.count })}</p>
                 </div>
                 <Chip size="sm" variant="soft" color="accent">
-                  {t('municipal_reports.values.hours', { count: Number(cat.hours.toFixed(1)) })}
+                  {t('municipal_reports.values.formatted_hours', { value: formatNumber(cat.hours, { maximumFractionDigits: 1 }) })}
                 </Chip>
               </div>
             ))}
@@ -1122,8 +1128,8 @@ function CooperativeNarrativeSection({
     );
   }
 
-  const retentionPct = (variant.member_retention_rate * 100).toFixed(1);
-  const reciprocityPct = (variant.reciprocity_rate * 100).toFixed(1);
+  const retentionPct = formatNumber(variant.member_retention_rate, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const reciprocityPct = formatNumber(variant.reciprocity_rate, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   return (
     <NarrativeShell
@@ -1134,14 +1140,14 @@ function CooperativeNarrativeSection({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.member_retention')}</p>
-          <p className="mt-1 text-2xl font-semibold">{retentionPct}%</p>
+          <p className="mt-1 text-2xl font-semibold">{retentionPct}</p>
           <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.member_retention_desc', { count: variant.retained_members_count })}
           </p>
         </div>
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.reciprocity_rate')}</p>
-          <p className="mt-1 text-2xl font-semibold">{reciprocityPct}%</p>
+          <p className="mt-1 text-2xl font-semibold">{reciprocityPct}</p>
           <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.reciprocity_rate_desc', { count: variant.reciprocal_members_count })}
           </p>
@@ -1153,7 +1159,7 @@ function CooperativeNarrativeSection({
         </div>
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.coordinator_load')}</p>
-          <p className="mt-1 text-2xl font-semibold">{variant.coordinator_load_avg.toFixed(1)}</p>
+          <p className="mt-1 text-2xl font-semibold">{formatNumber(variant.coordinator_load_avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
           <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.coordinator_load_desc', {
               pending: variant.pending_reviews_total,
@@ -1164,8 +1170,8 @@ function CooperativeNarrativeSection({
         <div className="rounded-lg border border-border bg-surface-secondary p-3 md:col-span-2">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.future_care_credit_pool')}</p>
           <p className="mt-1 text-2xl font-semibold">
-            {t('municipal_reports.values.hours', {
-              count: Number(variant.future_care_credit_pool.toFixed(1)),
+            {t('municipal_reports.values.formatted_hours', {
+              value: formatNumber(variant.future_care_credit_pool, { maximumFractionDigits: 1 }),
             })}
           </p>
           <p className="mt-1 text-xs text-muted">

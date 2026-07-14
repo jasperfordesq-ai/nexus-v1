@@ -457,7 +457,24 @@
     },
     "scroll_down": "Scroll down",
     "audience_cards": {
-      "title": "Where would you like to start?"
+      "title": "Where would you like to start?",
+      "defaults": {
+        "new_here": {
+          "title": "New here?",
+          "description": "Learn how our community works and how to get involved.",
+          "cta": "Get started"
+        },
+        "exchange": {
+          "title": "Offer or find help",
+          "description": "Browse what people are offering, or post your own request.",
+          "cta": "Browse listings"
+        },
+        "partner": {
+          "title": "Partner or refer",
+          "description": "For organisations, funders, and professionals supporting our members.",
+          "cta": "Learn more"
+        }
+      }
     },
     "how_it_works": {
       "title": "How It Works",

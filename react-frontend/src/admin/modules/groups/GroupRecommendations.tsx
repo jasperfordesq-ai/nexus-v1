@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentRatio, formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Progress, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -89,7 +89,7 @@ export default function GroupRecommendations() {
             </div>
             <div>
               <div className="text-sm text-muted">{t('groups.join_rate')}</div>
-              <div className="text-2xl font-bold mt-1">{stats.join_rate}%</div>
+              <div className="text-2xl font-bold mt-1">{formatPercentValue(stats.join_rate)}</div>
             </div>
           </div>
           </CardBody>
@@ -118,7 +118,7 @@ export default function GroupRecommendations() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Progress aria-label={t('groups.col_score')} value={rec.score * 100} size="sm" className="w-24" />
-                    <span className="text-sm">{(rec.score * 100).toFixed(0)}%</span>
+                    <span className="text-sm">{formatPercentRatio(rec.score, { maximumFractionDigits: 0 })}</span>
                   </div>
                 </TableCell>
                 <TableCell>

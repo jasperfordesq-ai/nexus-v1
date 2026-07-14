@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "categories": {
     "categories_admin_desc": "Cruthaigh agus bainistigh catagóirí le haghaidh liostaí agus obair dheonach",
@@ -97,7 +97,6 @@
     "label_type": "Cineál",
     "listings": "Liostaí",
     "page_title": "Catagóirí",
-    "placeholder_name": "Name...",
     "save_changes": "Sábháil athruithe",
     "search_placeholder": "Cuardaigh catagóirí...",
     "volunteering": "Obair dheonach",
@@ -105,7 +104,23 @@
     "type_event": "Imeacht",
     "type_listing": "Liostú",
     "type_resource": "Acmhainn",
-    "type_vol_opportunity": "Vol Opportunity",
-    "tabs_aria": "Scagaire cineáil chatagóir"
+    "tabs_aria": "Scagaire cineáil chatagóir",
+    "color_blue": "Gorm",
+    "color_cyan": "Léimneach",
+    "color_gray": "Liath",
+    "color_green": "Glas",
+    "color_orange": "Oráiste",
+    "color_pink": "Bándearg",
+    "color_purple": "Corcra",
+    "color_red": "Dearg",
+    "color_slate": "Gorm liath",
+    "color_teal": "Glas-ghorm",
+    "color_unknown": "Dath anaithnid",
+    "color_yellow": "Buí",
+    "failed_to_save_category": "Theip ar shábháil catagóir",
+    "placeholder_name": "m.sh. Ealaíona & Ceardaíocht",
+    "color_fuchsia": "Fuchsia",
+    "color_indigo": "Indigo",
+    "type_vol_opportunity": "Deis Vol"
   }
 }

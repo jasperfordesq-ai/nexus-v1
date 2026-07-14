@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,83 +67,81 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "Überprüfen Sie von Mitgliedern eingereichte Fehlerberichte mit Seitendiagnosen, Sentry-Ereignis-IDs und Triage-Notizen.",
     "loading": "Supportberichte werden geladen...",
     "empty": "Keine Supportberichte entsprechen diesen Filtern.",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "Seite öffnen",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "Diagnose kopieren",
       "copy_handoff": "Kopieren Sie die technische Übergabe",
-      "close": "Close",
-      "save": "Triage speichern"
+      "save": "Triage speichern",
+      "refresh": "Aktualisieren",
+      "search": "Suche",
+      "clear": "Löschen",
+      "review": "Überprüfen",
+      "open_sentry": "Sentry öffnen",
+      "close": "Schließen"
     },
     "stats": {
-      "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "open": "Offen",
+      "triaged": "Eingestuft",
+      "blocked": "Gesperrt",
+      "unassigned": "Nicht zugewiesen"
     },
     "filters": {
       "search": "Suchen Sie nach Referenz, Route, Reporter oder Zusammenfassung",
       "status": "Status",
-      "impact": "Impact"
+      "impact": "Auswirkung"
     },
     "status": {
       "all": "Alle Status",
-      "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "open": "Offen",
+      "triaged": "Eingestuft",
+      "resolved": "Behoben",
+      "closed": "Geschlossen"
     },
     "impact": {
       "all": "Alle Auswirkungen",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "Gesperrt",
+      "major": "Wichtig",
+      "minor": "Geringfügig",
+      "cosmetic": "Kosmetisch"
     },
     "table": {
       "aria": "Supportberichte",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
+      "reference": "Referenz",
+      "summary": "Zusammenfassung",
+      "impact": "Auswirkung",
       "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reporter": "Meldender",
+      "assignee": "Zuständiger",
+      "created": "Erstellt",
+      "actions": "Aktionen"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "Bericht wird geladen...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "Benutzeragent",
       "sentry_event": "Sentry-Event",
-      "diagnostics": "Diagnostics"
+      "summary": "Zusammenfassung",
+      "description": "Beschreibung",
+      "reporter": "Meldender",
+      "page": "Seite",
+      "created": "Erstellt",
+      "diagnostics": "Diagnose",
+      "title": "Melden {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "URL des Sentry-Problems",
-      "triage_notes": "Triage-Notizen"
+      "triage_notes": "Triage-Notizen",
+      "status": "Status",
+      "assignee": "Zuständiger"
     },
     "messages": {
       "saved": "Supportbericht aktualisiert.",
@@ -157,6 +154,37 @@
       "save": "Der Supportbericht konnte nicht gespeichert werden.",
       "copy": "Die Diagnose konnte nicht kopiert werden.",
       "copy_handoff": "Die technische Übergabe konnte nicht kopiert werden."
-    }
+    },
+    "handoff": {
+      "title": "Support-Bericht {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (Benutzer {{id}})",
+      "reporter_without_email": "{{name}} (Benutzer {{id}})",
+      "unknown_reporter": "Unbekannter Melder",
+      "no_diagnostics": "Es wurden keine Diagnosen eingeschlossen.",
+      "not_provided": "Nicht angegeben",
+      "none_yet": "Noch keine.",
+      "labels": {
+        "tenant": "Gemeinschaft",
+        "impact": "Auswirkung",
+        "status": "Status",
+        "created": "Erstellt",
+        "reporter": "Meldender",
+        "page_url": "Seiten-URL",
+        "user_agent": "Benutzeragent",
+        "sentry_event": "Sentry-Ereignis",
+        "sentry_issue": "Sentry-Problem",
+        "route": "Route"
+      },
+      "headings": {
+        "summary": "Zusammenfassung:",
+        "user_description": "Benutzerbeschreibung:",
+        "triage_notes": "Triagenotizen:",
+        "diagnostics": "Diagnostik:"
+      }
+    },
+    "unassigned": "Nicht zugewiesen",
+    "meta_title": "Supportberichte",
+    "title": "Supportberichte"
   }
 }

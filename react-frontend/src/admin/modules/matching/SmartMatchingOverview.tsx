@@ -31,6 +31,7 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SmartMatchingConfig, MatchingStatsResponse } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 import { logError } from '@/lib/logger';
+import { formatPercentValue } from '@/lib/helpers';
 import { isSmartMatchingConfig, parseMatchingStatsResponse } from './matchingResponseGuards';
 
 /**
@@ -187,7 +188,7 @@ export function SmartMatchingOverview() {
         <StatCard
           label={t('matching.label_avg_score')}
           value={overview?.avg_match_score !== undefined
-            ? `${overview.avg_match_score}%`
+            ? formatPercentValue(overview.avg_match_score)
             : '---'}
           icon={TrendingUp}
           color="success"
@@ -237,7 +238,7 @@ export function SmartMatchingOverview() {
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm text-foreground/80">{labelText}</span>
                         <span className="text-sm font-medium text-foreground">
-                          {pct}%
+                          {formatPercentValue(pct)}
                         </span>
                       </div>
                       <Progress
@@ -253,14 +254,14 @@ export function SmartMatchingOverview() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted">{t('matching.total')}</span>
                   <span className="font-semibold">
-                    {Math.round(
+                    {formatPercentValue(Math.round(
                       (config.category_weight +
                         config.skill_weight +
                         config.proximity_weight +
                         config.freshness_weight +
                         config.reciprocity_weight +
                         config.quality_weight) * 100
-                    )}%
+                    ))}
                   </span>
                 </div>
               </div>
@@ -427,7 +428,7 @@ export function SmartMatchingOverview() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-foreground/80">{t('matching.label_approval_rate')}</span>
-                    <span className="text-sm font-medium">{stats.approval_rate}%</span>
+                    <span className="text-sm font-medium">{formatPercentValue(stats.approval_rate)}</span>
                   </div>
                   <Progress
                     value={stats.approval_rate}

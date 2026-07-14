@@ -135,20 +135,26 @@ function formatDate(ts: string | null): string {
 }
 
 function formatCents(cents: number): string {
-  return `€${(cents / 100).toFixed(2)}`;
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(cents / 100);
 }
 
 function openRate(campaign: Campaign): string {
   if (campaign.actual_send_count === 0) return '—';
-  const rate = (campaign.open_count / campaign.actual_send_count) * 100;
-  return `${rate.toFixed(1)}%`;
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(campaign.open_count / campaign.actual_send_count);
 }
 
 function StatusChip({ status, t }: { status: CampaignStatus; t: Translate }) {
   const cfg = STATUS_CONFIG[status] ?? { labelKey: status, color: 'default' as const };
   return (
     <Chip size="sm" color={cfg.color} variant="soft">
-      {t(cfg.labelKey, status)}
+      {t(cfg.labelKey, { defaultValue: t('common.unknown') })}
     </Chip>
   );
 }
@@ -315,8 +321,8 @@ export default function PushCampaignAdminPage() {
       const statsRaw = statsRes.data;
       const statsData = ((statsRaw as unknown as { data?: OverviewStats }).data ?? statsRaw) as OverviewStats;
       setStats(statsData);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : t('advertising.push.toasts.load_failed'));
+    } catch {
+      setError(t('advertising.push.toasts.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -339,10 +345,10 @@ export default function PushCampaignAdminPage() {
         setActionMsg(t('advertising.push.toasts.approved', { name: campaign.name }));
         await fetchCampaigns();
       } else {
-        setActionMsg(res.error || t('advertising.push.toasts.approve_failed'));
+        setActionMsg(t('advertising.push.toasts.approve_failed'));
       }
-    } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.approve_failed'));
+    } catch {
+      setActionMsg(t('advertising.push.toasts.approve_failed'));
     } finally {
       setApproving(null);
     }
@@ -357,10 +363,10 @@ export default function PushCampaignAdminPage() {
         setActionMsg(t('advertising.push.toasts.dispatched', { name: campaign.name }));
         await fetchCampaigns();
       } else {
-        setActionMsg(res.error || t('advertising.push.toasts.dispatch_failed'));
+        setActionMsg(t('advertising.push.toasts.dispatch_failed'));
       }
-    } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.dispatch_failed'));
+    } catch {
+      setActionMsg(t('advertising.push.toasts.dispatch_failed'));
     } finally {
       setDispatching(null);
     }
@@ -384,10 +390,10 @@ export default function PushCampaignAdminPage() {
         setActionMsg(t('advertising.push.toasts.rejected', { name: rejectTarget.name }));
         await fetchCampaigns();
       } else {
-        setActionMsg(res.error || t('advertising.push.toasts.reject_failed'));
+        setActionMsg(t('advertising.push.toasts.reject_failed'));
       }
-    } catch (e: unknown) {
-      setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.reject_failed'));
+    } catch {
+      setActionMsg(t('advertising.push.toasts.reject_failed'));
     } finally {
       setRejectSubmitting(false);
     }
@@ -433,8 +439,8 @@ export default function PushCampaignAdminPage() {
       setCreateCtaUrl('');
       setCreateScheduledAt('');
       await fetchCampaigns();
-    } catch (e: unknown) {
-      setCreateError(e instanceof Error ? e.message : t('advertising.push.toasts.create_failed'));
+    } catch {
+      setCreateError(t('advertising.push.toasts.create_failed'));
     } finally {
       setCreateSubmitting(false);
     }
@@ -563,7 +569,7 @@ export default function PushCampaignAdminPage() {
                       <div className="text-sm">
                         <p>{c.advertiser_name || '—'}</p>
                         <p className="text-xs text-muted">
-                          {t(ADVERTISER_LABEL_KEYS[c.advertiser_type], c.advertiser_type)}
+                          {t(ADVERTISER_LABEL_KEYS[c.advertiser_type], { defaultValue: t('common.unknown') })}
                         </p>
                       </div>
                     </TableCell>
@@ -589,7 +595,7 @@ export default function PushCampaignAdminPage() {
                       <span className="text-sm">
                         {c.total_cost_cents > 0
                           ? formatCents(c.total_cost_cents)
-                          : `${c.cost_per_send}¢/send`}
+                          : t('advertising.push.cost_per_send', { cost: formatCents(c.cost_per_send) })}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -688,7 +694,7 @@ export default function PushCampaignAdminPage() {
                   </div>
                   <div>
                     <p className="mb-0.5 text-xs text-muted">{t('advertising.shared.fields.type')}</p>
-                    <p>{t(ADVERTISER_LABEL_KEYS[detailCampaign.advertiser_type], detailCampaign.advertiser_type)}</p>
+                    <p>{t(ADVERTISER_LABEL_KEYS[detailCampaign.advertiser_type], { defaultValue: t('common.unknown') })}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="mb-0.5 text-xs text-muted">{t('advertising.push.fields.push_title')}</p>
@@ -890,7 +896,7 @@ export default function PushCampaignAdminPage() {
               />
               <Input
                 label={t('advertising.push.fields.cta_url_optional')}
-                placeholder="https://... or nexus://..."
+                placeholder={t('advertising.push.placeholders.cta_url')}
                 value={createCtaUrl}
                 onValueChange={setCreateCtaUrl}
                 variant="secondary"

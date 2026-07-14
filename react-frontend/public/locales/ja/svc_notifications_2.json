@@ -169,7 +169,7 @@
     "item_not_found": "モデレーションキュー項目が見つかりません。",
     "already_reviewed": "この商品はすでにレビューされています。",
     "rejection_reason_required": "拒否理由は必須です。",
-    "content_decision": "内容は決定しました。"
+    "content_decision": "コンテンツは :decision されました。"
   },
   "tenant_settings": {
     "pending_verification": "本人確認が保留中です。承認をお待ちください。",
@@ -182,9 +182,9 @@
     "connection_successful": "接続成功",
     "ollama_not_configured": "Ollama ホスト URL が構成されていません",
     "ollama_cannot_connect": "Ollama に接続できません: :error",
-    "ollama_connected": "Ollama に接続 (:数個のモデルが利用可能)",
     "ollama_http_error": "オラマが HTTP :code を返しました",
-    "provider_error": "AI リクエストの処理中にエラーが発生しました。もう一度試してください。"
+    "provider_error": "AI リクエストの処理中にエラーが発生しました。もう一度試してください。",
+    "ollama_connected": "Ollama に接続中（:count モデル利用可能）"
   },
   "report_export": {
     "no_data": "選択したレポートとフィルターのデータが見つかりません。"

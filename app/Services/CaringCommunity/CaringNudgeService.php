@@ -194,7 +194,7 @@ class CaringNudgeService
                 'related_user' => $suggestion['recipient'],
                 'score' => round($score, 3),
                 'signals' => $suggestion['signals'] ?? [],
-                'reason' => (string) ($suggestion['reason'] ?? ''),
+                'reasons' => (array) ($suggestion['reasons'] ?? []),
                 'source_type' => 'tandem_candidate',
                 'notification_url' => '/caring-community/request-help',
                 // Render the message inside LocaleContext at dispatch time so

@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "users": {
     "action_approve": "يعتمد",
@@ -220,7 +220,9 @@
     "permissions_editor_unavailable_title": "الأذونات هنا للقراءة فقط",
     "permissions_editor_unavailable_desc": "تعرض هذه الصفحة دور المستخدم والأذونات الممنوحة له، لكن لا يمكن تغييرها هنا. يمكن إدارة الوصول عبر تغيير دور المستخدم في صفحة تعديل المستخدم.",
     "role_unknown": "دور غير معروف",
-    "role_tenant_super_admin": "مسؤول أعلى للمستأجر"
+    "role_tenant_super_admin": "مسؤول أعلى للمستأجر",
+    "role_super_admin_short": "المشرف الأعلى",
+    "reset_2fa_reason": "تم إعادة التعيين بواسطة مسؤول"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "الموافقة الممنوحة",
       "not_consented": "غير موافق",
       "not_given": "لم يتم إعطاء الموافقة",
-      "withdrawn_on": "انسحبت على"
+      "withdrawn_on": "انسحبت على",
+      "type_unknown": "نوع الموافقة غير معروف"
     },
     "descriptions": {
       "balance_amount": "استخدم القيم السالبة لخصم أرصدة الوقت من هذا العضو",
@@ -433,12 +436,28 @@
       "decision_confirmed": "تم تأكيد الشهادة",
       "decision_revoked": "تم إبطال الشهادة",
       "decision_not_confirmed": "لم يتم تأكيد الشهادة"
+    },
+    "insurance": {
+      "status_none": "لا شيء",
+      "status_pending": "قيد الانتظار",
+      "status_submitted": "تم الإرسال",
+      "status_verified": "تم التحقق",
+      "status_expired": "انتهت صلاحيتها",
+      "status_rejected": "مرفوض",
+      "status_revoked": "ملغى",
+      "status_unknown": "حالة غير معروفة",
+      "type_public_liability": "المسؤولية العامة",
+      "type_professional_indemnity": "المسؤولية المهنية",
+      "type_employers_liability": "مسؤولية أصحاب العمل",
+      "type_product_liability": "مسؤولية المنتج",
+      "type_personal_accident": "حادث شخصي",
+      "type_other": "أخرى",
+      "type_unknown": "نوع تأمين غير معروف"
     }
   },
   "aria": {
     "breadcrumbs": "فتات الخبز"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "عمليات التحقق من الإقامة",
     "page_desc": "راجع إقرارات الإقامة المقدّمة من الأعضاء وامنح شارة الإقامة الموثّقة.",
@@ -483,5 +502,6 @@
     "intelligence": "ذكاء",
     "engagement": "ارتباط",
     "system": "نظام"
-  }
+  },
+  "loading": "جارٍ التحميل"
 }

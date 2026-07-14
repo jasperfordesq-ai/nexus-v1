@@ -110,7 +110,7 @@ function FeaturedListingsPanel() {
         setSearchResults([]);
         loadFeatured();
       } else {
-        toast.error(res?.error || t('listings.failed_feature'));
+        toast.error(t('listings.failed_feature'));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -128,7 +128,7 @@ function FeaturedListingsPanel() {
         toast.success(t('listings.unfeatured_success'));
         loadFeatured();
       } else {
-        toast.error(res?.error || t('listings.failed_unfeature'));
+        toast.error(t('listings.failed_unfeature'));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -157,7 +157,9 @@ function FeaturedListingsPanel() {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="soft" color={typeColors[item.type] || 'default'} className="capitalize">
-          {item.type}
+          {t(`listings.types.${item.type}`, {
+            defaultValue: t('listings.types.unknown'),
+          })}
         </Chip>
       ),
     },
@@ -239,7 +241,9 @@ function FeaturedListingsPanel() {
                     </p>
                     <p className="text-xs text-muted">
                       {t('listings.by_author')} &middot;{' '}
-                      <span className="capitalize">{listing.type}</span>
+                      <span>{t(`listings.types.${listing.type}`, {
+                        defaultValue: t('listings.types.unknown'),
+                      })}</span>
                     </p>
                   </div>
                   <Button
@@ -375,7 +379,7 @@ export function ListingsAdmin() {
         toast.success(t(`listings.content_${type}_success`));
         loadItems();
       } else {
-        toast.error(res?.error || t(`listings.content_${type}_failed`));
+        toast.error(t(`listings.content_${type}_failed`));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -399,7 +403,7 @@ export function ListingsAdmin() {
         );
         loadItems();
       } else {
-        toast.error(res?.error || t('listings.failed_update_featured'));
+        toast.error(t('listings.failed_update_featured'));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -423,7 +427,9 @@ export function ListingsAdmin() {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="soft" color={typeColors[item.type] || 'default'} className="capitalize">
-          {item.type}
+          {t(`listings.types.${item.type}`, {
+            defaultValue: t('listings.types.unknown'),
+          })}
         </Chip>
       ),
     },

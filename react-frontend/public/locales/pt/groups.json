@@ -115,7 +115,7 @@
     "invite": "Convidar",
     "invite_link_desc": "Partilhe um link que qualquer pessoa pode usar para aderir:",
     "invite_email_desc": "Ou convide por e-mail (separados por vírgula):",
-    "invite_email_placeholder": "email1@exemplo.com, email2@exemplo.com",
+    "invite_email_placeholder": "email1@example.com, email2@example.com",
     "invite_emails_aria": "Endereços de e-mail a convidar",
     "invite_message_label": "Mensagem pessoal (opcional)",
     "invite_message_placeholder": "Junte-se ao nosso grupo!",

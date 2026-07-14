@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Franc na hEilvéise — an t-airgeadra a úsáidtear le haghaidh ríomh costais cúraim fhoirmiúla i gcur i láthair An Phobail Cúraim",
+    "fadp": "Acht Aontaithe um Chosaint Sonraí — dlí um chosaint sonraí na hEilvéise athbhreithnithe (ar feidhmiú ó Mheán Fómhair 2023)",
+    "ndsg": "Dlí um Chaomhnú Sonraí Nua — an tAcht um Chaomhnú Sonraí Federal Eilvéiseach n-athbhreithnithe (ainm coibhneasta do FADP)",
+    "dsg": "Dlí um Chaomhnú Sonraí — féach nDSG / FADP",
+    "gdpr": "Rialachán Ginearálta um Chosaint Sonraí — dlí cosanta sonraí na AE; úsáidtear FADP/nDSG in ionaid Eilvéise ina áit",
+    "sla": "Comhaontú leibhéal seirbhíse — an uasmhéid ama freagartha nó réitigh atá gealltaithe do gach sraith tosaíochta",
+    "agpl": "Ceadúnas Ginearálta GNU Affero v3 — an ceadúnas foinse oscailte faoi ar scaoileadh NEXUS go poiblí",
+    "kpi": "Táscaire feidhmíochta príomhúil — méadrach indéanta a úsáidtear chun dul chun cinn i dtreo sprioc sainithe a mheas",
+    "roi": "Tuar ar infheistíocht — anseo: costas cúraim fhoirmiúil a sheachaint in aghaidh na huaire de thacaíocht neamhfhoirmiúil a mhalartaítear",
+    "nexus": "Tionscadal NEXUS — an t-ardán il-úsáideora baincéireachta ama agus cúraim phobail",
+    "agm": "Comhdháil bhliantúil ghinearálta",
+    "xp": "Pointí taithí — pointí gamúcháin a bhronnadh as malartuithe a chríochnú agus sraitheanna a bhaint amach",
+    "isco": "Rangú Caighdeánach Idirnáisiúnta na nGairmeacha — úsáidte chun cineálacha seirbhísí cúraim a chatagóiriú"
+  }
+}

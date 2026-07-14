@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,12 +67,12 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Membri attivi",
     "already_notified": "Già notificato",
     "at_risk": "A rischio",
@@ -143,11 +142,7 @@
     "group_by_monthly": "Raggruppa per mensile",
     "group_by_weekly": "Raggruppa per settimanale",
     "hours": "Ore",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "{{value}}ore",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Membri attivi",
     "label_approve": "Approvare",
     "label_approved": "Approvato",
@@ -198,14 +193,10 @@
     "label_unique_categories": "Categorie uniche",
     "label_unique_givers": "Donatori unici",
     "mark_as_notified": "Contrassegna come notificato",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Membri contrassegnati come avvisati",
     "members_selected": "Membri selezionati",
     "members_selected_count": "{{count}}selezionato",
     "moderation_pending": "In attesa di",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Impostazioni di moderazione",
     "moderation_settings_updated": "Impostazioni di moderazione aggiornate",
     "never": "Mai",
@@ -282,7 +273,18 @@
     "members_selected_count_other": "{{count}}selezionato",
     "days_count_many": "{{count}} giorni",
     "days_count_one": "{{count}} giorni",
-    "days_count_other": "{{count}} giorni"
+    "days_count_other": "{{count}} giorni",
+    "unknown_period": "Periodo sconosciuto",
+    "week_period": "Settimana {{week}}, {{year}}",
+    "active_30d_total": "Attivo tra 30 giorni",
+    "hours_reports_page_desc": "Analizza il volume degli scambi di crediti temporali, i saldi dei membri e le tendenze per categoria.",
+    "hours_reports_page_title": "Rapporti sulle ore",
+    "inactive_members_page_desc": "Identifica i membri a rischio di disimpegno e gestisci le notifiche di follow-up.",
+    "inactive_members_page_title": "Membri inattivi",
+    "member_reports_page_desc": "Traccia l'attività dei membri, la fidelizzazione, il coinvolgimento e i modelli di contributo.",
+    "member_reports_page_title": "Segnalazioni dei membri",
+    "moderation_queue_page_desc": "Rivedi i contenuti in sospeso e segnalati prima che appaiano nella community.",
+    "moderation_queue_page_title": "Coda di moderazione"
   },
   "municipal_reports": {
     "meta": {
@@ -300,13 +302,13 @@
       "body_1_before_kiss": "Il Rapporto sull'impatto municipale è il pacchetto di prove che condividi con i partner municipali, i cantoni e i finanziatori per dimostrare il valore del programma. Mostra gli orari di assistenza verificati, i membri attivi, le organizzazioni partner e, utilizzando il",
       "body_1_after_kiss": " metodologia, una stima dei costi compensati per i servizi di assistenza formale (",
       "body_1_after_chf": "valore delle ore x moltiplicatore della prevenzione).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Usa il",
       "body_2_after_audience": "attiva/disattiva per cambiare l'inquadratura narrativa:",
       "body_2_after_canton": "aggrega più comuni e mostra la riduzione dei costi su scala cantonale;",
       "body_2_after_municipality": "si concentra sui residenti locali raggiunti e sulle organizzazioni partner;",
-      "body_2_after_cooperative": "mostra la fidelizzazione dei membri, il tasso di reciprocità e il carico di lavoro del coordinatore. Esporta come PDF per inviarlo ai partner o come CSV per ulteriori analisi. Salva i modelli di report per rigenerare rapidamente la stessa configurazione nei periodi futuri."
+      "body_2_after_cooperative": "mostra la fidelizzazione dei membri, il tasso di reciprocità e il carico di lavoro del coordinatore. Esporta come PDF per inviarlo ai partner o come CSV per ulteriori analisi. Salva i modelli di report per rigenerare rapidamente la stessa configurazione nei periodi futuri.",
+      "kiss_abbr": "Comunità premurosa"
     },
     "actions": {
       "analytics": "Analisi della comunità",
@@ -399,7 +401,8 @@
       "hours_other": "{{count}}h",
       "activities_many": "{{count}} attività",
       "activities_one": "{{count}} attività",
-      "activities_other": "{{count}} attività"
+      "activities_other": "{{count}} attività",
+      "formatted_hours": "{{value}}h"
     },
     "toast": {
       "load_failed": "Impossibile caricare i dati sull'impatto comunale.",
@@ -557,7 +560,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}% su base annua"
+      "yoy_value": "{{value}} su base annua"
     }
   }
 }

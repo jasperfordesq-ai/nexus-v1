@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,12 +67,12 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Miembros activos",
     "already_notified": "Ya notificado",
     "at_risk": "En riesgo",
@@ -143,11 +142,7 @@
     "group_by_monthly": "Agrupar por mes",
     "group_by_weekly": "Agrupar por semana",
     "hours": "Horas",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "Horas de{{value}}",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Miembros activos",
     "label_approve": "Aprobar",
     "label_approved": "Aprobado",
@@ -198,14 +193,10 @@
     "label_unique_categories": "Categorías únicas",
     "label_unique_givers": "Donantes únicos",
     "mark_as_notified": "Marcar como notificado",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Miembros marcados como notificados",
     "members_selected": "Miembros seleccionados",
     "members_selected_count": "{{count}}seleccionado",
     "moderation_pending": "Pendiente",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Configuración de moderación",
     "moderation_settings_updated": "Configuración de moderación actualizada",
     "never": "nunca",
@@ -282,7 +273,18 @@
     "members_selected_count_other": "{{count}}seleccionado",
     "days_count_many": "{{count}} días",
     "days_count_one": "{{count}} días",
-    "days_count_other": "{{count}} días"
+    "days_count_other": "{{count}} días",
+    "unknown_period": "Período desconocido",
+    "week_period": "Semana {{week}}, {{year}}",
+    "active_30d_total": "Activo en 30 días",
+    "hours_reports_page_desc": "Analizar el volumen de intercambio de créditos de tiempo, los saldos de los miembros y las tendencias por categoría.",
+    "hours_reports_page_title": "Informes de horas",
+    "inactive_members_page_desc": "Identificar miembros en riesgo de desinterés y gestionar las notificaciones de seguimiento.",
+    "inactive_members_page_title": "Miembros inactivos",
+    "member_reports_page_desc": "Rastrea la actividad de los miembros, la retención, la participación y los patrones de contribución.",
+    "member_reports_page_title": "Informes de miembros",
+    "moderation_queue_page_desc": "Revisa el contenido pendiente y marcado antes de que aparezca en la comunidad.",
+    "moderation_queue_page_title": "Cola de moderación"
   },
   "municipal_reports": {
     "meta": {
@@ -300,13 +302,13 @@
       "body_1_before_kiss": "El Informe de Impacto Municipal es el paquete de evidencia que usted comparte con socios municipales, cantones y financiadores para demostrar el valor del programa. Muestra horas de atención verificadas, miembros activos, organizaciones asociadas y, utilizando el",
       "body_1_after_kiss": " metodología, un costo estimado compensado con los servicios de atención formal (",
       "body_1_after_chf": "valor de horas x multiplicador de prevención).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Utilice el",
       "body_2_after_audience": "alternar para cambiar el marco narrativo:",
       "body_2_after_canton": "agrega múltiples municipios y muestra la evitación de costos a escala cantonal;",
       "body_2_after_municipality": "se centra en los residentes locales alcanzados y las organizaciones asociadas;",
-      "body_2_after_cooperative": "muestra la retención de miembros, la tasa de reciprocidad y la carga de trabajo del coordinador. Exporte como PDF para enviarlo a socios o como CSV para un análisis más detallado. Guarde plantillas de informes para regenerar rápidamente la misma configuración en períodos futuros."
+      "body_2_after_cooperative": "muestra la retención de miembros, la tasa de reciprocidad y la carga de trabajo del coordinador. Exporte como PDF para enviarlo a socios o como CSV para un análisis más detallado. Guarde plantillas de informes para regenerar rápidamente la misma configuración en períodos futuros.",
+      "kiss_abbr": "Comunidad Solidaria"
     },
     "actions": {
       "analytics": "Análisis comunitario",
@@ -399,7 +401,8 @@
       "hours_other": "{{count}}h",
       "activities_many": "{{count}} actividades",
       "activities_one": "{{count}} actividades",
-      "activities_other": "{{count}} actividades"
+      "activities_other": "{{count}} actividades",
+      "formatted_hours": "{{value}}h"
     },
     "toast": {
       "load_failed": "No se pudieron cargar los datos de impacto municipal.",
@@ -557,7 +560,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}} % interanual"
+      "yoy_value": "{{value}} interanual"
     }
   }
 }

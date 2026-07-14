@@ -10,77 +10,75 @@
     "partner_timebanks": "Partner-Zeitbanken",
     "federation_dashboard": "Armaturenbrett",
     "system_controls": "Systemkontrollen",
-    "whitelist": "Whitelist",
     "partnerships": "Partnerschaften",
     "federation_audit": "Föderationsprüfung",
     "platform_admin": "Plattformadministrator",
     "back_to_platform_admin": "Zurück zum Plattformadministrator",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Pilotanfragen",
+    "provisioning_queue": "Bereitstellung Warteschlange",
+    "billing_control": "Abrechnungssteuerung",
+    "revenue_dashboard": "Umsatz-Dashboard",
+    "regional_analytics": "Regionale Analysen",
+    "national_dashboard": "Nationales Dashboard",
+    "whitelist": "Weiße Liste"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Super-Admin wird geladen",
+    "skip_to_main": "Zum Hauptinhalt springen",
+    "close_navigation": "Super-Admin-Navigation schließen",
+    "navigation": "Super-Admin-Navigation"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Zurück zur Verwaltung",
+    "toggle_sidebar": "Seitenleiste umschalten",
+    "notifications": "Benachrichtigungen",
+    "my_profile": "Mein Profil",
+    "sign_out": "Abmelden",
+    "user_fallback": "Super-Administrator",
+    "user_menu": "Super-Admin-Menü"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Überblick",
+    "section_tenants": "Mieter",
+    "section_federation": "Föderation",
+    "section_commercial": "Kommerziell",
+    "expand": "Seitenleiste erweitern",
+    "collapse": "Seitenleiste einklappen",
+    "nav_label": "Super-Admin-Navigation"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Super-Administrator",
+    "tenants": "Mieter",
+    "create": "Erstellen",
+    "edit": "Bearbeiten",
+    "hierarchy": "Hierarchie",
+    "users": "Benutzer",
+    "federation": "Föderation",
+    "partnerships": "Partnerschaften",
+    "tenant": "Mandant",
+    "features": "Funktionen",
+    "billing": "Abrechnung",
+    "revenue": "Einnahmen",
+    "platform": "Plattform",
+    "pilot_inquiries": "Pilotanfragen",
+    "provisioning_requests": "Bereitstellungsanfragen",
+    "regional_analytics": "Regionale Analysen",
+    "subscriptions": "Abonnements",
+    "aria_label": "Brotkrumen",
+    "bulk": "Massenoperationen",
+    "audit": "Prüfprotokoll",
+    "whitelist": "Weiße Liste",
+    "national": "National"
   },
   "dashboard": {
     "title": "Infrastruktur-Dashboard",
     "subtitle_global": "Globaler Überblick über alle Mieter und Infrastruktur",
-    "subtitle_scoped": "Übersicht über:tenant_name und Untermieter",
     "create_tenant_btn": "Mieter erstellen",
     "stat_total_tenants": "Gesamtzahl der Mieter",
     "stat_active_tenants": "Aktive Mieter",
     "stat_total_users": "Gesamtzahl der Benutzer",
-    "stat_super_admins": "Super Admins",
     "stat_hub_tenants": "Hub-Mieter",
     "table_title": "Mieterhierarchie",
     "view_all": "Alle anzeigen",
@@ -88,7 +86,6 @@
     "col_domain": "Domäne",
     "col_users": "Benutzer",
     "col_children": "Kinder",
-    "col_hub": "Hub",
     "col_status": "Status",
     "col_actions": "Aktionen",
     "you_badge": "Du",
@@ -103,12 +100,14 @@
     "quick_actions_title": "Schnelle Aktionen",
     "create_new_tenant": "Neuen Mandanten erstellen",
     "view_super_admins": "Super Admins anzeigen",
-    "back_to_platform_admin": "Zurück zum Plattformadministrator"
+    "back_to_platform_admin": "Zurück zum Plattformadministrator",
+    "subtitle_scoped": "Übersicht über :tenant_name und Untermieter",
+    "stat_super_admins": "Super-Admins",
+    "col_hub": "Hub"
   },
   "common": {
     "active": "Aktiv",
     "inactive": "Inaktiv",
-    "hub": "Hub",
     "leaf": "Blatt",
     "yes": "Ja",
     "no": "Nein",
@@ -130,7 +129,8 @@
     "pending": "Ausstehend",
     "never_logged_in": "Niemals",
     "before_label": "Vorher:",
-    "after_label": "Nachher:"
+    "after_label": "Nachher:",
+    "hub": "Hub"
   },
   "users": {
     "index": {
@@ -147,7 +147,6 @@
       "filter_role_all": "Alle Rollen",
       "filter_role_admin": "Admin",
       "filter_role_tenant_admin": "Mieteradministrator",
-      "filter_role_moderator": "Moderator",
       "filter_role_member": "Mitglied",
       "filter_super_admins": "Nur Superadministratoren",
       "col_user": "Benutzer",
@@ -162,7 +161,8 @@
       "super_admin_yes": "Ja",
       "super_admin_legacy": "Vermächtnis",
       "no_users": "Es wurden keine Benutzer gefunden, die Ihren Kriterien entsprechen",
-      "showing_first_100": "Die ersten 100 Ergebnisse werden angezeigt. Verwenden Sie Filter, um Ihre Suche einzugrenzen."
+      "showing_first_100": "Die ersten 100 Ergebnisse werden angezeigt. Verwenden Sie Filter, um Ihre Suche einzugrenzen.",
+      "filter_role_moderator": "Moderator"
     },
     "show": {
       "breadcrumb_users": "Benutzer",
@@ -188,7 +188,6 @@
       "actions_card_title": "Aktionen",
       "view_tenant_btn": "Mieter anzeigen",
       "god_card_title": "Globaler Superadministrator (nur Gott)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Globale Super Admins können auf ALLE Mandanten auf der Plattform zugreifen.",
       "god_has_access": "Der Benutzer verfügt über GLOBAL Super Admin-Zugriff",
       "god_revoke_btn": "Widerrufen Sie den globalen Superadministrator",
@@ -206,7 +205,8 @@
       "stat_user_id": "Benutzer-ID",
       "stat_tenant_id": "Mieter-ID",
       "stat_status": "Status",
-      "stat_approved": "Genehmigt"
+      "stat_approved": "Genehmigt",
+      "god_warning": "Warnung:"
     },
     "create": {
       "breadcrumb_create": "Erstellen",
@@ -265,8 +265,6 @@
       "stat_user_id": "Benutzer-ID",
       "stat_current_tenant": "Aktueller Mieter",
       "stat_tenant_type": "Mietertyp",
-      "stat_hub": "Hub",
-      "stat_standard": "Standard",
       "stat_super_admin": "Super Admin",
       "stat_account_status": "Kontostatus",
       "stat_active": "Aktiv",
@@ -277,18 +275,19 @@
       "revoke_confirm": "Super Admin-Rechte entziehen?",
       "grant_btn": "Super Admin gewähren",
       "grant_confirm": "Super Admin-Berechtigungen gewähren?",
-      "no_hub_text": "Super Admin kann nicht gewährt werden, da:tenant_name kein Hub-Mandant ist.",
       "no_hub_move_text": "Verwenden Sie die Funktion „Super Admin verschieben und gewähren“, um diesen Benutzer einem Hub-Mandanten zuzuweisen.",
       "quick_links_card_title": "Quicklinks",
       "view_profile_btn": "Profil anzeigen",
       "view_tenant_btn": "Mieter anzeigen",
-      "tenant_users_btn": "Mieterbenutzer"
+      "tenant_users_btn": "Mieterbenutzer",
+      "no_hub_text": "Super-Admin kann nicht zugewiesen werden, da :tenant_name kein Hub-Mieter ist.",
+      "stat_hub": "Hub",
+      "stat_standard": "Standard"
     }
   },
   "tenants": {
     "index": {
       "title": "Mieter verwalten",
-      "subtitle": ":zählen Sie Mieter in Ihrem Bereich",
       "create_btn": "Mieter erstellen",
       "filter_search_placeholder": "Mieter suchen...",
       "filter_hub_label": "Nur Hub-Mieter",
@@ -300,13 +299,14 @@
       "col_domain": "Domäne",
       "col_parent": "Eltern",
       "col_users": "Benutzer",
-      "col_hub": "Hub",
       "col_status": "Status",
       "col_actions": "Aktionen",
       "parent_root": "Wurzel",
-      "level_label": "Ebene: Tiefe",
       "you_badge": "Du",
-      "no_tenants": "Keine Mieter gefunden"
+      "no_tenants": "Keine Mieter gefunden",
+      "subtitle": ":count Mieter in Ihrem Bereich",
+      "level_label": "Ebene :depth",
+      "col_hub": "Hub"
     },
     "show": {
       "breadcrumb_tenants": "Mieter",
@@ -319,11 +319,9 @@
       "field_slug": "Schnecke",
       "field_domain": "Domäne",
       "field_hierarchy_level": "Hierarchieebene",
-      "field_level": "Ebene: Tiefe",
       "field_parent": "Eltern",
       "field_total_users": "Gesamtzahl der Benutzer",
       "field_sub_tenants": "Untermieter",
-      "field_sub_tenants_direct": ":direkt zählen",
       "field_description": "Beschreibung",
       "not_configured": "Nicht konfiguriert",
       "root_tenant": "Stammmieter",
@@ -355,18 +353,18 @@
       "reactivate_card_title": "Mieter reaktivieren",
       "reactivate_desc": "Dieser Mieter ist derzeit inaktiv. Durch eine erneute Aktivierung wird der Benutzerzugriff wiederhergestellt.",
       "reactivate_btn": "Mieter reaktivieren",
-      "tenant_id_label": "Mieter-ID::id | Pfad::pfad"
+      "field_level": "Ebene :depth",
+      "field_sub_tenants_direct": ":count direkt",
+      "tenant_id_label": "Mieter-ID: :id | Pfad: :path"
     },
     "create": {
       "breadcrumb_create": "Erstellen",
       "title": "Neuen Mandanten erstellen",
-      "subtitle_selected": "Untermieter unter:parent_name erstellen",
       "subtitle_default": "Wählen Sie einen übergeordneten Mieter aus, um einen neuen Untermieter zu erstellen",
       "card_title": "Angaben zum Mieter",
       "parent_label": "Hauptmieter",
       "parent_placeholder": "-- Übergeordneten Mieter auswählen --",
       "parent_help": "Es werden nur Mieter mit Untermieterfähigkeit angezeigt. Der neue Mandant wird als untergeordnetes Element des ausgewählten übergeordneten Elements erstellt.",
-      "depth_label": "(Tiefe::Tiefe)",
       "name_label": "Name des Mieters",
       "slug_label": "Schnecke",
       "slug_help": "Nur Kleinbuchstaben, Zahlen und Bindestriche",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Unbegrenzt",
       "max_depth_help": "Begrenzen Sie, wie viele Ebenen von Untermandanten unterhalb dieses Mandanten erstellt werden können (gilt nur, wenn Hub aktiviert ist)",
       "submit_btn": "Mieter erstellen",
-      "cancel_btn": "Abbrechen"
+      "cancel_btn": "Abbrechen",
+      "depth_label": "(Tiefe: :depth)",
+      "subtitle_selected": "Erstellen eines Unter-Mandanten unter :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "Bearbeiten",
       "title": "Mieter bearbeiten",
-      "subtitle": "Ändern::Name (Ebene:Tiefe)",
       "back_btn": "Zurück zu Details",
       "details_card_title": "Angaben zum Mieter",
       "name_label": "Name des Mieters",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "Standardmieter",
       "max_depth_label": "Maximale Untermietertiefe",
       "max_depth_unlimited": "Unbegrenzt",
-      "max_depth_levels": ":Stufen zählen",
       "disable_hub_btn": "Hub deaktivieren",
       "disable_hub_confirm": "Dadurch wird verhindert, dass neue Untermieter entstehen. Bestehende Untermieter bleiben bestehen.",
       "enable_hub_btn": "Hub aktivieren",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "Sind Sie sicher, dass Sie diesen Mandanten deaktivieren möchten? Benutzer verlieren den Zugriff.",
       "reactivate_card_title": "Mieter reaktivieren",
       "reactivate_desc": "Dieser Mieter ist derzeit inaktiv. Durch eine erneute Aktivierung wird der Benutzerzugriff wiederhergestellt.",
-      "reactivate_btn": "Mieter reaktivieren"
+      "reactivate_btn": "Mieter reaktivieren",
+      "subtitle": "Modifizieren: :name (Stufe :depth)",
+      "max_depth_levels": ":count Stufen"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Mieter",
@@ -504,7 +504,6 @@
       "filter_active": "Aktiv",
       "filter_inactive": "Inaktiv",
       "legend_master": "Meister",
-      "legend_hub": "Hub",
       "legend_hub_desc": "Kann Untermieter erstellen",
       "legend_drag": "Zum Verschieben ziehen",
       "no_tenants_title": "Keine Mieter gefunden",
@@ -521,7 +520,8 @@
       "no_results_title": "Keine Mieter gefunden",
       "no_results_desc": "Versuchen Sie, Ihre Such- oder Filterkriterien anzupassen.",
       "reset_filters_btn": "Filter zurücksetzen",
-      "search_placeholder": "Mieter suchen..."
+      "search_placeholder": "Mieter suchen...",
+      "legend_hub": "Hub"
     }
   },
   "audit": {
@@ -577,7 +577,6 @@
     "source_tenant_all": "Alle Mieter",
     "user_selection_label": "Wählen Sie Benutzer aus",
     "user_select_hint": "Wählen Sie einen Quellmandanten aus, um Benutzer zu laden",
-    "users_selected": ":Anzahl der ausgewählten Benutzer",
     "target_tenant_label": "Zielmieter",
     "target_tenant_placeholder": "-- Ziel auswählen --",
     "grant_super_admin_label": "Gewähren Sie allen verschobenen Benutzern Super Admin",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Massenmieteroperationen",
     "bulk_tenants_desc": "Aktivieren/deaktivieren Sie mehrere Mandanten oder schalten Sie die Hub-Funktion in großen Mengen um.",
     "select_tenants_label": "Wählen Sie Mieter aus",
-    "tenants_selected": ":Anzahl der ausgewählten Mieter",
     "select_all": "Wählen Sie „Alle“ aus",
     "deselect_all": "Alle abwählen",
     "action_label": "Aktion",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Hub aktivieren",
     "action_disable_hub": "Hub deaktivieren",
     "apply_btn": "Auf Ausgewählte anwenden",
-    "apply_confirm": "Diese Aktion auf alle ausgewählten Mieter anwenden?"
+    "apply_confirm": "Diese Aktion auf alle ausgewählten Mieter anwenden?",
+    "users_selected": ":count Benutzer ausgewählt",
+    "tenants_selected": ":count Mandant(en) ausgewählt"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Letzte Aktivität",
       "full_log_btn": "Vollständiges Protokoll",
       "no_federation_activity": "Noch keine Verbandsaktivität",
-      "by_label": "by",
       "activity_title": "Föderationsaktivität (30 Tage)",
       "stat_total_actions": "Gesamtaktionen",
       "stat_messages": "Nachrichten",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Kritische Ereignisse",
       "most_active_partnerships": "Die aktivsten Partnerschaften",
       "quick_nav_title": "Schnelle Navigation",
-      "tenant_whitelist_btn": "Mieter-Whitelist"
+      "tenant_whitelist_btn": "Mieter-Whitelist",
+      "by_label": "von"
     },
     "system_controls": {
       "title": "Föderationssystemkontrollen",

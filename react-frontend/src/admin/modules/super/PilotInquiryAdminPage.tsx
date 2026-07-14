@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Spinner, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -111,7 +111,7 @@ function FitChip({ score }: { score: number | null }) {
   const color = score >= 60 ? 'success' : score >= 40 ? 'warning' : 'default';
   return (
     <Chip size="sm" color={color} variant="soft">
-      {score.toFixed(1)}
+      {formatNumber(score, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
     </Chip>
   );
 }
@@ -137,7 +137,9 @@ function InquiryCard({
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="font-semibold text-sm leading-tight">{inquiry.municipality_name}</p>
-            <p className="text-xs text-muted">{inquiry.country}{inquiry.region ? ` Â· ${inquiry.region}` : ''}</p>
+            <p className="text-xs text-muted">
+              {inquiry.region ? t('values.country_region', { country: inquiry.country, region: inquiry.region }) : inquiry.country}
+            </p>
           </div>
           <FitChip score={inquiry.fit_score} />
         </div>
@@ -198,7 +200,7 @@ function InquiryDetailModal({
         onRefresh();
         onClose();
       } else {
-        toast.error(res.error || t('toasts.stage_update_failed'));
+        toast.error(t('toasts.stage_update_failed'));
       }
     } catch (err) {
       logError('stage update failed', err);
@@ -216,7 +218,7 @@ function InquiryDetailModal({
         toast.success(t('toasts.notes_saved'));
         onRefresh();
       } else {
-        toast.error(res.error || t('toasts.notes_save_failed'));
+        toast.error(t('toasts.notes_save_failed'));
       }
     } catch (err) {
       logError('notes save failed', err);
@@ -246,7 +248,7 @@ function InquiryDetailModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
-              <p>{inquiry.country}{inquiry.region ? ` Â· ${inquiry.region}` : ''}</p>
+              <p>{inquiry.region ? t('values.country_region', { country: inquiry.country, region: inquiry.region }) : inquiry.country}</p>
             </div>
             <div>
               <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.population')}</p>
@@ -277,7 +279,9 @@ function InquiryDetailModal({
               <p className="text-muted text-xs uppercase tracking-wide mb-1">{t('fields.modules_of_interest')}</p>
               <div className="flex flex-wrap gap-1">
                 {modules.map((m: string) => (
-                  <Chip key={m} size="sm" variant="soft" color="accent">{m.replace(/_/g, ' ')}</Chip>
+                  <Chip key={m} size="sm" variant="soft" color="accent">
+                    {t(`module_values.${m}`, { defaultValue: t('module_values.unknown') })}
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -290,7 +294,11 @@ function InquiryDetailModal({
             </div>
             <div>
               <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.budget')}</p>
-              <p>{inquiry.budget_indication?.replace(/_/g, ' ') ?? t('values.empty')}</p>
+              <p>
+                {inquiry.budget_indication
+                  ? t(`budget_values.${inquiry.budget_indication}`, { defaultValue: t('budget_values.unknown') })
+                  : t('values.empty')}
+              </p>
             </div>
           </div>
 
@@ -309,13 +317,13 @@ function InquiryDetailModal({
               <div className="grid grid-cols-2 gap-1">
                 {Object.entries(breakdown).map(([key, val]) => (
                   <div key={key} className="flex items-center justify-between text-xs bg-surface-secondary rounded px-2 py-1">
-                    <span className="capitalize">{key.replace(/_/g, ' ')}</span>
-                    <span className="font-semibold text-accent">+{val}</span>
+                    <span>{t(`breakdown.${key}`, { defaultValue: t('breakdown.unknown') })}</span>
+                    <span className="font-semibold text-accent">{formatNumber(val, { signDisplay: 'always' })}</span>
                   </div>
                 ))}
                 <div className="flex items-center justify-between text-xs bg-accent-soft rounded px-2 py-1 font-semibold col-span-2">
                   <span>{t('fields.total')}</span>
-                  <span>{inquiry.fit_score}</span>
+                  <span>{inquiry.fit_score === null ? t('values.empty') : formatNumber(inquiry.fit_score, { maximumFractionDigits: 1 })}</span>
                 </div>
               </div>
             </div>
@@ -518,7 +526,7 @@ export function PilotInquiryAdminPage() {
         />
         <StatCard
           title={t('stats.avg_fit_score')}
-          value={stats ? stats.avg_fit_score.toFixed(1) : t('values.empty')}
+          value={stats ? formatNumber(stats.avg_fit_score, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : t('values.empty')}
           icon={<CheckCircle className="w-5 h-5 text-accent" />}
         />
       </div>

@@ -8,5 +8,33 @@
   "after_label": "Dopo",
   "caveat_label": "Metodo",
   "evidence_label": "Prova",
-  "error_loading": "Al momento non è possibile caricare le storie di successo. Riprova tra qualche istante."
+  "error_loading": "Al momento non è possibile caricare le storie di successo. Riprova tra qualche istante.",
+  "audiences": {
+    "all_residents": "Tutti i residenti",
+    "municipality": "Comune",
+    "kanton": "Cantone",
+    "verein_members": "Membri dell'associazione",
+    "volunteers": "Volontari",
+    "recipients": "Destinatari di cure"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% in meno di sforzo nella distribuzione delle informazioni",
+      "narrative": "I coordinatori impiegano circa un terzo in meno di tempo per distribuire gli aggiornamenti dopo il passaggio a NEXUS. Annunci, targeting dei segmenti di membri e tracciamento delle conferme sono consolidati in un unico luogo.",
+      "method_caveat": "Esempio illustrativo basato su una dichiarazione della comunità dei pari; non è stato misurato per questo inquilino.",
+      "evidence_source": "Pagina del comune pari (illustrativa)"
+    },
+    "volunteer_engagement": {
+      "title": "25% in più di coinvolgimento dei volontari",
+      "narrative": "Le comunità pilota riportano un quarto in più di partecipazione attiva dei volontari dopo l'adozione di NEXUS, supportata da un abbinamento più chiaro, una registrazione senza attriti e un riconoscimento visibile del Pass Calore.",
+      "method_caveat": "Esempio illustrativo basato su una dichiarazione della comunità dei pari; non è stato misurato per questo inquilino.",
+      "evidence_source": "Pagina del comune pari (illustrativa)"
+    },
+    "formal_care_offset": {
+      "title": "12.250 CHF di costi per assistenza formale compensati",
+      "narrative": "Le ore di volontariato coordinate tramite NEXUS rappresentano una compensazione di 12.250 CHF contro i costi di assistenza domiciliare formale durante il periodo pilota, valutate al tasso svizzero per assistenti di cura formale.",
+      "method_caveat": "Stima utilizzando 35 CHF all'ora per 350 ore; il confronto è effettuato solo rispetto alla baseline pre-pilota.",
+      "evidence_source": "Modello ROI municipale AG76 (illustrativo)"
+    }
+  }
 }

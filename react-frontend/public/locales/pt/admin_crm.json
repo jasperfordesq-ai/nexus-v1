@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "crm": {
     "action_cancel": "Cancelar",
@@ -344,7 +344,6 @@
     "status_pending": "Pendente",
     "days_ago": "há {{count}} dias",
     "hours_ago": "há {{count}} horas",
-    "just_now": "Just Now",
     "minutes_ago": "há {{count}} minutos",
     "loss_between_stages_many": "{{count}}perdido entre etapas",
     "loss_between_stages_one": "{{count}}perdido entre etapas",
@@ -365,6 +364,35 @@
     "activity_type_note_added": "Nota adicionada",
     "activity_type_task_created": "Tarefa criada",
     "activity_type_profile_updated": "Perfil atualizado",
-    "activity_type_group_joined": "Grupo entrou"
+    "activity_type_group_joined": "Grupo entrou",
+    "activity_type_unknown": "Atividade desconhecida",
+    "admin_roles": {
+      "admin": "Administrador",
+      "tenant_admin": "Administrador do inquilino",
+      "super_admin": "Administrador da plataforma",
+      "unknown": "Administrador"
+    },
+    "funnel_stage_registered": "Registrado",
+    "funnel_stage_email_verified": "Email Verificado",
+    "funnel_stage_profile_complete": "Perfil Completo",
+    "funnel_stage_first_listing": "Primeira Listagem",
+    "funnel_stage_first_exchange": "Primeira Troca",
+    "funnel_stage_repeat_user": "Usuário Recorrente",
+    "funnel_stage_unknown": "Estágio Desconhecido",
+    "activity_description_login": "Conectado",
+    "activity_description_signup": "Registrou uma conta",
+    "activity_description_listing_created": "Criou anúncio: {{title}}",
+    "activity_description_exchange_completed": "Concluiu troca com {{member_name}}",
+    "activity_description_note_added": "Nota adicionada por {{author_name}}: {{content}}",
+    "activity_description_task_created": "Criou tarefa: {{title}}",
+    "activity_description_group_joined": "Entrou no grupo: {{group_name}}",
+    "activity_description_profile_updated": "Atualizou seu perfil",
+    "activity_description_unknown": "Atividade registrada",
+    "activity_value_untitled_listing": "Listagem sem título",
+    "activity_value_unknown_member": "Membro desconhecido",
+    "activity_value_system": "Sistema",
+    "activity_value_untitled_task": "Tarefa sem título",
+    "activity_value_unknown_group": "Grupo desconhecido",
+    "just_now": "Agora mesmo"
   }
 }

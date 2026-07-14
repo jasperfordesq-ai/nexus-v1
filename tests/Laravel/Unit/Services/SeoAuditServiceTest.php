@@ -46,7 +46,7 @@ class SeoAuditServiceTest extends TestCase
     {
         $results = $this->service->runAudit($this->testTenantId);
 
-        $keys = array_column($results['checks'], 'key');
+        $keys = array_column($results['checks'], 'code');
 
         $this->assertContains('tenant_metadata', $keys);
         $this->assertContains('seo_settings', $keys);
@@ -66,17 +66,28 @@ class SeoAuditServiceTest extends TestCase
         $results = $this->service->runAudit($this->testTenantId);
 
         foreach ($results['checks'] as $check) {
-            $this->assertArrayHasKey('key', $check);
-            $this->assertArrayHasKey('name', $check);
-            $this->assertArrayHasKey('description', $check);
+            $this->assertArrayHasKey('code', $check);
+            $this->assertArrayHasKey('params', $check);
             $this->assertArrayHasKey('status', $check);
             $this->assertArrayHasKey('issues', $check);
             $this->assertArrayHasKey('issue_count', $check);
             $this->assertArrayHasKey('points', $check);
             $this->assertArrayHasKey('max_points', $check);
+            $this->assertArrayNotHasKey('name', $check);
+            $this->assertArrayNotHasKey('description', $check);
+            $this->assertArrayNotHasKey('details', $check);
             $this->assertContains($check['status'], ['pass', 'warning', 'fail']);
+            $this->assertIsArray($check['params']);
             $this->assertIsArray($check['issues']);
             $this->assertLessThanOrEqual($check['max_points'], $check['points']);
+
+            foreach ($check['issues'] as $issue) {
+                $this->assertIsArray($issue);
+                $this->assertArrayHasKey('code', $issue);
+                $this->assertArrayHasKey('params', $issue);
+                $this->assertIsString($issue['code']);
+                $this->assertIsArray($issue['params']);
+            }
         }
     }
 
@@ -127,6 +138,42 @@ class SeoAuditServiceTest extends TestCase
         $this->assertArrayHasKey('score', $result);
     }
 
+    public function test_getLatestAudit_removes_legacy_english_display_copy(): void
+    {
+        DB::delete('DELETE FROM seo_audits WHERE tenant_id = ?', [$this->testTenantId]);
+        DB::table('seo_audits')->insert([
+            'tenant_id' => $this->testTenantId,
+            'url' => '',
+            'results' => json_encode([
+                'checks' => [[
+                    'key' => 'tenant_metadata',
+                    'name' => 'Legacy English Name',
+                    'description' => 'Legacy English Description',
+                    'status' => 'warning',
+                    'issues' => ['Legacy English Issue'],
+                    'issue_count' => 1,
+                    'points' => 5,
+                    'max_points' => 10,
+                ]],
+                'score' => 5,
+                'max_score' => 10,
+                'grade' => 'F',
+                'run_at' => '2026-01-01T00:00:00+00:00',
+            ]),
+            'created_at' => now(),
+        ]);
+
+        $result = $this->service->getLatestAudit($this->testTenantId);
+
+        $this->assertNotNull($result);
+        $check = $result['checks'][0];
+        $this->assertSame('tenant_metadata', $check['code']);
+        $this->assertArrayNotHasKey('name', $check);
+        $this->assertArrayNotHasKey('description', $check);
+        $this->assertSame('legacy_result_requires_rerun', $check['issues'][0]['code']);
+        $this->assertSame([], $check['issues'][0]['params']);
+    }
+
     // =========================================================================
     // Specific audit checks
     // =========================================================================
@@ -140,7 +187,7 @@ class SeoAuditServiceTest extends TestCase
         ]);
 
         $results = $this->service->runAudit($this->testTenantId);
-        $redirectCheck = collect($results['checks'])->firstWhere('key', 'redirect_health');
+        $redirectCheck = collect($results['checks'])->firstWhere('code', 'redirect_health');
 
         $this->assertNotEmpty($redirectCheck['issues']);
     }
@@ -154,9 +201,14 @@ class SeoAuditServiceTest extends TestCase
         ]);
 
         $results = $this->service->runAudit($this->testTenantId);
-        $redirectCheck = collect($results['checks'])->firstWhere('key', 'redirect_health');
+        $redirectCheck = collect($results['checks'])->firstWhere('code', 'redirect_health');
 
-        $hasChainIssue = collect($redirectCheck['issues'])->contains(fn ($issue) => str_contains($issue, 'chain'));
+        $hasChainIssue = collect($redirectCheck['issues'])->contains(
+            fn (array $issue): bool => $issue['code'] === 'redirect_chain'
+                && $issue['params']['from'] === '/chain-a'
+                && $issue['params']['via'] === '/chain-b'
+                && $issue['params']['destination'] === '/chain-c'
+        );
         $this->assertTrue($hasChainIssue);
     }
 }

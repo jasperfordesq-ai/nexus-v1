@@ -286,7 +286,6 @@
     "reviews_intro": "Registre decisiones controladas sin notas de texto libre, datos de contacto ni registros de incidentes.",
     "review_member": "Participante del evento",
     "review_member_choose": "Elige un participante",
-    "member_fallback": "Miembro #:identificación",
     "review_decision": "Decisión",
     "decisions": {
       "deny": "Negar participación",
@@ -319,6 +318,7 @@
     },
     "reviewed_by": "Revisado por",
     "withdraw_review": "decisión de retirar",
-    "ledger_empty": "No se han registrado reseñas de participación para este evento."
+    "ledger_empty": "No se han registrado reseñas de participación para este evento.",
+    "member_fallback": "Miembro #:id"
   }
 }

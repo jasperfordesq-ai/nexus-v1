@@ -337,7 +337,10 @@
     "members_error_title": "Níorbh fhéidir baill ar feitheamh a lódáil",
     "members_error_hint": "Theip ar an scuaine cheadaithe a lódáil. Triail arís chun é a fháil arís.",
     "retry": "Triail arís",
-    "empty_pending_title": "Gach rud déanta"
+    "empty_pending_title": "Gach rud déanta",
+    "stage_first_listing": "Liostú Ar an gcéad uair",
+    "stage_repeat_user": "Úsáideoir Athfhillte",
+    "stage_unknown": "Céim anaithnid"
   },
   "safeguarding": {
     "title": "Cosaint",
@@ -1312,7 +1315,8 @@
     "pending_confirmation": "Ag fanacht le deimhniú",
     "confirmed": "Deimhnithe",
     "review_requested": "Athbhreithniú iarrtha",
-    "not_confirmed": "Gan daingniú"
+    "not_confirmed": "Gan daingniú",
+    "unknown": "Anaithnid"
   },
   "common": {
     "loading": "Á luchtú...",

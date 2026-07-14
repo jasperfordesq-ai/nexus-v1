@@ -71,7 +71,7 @@ export function GroupApprovals() {
         toast.success(t('groups.approved_member'));
         loadItems();
       } else {
-        toast.error(res?.error || t('groups.failed_to_approve_membership'));
+        toast.error(t('groups.failed_to_approve_membership'));
       }
     } catch {
       toast.error(t('groups.an_unexpected_error_occurred'));
@@ -89,7 +89,7 @@ export function GroupApprovals() {
         toast.success(t('groups.rejected_member'));
         loadItems();
       } else {
-        toast.error(res?.error || t('groups.failed_to_reject_membership'));
+        toast.error(t('groups.failed_to_reject_membership'));
       }
     } catch {
       toast.error(t('groups.an_unexpected_error_occurred'));

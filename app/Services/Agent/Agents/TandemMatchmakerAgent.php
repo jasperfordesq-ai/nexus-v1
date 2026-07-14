@@ -50,6 +50,7 @@ final class TandemMatchmakerAgent extends BaseAgent
                     'recipient_id'   => $recipientId,
                     'recipient_name' => $pair['recipient']['name'] ?? '',
                     'signals'        => $pair['signals'] ?? [],
+                    'reasons'        => $pair['reasons'] ?? [],
                 ],
                 reasoning: $reasoning,
                 confidence: $score,
@@ -74,7 +75,7 @@ final class TandemMatchmakerAgent extends BaseAgent
     private function generateReasoning(array $pair): string
     {
         $signals  = $pair['signals'] ?? [];
-        $fallback = (string) ($pair['reason'] ?? 'High compatibility based on profile signals.');
+        $fallback = '';
 
         $messages = [
             [

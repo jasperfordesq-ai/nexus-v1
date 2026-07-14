@@ -651,7 +651,8 @@
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
     "link": "ブロックされたユーザー",
-    "count_other": "{{count}} 件ブロック中"
+    "count_other": "{{count}} 件ブロック中",
+    "count_one": "{{count}} がブロックされました"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",

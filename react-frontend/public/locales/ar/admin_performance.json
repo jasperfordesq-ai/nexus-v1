@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "performance": {
     "label_performance_metrics": "مقاييس الأداء",
@@ -83,19 +83,20 @@
     "label_n_plus_one_warnings": "تحذيرات N Plus One",
     "label_slow_queries": "الاستعلامات البطيئة",
     "label_total_requests": "إجمالي الطلبات",
-    "n_plus_one_body": "N Plus One Body",
     "n_plus_one_title": "ن بلس واحد",
     "no_memory_spikes": "لم يتم العثور على ارتفاعات في الذاكرة",
     "no_slow_queries": "لم يتم العثور على استعلامات بطيئة",
     "no_slow_requests": "لم يتم العثور على طلبات بطيئة",
     "no_volume_data": "لم يتم العثور على بيانات الحجم",
-    "page_description": "Page.",
     "peak_memory": "ذاكرة الذروة",
     "query_count": "عدد الاستعلامات",
     "refresh": "ينعش",
     "tab_memory_spikes": "مسامير الذاكرة",
     "tab_request_volume": "حجم الطلب",
     "tab_slow_queries": "الاستعلامات البطيئة",
-    "tab_slow_requests": "الطلبات البطيئة"
+    "tab_slow_requests": "الطلبات البطيئة",
+    "warning_unknown": "تحذير أداء",
+    "n_plus_one_body": "تم الكشف عن أنماط استعلام محتملة N+1. راجع الطلب البطيء وتفاصيل الاستعلام لتحميل العلاقات المكررة.",
+    "page_description": "مؤشرات أداء قاعدة البيانات والطلبات والذاكرة للفترة المحددة."
   }
 }

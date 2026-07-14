@@ -8,7 +8,7 @@
  * Admin page for managing volunteer expense submissions, reviews, and policies.
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatCurrency, formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Building2 from 'lucide-react/icons/building-2';
@@ -96,6 +96,19 @@ function toNum(value: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function formatExpenseAmount(value: unknown, currency?: string | null): string {
+  const amount = toNum(value);
+  if (!currency) {
+    return formatNumber(amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  try {
+    return formatCurrency(amount, currency.toUpperCase());
+  } catch {
+    return `${formatNumber(amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency.toUpperCase()}`;
+  }
+}
+
 // Safety cap so a runaway cursor can't loop forever during a full export.
 const MAX_EXPORT_PAGES = 200;
 
@@ -106,14 +119,11 @@ function csvCell(value: unknown): string {
   return JSON.stringify(/^[=+\-@\t\r]/.test(str) ? `'${str}` : str);
 }
 
-function buildCsv(data: Array<Record<string, unknown>>, filename: string) {
-  if (data.length === 0) return;
-  const first = data[0];
-  if (!first) return;
-  const headers = Object.keys(first);
+function buildCsv(headers: string[], rows: unknown[][], filename: string) {
+  if (rows.length === 0) return;
   const csv = [
-    headers.join(','),
-    ...data.map((r) => headers.map((h) => csvCell(r[h])).join(',')),
+    headers.map(csvCell).join(','),
+    ...rows.map((row) => row.map(csvCell).join(',')),
   ].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -379,18 +389,29 @@ export function VolunteerExpenses() {
         return true;
       });
 
-      const exportData = rows.map((item) => ({
-        volunteer: item.volunteer_name || '',
-        organization: item.organization_name || '',
-        amount: toNum(item.amount).toFixed(2),
-        currency: item.currency || '',
-        type: item.type,
-        status: item.status,
-        submitted: item.submitted_at ? new Date(item.submitted_at).toLocaleDateString(getFormattingLocale()) : '',
-        has_receipt: item.has_receipt ? t('volunteering.yes') : t('volunteering.no'),
-        payment_reference: item.payment_reference || '',
-      }));
-      buildCsv(exportData, `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`);
+      const headers = [
+        t('volunteering.export_columns.volunteer'),
+        t('volunteering.export_columns.organization'),
+        t('volunteering.export_columns.amount'),
+        t('volunteering.export_columns.currency'),
+        t('volunteering.export_columns.type'),
+        t('volunteering.export_columns.status'),
+        t('volunteering.export_columns.submitted'),
+        t('volunteering.export_columns.has_receipt'),
+        t('volunteering.export_columns.payment_reference'),
+      ];
+      const exportRows = rows.map((item) => [
+        item.volunteer_name || '',
+        item.organization_name || '',
+        toNum(item.amount).toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        item.currency || '',
+        t(`volunteering.expense_type_${item.type}`, { defaultValue: t('volunteering.expense_type_unknown') }),
+        t(`volunteering.status_${item.status}`, { defaultValue: t('volunteering.status_unknown') }),
+        item.submitted_at ? new Date(item.submitted_at).toLocaleDateString(getFormattingLocale()) : '',
+        item.has_receipt ? t('volunteering.yes') : t('volunteering.no'),
+        item.payment_reference || '',
+      ]);
+      buildCsv(headers, exportRows, `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`);
 
       if (truncated) {
         toast.warning(t('volunteering.export_truncated', { count: MAX_EXPORT_PAGES }));
@@ -456,7 +477,7 @@ export function VolunteerExpenses() {
       sortable: true,
       render: (item) => (
         <span className="font-semibold">
-          {item.currency || ''}{toNum(item.amount).toFixed(2)}
+          {formatExpenseAmount(item.amount, item.currency)}
         </span>
       ),
     },
@@ -681,15 +702,15 @@ export function VolunteerExpenses() {
                       <TableCell>
                         <span className="font-medium">{org.name}</span>
                       </TableCell>
-                      <TableCell className="text-right font-mono">{org.count}</TableCell>
+                      <TableCell className="text-right font-mono">{formatNumber(org.count)}</TableCell>
                       <TableCell className="text-right font-mono text-warning">
-                        {org.pending > 0 ? org.pending.toFixed(2) : '--'}
+                        {org.pending > 0 ? formatNumber(org.pending, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--'}
                       </TableCell>
                       <TableCell className="text-right font-mono text-success">
-                        {org.approved > 0 ? org.approved.toFixed(2) : '--'}
+                        {org.approved > 0 ? formatNumber(org.approved, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--'}
                       </TableCell>
                       <TableCell className="text-right font-mono font-semibold">
-                        {org.total.toFixed(2)}
+                        {formatNumber(org.total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -790,7 +811,7 @@ export function VolunteerExpenses() {
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_amount')}:</span>
-                    <p className="font-semibold">{reviewExpense.currency || ''}{toNum(reviewExpense.amount).toFixed(2)}</p>
+                    <p className="font-semibold">{formatExpenseAmount(reviewExpense.amount, reviewExpense.currency)}</p>
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_type')}:</span>

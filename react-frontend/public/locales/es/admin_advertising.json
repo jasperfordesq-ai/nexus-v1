@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,9 +67,10 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "advertising": {
     "status": {
@@ -162,11 +162,13 @@
         "all": "Todas las ubicaciones",
         "discovery": "Descubrimiento",
         "feed": "Alimentar",
-        "market": "Mercado"
+        "market": "Mercado",
+        "markt": "Mercado"
       },
       "placeholders": {
         "budget": "p.ej. 5000 = EUR 50.00",
-        "campaign_name": "Rebajas de Verano - Cafe Helvetia"
+        "campaign_name": "Rebajas de Verano - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"jardinería\"]}"
       },
       "stats": {
         "active_campaigns": "Campañas activas",
@@ -241,7 +243,8 @@
       "placeholders": {
         "body": "Máximo 400 caracteres",
         "campaign_name": "p.ej. Promoción de Primavera - Cafe Seeblick",
-        "title": "Máximo 100 caracteres"
+        "title": "Máximo 100 caracteres",
+        "cta_url": "https://... o nexus://..."
       },
       "stats": {
         "needs_attention": "necesita atencion",
@@ -261,7 +264,8 @@
         "rejected": "Campaña \"{{name}}\" rechazada.",
         "reject_failed": "No se pudo rechazar la campaña.",
         "required_fields": "Se requieren nombre, título y cuerpo."
-      }
+      },
+      "cost_per_send": "{{cost}} por envío"
     },
     "tabs_aria": "Filtro de estado de campaña publicitaria"
   }

@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "advertising": {
     "status": {
@@ -162,11 +162,13 @@
         "all": "すべてのプレースメント",
         "discovery": "発見",
         "feed": "餌",
-        "market": "市場"
+        "market": "市場",
+        "markt": "市場"
       },
       "placeholders": {
         "budget": "例: 5000 = EUR 50.00",
-        "campaign_name": "サマーセール - Cafe Helvetia"
+        "campaign_name": "サマーセール - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"園芸\"]}"
       },
       "stats": {
         "active_campaigns": "アクティブなキャンペーン",
@@ -188,7 +190,8 @@
         "rejected": "キャンペーン「{{name}}」が拒否されました",
         "reject_failed": "キャンペーンを拒否できませんでした"
       },
-      "creatives_count_other": "クリエイティブ ({{count}})"
+      "creatives_count_other": "クリエイティブ ({{count}})",
+      "creatives_count_one": "クリエイティブ ({{count}})"
     },
     "push": {
       "page_title": "プッシュキャンペーン",
@@ -239,7 +242,8 @@
       "placeholders": {
         "body": "最大400文字",
         "campaign_name": "例えば春のプロモーション - Cafe Seeblick",
-        "title": "最大100文字"
+        "title": "最大100文字",
+        "cta_url": "https://... または nexus://..."
       },
       "stats": {
         "needs_attention": "注意が必要です",
@@ -259,7 +263,8 @@
         "rejected": "キャンペーン「{{name}}」が拒否されました。",
         "reject_failed": "キャンペーンを拒否できませんでした。",
         "required_fields": "名前、タイトル、本文は必須です。"
-      }
+      },
+      "cost_per_send": "送信ごとに {{cost}}"
     },
     "tabs_aria": "広告キャンペーンステータスフィルター"
   }

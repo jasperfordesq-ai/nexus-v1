@@ -38,7 +38,8 @@ interface Resource {
   id: number;
   title: string;
   category: string;
-  author_name: string;
+  author_name: string | null;
+  author_code?: string | null;
   views: number;
   helpful_votes: number;
   status: string;
@@ -121,7 +122,7 @@ export function ResourcesAdmin() {
         toast.success(t('resources.resource_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(t('resources.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('resources.an_unexpected_error_occurred'));
@@ -155,7 +156,9 @@ export function ResourcesAdmin() {
       label: t('resources.resources_admin_author'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">{item.author_name || t('resources.unknown')}</span>
+        <span className="text-sm text-muted">
+          {item.author_name || (item.author_code === 'system' ? t('resources.system') : t('resources.unknown'))}
+        </span>
       ),
     },
     {
@@ -191,7 +194,7 @@ export function ResourcesAdmin() {
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {t(`resources.status_${item.status}`, { defaultValue: t('common.unknown') })}
         </Chip>
       ),
     },

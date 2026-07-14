@@ -7,6 +7,7 @@ import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinne
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { Separator } from '@/components/ui';
 import Award from 'lucide-react/icons/award';
@@ -29,6 +30,7 @@ type MetricSource = 'pilot_scoreboard' | 'municipal_roi' | 'manual';
 
 interface SuccessStory {
   id: string;
+  copy_code?: string | null;
   title: string;
   narrative: string;
   metric_source: MetricSource;
@@ -103,10 +105,22 @@ function emptyForm(): FormState {
   };
 }
 
-function fromStory(s: SuccessStory): FormState {
+function storyCopy(
+  story: SuccessStory,
+  field: 'title' | 'narrative' | 'method_caveat' | 'evidence_source',
+  t: TFunction,
+): string {
+  if (!story.copy_code) return story[field];
+
+  return t(`success_stories_admin.demo_stories.${story.copy_code}.${field}`, {
+    defaultValue: story[field],
+  });
+}
+
+function fromStory(s: SuccessStory, t: TFunction): FormState {
   return {
-    title: s.title,
-    narrative: s.narrative,
+    title: storyCopy(s, 'title', t),
+    narrative: storyCopy(s, 'narrative', t),
     metric_source: s.metric_source,
     metric_key: s.metric_key ?? '',
     before_value: s.before_value === null ? '' : String(s.before_value),
@@ -114,8 +128,8 @@ function fromStory(s: SuccessStory): FormState {
     unit: s.unit,
     audience: s.audience,
     sub_region_id: s.sub_region_id ?? '',
-    method_caveat: s.method_caveat,
-    evidence_source: s.evidence_source,
+    method_caveat: storyCopy(s, 'method_caveat', t),
+    evidence_source: storyCopy(s, 'evidence_source', t),
     is_demo: s.is_demo,
     is_published: s.is_published,
   };
@@ -200,7 +214,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
 
   const openEdit = (s: SuccessStory) => {
     setEditing(s);
-    setForm(fromStory(s));
+    setForm(fromStory(s, t));
     editModal.onOpen();
   };
 
@@ -220,7 +234,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
         setItems(res.data.items ?? []);
         showToast(t('success_stories_admin.toasts.seeded'), 'success');
       } else {
-        showToast(res.error ?? t('success_stories_admin.toasts.seed_failed'), 'error');
+        showToast(t('success_stories_admin.toasts.seed_failed'), 'error');
       }
     } catch {
       showToast(t('success_stories_admin.toasts.seed_failed'), 'error');
@@ -243,7 +257,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? t('success_stories_admin.toasts.update_failed'), 'error');
+          showToast(t('success_stories_admin.toasts.update_failed'), 'error');
         }
       } else {
         const res = await api.post<StoryResponse>(
@@ -255,7 +269,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
           editModal.onClose();
           await load();
         } else {
-          showToast(res.error ?? t('success_stories_admin.toasts.create_failed'), 'error');
+          showToast(t('success_stories_admin.toasts.create_failed'), 'error');
         }
       }
     } catch {
@@ -278,7 +292,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
         setTarget(null);
         await load();
       } else {
-        showToast(res.error ?? t('success_stories_admin.toasts.delete_failed'), 'error');
+        showToast(t('success_stories_admin.toasts.delete_failed'), 'error');
       }
     } catch {
       showToast(t('success_stories_admin.toasts.delete_failed'), 'error');
@@ -298,7 +312,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
         showToast(t('success_stories_admin.toasts.metric_refreshed'), 'success');
         await load();
       } else {
-        showToast(res.error ?? t('success_stories_admin.toasts.refresh_failed'), 'error');
+        showToast(t('success_stories_admin.toasts.refresh_failed'), 'error');
       }
     } catch {
       showToast(t('success_stories_admin.toasts.refresh_failed'), 'error');
@@ -414,9 +428,9 @@ export default function SuccessStoryAdminPage(): ReactNode {
                   <TableRow key={s.id}>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium">{s.title}</span>
+                        <span className="font-medium">{storyCopy(s, 'title', t)}</span>
                         <span className="line-clamp-1 max-w-md text-xs text-muted">
-                          {s.narrative}
+                          {storyCopy(s, 'narrative', t)}
                         </span>
                       </div>
                     </TableCell>
@@ -504,7 +518,9 @@ export default function SuccessStoryAdminPage(): ReactNode {
       >
         <ModalContent>
           <ModalHeader>
-            {editing ? t('success_stories_admin.editor.edit_title', { title: editing.title }) : t('success_stories_admin.editor.new_title')}
+            {editing
+              ? t('success_stories_admin.editor.edit_title', { title: storyCopy(editing, 'title', t) })
+              : t('success_stories_admin.editor.new_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
@@ -677,7 +693,7 @@ export default function SuccessStoryAdminPage(): ReactNode {
               <div className="space-y-3">
                 <p className="text-sm">
                   {t('success_stories_admin.delete_modal.body_prefix')}{' '}
-                  <span className="font-semibold">{target.title}</span>{' '}
+                  <span className="font-semibold">{storyCopy(target, 'title', t)}</span>{' '}
                   {t('success_stories_admin.delete_modal.body_suffix')}
                 </p>
                 <Separator />

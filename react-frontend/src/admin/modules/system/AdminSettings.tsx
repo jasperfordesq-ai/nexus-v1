@@ -253,7 +253,7 @@ export function AdminSettings() {
         );
         if (res.success === false) {
           ok = false;
-          toast.error(res.error || t('system.save_failed'));
+          toast.error(t('system.save_failed'));
         }
       }
 
@@ -351,12 +351,10 @@ export function AdminSettings() {
         toast.success(t('admin_settings.header_logo_uploaded'));
         await refreshTenant();
       } else {
-        // Surface the real reason (e.g. "Session expired", "Image must be 2 MB
-        // or smaller") instead of a generic toast, so failures are diagnosable.
-        toast.error(res.error || t('admin_settings.upload_failed'));
+        toast.error(t('admin_settings.upload_failed'));
       }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('admin_settings.upload_failed'));
+    } catch {
+      toast.error(t('admin_settings.upload_failed'));
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
@@ -370,13 +368,13 @@ export function AdminSettings() {
     try {
       const res = await removeFn();
       if (res.success === false) {
-        toast.error(res.error || t('admin_settings.upload_failed'));
+        toast.error(t('admin_settings.upload_failed'));
         return;
       }
       toast.success(t('admin_settings.header_logo_removed'));
       await refreshTenant();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('admin_settings.upload_failed'));
+    } catch {
+      toast.error(t('admin_settings.upload_failed'));
     }
   };
 

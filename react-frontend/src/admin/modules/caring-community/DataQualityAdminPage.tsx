@@ -29,10 +29,11 @@ type Severity = 'ok' | 'info' | 'warning' | 'danger';
 
 interface DataQualityCheck {
   key: string;
-  label: string;
+  label_code: string;
   severity: Severity;
   count: number;
-  message: string;
+  message_code: string;
+  message_params: Record<string, string | number>;
   has_drilldown: boolean;
 }
 
@@ -46,6 +47,8 @@ interface DataQualityReport {
 interface AffectedRow {
   id: number;
   identifier?: string;
+  identifier_code?: string;
+  identifier_params?: Record<string, string | number>;
   name?: string;
   status?: string | null;
   created_at?: string | null;
@@ -55,7 +58,7 @@ interface AffectedRowsResponse {
   check_key: string;
   limit: number;
   rows: AffectedRow[];
-  note?: string | null;
+  note_code?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -76,6 +79,24 @@ function formatTimestamp(ts: string | null | undefined): string {
   return d.toLocaleString(getFormattingLocale());
 }
 
+type AdminT = (key: string, options?: Record<string, unknown>) => string;
+
+function checkLabel(t: AdminT, code: string): string {
+  return t(`data_quality.checks.${code}.label`);
+}
+
+function checkMessage(t: AdminT, code: string, params: Record<string, string | number>): string {
+  return t(`data_quality.checks.${code}`, params);
+}
+
+function affectedRowIdentifier(t: AdminT, row: AffectedRow, emptyValue: string): string {
+  if (row.identifier) return row.identifier;
+  if (row.identifier_code) {
+    return t(`data_quality.identifiers.${row.identifier_code}`, row.identifier_params ?? {});
+  }
+  return emptyValue;
+}
+
 // ---------------------------------------------------------------------------
 // Main Page
 // ---------------------------------------------------------------------------
@@ -91,7 +112,7 @@ export default function DataQualityAdminPage() {
   const [drilldownKey, setDrilldownKey] = useState<string | null>(null);
   const [drilldownLabel, setDrilldownLabel] = useState<string>('');
   const [drilldownRows, setDrilldownRows] = useState<AffectedRow[] | null>(null);
-  const [drilldownNote, setDrilldownNote] = useState<string | null>(null);
+  const [drilldownNoteCode, setDrilldownNoteCode] = useState<string | null>(null);
   const [drilldownLoading, setDrilldownLoading] = useState(false);
 
   const load = useCallback(async () => {
@@ -115,9 +136,9 @@ export default function DataQualityAdminPage() {
   const openDrilldown = useCallback(
     async (check: DataQualityCheck) => {
       setDrilldownKey(check.key);
-      setDrilldownLabel(check.label);
+      setDrilldownLabel(checkLabel(t, check.label_code));
       setDrilldownRows(null);
-      setDrilldownNote(null);
+      setDrilldownNoteCode(null);
       setDrilldownLoading(true);
       try {
         const res = await api.get<AffectedRowsResponse>(
@@ -126,7 +147,7 @@ export default function DataQualityAdminPage() {
         const payload = res.data;
         if (payload) {
           setDrilldownRows(payload.rows ?? []);
-          setDrilldownNote(payload.note ?? null);
+          setDrilldownNoteCode(payload.note_code ?? null);
         } else {
           setDrilldownRows([]);
         }
@@ -144,7 +165,7 @@ export default function DataQualityAdminPage() {
     setDrilldownKey(null);
     setDrilldownLabel('');
     setDrilldownRows(null);
-    setDrilldownNote(null);
+    setDrilldownNoteCode(null);
   }, []);
 
   const totals = report?.totals;
@@ -270,7 +291,7 @@ export default function DataQualityAdminPage() {
               >
                 <CardHeader className="flex items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-foreground">{check.label}</p>
+                    <p className="text-sm font-semibold text-foreground">{checkLabel(t, check.label_code)}</p>
                     <p className="mt-0.5 text-xs text-muted">{check.key}</p>
                   </div>
                   <Chip
@@ -289,7 +310,9 @@ export default function DataQualityAdminPage() {
                     </span>
                     <span className="pb-1 text-xs text-muted">{t('data_quality.summary.affected')}</span>
                   </div>
-                  <p className="text-sm text-muted">{check.message}</p>
+                  <p className="text-sm text-muted">
+                    {checkMessage(t, check.message_code, check.message_params)}
+                  </p>
                   {check.has_drilldown && (
                     <Button
                       size="sm"
@@ -328,13 +351,13 @@ export default function DataQualityAdminPage() {
               </div>
             )}
 
-            {!drilldownLoading && drilldownNote && (
+            {!drilldownLoading && drilldownNoteCode && (
               <div className="mb-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-muted">
-                {drilldownNote}
+                {t(`data_quality.notes.${drilldownNoteCode}`)}
               </div>
             )}
 
-            {!drilldownLoading && drilldownRows && drilldownRows.length === 0 && !drilldownNote && (
+            {!drilldownLoading && drilldownRows && drilldownRows.length === 0 && !drilldownNoteCode && (
               <p className="py-6 text-center text-sm text-muted">{t('data_quality.drilldown.empty')}</p>
             )}
 
@@ -351,9 +374,13 @@ export default function DataQualityAdminPage() {
                   {drilldownRows.map((row) => (
                     <TableRow key={row.id}>
                       <TableCell>{row.id}</TableCell>
-                      <TableCell>{row.identifier ?? emptyValue}</TableCell>
+                      <TableCell>{affectedRowIdentifier(t, row, emptyValue)}</TableCell>
                       <TableCell>{row.name ?? emptyValue}</TableCell>
-                      <TableCell>{row.status ?? emptyValue}</TableCell>
+                      <TableCell>
+                        {row.status
+                          ? t(`data_quality.row_status.${row.status}`, { defaultValue: t('data_quality.row_status.unknown') })
+                          : emptyValue}
+                      </TableCell>
                       <TableCell>{formatTimestamp(row.created_at)}</TableCell>
                     </TableRow>
                   ))}

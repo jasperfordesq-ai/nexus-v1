@@ -176,7 +176,7 @@ export function BlogPostForm() {
         setMetaDescription(postData.meta_description || '');
         setNoindex(postData.noindex || false);
       } else {
-        setLoadError(res.error || t('blog.failed_to_load_blog_posts'));
+        setLoadError(t('blog.failed_to_load_blog_posts'));
       }
     } catch {
       setLoadError(t('blog.an_unexpected_error_occurred'));
@@ -243,7 +243,7 @@ export function BlogPostForm() {
         toast.success(isEdit ? t('blog.post_updated') : t('blog.post_created'));
         navigate(tenantPath('/admin/blog'));
       } else {
-        toast.error(res.error || t('blog.an_unexpected_error_occurred'));
+        toast.error(t('blog.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('blog.an_unexpected_error_occurred'));

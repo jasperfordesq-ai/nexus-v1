@@ -5,6 +5,7 @@
 
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts/TenantContext';
 
 /**
@@ -37,6 +38,7 @@ const areaServedTypeMap: Record<string, string> = {
 };
 
 export function SeoHead() {
+  const { t } = useTranslation('common');
   const { branding, tenant } = useTenant();
   const location = useLocation();
 
@@ -50,11 +52,14 @@ export function SeoHead() {
   const pathSegments = location.pathname.split('/').filter(Boolean);
 
   const breadcrumbItems = [
-    { '@type': 'ListItem' as const, position: 1, name: 'Home', item: siteUrl || '/' },
+    { '@type': 'ListItem' as const, position: 1, name: t('nav.home'), item: siteUrl || '/' },
     ...pathSegments.map((segment, index) => ({
       '@type': 'ListItem' as const,
       position: index + 2,
-      name: segment.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      // URL-derived identifiers (tenant slugs, record IDs, and routes) are not
+      // authored prose. Preserve them verbatim instead of applying an English
+      // title-casing heuristic.
+      name: decodeURIComponent(segment),
       item: `${siteUrl}/${pathSegments.slice(0, index + 1).join('/')}`,
     })),
   ];

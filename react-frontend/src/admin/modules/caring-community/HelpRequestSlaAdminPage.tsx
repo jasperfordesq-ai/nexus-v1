@@ -79,11 +79,18 @@ const BUCKET_COLORS: Record<Bucket, 'danger' | 'warning' | 'success'> = {
 };
 
 function fmtHours(h: number): string {
-  if (h < 1) return `${Math.round(h * 60)}m`;
-  if (h < 24) return `${h.toFixed(1)}h`;
+  if (h < 1) {
+    return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'minute', unitDisplay: 'short' }).format(Math.round(h * 60));
+  }
+  if (h < 24) {
+    return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'hour', unitDisplay: 'short', maximumFractionDigits: 1 }).format(h);
+  }
   const days = Math.floor(h / 24);
   const remHours = Math.round(h - days * 24);
-  return `${days}d ${remHours}h`;
+  const dayLabel = new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'day', unitDisplay: 'short' }).format(days);
+  return remHours === 0
+    ? dayLabel
+    : `${dayLabel} ${new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'hour', unitDisplay: 'short' }).format(remHours)}`;
 }
 
 export default function HelpRequestSlaAdminPage() {
@@ -369,7 +376,7 @@ export default function HelpRequestSlaAdminPage() {
                         </TableCell>
                         <TableCell>
                           <Chip size="sm" variant="dot">
-                            {req.status}
+                            {t(`help_request_sla.status.${req.status}`, { defaultValue: t('help_request_sla.status.unknown') })}
                           </Chip>
                         </TableCell>
                         <TableCell>

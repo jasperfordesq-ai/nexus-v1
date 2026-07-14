@@ -23,6 +23,7 @@ import { apiResponseSchema } from '@/lib/api-schemas';
 import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
 import { queueSentryApiCall, queueSentryBreadcrumb, queueSentryMessage } from '@/lib/telemetryQueue';
+import i18n from '@/i18n';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -548,7 +549,7 @@ export class ApiClient {
   private sessionExpiredResponse<T>(): ApiResponse<T> {
     return {
       success: false,
-      error: 'Session expired. Please log in again.',
+      error: i18n.t('session_expired_message', { ns: 'errors' }),
       code: 'SESSION_EXPIRED',
     };
   }
@@ -1147,7 +1148,7 @@ export class ApiClient {
         }
         return {
           success: false,
-          error: 'Service temporarily unavailable',
+          error: i18n.t('api.service_unavailable', { ns: 'errors' }),
           code: 'SERVICE_UNAVAILABLE',
         };
       }
@@ -1172,7 +1173,7 @@ export class ApiClient {
         }
         return {
           success: false,
-          error: 'Invalid response from server',
+          error: i18n.t('api.invalid_response', { ns: 'errors' }),
           code: 'PARSE_ERROR',
         };
       }
@@ -1197,7 +1198,7 @@ export class ApiClient {
           const firstError = errors && errors.length > 0 ? errors[0] : null;
           const result: ApiResponse<T> = {
             success: false,
-            error: data.error ?? firstError?.message ?? data.message ?? 'Request failed',
+            error: data.error ?? firstError?.message ?? data.message ?? i18n.t('api.request_failed', { ns: 'errors' }),
             code: data.code ?? firstError?.code ?? 'REQUEST_FAILED',
             errors,
             meta: data.meta,
@@ -1224,7 +1225,7 @@ export class ApiClient {
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
       const errors = Array.isArray(data.errors) ? data.errors as ApiErrorDetail[] : undefined;
       const firstError = errors && errors.length > 0 ? errors[0] : null;
-      const errorMessage = data.error ?? firstError?.message ?? data.message ?? 'Request failed';
+      const errorMessage = data.error ?? firstError?.message ?? data.message ?? i18n.t('api.request_failed', { ns: 'errors' });
       const errorCode = data.code ?? firstError?.code ?? `HTTP_${response.status}`;
 
       // Dispatch global error for server errors (5xx) so useApiErrorHandler can show toasts.
@@ -1252,16 +1253,13 @@ export class ApiClient {
         const duration = performance.now() - startTime;
         captureTelemetryApiCall(method, endpoint, 408, duration); // 408 Request Timeout
         recordApiDiagnostic({ method, endpoint, status: 408, durationMs: duration });
-        const message = 'Request timed out. Please try again.';
+        const message = i18n.t('api.request_timeout', { ns: 'errors' });
         this.dispatchApiError(message, 'TIMEOUT', endpoint);
         return { success: false, error: message, code: 'TIMEOUT' };
       }
 
       // Network or other error - sanitize for production
-      const rawMessage = error instanceof Error ? error.message : 'Network error';
-      const message = import.meta.env.PROD
-        ? 'Unable to connect. Please check your internet connection and try again.'
-        : rawMessage;
+      const message = i18n.t('api.network_error', { ns: 'errors' });
       this.dispatchApiError(message, 'NETWORK_ERROR', endpoint);
       return {
         success: false,
@@ -1405,16 +1403,16 @@ export class ApiClient {
           return this.downloadWithRetry(endpoint, options, false);
         }
         if (outcome === 'transient') {
-          throw new Error(`Download failed (HTTP ${response.status})`);
+          throw new Error(i18n.t('api.download_failed_status', { ns: 'errors', status: response.status }));
         }
       } else {
         this.expireSession();
       }
-      throw new Error('Session expired. Please log in again.');
+      throw new Error(i18n.t('session_expired_message', { ns: 'errors' }));
     }
 
     if (!response.ok) {
-      throw new Error(`Download failed (HTTP ${response.status})`);
+      throw new Error(i18n.t('api.download_failed_status', { ns: 'errors', status: response.status }));
     }
 
     const blob = await response.blob();
@@ -1575,7 +1573,7 @@ export class ApiClient {
           const firstError = errors && errors.length > 0 ? errors[0] : null;
           return {
             success: false,
-            error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
+            error: data.error ?? firstError?.message ?? data.message ?? i18n.t('api.upload_failed', { ns: 'errors' }),
             code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
             errors,
             meta: data.meta,
@@ -1589,7 +1587,7 @@ export class ApiClient {
       const firstError = errors && errors.length > 0 ? errors[0] : null;
       return {
         success: false,
-        error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
+        error: data.error ?? firstError?.message ?? data.message ?? i18n.t('api.upload_failed', { ns: 'errors' }),
         code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
         errors,
       };
@@ -1597,14 +1595,11 @@ export class ApiClient {
       clearTimeout(uploadTimeoutId);
       if (isAbortError(error)) {
         if (callerSignal?.aborted && !uploadTimedOut) {
-          return { success: false, error: 'Upload cancelled', code: 'UPLOAD_ABORTED' };
+          return { success: false, error: i18n.t('api.upload_cancelled', { ns: 'errors' }), code: 'UPLOAD_ABORTED' };
         }
-        return { success: false, error: 'Upload timed out. Please try again.', code: 'UPLOAD_TIMEOUT' };
+        return { success: false, error: i18n.t('api.upload_timeout', { ns: 'errors' }), code: 'UPLOAD_TIMEOUT' };
       }
-      const rawMessage = error instanceof Error ? error.message : 'Upload failed';
-      const message = import.meta.env.PROD
-        ? 'Upload failed. Please try again.'
-        : rawMessage;
+      const message = i18n.t('api.upload_failed_retry', { ns: 'errors' });
       return { success: false, error: message, code: 'NETWORK_ERROR' };
     }
   }
@@ -1690,7 +1685,7 @@ export class ApiClient {
           if ('success' in data && data.success === false) {
             resolve({
               success: false,
-              error: (data.error as string) ?? firstError?.message ?? (data.message as string) ?? 'Upload failed',
+              error: (data.error as string) ?? firstError?.message ?? (data.message as string) ?? i18n.t('api.upload_failed', { ns: 'errors' }),
               code: (data.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
               errors,
               meta,
@@ -1703,7 +1698,7 @@ export class ApiClient {
 
         resolve({
           success: false,
-          error: (data?.error as string) ?? firstError?.message ?? (data?.message as string) ?? 'Upload failed',
+          error: (data?.error as string) ?? firstError?.message ?? (data?.message as string) ?? i18n.t('api.upload_failed', { ns: 'errors' }),
           code: (data?.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
           errors,
         });
@@ -1711,11 +1706,11 @@ export class ApiClient {
 
       xhr.onerror = () => resolve({
         success: false,
-        error: import.meta.env.PROD ? 'Upload failed. Please try again.' : 'Network error during upload',
+        error: i18n.t('api.upload_failed_retry', { ns: 'errors' }),
         code: 'NETWORK_ERROR',
       });
-      xhr.ontimeout = () => resolve({ success: false, error: 'Upload timed out. Please try again.', code: 'UPLOAD_TIMEOUT' });
-      xhr.onabort = () => resolve({ success: false, error: 'Upload cancelled', code: 'UPLOAD_ABORTED' });
+      xhr.ontimeout = () => resolve({ success: false, error: i18n.t('api.upload_timeout', { ns: 'errors' }), code: 'UPLOAD_TIMEOUT' });
+      xhr.onabort = () => resolve({ success: false, error: i18n.t('api.upload_cancelled', { ns: 'errors' }), code: 'UPLOAD_ABORTED' });
 
       xhr.send(formData);
     });

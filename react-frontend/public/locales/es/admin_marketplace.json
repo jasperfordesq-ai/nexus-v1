@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -208,7 +208,22 @@
     "verify_seller_title": "Verificar vendedor",
     "view_all": "Ver todo",
     "moderation_tabs_aria": "Filtro de estado de moderación del marketplace",
-    "seller_tabs_aria": "Filtro de estado del vendedor"
+    "seller_tabs_aria": "Filtro de estado del vendedor",
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "sold": "Vendido",
+      "expired": "Expirado",
+      "draft": "Borrador",
+      "unknown": "Otro estado de listado"
+    },
+    "moderation_status": {
+      "approved": "Aprobado",
+      "pending": "Pendiente de revisión",
+      "rejected": "Rechazado",
+      "flagged": "Marcado",
+      "unknown": "Otro estado de moderación"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} seleccionado",

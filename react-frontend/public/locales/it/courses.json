@@ -203,7 +203,8 @@
     "moderated": "Corso aggiornato",
     "error": "Qualcosa è andato storto. Per favore riprova.",
     "no_courses": "Nessun corso ancora.",
-    "no_instructors": "Nessun istruttore assegnato ancora."
+    "no_instructors": "Nessun istruttore assegnato ancora.",
+    "status_unknown": "Stato sconosciuto"
   },
   "builder": {
     "add_section": "Aggiungi sezione",

@@ -457,7 +457,24 @@
     },
     "scroll_down": "Scrollaigh síos",
     "audience_cards": {
-      "title": "Cá háit ar mhaith leat tosú?"
+      "title": "Cá háit ar mhaith leat tosú?",
+      "defaults": {
+        "new_here": {
+          "title": "Nua anseo?",
+          "description": "Foghlaim conas a oibríonn ár bpobal agus conas páirt a ghlacadh ann.",
+          "cta": "Tosaigh anois"
+        },
+        "exchange": {
+          "title": "Tairg nó faigh cabhair",
+          "description": "Sleamhnáil trí na rudanna atá á dtairgiú ag daoine, nó cuir do iarraidh féin.",
+          "cta": "Sleamhnáil trí liostaí"
+        },
+        "partner": {
+          "title": "Comhpháirtigh nó mol",
+          "description": "Do eagraíochtaí, maoinitheoirí, agus gairmithe a thacaíonn lenár mbaill.",
+          "cta": "Foghlaim níos mó"
+        }
+      }
     },
     "how_it_works": {
       "title": "Conas a Oibríonn Sé",
@@ -595,7 +612,7 @@
       "name_label": "Ainm",
       "name_placeholder": "D'ainm",
       "email_label": "Ríomhphost",
-      "email_placeholder": "tu@sampla.com",
+      "email_placeholder": "you@example.com",
       "subject_label": "Ábhar",
       "subject_placeholder": "Cad é seo faoi?",
       "subjects": {

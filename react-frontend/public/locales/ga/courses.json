@@ -211,7 +211,8 @@
     "moderated": "Cúrsa nuashonraithe",
     "error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
     "no_courses": "Níl cúrsaí ar bith fós.",
-    "no_instructors": "Níl aon teagascóirí ceadaithe go fóill."
+    "no_instructors": "Níl aon teagascóirí ceadaithe go fóill.",
+    "status_unknown": "Stádas anaithnid"
   },
   "builder": {
     "add_section": "Cuir alt leis",

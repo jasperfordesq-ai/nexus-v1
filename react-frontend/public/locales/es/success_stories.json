@@ -8,5 +8,33 @@
   "after_label": "Después",
   "caveat_label": "Método",
   "evidence_label": "Evidencia",
-  "error_loading": "No pudimos cargar las historias de éxito en este momento. Por favor, inténtalo de nuevo en un momento."
+  "error_loading": "No pudimos cargar las historias de éxito en este momento. Por favor, inténtalo de nuevo en un momento.",
+  "audiences": {
+    "all_residents": "Todos los residentes",
+    "municipality": "Municipio",
+    "kanton": "Cantón",
+    "verein_members": "Miembros de la asociación",
+    "volunteers": "Voluntarios",
+    "recipients": "Beneficiarios de cuidados"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% menos esfuerzo en la distribución de información",
+      "narrative": "Los coordinadores pasan aproximadamente un tercio menos de tiempo distribuyendo actualizaciones después de cambiar a NEXUS. Los anuncios, la segmentación de miembros y el seguimiento de confirmaciones se consolidan en un solo lugar.",
+      "method_caveat": "Ejemplo ilustrativo basado en una afirmación de la comunidad de pares; no se ha medido para este inquilino.",
+      "evidence_source": "Página de municipio par (ilustrativa)"
+    },
+    "volunteer_engagement": {
+      "title": "25% más de participación de voluntarios",
+      "narrative": "Las comunidades piloto informan un aumento de un cuarto en la participación activa de voluntarios tras adoptar NEXUS, respaldado por una asignación más clara, un registro sin fricciones y el reconocimiento visible del Pase de Calidez.",
+      "method_caveat": "Ejemplo ilustrativo basado en una afirmación de la comunidad de pares; no se ha medido para este inquilino.",
+      "evidence_source": "Página de municipio par (ilustrativa)"
+    },
+    "formal_care_offset": {
+      "title": "CHF 12,250 en costos de cuidado formal compensados",
+      "narrative": "Las horas de voluntariado coordinadas a través de NEXUS representan una compensación de CHF 12,250 contra los costos de atención domiciliaria formal durante el período piloto, valoradas según la tarifa de asistente de cuidado formal suizo.",
+      "method_caveat": "Estimar usando CHF 35 por hora durante 350 horas; la comparación es solo contra la línea base previa al piloto.",
+      "evidence_source": "Modelo de ROI municipal AG76 (ilustrativo)"
+    }
+  }
 }

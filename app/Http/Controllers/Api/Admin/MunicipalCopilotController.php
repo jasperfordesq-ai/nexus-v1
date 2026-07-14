@@ -71,12 +71,17 @@ class MunicipalCopilotController extends BaseApiController
 
         $draft = trim((string) $this->input('draft', ''));
         if ($draft === '') {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'Draft text is required.', 'draft', 422);
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED',
+                __('api.missing_required_field', ['field' => 'draft']),
+                'draft',
+                422,
+            );
         }
         if (mb_strlen($draft) > self::MAX_DRAFT_CHARS) {
             return $this->respondWithError(
                 'VALIDATION_LENGTH',
-                'Draft must be ' . self::MAX_DRAFT_CHARS . ' characters or fewer.',
+                __('api.field_max_characters', ['field' => 'draft', 'max' => self::MAX_DRAFT_CHARS]),
                 'draft',
                 422,
             );
@@ -119,7 +124,10 @@ class MunicipalCopilotController extends BaseApiController
             if (mb_strlen($editedPolished) > self::MAX_DRAFT_CHARS) {
                 return $this->respondWithError(
                     'VALIDATION_LENGTH',
-                    'Edited polished text must be ' . self::MAX_DRAFT_CHARS . ' characters or fewer.',
+                    __('api.field_max_characters', [
+                        'field' => 'edited_polished_text',
+                        'max' => self::MAX_DRAFT_CHARS,
+                    ]),
                     'edited_polished_text',
                     422,
                 );
@@ -139,7 +147,7 @@ class MunicipalCopilotController extends BaseApiController
         );
 
         if ($proposal === null) {
-            return $this->respondNotFound('Proposal not found.');
+            return $this->respondNotFound(__('api.proposal_not_found'));
         }
 
         return $this->respondWithData([
@@ -160,12 +168,17 @@ class MunicipalCopilotController extends BaseApiController
 
         $reason = trim((string) $this->input('reason', ''));
         if ($reason === '') {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'Rejection reason is required.', 'reason', 422);
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED',
+                __('api.missing_required_field', ['field' => 'reason']),
+                'reason',
+                422,
+            );
         }
         if (mb_strlen($reason) > self::MAX_REASON_CHARS) {
             return $this->respondWithError(
                 'VALIDATION_LENGTH',
-                'Reason must be ' . self::MAX_REASON_CHARS . ' characters or fewer.',
+                __('api.field_max_characters', ['field' => 'reason', 'max' => self::MAX_REASON_CHARS]),
                 'reason',
                 422,
             );
@@ -179,7 +192,7 @@ class MunicipalCopilotController extends BaseApiController
         );
 
         if ($proposal === null) {
-            return $this->respondNotFound('Proposal not found.');
+            return $this->respondNotFound(__('api.proposal_not_found'));
         }
 
         return $this->respondWithData(['proposal' => $proposal]);
@@ -194,7 +207,7 @@ class MunicipalCopilotController extends BaseApiController
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
-            return $this->respondForbidden('Caring Community feature is not enabled for this tenant.');
+            return $this->respondForbidden(__('api.caring_community_feature_disabled'));
         }
 
         return null;

@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Zwitserse frank — de valuta die wordt gebruikt voor berekeningen van kostencompensatie voor formele zorg in Caring Community-implementaties",
+    "fadp": "Federale wet op gegevensbescherming — herziene Zwitserse wet op gegevensbescherming (van kracht sinds september 2023)",
+    "ndsg": "Neues Datenschutzgesetz — het herziene Zwitserse Federale Gegevensbeschermingswet (synoniem voor FADP)",
+    "dsg": "Datenschutzgesetz — zie nDSG / FADP",
+    "gdpr": "General Data Protection Regulation — EU gegevensbeschermingswet; Zwitserse toepassingen gebruiken in plaats daarvan FADP/nDSG",
+    "sla": "Service-level agreement — de maximaal toegezegde reactietijd of oplostijd voor elk prioriteitsniveau",
+    "agpl": "GNU Affero General Public License v3 — de open-source licentie waaronder NEXUS openbaar wordt uitgebracht",
+    "kpi": "Kernprestatie-indicator — een meetbare maatstaf die wordt gebruikt om de voortgang naar een bepaald doel te evalueren",
+    "roi": "Rendement op investering — hier: formele zorgkosten die worden vermeden per uur informele ondersteuning uitgewisseld",
+    "nexus": "Project NEXUS — het multi-tenant tijdbank- en gemeenschapszorgplatform",
+    "agm": "Algemene jaarlijkse vergadering",
+    "xp": "Ervaringspunten — gamificatiepunten die worden toegekend voor het voltooien van uitwisselingen en het bereiken van mijlpalen",
+    "isco": "Internationale Standaard Classificatie van Beroepen — gebruikt om soorten zorgdiensten te categoriseren"
+  }
+}

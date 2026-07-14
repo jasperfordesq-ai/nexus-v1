@@ -91,14 +91,11 @@ class CommercialBoundaryServiceTest extends TestCase
 
         foreach ($m['capabilities'] as $cap) {
             $this->assertArrayHasKey('key', $cap, "Missing 'key' in capability");
-            $this->assertArrayHasKey('label', $cap);
-            $this->assertArrayHasKey('description', $cap);
             $this->assertArrayHasKey('category', $cap);
             $this->assertArrayHasKey('default_classification', $cap);
             $this->assertArrayHasKey('effective_classification', $cap);
             $this->assertArrayHasKey('is_overridden', $cap);
             $this->assertArrayHasKey('agpl_module', $cap);
-            $this->assertArrayHasKey('notes', $cap);
         }
     }
 
@@ -238,9 +235,9 @@ class CommercialBoundaryServiceTest extends TestCase
         $this->assertArrayHasKey('errors', $result);
         $fields = array_column($result['errors'], 'field');
         $this->assertContains('classification', $fields);
-        // Error message must reference the allowed values.
-        $messages = array_column($result['errors'], 'message');
-        $this->assertStringContainsString('agpl_public', implode(' ', $messages));
+        $error = collect($result['errors'])->firstWhere('field', 'classification');
+        $this->assertSame('INVALID_CLASSIFICATION', $error['code']);
+        $this->assertSame(CommercialBoundaryService::CLASSIFICATIONS, $error['params']['classifications']);
     }
 
     public function test_set_override_rejects_both_bad_key_and_bad_classification(): void

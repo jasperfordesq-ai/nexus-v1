@@ -68,7 +68,12 @@ class CommercialBoundaryController extends BaseApiController
 
         $capabilityKey = $this->input('capability_key');
         if (!is_string($capabilityKey) || $capabilityKey === '') {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'capability_key is required', 'capability_key', 422);
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED_FIELD',
+                __('api.missing_required_field', ['field' => 'capability_key']),
+                'capability_key',
+                422,
+            );
         }
 
         // classification may be a string or explicit null (clear). We must
@@ -78,7 +83,12 @@ class CommercialBoundaryController extends BaseApiController
         $classification = null;
         if ($rawClassification !== null) {
             if (!is_string($rawClassification)) {
-                return $this->respondWithError('VALIDATION_INVALID', 'classification must be a string or null', 'classification', 422);
+                return $this->respondWithError(
+                    'VALIDATION_INVALID',
+                    __('api.field_string_or_null', ['field' => 'classification']),
+                    'classification',
+                    422,
+                );
             }
             $classification = $rawClassification;
         }
@@ -90,9 +100,10 @@ class CommercialBoundaryController extends BaseApiController
             $errors = [];
             foreach ($result['errors'] as $err) {
                 $errors[] = [
-                    'code'    => 'VALIDATION_ERROR',
-                    'message' => $err['message'],
+                    'code'    => (string) ($err['code'] ?? 'VALIDATION_ERROR'),
+                    'message' => __('api.validation_failed'),
                     'field'   => $err['field'],
+                    'params'  => $err['params'] ?? [],
                 ];
             }
             return $this->respondWithErrors($errors, 422);

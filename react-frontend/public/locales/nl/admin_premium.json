@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Abonnees",
       "user_fallback": "Gebruiker #{{id}}",
       "columns": {
-        "member": "LID",
-        "email": "EMAIL",
-        "tier": "LAAG",
-        "interval": "INTERVAL",
-        "status": "STATUS",
-        "next_billing": "VOLGENDE FACTUREER",
-        "started": "BEGONNEN"
+        "member": "Lid",
+        "email": "E-mail",
+        "tier": "Niveau",
+        "interval": "Interval",
+        "status": "Status",
+        "next_billing": "Volgende facturering",
+        "started": "Gestart"
       },
       "status": {
         "active": "Actief",
@@ -183,31 +183,31 @@
       "settings_save_failed": "Instellingen voor donatieroutering kunnen niet worden opgeslagen.",
       "onboarding_failed": "Stripe-onboarding kan niet worden gestart.",
       "finance_load_failed": "Donatiefinancieringstransacties konden niet worden geladen.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Export van jaarlijkse bonnen kan niet worden gedownload."
+      "annual_receipts_export_failed": "Export van jaarlijkse bonnen kan niet worden gedownload.",
+      "gift_aid_export_failed": "Gift Aid-export kon niet worden gedownload."
     },
     "settings": {
-      "title": "Gestreepte routering",
       "description": "Laat dit veld leeg om het platform Stripe-account met metadata van de tenant te gebruiken. Koppel een Stripe-tenantaccount om toekomstige eenmalige en reguliere donaties naar dat huurdersaccount te sturen.",
       "stripe_connect_account_id": "Tenant Stripe Connect-account-ID",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Als u dit wijzigt, heeft dit invloed op toekomstige donatie-afrekeningen. Synchroniseer de ondersteuningsniveaus opnieuw na het toevoegen van een tenantaccount, zodat terugkerende prijzen in dat Stripe-account bestaan.",
       "route_platform_default": "Platformterugval",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Start de introductie van Stripe",
       "continue_onboarding": "Ga door met de introductie van Stripe",
       "requirements_due": "Stripe-accountvereisten vereisen aandacht: {{count}}.",
       "save": "Route opslaan",
       "status": {
         "not_connected": "Niet verbonden",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Actie nodig",
-        "unknown": "Status onbekend"
+        "unknown": "Status onbekend",
+        "pending": "In afwachting",
+        "ready": "Klaar"
       },
       "connect_fallback_active": "Er is een Stripe Connect-account geconfigureerd, maar deze is nog niet klaar voor live donaties. Betalingen maken gebruik van de fallback van het platform totdat de onboarding is voltooid.",
       "requirements_due_one": "Stripe-accountvereisten vereisen aandacht: {{count}}.",
-      "requirements_due_other": "Stripe-accountvereisten vereisen aandacht: {{count}}."
+      "requirements_due_other": "Stripe-accountvereisten vereisen aandacht: {{count}}.",
+      "route_tenant_connect": "Huurder Connect",
+      "title": "Stripe routering"
     },
     "finance": {
       "title": "Financiële operaties",
@@ -215,22 +215,22 @@
       "completed_volume": "Voltooid volume",
       "platform_fallback_volume": "Platform-fallback-volume",
       "tenant_connect_volume": "Tenant Connect-volume",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Openlijke geschillen",
       "active_recurring": "Actief terugkerend",
       "failed_receipts": "Mislukte ontvangstbewijzen",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Jaarbonnen exporteren",
       "empty": "Er zijn nog geen financiële activiteiten geregistreerd.",
       "donation_count_one": "{{count}} donatie",
       "declaration_count_one": "{{count}} verklaring",
       "past_due_count_one": "{{count}} achterstallig",
-      "past_due_count_other": "{{count}} achterstallig"
+      "past_due_count_other": "{{count}} achterstallig",
+      "gift_aid_ready": "Gift Aid klaar",
+      "export_gift_aid": "Exporteer Gift Aid",
+      "donation_count": "{{count}} donatie",
+      "donation_count_other": "{{count}} donaties",
+      "declaration_count": "{{count}} verklaring",
+      "declaration_count_other": "{{count}} verklaringen",
+      "past_due_count": "{{count}} achterstallig"
     }
   }
 }

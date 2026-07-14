@@ -8,5 +8,33 @@
   "after_label": "Po",
   "caveat_label": "Metoda",
   "evidence_label": "Dowód",
-  "error_loading": "Nie udało się załadować historii sukcesu. Spróbuj ponownie za chwilę."
+  "error_loading": "Nie udało się załadować historii sukcesu. Spróbuj ponownie za chwilę.",
+  "audiences": {
+    "all_residents": "Wszyscy mieszkańcy",
+    "municipality": "Gmina",
+    "kanton": "Kanton",
+    "verein_members": "Członkowie stowarzyszenia",
+    "volunteers": "Wolontariusze",
+    "recipients": "Odbiorcy opieki"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "O 30% mniejszy wysiłek w dystrybucji informacji",
+      "narrative": "Koordynatorzy spędzają mniej więcej o jedną trzecią mniej czasu na dystrybucji aktualizacji po przejściu na NEXUS. Ogłoszenia, celowanie w segmenty członków i śledzenie potwierdzeń są skonsolidowane w jednym miejscu.",
+      "method_caveat": "Przykładowy ilustracyjny przykład oparty na twierdzeniu społeczności rówieśniczej; nie został zmierzony dla tego najemcy.",
+      "evidence_source": "Strona gminy rówieśniczej (ilustracyjna)"
+    },
+    "volunteer_engagement": {
+      "title": "25% więcej zaangażowania wolontariackiego",
+      "narrative": "Społeczności pilotażowe zgłaszają o jedną czwartą więcej aktywnego udziału wolontariuszy po wdrożeniu NEXUS, wspierane przez wyraźniejsze dopasowanie, łatwy proces rejestracji oraz widoczne uznanie w postaci Warmth Pass.",
+      "method_caveat": "Przykładowy ilustracyjny przykład oparty na twierdzeniu społeczności rówieśniczej; nie został zmierzony dla tego najemcy.",
+      "evidence_source": "Strona gminy rówieśniczej (ilustracyjna)"
+    },
+    "formal_care_offset": {
+      "title": "12 250 CHF w kosztach opieki formalnej zrekompensowane",
+      "narrative": "Godziny wolontariatu koordynowane przez NEXUS stanowią rekompensatę w wysokości 12 250 CHF w kosztach formalnej opieki domowej w okresie pilotażowym, wycenione według szwajcarskiej stawki asystenta opieki formalnej.",
+      "method_caveat": "Szacunkowo przy stawce 35 CHF za godzinę w 350 godzinach; porównanie dotyczy wyłącznie poziomu wyjściowego przed okresem pilotażowym.",
+      "evidence_source": "Model ROI gminy AG76 (ilustracyjny)"
+    }
+  }
 }

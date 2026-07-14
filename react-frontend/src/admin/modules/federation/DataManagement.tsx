@@ -74,7 +74,7 @@ export function DataManagement() {
           dryRun ? t('federation.import_dry_run_ok') : t('federation.import_success'),
         );
       } else {
-        toast.error(res.error || t('federation.import_failed'));
+        toast.error(t('federation.import_failed'));
       }
     } catch {
       toast.error(t('federation.import_failed'));
@@ -90,7 +90,7 @@ export function DataManagement() {
         toast.success(t('federation.purge_success'));
         purgeModal.onClose();
       } else {
-        toast.error(res.error || t('federation.purge_failed'));
+        toast.error(t('federation.purge_failed'));
       }
     } catch {
       toast.error(t('federation.purge_failed'));

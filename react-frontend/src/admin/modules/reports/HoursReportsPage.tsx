@@ -32,6 +32,7 @@ import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartCo
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -215,7 +216,7 @@ export function HoursReportsPage() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
       <StatCard
         label={t('reports.label_total_hours')}
-        value={summary ? (summary.total_hours ?? 0).toFixed(1) : '\u2014'}
+        value={summary ? formatNumber(summary.total_hours ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
         icon={Clock}
         color="warning"
         loading={!summary}
@@ -235,7 +236,7 @@ export function HoursReportsPage() {
       />
       <StatCard
         label={t('reports.label_avg_hours_transaction')}
-        value={summary ? (summary.avg_hours_per_transaction ?? 0).toFixed(1) : '\u2014'}
+        value={summary ? formatNumber(summary.avg_hours_per_transaction ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
         icon={Activity}
         loading={!summary}
       />
@@ -265,7 +266,7 @@ export function HoursReportsPage() {
                 <ResponsiveContainer width="100%" height={350}>
                   <BarChart data={categories} layout="vertical" margin={{ left: 80 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                    <XAxis type="number" tick={{ fontSize: 12 }} />
+                    <XAxis type="number" tick={{ fontSize: 12 }} tickFormatter={(value: number) => formatNumber(value)} />
                     <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
                     <Tooltip contentStyle={tooltipStyle} />
                     <Bar dataKey="total_hours" name={t('reports.hours')} fill={CHART_COLOR_MAP.primary} radius={[0, 4, 4, 0]} fillOpacity={0.8} />
@@ -303,7 +304,7 @@ export function HoursReportsPage() {
                       innerRadius={50}
                       paddingAngle={2}
                       label={({ name, percent }) =>
-                        `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
+                        `${name} (${formatNumber(percent ?? 0, { style: 'percent', maximumFractionDigits: 0 })})`
                       }
                       labelLine={{ strokeWidth: 1 }}
                     >
@@ -316,7 +317,7 @@ export function HoursReportsPage() {
                     <Tooltip
                       contentStyle={tooltipStyle}
                       formatter={(value, name) =>
-                        [t('reports.hours_value', { value: Number(value ?? 0).toFixed(1) }), String(name ?? '')] as [string, string]
+                        [t('reports.hours_value', { value: formatNumber(Number(value ?? 0), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }), String(name ?? '')] as [string, string]
                       }
                     />
                   </PieChart>
@@ -383,16 +384,16 @@ export function HoursReportsPage() {
                     <span className="text-sm font-medium">{m.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm text-success font-medium">{(m.hours_given ?? 0).toFixed(1)}</TableCell>
-                <TableCell className="text-sm text-warning font-medium">{(m.hours_received ?? 0).toFixed(1)}</TableCell>
-                <TableCell className="text-sm text-muted font-medium">{(m.total_hours ?? 0).toFixed(1)}</TableCell>
+                <TableCell className="text-sm text-success font-medium">{formatNumber(m.hours_given ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
+                <TableCell className="text-sm text-warning font-medium">{formatNumber(m.hours_received ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
+                <TableCell className="text-sm text-muted font-medium">{formatNumber(m.total_hours ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
                     variant="soft"
                     color={(m.balance ?? 0) >= 0 ? 'success' : 'danger'}
                   >
-                    {(m.balance ?? 0) >= 0 ? '+' : ''}{(m.balance ?? 0).toFixed(1)}
+                    {formatNumber(m.balance ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: (m.balance ?? 0) >= 0 ? 'always' : 'auto' })}
                   </Chip>
                 </TableCell>
               </TableRow>
@@ -434,9 +435,19 @@ export function HoursReportsPage() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 11 }}
+                    tickLine={false}
+                    tickFormatter={(month: string) => {
+                      const match = /^(\d{4})-(\d{2})$/.exec(month);
+                      return match
+                        ? new Date(Number(match[1]), Number(match[2]) - 1, 1).toLocaleDateString(getFormattingLocale(), { month: 'short', year: 'numeric' })
+                        : t('reports.unknown_period');
+                    }}
+                  />
+                  <YAxis tick={{ fontSize: 12 }} tickLine={false} tickFormatter={(value: number) => formatNumber(value)} />
+                  <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} formatter={(value) => formatNumber(Number(value), { maximumFractionDigits: 1 })} />
                   <Legend />
                   <Area
                     type="monotone"

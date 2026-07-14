@@ -53,41 +53,27 @@ interface SegmentSuggestion {
 
 interface RuleFieldConfig {
   key: string;
-  label: string;
   type: 'number' | 'text' | 'select' | 'date' | 'boolean';
   operators: string[];
   options?: string[];
 }
 
 const RULE_FIELDS: RuleFieldConfig[] = [
-  { key: 'activity_score', label: 'Activity Score', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
-  { key: 'community_rank', label: 'CommunityRank', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
-  { key: 'login_recency', label: 'Login Recency (days)', type: 'number', operators: ['less_than', 'greater_than'] },
-  { key: 'transaction_count', label: 'Transaction Count', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
-  { key: 'email_open_rate', label: 'Email Open Rate (%)', type: 'number', operators: ['greater_than', 'less_than'] },
-  { key: 'email_click_rate', label: 'Email Click Rate (%)', type: 'number', operators: ['greater_than', 'less_than'] },
-  { key: 'county', label: 'County', type: 'text', operators: ['equals', 'contains', 'in'] },
-  { key: 'town', label: 'Town/City', type: 'text', operators: ['equals', 'contains', 'in'] },
-  { key: 'group_membership', label: 'Group Membership', type: 'select', operators: ['in', 'not_in'] },
-  { key: 'profile_type', label: 'Profile Type', type: 'select', operators: ['equals', 'not_equals'], options: ['individual', 'organisation'] },
-  { key: 'user_role', label: 'User Role', type: 'select', operators: ['equals', 'not_equals'], options: ['member', 'admin', 'broker'] },
-  { key: 'member_since', label: 'Member Since', type: 'date', operators: ['before', 'after'] },
-  { key: 'has_listings', label: 'Has Listings', type: 'boolean', operators: ['equals'] },
-  { key: 'listing_count', label: 'Listing Count', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
+  { key: 'activity_score', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
+  { key: 'community_rank', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
+  { key: 'login_recency', type: 'number', operators: ['less_than', 'greater_than'] },
+  { key: 'transaction_count', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
+  { key: 'email_open_rate', type: 'number', operators: ['greater_than', 'less_than'] },
+  { key: 'email_click_rate', type: 'number', operators: ['greater_than', 'less_than'] },
+  { key: 'county', type: 'text', operators: ['equals', 'contains', 'in'] },
+  { key: 'town', type: 'text', operators: ['equals', 'contains', 'in'] },
+  { key: 'group_membership', type: 'select', operators: ['in', 'not_in'] },
+  { key: 'profile_type', type: 'select', operators: ['equals', 'not_equals'], options: ['individual', 'organisation'] },
+  { key: 'user_role', type: 'select', operators: ['equals', 'not_equals'], options: ['member', 'admin', 'broker'] },
+  { key: 'member_since', type: 'date', operators: ['before', 'after'] },
+  { key: 'has_listings', type: 'boolean', operators: ['equals'] },
+  { key: 'listing_count', type: 'number', operators: ['equals', 'greater_than', 'less_than'] },
 ];
-
-const OPERATOR_LABELS: Record<string, string> = {
-  equals: 'Equals',
-  not_equals: 'Not Equals',
-  greater_than: 'Greater Than',
-  less_than: 'Less Than',
-  contains: 'Contains',
-  in: 'In',
-  not_in: 'Not In',
-  within_km: 'Within (km)',
-  before: 'Before',
-  after: 'After',
-};
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
@@ -255,7 +241,7 @@ export function SegmentForm() {
       if (res.success) {
         navigate(tenantPath('/admin/newsletters/segments'));
       } else {
-        setErrors({ form: res.error || t('newsletters.failed_to_save_segment') });
+        setErrors({ form: t('newsletters.failed_to_save_segment') });
       }
     } catch {
       setErrors({ form: t('newsletters.failed_to_save_segment') });
@@ -317,7 +303,7 @@ export function SegmentForm() {
           className="min-w-[160px]"
         >
           {fieldConfig.options.map(opt => (
-            <SelectItem key={opt} id={opt}>{t(`segment_form.option_${opt}`, opt.charAt(0).toUpperCase() + opt.slice(1))}</SelectItem>
+            <SelectItem key={opt} id={opt}>{t(`segment_form.option_${opt}`, { defaultValue: t('segment_form.option_unknown') })}</SelectItem>
           ))}
         </Select>
       );
@@ -461,7 +447,7 @@ export function SegmentForm() {
                 className="min-w-[180px] flex-1"
               >
                 {RULE_FIELDS.map(f => (
-                  <SelectItem key={f.key} id={f.key}>{t(`segment_form.field_${f.key}`, f.label)}</SelectItem>
+                  <SelectItem key={f.key} id={f.key}>{t(`segment_form.field_${f.key}`, { defaultValue: t('segment_form.field_unknown') })}</SelectItem>
                 ))}
               </Select>
 
@@ -477,7 +463,7 @@ export function SegmentForm() {
                   className="min-w-[150px]"
                 >
                   {(getFieldConfig(rule.field)?.operators || []).map(op => (
-                    <SelectItem key={op} id={op}>{t(`segment_form.operator_${op}`, OPERATOR_LABELS[op] || op)}</SelectItem>
+                    <SelectItem key={op} id={op}>{t(`segment_form.operator_${op}`, { defaultValue: t('segment_form.operator_unknown') })}</SelectItem>
                   ))}
                 </Select>
               )}

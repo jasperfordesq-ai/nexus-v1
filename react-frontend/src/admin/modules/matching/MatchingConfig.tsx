@@ -24,6 +24,7 @@ import { EmptyState } from '../../components/EmptyState';
 import type { SmartMatchingConfig, MatchingGatesConfig, MatchingAiConfig } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 import { logError } from '@/lib/logger';
+import { formatPercentValue } from '@/lib/helpers';
 import { isSmartMatchingConfig } from './matchingResponseGuards';
 
 /**
@@ -399,7 +400,7 @@ export function MatchingConfig() {
                 totalValid ? 'text-success' : 'text-danger'
               }`}
             >
-              {t('matching.total')}: {totalPct}%
+              {t('matching.total')}: {formatPercentValue(totalPct)}
               {!totalValid && ` (${t('matching.should_be_100')})`}
             </span>
           </CardHeader>
@@ -723,7 +724,7 @@ function WeightSlider({
           <p className="text-xs text-muted">{description}</p>
         </div>
         <span className="text-sm font-semibold tabular-nums w-12 text-right">
-          {pct}%
+          {formatPercentValue(pct)}
         </span>
       </div>
       <Slider

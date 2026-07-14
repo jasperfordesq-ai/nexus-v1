@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress } from '@/components/ui';
 import {
   useCallback,
@@ -44,14 +44,19 @@ import { useTranslation } from 'react-i18next';
  */
 
 
-interface FunnelStage {
-  name: string;
+interface FunnelStagePayload {
+  code: string;
+  name?: string;
   count: number;
   color: string;
 }
 
+interface FunnelStage extends FunnelStagePayload {
+  name: string;
+}
+
 interface FunnelData {
-  stages: FunnelStage[];
+  stages: FunnelStagePayload[];
   monthly_registrations: Array<{ month: string; count: number }>;
 }
 
@@ -85,20 +90,18 @@ interface SnapshotCardProps {
 }
 
 function formatPercent(value: number, maximumFractionDigits = 1): string {
-  return `${Number(value.toFixed(maximumFractionDigits)).toLocaleString(getFormattingLocale(), {
+  return formatPercentValue(value, {
     maximumFractionDigits,
     minimumFractionDigits: 0,
-  })}%`;
+  });
 }
 
 function formatSignedPercent(value: number, maximumFractionDigits = 1): string {
-  const absolute = Math.abs(value);
-  const sign = value > 0 ? '+' : value < 0 ? '-' : '';
-
-  return `${sign}${Number(absolute.toFixed(maximumFractionDigits)).toLocaleString(getFormattingLocale(), {
+  return formatPercentValue(value, {
     maximumFractionDigits,
     minimumFractionDigits: 0,
-  })}%`;
+    signDisplay: value > 0 ? 'always' : 'auto',
+  });
 }
 
 function formatMonthLabel(value: string): string {
@@ -249,7 +252,12 @@ export default function OnboardingFunnel() {
   }, [fetchData]);
 
   const insights = useMemo(() => {
-    const stages = data?.stages ?? [];
+    const stages: FunnelStage[] = (data?.stages ?? []).map((stage) => ({
+      ...stage,
+      name: t(`crm.funnel_stage_${stage.code}`, {
+        defaultValue: t('crm.funnel_stage_unknown'),
+      }),
+    }));
     const monthlyRegistrations = data?.monthly_registrations ?? [];
 
     const entryStage = stages[0] ?? null;
@@ -339,7 +347,7 @@ export default function OnboardingFunnel() {
           : 0,
       monthlyRegistrations,
     };
-  }, [data]);
+  }, [data, t]);
 
   if (loading) {
     return (
@@ -789,7 +797,7 @@ export default function OnboardingFunnel() {
                     color={weakestHandoff ? getRateTone(weakestHandoff.rate).chipColor : undefined}
                     variant="soft"
                   >
-                    {weakestHandoff ? formatPercent(weakestHandoff.rate) : '0%'}
+                    {weakestHandoff ? formatPercent(weakestHandoff.rate) : formatPercent(0)}
                   </Chip>
                 </div>
                 <p className="mt-3 text-base font-semibold text-foreground">
@@ -927,7 +935,7 @@ export default function OnboardingFunnel() {
                   <div className="rounded-2xl border border-border bg-surface-secondary p-4">
                     <p className="text-sm font-medium text-muted">{t('crm.change_from_previous_month')}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
-                      {monthOverMonthChange !== null ? formatSignedPercent(monthOverMonthChange) : '0%'}
+                      {monthOverMonthChange !== null ? formatSignedPercent(monthOverMonthChange) : formatSignedPercent(0)}
                     </p>
                     <p className="mt-1 text-sm text-muted">
                       {previousMonth ? formatMonthLabel(previousMonth.month) : t('crm.no_registration_data')}

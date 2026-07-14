@@ -165,7 +165,7 @@ export default function ResearchPartnershipsAdminPage() {
       if (response.success && response.data) {
         setRenderedTemplate(response.data);
       } else {
-        showToast(response.error || t('research_partnerships.toasts.render_template_failed'), 'error');
+        showToast(t('research_partnerships.toasts.render_template_failed'), 'error');
       }
     } catch {
       showToast(t('research_partnerships.toasts.render_template_failed'), 'error');
@@ -213,7 +213,7 @@ export default function ResearchPartnershipsAdminPage() {
     });
 
     if (!response.success) {
-      showToast(response.error || t('research_partnerships.toasts.create_partner_failed'), 'error');
+      showToast(t('research_partnerships.toasts.create_partner_failed'), 'error');
       return;
     }
 
@@ -237,7 +237,7 @@ export default function ResearchPartnershipsAdminPage() {
     setWorkingId(null);
 
     if (!response.success) {
-      showToast(response.error || t('research_partnerships.toasts.generate_export_failed'), 'error');
+      showToast(t('research_partnerships.toasts.generate_export_failed'), 'error');
       return;
     }
 
@@ -252,7 +252,7 @@ export default function ResearchPartnershipsAdminPage() {
     setWorkingId(null);
 
     if (!response.success) {
-      showToast(response.error || t('research_partnerships.toasts.revoke_export_failed'), 'error');
+      showToast(t('research_partnerships.toasts.revoke_export_failed'), 'error');
       return;
     }
 
@@ -542,7 +542,9 @@ export default function ResearchPartnershipsAdminPage() {
                       {activeTemplate.placeholders.map((p) => (
                         <Input
                           key={p}
-                          label={t('research_partnerships.templates.placeholder_label', { placeholder: p.replace(/_/g, ' ') })}
+                          label={t(`research_partnerships.templates.placeholders.${p}`, {
+                            defaultValue: t('research_partnerships.templates.placeholders.unknown'),
+                          })}
                           size="sm"
                           value={templateValues[p] ?? ''}
                           onValueChange={(v) =>

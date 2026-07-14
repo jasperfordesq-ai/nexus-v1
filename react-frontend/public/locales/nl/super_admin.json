@@ -15,67 +15,66 @@
     "federation_audit": "Federatie-audit",
     "platform_admin": "Platformbeheerder",
     "back_to_platform_admin": "Terug naar Platformbeheer",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Pilotvragen",
+    "provisioning_queue": "Leveringswachtrij",
+    "billing_control": "Factureringscontrole",
+    "revenue_dashboard": "Inkomstendashboard",
+    "regional_analytics": "Regionale analyse",
+    "national_dashboard": "Nationaal dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Superbeheerder laden",
+    "skip_to_main": "Sla over naar hoofdinhoud",
+    "close_navigation": "Sluit superadmin-navigatie",
+    "navigation": "Superadmin-navigatie"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Terug naar beheer",
+    "toggle_sidebar": "Zijbalk wisselen",
+    "notifications": "Meldingen",
+    "my_profile": "Mijn Profiel",
+    "sign_out": "Afmelden",
+    "user_fallback": "Superbeheerder",
+    "user_menu": "Superadmin-menu"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Overzicht",
+    "section_tenants": "Huurders",
+    "section_federation": "Federatie",
+    "section_commercial": "Commercieel",
+    "expand": "Zijbalk uitklappen",
+    "collapse": "Zijbalk inklappen",
+    "nav_label": "Superadmin-navigatie"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Superbeheerder",
+    "tenants": "Huurders",
+    "create": "Aanmaken",
+    "edit": "Bewerken",
+    "hierarchy": "Hiërarchie",
+    "users": "Gebruikers",
+    "federation": "Federatie",
+    "whitelist": "Witte lijst",
+    "partnerships": "Partnerschappen",
+    "tenant": "Huurder",
+    "features": "Functies",
+    "billing": "Facturering",
+    "revenue": "Inkomsten",
+    "platform": "Platform",
+    "pilot_inquiries": "Pilotvragen",
+    "provisioning_requests": "Verzoeken voor voorziening",
+    "national": "Nationaal",
+    "regional_analytics": "Regionale analyse",
+    "subscriptions": "Abonnementen",
+    "aria_label": "Broodkruimels",
+    "bulk": "Grootbewerkingen",
+    "audit": "Auditlog"
   },
   "dashboard": {
     "title": "Infrastructuurdashboard",
     "subtitle_global": "Globaal overzicht van alle huurders en infrastructuur",
-    "subtitle_scoped": "Overzicht van:tenant_name en subtenants",
     "create_tenant_btn": "Huurder maken",
     "stat_total_tenants": "Totaal huurders",
     "stat_active_tenants": "Actieve huurders",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Snelle acties",
     "create_new_tenant": "Nieuwe huurder maken",
     "view_super_admins": "Bekijk Superbeheerders",
-    "back_to_platform_admin": "Terug naar Platformbeheer"
+    "back_to_platform_admin": "Terug naar Platformbeheer",
+    "subtitle_scoped": "Overzicht van :tenant_name en sub-huurders"
   },
   "common": {
     "active": "Actief",
@@ -147,7 +147,6 @@
       "filter_role_all": "Alle rollen",
       "filter_role_admin": "Beheerder",
       "filter_role_tenant_admin": "Huurder beheerder",
-      "filter_role_moderator": "Moderator",
       "filter_role_member": "Lid",
       "filter_super_admins": "Alleen superbeheerders",
       "col_user": "Gebruiker",
@@ -162,7 +161,8 @@
       "super_admin_yes": "Ja",
       "super_admin_legacy": "erfenis",
       "no_users": "Er zijn geen gebruikers gevonden die aan uw criteria voldoen",
-      "showing_first_100": "Eerste 100 resultaten weergegeven. Gebruik filters om uw zoekopdracht te verfijnen."
+      "showing_first_100": "Eerste 100 resultaten weergegeven. Gebruik filters om uw zoekopdracht te verfijnen.",
+      "filter_role_moderator": "Moderator"
     },
     "show": {
       "breadcrumb_users": "Gebruikers",
@@ -188,7 +188,6 @@
       "actions_card_title": "Acties",
       "view_tenant_btn": "Bekijk huurder",
       "god_card_title": "Wereldwijde superbeheerder (alleen God)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Globale superbeheerders hebben toegang tot ALLE tenants op het platform.",
       "god_has_access": "Gebruiker heeft GLOBAL superadmin-toegang",
       "god_revoke_btn": "Algemene superbeheerder intrekken",
@@ -206,12 +205,12 @@
       "stat_user_id": "Gebruikers-ID",
       "stat_tenant_id": "Huurder-ID",
       "stat_status": "Status",
-      "stat_approved": "Goedgekeurd"
+      "stat_approved": "Goedgekeurd",
+      "god_warning": "Waarschuwing:"
     },
     "create": {
       "breadcrumb_create": "Creëer",
       "title": "Nieuwe gebruiker maken",
-      "subtitle_selected": "Gebruiker maken voor:tenant_name",
       "subtitle_default": "Selecteer een tenant om een nieuwe gebruiker te maken",
       "card_title": "Gebruikersgegevens",
       "tenant_label": "Huurder",
@@ -229,7 +228,8 @@
       "super_admin_label": "Verleen superbeheerdersrechten",
       "super_admin_help": "Superbeheerders hebben toegang tot het superbeheerdersdashboard en kunnen de subtenants van hun tenant beheren. Alleen beschikbaar voor Hub-tenants (tenants met subtenantmogelijkheden).",
       "submit_btn": "Gebruiker aanmaken",
-      "cancel_btn": "Annuleer"
+      "cancel_btn": "Annuleer",
+      "subtitle_selected": "Gebruiker aanmaken voor :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Bewerken",
@@ -272,23 +272,22 @@
       "stat_active": "Actief",
       "stat_pending": "In behandeling",
       "super_admin_card_title": "Superbeheerdersstatus",
-      "super_admin_toggle_desc": "Schakel Superbeheerder in voor:tenant_name",
       "revoke_btn": "Superbeheerder intrekken",
       "revoke_confirm": "Superbeheerdersrechten intrekken?",
       "grant_btn": "Verleen superbeheerder",
       "grant_confirm": "Superbeheerdersrechten verlenen?",
-      "no_hub_text": "Kan geen superbeheerder verlenen omdat:tenant_name geen Hub-tenant is.",
       "no_hub_move_text": "Gebruik de functie 'Verplaatsen en superbeheerder verlenen' om deze gebruiker toe te wijzen aan een Hub-tenant.",
       "quick_links_card_title": "Snelle koppelingen",
       "view_profile_btn": "Bekijk profiel",
       "view_tenant_btn": "Bekijk huurder",
-      "tenant_users_btn": "Huurdergebruikers"
+      "tenant_users_btn": "Huurdergebruikers",
+      "super_admin_toggle_desc": "Schakel Super Admin in voor :tenant_name",
+      "no_hub_text": "Kan geen Super Admin toekennen omdat :tenant_name geen Hub-huurder is."
     }
   },
   "tenants": {
     "index": {
       "title": "Beheer huurders",
-      "subtitle": ":tel huurder(s) in uw bereik",
       "create_btn": "Huurder maken",
       "filter_search_placeholder": "Zoek huurders...",
       "filter_hub_label": "Alleen hub-huurders",
@@ -304,9 +303,10 @@
       "col_status": "Status",
       "col_actions": "Acties",
       "parent_root": "Wortel",
-      "level_label": "Niveau: diepte",
       "you_badge": "Jij",
-      "no_tenants": "Geen huurders gevonden"
+      "no_tenants": "Geen huurders gevonden",
+      "subtitle": ":count huurder(s) in jouw bereik",
+      "level_label": "Niveau :depth"
     },
     "show": {
       "breadcrumb_tenants": "Huurders",
@@ -319,15 +319,12 @@
       "field_slug": "Slak",
       "field_domain": "Domein",
       "field_hierarchy_level": "Hiërarchieniveau",
-      "field_level": "Niveau: diepte",
       "field_parent": "Ouder",
       "field_total_users": "Totaal aantal gebruikers",
       "field_sub_tenants": "Onderhuurders",
-      "field_sub_tenants_direct": ": direct tellen",
       "field_description": "Beschrijving",
       "not_configured": "Niet geconfigureerd",
       "root_tenant": "Hoofdtenant",
-      "sub_tenants_card_title": "Onderhuurders (:aantal)",
       "col_name": "Naam",
       "col_users": "Gebruikers",
       "col_status": "Status",
@@ -355,18 +352,19 @@
       "reactivate_card_title": "Huurder opnieuw activeren",
       "reactivate_desc": "Deze tenant is momenteel inactief. Door opnieuw te activeren wordt de gebruikerstoegang hersteld.",
       "reactivate_btn": "Huurder opnieuw activeren",
-      "tenant_id_label": "Huurder-ID::id | Pad::pad"
+      "field_level": "Niveau :depth",
+      "sub_tenants_card_title": "Sub-Huurders (:count)",
+      "tenant_id_label": "Huurder ID: :id | Pad: :path",
+      "field_sub_tenants_direct": ":count direct"
     },
     "create": {
       "breadcrumb_create": "Creëer",
       "title": "Nieuwe huurder maken",
-      "subtitle_selected": "Subtenant maken onder:parent_name",
       "subtitle_default": "Selecteer een bovenliggende tenant om een nieuwe subtenant te maken",
       "card_title": "Huurdergegevens",
       "parent_label": "Ouder Huurder",
       "parent_placeholder": "-- Selecteer bovenliggende huurder --",
       "parent_help": "Er worden alleen tenants met subtenantmogelijkheden weergegeven. De nieuwe tenant wordt gemaakt als een onderliggend element van het geselecteerde bovenliggende item.",
-      "depth_label": "(Diepte::diepte)",
       "name_label": "Naam huurder",
       "slug_label": "Slak",
       "slug_help": "Alleen kleine letters, cijfers en koppeltekens",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Onbeperkt",
       "max_depth_help": "Beperk hoeveel niveaus van subtenants onder deze tenant kunnen worden aangemaakt (alleen van toepassing als Hub is ingeschakeld)",
       "submit_btn": "Huurder maken",
-      "cancel_btn": "Annuleer"
+      "cancel_btn": "Annuleer",
+      "depth_label": "(Diepte: :depth)",
+      "subtitle_selected": "Sub-huurder aanmaken onder :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "Bewerken",
       "title": "Huurder bewerken",
-      "subtitle": "Wijzigen::naam (Niveau:diepte)",
       "back_btn": "Terug naar Details",
       "details_card_title": "Huurdergegevens",
       "name_label": "Naam huurder",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "Standaard huurder",
       "max_depth_label": "Maximale diepte van subtenant",
       "max_depth_unlimited": "Onbeperkt",
-      "max_depth_levels": ": tel niveaus",
       "disable_hub_btn": "Hub uitschakelen",
       "disable_hub_confirm": "Hiermee wordt voorkomen dat er nieuwe onderhuurders ontstaan. De bestaande onderhuurders blijven behouden.",
       "enable_hub_btn": "Hub inschakelen",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "Weet u zeker dat u deze tenant wilt deactiveren? Gebruikers raken de toegang kwijt.",
       "reactivate_card_title": "Huurder opnieuw activeren",
       "reactivate_desc": "Deze tenant is momenteel inactief. Door opnieuw te activeren wordt de gebruikerstoegang hersteld.",
-      "reactivate_btn": "Huurder opnieuw activeren"
+      "reactivate_btn": "Huurder opnieuw activeren",
+      "subtitle": "Aanpassen: :name (Niveau :depth)",
+      "max_depth_levels": ":count niveaus"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Huurders",
@@ -553,7 +553,6 @@
     "filter_all_types": "Alle soorten",
     "filter_type_tenant": "Huurders",
     "filter_type_user": "Gebruikers",
-    "filter_type_bulk": "Bulk",
     "filter_date_from": "Vanaf Datum",
     "filter_date_to": "Tot op heden",
     "filter_search_label": "Zoeken",
@@ -565,7 +564,8 @@
     "col_target": "Doel",
     "col_description": "Beschrijving",
     "no_entries": "Geen auditlogboekvermeldingen gevonden",
-    "no_entries_hint": "Wijzigingen worden hier weergegeven zodra ze worden aangebracht"
+    "no_entries_hint": "Wijzigingen worden hier weergegeven zodra ze worden aangebracht",
+    "filter_type_bulk": "Groothandel"
   },
   "bulk": {
     "breadcrumb": "Bulkoperaties",
@@ -577,7 +577,6 @@
     "source_tenant_all": "Alle huurders",
     "user_selection_label": "Selecteer Gebruikers",
     "user_select_hint": "Selecteer een brontenant om gebruikers te laden",
-    "users_selected": ":tel de geselecteerde gebruiker(s).",
     "target_tenant_label": "Doelhuurder",
     "target_tenant_placeholder": "-- Selecteer doel --",
     "grant_super_admin_label": "Geef superbeheerder aan alle verplaatste gebruikers",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Bulktenantbewerkingen",
     "bulk_tenants_desc": "Schakel meerdere tenants in/uit of schakel Hub-mogelijkheden bulksgewijs in/uit.",
     "select_tenants_label": "Selecteer Huurders",
-    "tenants_selected": ":tel geselecteerde huurder(s).",
     "select_all": "Selecteer Alles",
     "deselect_all": "Deselecteer Alles",
     "action_label": "Actie",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Hub inschakelen",
     "action_disable_hub": "Hub uitschakelen",
     "apply_btn": "Toepassen op geselecteerd",
-    "apply_confirm": "Deze actie toepassen op alle geselecteerde tenants?"
+    "apply_confirm": "Deze actie toepassen op alle geselecteerde tenants?",
+    "users_selected": ":count gebruiker(s) geselecteerd",
+    "tenants_selected": ":count huurder(s) geselecteerd"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Recente activiteit",
       "full_log_btn": "Volledig logboek",
       "no_federation_activity": "Nog geen federatieactiviteit",
-      "by_label": "by",
       "activity_title": "Federatie-activiteit (30 dagen)",
       "stat_total_actions": "Totaal aantal acties",
       "stat_messages": "Berichten",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Kritieke gebeurtenissen",
       "most_active_partnerships": "Meest actieve partnerschappen",
       "quick_nav_title": "Snelle navigatie",
-      "tenant_whitelist_btn": "Witte lijst van huurders"
+      "tenant_whitelist_btn": "Witte lijst van huurders",
+      "by_label": "doorg"
     },
     "system_controls": {
       "title": "Systeemcontroles van de Federatie",
@@ -729,7 +729,6 @@
       "stat_critical": "Kritisch",
       "stat_warnings": "Waarschuwingen",
       "stat_info": "Info",
-      "filters_card_title": "Filters",
       "level_label": "Niveau",
       "level_all": "Alle niveaus",
       "level_critical": "Kritisch",
@@ -768,7 +767,8 @@
       "modal_actor": "Acteur:",
       "modal_ip": "IP-adres:",
       "modal_user_agent": "Gebruikersagent:",
-      "modal_data": "Gegevens:"
+      "modal_data": "Gegevens:",
+      "filters_card_title": "Filters"
     },
     "tenant_features": {
       "subtitle": "Federatie-instellingen voor deze tenant",
@@ -782,7 +782,6 @@
       "not_whitelisted_warning": "Deze tenant staat niet op de witte lijst voor federatie. Functies kunnen pas worden ingeschakeld als ze aan de witte lijst zijn toegevoegd.",
       "features_card_title": "Functievlaggen voor huurders",
       "features_card_desc": "Bepaal welke federatiefuncties deze tenant kan gebruiken. Dit zijn limieten op tenantniveau bovenop de instellingen op systeemniveau.",
-      "partnerships_card_title": "Partnerschappen (:aantal)",
       "col_partner_tenant": "Partnerhuurder",
       "col_partner": "Partnerhuurder",
       "col_level": "Niveau",
@@ -804,7 +803,8 @@
       "feat_events_title": "Evenementen",
       "feat_events_desc": "Deelname aan evenementen tussen meerdere tenants toestaan",
       "feat_groups_title": "Groepen",
-      "feat_groups_desc": "Sta groepslidmaatschap tussen meerdere tenants toe"
+      "feat_groups_desc": "Sta groepslidmaatschap tussen meerdere tenants toe",
+      "partnerships_card_title": "Partnerschappen (:count)"
     }
   }
 }

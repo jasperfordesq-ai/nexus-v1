@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "polls": {
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -78,9 +78,7 @@
     "col_created": "Créé",
     "col_creator": "Créateur",
     "col_options": "Possibilités",
-    "col_question": "Question",
     "col_status": "Statut",
-    "col_votes": "Votes",
     "confirm_delete_poll": "Supprimer le sondage",
     "created": "Créé",
     "creator": "Créateur",
@@ -95,18 +93,20 @@
     "poll_details": "Détails du sondage",
     "polls_admin_desc": "Afficher et gérer les sondages créés par les membres de la communauté",
     "polls_admin_title": "Administrateur des sondages",
-    "question": "Question",
     "search_polls_placeholder": "Rechercher des sondages...",
     "status": "Statut",
     "status_active": "Actif",
     "status_ended": "Terminé",
     "total_count": "Total: {{count}}",
     "unknown": "Inconnu",
-    "votes": "Votes",
     "no_matching_polls": "Aucun sondage correspondant trouvé",
-    "no_polls_found": "No polls found found",
     "total_count_many": "Total: {{count}}",
     "total_count_one": "Total : {{count}}",
-    "total_count_other": "Total : {{count}}"
+    "total_count_other": "Total : {{count}}",
+    "no_polls_found": "Aucun sondage trouvé",
+    "col_question": "Question",
+    "col_votes": "Votes",
+    "question": "Question",
+    "votes": "Votes"
   }
 }

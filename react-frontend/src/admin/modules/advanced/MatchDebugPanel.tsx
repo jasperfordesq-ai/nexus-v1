@@ -9,7 +9,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatPercentValue, resolveAvatarUrl } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { adminUsers } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
@@ -374,7 +374,7 @@ export function MatchDebugPanel() {
                       </Chip>
                       {match.category && (
                         <Chip size="sm" variant="soft" className="text-xs">
-                          {match.category}
+                          {t('match_category.value', { category: match.category })}
                         </Chip>
                       )}
                     </div>
@@ -418,7 +418,7 @@ export function MatchDebugPanel() {
                 <div>
                   <div className="flex justify-between text-xs text-muted mb-1">
                     <span className="font-medium">{t('overall_match_score')}</span>
-                    <span>{match.match_score}%</span>
+                    <span>{formatPercentValue(match.match_score)}</span>
                   </div>
                   <Progress
                     value={match.match_score}
@@ -452,7 +452,7 @@ export function MatchDebugPanel() {
                               value={value}
                               color={scoreColor(value)}
                               size="sm"
-                              aria-label={`${t(i18nKey)} score: ${value}`}
+                              aria-label={t('component_match_score_aria', { component: t(i18nKey), score: value })}
                             />
                           </div>
                         );

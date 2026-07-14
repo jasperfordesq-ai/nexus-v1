@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,12 +67,12 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Membres actifs",
     "already_notified": "Déjà notifié",
     "at_risk": "À risque",
@@ -143,11 +142,7 @@
     "group_by_monthly": "Regrouper par mois",
     "group_by_weekly": "Regrouper par Hebdomadaire",
     "hours": "Heures",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "Horaires{{value}}",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Membres actifs",
     "label_approve": "Approuver",
     "label_approved": "Approuvé",
@@ -155,7 +150,6 @@
     "label_content_type_filter": "Filtre de type de contenu",
     "label_currency": "Devise",
     "label_days_threshold": "Seuil de jours",
-    "label_dormant": "Dormant",
     "label_events_held": "Événements organisés",
     "label_flag_type": "Type de drapeau",
     "label_flagged": "Marqué",
@@ -198,14 +192,10 @@
     "label_unique_categories": "Catégories uniques",
     "label_unique_givers": "Donateurs uniques",
     "mark_as_notified": "Marquer comme notifié",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Membres marqués comme notifiés",
     "members_selected": "Membres sélectionnés",
     "members_selected_count": "{{count}}sélectionné",
     "moderation_pending": "En attente",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Paramètres de modération",
     "moderation_settings_updated": "Paramètres de modération mis à jour",
     "never": "Jamais",
@@ -282,7 +272,19 @@
     "members_selected_count_other": "{{count}}sélectionné",
     "days_count_many": "{{count}} jours",
     "days_count_one": "{{count}} jours",
-    "days_count_other": "{{count}} jours"
+    "days_count_other": "{{count}} jours",
+    "unknown_period": "Période inconnue",
+    "week_period": "Semaine {{week}}, {{year}}",
+    "active_30d_total": "Actif dans 30 jours",
+    "hours_reports_page_desc": "Analyser le volume des échanges de crédits de temps, les soldes des membres, et les tendances par catégorie.",
+    "hours_reports_page_title": "Rapports d'heures",
+    "inactive_members_page_desc": "Identifier les membres à risque de désengagement et gérer les notifications de suivi.",
+    "inactive_members_page_title": "Membres inactifs",
+    "member_reports_page_desc": "Suivre l'activité des membres, la rétention, l'engagement et les modèles de contribution.",
+    "member_reports_page_title": "Rapports des membres",
+    "moderation_queue_page_desc": "Examiner le contenu en attente et signalé avant qu'il n'apparaisse dans la communauté.",
+    "moderation_queue_page_title": "File d'attente de modération",
+    "label_dormant": "Inactif"
   },
   "municipal_reports": {
     "meta": {
@@ -300,13 +302,13 @@
       "body_1_before_kiss": "Le rapport d'impact municipal est un ensemble de preuves que vous partagez avec les partenaires municipaux, les cantons et les bailleurs de fonds pour démontrer la valeur du programme. Il affiche les heures de soins vérifiées, les membres actifs, les organisations partenaires et, à l'aide du",
       "body_1_after_kiss": " méthodologie, une estimation des coûts compensés par les services de soins formels (",
       "body_1_after_chf": "valeur des heures x multiplicateur de prévention).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Utilisez le",
       "body_2_after_audience": "basculez pour changer le cadrage narratif:",
       "body_2_after_canton": "regroupe plusieurs communes et montre une économie de coûts à l’échelle cantonale;",
       "body_2_after_municipality": "se concentre sur les résidents locaux touchés et les organisations partenaires;",
-      "body_2_after_cooperative": "montre la fidélisation des membres, le taux de réciprocité et la charge de travail du coordinateur. Exportez sous PDF pour envoyer aux partenaires ou sous CSV pour une analyse plus approfondie. Enregistrez des modèles de rapport pour régénérer rapidement la même configuration dans les périodes futures."
+      "body_2_after_cooperative": "montre la fidélisation des membres, le taux de réciprocité et la charge de travail du coordinateur. Exportez sous PDF pour envoyer aux partenaires ou sous CSV pour une analyse plus approfondie. Enregistrez des modèles de rapport pour régénérer rapidement la même configuration dans les périodes futures.",
+      "kiss_abbr": "Communauté bienveillante"
     },
     "actions": {
       "analytics": "Analyse de la communauté",
@@ -329,9 +331,9 @@
       "exports": "Exportations",
       "csv_pdf": "CSV/PDF",
       "verified_hours": "Horaires vérifiés",
-      "participants": "Participants",
       "organisations": "Organisations",
-      "total_value": "Valeur totale"
+      "total_value": "Valeur totale",
+      "participants": "Participants"
     },
     "loading": "Chargement des données d'impact municipal",
     "period": "Période de déclaration",
@@ -354,13 +356,13 @@
     },
     "readiness": {
       "municipal_value": "Valeur municipale",
-      "participation": "Participation",
       "partner_network": "Réseau de partenaires",
       "local_exchange": "Échange local",
       "status": {
         "ready": "Prêt",
         "needs_data": "Besoin de données"
-      }
+      },
+      "participation": "Participation"
     },
     "readiness_intro": {
       "prefix": "Ces quatre signaux indiquent si le rapport contient suffisamment de données pour convaincre un public externe.",
@@ -399,7 +401,8 @@
       "hours_other": "{{count}}h",
       "activities_many": "{{count}} activités",
       "activities_one": "{{count}} activités",
-      "activities_other": "{{count}} activités"
+      "activities_other": "{{count}} activités",
+      "formatted_hours": "{{value}}h"
     },
     "toast": {
       "load_failed": "Échec du chargement des données d'impact municipal.",
@@ -557,7 +560,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}} % sur un an"
+      "yoy_value": "{{value}} sur un an"
     }
   }
 }

@@ -3,21 +3,21 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatUnit, getFormattingLocale } from '@/lib/helpers';
 import type { PrerenderJob } from '../../../api/adminApi';
 
 export function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / 1024 / 1024).toFixed(2)} MB`;
+  if (n < 1024) return formatUnit(n, 'byte');
+  if (n < 1024 * 1024) return formatUnit(n / 1024, 'kilobyte', { maximumFractionDigits: 1 });
+  return formatUnit(n / 1024 / 1024, 'megabyte', { maximumFractionDigits: 2 });
 }
 
 export function formatAge(seconds: number | null | undefined): string {
   if (seconds == null) return '—';
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-  return `${Math.floor(seconds / 86400)}d`;
+  if (seconds < 60) return formatUnit(seconds, 'second');
+  if (seconds < 3600) return formatUnit(Math.floor(seconds / 60), 'minute');
+  if (seconds < 86400) return formatUnit(Math.floor(seconds / 3600), 'hour');
+  return formatUnit(Math.floor(seconds / 86400), 'day');
 }
 
 export function formatTs(ts: number | string | null | undefined): string {

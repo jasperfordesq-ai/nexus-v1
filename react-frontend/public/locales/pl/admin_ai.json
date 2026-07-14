@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "ai": {
     "common": {
@@ -133,7 +133,8 @@
       },
       "triggered_by": {
         "manual": "Podręcznik",
-        "scheduled": "Zaplanowany"
+        "scheduled": "Zaplanowany",
+        "schedule": "Harmonogram"
       },
       "config": {
         "enable_title": "Włącz KI-Agenten",
@@ -151,7 +152,7 @@
         "max_proposals": "Maksymalna liczba propozycji na przebieg",
         "schedule_hour": "Godzina harmonogramu (0–23, czas lokalny serwera)",
         "notification_email": "E-mail z powiadomieniem",
-        "notification_email_placeholder": "administrator@example.org"
+        "notification_email_placeholder": "admin@example.org"
       },
       "actions": {
         "approve": "Zatwierdzić",
@@ -248,6 +249,13 @@
         "run_triggered_many": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
         "run_triggered_one": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
         "run_triggered_other": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}."
+      },
+      "unknown_identifier": "Nieznany",
+      "proposal_types": {
+        "create_tandem": "Utwórz tandemy",
+        "route_help_request": "Przekaż prośbę o pomoc",
+        "send_activity_summary": "Wyślij podsumowanie aktywności",
+        "send_nudge": "Wyślij przypomnienie"
       }
     },
     "module_docs": {
@@ -319,6 +327,122 @@
         "seeded_many": "Domyślne dokumenty {{count}} zostały rozstawione.",
         "seeded_one": "Domyślne dokumenty {{count}} zostały rozstawione.",
         "seeded_other": "Domyślne dokumenty {{count}} zostały rozstawione."
+      },
+      "defaults": {
+        "overview": {
+          "title": "Przegląd platformy — czym to jest"
+        },
+        "timebanking": {
+          "title": "Podstawy i filozofia bankowania czasu"
+        },
+        "getting_started": {
+          "title": "Pierwsze kroki — twój pierwszy tydzień"
+        },
+        "safety": {
+          "title": "Bezpieczeństwo, zaufanie i zasady społeczności"
+        },
+        "listings": {
+          "title": "Oferty — propozycje i zapytania"
+        },
+        "wallet": {
+          "title": "Portfel i saldo kredytów czasowych"
+        },
+        "messages": {
+          "title": "Wiadomości — prywatne rozmowy"
+        },
+        "feed": {
+          "title": "Kanał — strumień aktywności społeczności"
+        },
+        "dashboard": {
+          "title": "Panel — twoje punkt startowy"
+        },
+        "profile": {
+          "title": "Profil i katalog członków"
+        },
+        "notifications": {
+          "title": "Powiadomienia"
+        },
+        "settings": {
+          "title": "Ustawienia — zarządzaj swoim kontem"
+        },
+        "events": {
+          "title": "Wydarzenia — spotkania społeczności"
+        },
+        "groups": {
+          "title": "Grupy — subspołeczności"
+        },
+        "volunteering": {
+          "title": "Wolontariat — możliwości i zmiany"
+        },
+        "jobs": {
+          "title": "Oferty pracy"
+        },
+        "marketplace": {
+          "title": "Rynek — przedmioty, nie usługi"
+        },
+        "blog": {
+          "title": "Blog — historie i wiadomości społeczności"
+        },
+        "resources": {
+          "title": "Zasoby — baza wiedzy i pliki"
+        },
+        "polls": {
+          "title": "Ankiety — decyzje społeczności"
+        },
+        "ideation": {
+          "title": "Wyzwania pomysłowe — wspólne rozwiązywanie problemów"
+        },
+        "organisations": {
+          "title": "Organizacje — profile partnerów"
+        },
+        "group_exchanges": {
+          "title": "Wymiany grupowe — projekty czasowe wiele-do-wielu"
+        },
+        "federation": {
+          "title": "Federacja — łączenie społeczności"
+        },
+        "gamification": {
+          "title": "Grywalizacja — odznaki, XP i uznanie"
+        },
+        "goals": {
+          "title": "Cele — osobiste i wspólnotowe"
+        },
+        "connections": {
+          "title": "Połączenia — Twoja sieć"
+        },
+        "reviews": {
+          "title": "Recenzje i oceny"
+        },
+        "ai_chat": {
+          "title": "Asystent AI — przycisk czatu"
+        },
+        "search": {
+          "title": "Wyszukiwanie — znajdowanie czegokolwiek"
+        },
+        "caring_community": {
+          "title": "Troskliwa społeczność — wsparcie dla wrażliwych członków"
+        },
+        "newsletter": {
+          "title": "Biuletyn i skróty e-mailowe"
+        },
+        "account_security": {
+          "title": "Bezpieczeństwo konta — hasła, 2FA, klucze dostępu"
+        },
+        "privacy_data": {
+          "title": "Prywatność i prawa do danych (RODO)"
+        },
+        "accessibility": {
+          "title": "Dostępność — motywy, języki, technologie wspomagające"
+        },
+        "mobile_pwa": {
+          "title": "Aplikacja mobilna i PWA"
+        },
+        "troubleshooting": {
+          "title": "Rozwiązywanie typowych problemów"
+        },
+        "admin_overview": {
+          "title": "Dla administratorów społeczności"
+        }
       }
     },
     "trace_metrics": {

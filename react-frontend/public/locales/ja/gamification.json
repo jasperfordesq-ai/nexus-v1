@@ -25,7 +25,9 @@
       "month_inactive_tooltip": "非アクティブ",
       "description": "少なくとも 1 つの有意義な活動 (交換、リスト、レビュー、またはボランティア時間) を完了した月。",
       "months_active_other": "{{count}}/12 か月",
-      "month_active_tooltip_other": "アクティブ: {{count}} アクティビティ"
+      "month_active_tooltip_other": "アクティブ: {{count}} アクティビティ",
+      "months_active_one": "12か月のうち{{count}}",
+      "month_active_tooltip_one": "アクティブ: {{count}} 活動"
     },
     "badge_type": {
       "vol": "ボランティア活動",
@@ -80,7 +82,8 @@
       "claim_failed": "請求が失敗しました",
       "claim_failed_desc": "毎日の報酬を請求できませんでした。",
       "claim_error": "何か問題が発生しました。もう一度試してください。",
-      "day_streak_other": "{{count}} 日の連続記録"
+      "day_streak_other": "{{count}} 日の連続記録",
+      "day_streak_one": "{{count}} 日連続"
     },
     "challenges": {
       "active_challenges": "積極的な挑戦",
@@ -338,7 +341,8 @@
       "xp_reward": "{{xp}} XP",
       "load_failed": "ロードに失敗しました",
       "load_failed_desc": "シーズン履歴を読み込めませんでした。",
-      "participants_other": "{{count}} 参加者"
+      "participants_other": "{{count}} 参加者",
+      "participants_one": "{{count}} 参加者"
     },
     "score_unit": {
       "hours": "h",
@@ -433,7 +437,9 @@
     "max_score_label": "/{{max}}",
     "loading": "NexusScore を読み込んでいます...",
     "points_to_next_other": "{{count}} は {{tier}} を指します",
-    "remaining_count_other": "{{count}} 残り"
+    "remaining_count_other": "{{count}} 残り",
+    "points_to_next_one": "{{count}} ポイント → {{tier}}",
+    "remaining_count_one": "{{count}} 残り"
   },
   "common": {
     "refresh": "リフレッシュ",

@@ -742,7 +742,7 @@ class AdminContentController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             Log::warning('Manual Stripe sync failed', ['plan_id' => $id, 'error' => $e->getMessage()]);
-            return $this->respondWithError('STRIPE_ERROR', 'Stripe sync failed: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('STRIPE_ERROR', __('api.stripe_plan_sync_failed'), null, 500);
         }
     }
 

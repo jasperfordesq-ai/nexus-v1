@@ -96,7 +96,7 @@ export default function GroupDetail() {
         success(t('groups.location_geocoded'));
         loadGroup();
       } else {
-        error(res.error || t('groups.failed_to_geocode_location'));
+        error(t('groups.failed_to_geocode_location'));
       }
     } catch {
       error(t('groups.failed_to_geocode_location'));
@@ -110,7 +110,7 @@ export default function GroupDetail() {
         success(t('groups.member_promoted'));
         loadMembers();
       } else {
-        error(res.error || t('groups.failed_to_promote_member'));
+        error(t('groups.failed_to_promote_member'));
       }
     } catch {
       error(t('groups.failed_to_promote_member'));
@@ -124,7 +124,7 @@ export default function GroupDetail() {
         success(t('groups.member_demoted'));
         loadMembers();
       } else {
-        error(res.error || t('groups.failed_to_demote_member'));
+        error(t('groups.failed_to_demote_member'));
       }
     } catch {
       error(t('groups.failed_to_demote_member'));
@@ -140,7 +140,7 @@ export default function GroupDetail() {
         success(t('groups.member_removed'));
         loadMembers();
       } else {
-        error(res.error || t('groups.failed_to_remove_member'));
+        error(t('groups.failed_to_remove_member'));
       }
     } catch {
       error(t('groups.failed_to_remove_member'));

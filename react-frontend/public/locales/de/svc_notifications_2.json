@@ -169,7 +169,7 @@
     "item_not_found": "Element der Moderationswarteschlange nicht gefunden.",
     "already_reviewed": "Dieser Artikel wurde bereits überprüft.",
     "rejection_reason_required": "Ein Ablehnungsgrund ist erforderlich.",
-    "content_decision": "Der Inhalt war: Entscheidung."
+    "content_decision": "Inhalt wurde :decision."
   },
   "tenant_settings": {
     "pending_verification": "Ihre Identitätsüberprüfung steht noch aus. Bitte warten Sie auf die Genehmigung.",
@@ -182,9 +182,9 @@
     "connection_successful": "Verbindung erfolgreich",
     "ollama_not_configured": "Ollama-Host-URL nicht konfiguriert",
     "ollama_cannot_connect": "Es kann keine Verbindung zu Ollama hergestellt werden: :error",
-    "ollama_connected": "Verbunden mit Ollama (:anzahl verfügbarer Modelle)",
     "ollama_http_error": "Ollama hat HTTP :code zurückgegeben",
-    "provider_error": "Bei der Verarbeitung Ihrer AI-Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+    "provider_error": "Bei der Verarbeitung Ihrer AI-Anfrage ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "ollama_connected": "Verbunden mit Ollama (:count Modelle verfügbar)"
   },
   "report_export": {
     "no_data": "Für den ausgewählten Bericht und die ausgewählten Filter wurden keine Daten gefunden."

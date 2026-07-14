@@ -81,7 +81,7 @@ function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
         setDescription('');
         onComplete();
       } else {
-        toast.error(res.error || t('timebanking.community_fund_deposit_failed'));
+        toast.error(t('timebanking.community_fund_deposit_failed'));
       }
     } catch {
       toast.error(t('timebanking.community_fund_deposit_failed'));
@@ -203,7 +203,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
         setDescription('');
         onComplete();
       } else {
-        toast.error(res.error || t('timebanking.community_fund_grant_failed'));
+        toast.error(t('timebanking.community_fund_grant_failed'));
       }
     } catch {
       toast.error(t('timebanking.community_fund_grant_failed'));
@@ -352,7 +352,7 @@ export function CommunityFund() {
       if (res.success && res.data) {
         setFund(res.data);
       } else {
-        toast.error(res.error || t('timebanking.community_fund_load_failed'));
+        toast.error(t('timebanking.community_fund_load_failed'));
       }
     } catch {
       toast.error(t('timebanking.community_fund_load_failed'));
@@ -373,7 +373,7 @@ export function CommunityFund() {
         setTransactions(unwrapArray<CommunityFundTransaction>(res.data));
         setTotalTransactions(res.meta?.total ?? unwrapArray<CommunityFundTransaction>(res.data).length);
       } else {
-        toast.error(res.error || t('timebanking.community_fund_transactions_failed'));
+        toast.error(t('timebanking.community_fund_transactions_failed'));
       }
     } catch {
       toast.error(t('timebanking.community_fund_transactions_failed'));

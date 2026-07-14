@@ -203,7 +203,8 @@
     "moderated": "Cours mis à jour",
     "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
     "no_courses": "Pas encore de cours.",
-    "no_instructors": "Aucun instructeur n'est encore accordé."
+    "no_instructors": "Aucun instructeur n'est encore accordé.",
+    "status_unknown": "Statut inconnu"
   },
   "builder": {
     "add_section": "Ajouter une rubrique",

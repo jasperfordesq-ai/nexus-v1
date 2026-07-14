@@ -10,10 +10,42 @@ import { createMockContexts } from '@/test/mock-contexts';
 
 // ── stable mock data ──────────────────────────────────────────────────────────
 const MOCK_CHECKS = vi.hoisted(() => [
-  { name: 'Meta Title', description: 'Page has a title tag', status: 'pass' as const },
-  { name: 'Meta Description', description: 'Missing description', status: 'warning' as const },
-  { name: 'Canonical URL', description: 'No canonical set', status: 'fail' as const },
+  {
+    code: 'tenant_metadata' as const,
+    params: {},
+    status: 'pass' as const,
+    issues: [],
+    issue_count: 0,
+    points: 10,
+    max_points: 10,
+  },
+  {
+    code: 'seo_settings' as const,
+    params: {},
+    status: 'warning' as const,
+    issues: [{ code: 'canonical_urls_not_enabled' as const, params: {} }],
+    issue_count: 1,
+    points: 5,
+    max_points: 10,
+  },
+  {
+    code: 'canonical_urls' as const,
+    params: {},
+    status: 'fail' as const,
+    issues: [{ code: 'custom_canonical_urls_high' as const, params: { count: 58 } }],
+    issue_count: 1,
+    points: 0,
+    max_points: 10,
+  },
 ]);
+
+const auditResult = () => ({
+  checks: MOCK_CHECKS,
+  score: 15,
+  max_score: 30,
+  grade: 'F' as const,
+  run_at: '2025-06-01T12:00:00Z',
+});
 
 // ── mock adminApi ─────────────────────────────────────────────────────────────
 vi.mock('@/admin/api/adminApi', () => ({
@@ -52,13 +84,13 @@ describe('SeoAudit', () => {
     const busyEl = statusEls.find((el) => el.getAttribute('aria-busy') === 'true');
     expect(busyEl).toBeInTheDocument();
 
-    resolve({ success: true, data: { checks: [], last_run_at: null } });
+    resolve({ success: true, data: { ...auditResult(), checks: [] } });
   });
 
   it('hides loading spinner after data loads', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: [], last_run_at: null },
+      data: { ...auditResult(), checks: [] },
     } as never);
 
     render(<SeoAudit />);
@@ -74,7 +106,7 @@ describe('SeoAudit', () => {
   it('shows empty state when no previous audit results', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: [], last_run_at: null },
+      data: { ...auditResult(), checks: [] },
     } as never);
 
     render(<SeoAudit />);
@@ -87,22 +119,24 @@ describe('SeoAudit', () => {
   it('renders audit check rows when results exist', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: MOCK_CHECKS, last_run_at: '2025-06-01T12:00:00Z' },
+      data: auditResult(),
     } as never);
 
     render(<SeoAudit />);
 
     await waitFor(() => {
-      expect(screen.getByText('Meta Title')).toBeInTheDocument();
+      expect(screen.getByText('Homepage Metadata')).toBeInTheDocument();
     });
-    expect(screen.getByText('Meta Description')).toBeInTheDocument();
-    expect(screen.getByText('Canonical URL')).toBeInTheDocument();
+    expect(screen.getByText('SEO Configuration')).toBeInTheDocument();
+    expect(screen.getByText('Canonical URLs')).toBeInTheDocument();
+    expect(screen.getByText('Canonical URLs are not enabled.')).toBeInTheDocument();
+    expect(screen.getByText('58 pages have custom canonical URLs; confirm that they are still valid.')).toBeInTheDocument();
   });
 
   it('shows pass/warning/fail chips with correct count summary', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: MOCK_CHECKS, last_run_at: '2025-06-01T12:00:00Z' },
+      data: auditResult(),
     } as never);
 
     render(<SeoAudit />);
@@ -118,11 +152,11 @@ describe('SeoAudit', () => {
   it('calls runSeoAudit when Run Audit button clicked', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: [], last_run_at: null },
+      data: { ...auditResult(), checks: [] },
     } as never);
     runAuditMock.mockResolvedValueOnce({
       success: true,
-      data: MOCK_CHECKS,
+      data: auditResult(),
     } as never);
 
     const user = userEvent.setup();
@@ -146,11 +180,11 @@ describe('SeoAudit', () => {
   it('shows newly returned checks after running the audit', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: [], last_run_at: null },
+      data: { ...auditResult(), checks: [] },
     } as never);
     runAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: MOCK_CHECKS },
+      data: auditResult(),
     } as never);
 
     const user = userEvent.setup();
@@ -165,7 +199,7 @@ describe('SeoAudit', () => {
     await user.click(screen.getByRole('button', { name: /run.*audit/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Meta Title')).toBeInTheDocument();
+      expect(screen.getByText('Homepage Metadata')).toBeInTheDocument();
     });
   });
 
@@ -187,13 +221,13 @@ describe('SeoAudit', () => {
   it('shows Reload Results button when results exist', async () => {
     getAuditMock.mockResolvedValueOnce({
       success: true,
-      data: { checks: MOCK_CHECKS, last_run_at: '2025-06-01T12:00:00Z' },
+      data: auditResult(),
     } as never);
 
     render(<SeoAudit />);
 
     await waitFor(() => {
-      expect(screen.getByText('Meta Title')).toBeInTheDocument();
+      expect(screen.getByText('Homepage Metadata')).toBeInTheDocument();
     });
 
     expect(screen.getByRole('button', { name: /reload/i })).toBeInTheDocument();

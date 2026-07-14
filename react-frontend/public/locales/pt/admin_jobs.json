@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "jobs": {
     "add_edit_notes": "Adicionar/editar notas",
@@ -265,7 +265,10 @@
     "stat_pending_offers_other": "Ofertas pendentes{{count}}",
     "pipeline_minutes_many": "{{count}}min",
     "pipeline_minutes_one": "{{count}}min",
-    "pipeline_minutes_other": "{{count}}min"
+    "pipeline_minutes_other": "{{count}}min",
+    "stage_unknown": "Outro estágio",
+    "type_unknown": "Outro tipo de trabalho",
+    "category_value": "{{category}}"
   },
   "moderation": {
     "action_failed": "Falha",

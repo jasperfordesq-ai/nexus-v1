@@ -64,7 +64,9 @@ class AdminCrmControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/crm/funnel');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['stages' => ['*' => ['code', 'count', 'color']]]]);
+        $this->assertSame('registered', $response->json('data.stages.0.code'));
+        $this->assertArrayNotHasKey('name', $response->json('data.stages.0'));
     }
 
     public function test_funnel_returns_403_for_regular_member(): void
@@ -188,7 +190,15 @@ class AdminCrmControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/crm/timeline');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['*' => [
+            'activity_type', 'description_code', 'description_params', 'created_at',
+        ]]]);
+
+        $signup = collect($response->json('data'))->firstWhere('activity_type', 'signup');
+        $this->assertNotNull($signup);
+        $this->assertSame('signup', $signup['description_code']);
+        $this->assertSame([], $signup['description_params']);
+        $this->assertArrayNotHasKey('description', $signup);
     }
 
     // ================================================================

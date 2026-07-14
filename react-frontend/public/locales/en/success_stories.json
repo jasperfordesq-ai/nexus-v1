@@ -8,5 +8,33 @@
   "after_label": "After",
   "caveat_label": "Method",
   "evidence_label": "Evidence",
-  "error_loading": "We couldn't load the success stories right now. Please try again in a moment."
+  "error_loading": "We couldn't load the success stories right now. Please try again in a moment.",
+  "audiences": {
+    "all_residents": "All residents",
+    "municipality": "Municipality",
+    "kanton": "Canton",
+    "verein_members": "Association members",
+    "volunteers": "Volunteers",
+    "recipients": "Care recipients"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% lower information-distribution effort",
+      "narrative": "Coordinators spend roughly a third less time distributing updates after switching to NEXUS. Announcements, member-segment targeting, and confirmation tracking are consolidated in one place.",
+      "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+      "evidence_source": "Peer municipality page (illustrative)"
+    },
+    "volunteer_engagement": {
+      "title": "25% more volunteer engagement",
+      "narrative": "Pilot communities report a quarter more active volunteer participation after adopting NEXUS, supported by clearer matching, low-friction sign-up, and visible Warmth Pass recognition.",
+      "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+      "evidence_source": "Peer municipality page (illustrative)"
+    },
+    "formal_care_offset": {
+      "title": "CHF 12,250 in formal-care costs offset",
+      "narrative": "Volunteer hours coordinated through NEXUS represent a CHF 12,250 offset against formal home-care costs during the pilot window, valued at the Swiss formal-care assistant rate.",
+      "method_caveat": "Estimate using CHF 35 per hour across 350 hours; the comparison is against the pre-pilot baseline only.",
+      "evidence_source": "AG76 municipal ROI model (illustrative)"
+    }
+  }
 }

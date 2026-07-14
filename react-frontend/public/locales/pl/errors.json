@@ -49,5 +49,23 @@
   "extend_session": "Przedłuż sesję",
   "dismiss": "Zamknij",
   "idle_logout_title": "Wylogowano z powodu bezczynności",
-  "idle_logout_message": "Po okresie bezczynności nastąpiło automatyczne wylogowanie. Zaloguj się ponownie, aby kontynuować."
+  "idle_logout_message": "Po okresie bezczynności nastąpiło automatyczne wylogowanie. Zaloguj się ponownie, aby kontynuować.",
+  "api": {
+    "request_failed_title": "Żądanie nie powiodło się",
+    "request_failed": "Nie można było zakończyć żądania.",
+    "service_unavailable": "Usługa jest tymczasowo niedostępna. Proszę spróbować ponownie później.",
+    "invalid_response": "Serwer zwrócił nieprawidłową odpowiedź.",
+    "request_timeout": "Żądanie przekroczyło czas oczekiwania. Proszę spróbować ponownie.",
+    "network_error": "Nie można połączyć się. Proszę sprawdzić swoje połączenie internetowe i spróbować ponownie.",
+    "invalid_request": "Żądanie było nieprawidłowe. Proszę sprawdzić swoje dane wejściowe.",
+    "permission_denied": "Nie masz uprawnień do wykonania tej akcji.",
+    "resource_not_found": "Żądany zasób nie został znaleziony.",
+    "too_many_requests": "Zbyt wiele żądań. Proszę odczekać chwilę i spróbować ponownie.",
+    "server_error": "Wystąpił nieoczekiwany błąd serwera. Proszę spróbować ponownie później.",
+    "download_failed_status": "Pobieranie nie powiodło się (HTTP {{status}}).",
+    "upload_failed": "Przesyłanie nie powiodło się.",
+    "upload_failed_retry": "Przesyłanie nie powiodło się. Spróbuj ponownie.",
+    "upload_cancelled": "Przesyłanie anulowane.",
+    "upload_timeout": "Przekroczono czas przesyłania. Spróbuj ponownie."
+  }
 }

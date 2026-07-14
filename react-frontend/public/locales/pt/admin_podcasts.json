@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,7 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
+    "loading": "Carregando",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,7 +68,7 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
+    "select_row": "Selecionar linha {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
   },
@@ -97,13 +97,12 @@
     "load_failed": "Não foi possível carregar a moderação do podcast.",
     "action_failed": "Não foi possível atualizar a moderação do podcast.",
     "empty_value": "-",
-    "count": "{{count}} items",
     "actions": {
       "inspect": "Rever e moderar",
-      "refresh": "Refresh",
-      "approve": "Approve",
-      "reject": "Reject",
-      "flag": "Flag",
+      "refresh": "Atualizar",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "flag": "Bandeira",
       "resolve_report": "Resolver relatório",
       "dismiss_report": "Dispensar relatório",
       "escalate_report": "Escalar relatório",
@@ -111,30 +110,48 @@
     },
     "filters": {
       "label": "Filtro de moderação de podcast",
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "Pendente",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado",
+      "flagged": "Sinalizado",
+      "all": "Todos"
     },
     "sections": {
-      "shows": "Shows",
-      "episodes": "Episodes",
       "top_episodes": "Episódios principais",
       "client_breakdown": "Detalhamento do cliente",
-      "retention": "Retention",
-      "reports": "Abrir relatórios"
+      "reports": "Abrir relatórios",
+      "shows": "Shows",
+      "episodes": "Episódios",
+      "retention": "Retenção"
     },
     "review_values": {
-      "visibility": { "public": "Público", "members": "Membros", "private": "Privado", "inherit": "Herdar do programa" },
-      "media_scan": { "pending": "Análise pendente", "clean": "Limpo", "infected": "Infetado", "scan_unavailable": "Analisador indisponível", "not_required": "Não necessário" },
-      "media_processing": { "pending": "Pendente", "ready_for_processing": "Pronto para processamento", "complete": "Concluído", "failed": "Falhou" },
-      "report_status": { "open": "Aberto", "resolved": "Resolvido", "dismissed": "Ignorado", "escalated": "Escalado" }
+      "visibility": {
+        "public": "Público",
+        "members": "Membros",
+        "private": "Privado",
+        "inherit": "Herdar do programa"
+      },
+      "media_scan": {
+        "pending": "Análise pendente",
+        "clean": "Limpo",
+        "infected": "Infetado",
+        "scan_unavailable": "Analisador indisponível",
+        "not_required": "Não necessário"
+      },
+      "media_processing": {
+        "pending": "Pendente",
+        "ready_for_processing": "Pronto para processamento",
+        "complete": "Concluído",
+        "failed": "Falhou"
+      },
+      "report_status": {
+        "open": "Aberto",
+        "resolved": "Resolvido",
+        "dismissed": "Ignorado",
+        "escalated": "Escalado"
+      }
     },
     "readiness": {
-      "moderation": "Moderation",
-      "reports": "Reports",
-      "media": "Media",
       "rss": "RSS",
       "pending_items_one": "{{count}} item aguardando revisão",
       "pending_items_other": "{{count}} itens aguardando revisão",
@@ -147,12 +164,15 @@
       "pending_items_many": "{{count}} itens aguardando revisão",
       "open_reports_many": "{{count}} abrir relatórios de membros",
       "media_jobs_many": "{{count}} trabalhos de mídia aguardando",
-      "rss_ready_many": "{{count}} programas publicados podem ser verificados"
+      "rss_ready_many": "{{count}} programas publicados podem ser verificados",
+      "moderation": "Moderação",
+      "reports": "Relatórios",
+      "media": "Mídia"
     },
     "feed_validation": {
       "title": "Validação RSS",
       "subtitle": "Última verificação para {{title}}",
-      "valid": "Ready",
+      "valid": "Pronto",
       "invalid": "Precisa de trabalho",
       "errors": "Problemas de bloqueio",
       "warnings": "Correções recomendadas"
@@ -167,61 +187,62 @@
       "missing_artwork": "Adicione arte do show para preparação do diretório de podcast.",
       "episode_missing_audio_url": "Falta um URL de áudio HTTP válido em um episódio.",
       "episode_missing_audio_length": "Um episódio não tem o tamanho do arquivo de áudio.",
-      "episode_missing_audio_mime": "Um episódio está sem o tipo MIME de áudio."
+      "episode_missing_audio_mime": "Um episódio está sem o tipo MIME de áudio.",
+      "unknown": "O feed tem um problema não reconhecido."
     },
     "columns": {
-      "title": "Title",
-      "owner": "Owner",
-      "show": "Show",
-      "author": "Author",
+      "title": "Título",
+      "owner": "Proprietário",
+      "author": "Autor",
       "status": "Status",
-      "moderation": "Moderation",
-      "updated": "Updated",
-      "actions": "Actions",
-      "listens": "Listens",
-      "client": "Client",
-      "bucket": "Bucket",
-      "episode": "Episode",
-      "reason": "Reason",
-      "details": "Details"
+      "updated": "Atualizado",
+      "actions": "Ações",
+      "listens": "Reproduções",
+      "details": "Detalhes",
+      "show": "Show",
+      "moderation": "Moderação",
+      "client": "Cliente",
+      "bucket": "Pasta",
+      "episode": "Episódio",
+      "reason": "Motivo"
     },
-    "report_unknown_episode": "Episode #{{id}}",
-    "reporter": "Reported by {{name}}",
+    "reporter": "Reportado por {{name}}",
     "report_meta": "{{show}} · {{reporter}}",
     "report_reasons": {
       "safety": "Segurança ou dano",
       "spam": "Spam ou conteúdo enganoso",
       "rights": "Preocupação com direitos autorais ou direitos",
-      "other": "Other"
+      "unknown": "Motivo não reconhecido",
+      "other": "Outro"
     },
     "stats": {
-      "total_shows": "Shows",
       "published_shows": "Programas publicados",
       "pending_shows": "Programas pendentes",
-      "total_episodes": "Episodes",
       "published_episodes": "Episódios publicados",
       "pending_episodes": "Episódios pendentes",
-      "total_listens": "Listens",
+      "total_listens": "Reproduções",
       "completed_listens": "Escutas concluídas",
       "completion_rate": "Taxa de conclusão",
       "unique_listeners": "Ouvintes únicos",
       "open_reports": "Abrir relatórios",
-      "subscribers": "Followers",
       "pending_media_scans": "Verificações pendentes",
       "media_scan_unavailable": "Scanner indisponível",
       "pending_media_processing": "Jobs de mídia pendentes",
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "total_shows": "Shows",
+      "total_episodes": "Episódios",
+      "subscribers": "Seguidores"
     },
     "status": {
-      "draft": "Draft",
-      "published": "Published",
-      "archived": "Archived"
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "archived": "Arquivado"
     },
     "moderation": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "Pendente",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado",
+      "flagged": "Sinalizado"
     },
     "empty": {
       "shows": "Nenhuma exibição corresponde ao filtro atual.",
@@ -262,6 +283,8 @@
     },
     "count_many": "{{count}} items",
     "count_one": "{{count}} itens",
-    "count_other": "{{count}} itens"
+    "count_other": "{{count}} itens",
+    "count": "{{count}} itens",
+    "report_unknown_episode": "Episódio #{{id}}"
   }
 }

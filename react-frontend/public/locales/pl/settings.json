@@ -595,7 +595,7 @@
     "modal_title": "Dodaj połączone konto",
     "modal_description": "Wprowadź adres e-mail osoby, którą chcesz połączyć. Otrzyma powiadomienie o zatwierdzeniu prośby.",
     "email_label": "Adres e-mail",
-    "email_placeholder": "dziecko@example.com",
+    "email_placeholder": "child@example.com",
     "name_label": "Imię (opcjonalnie)",
     "name_placeholder": "Ich nazwa wyświetlana",
     "cancel": "Anuluj",

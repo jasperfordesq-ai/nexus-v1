@@ -77,7 +77,7 @@ class TenantDataQualityController extends BaseApiController
         if (!in_array($checkKey, self::ALLOWED_DRILLDOWN_KEYS, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Unknown data-quality check key.',
+                __('api.data_quality_check_unknown'),
                 'check_key',
                 422
             );
@@ -95,7 +95,7 @@ class TenantDataQualityController extends BaseApiController
             'check_key' => $checkKey,
             'limit'     => $limit,
             'rows'      => $payload['rows'],
-            'note'      => $payload['note'] ?? null,
+            'note_code' => $payload['note_code'] ?? null,
         ]);
     }
 

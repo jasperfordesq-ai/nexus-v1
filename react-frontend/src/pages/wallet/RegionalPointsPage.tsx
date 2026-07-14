@@ -45,6 +45,7 @@ import { logError } from '@/lib/logger';
 interface SummaryConfig {
   enabled: boolean;
   label: string;
+  label_code?: 'default' | null;
   symbol: string;
   member_transfers_enabled: boolean;
   marketplace_redemption_enabled: boolean;

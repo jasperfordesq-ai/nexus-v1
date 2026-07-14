@@ -101,5 +101,6 @@
     "title": "投票"
   },
   "category_filter_label": "カテゴリでフィルタリングする",
-  "total_ballots_other": "総投票数: {{count}}"
+  "total_ballots_other": "総投票数: {{count}}",
+  "total_ballots_one": "総投票数: {{count}}"
 }

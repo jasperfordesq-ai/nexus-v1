@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,21 +67,20 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "admin_settings": {
     "logo_uploaded": "Uaslódáladh lógó na gcomhpháirtithe",
     "upload_failed": "Theip ar an uaslódáil",
-    "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "Taispeántar sa sliotán buntásc ar chlé. PNG, JPEG, WebP nó SVG — 2 MB ar a mhéad.",
     "replace_image": "Ionadaigh an íomhá",
     "upload_image": "Uaslódáil íomhá",
     "remove_light_image": "Bain íomhá mód solais",
     "remove_dark_image": "Bain íomhá mód dorcha",
     "remove_partner_logo": "Bain lógó an chomhpháirtí",
-    "header_logo_section": "Header Logo",
     "header_colors_section": "Dath ceanntásca inrochtana",
     "header_colors_desc": "Roghnaigh dath ceanntásc an tsuímh inrochtana (GOV.UK-style). Fág gan socrú chun an ceanntásc caighdeánach dubh a choinneáil leis an líne ghorm.",
     "header_bg_color_label": "Dath cúlra ceanntásca",
@@ -90,7 +88,6 @@
     "header_accent_color_label": "Dath líne accent",
     "header_accent_color_hint": "An líne tanaí faoin gceanntásc. Fág bán chun an cúlra a mheaitseáil (gan líne infheicthe), nó roghnaigh dath codarsnachta ar nós bán.",
     "header_colors_reset": "Athshocraigh go réamhshocrú",
-    "header_colors_preview": "Preview",
     "header_logo_desc": "Uaslódáil lógó saincheaptha le taispeáint i gceanntásc an tsuímh in ionad ceannlitreacha do phobail. Fág folamh chun an réamhshocrú a úsáid.",
     "header_logo_light_label": "Lógó ceanntásca (mód solais)",
     "header_logo_dark_label": "Lógó ceanntásca (mód dorcha)",
@@ -99,29 +96,32 @@
     "header_logo_uploaded": "Nuashonraíodh an lógó ceanntásca",
     "header_logo_removed": "Baineadh an lógó ceanntásc",
     "remove_header_logo": "Bain lógó ceanntásca",
-    "remove_header_logo_dark": "Bain lógó ceanntásc mód dorcha"
+    "remove_header_logo_dark": "Bain lógó ceanntásc mód dorcha",
+    "partner_logo_label": "Lógó Comhpháirtí",
+    "header_logo_section": "Lógó Ceanntásc",
+    "header_colors_preview": "Réamhamharc"
   },
   "operations": {
-    "title": "Operations",
     "description": "Staitisticí taisce agus rialuithe poist chúlra.",
-    "refresh": "Refresh",
-    "cache_heading": "Cache",
-    "bg_jobs_heading": "Background Jobs",
     "redis_label": "Redis",
-    "redis_connected": "Connected",
-    "redis_disconnected": "Disconnected",
     "memory_used": "Cuimhne a úsáidtear",
-    "keys": "Keys",
     "clear_cache": "Glan taisce tionónta",
     "cache_cleared": "Glanadh an taisce go rathúil",
     "cache_clear_failed": "Theip ar an taisce a ghlanadh",
     "job_triggered": "Spreag post go rathúil",
     "job_trigger_failed": "Theip ar an bpost a spreagadh",
-    "run_job_label": "Run {{name}}",
-    "last_run": "Last run: {{date}}",
     "never_run": "Ná rith",
     "no_jobs": "Níl aon phoist chúlra cumraithe",
-    "loading": "Loading"
+    "refresh": "Athnuaigh",
+    "keys": "Eochracha",
+    "loading": "Luchtú",
+    "title": "Oibríochtaí",
+    "cache_heading": "Caillteán",
+    "bg_jobs_heading": "Obair Cúlra",
+    "redis_connected": "Ceangailte",
+    "redis_disconnected": "Dícheangailte",
+    "run_job_label": "Rith {{name}}",
+    "last_run": "Rith deireanach: {{date}}"
   },
   "retention": {
     "page_title": "Coinneáil Sonraí",
@@ -160,7 +160,9 @@
     "type_vol_safeguarding_incidents": "Teagmhais chosanta",
     "type_vol_safeguarding_incidents_desc": "Taifid chásanna cosanta. Ní ghlantar ach cásanna réitithe nó dúnta; seiceáil dualgais choinneála reachtúla sula gcumasaítear é.",
     "type_vol_guardian_consents": "Toilithe caomhnóirí",
-    "type_vol_guardian_consents_desc": "Taifid toilithe caomhnóirí do mhionaoisigh, glanta an líon seo laethanta tar éis don toiliú dul in éag."
+    "type_vol_guardian_consents_desc": "Taifid toilithe caomhnóirí do mhionaoisigh, glanta an líon seo laethanta tar éis don toiliú dul in éag.",
+    "status_unknown": "Stádas anaithnid",
+    "type_unknown": "Cineál sonraí anaithnid"
   },
   "seed_generator": {
     "count_aria_label": "Líon {{label}}",
@@ -183,62 +185,63 @@
     "option_messages_desc": "Gin teachtaireachtaí ball samplach",
     "option_badges_label": "Suaitheantais",
     "option_badges_desc": "Gin dámhachtainí suaitheantais samplacha",
-    "warning_body": "Warning Body"
+    "warning_body": "Rith giniúint síolta amháin i dtimpeallachtaí forbartha nó tástála. Cruthaíonn sé taifid shamplacha agus d’fhéadfadh sé tuarascálacha a chur faoi deara."
   },
   "sso": {
-    "page_title": "Single Sign-On",
     "page_subtitle": "Cumraigh soláthraithe aitheantais OpenID Connect don phobal seo",
     "loading": "Soláthraithe SSO á lódáil",
     "load_failed": "Theip ar lódáil soláthraithe SSO",
-    "refresh": "Refresh",
     "add_provider": "Cuir soláthraí leis",
     "intro": "Síníonn baill isteach trí sholáthraí aitheantais d’eagraíochta ag úsáid OpenID Connect. Tá cnaipe le feiceáil ar na leathanaigh logála isteach agus clárúcháin do gach soláthraí cumasaithe.",
     "no_providers": "Níl aon soláthraí SSO cumraithe fós.",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "updated_at": "Updated {{date}}",
-    "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
     "preset_entra_hint": "I gcás Microsoft Entra ID, is é URL an eisitheora ná https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "Ceangal tástála",
     "testing": "Ag tástáil…",
-    "test_ok": "Connection OK",
     "test_error": "Theip ar an gceangal",
     "test_failed": "Theip ar an tástáil. Bain triail eile as.",
-    "edit": "Edit",
-    "edit_provider_title": "Edit {{name}}",
-    "delete": "Delete",
     "delete_title": "Scrios soláthraí SSO",
     "delete_body": "Scrios \"{{name}}\"? Ní bheidh baill in ann síniú isteach leis an soláthraí seo a thuilleadh.",
-    "delete_confirm": "Delete",
     "deleted": "Scriosadh an soláthraí",
     "delete_failed": "Theip ar an soláthraí a scriosadh",
     "saved": "Sábháladh an soláthraí",
-    "save": "Save",
     "saving": "Ag sábháil…",
     "save_failed": "Theip ar an soláthraí a shábháil",
-    "cancel": "Cancel",
     "key_invalid": "Ní mór 2–20 carachtar a bheith in eochair an tsoláthraí: litreacha beaga, uimhreacha, fleiscíní nó folínte, ag tosú le litir nó uimhir.",
     "field_key": "Eochair soláthraí",
     "field_key_desc": "Aitheantóir gearr uathúil a úsáidtear i URLanna (m.sh. coventry). Ní féidir é a athrú níos déanaí.",
     "field_display_name": "Ainm taispeána",
     "field_display_name_desc": "Taispeántar ar an gcnaipe síniú isteach, e.g. \"Sínigh isteach le Comhairle Cathrach Coventry\".",
-    "field_preset": "Preset",
-    "field_issuer_url": "Issuer URL",
     "field_issuer_url_desc": "An t-eisitheoir OIDC; ritheann an fhionnachtain in aghaidh {issuer}/.well-known/openid-configuration.",
-    "field_client_id": "Client ID",
     "field_client_secret": "Rún an chliaint",
     "secret_keep_placeholder": "Fág folamh chun an rún reatha a choinneáil",
     "secret_keep_desc": "Stóráiltear rún. Cuir isteach luach nua chun é a athsholáthar, nó fág bán é chun é a choinneáil.",
-    "field_scopes": "Scopes",
     "field_scopes_desc": "Scóipeanna OIDC spásscartha. Réamhshocrú: ríomhphost próifíle openid",
     "field_domains": "Fearainn ríomhphoist ceadaithe",
-    "field_domains_desc": "Camóg-scartha, e.g. coventry.gov.uk, sampla.org. Fág folamh chun aon fhearann ​​a cheadú.",
+    "field_domains_desc": "Camóg-scartha, e.g. coventry.gov.uk, example.org. Fág folamh chun aon fhearann ​​a cheadú.",
     "field_auto_provision": "Cuntais uathsholáthair",
     "field_auto_provision_desc": "Cruthaigh cuntas ball go huathoibríoch ar an gcéad síniú isteach. Nuair atá siad múchta, ní féidir ach le baill reatha síniú isteach le SSO.",
-    "field_enabled": "Enabled",
-    "field_enabled_desc": "Taispeáin an soláthraí seo ar na leathanaigh logáil isteach agus clárúcháin."
+    "field_enabled_desc": "Taispeáin an soláthraí seo ar na leathanaigh logáil isteach agus clárúcháin.",
+    "preset_unknown": "Réamhshocrú anaithnid",
+    "refresh": "Athnuaigh",
+    "enabled": "Cumasaíodh",
+    "disabled": "Díghníomhachtaithe",
+    "edit": "Cuir in eagar",
+    "delete": "Scrios",
+    "save": "Sábháil",
+    "cancel": "Cealaigh",
+    "page_title": "Aon-Síniú Amháin",
+    "updated_at": "Nuashonraithe {{date}}",
+    "preset_generic": "OIDC Ginearálta",
+    "test_ok": "Nasc OK",
+    "edit_provider_title": "Cuir in Eagar {{name}}",
+    "delete_confirm": "Scrios",
+    "field_preset": "Réamhshocrú",
+    "field_issuer_url": "URL an eisiúnaí",
+    "field_client_id": "Aitheantas Cliant",
+    "field_scopes": "Raonta",
+    "field_enabled": "Cumasaíodh"
   },
   "system": {
     "active": "Gníomhach",
@@ -318,7 +321,6 @@
     "cron_success_title": "Sin é!",
     "currency_aud": "AUD - Dollar na hAstráile",
     "currency_cad": "CAD - Dollar Cheanada",
-    "currency_eur": "EUR - Euro",
     "currency_gbp": "GBP - Punt na Breataine",
     "currency_jpy": "JPY - Yen na Seapáine",
     "currency_usd": "USD - Dollar SAM",
@@ -327,9 +329,6 @@
     "only_word": "amháin.",
     "platform_azure_vm": "Azure VM",
     "platform_cpanel": "cPanel",
-    "platform_docker": "Docker",
-    "platform_gcp": "GCP",
-    "platform_linux_vps": "Linux / VPS",
     "recommended": "Molta",
     "replace": "Ionadaigh",
     "test_connection": "Ceangal tástála",
@@ -340,7 +339,7 @@
     "with_absolute_project_path": "leis an gcosán iomlán chuig do thionscadal.",
     "with_actual_project_root": "le do fhréamh tionscadal iarbhír.",
     "cron_jobs_desc": "Bainistigh poist chúlra sceidealta do d'ardán",
-    "cron_jobs_title": "Cron Jobs",
+    "cron_jobs_title": "Jabanna Cron",
     "desc_apple_push_notification_service_key": "Eochair phríobháideach Seirbhís Fógra Push Apple (APNanna) le haghaidh fógraí brú iOS",
     "desc_blog_post_backups_will_appear_here_when_": "Beidh cúltacaí post blag le feiceáil anseo nuair a bheidh uathchúltaca cumasaithe",
     "desc_codes_expire_at_midnight_on_this_date_l": "Téann cóid in éag ag meán oíche ar an dáta seo. Fág folamh gan aon dul in éag.",
@@ -398,7 +397,6 @@
     "label_auto_resize": "Athraigh Méid Uathoibríoch",
     "label_auto_web_p": "WebP uathoibríoch",
     "label_contact_phone": "Teagmháil Fón",
-    "label_copy_c_u_r_l_command": "Cóipeáil CURL Ordú",
     "label_copy_code": "Cóipeáil Cód",
     "label_copy_crontab_entry": "Cóipeáil Iontráil Crontab",
     "label_copy_gcloud_command": "Cóipeáil cloud Ordú",
@@ -579,12 +577,8 @@
       "preset_applied": "Réamhshocrú Fheidhmeach",
       "preset_confirm": "An bhfuil tú cinnte gur mhaith leat an réamhshocrú seo a chur i bhfeidhm? Forscríobhfaidh sé na socruithe reatha.",
       "preset_created_options": "Réamhshocrú curtha i bhfeidhm agus roghanna cruthaithe",
-      "preset_custom": "Custom",
       "preset_england_wales": "Sasana agus an Bhreatain Bheag",
-      "preset_ireland": "Ireland",
-      "preset_northern_ireland": "Northern Ireland",
       "preset_note": "Má chuirtear réamhshocrú i bhfeidhm déanfar do shocruithe polasaí clárúcháin reatha a fhorscríobh",
-      "preset_scotland": "Scotland",
       "profile_requirements": "Riachtanais Próifíl",
       "profile_requirements_desc": "Socraigh na riachtanais phróifíle íosta a chaithfidh baill a chomhlánú",
       "require_avatar_visibility": "A cheangal ar Infheictheacht Avatar",
@@ -632,7 +626,11 @@
       "preset_united_kingdom": "An R?ocht Aontaithe",
       "n_active_few": "{{count}}gníomhach",
       "n_active_many": "{{count}}gníomhach",
-      "n_active_two": "{{count}}gníomhach"
+      "n_active_two": "{{count}}gníomhach",
+      "preset_custom": "Saincheaptha",
+      "preset_ireland": "Éire",
+      "preset_northern_ireland": "Tuaisceart Éireann",
+      "preset_scotland": "Alban"
     },
     "overdue_jobs": "Poist thar téarma",
     "page_title": "Córas",
@@ -762,14 +760,12 @@
       "require_email_desc": "Iarr ar bhaill a seoladh ríomhphoist a fhíorú roimh rochtain a fháil ar an ardán",
       "require_email_tooltip": "Ní féidir ach le sár-riarthóirí ardáin an socrú seo a athrú",
       "save_credentials": "Sábháil Dintiúir",
-      "save_policy": "Save Policy",
       "show_api_key": "Taispeáin Eochair API",
       "show_webhook": "Taispeáin Crúca Gréasáin",
       "tip_change_modes": "Tagann athrú ar an modh clárúcháin i bhfeidhm láithreach le haghaidh clárúcháin nua",
       "total_codes": "Cóid Iomlán",
       "total_codes_count": "Cóid iomlána: {{count}}",
       "unavailable": "Níl fáil air",
-      "understanding_modes": "Understanding Modes",
       "verification_settings": "Socruithe Fíoraithe",
       "verification_settings_desc": "Cumraigh ceanglais fíoraithe aitheantais le haghaidh clárúcháin ball nua",
       "waitlist_info": "Faomhann riarthóir de láimh na baill ar an liosta feithimh",
@@ -790,10 +786,11 @@
       "n_available_two": "{{count}}ar fáil",
       "total_codes_count_few": "Cóid iomlána: {{count}}",
       "total_codes_count_many": "Cóid iomlána: {{count}}",
-      "total_codes_count_two": "Cóid iomlána: {{count}}"
+      "total_codes_count_two": "Cóid iomlána: {{count}}",
+      "save_policy": "Sábháil Polasaí Clárúcháin",
+      "understanding_modes": "Ag Tuigbheáil Móidí Clárúcháin"
     },
     "registration_policy_saved_successfully": "D'éirigh le sábháil an pholasaí clárúcháin",
-    "registration_policy_settings_title": "Registration Policy Settings",
     "run_now": "Rith Anois",
     "running": "Ag rith",
     "schedule": "Sceideal",
@@ -823,16 +820,13 @@
     "label_default_currency": "airgeadra réamhshocraithe",
     "desc_default_currency": "Úsáidtear é le haghaidh síntiúis agus praghsála margaidh",
     "section_branding_legal": "Brandáil & Dlí",
-    "powered_by_branding_section": "Powered By Branding",
     "powered_by_branding_desc": "Cumraigh sliotán 'Powered By' ar thaobh na láimhe deise den bhuntásc. Tagann athruithe i bhfeidhm láithreach. Dia amháin.",
     "god_only_chip": "Dia amháin",
     "label_partner_logo_label": "Lipéad lógó comhpháirtíochta",
-    "placeholder_partner_logo_label": "Community Partner",
     "desc_partner_logo_label": "Lipéad gairid léirithe os cionn lógó an chomhpháirtí (fág bán chun an téacs réamhshocraithe 'Comhpháirtí Pobail' a úsáid)",
     "label_powered_by_label": "Téacs lipéad",
     "placeholder_powered_by_label": "Cumhachtaithe ag",
     "desc_powered_by_label": "Lipéad gairid léirithe os cionn na híomhá (fág bán chun an téacs réamhshocraithe 'Powered by' a úsáid)",
-    "label_powered_by_url": "Link URL",
     "placeholder_powered_by_url": "https://example.com",
     "desc_powered_by_url": "Is féidir an íomhá a chliceáil. Fág bán gan nasc.",
     "label_powered_by_image_light": "Íomhá mód solais",
@@ -894,9 +888,7 @@
     "advanced_custom_settings": "Ardsocruithe Saincheaptha",
     "app_configuration_heading": "Cumraíocht App",
     "auto_convert_webp": "Tiontaigh WebP go huathoibríoch",
-    "auto_convert_webp_desc": "Auto Convert WebP.",
     "auto_resize": "Athraigh Méid Uathoibríoch",
-    "auto_resize_desc": "Auto Resize.",
     "avg_completion_minutes": "Miontuairiscí Críochnaithe Meán Fómhair",
     "avg_completion_seconds": "Meán Soicind Críochnaithe",
     "blog_restore_warning": "Rabhadh Athchóirigh Blag",
@@ -912,9 +904,6 @@
     "col_provider": "Soláthraí",
     "col_time": "Am",
     "conversion_failed": "Theip ar an gcomhshó",
-    "desc_comma_separated_emails": "Comma Separated Emails.",
-    "desc_job_will_run_when_enabled": "Job Will Run When Enabled.",
-    "desc_notify_on_failure": "Notify on Failure.",
     "enable_push_notifications": "Cumasaigh Fógraí Brúigh",
     "enable_push_notifications_desc": "Cumasaigh Fógraí Brúigh.",
     "failed_to_action_verification": "Theip ar fhíorú gnímh",
@@ -922,7 +911,6 @@
     "failed_to_load_provider_health": "Theip ar lódáil sláinte an tsoláthraí",
     "failed_count": "Theip ar{{count}}",
     "generate_thumbnails": "Mionsamhlacha Gin",
-    "generate_thumbnails_desc": "Generate Thumbnails.",
     "generated_data_for": "Gineadh sonraí do {{count}} chineál sonraí roghnaithe",
     "health_check_complete": "Seiceáil Sláinte Críochnaithe",
     "health_check_failed": "Theip ar Sheiceáil Sláinte",
@@ -953,7 +941,6 @@
     "n_hours_ago": "N Uaireanta ó shin",
     "n_minutes_ago": "N Nóiméad ó shin",
     "n_sessions": "N Seisiúin",
-    "no_backups_available": "No backups available found",
     "no_failed_sessions": "Níor aimsíodh aon seisiún teipthe",
     "no_identity_providers": "Níor aimsíodh aon soláthraí aitheantais",
     "not_available_short": "N/B",
@@ -1001,16 +988,13 @@
     "services": "Seirbhísí",
     "stat_expired": "Stat in éag",
     "stat_failed": "Theip ar Stat",
-    "stat_passed": "Stat Passed",
     "stat_pending": "Stait ar Feitheamh",
     "stat_total": "Stat Iomlán",
     "strip_exif": "Stráice Exif",
-    "strip_exif_desc": "Strip Exif.",
     "success_rate_label": "Ráta Ratha",
     "system_requirements_desc": "Riachtanais Chórais.",
     "system_requirements_title": "Riachtanais Chórais",
     "tests_failed": "Theip ar na tástálacha",
-    "tooltip_api_latency": "API Latency",
     "tooltip_avg_completion": "Meánlíon Críochnaithe",
     "tooltip_last_webhook_event": "Ócáid Ghréasán Deiridh",
     "tooltip_provider_available": "Soláthraí ar Fáil",
@@ -1037,8 +1021,6 @@
     "not_writable_status": "Níl sé inscríofa",
     "search_extensions_placeholder": "Cuardaigh síntí...",
     "some_warnings_detected": "Braitheadh roinnt rabhadh",
-    "status_fail": "FAIL",
-    "status_ok": "OK",
     "writable_status": "Inscríofa",
     "action": {
       "admin_approve_group_member": "Ball Grúpa a cheadú",
@@ -1128,9 +1110,9 @@
       "vetting_record_rejected": "Taifead Grinnfhiosrúcháin Diúltaithe",
       "vetting_record_updated": "Taifead Grinnfhiosrúcháin Nuashonraithe",
       "vetting_record_verified": "Taifead Grinnfhiosrúcháin Deimhnithe",
-      "welcome_credits_issued": "Creidmheasanna Fáilte Eisithe"
+      "welcome_credits_issued": "Creidmheasanna Fáilte Eisithe",
+      "unknown": "Gníomh anaithnid"
     },
-    "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Nasc láithreán gréasáin roghnach le haghaidh lógó an chomhpháirtí sa bhuntásc.",
     "label_inactivity_timeout": "Teorainn neamhghníomhaíochta (nóiméid)",
     "desc_inactivity_timeout": "Sínigh baill amach go huathoibríoch tar éis an líon seo nóiméad gan ghníomhaíocht. Díchumasaíonn 0 an teorainn; is é 5–480 nóiméad an raon ceadaithe. Moltar: 120.",
@@ -1162,7 +1144,31 @@
       "api_unavailable": "Níl API an tseiceála sláinte ar fáil",
       "run_all": "Rith gach tástáil",
       "suites": "Sraitheanna tástála",
-      "unknown_test": "Diagnóisic: {{name}}"
+      "unknown_test": "Diagnóisic: {{name}}",
+      "tests": {
+        "api_health": "Seiceáil sláinte API",
+        "database": "Ceangal bunachar sonraí",
+        "redis": "Ceangal Redis",
+        "auth_token": "Giniúint comhartha fíordheimhnithe",
+        "tenant_bootstrap": "Túsú tionónta",
+        "file_upload": "Uaslódáil comhaid (S3 nó áitiúil)",
+        "email_service": "Seirbhís ríomhphoist",
+        "pusher": "WebSocket Pusher"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "Cruthaíodh blagphost #{{id}}: {{title}}",
+      "blog_post_updated": "Nuashonraíodh blagphost #{{id}}: {{title}}",
+      "blog_post_deleted": "Scriosadh blagphost #{{id}}: {{title}}",
+      "blog_post_status_changed": "Athraíodh stádas blagphost #{{id}} ó {{old_status}} go {{new_status}}.",
+      "blog_posts_bulk_deleted": "Blagphoist a scriosadh ar an mórchóir: {{count}}",
+      "blog_posts_bulk_published": "Blagphoist a foilsíodh ar an mórchóir: {{count}}",
+      "unknown": "Sonra gníomhaíochta: {{code}}"
+    },
+    "activity_status": {
+      "unknown": "Stádas anaithnid",
+      "draft": "dréacht",
+      "published": "foilsithe"
     },
     "generated_data_for_few": "Gineadh sonraí do {{count}} chineál sonraí roghnaithe",
     "generated_data_for_many": "Gineadh sonraí do {{count}} chineál sonraí roghnaithe",
@@ -1199,7 +1205,230 @@
     "blog_posts_restored_two": "Postálacha blag{{count}}athchóirithe ó{{filename}}",
     "available_backups_few": "Cúltaca ar Fáil ({{count}})",
     "available_backups_many": "Cúltaca ar Fáil ({{count}})",
-    "available_backups_two": "Cúltaca ar Fáil ({{count}})"
+    "available_backups_two": "Cúltaca ar Fáil ({{count}})",
+    "alert_status_healthy": "Sláintiúil",
+    "alert_status_warning": "Rabhadh",
+    "alert_status_critical": "Criticiúil",
+    "verification_level_none": "Uile",
+    "verification_level_document_only": "Doiciméad amháin",
+    "verification_level_document_selfie": "Doiciméad agus selfie",
+    "verification_level_reusable_digital_id": "Aitheantas digiteach in-athúsáidte",
+    "verification_level_manual_review": "Athbhreithniú láimhe",
+    "verification_level_unknown": "Leibhéal fíoraithe anaithnid",
+    "job_category_notifications": "Fógraí",
+    "job_category_newsletters": "Nuachtlitreacha",
+    "job_category_matching": "Ag meaitseáil",
+    "job_category_geocoding": "Geocódú",
+    "job_category_maintenance": "Cothabháil",
+    "job_category_master": "Príomh",
+    "job_category_gamification": "Cluiche",
+    "job_category_groups": "Grúpaí",
+    "job_category_security": "Slándáil",
+    "job_category_other": "Eile",
+    "job_category_unknown": "Catagóir anaithnid",
+    "cron_job_name_unknown": "Tasc sceidealta",
+    "cron_job_description_unknown": "Ritheann tasc cúlra sceidealta.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "Rithfear craoltóir máistir cron",
+        "description": "Ritheann na tascanna sceidealta cuí don am reatha. Ritheann na postanna eile go léir tríd an iontráil sceidealóra seo."
+      },
+      "process_queue": {
+        "name": "Clárlann fógra láithreach",
+        "description": "Déanann próiseáil ar fógraí instíneacha atá le seachadadh láithreach."
+      },
+      "daily_digest": {
+        "name": "Dígest laethúil",
+        "description": "Seolann ríomhphoist dígest fógra laethúil do bhaill a roghnaigh seachadadh laethúil."
+      },
+      "weekly_digest": {
+        "name": "Dígest míosúil",
+        "description": "Seolann sé an dígest fógra míosúil ar an gcéad lá de gach mí."
+      },
+      "process_newsletters": {
+        "name": "Próiseáil nuachtlitreacha sceidealta",
+        "description": "Lorgaíonn nuachtlitreacha atá le seachadadh agus tosaíonn an próiseas seolta."
+      },
+      "process_recurring": {
+        "name": "Próiseáil nuachtlitreacha athfhillteacha",
+        "description": "Próiseálann nuachtlitreacha athfhillteacha agus uathoibrithe."
+      },
+      "process_newsletter_queue": {
+        "name": "Próiseálaí cadhnraí nuachtlitreach",
+        "description": "Próiseálann sé seachadtaí nuachtlitreach i mbéilí."
+      },
+      "notify_hot_matches": {
+        "name": "Fógraí cluiche te",
+        "description": "Fógraíonn sé do bhaill faoi chluichí nua ardfhuinnimh."
+      },
+      "match_digest_daily": {
+        "name": "Achoimre laethúil ar chluichí",
+        "description": "Seolann sé moltaí laethúla cluiche do bhaill."
+      },
+      "match_digest_weekly": {
+        "name": "Achoimre seachtainiúil ar chluichí",
+        "description": "Seolann achoimre moltaí cluiche seachtainiúil."
+      },
+      "gamification_daily": {
+        "name": "Tascanna gamification laethúla",
+        "description": "Léiríonn athshocruithe sraithe, bónais laethúla, agus seiceálacha bratacha."
+      },
+      "gamification_campaigns": {
+        "name": "Próiseáil feachtas éachtaí",
+        "description": "Próiseáil feachtais éachtaí athfhillteacha."
+      },
+      "gamification_leaderboard": {
+        "name": "Grianghraf de cheannairí cláir",
+        "description": "Cruthaíonn sé splancscáileanna ceannlínne laethúla agus críochnaíonn sé séasúir."
+      },
+      "gamification_challenges": {
+        "name": "Seiceáil fad saoil dúshláin",
+        "description": "Éilíonn sé dúshláin chríochnaithe agus nuashonraíonn sé a stádas."
+      },
+      "gamification_weekly_digest": {
+        "name": "Digistail gamification míosúil",
+        "description": "Seolann sé ríomhphoist digistail dul chun cinn míosúil do bhaill."
+      },
+      "gamification_streaks": {
+        "name": "Féilte luaíochta cluichí",
+        "description": "Seiceálann agus bronnann sé féilte ball"
+      },
+      "gamification_cleanup": {
+        "name": "Glanadh luaíochta cluichí",
+        "description": "Baintear fógraí taithí sean, bronnta feachtais, agus sonraí anailíseacha."
+      },
+      "update_featured_groups": {
+        "name": "Nuashonraigh grúpaí ábhartha",
+        "description": "Nuashonraíodh grúpaí le feiceáil ag úsáid na rialacha rátála."
+      },
+      "group_weekly_digest": {
+        "name": "Achoimrí grúpa míosúla",
+        "description": "Seolann ríomhphoist achoimrí anailíse míosúla chuig úinéirí grúpa."
+      },
+      "abuse_detection": {
+        "name": "Braite mí-úsáide",
+        "description": "Scanann sé idirbheart féideartha patróin mí-úsáide."
+      },
+      "abuse_daily_report": {
+        "name": "Tuarascáil mí-úsáide laethúil",
+        "description": "Seolann sé tuarascáil laethúil ar bhrath mí-úsáide chuig na riarthóirí."
+      },
+      "abuse_cleanup": {
+        "name": "Glanadh foláirimh mí-úsáide",
+        "description": "Cartlannaithear sean-fholáirimh agus diúltaítear míreanna íseal-thromchúiseacha go huathoibríoch."
+      },
+      "verification_reminders": {
+        "name": "Cuimhnithe fíoraithe",
+        "description": "Cuireann sé i gcuimhne do bhaill faoi fhíoruithe aitheantais nach bhfuil críochnaithe."
+      },
+      "expire_verifications": {
+        "name": "Déan deimhniúcháin tréigthe a éag",
+        "description": "Éagann seisiúin deimhniúcháin a dtréig siad níos mó ná 72 uair an chloig."
+      },
+      "purge_verification_sessions": {
+        "name": "Scrios sonraí deimhniúcháin sean",
+        "description": "Scriosann seisiúin deimhniúcháin críochnaithe agus tréigthe tar éis 180 lá."
+      },
+      "volunteer_pre_shift": {
+        "name": "Meabhrúcháin tosaigh do dheonaithe",
+        "description": "Seolann meabhrúcháin roimh aistrithe deonach."
+      },
+      "volunteer_post_shift": {
+        "name": "Aiseolas deonach tar éis an aistrithe",
+        "description": "Iarrann aiseolas tar éis aistrithe deonach a chríochnaíodh."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "Moltóireacht deonach caillte",
+        "description": "Moltaíonn sé do dhéantóirí nach raibh gníomhach le déanaí."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "Éadáil creidmheasa deonaithe",
+        "description": "Rabhraíonn sé le deontóirí faoi chreidmheasa agus faoi oiliúint a mbeidh deireadh leo go luath."
+      },
+      "recurring_shifts": {
+        "name": "Gineadh aistrithe athfhillteacha",
+        "description": "Cruthaíonn sé aistrithe deonaithe atá le teacht ó thíleanna athfhillteacha."
+      },
+      "volunteer_expire_consents": {
+        "name": "Críochnaigh ceaduithe na gcustaiméirí",
+        "description": "Scrios taifid ceadúnas caomhnóra tar éis a dáta éaga."
+      },
+      "cleanup": {
+        "name": "Glanadh córais",
+        "description": "Baintear táscairí atá imithe in éag, iontrálacha sean-sraith, táscairí API, agus sonraí rianaithe."
+      },
+      "geocode_batch": {
+        "name": "Geocódú asraith",
+        "description": "Geocódálann comhaltaí agus liostaí nach bhfuil comhordáin acu."
+      },
+      "event_reminders": {
+        "name": "Cuimhneacháin imeachtaí",
+        "description": "Seolann cuimhneacháin sula dtagann imeachtaí amach."
+      },
+      "inactive_members": {
+        "name": "Braite bhall neamhghníomhach",
+        "description": "Aimníonn agus déanann sé baill neamhghníomhacha a mharcáil le haghaidh leantach."
+      },
+      "listing_expiry": {
+        "name": "Próiseáil éaga liostaí",
+        "description": "Éagann liostaí tar éis a dáta éaga."
+      },
+      "listing_expiry_reminders": {
+        "name": "Ag cur i gcuimhne faoina n-uirlisí liosta",
+        "description": "Rabhraíonn siad le húinéirí liostaí sula n-imeoidh liosta."
+      },
+      "job_expiry": {
+        "name": "Éagtha folúntais",
+        "description": "Éilíonn sé go mbeidh folúntais poist dodhéanta tar éis a n-dáta dúnadh."
+      },
+      "federation_weekly_digest": {
+        "name": "Dígest fáilteachais mhíosúil",
+        "description": "Seolann achoimre ar ghníomhaíocht an fhederáide chuig pobal páirteach."
+      },
+      "balance_alerts": {
+        "name": "Fógraí cothromaíochta",
+        "description": "Seiceálann cistí sparán na heagraíochta agus seolann fógraí faoin gcothrom íseal."
+      },
+      "goal_reminders": {
+        "name": "Meabhrúcháin spriocanna",
+        "description": "Seolann meabhrúcháin don spriocanna atá le déanamh nó atá taobh thiar den sceideal."
+      },
+      "retry_failed_webhooks": {
+        "name": "Athbhainiste webhooks a theip orthu",
+        "description": "Athbhainisteann sé seachadtaí webhook a theip orthu roimhe seo."
+      },
+      "digest_emails": {
+        "name": "Seoltóir digheasta ríomhphoist"
+      },
+      "badge_checker": {
+        "name": "Seiceálaí gradam bratach"
+      },
+      "streak_updater": {
+        "name": "Nuashonraíodh sraith logála isteach"
+      }
+    },
+    "partner_logo_link_url": "URL Nasc Lógó Comhpháirtí",
+    "registration_policy_settings_title": "Clárú & Fíorú Aitheantais",
+    "auto_convert_webp_desc": "Cruthaigh leaganacha WebP de na híosluchtaí tacaithe le haghaidh íosluchtaí íomhá níos lú.",
+    "auto_resize_desc": "Athmhéadaigh íomhánna a sháraíonn na toisí uasta cumraithe.",
+    "desc_comma_separated_emails": "Cuir isteach seoladh ríomhphoist amháin nó níos mó, scartha le camóga.",
+    "desc_job_will_run_when_enabled": "Rithfidh an t- post seo ar a sceideal cumraithe nuair a bheidh sé cumasaithe.",
+    "desc_notify_on_failure": "Seol fógra ríomhphoist nuair a theipeann ar an bpost seo.",
+    "generate_thumbnails_desc": "Gineann éagsúlachtaí beaga de thumbliní do liostaí, próifílí, agus cártaí.",
+    "no_backups_available": "Níl aon cúltacaí ar fáil",
+    "strip_exif_desc": "Bain sonraí EXIF ó íomhánna a uaslódáladh roimh stóráil.",
+    "status_fail": "FAILTE",
+    "status_ok": "OK",
+    "placeholder_partner_logo_label": "Comhpháirtí Pobal",
+    "label_powered_by_url": "Nasc URL",
+    "label_copy_c_u_r_l_command": "Cóipeáil cURL Ordú",
+    "platform_gcp": "GCP",
+    "currency_eur": "EUR - Euro",
+    "platform_docker": "Docker",
+    "platform_linux_vps": "Linux / VPS",
+    "stat_passed": "Stait Pasáilte",
+    "tooltip_api_latency": "API Luasghaoithe",
+    "powered_by_branding_section": "Brandaíochta a chumhachtar ag"
   },
   "verification": {
     "approve": "Cheadaigh",
@@ -1273,7 +1502,20 @@
     "n_pending_two": "{{count}} ar feitheamh",
     "total_events_few": "Imeachtaí {{count}}",
     "total_events_many": "Imeachtaí {{count}}",
-    "total_events_two": "Imeachtaí {{count}}"
+    "total_events_two": "Imeachtaí {{count}}",
+    "provider_mock": "Soláthraí samhlaithe",
+    "provider_stripe_identity": "Aitheantas Stripe",
+    "provider_idenfy": "iDenfy",
+    "provider_unknown": "Soláthraí anaithnid",
+    "actor_type_system": "Córas",
+    "actor_type_user": "Úsáideoir",
+    "actor_type_admin": "Riarthóir",
+    "actor_type_webhook": "Webhook",
+    "actor_type_unknown": "Aisteoir anaithnid",
+    "status_unknown": "Stádas anaithnid",
+    "provider_veriff": "Veriff",
+    "provider_jumio": "Jumio",
+    "provider_onfido": "Onfido"
   },
   "cancel": "Cealaigh"
 }

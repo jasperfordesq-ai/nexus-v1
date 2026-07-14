@@ -102,7 +102,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         setReason('');
         onGranted();
       } else {
-        toast.error(res?.error || t('timebanking.failed_to_grant_credits'));
+        toast.error(t('timebanking.failed_to_grant_credits'));
       }
     } catch {
       toast.error(t('timebanking.an_unexpected_error_occurred'));

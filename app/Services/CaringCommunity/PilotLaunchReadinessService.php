@@ -68,7 +68,7 @@ class PilotLaunchReadinessService
      *
      * @return array{
      *   generated_at: string,
-     *   overall: array{status: string, ready_section_count: int, total_section_count: int, summary: string},
+     *   overall: array{status: string, ready_section_count: int, total_section_count: int, summary_code: string, summary_params: array<string, int>},
      *   sections: list<array<string, mixed>>,
      *   isolated_node_required: bool,
      * }
@@ -111,7 +111,6 @@ class PilotLaunchReadinessService
                 $canLaunch = false;
                 $blockers[] = [
                     'key'    => $key,
-                    'label'  => (string) ($section['label'] ?? ''),
                     'status' => $status,
                 ];
             }
@@ -245,9 +244,10 @@ class PilotLaunchReadinessService
         if (!$isCustomised) {
             return [
                 'key'           => 'disclosure_pack',
-                'label'         => 'AG80 — FADP/nDSG disclosure pack',
+                'label_code'    => 'disclosure_pack',
                 'status'        => self::STATUS_NOT_STARTED,
-                'summary'       => 'Pack still on platform defaults; no controller named.',
+                'summary_code'  => 'disclosure_pack.not_started',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/disclosure-pack',
                 'last_updated_at' => $pack['last_updated_at'] ?? null,
                 'missing'       => $missing,
@@ -257,9 +257,10 @@ class PilotLaunchReadinessService
         if ($missing !== []) {
             return [
                 'key'           => 'disclosure_pack',
-                'label'         => 'AG80 — FADP/nDSG disclosure pack',
+                'label_code'    => 'disclosure_pack',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => 'Controller / DPO / incident contact still incomplete.',
+                'summary_code'  => 'disclosure_pack.needs_review',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/disclosure-pack',
                 'last_updated_at' => $pack['last_updated_at'] ?? null,
                 'missing'       => $missing,
@@ -268,9 +269,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'disclosure_pack',
-            'label'         => 'AG80 — FADP/nDSG disclosure pack',
+            'label_code'    => 'disclosure_pack',
             'status'        => self::STATUS_READY,
-            'summary'       => 'Controller, DPO, and incident contact captured.',
+            'summary_code'  => 'disclosure_pack.ready',
+            'summary_params'=> [],
             'admin_path'    => '/admin/caring-community/disclosure-pack',
             'last_updated_at' => $pack['last_updated_at'] ?? null,
             'missing'       => [],
@@ -296,9 +298,10 @@ class PilotLaunchReadinessService
         if ($lastUpdated === null) {
             return [
                 'key'           => 'operating_policy',
-                'label'         => 'AG81 — KISS operating policy',
+                'label_code'    => 'operating_policy',
                 'status'        => self::STATUS_NOT_STARTED,
-                'summary'       => 'Policy still on platform defaults — schedule the workshop.',
+                'summary_code'  => 'operating_policy.not_started',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/operating-policy',
                 'last_updated_at' => null,
                 'missing'       => array_merge(['workshop_not_run'], $missing),
@@ -308,9 +311,10 @@ class PilotLaunchReadinessService
         if ($missing !== []) {
             return [
                 'key'           => 'operating_policy',
-                'label'         => 'AG81 — KISS operating policy',
+                'label_code'    => 'operating_policy',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => 'Workshop run, but appendix URL or safeguarding owner missing.',
+                'summary_code'  => 'operating_policy.needs_review',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/operating-policy',
                 'last_updated_at' => $lastUpdated,
                 'missing'       => $missing,
@@ -319,9 +323,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'operating_policy',
-            'label'         => 'AG81 — KISS operating policy',
+            'label_code'    => 'operating_policy',
             'status'        => self::STATUS_READY,
-            'summary'       => 'Policy workshop complete; appendix linked and safeguarding owner assigned.',
+            'summary_code'  => 'operating_policy.ready',
+            'summary_params'=> [],
             'admin_path'    => '/admin/caring-community/operating-policy',
             'last_updated_at' => $lastUpdated,
             'missing'       => [],
@@ -343,9 +348,10 @@ class PilotLaunchReadinessService
         if (!$acknowledged && $overrides === 0) {
             return [
                 'key'           => 'commercial_boundary',
-                'label'         => 'AG82 — Commercial boundary map',
+                'label_code'    => 'commercial_boundary',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => 'Default classifications in effect; admin has not acknowledged the matrix.',
+                'summary_code'  => 'commercial_boundary.needs_review',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/commercial-boundary',
                 'last_updated_at' => $lastUpdated,
                 'missing'       => ['acknowledgement'],
@@ -354,11 +360,12 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'commercial_boundary',
-            'label'         => 'AG82 — Commercial boundary map',
+            'label_code'    => 'commercial_boundary',
             'status'        => self::STATUS_READY,
-            'summary'       => $overrides > 0
-                ? "{$overrides} override(s) applied; matrix reviewed."
-                : 'Default matrix acknowledged.',
+            'summary_code'  => $overrides > 0
+                ? 'commercial_boundary.ready_with_overrides'
+                : 'commercial_boundary.ready_default',
+            'summary_params'=> ['count' => $overrides],
             'admin_path'    => '/admin/caring-community/commercial-boundary',
             'last_updated_at' => $lastUpdated,
             'missing'       => [],
@@ -376,9 +383,10 @@ class PilotLaunchReadinessService
         if (!$prePilot) {
             return [
                 'key'           => 'pilot_scoreboard',
-                'label'         => 'AG83 — Pilot scoreboard baseline',
+                'label_code'    => 'pilot_scoreboard',
                 'status'        => self::STATUS_NOT_STARTED,
-                'summary'       => 'No pre-pilot baseline captured — without it, no before/after comparison is possible.',
+                'summary_code'  => 'pilot_scoreboard.not_started',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/pilot-scoreboard',
                 'last_updated_at' => null,
                 'missing'       => ['pre_pilot_baseline'],
@@ -388,9 +396,10 @@ class PilotLaunchReadinessService
         if ($isOverdue) {
             return [
                 'key'           => 'pilot_scoreboard',
-                'label'         => 'AG83 — Pilot scoreboard baseline',
+                'label_code'    => 'pilot_scoreboard',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => 'Pre-pilot baseline captured; quarterly review is overdue.',
+                'summary_code'  => 'pilot_scoreboard.needs_review',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/pilot-scoreboard',
                 'last_updated_at' => $prePilot['captured_at'] ?? null,
                 'missing'       => ['quarterly_review'],
@@ -400,9 +409,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'pilot_scoreboard',
-            'label'         => 'AG83 — Pilot scoreboard baseline',
+            'label_code'    => 'pilot_scoreboard',
             'status'        => self::STATUS_READY,
-            'summary'       => 'Pre-pilot baseline captured; quarterly cadence on track.',
+            'summary_code'  => 'pilot_scoreboard.ready',
+            'summary_params'=> [],
             'admin_path'    => '/admin/caring-community/pilot-scoreboard',
             'last_updated_at' => $prePilot['captured_at'] ?? null,
             'missing'       => [],
@@ -420,9 +430,10 @@ class PilotLaunchReadinessService
         if ($danger > 0) {
             return [
                 'key'           => 'data_quality',
-                'label'         => 'AG84 — Tenant data quality',
+                'label_code'    => 'data_quality',
                 'status'        => self::STATUS_BLOCKED,
-                'summary'       => "{$danger} blocking issue(s) — duplicate accounts or seed users still present.",
+                'summary_code'  => 'data_quality.blocked',
+                'summary_params'=> ['count' => $danger],
                 'admin_path'    => '/admin/caring-community/data-quality',
                 'last_updated_at' => $report['generated_at'] ?? null,
                 'missing'       => ['danger_checks'],
@@ -433,9 +444,10 @@ class PilotLaunchReadinessService
         if ($warning > 0) {
             return [
                 'key'           => 'data_quality',
-                'label'         => 'AG84 — Tenant data quality',
+                'label_code'    => 'data_quality',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => "{$warning} warning(s) — review before launch.",
+                'summary_code'  => 'data_quality.needs_review',
+                'summary_params'=> ['count' => $warning],
                 'admin_path'    => '/admin/caring-community/data-quality',
                 'last_updated_at' => $report['generated_at'] ?? null,
                 'missing'       => ['warning_checks'],
@@ -445,9 +457,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'data_quality',
-            'label'         => 'AG84 — Tenant data quality',
+            'label_code'    => 'data_quality',
             'status'        => self::STATUS_READY,
-            'summary'       => 'All checks pass — data is ready for real residents.',
+            'summary_code'  => 'data_quality.ready',
+            'summary_params'=> [],
             'admin_path'    => '/admin/caring-community/data-quality',
             'last_updated_at' => $report['generated_at'] ?? null,
             'missing'       => [],
@@ -468,11 +481,12 @@ class PilotLaunchReadinessService
             // gate to be closed before launching, so it stays informational.
             return [
                 'key'           => 'isolated_node',
-                'label'         => 'AG85 — Isolated-node decision gate',
+                'label_code'    => 'isolated_node',
                 'status'        => $closed ? self::STATUS_READY : self::STATUS_NOT_STARTED,
-                'summary'       => $closed
-                    ? 'Gate closed (informational — deployment is hosted).'
-                    : 'Not required for hosted deployments — gate is informational.',
+                'summary_code'  => $closed
+                    ? 'isolated_node.hosted_closed'
+                    : 'isolated_node.hosted_informational',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/isolated-node',
                 'last_updated_at' => $node['last_updated_at'] ?? null,
                 'missing'       => [],
@@ -489,9 +503,10 @@ class PilotLaunchReadinessService
         if ($blockers !== []) {
             return [
                 'key'           => 'isolated_node',
-                'label'         => 'AG85 — Isolated-node decision gate',
+                'label_code'    => 'isolated_node',
                 'status'        => self::STATUS_BLOCKED,
-                'summary'       => count($blockers) . ' blocked decision(s) — canton deployment cannot launch.',
+                'summary_code'  => 'isolated_node.blocked',
+                'summary_params'=> ['count' => count($blockers)],
                 'admin_path'    => '/admin/caring-community/isolated-node',
                 'last_updated_at' => $node['last_updated_at'] ?? null,
                 'missing'       => $blockers,
@@ -508,9 +523,10 @@ class PilotLaunchReadinessService
         if (!$closed) {
             return [
                 'key'           => 'isolated_node',
-                'label'         => 'AG85 — Isolated-node decision gate',
+                'label_code'    => 'isolated_node',
                 'status'        => self::STATUS_NEEDS_REVIEW,
-                'summary'       => "{$decided} of {$total} decisions made — canton deployment requires all decided.",
+                'summary_code'  => 'isolated_node.needs_review',
+                'summary_params'=> ['decided' => $decided, 'total' => $total],
                 'admin_path'    => '/admin/caring-community/isolated-node',
                 'last_updated_at' => $node['last_updated_at'] ?? null,
                 'missing'       => ['undecided_items'],
@@ -526,9 +542,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'isolated_node',
-            'label'         => 'AG85 — Isolated-node decision gate',
+            'label_code'    => 'isolated_node',
             'status'        => self::STATUS_READY,
-            'summary'       => 'Every gate decision recorded — canton deployment ready.',
+            'summary_code'  => 'isolated_node.ready',
+            'summary_params'=> [],
             'admin_path'    => '/admin/caring-community/isolated-node',
             'last_updated_at' => $node['last_updated_at'] ?? null,
             'missing'       => [],
@@ -561,9 +578,10 @@ class PilotLaunchReadinessService
         if ($totalCount === 0) {
             return [
                 'key'           => 'external_integrations',
-                'label'         => 'AG87 — External integration backlog',
+                'label_code'    => 'external_integrations',
                 'status'        => self::STATUS_NOT_STARTED,
-                'summary'       => 'Backlog empty — seed defaults or confirm no partner integrations are needed.',
+                'summary_code'  => 'external_integrations.not_started',
+                'summary_params'=> [],
                 'admin_path'    => '/admin/caring-community/external-integrations',
                 'last_updated_at' => $lastUpdated,
                 'missing'       => ['backlog_empty'],
@@ -578,9 +596,10 @@ class PilotLaunchReadinessService
         if ($blockedCount > 0) {
             return [
                 'key'           => 'external_integrations',
-                'label'         => 'AG87 — External integration backlog',
+                'label_code'    => 'external_integrations',
                 'status'        => self::STATUS_BLOCKED,
-                'summary'       => "{$blockedCount} integration(s) blocked — partner-dependent features cannot ship.",
+                'summary_code'  => 'external_integrations.blocked',
+                'summary_params'=> ['count' => $blockedCount],
                 'admin_path'    => '/admin/caring-community/external-integrations',
                 'last_updated_at' => $lastUpdated,
                 'missing'       => ['blocked_integrations'],
@@ -594,9 +613,10 @@ class PilotLaunchReadinessService
 
         return [
             'key'           => 'external_integrations',
-            'label'         => 'AG87 — External integration backlog',
+            'label_code'    => 'external_integrations',
             'status'        => self::STATUS_READY,
-            'summary'       => "{$totalCount} item(s) tracked, none blocked.",
+            'summary_code'  => 'external_integrations.ready',
+            'summary_params'=> ['count' => $totalCount],
             'admin_path'    => '/admin/caring-community/external-integrations',
             'last_updated_at' => $lastUpdated,
             'missing'       => [],
@@ -673,7 +693,7 @@ class PilotLaunchReadinessService
 
     /**
      * @param list<array<string, mixed>> $sections
-     * @return array{status: string, ready_section_count: int, total_section_count: int, summary: string}
+     * @return array{status: string, ready_section_count: int, total_section_count: int, summary_code: string, summary_params: array<string, int>}
      */
     private function computeOverallStatus(array $sections): array
     {
@@ -696,7 +716,8 @@ class PilotLaunchReadinessService
                 'status'              => self::STATUS_BLOCKED,
                 'ready_section_count' => $readyCount,
                 'total_section_count' => $total,
-                'summary'             => 'One or more sections are blocked — pilot launch is not safe.',
+                'summary_code'        => 'blocked',
+                'summary_params'      => [],
             ];
         }
 
@@ -705,7 +726,8 @@ class PilotLaunchReadinessService
                 'status'              => self::STATUS_READY,
                 'ready_section_count' => $readyCount,
                 'total_section_count' => $total,
-                'summary'             => 'All sections ready — pilot launch may proceed.',
+                'summary_code'        => 'ready',
+                'summary_params'      => [],
             ];
         }
 
@@ -714,7 +736,8 @@ class PilotLaunchReadinessService
                 'status'              => self::STATUS_NEEDS_REVIEW,
                 'ready_section_count' => $readyCount,
                 'total_section_count' => $total,
-                'summary'             => "{$readyCount} of {$total} ready — coordinator review needed before launch.",
+                'summary_code'        => 'needs_review',
+                'summary_params'      => ['ready' => $readyCount, 'total' => $total],
             ];
         }
 
@@ -723,7 +746,8 @@ class PilotLaunchReadinessService
                 'status'              => self::STATUS_NOT_STARTED,
                 'ready_section_count' => $readyCount,
                 'total_section_count' => $total,
-                'summary'             => "{$readyCount} of {$total} ready — pilot evaluation has not been run end to end.",
+                'summary_code'        => 'not_started',
+                'summary_params'      => ['ready' => $readyCount, 'total' => $total],
             ];
         }
 
@@ -731,7 +755,8 @@ class PilotLaunchReadinessService
             'status'              => self::STATUS_NEEDS_REVIEW,
             'ready_section_count' => $readyCount,
             'total_section_count' => $total,
-            'summary'             => "{$readyCount} of {$total} ready.",
+            'summary_code'        => 'fallback',
+            'summary_params'      => ['ready' => $readyCount, 'total' => $total],
         ];
     }
 }

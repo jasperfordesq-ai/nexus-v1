@@ -120,13 +120,21 @@ class AiModuleDocsService
      */
     public function listForTenant(int $tenantId): array
     {
+        $defaults = self::defaultSeed();
+
         return DB::table('ai_module_docs')
             ->where('tenant_id', $tenantId)
             ->orderBy('module_slug')
             ->get(['id', 'module_slug', 'title', 'body', 'keywords', 'is_active', 'updated_at'])
-            ->map(function ($row) {
+            ->map(function ($row) use ($defaults) {
                 $row->keywords = $this->decodeKeywords($row->keywords);
                 $row->is_active = (bool) $row->is_active;
+                $slug = (string) $row->module_slug;
+                $default = $defaults[$slug] ?? null;
+                $row->default_title_code = is_array($default)
+                    && hash_equals((string) ($default['title'] ?? ''), (string) $row->title)
+                        ? $slug
+                        : null;
                 return $row;
             })
             ->all();

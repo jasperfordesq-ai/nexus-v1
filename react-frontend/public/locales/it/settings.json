@@ -595,7 +595,7 @@
     "modal_title": "Aggiungi account collegato",
     "modal_description": "Inserisci l'indirizzo email della persona che vuoi collegare. Riceverà una notifica per approvare la richiesta.",
     "email_label": "Indirizzo email",
-    "email_placeholder": "figlio@esempio.it",
+    "email_placeholder": "child@example.com",
     "name_label": "Nome (facoltativo)",
     "name_placeholder": "Nome visualizzato",
     "cancel": "Annulla",

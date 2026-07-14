@@ -188,7 +188,8 @@
     "opportunity_count_one": "{{count}} の機会",
     "opportunity_count_other": "{{count}} の機会",
     "loading": "組織を読み込んでいます",
-    "volunteer_count_other": "{{count}} ボランティア"
+    "volunteer_count_other": "{{count}} ボランティア",
+    "volunteer_count_one": "{{count}} 自発的に参加する"
   },
   "organisation_detail": {
     "page_title": "組織",
@@ -235,7 +236,8 @@
     "rating_required": "送信する前に評価を選択してください。",
     "meta_description_fallback_one": "このコミュニティ タイムバンクで {{name}} と {{count}} のアクティブなボランティアの機会を探してください。",
     "meta_description_fallback_other": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。",
-    "review_count_other": "{{count}} のレビュー"
+    "review_count_other": "{{count}} のレビュー",
+    "review_count_one": "{{count}} レビューする"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",

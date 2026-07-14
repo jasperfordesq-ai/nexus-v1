@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "performance": {
     "label_performance_metrics": "パフォーマンス指標",
@@ -83,19 +83,20 @@
     "label_n_plus_one_warnings": "Nプラスワンの警告",
     "label_slow_queries": "遅いクエリ",
     "label_total_requests": "総リクエスト数",
-    "n_plus_one_body": "N Plus One Body",
     "n_plus_one_title": "エヌプラスワン",
     "no_memory_spikes": "メモリスパイクは見つかりませんでした",
     "no_slow_queries": "遅いクエリは見つかりませんでした",
     "no_slow_requests": "遅いリクエストは見つかりませんでした",
     "no_volume_data": "ボリュームデータが見つかりません",
-    "page_description": "Page.",
     "peak_memory": "ピークメモリ",
     "query_count": "クエリ数",
     "refresh": "リフレッシュ",
     "tab_memory_spikes": "メモリスパイク",
     "tab_request_volume": "リクエスト量",
     "tab_slow_queries": "遅いクエリ",
-    "tab_slow_requests": "遅いリクエスト"
+    "tab_slow_requests": "遅いリクエスト",
+    "warning_unknown": "パフォーマンス警告",
+    "n_plus_one_body": "潜在的なN+1クエリパターンが検出されました。遅いリクエストとリレーションシップの繰り返し読み込みの詳細を確認してください。",
+    "page_description": "選択した期間のデータベース、リクエスト、およびメモリのパフォーマンス指標。"
   }
 }

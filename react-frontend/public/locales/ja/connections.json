@@ -38,5 +38,6 @@
     "title": "つながり"
   },
   "loading": "接続を読み込み中...",
-  "pending_count_other": "{{count}} 保留中"
+  "pending_count_other": "{{count}} 保留中",
+  "pending_count_one": "{{count}} 保留中"
 }

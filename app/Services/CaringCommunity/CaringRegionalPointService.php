@@ -22,7 +22,7 @@ class CaringRegionalPointService
 
     private const DEFAULTS = [
         'enabled' => false,
-        'label' => 'Regional Points',
+        'label' => '',
         'symbol' => 'pts',
         'auto_issue_enabled' => false,
         'points_per_approved_hour' => 0,
@@ -53,7 +53,7 @@ class CaringRegionalPointService
     public function getConfig(int $tenantId): array
     {
         if (!Schema::hasTable('tenant_settings')) {
-            return self::DEFAULTS;
+            return $this->withDisplayMetadata(self::DEFAULTS);
         }
 
         $rows = DB::table('tenant_settings')
@@ -73,21 +73,22 @@ class CaringRegionalPointService
             }
         }
 
-        return $this->normaliseConfig($config);
+        return $this->withDisplayMetadata($this->normaliseConfig($config));
     }
 
     public function updateConfig(int $tenantId, array $input): array
     {
         $config = $this->normaliseConfig(array_merge(
-            $this->getConfig($tenantId),
+            array_intersect_key($this->getConfig($tenantId), self::DEFAULTS),
             array_intersect_key($input, self::DEFAULTS)
         ));
 
         if (!Schema::hasTable('tenant_settings')) {
-            return $config;
+            return $this->withDisplayMetadata($config);
         }
 
-        foreach ($config as $key => $value) {
+        foreach (self::DEFAULTS as $key => $_default) {
+            $value = $config[$key];
             DB::table('tenant_settings')->updateOrInsert(
                 ['tenant_id' => $tenantId, 'setting_key' => self::PREFIX . $key],
                 [
@@ -820,6 +821,7 @@ class CaringRegionalPointService
 
         return [
             'label' => $config['label'],
+            'label_code' => $config['label_code'],
             'symbol' => $config['symbol'],
             'member_transfers_enabled' => $config['member_transfers_enabled'],
             'marketplace_redemption_enabled' => $config['marketplace_redemption_enabled'],
@@ -1044,7 +1046,7 @@ class CaringRegionalPointService
     private function normaliseConfig(array $config): array
     {
         $config['enabled'] = (bool) $config['enabled'];
-        $config['label'] = trim((string) $config['label']) !== '' ? mb_substr(trim((string) $config['label']), 0, 80) : self::DEFAULTS['label'];
+        $config['label'] = trim((string) $config['label']) !== '' ? mb_substr(trim((string) $config['label']), 0, 80) : '';
         $config['symbol'] = trim((string) $config['symbol']) !== '' ? mb_substr(trim((string) $config['symbol']), 0, 12) : self::DEFAULTS['symbol'];
         $config['auto_issue_enabled'] = (bool) $config['auto_issue_enabled'];
         $config['points_per_approved_hour'] = max(0.0, min(10000.0, round((float) $config['points_per_approved_hour'], 2)));
@@ -1056,6 +1058,13 @@ class CaringRegionalPointService
             $config['member_transfers_enabled'] = false;
             $config['marketplace_redemption_enabled'] = false;
         }
+
+        return $config;
+    }
+
+    private function withDisplayMetadata(array $config): array
+    {
+        $config['label_code'] = $config['label'] === '' ? 'default' : null;
 
         return $config;
     }

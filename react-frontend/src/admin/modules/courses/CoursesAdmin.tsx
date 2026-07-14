@@ -112,7 +112,11 @@ export default function CoursesAdmin() {
     if (c.moderation_status === 'rejected') {
       return <Chip size="sm" color="danger" variant="soft">{t('admin.reject')}</Chip>;
     }
-    return <Chip size="sm" variant="soft">{c.status}</Chip>;
+    return (
+      <Chip size="sm" variant="soft">
+        {t(`instructor.${c.status}`, { defaultValue: t('admin.status_unknown') })}
+      </Chip>
+    );
   };
 
   const stats: Array<{ label: string; value: number }> = analytics ? [

@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "jobs": {
     "add_edit_notes": "Notizen hinzufügen/bearbeiten",
@@ -102,7 +102,6 @@
     "hide_notes": "Notizen ausblenden",
     "internal_notes": "Interne Notizen",
     "cv_label": "CV",
-    "interview_label": "Interview",
     "offer_label": "Angebot",
     "job_deleted": "Auftrag gelöscht",
     "jobs_count": "{{count}}-Jobs",
@@ -118,7 +117,6 @@
     "notes_placeholder": "Fügen Sie interne Notizen zu dieser Anwendung hinzu...",
     "now_featured": "{{title}}wird jetzt vorgestellt",
     "page_description": "Verwalten Sie Stellenangebote und Bewerbungen",
-    "page_title": "Jobs",
     "panels_aria": "Panels mit Stellenangeboten",
     "refresh": "Aktualisieren",
     "removed_featured": "{{title}}wurde aus der Liste entfernt",
@@ -143,7 +141,6 @@
     "pipeline_title": "Einstellungspipeline",
     "pipeline_description": "Verfolgen Sie Vorstellungsgespräche und Angebote für alle Bewerbungen",
     "pipeline_tabs": "Pipeline-Registerkarten",
-    "pipeline_interviews": "Interviews",
     "pipeline_offers": "Angebote",
     "pipeline_filter_status": "Nach Status filtern",
     "pipeline_all": "Alle",
@@ -230,7 +227,6 @@
     "stage_screening": "Vorführung",
     "stage_reviewed": "Bewertet",
     "stage_shortlisted": "In die engere Wahl gezogen",
-    "stage_interview": "Interview",
     "stage_offer": "Angebot",
     "stage_accepted": "Akzeptiert",
     "stage_rejected": "Abgelehnt",
@@ -260,7 +256,14 @@
     "stat_pending_offers_one": "{{count}}ausstehende Angebote",
     "stat_pending_offers_other": "{{count}}ausstehende Angebote",
     "pipeline_minutes_one": "{{count}}min",
-    "pipeline_minutes_other": "{{count}}min"
+    "pipeline_minutes_other": "{{count}}min",
+    "stage_unknown": "Andere Stufe",
+    "type_unknown": "Andere Art von Job",
+    "category_value": "{{category}}",
+    "interview_label": "Interview",
+    "page_title": "Jobs",
+    "pipeline_interviews": "Interviews",
+    "stage_interview": "Interview"
   },
   "moderation": {
     "action_failed": "Fehlgeschlagen",
@@ -285,7 +288,6 @@
     "col_description": "Beschreibung",
     "col_rating": "Bewertung",
     "col_reason": "Grund",
-    "col_reporter": "Reporter",
     "col_reviewee": "Rezensent",
     "col_reviewer": "Rezensent",
     "col_status": "Status",
@@ -479,7 +481,8 @@
     "load_error": "Die Moderationswarteschlange konnte nicht geladen werden.",
     "pagination_label": "Paginierung der Moderationswarteschlange",
     "user_fallback": "Unbekannter Benutzer",
-    "rating_aria": "{{n}} von 5 Sternen"
+    "rating_aria": "{{n}} von 5 Sternen",
+    "col_reporter": "Reporter"
   },
   "something_wrong": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
   "spam": {

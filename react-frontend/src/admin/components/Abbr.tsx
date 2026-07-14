@@ -6,28 +6,29 @@
 /**
  * Admin-only abbreviation tooltip component.
  * Renders with a dotted underline and a HeroUI Tooltip showing the full definition.
- * Admin panel is English-only — no i18n.
+ * Definitions are resolved from the active admin locale.
  */
 
 
 
-export const ABBR_TERMS: Record<string, string> = {
-  CHF: 'Swiss Franc — the currency used for formal-care cost-offset calculations in Caring Community deployments',
-  FADP: 'Federal Act on Data Protection — revised Swiss data protection law (in force since Sep 2023)',
-  nDSG: 'neues Datenschutzgesetz — the revised Swiss Federal Data Protection Act (synonym for FADP)',
-  DSG: 'Datenschutzgesetz — see nDSG / FADP',
-  GDPR: 'General Data Protection Regulation — EU data protection law; Swiss deployments use FADP/nDSG instead',
-  SLA: 'Service Level Agreement — the maximum committed response or resolution time for each priority tier',
-  AGPL: 'GNU Affero General Public License v3 — the open-source licence under which NEXUS is publicly released',
-  KPI: 'Key Performance Indicator — a measurable metric used to evaluate progress toward a defined goal',
-  ROI: 'Return on Investment — here: formal-care cost avoided per hour of informal support exchanged',
-  NEXUS: 'Project NEXUS — the multi-tenant timebanking and community care platform',
-  AGM: 'Annual General Meeting',
-  XP: 'Experience Points — gamification currency awarded for completing exchanges and reaching milestones',
-  ISCO: 'International Standard Classification of Occupations — used to categorise care service types',
-};
+export const ABBR_TERMS = {
+  CHF: 'terms.chf',
+  FADP: 'terms.fadp',
+  nDSG: 'terms.ndsg',
+  DSG: 'terms.dsg',
+  GDPR: 'terms.gdpr',
+  SLA: 'terms.sla',
+  AGPL: 'terms.agpl',
+  KPI: 'terms.kpi',
+  ROI: 'terms.roi',
+  NEXUS: 'terms.nexus',
+  AGM: 'terms.agm',
+  XP: 'terms.xp',
+  ISCO: 'terms.isco',
+} as const;
 
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip } from '@/components/ui';
 interface AbbrProps {
@@ -44,8 +45,8 @@ interface AbbrProps {
  *   <Abbr term="CHF">CHF 35/hr</Abbr>     → renders "CHF 35/hr" with CHF tooltip
  */
 export function Abbr({ term, children, className }: AbbrProps) {
-  const definition = ABBR_TERMS[term];
-  if (!definition) return <>{children ?? term}</>;
+  const { t } = useTranslation('admin_glossary');
+  const definition = t(ABBR_TERMS[term]);
 
   return (
     <Tooltip

@@ -491,18 +491,14 @@ class AdminConfigController extends BaseApiController
             }
         } catch (\Throwable) {}
 
-        $definitions = [
-            ['id' => 'digest_emails',  'name' => 'Email Digest Sender'],
-            ['id' => 'badge_checker',  'name' => 'Badge Award Checker'],
-            ['id' => 'streak_updater', 'name' => 'Login Streak Updater'],
-        ];
+        $definitions = ['digest_emails', 'badge_checker', 'streak_updater'];
 
-        $jobs = array_map(function ($def) use ($cronIdMap, $lastRuns) {
-            $cronId = $cronIdMap[$def['id']];
+        $jobs = array_map(function (string $jobId) use ($cronIdMap, $lastRuns) {
+            $cronId = $cronIdMap[$jobId];
             $run    = $lastRuns[$cronId] ?? null;
             return [
-                'id'          => $def['id'],
-                'name'        => $def['name'],
+                'id'          => $jobId,
+                'translation_key' => $jobId,
                 'status'      => $run ? $run['status'] : 'idle',
                 'last_run_at' => $run ? $run['last_run_at'] : null,
                 'next_run_at' => null,
@@ -588,12 +584,11 @@ class AdminConfigController extends BaseApiController
             $response[] = [
                 'id' => $numericId,
                 'slug' => $jobId,
-                'name' => $job['name'],
+                'translation_key' => str_replace('-', '_', $jobId),
                 'command' => $job['command'],
                 'schedule' => $job['schedule'],
                 'status' => $isEnabled ? 'active' : 'disabled',
                 'category' => $job['category'],
-                'description' => $job['description'],
                 'last_run_at' => $lastRun['last_run_at'] ?? null,
                 'last_status' => $lastRun['last_status'] ?? null,
                 'next_run_at' => $this->calculateNextRun($job['schedule']),
@@ -839,7 +834,7 @@ class AdminConfigController extends BaseApiController
         return $this->respondWithData([
             'triggered' => true,
             'job_slug' => $jobSlug,
-            'job_name' => $job['name'],
+            'job_translation_key' => str_replace('-', '_', $jobSlug),
             'status' => $status,
             'duration' => round($duration, 2),
             'output' => substr($output, 0, 500),
@@ -923,18 +918,18 @@ class AdminConfigController extends BaseApiController
 
         $file = request()->file('logo');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.file_required'), 'logo', 400);
         }
 
         // Only allow image types
         $mime = $file->getMimeType();
         if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_invalid_type'), 'logo', 422);
         }
 
         // Max 2 MB
         if ($file->getSize() > 2 * 1024 * 1024) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_size_limit_2mb'), 'logo', 422);
         }
 
         try {
@@ -965,7 +960,7 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithData(['url' => $imageUrl]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Partner logo upload failed', ['error' => $e->getMessage(), 'tenant_id' => $tenantId]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'logo', 500);
         }
     }
 
@@ -987,23 +982,23 @@ class AdminConfigController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!\App\Models\User::isGod($adminId)) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'God access required.', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.god_level_access_required'), null, 403);
         }
 
         $this->rateLimit('admin_logo_upload', 10, 60);
 
         $file = request()->file('logo');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.file_required'), 'logo', 400);
         }
 
         $mime = $file->getMimeType();
         if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_invalid_type'), 'logo', 422);
         }
 
         if ($file->getSize() > 2 * 1024 * 1024) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_size_limit_2mb'), 'logo', 422);
         }
 
         try {
@@ -1039,7 +1034,7 @@ class AdminConfigController extends BaseApiController
                 'error'     => $e->getMessage(),
                 'tenant_id' => $tenantId,
             ]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'logo', 500);
         }
     }
 
@@ -1092,10 +1087,20 @@ class AdminConfigController extends BaseApiController
         // absent / empty value is a deliberate "use the default", stored as
         // null below (setTenantConfigValue unsets the key).
         if (is_string($rawBg) && trim($rawBg) !== '' && $bg === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Background colour must be a valid hex value like #0053BE.', 'bg_color', 422);
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_hex_color', ['field' => 'bg_color', 'example' => '#0053BE']),
+                'bg_color',
+                422,
+            );
         }
         if (is_string($rawAccent) && trim($rawAccent) !== '' && $accent === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Accent colour must be a valid hex value like #0053BE.', 'accent_color', 422);
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_hex_color', ['field' => 'accent_color', 'example' => '#0053BE']),
+                'accent_color',
+                422,
+            );
         }
 
         try {
@@ -1153,7 +1158,7 @@ class AdminConfigController extends BaseApiController
 
         $file = request()->file('logo');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.file_required'), 'logo', 400);
         }
 
         // SVG MIME sniffing (finfo) is unreliable across platforms — it often
@@ -1165,12 +1170,12 @@ class AdminConfigController extends BaseApiController
         $isSvg = $mime === 'image/svg+xml' || $ext === 'svg';
 
         if (!$isSvg && !in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_invalid_type'), 'logo', 422);
         }
 
         // Max 2 MB
         if ($file->getSize() > 2 * 1024 * 1024) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.admin_image_size_limit_2mb'), 'logo', 422);
         }
 
         $configKey = $variant === 'dark' ? 'logo_dark_url' : 'logo_url';
@@ -1202,7 +1207,7 @@ class AdminConfigController extends BaseApiController
                 'error'     => $e->getMessage(),
                 'tenant_id' => $tenantId,
             ]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'logo', 500);
         }
     }
 
@@ -1290,7 +1295,7 @@ class AdminConfigController extends BaseApiController
             } catch (\Throwable) {
                 return $this->respondWithError(
                     'AUTH_INSUFFICIENT_PERMISSIONS',
-                    'Only platform super-admins may change email verification or admin approval settings.',
+                    __('api.platform_super_admin_auth_settings_required'),
                     null,
                     403
                 );
@@ -2517,66 +2522,66 @@ class AdminConfigController extends BaseApiController
     {
         return [
             // ── Master ──
-            ['id' => 'run-all', 'name' => 'Master Cron Runner', 'command' => 'runAll', 'schedule' => '* * * * *', 'category' => 'master', 'description' => 'Runs all appropriate cron tasks based on the current time. This is the only scheduled entry — all other jobs run inside it.'],
+            ['id' => 'run-all', 'command' => 'runAll', 'schedule' => '* * * * *', 'category' => 'master'],
 
             // ── Notifications ──
-            ['id' => 'process-queue', 'name' => 'Instant Notification Queue', 'command' => 'runInstantQueue', 'schedule' => '* * * * *', 'category' => 'notifications', 'description' => 'Processes the instant notification queue, sending pending notifications immediately.'],
-            ['id' => 'daily-digest', 'name' => 'Daily Digest', 'command' => 'dailyDigest', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends daily notification digest emails to users who opted for daily frequency.'],
-            ['id' => 'weekly-digest', 'name' => 'Monthly Digest', 'command' => 'weeklyDigest', 'schedule' => '0 17 1 * *', 'category' => 'notifications', 'description' => 'Sends monthly notification digest emails (1st of month at 5 PM).'],
+            ['id' => 'process-queue', 'command' => 'runInstantQueue', 'schedule' => '* * * * *', 'category' => 'notifications'],
+            ['id' => 'daily-digest', 'command' => 'dailyDigest', 'schedule' => '0 8 * * *', 'category' => 'notifications'],
+            ['id' => 'weekly-digest', 'command' => 'weeklyDigest', 'schedule' => '0 17 1 * *', 'category' => 'notifications'],
 
             // ── Newsletters ──
-            ['id' => 'process-newsletters', 'name' => 'Process Scheduled Newsletters', 'command' => 'processNewsletters', 'schedule' => '*/5 * * * *', 'category' => 'newsletters', 'description' => 'Checks for newsletters scheduled to be sent and initiates their sending process.'],
-            ['id' => 'process-recurring', 'name' => 'Process Recurring Newsletters', 'command' => 'processRecurring', 'schedule' => '*/15 * * * *', 'category' => 'newsletters', 'description' => 'Handles recurring/automated newsletters (e.g., weekly community updates).'],
-            ['id' => 'process-newsletter-queue', 'name' => 'Newsletter Queue Processor', 'command' => 'processNewsletterQueue', 'schedule' => '* * * * *', 'category' => 'newsletters', 'description' => 'Processes the newsletter sending queue in batches for large sends.'],
+            ['id' => 'process-newsletters', 'command' => 'processNewsletters', 'schedule' => '*/5 * * * *', 'category' => 'newsletters'],
+            ['id' => 'process-recurring', 'command' => 'processRecurring', 'schedule' => '*/15 * * * *', 'category' => 'newsletters'],
+            ['id' => 'process-newsletter-queue', 'command' => 'processNewsletterQueue', 'schedule' => '* * * * *', 'category' => 'newsletters'],
 
             // ── Matching ──
-            ['id' => 'notify-hot-matches', 'name' => 'Hot Match Notifications', 'command' => 'notifyHotMatches', 'schedule' => '0 * * * *', 'category' => 'matching', 'description' => 'Notifies users of new high-scoring matches.'],
-            ['id' => 'match-digest-daily', 'name' => 'Daily Match Digest', 'command' => 'matchDigestDaily', 'schedule' => '0 9 * * *', 'category' => 'matching', 'description' => 'Sends daily match recommendations to users.'],
-            ['id' => 'match-digest-weekly', 'name' => 'Weekly Match Digest', 'command' => 'matchDigestWeekly', 'schedule' => '0 9 * * 1', 'category' => 'matching', 'description' => 'Sends weekly match recommendations summary (Mondays 9 AM).'],
+            ['id' => 'notify-hot-matches', 'command' => 'notifyHotMatches', 'schedule' => '0 * * * *', 'category' => 'matching'],
+            ['id' => 'match-digest-daily', 'command' => 'matchDigestDaily', 'schedule' => '0 9 * * *', 'category' => 'matching'],
+            ['id' => 'match-digest-weekly', 'command' => 'matchDigestWeekly', 'schedule' => '0 9 * * 1', 'category' => 'matching'],
 
             // ── Gamification ──
-            ['id' => 'gamification-daily', 'name' => 'Gamification Daily Tasks', 'command' => 'gamificationDaily', 'schedule' => '0 3 * * *', 'category' => 'gamification', 'description' => 'Processes streak resets, daily bonuses, and badge checks.'],
-            ['id' => 'gamification-campaigns', 'name' => 'Process Achievement Campaigns', 'command' => 'gamificationCampaigns', 'schedule' => '0 * * * *', 'category' => 'gamification', 'description' => 'Processes recurring achievement campaigns.'],
-            ['id' => 'gamification-leaderboard', 'name' => 'Leaderboard Snapshot', 'command' => 'gamificationLeaderboard', 'schedule' => '0 0 * * *', 'category' => 'gamification', 'description' => 'Creates daily leaderboard snapshots and finalizes seasons.'],
-            ['id' => 'gamification-challenges', 'name' => 'Check Challenge Expirations', 'command' => 'gamificationChallenges', 'schedule' => '30 * * * *', 'category' => 'gamification', 'description' => 'Expires completed challenges and updates statuses.'],
-            ['id' => 'gamification-weekly-digest', 'name' => 'Gamification Monthly Digest', 'command' => 'gamificationWeeklyDigest', 'schedule' => '0 4 1 * *', 'category' => 'gamification', 'description' => 'Sends monthly progress email digests to users.'],
-            ['id' => 'gamification-streaks', 'name' => 'Gamification Streak Milestones', 'command' => 'gamificationStreaks', 'schedule' => '0 1 * * *', 'category' => 'gamification', 'description' => 'Checks and awards streak milestones (7/14/30/60/90/180/365 days).'],
-            ['id' => 'gamification-cleanup', 'name' => 'Gamification Cleanup', 'command' => 'gamificationCleanup', 'schedule' => '0 3 * * 0', 'category' => 'gamification', 'description' => 'Cleans old XP notifications, campaign awards, and analytics data.'],
+            ['id' => 'gamification-daily', 'command' => 'gamificationDaily', 'schedule' => '0 3 * * *', 'category' => 'gamification'],
+            ['id' => 'gamification-campaigns', 'command' => 'gamificationCampaigns', 'schedule' => '0 * * * *', 'category' => 'gamification'],
+            ['id' => 'gamification-leaderboard', 'command' => 'gamificationLeaderboard', 'schedule' => '0 0 * * *', 'category' => 'gamification'],
+            ['id' => 'gamification-challenges', 'command' => 'gamificationChallenges', 'schedule' => '30 * * * *', 'category' => 'gamification'],
+            ['id' => 'gamification-weekly-digest', 'command' => 'gamificationWeeklyDigest', 'schedule' => '0 4 1 * *', 'category' => 'gamification'],
+            ['id' => 'gamification-streaks', 'command' => 'gamificationStreaks', 'schedule' => '0 1 * * *', 'category' => 'gamification'],
+            ['id' => 'gamification-cleanup', 'command' => 'gamificationCleanup', 'schedule' => '0 3 * * 0', 'category' => 'gamification'],
 
             // ── Groups ──
-            ['id' => 'update-featured-groups', 'name' => 'Update Featured Groups', 'command' => 'updateFeaturedGroups', 'schedule' => '0 8 * * *', 'category' => 'groups', 'description' => 'Updates featured groups based on ranking algorithms.'],
-            ['id' => 'group-weekly-digest', 'name' => 'Group Monthly Digests', 'command' => 'groupWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'groups', 'description' => 'Sends monthly analytics digest emails to group owners.'],
+            ['id' => 'update-featured-groups', 'command' => 'updateFeaturedGroups', 'schedule' => '0 8 * * *', 'category' => 'groups'],
+            ['id' => 'group-weekly-digest', 'command' => 'groupWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'groups'],
 
             // ── Security ──
-            ['id' => 'abuse-detection', 'name' => 'Abuse Detection', 'command' => 'abuseDetection', 'schedule' => '0 * * * *', 'category' => 'security', 'description' => 'Scans transactions for potential abuse patterns.'],
-            ['id' => 'abuse-daily-report', 'name' => 'Abuse Daily Report', 'command' => 'abuseDailyReport', 'schedule' => '0 7 * * *', 'category' => 'security', 'description' => 'Sends daily abuse detection report to admins.'],
-            ['id' => 'abuse-cleanup', 'name' => 'Abuse Alert Cleanup', 'command' => 'abuseCleanup', 'schedule' => '0 2 * * 0', 'category' => 'security', 'description' => 'Archives old alerts and auto-dismisses low-severity items.'],
+            ['id' => 'abuse-detection', 'command' => 'abuseDetection', 'schedule' => '0 * * * *', 'category' => 'security'],
+            ['id' => 'abuse-daily-report', 'command' => 'abuseDailyReport', 'schedule' => '0 7 * * *', 'category' => 'security'],
+            ['id' => 'abuse-cleanup', 'command' => 'abuseCleanup', 'schedule' => '0 2 * * 0', 'category' => 'security'],
 
             // ── Identity Verification ──
-            ['id' => 'verification-reminders', 'name' => 'Verification Reminders', 'command' => 'verificationReminders', 'schedule' => '0 */6 * * *', 'category' => 'verification', 'description' => 'Sends reminders to users with incomplete identity verifications.'],
-            ['id' => 'expire-verifications', 'name' => 'Expire Abandoned Verifications', 'command' => 'expireVerifications', 'schedule' => '30 4 * * *', 'category' => 'verification', 'description' => 'Expires verification sessions abandoned for 72+ hours.'],
-            ['id' => 'purge-verification-sessions', 'name' => 'Purge Old Verification Data', 'command' => 'purgeVerificationSessions', 'schedule' => '30 3 * * 0', 'category' => 'verification', 'description' => 'Purges completed/expired verification sessions older than 180 days.'],
+            ['id' => 'verification-reminders', 'command' => 'verificationReminders', 'schedule' => '0 */6 * * *', 'category' => 'verification'],
+            ['id' => 'expire-verifications', 'command' => 'expireVerifications', 'schedule' => '30 4 * * *', 'category' => 'verification'],
+            ['id' => 'purge-verification-sessions', 'command' => 'purgeVerificationSessions', 'schedule' => '30 3 * * 0', 'category' => 'verification'],
 
             // ── Volunteering ──
-            ['id' => 'volunteer-pre-shift', 'name' => 'Volunteer Pre-Shift Reminders', 'command' => 'volunteerPreShiftReminders', 'schedule' => '*/30 * * * *', 'category' => 'volunteering', 'description' => 'Sends reminders 24h and 2h before volunteer shifts.'],
-            ['id' => 'volunteer-post-shift', 'name' => 'Volunteer Post-Shift Feedback', 'command' => 'volunteerPostShiftFeedback', 'schedule' => '*/30 * * * *', 'category' => 'volunteering', 'description' => 'Sends feedback request after completed shifts.'],
-            ['id' => 'volunteer-lapsed-nudge', 'name' => 'Lapsed Volunteer Nudge', 'command' => 'volunteerLapsedNudge', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Nudges volunteers who haven\'t been active recently.'],
-            ['id' => 'volunteer-expiry-warnings', 'name' => 'Volunteer Credential Expiry', 'command' => 'volunteerExpiryWarnings', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Warns volunteers about expiring credentials and training.'],
-            ['id' => 'recurring-shifts', 'name' => 'Generate Recurring Shifts', 'command' => 'recurringShifts', 'schedule' => '0 6 * * *', 'category' => 'volunteering', 'description' => 'Auto-generates volunteer shifts 14 days ahead from recurring templates.'],
-            ['id' => 'volunteer-expire-consents', 'name' => 'Expire Guardian Consents', 'command' => 'volunteerExpireConsents', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Expires guardian consent records that have passed their expiry date.'],
+            ['id' => 'volunteer-pre-shift', 'command' => 'volunteerPreShiftReminders', 'schedule' => '*/30 * * * *', 'category' => 'volunteering'],
+            ['id' => 'volunteer-post-shift', 'command' => 'volunteerPostShiftFeedback', 'schedule' => '*/30 * * * *', 'category' => 'volunteering'],
+            ['id' => 'volunteer-lapsed-nudge', 'command' => 'volunteerLapsedNudge', 'schedule' => '0 5 * * *', 'category' => 'volunteering'],
+            ['id' => 'volunteer-expiry-warnings', 'command' => 'volunteerExpiryWarnings', 'schedule' => '0 5 * * *', 'category' => 'volunteering'],
+            ['id' => 'recurring-shifts', 'command' => 'recurringShifts', 'schedule' => '0 6 * * *', 'category' => 'volunteering'],
+            ['id' => 'volunteer-expire-consents', 'command' => 'volunteerExpireConsents', 'schedule' => '0 5 * * *', 'category' => 'volunteering'],
 
             // ── Maintenance ──
-            ['id' => 'cleanup', 'name' => 'System Cleanup', 'command' => 'cleanup', 'schedule' => '0 0 * * *', 'category' => 'maintenance', 'description' => 'Cleans expired tokens, old queue entries, API tokens, and tracking data.'],
-            ['id' => 'geocode-batch', 'name' => 'Batch Geocoding', 'command' => 'geocodeBatch', 'schedule' => '*/30 * * * *', 'category' => 'maintenance', 'description' => 'Geocodes users and listings missing lat/lng coordinates.'],
-            ['id' => 'event-reminders', 'name' => 'Event Reminders', 'command' => 'eventReminders', 'schedule' => '*/15 * * * *', 'category' => 'notifications', 'description' => 'Sends reminders 24h and 1h before events.'],
-            ['id' => 'inactive-members', 'name' => 'Inactive Member Detection', 'command' => 'inactiveMembers', 'schedule' => '0 2 * * *', 'category' => 'maintenance', 'description' => 'Detects and flags inactive members for follow-up.'],
-            ['id' => 'listing-expiry', 'name' => 'Listing Expiry Processing', 'command' => 'listingExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires listings that have passed their expiry date.'],
-            ['id' => 'listing-expiry-reminders', 'name' => 'Listing Expiry Reminders', 'command' => 'listingExpiryReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Warns listing owners 3 days before their listing expires.'],
-            ['id' => 'job-expiry', 'name' => 'Job Vacancy Expiry', 'command' => 'jobExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires job vacancies that have passed their closing date.'],
-            ['id' => 'federation-weekly-digest', 'name' => 'Federation Monthly Digest', 'command' => 'federationWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'notifications', 'description' => 'Sends federation activity digest to opted-in tenants.'],
-            ['id' => 'balance-alerts', 'name' => 'Balance Alerts', 'command' => 'balanceAlerts', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Checks organization wallet balances and sends low/critical alerts.'],
-            ['id' => 'goal-reminders', 'name' => 'Goal Reminders', 'command' => 'goalReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends reminders for goals that are due or behind schedule.'],
-            ['id' => 'retry-failed-webhooks', 'name' => 'Retry Failed Webhooks', 'command' => 'retryFailedWebhooks', 'schedule' => '*/5 * * * *', 'category' => 'maintenance', 'description' => 'Retries webhook deliveries that previously failed.'],
+            ['id' => 'cleanup', 'command' => 'cleanup', 'schedule' => '0 0 * * *', 'category' => 'maintenance'],
+            ['id' => 'geocode-batch', 'command' => 'geocodeBatch', 'schedule' => '*/30 * * * *', 'category' => 'maintenance'],
+            ['id' => 'event-reminders', 'command' => 'eventReminders', 'schedule' => '*/15 * * * *', 'category' => 'notifications'],
+            ['id' => 'inactive-members', 'command' => 'inactiveMembers', 'schedule' => '0 2 * * *', 'category' => 'maintenance'],
+            ['id' => 'listing-expiry', 'command' => 'listingExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance'],
+            ['id' => 'listing-expiry-reminders', 'command' => 'listingExpiryReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications'],
+            ['id' => 'job-expiry', 'command' => 'jobExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance'],
+            ['id' => 'federation-weekly-digest', 'command' => 'federationWeeklyDigest', 'schedule' => '0 9 1 * *', 'category' => 'notifications'],
+            ['id' => 'balance-alerts', 'command' => 'balanceAlerts', 'schedule' => '0 8 * * *', 'category' => 'notifications'],
+            ['id' => 'goal-reminders', 'command' => 'goalReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications'],
+            ['id' => 'retry-failed-webhooks', 'command' => 'retryFailedWebhooks', 'schedule' => '*/5 * * * *', 'category' => 'maintenance'],
         ];
     }
 
@@ -2888,15 +2893,15 @@ class AdminConfigController extends BaseApiController
 
         // Type-check key before truth-testing so arrays/objects don't slip through
         if (!is_string($key) || $key === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'key']), 'key', 422);
         }
 
         if (!array_key_exists($key, ListingConfigurationService::DEFAULTS)) {
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.configuration_key_unknown', ['key' => $key]), 'key', 422);
         }
 
         if ($value === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'value']), 'value', 422);
         }
 
         $defaultValue = ListingConfigurationService::DEFAULTS[$key];
@@ -2922,7 +2927,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.non_empty_array_required', ['field' => 'settings']), 'settings', 422);
         }
 
         $updated = [];
@@ -3018,7 +3023,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.non_empty_array_required', ['field' => 'settings']), 'settings', 422);
         }
 
         $updated = [];
@@ -3189,51 +3194,105 @@ class AdminConfigController extends BaseApiController
         $config = $this->input('config');
 
         if ($config !== null && !is_array($config)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Config must be an object or null', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.landing_config_invalid'), 'config', 422);
         }
 
         // Validate structure if config provided
         if ($config !== null) {
             if (!isset($config['sections']) || !is_array($config['sections'])) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Config must have a sections array', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.landing_config_sections_required'), 'sections', 422);
             }
 
             $validTypes = ['hero', 'audience_cards', 'feature_pills', 'stats', 'how_it_works', 'core_values', 'cta'];
             foreach ($config['sections'] as $i => $section) {
                 if (!isset($section['id'], $section['type'], $section['enabled'], $section['order'])) {
-                    return $this->respondWithError('VALIDATION_ERROR', "Section $i missing required fields (id, type, enabled, order)", null, 422);
+                    return $this->respondWithError(
+                        'VALIDATION_ERROR',
+                        __('api.landing_section_fields_required', ['section' => $i]),
+                        'sections',
+                        422,
+                    );
                 }
                 if (!in_array($section['type'], $validTypes, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', "Section $i has invalid type: {$section['type']}", null, 422);
+                    return $this->respondWithError(
+                        'VALIDATION_ERROR',
+                        __('api.landing_section_type_invalid', ['section' => $i, 'type' => $section['type']]),
+                        'sections',
+                        422,
+                    );
                 }
                 if ($section['type'] === 'audience_cards' && isset($section['content']) && is_array($section['content'])) {
                     $cards = $section['content']['cards'] ?? null;
                     if ($cards !== null) {
                         if (!is_array($cards)) {
-                            return $this->respondWithError('VALIDATION_ERROR', "Section $i: audience_cards.cards must be an array", null, 422);
+                            return $this->respondWithError(
+                                'VALIDATION_ERROR',
+                                __('api.landing_cards_invalid', ['section' => $i]),
+                                'sections',
+                                422,
+                            );
                         }
                         if (count($cards) > 4) {
-                            return $this->respondWithError('VALIDATION_ERROR', "Section $i: audience_cards allows at most 4 cards", null, 422);
+                            return $this->respondWithError(
+                                'VALIDATION_ERROR',
+                                __('api.landing_cards_limit', ['section' => $i, 'max' => 4]),
+                                'sections',
+                                422,
+                            );
                         }
                         foreach ($cards as $ci => $card) {
                             if (!is_array($card)) {
-                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci must be an object", null, 422);
+                                return $this->respondWithError(
+                                    'VALIDATION_ERROR',
+                                    __('api.landing_card_invalid', ['section' => $i, 'card' => $ci]),
+                                    'sections',
+                                    422,
+                                );
                             }
                             $url = $card['target_url'] ?? '';
                             if (!is_string($url) || $url === '') {
-                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci is missing target_url", null, 422);
+                                return $this->respondWithError(
+                                    'VALIDATION_ERROR',
+                                    __('api.landing_card_target_required', ['section' => $i, 'card' => $ci]),
+                                    'sections',
+                                    422,
+                                );
                             }
                             $isRelative = str_starts_with($url, '/') && !str_starts_with($url, '//');
                             $isHttp = preg_match('#^https?://#i', $url) === 1;
                             if (!$isRelative && !$isHttp) {
-                                return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci target_url must be a relative path or http(s) URL", null, 422);
+                                return $this->respondWithError(
+                                    'VALIDATION_ERROR',
+                                    __('api.landing_card_target_invalid', ['section' => $i, 'card' => $ci]),
+                                    'sections',
+                                    422,
+                                );
                             }
                             foreach (['title', 'description', 'cta_label'] as $field) {
                                 if (!isset($card[$field]) || !is_string($card[$field])) {
-                                    return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci is missing $field", null, 422);
+                                    return $this->respondWithError(
+                                        'VALIDATION_ERROR',
+                                        __('api.landing_card_field_required', [
+                                            'section' => $i,
+                                            'card' => $ci,
+                                            'field' => $field,
+                                        ]),
+                                        'sections',
+                                        422,
+                                    );
                                 }
                                 if (mb_strlen($card[$field]) > 500) {
-                                    return $this->respondWithError('VALIDATION_ERROR', "Section $i: card $ci $field exceeds 500 chars", null, 422);
+                                    return $this->respondWithError(
+                                        'VALIDATION_ERROR',
+                                        __('api.landing_card_field_too_long', [
+                                            'section' => $i,
+                                            'card' => $ci,
+                                            'field' => $field,
+                                            'max' => 500,
+                                        ]),
+                                        'sections',
+                                        422,
+                                    );
                                 }
                             }
                         }
@@ -3301,15 +3360,15 @@ class AdminConfigController extends BaseApiController
         $value = $this->input('value');
 
         if (!$key || !is_string($key)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'key']), 'key', 422);
         }
 
         if (!array_key_exists($key, \App\Services\TranslationConfigurationService::DEFAULTS)) {
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.configuration_key_unknown', ['key' => $key]), 'key', 422);
         }
 
         if ($value === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'value']), 'value', 422);
         }
 
         $defaultValue = \App\Services\TranslationConfigurationService::DEFAULTS[$key];
@@ -3333,7 +3392,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.non_empty_array_required', ['field' => 'settings']), 'settings', 422);
         }
 
         $updated = [];
@@ -3395,19 +3454,19 @@ class AdminConfigController extends BaseApiController
         $targetLanguage = trim($this->input('target_language', ''));
 
         if (empty($sourceTerm)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Source term is required', 'source_term', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'source_term']), 'source_term', 422);
         }
         if (empty($targetTerm)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Target term is required', 'target_term', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'target_term']), 'target_term', 422);
         }
         if (empty($targetLanguage)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Target language is required', 'target_language', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'target_language']), 'target_language', 422);
         }
         if (mb_strlen($sourceTerm) > 255 || mb_strlen($targetTerm) > 255) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Terms must be 255 characters or fewer', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.glossary_terms_too_long', ['max' => 255]), null, 422);
         }
         if (!preg_match('/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/', $targetLanguage)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'target_language must be a valid ISO 639-1 code (e.g. en, fr, de)', 'target_language', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.glossary_language_invalid'), 'target_language', 422);
         }
 
         try {
@@ -3422,7 +3481,12 @@ class AdminConfigController extends BaseApiController
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
-                return $this->respondWithError('DUPLICATE', "A glossary entry for \"{$sourceTerm}\" in {$targetLanguage} already exists", 'source_term', 409);
+                return $this->respondWithError(
+                    'DUPLICATE',
+                    __('api.glossary_duplicate', ['term' => $sourceTerm, 'language' => $targetLanguage]),
+                    'source_term',
+                    409,
+                );
             }
             throw $e;
         }
@@ -3442,7 +3506,7 @@ class AdminConfigController extends BaseApiController
             ->delete();
 
         if (!$deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Glossary entry not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.glossary_not_found'), null, 404);
         }
 
         return $this->respondWithData(['deleted' => true]);
@@ -3566,7 +3630,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.non_empty_array_required', ['field' => 'settings']), 'settings', 422);
         }
 
         $updated = [];

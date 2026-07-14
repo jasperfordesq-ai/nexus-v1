@@ -99,12 +99,12 @@ export function CronJobLogs() {
     try {
       const res = await adminCron.clearLogs(clearBeforeDate);
       if (res.success) {
-        toast.success(res.message || t('system.logs_cleared_successfully'));
+        toast.success(t('system.logs_cleared_successfully'));
         onClearClose();
         setClearBeforeDate('');
         loadLogs();
       } else {
-        toast.error(res.error || t('system.failed_to_clear_logs'));
+        toast.error(t('system.failed_to_clear_logs'));
       }
     } catch {
       toast.error(t('system.failed_to_clear_logs'));

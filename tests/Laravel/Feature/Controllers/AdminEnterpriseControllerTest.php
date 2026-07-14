@@ -205,7 +205,13 @@ class AdminEnterpriseControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/enterprise/monitoring/health');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['status', 'checks' => ['*' => ['code', 'status']]]]);
+        $this->assertSame('database', $response->json('data.checks.0.code'));
+        $this->assertArrayNotHasKey('name', $response->json('data.checks.0'));
+
+        $extensionCheck = collect($response->json('data.checks'))->firstWhere('code', 'php_extension');
+        $this->assertNotNull($extensionCheck);
+        $this->assertArrayHasKey('extension', $extensionCheck['params']);
     }
 
     // ================================================================

@@ -8,5 +8,33 @@
   "after_label": "Après",
   "caveat_label": "Méthode",
   "evidence_label": "Preuve",
-  "error_loading": "Impossible de charger les histoires de réussite pour le moment. Veuillez réessayer dans un instant."
+  "error_loading": "Impossible de charger les histoires de réussite pour le moment. Veuillez réessayer dans un instant.",
+  "audiences": {
+    "all_residents": "Tous les résidents",
+    "municipality": "Municipalité",
+    "kanton": "Canton",
+    "verein_members": "Membres de l'association",
+    "volunteers": "Bénévoles",
+    "recipients": "Bénéficiaires de soins"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "Effort de distribution de l'information réduit de 30 %",
+      "narrative": "Les coordinateurs passent environ un tiers de temps en moins à distribuer les mises à jour après être passés à NEXUS. Les annonces, le ciblage des segments de membres et le suivi des confirmations sont consolidés en un seul endroit.",
+      "method_caveat": "Exemple illustratif basé sur une affirmation d'une communauté de pairs ; il n'a pas été mesuré pour ce locataire.",
+      "evidence_source": "Page de la municipalité partenaire (illustrative)"
+    },
+    "volunteer_engagement": {
+      "title": "25 % d'engagement bénévole en plus",
+      "narrative": "Les communautés pilotes signalent un quart de participation bénévole en plus après l'adoption de NEXUS, soutenue par un jumelage plus clair, une inscription sans friction et une reconnaissance visible du Warmth Pass.",
+      "method_caveat": "Exemple illustratif basé sur une affirmation d'une communauté de pairs ; il n'a pas été mesuré pour ce locataire.",
+      "evidence_source": "Page de la municipalité partenaire (illustrative)"
+    },
+    "formal_care_offset": {
+      "title": "12 250 CHF de coûts de soins formels compensés",
+      "narrative": "Les heures de bénévolat coordonnées via NEXUS représentent une compensation de 12 250 CHF contre les coûts de soins à domicile formels pendant la période pilote, évaluée au tarif suisse des assistants de soins formels.",
+      "method_caveat": "Estimation en utilisant 35 CHF par heure sur 350 heures ; la comparaison se fait uniquement par rapport à la référence avant pilote.",
+      "evidence_source": "Modèle de ROI municipal AG76 (illustratif)"
+    }
+  }
 }

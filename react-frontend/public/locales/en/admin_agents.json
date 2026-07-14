@@ -92,6 +92,30 @@
       "pending": "Pending",
       "running": "Running"
     },
+    "agent_type": {
+      "activity_summary": "Activity summary",
+      "activity_summariser": "Activity summariser",
+      "help_routing": "Help routing",
+      "listing-enrichment": "Listing enrichment",
+      "matchmaker": "Matchmaker",
+      "matching": "Matching",
+      "notifications": "Notifications",
+      "nudge_dispatch": "Nudge dispatch",
+      "tandem_matching": "Tandem matching"
+    },
+    "triggered_by": {
+      "admin": "Administrator",
+      "manual": "Manual",
+      "schedule": "Schedule",
+      "scheduled": "Scheduled"
+    },
+    "proposal_type": {
+      "create_tandem": "Create tandem",
+      "match_suggestion": "Match suggestion",
+      "route_help_request": "Route help request",
+      "send_activity_summary": "Send activity summary",
+      "send_nudge": "Send nudge"
+    },
     "proposal_status": {
       "approved": "Approved",
       "pending": "Pending",

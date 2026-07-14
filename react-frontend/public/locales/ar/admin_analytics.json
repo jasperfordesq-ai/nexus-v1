@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "analytics": {
     "category_demand_title": "الطلب على الفئة",
@@ -201,7 +201,8 @@
         "language_distribution": "توزيع اللغة",
         "member_growth_12m": "نمو الأعضاء، آخر 12 شهرًا",
         "total_with_data": "أعضاء {{total}} مع البيانات الديموغرافية",
-        "total_active_members": "{{total}} الأعضاء النشطين"
+        "total_active_members": "{{total}} الأعضاء النشطين",
+        "unknown_language": "لغة غير معروفة"
       },
       "volunteer": {
         "total_hours": "إجمالي الساعات",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "طلبات المساعدة حسب الفئة",
-        "resolution_trend_6m": "اتجاه القرار، آخر 6 أشهر"
+        "resolution_trend_6m": "اتجاه القرار، آخر 6 أشهر",
+        "categories": {
+          "either": "هاتف أو رسالة",
+          "message": "رسالة",
+          "phone": "هاتف",
+          "unknown": "تفضيل غير معروف"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -286,6 +293,17 @@
     "count_value_few": "{{count}}×",
     "count_value_many": "{{count}}×",
     "count_value_two": "{{count}}×",
-    "count_value_zero": "{{count}}×"
+    "count_value_zero": "{{count}}×",
+    "result_types": {
+      "blog": "مدونة",
+      "events": "الفعاليات",
+      "groups": "المجموعات",
+      "jobs": "وظائف",
+      "listings": "القوائم",
+      "marketplace": "سوق",
+      "members": "الأعضاء",
+      "resources": "الموارد",
+      "volunteering": "التطوع"
+    }
   }
 }

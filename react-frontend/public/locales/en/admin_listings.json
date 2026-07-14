@@ -126,6 +126,11 @@
     "unfeature_listing": "Unfeature Listing",
     "unfeatured_success": "Unfeatured successfully",
     "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "filter_tabs_aria": "Listing status filter",
+    "types": {
+      "offer": "Offer",
+      "request": "Request",
+      "unknown": "Other listing type"
+    }
   }
 }

@@ -812,5 +812,8 @@
     "contact_cta_body": "Ponte en contacto y un coordinador se comunicará contigo. La mayoría de los mensajes se responden dentro de un día hábil.",
     "contact_cta_button": "Contáctenos",
     "community_guidelines_link": "Lea las pautas de la comunidad"
+  },
+  "custom_document": {
+    "introduction": "Introducción"
   }
 }

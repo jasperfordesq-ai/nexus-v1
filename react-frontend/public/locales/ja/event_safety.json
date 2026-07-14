@@ -286,7 +286,6 @@
     "reviews_intro": "自由記述のメモ、連絡先の詳細、事件記録を使用せずに、管理された決定を記録します。",
     "review_member": "イベント参加者",
     "review_member_choose": "参加者を選択してください",
-    "member_fallback": "メンバー番号:id",
     "review_decision": "決定",
     "decisions": {
       "deny": "参加を拒否する",
@@ -319,6 +318,7 @@
     },
     "reviewed_by": "レビュー者",
     "withdraw_review": "決定の撤回",
-    "ledger_empty": "このイベントには参加レビューが記録されていません。"
+    "ledger_empty": "このイベントには参加レビューが記録されていません。",
+    "member_fallback": "会員番号 #:id"
   }
 }

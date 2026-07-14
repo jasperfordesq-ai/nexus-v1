@@ -339,7 +339,15 @@ class AdminEnterpriseController extends BaseApiController
 
         try {
             $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
-            $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
+            $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name,
+                        (SELECT ct.name FROM consent_types ct
+                         WHERE ct.slug = uc.consent_type
+                           AND (ct.tenant_id = uc.tenant_id OR ct.tenant_id IS NULL)
+                         ORDER BY ct.tenant_id IS NULL ASC LIMIT 1) as consent_type_name
+                 FROM user_consents uc
+                 LEFT JOIN users u ON u.id = uc.user_id
+                 WHERE uc.tenant_id = ?
+                 ORDER BY uc.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
             return $this->respondWithData($consents, ['total' => $total, 'page' => $page, 'per_page' => $perPage]);
         } catch (\Exception $e) { return $this->respondWithData([], ['total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
@@ -574,19 +582,19 @@ class AdminEnterpriseController extends BaseApiController
         $dbOk = false; try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
         $redisOk = false; try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
-        $diskFree = 'N/A'; $diskTotal = 'N/A';
-        try { $f = disk_free_space('/'); $t = disk_total_space('/'); if ($f !== false && $t !== false) { $diskFree = $this->formatBytes($f); $diskTotal = $this->formatBytes($t); } } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+        $diskOk = false; $diskFree = null; $diskTotal = null;
+        try { $f = disk_free_space('/'); $t = disk_total_space('/'); if ($f !== false && $t !== false) { $diskOk = true; $diskFree = $this->formatBytes($f); $diskTotal = $this->formatBytes($t); } } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         $checks = [
-            ['name' => 'Database', 'status' => $dbOk ? 'ok' : 'fail'],
-            ['name' => 'Redis', 'status' => $redisOk ? 'ok' : 'fail'],
-            ['name' => 'Disk', 'status' => 'ok', 'free' => $diskFree, 'total' => $diskTotal],
+            ['code' => 'database', 'status' => $dbOk ? 'ok' : 'fail'],
+            ['code' => 'redis', 'status' => $redisOk ? 'ok' : 'fail'],
+            ['code' => 'disk', 'status' => $diskOk ? 'ok' : 'fail', 'free' => $diskFree, 'total' => $diskTotal],
         ];
 
         foreach (['pdo_mysql','redis','zip','mbstring','gd','curl','json','openssl'] as $ext) {
-            $checks[] = ['name' => 'PHP ext: ' . $ext, 'status' => extension_loaded($ext) ? 'ok' : 'fail'];
+            $checks[] = ['code' => 'php_extension', 'params' => ['extension' => $ext], 'status' => extension_loaded($ext) ? 'ok' : 'fail'];
         }
-        $checks[] = ['name' => 'PHP >= 8.2', 'status' => version_compare(PHP_VERSION, '8.2.0', '>=') ? 'ok' : 'fail'];
+        $checks[] = ['code' => 'php_version_minimum', 'params' => ['version' => '8.2'], 'status' => version_compare(PHP_VERSION, '8.2.0', '>=') ? 'ok' : 'fail'];
 
         $hasFailures = !empty(array_filter($checks, fn($c) => $c['status'] === 'fail'));
         $overallStatus = $hasFailures ? 'unhealthy' : 'healthy';

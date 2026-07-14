@@ -162,9 +162,11 @@
         "all": "All placements",
         "discovery": "Discovery",
         "feed": "Feed",
-        "market": "Market"
+        "market": "Market",
+        "markt": "Market"
       },
       "placeholders": {
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"gardening\"]}",
         "budget": "e.g. 5000 = EUR 50.00",
         "campaign_name": "Summer Sale - Cafe Helvetia"
       },
@@ -199,6 +201,7 @@
       "daily_breakdown": "Daily breakdown",
       "immediate": "Immediate",
       "no_daily_data": "No daily data yet.",
+      "cost_per_send": "{{cost}} per send",
       "reject_intro_prefix": "Rejecting",
       "reject_intro_suffix": "Please provide a reason that will be visible to the advertiser.",
       "rejection_placeholder": "e.g. Content does not comply with community guidelines...",
@@ -240,6 +243,7 @@
       "placeholders": {
         "body": "Max 400 characters",
         "campaign_name": "e.g. Spring Promotion - Cafe Seeblick",
+        "cta_url": "https://... or nexus://...",
         "title": "Max 100 characters"
       },
       "stats": {

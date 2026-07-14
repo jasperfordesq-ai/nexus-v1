@@ -188,7 +188,7 @@ export function Subscribers() {
         setAddForm({ email: '', first_name: '', last_name: '' });
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || t('newsletters.failed_to_add_subscriber'));
+        toast.error(t('newsletters.failed_to_add_subscriber'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_add_subscriber'));
@@ -282,7 +282,7 @@ export function Subscribers() {
         setImportFileName('');
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || t('newsletters.failed_to_import_subscribers'));
+        toast.error(t('newsletters.failed_to_import_subscribers'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_import_subscribers'));
@@ -337,7 +337,7 @@ export function Subscribers() {
         toast.success(t('newsletters.sync_result'));
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || t('newsletters.failed_to_sync_members'));
+        toast.error(t('newsletters.failed_to_sync_members'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_sync_members'));
@@ -551,7 +551,7 @@ export function Subscribers() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="soft" color={statusColor(sub.status)}>
-                  {sub.status}
+                  {t(`newsletters.label_${sub.status}`, { defaultValue: t('common.unknown') })}
                 </Chip>
               </TableCell>
               <TableCell className="text-sm text-muted">

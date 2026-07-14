@@ -169,7 +169,7 @@
     "item_not_found": "Elemento della coda di moderazione non trovato.",
     "already_reviewed": "Questo articolo è già stato recensito.",
     "rejection_reason_required": "Il motivo del rifiuto è obbligatorio.",
-    "content_decision": "Il contenuto è stato: decisione."
+    "content_decision": "Il contenuto è stato :decision."
   },
   "tenant_settings": {
     "pending_verification": "La verifica della tua identità è in sospeso. Si prega di attendere l'approvazione.",
@@ -182,9 +182,9 @@
     "connection_successful": "Connessione riuscita",
     "ollama_not_configured": "URL dell'host Ollama non configurato",
     "ollama_cannot_connect": "Impossibile connettersi a Ollama: :error",
-    "ollama_connected": "Connesso a Ollama (:conta modelli disponibili)",
-    "ollama_http_error": "Ollama ha restituito HTTP:code",
-    "provider_error": "Si è verificato un errore durante l'elaborazione della tua richiesta AI. Per favore riprova."
+    "provider_error": "Si è verificato un errore durante l'elaborazione della tua richiesta AI. Per favore riprova.",
+    "ollama_connected": "Connesso a Ollama (modelli :count disponibili)",
+    "ollama_http_error": "Ollama ha restituito HTTP :code"
   },
   "report_export": {
     "no_data": "Nessun dato trovato per il rapporto e i filtri selezionati."

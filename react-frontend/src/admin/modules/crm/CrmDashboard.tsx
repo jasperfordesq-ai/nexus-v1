@@ -16,6 +16,7 @@ import Tag from 'lucide-react/icons/tag';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
+import { formatPercentValue } from '@/lib/helpers';
 import { adminCrm } from '../../api/adminApi';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
@@ -195,7 +196,7 @@ export function CrmDashboard() {
         />
         <StatCard
           label={t('crm.label_retention_rate')}
-          value={data ? `${data.retention_rate}%` : '0%'}
+          value={formatPercentValue(data?.retention_rate ?? 0)}
           icon={TrendingUp}
           color="success"
           loading={!data}
@@ -302,7 +303,7 @@ export function CrmDashboard() {
                 variant="tertiary"
                 size="lg"
               >
-                {data?.retention_rate ?? 0}%
+                {formatPercentValue(data?.retention_rate ?? 0)}
               </Chip>
             </div>
           </CardBody>

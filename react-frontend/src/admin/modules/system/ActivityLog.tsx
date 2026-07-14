@@ -43,6 +43,15 @@ const actionColorMap: Record<string, 'success' | 'warning' | 'danger' | 'primary
   transfer: 'secondary',
 };
 
+const activityDetailKeys: Record<string, string> = {
+  blog_post_created: 'system.activity_details.blog_post_created',
+  blog_post_updated: 'system.activity_details.blog_post_updated',
+  blog_post_deleted: 'system.activity_details.blog_post_deleted',
+  blog_post_status_changed: 'system.activity_details.blog_post_status_changed',
+  blog_posts_bulk_deleted: 'system.activity_details.blog_posts_bulk_deleted',
+  blog_posts_bulk_published: 'system.activity_details.blog_posts_bulk_published',
+};
+
 function getActionColor(action: string): 'success' | 'warning' | 'danger' | 'primary' | 'default' | 'secondary' {
   const lower = action.toLowerCase();
   for (const [key, color] of Object.entries(actionColorMap)) {
@@ -81,6 +90,28 @@ export function ActivityLog() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
+  const getDescription = useCallback((entry: ActivityLogEntry): string => {
+    if (entry.description_code) {
+      const translationKey = activityDetailKeys[entry.description_code];
+      const params = { ...(entry.description_params ?? {}) };
+      for (const statusField of ['old_status', 'new_status'] as const) {
+        const status = params[statusField];
+        if (typeof status === 'string') {
+          params[statusField] = t(`system.activity_status.${status}`, {
+            defaultValue: t('system.activity_status.unknown'),
+          });
+        }
+      }
+      return translationKey
+        ? t(translationKey, params)
+        : t('system.activity_details.unknown', { code: entry.description_code });
+    }
+
+    // Historical rows stored free-form prose. Keep displaying that legacy
+    // value, but all newly structured rows are rendered from stable codes.
+    return entry.description || '—';
+  }, [t]);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -114,7 +145,7 @@ export function ActivityLog() {
     ? entries.filter(
         (e) =>
           e.action.toLowerCase().includes(search.toLowerCase()) ||
-          e.description.toLowerCase().includes(search.toLowerCase()) ||
+          getDescription(e).toLowerCase().includes(search.toLowerCase()) ||
           e.user_name.toLowerCase().includes(search.toLowerCase())
       )
     : entries;
@@ -145,11 +176,9 @@ export function ActivityLog() {
       label: t('system.col_action'),
       sortable: true,
       render: (entry) => {
-        const key = `system.action.${entry.action}`;
-        const translated = t(key);
-        const label = translated === key
-          ? entry.action.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-          : translated;
+        const label = t(`system.action.${entry.action}`, {
+          defaultValue: t('system.action.unknown'),
+        });
         return (
           <Chip size="sm" variant="soft" color={getActionColor(entry.action)}>
             {label}
@@ -162,7 +191,7 @@ export function ActivityLog() {
       label: t('system.col_description'),
       render: (entry) => (
         <span className="text-sm text-muted line-clamp-2">
-          {entry.description || '—'}
+          {getDescription(entry)}
         </span>
       ),
     },

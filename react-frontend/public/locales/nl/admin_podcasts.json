@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,7 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
+    "loading": "Laden",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,7 +68,7 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
+    "select_row": "Selecteer rij {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
   },
@@ -85,25 +85,24 @@
       "category": "Categorie",
       "media_scan": "Mediascan",
       "media_processing": "Mediaverwerking",
-      "transcript": "Transcript",
       "chapters": "Hoofdstukken",
       "report_history": "Meldingsgeschiedenis",
       "notes": "Notities van moderator",
       "notes_hint": "Leg de beslissing uit zodat de maker de nodige wijzigingen kan aanbrengen.",
-      "audio_unsupported": "Je browser kan deze audio niet afspelen."
+      "audio_unsupported": "Je browser kan deze audio niet afspelen.",
+      "transcript": "Transcript"
     },
     "title": "Podcasts",
     "description": "Beoordeel communityshows en afleveringen, inclusief inhoud die wordt bewaard voor moderatie door huurders.",
     "load_failed": "Kan podcast-moderatie niet laden.",
     "action_failed": "Kan podcast-moderatie niet updaten.",
     "empty_value": "-",
-    "count": "{{count}} items",
     "actions": {
       "inspect": "Beoordelen en modereren",
-      "refresh": "Refresh",
-      "approve": "Approve",
-      "reject": "Reject",
-      "flag": "Flag",
+      "refresh": "Vernieuwen",
+      "approve": "Goedkeuren",
+      "reject": "Afwijzen",
+      "flag": "Vlag",
       "resolve_report": "Rapport oplossen",
       "dismiss_report": "Rapport afwijzen",
       "escalate_report": "Escaleer het rapport",
@@ -111,30 +110,48 @@
     },
     "filters": {
       "label": "Podcast-moderatiefilter",
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "In behandeling",
+      "approved": "Goedgekeurd",
+      "rejected": "Afgewezen",
+      "flagged": "Gemarkeerd",
+      "all": "Alles"
     },
     "sections": {
-      "shows": "Shows",
-      "episodes": "Episodes",
       "top_episodes": "Topafleveringen",
       "client_breakdown": "Uitsplitsing van de klant",
-      "retention": "Retention",
-      "reports": "Rapporten openen"
+      "reports": "Rapporten openen",
+      "shows": "Toont",
+      "episodes": "Afleveringen",
+      "retention": "Bewaring"
     },
     "review_values": {
-      "visibility": { "public": "Openbaar", "members": "Leden", "private": "Privé", "inherit": "Overnemen van de show" },
-      "media_scan": { "pending": "Scan in afwachting", "clean": "Schoon", "infected": "Geïnfecteerd", "scan_unavailable": "Scanner niet beschikbaar", "not_required": "Niet vereist" },
-      "media_processing": { "pending": "In afwachting", "ready_for_processing": "Klaar voor verwerking", "complete": "Voltooid", "failed": "Mislukt" },
-      "report_status": { "open": "Open", "resolved": "Opgelost", "dismissed": "Afgewezen", "escalated": "Geëscaleerd" }
+      "visibility": {
+        "public": "Openbaar",
+        "members": "Leden",
+        "private": "Privé",
+        "inherit": "Overnemen van de show"
+      },
+      "media_scan": {
+        "pending": "Scan in afwachting",
+        "clean": "Schoon",
+        "infected": "Geïnfecteerd",
+        "scan_unavailable": "Scanner niet beschikbaar",
+        "not_required": "Niet vereist"
+      },
+      "media_processing": {
+        "pending": "In afwachting",
+        "ready_for_processing": "Klaar voor verwerking",
+        "complete": "Voltooid",
+        "failed": "Mislukt"
+      },
+      "report_status": {
+        "open": "Open",
+        "resolved": "Opgelost",
+        "dismissed": "Afgewezen",
+        "escalated": "Geëscaleerd"
+      }
     },
     "readiness": {
-      "moderation": "Moderation",
-      "reports": "Reports",
-      "media": "Media",
       "rss": "RSS",
       "pending_items_one": "{{count}} item wacht op beoordeling",
       "pending_items_other": "{{count}} items wachten op beoordeling",
@@ -143,12 +160,15 @@
       "media_jobs_one": "{{count}} mediataak wacht",
       "media_jobs_other": "{{count}} mediataken wachten",
       "rss_ready_one": "{{count}} gepubliceerde show kan worden gecontroleerd",
-      "rss_ready_other": "{{count}} gepubliceerde shows kunnen worden gecontroleerd"
+      "rss_ready_other": "{{count}} gepubliceerde shows kunnen worden gecontroleerd",
+      "moderation": "Moderatie",
+      "reports": "Rapporten",
+      "media": "Media"
     },
     "feed_validation": {
       "title": "RSS-validatie",
       "subtitle": "Laatste controle voor {{title}}",
-      "valid": "Ready",
+      "valid": "Klaar",
       "invalid": "Heeft werk nodig",
       "errors": "Blokkerende problemen",
       "warnings": "Aanbevolen oplossingen"
@@ -163,61 +183,62 @@
       "missing_artwork": "Voeg showillustraties toe om de podcastdirectory gereed te maken.",
       "episode_missing_audio_url": "Voor een aflevering ontbreekt een geldige HTTP-audio-URL.",
       "episode_missing_audio_length": "Bij een aflevering ontbreekt de audiobestandsgrootte.",
-      "episode_missing_audio_mime": "Een aflevering mist het audio-MIME-type."
+      "episode_missing_audio_mime": "Een aflevering mist het audio-MIME-type.",
+      "unknown": "De feed heeft een niet-herkende fout."
     },
     "columns": {
-      "title": "Title",
-      "owner": "Owner",
-      "show": "Show",
-      "author": "Author",
+      "title": "Titel",
+      "owner": "Eigenaar",
+      "author": "Auteur",
       "status": "Status",
-      "moderation": "Moderation",
-      "updated": "Updated",
-      "actions": "Actions",
-      "listens": "Listens",
-      "client": "Client",
+      "updated": "Bijgewerkt",
+      "actions": "Acties",
+      "listens": "Weergaven",
+      "details": "Details",
+      "show": "Toon",
+      "moderation": "Moderatie",
+      "client": "Cliënt",
       "bucket": "Bucket",
-      "episode": "Episode",
-      "reason": "Reason",
-      "details": "Details"
+      "episode": "Aflevering",
+      "reason": "Reden"
     },
-    "report_unknown_episode": "Episode #{{id}}",
-    "reporter": "Reported by {{name}}",
+    "reporter": "Gemeld door {{name}}",
     "report_meta": "{{show}} · {{reporter}}",
     "report_reasons": {
       "safety": "Veiligheid of schade",
       "spam": "Spam of misleidende inhoud",
       "rights": "Auteursrecht of rechten betreft",
-      "other": "Other"
+      "unknown": "Niet-herkende reden",
+      "other": "Overig"
     },
     "stats": {
-      "total_shows": "Shows",
       "published_shows": "Gepubliceerde shows",
       "pending_shows": "In behandeling zijnde shows",
-      "total_episodes": "Episodes",
       "published_episodes": "Gepubliceerde afleveringen",
       "pending_episodes": "Afleveringen in behandeling",
-      "total_listens": "Listens",
+      "total_listens": "Weergaven",
       "completed_listens": "Voltooide luisterbeurten",
       "completion_rate": "Voltooiingspercentage",
       "unique_listeners": "Unieke luisteraars",
       "open_reports": "Rapporten openen",
-      "subscribers": "Followers",
       "pending_media_scans": "Scans in behandeling",
       "media_scan_unavailable": "Scanner niet beschikbaar",
       "pending_media_processing": "Mediataken in behandeling",
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "total_shows": "Toont",
+      "total_episodes": "Afleveringen",
+      "subscribers": "Volgers"
     },
     "status": {
-      "draft": "Draft",
-      "published": "Published",
-      "archived": "Archived"
+      "draft": "Concept",
+      "published": "Gepubliceerd",
+      "archived": "Gearchiveerd"
     },
     "moderation": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "In behandeling",
+      "approved": "Goedgekeurd",
+      "rejected": "Afgewezen",
+      "flagged": "Gemarkeerd"
     },
     "empty": {
       "shows": "Geen enkele show komt overeen met het huidige filter.",
@@ -254,6 +275,8 @@
       "confirm_reject_message_other": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept."
     },
     "count_one": "{{count}} artikelen",
-    "count_other": "{{count}} artikelen"
+    "count_other": "{{count}} artikelen",
+    "count": "{{count}} items",
+    "report_unknown_episode": "Aflevering #{{id}}"
   }
 }

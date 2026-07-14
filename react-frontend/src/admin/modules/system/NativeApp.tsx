@@ -118,7 +118,7 @@ export function NativeApp() {
         setReadiness(payload.deployment_readiness ?? {});
         toast.success(t('system.native_app_settings_saved_successfully'));
       } else {
-        toast.error(res.error || t('system.failed_to_save_native_app_settings'));
+        toast.error(t('system.failed_to_save_native_app_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_native_app_settings'));

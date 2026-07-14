@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,7 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
+    "loading": "Chargement",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,7 +68,7 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
+    "select_row": "Sélectionner la ligne {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
   },
@@ -208,7 +208,22 @@
     "verify_seller_title": "Vérifier le vendeur",
     "view_all": "Tout afficher",
     "moderation_tabs_aria": "Filtre de statut de modération Marketplace",
-    "seller_tabs_aria": "Filtre de statut du vendeur"
+    "seller_tabs_aria": "Filtre de statut du vendeur",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "sold": "Vendu",
+      "expired": "Expiré",
+      "draft": "Brouillon",
+      "unknown": "Autre statut de l'annonce"
+    },
+    "moderation_status": {
+      "approved": "Approuvé",
+      "pending": "En attente de révision",
+      "rejected": "Rejeté",
+      "flagged": "Signalé",
+      "unknown": "Autre statut de modération"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} sélectionné",

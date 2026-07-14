@@ -286,7 +286,6 @@
     "reviews_intro": "Rejestruj kontrolowane decyzje bez notatek, danych kontaktowych i zapisów incydentów.",
     "review_member": "Uczestnik wydarzenia",
     "review_member_choose": "Wybierz uczestnika",
-    "member_fallback": "Numer członka: identyfikator",
     "review_decision": "Decyzja",
     "decisions": {
       "deny": "Odmów udziału",
@@ -319,6 +318,7 @@
     },
     "reviewed_by": "Oceniony przez",
     "withdraw_review": "Cofnij decyzję",
-    "ledger_empty": "Nie zarejestrowano żadnych recenzji uczestnictwa w tym wydarzeniu."
+    "ledger_empty": "Nie zarejestrowano żadnych recenzji uczestnictwa w tym wydarzeniu.",
+    "member_fallback": "Członek #:id"
   }
 }

@@ -282,7 +282,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
       if (requestedPage > 1) query.set('page', String(requestedPage));
       const suffix = query.size > 0 ? `?${query.toString()}` : '';
       const response = await api.get(`/v2/admin/groups/${groupId}/audit-log${suffix}`);
-      if (!response.success) throw new Error(response.error || 'Audit request failed');
+      if (!response.success) throw new Error(t('groups.audit_load_failed'));
 
       const result = parseAuditPage(response.data);
       if (generation !== requestGeneration.current) return;

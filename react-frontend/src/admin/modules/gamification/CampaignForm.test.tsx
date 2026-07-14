@@ -232,14 +232,14 @@ describe('CampaignForm — create mode', () => {
     });
   });
 
-  it('has a back/cancel button linking to campaigns list', async () => {
+  it('has a back link to the campaigns list', async () => {
     renderCreate();
 
     await waitFor(() => {
-      const cancelBtn = screen.getAllByRole('button').find(
-        (b) => /cancel|back/i.test(b.textContent ?? ''),
+      expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute(
+        'href',
+        '/test/admin/gamification/campaigns',
       );
-      expect(cancelBtn).toBeInTheDocument();
     });
   });
 });

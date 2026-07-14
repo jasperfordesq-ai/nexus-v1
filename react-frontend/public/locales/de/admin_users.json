@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "users": {
     "action_approve": "Genehmigen",
@@ -143,7 +143,6 @@
     "import_title": "Importieren",
     "import_total_rows": "Gesamtzahl der Zeilen",
     "label_amount": "Betrag",
-    "label_bio": "Bio",
     "label_email": "E-Mail",
     "label_first_name": "Vorname",
     "label_last_name": "Nachname",
@@ -197,7 +196,6 @@
     "role_admin": "Admin",
     "role_broker": "Makler",
     "role_member": "Mitglied",
-    "role_moderator": "Moderator",
     "role_newsletter_admin": "Newsletter-Administrator",
     "role_tenant_admin": "Mieteradministrator",
     "send_welcome_email": "Senden Sie eine Willkommens-E-Mail",
@@ -220,7 +218,11 @@
     "permissions_editor_unavailable_title": "Berechtigungen sind hier schreibgeschützt",
     "permissions_editor_unavailable_desc": "Diese Seite zeigt die Rolle und die erteilten Berechtigungen des Benutzers, kann sie aber nicht ändern. Verwalten Sie den Zugriff, indem Sie die Rolle des Benutzers auf der Bearbeitungsseite ändern.",
     "role_unknown": "Unbekannte Rolle",
-    "role_tenant_super_admin": "Mandanten-Superadministrator"
+    "role_tenant_super_admin": "Mandanten-Superadministrator",
+    "role_super_admin_short": "Super-Administrator",
+    "reset_2fa_reason": "Zurückgesetzt durch einen Administrator",
+    "label_bio": "Biografie",
+    "role_moderator": "Moderator"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "Einwilligung erteilt",
       "not_consented": "Nicht eingewilligt",
       "not_given": "Einwilligung nicht erteilt",
-      "withdrawn_on": "Zurückgezogen am"
+      "withdrawn_on": "Zurückgezogen am",
+      "type_unknown": "Unbekannter Zustimmungstyp"
     },
     "descriptions": {
       "balance_amount": "Verwenden Sie negative Werte, um Zeitguthaben von diesem Mitglied abzuziehen",
@@ -280,7 +283,6 @@
     "fields": {
       "amount": "Menge",
       "balance": "Gleichgewicht",
-      "bio": "Bio",
       "current_balance": "Aktueller Kontostand",
       "email": "E-Mail",
       "email_activation_status": "E-Mail-Aktivierungsstatus",
@@ -297,7 +299,8 @@
       "role": "Rolle",
       "status": "Status",
       "tagline": "Slogan",
-      "tenant_super_admin": "Mieter-Superadministrator"
+      "tenant_super_admin": "Mieter-Superadministrator",
+      "bio": "Biografie"
     },
     "loading": {
       "compliance": "Compliance wird geladen",
@@ -346,9 +349,9 @@
       "admin": "Admin",
       "broker": "Makler",
       "member": "Mitglied",
-      "moderator": "Moderator",
       "newsletter_admin": "Newsletter-Administrator",
-      "tenant_admin": "Mieteradministrator"
+      "tenant_admin": "Mieteradministrator",
+      "moderator": "Moderator"
     },
     "sections": {
       "account_actions": "Kontoaktionen",
@@ -433,12 +436,28 @@
       "decision_confirmed": "Attest bestätigt",
       "decision_revoked": "Bescheinigung widerrufen",
       "decision_not_confirmed": "Attest nicht bestätigt"
+    },
+    "insurance": {
+      "status_none": "Keine",
+      "status_pending": "Ausstehend",
+      "status_submitted": "Eingereicht",
+      "status_verified": "Verifiziert",
+      "status_expired": "Abgelaufen",
+      "status_rejected": "Abgelehnt",
+      "status_revoked": "Zurückgezogen",
+      "status_unknown": "Unbekannter Status",
+      "type_public_liability": "Haftpflichtversicherung",
+      "type_professional_indemnity": "Berufshaftpflicht",
+      "type_employers_liability": "Haftung des Arbeitgebers",
+      "type_product_liability": "Produkthaftung",
+      "type_personal_accident": "Persönlicher Unfall",
+      "type_other": "Andere",
+      "type_unknown": "Unbekannte Versicherungsart"
     }
   },
   "aria": {
     "breadcrumbs": "Semmelbrösel"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "Wohnsitzverifizierungen",
     "page_desc": "Prüfen Sie von Mitgliedern eingereichte Wohnsitzerklärungen und vergeben Sie das Abzeichen für verifizierten Wohnsitz.",
@@ -483,5 +502,6 @@
     "intelligence": "Intelligenz",
     "engagement": "Interaktion",
     "system": "System"
-  }
+  },
+  "loading": "Lädt"
 }

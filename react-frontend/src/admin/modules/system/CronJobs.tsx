@@ -9,7 +9,7 @@
  * Parity: PHP CronJobController::index()
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState } from 'react';
 import { Separator } from '@/components/ui';
 import Activity from 'lucide-react/icons/activity';
@@ -31,16 +31,11 @@ import { adminCron, adminSystem } from '../../api/adminApi';
 import type { CronHealthMetrics, CronJob } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/DataTable';
+import { getCronJobDescription, getCronJobName } from './cronJobTranslations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Extended type to include extra fields from the API
 // ─────────────────────────────────────────────────────────────────────────────
-
-type CronJobExtended = Omit<CronJob, 'slug'> & {
-  slug?: string;
-  category?: string;
-  description?: string;
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Category colour & label mapping
@@ -70,7 +65,7 @@ export function CronJobs() {
   const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
-  const [jobs, setJobs] = useState<CronJobExtended[]>([]);
+  const [jobs, setJobs] = useState<CronJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [runningJob, setRunningJob] = useState<number | null>(null);
   const [healthMetrics, setHealthMetrics] = useState<CronHealthMetrics | null>(null);
@@ -128,7 +123,7 @@ export function CronJobs() {
     setLoadingHealth(false);
   }, []);
 
-  const handleRunJob = async (id: number, _jobName: string) => {
+  const handleRunJob = async (id: number) => {
     setRunningJob(id);
     try {
       const res = await adminSystem.runCronJob(id);
@@ -136,7 +131,7 @@ export function CronJobs() {
         toast.success(t('system.job_triggered'));
         loadJobs(); // Refresh to get updated status
       } else {
-        toast.error(res.error || t('system.failed_to_run_job'));
+        toast.error(t('system.failed_to_run_job'));
       }
     } catch {
       toast.error(t('system.failed_to_run_job'));
@@ -150,7 +145,7 @@ export function CronJobs() {
   }, [loadJobs, loadHealthMetrics]);
 
   // Group jobs by category
-  const jobsByCategory = jobs.reduce<Record<string, CronJobExtended[]>>((acc, job) => {
+  const jobsByCategory = jobs.reduce<Record<string, CronJob[]>>((acc, job) => {
     const cat = job.category || 'other';
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(job);
@@ -234,7 +229,7 @@ export function CronJobs() {
                   }
                   className="mt-2"
                 >
-                  {healthMetrics.alert_status}
+                  {t(`system.alert_status_${healthMetrics.alert_status}`, { defaultValue: t('common.unknown') })}
                 </Chip>
               </CardBody>
             </Card>
@@ -248,9 +243,8 @@ export function CronJobs() {
               <CardBody className="pt-0">
                 <div className="flex items-end gap-2">
                   <span className="text-4xl font-bold text-success">
-                    {Math.round(healthMetrics.avg_success_rate_7d * 100)}
+                    {formatNumber(healthMetrics.avg_success_rate_7d, { style: 'percent', maximumFractionDigits: 0 })}
                   </span>
-                  <span className="mb-1 text-sm text-muted">%</span>
                 </div>
                 <p className="mt-2 text-xs text-muted">
                   {t('system.average_across_all_jobs')}
@@ -409,7 +403,7 @@ export function CronJobs() {
                 color={categoryColorMap[category] || 'default'}
                 className="capitalize"
               >
-                {category}
+                {t(`system.job_category_${category}`, { defaultValue: t('system.job_category_unknown') })}
               </Chip>
               <span className="text-sm text-muted">
                 {t('system.job_count')}
@@ -422,12 +416,10 @@ export function CronJobs() {
                   {/* Header: Name + Status */}
                   <CardHeader className="flex items-start justify-between gap-2 px-4 pt-4 pb-0">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-foreground truncate">{job.name}</h3>
-                      {job.description && (
-                        <p className="mt-0.5 line-clamp-2 text-xs text-muted">
-                          {job.description}
-                        </p>
-                      )}
+                      <h3 className="font-semibold text-foreground truncate">{getCronJobName(t, job)}</h3>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted">
+                        {getCronJobDescription(t, job)}
+                      </p>
                     </div>
                     <StatusBadge status={job.status} />
                   </CardHeader>
@@ -505,7 +497,7 @@ export function CronJobs() {
                       }
                       isLoading={runningJob === job.id}
                       isDisabled={job.status === 'disabled' || runningJob !== null}
-                      onPress={() => handleRunJob(job.id, job.name)}
+                      onPress={() => handleRunJob(job.id)}
                     >
                       {runningJob === job.id ? t('system.running') : t('system.run_now')}
                     </Button>

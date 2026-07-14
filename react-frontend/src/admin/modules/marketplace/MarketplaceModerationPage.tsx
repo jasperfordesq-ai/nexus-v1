@@ -146,7 +146,7 @@ export function MarketplaceModerationPage() {
         toast.success(t('marketplace.listing_approved'));
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_approve_listing'));
+        toast.error(t('marketplace.failed_approve_listing'));
       }
     } catch {
       toast.error(t('marketplace.unexpected_error'));
@@ -168,7 +168,7 @@ export function MarketplaceModerationPage() {
         setRejectNotes('');
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_reject_listing'));
+        toast.error(t('marketplace.failed_reject_listing'));
       }
     } catch {
       toast.error(t('marketplace.unexpected_error'));
@@ -186,7 +186,7 @@ export function MarketplaceModerationPage() {
         toast.success(t('marketplace.listing_removed'));
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || t('marketplace.failed_delete_listing'));
+        toast.error(t('marketplace.failed_delete_listing'));
       }
     } catch {
       toast.error(t('marketplace.unexpected_error'));
@@ -260,7 +260,9 @@ export function MarketplaceModerationPage() {
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
-          {item.status}
+          {t(`marketplace.status.${item.status}`, {
+            defaultValue: t('marketplace.status.unknown'),
+          })}
         </Chip>
       ),
     },
@@ -275,7 +277,9 @@ export function MarketplaceModerationPage() {
           color={moderationColors[item.moderation_status] || 'default'}
           className="capitalize"
         >
-          {item.moderation_status}
+          {t(`marketplace.moderation_status.${item.moderation_status}`, {
+            defaultValue: t('marketplace.moderation_status.unknown'),
+          })}
         </Chip>
       ),
     },
@@ -412,7 +416,7 @@ export function MarketplaceModerationPage() {
               try {
                 const res = await adminMarketplace.bulkReject(selectedIdList, reason);
                 if (!res.success) {
-                  toast.error(res.error || t('bulk.result_failed'));
+                  toast.error(t('bulk.result_failed'));
                   return;
                 }
                 const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };

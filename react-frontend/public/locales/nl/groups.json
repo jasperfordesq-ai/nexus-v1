@@ -115,7 +115,7 @@
     "invite": "Uitnodigen",
     "invite_link_desc": "Deel een link die iedereen kan gebruiken om lid te worden:",
     "invite_email_desc": "Of nodig uit via e-mail (gescheiden door komma's):",
-    "invite_email_placeholder": "e-mail1@voorbeeld.com, e-mail2@voorbeeld.com",
+    "invite_email_placeholder": "email1@example.com, email2@example.com",
     "invite_emails_aria": "E-mailadressen om uit te nodigen",
     "invite_message_label": "Persoonlijk bericht (optioneel)",
     "invite_message_placeholder": "Word lid van onze groep!",

@@ -23,6 +23,7 @@ interface ModuleDoc {
   id: number;
   module_slug: string;
   title: string;
+  default_title_code?: string | null;
   body: string;
   keywords: string[];
   is_active: boolean;
@@ -59,6 +60,12 @@ export default function AiModuleDocsAdminPage() {
   const [seeding, setSeeding] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ModuleDoc | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const displayTitle = useCallback((doc: ModuleDoc) => (
+    doc.default_title_code
+      ? t(`ai.module_docs.defaults.${doc.default_title_code}.title`, { defaultValue: doc.title })
+      : doc.title
+  ), [t]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -112,11 +119,10 @@ export default function AiModuleDocsAdminPage() {
         setEditorOpen(false);
         void load();
       } else {
-        toast.error(res.error || t('ai.module_docs.toasts.save_failed'));
+        toast.error(t('ai.module_docs.toasts.save_failed'));
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : t('ai.module_docs.toasts.save_failed');
-      toast.error(msg);
+    } catch {
+      toast.error(t('ai.module_docs.toasts.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -131,7 +137,7 @@ export default function AiModuleDocsAdminPage() {
         toast.success(t('ai.module_docs.toasts.deleted'));
         void load();
       } else {
-        toast.error(res.error || t('ai.module_docs.toasts.delete_failed'));
+        toast.error(t('ai.module_docs.toasts.delete_failed'));
       }
     } catch {
       toast.error(t('ai.module_docs.toasts.delete_failed'));
@@ -215,7 +221,7 @@ export default function AiModuleDocsAdminPage() {
               <TableCell>
                 <span className="font-mono text-xs">{doc.module_slug}</span>
               </TableCell>
-              <TableCell>{doc.title}</TableCell>
+              <TableCell>{displayTitle(doc)}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1 max-w-[20rem]">
                   {doc.keywords.slice(0, 6).map((k) => (
@@ -264,7 +270,7 @@ export default function AiModuleDocsAdminPage() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => void handleDelete()}
         title={t('ai.module_docs.actions.delete')}
-        message={deleteTarget ? t('ai.module_docs.confirm_delete', { title: deleteTarget.title }) : ''}
+        message={deleteTarget ? t('ai.module_docs.confirm_delete', { title: displayTitle(deleteTarget) }) : ''}
         confirmLabel={t('ai.module_docs.actions.delete')}
         cancelLabel={t('ai.common.cancel')}
         confirmColor="danger"
@@ -275,7 +281,7 @@ export default function AiModuleDocsAdminPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>{editing ? t('ai.module_docs.editor.edit_title', { title: editing.title }) : t('ai.module_docs.editor.create_title')}</ModalHeader>
+              <ModalHeader>{editing ? t('ai.module_docs.editor.edit_title', { title: displayTitle(editing) }) : t('ai.module_docs.editor.create_title')}</ModalHeader>
               <ModalBody>
                 <div className="flex flex-col gap-4">
                   <Input

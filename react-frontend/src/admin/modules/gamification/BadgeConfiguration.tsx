@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { BadgeConfigEntry } from '../../api/types';
+import { badgeDisplayDescription, badgeDisplayName } from './badgeDisplay';
 
 // TIER_LABELS removed — tier display names now come from i18n (gamification.badge_tiers.*)
 
@@ -171,6 +172,8 @@ export function BadgeConfiguration() {
                 {(grouped[tier] ?? []).map((badge) => {
                   const IconComp = CLASS_ICONS[badge.badge_class] ?? Award;
                   const isUpdating = updating === badge.key;
+                  const displayName = badgeDisplayName(t, badge);
+                  const displayDescription = badgeDisplayDescription(t, badge);
                   return (
                     <Card
                       key={badge.key}
@@ -184,8 +187,8 @@ export function BadgeConfiguration() {
                               <IconComp size={20} />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-medium text-foreground truncate">{badge.name}</p>
-                              <p className="text-xs text-muted line-clamp-2">{badge.description}</p>
+                              <p className="font-medium text-foreground truncate">{displayName}</p>
+                              <p className="text-xs text-muted line-clamp-2">{displayDescription}</p>
                             </div>
                           </div>
                           <Switch
@@ -193,7 +196,7 @@ export function BadgeConfiguration() {
                             isSelected={badge.is_enabled}
                             isDisabled={badge.badge_tier === 'core' || isUpdating}
                             onValueChange={(val) => handleToggle(badge, val)}
-                            aria-label={t('gamification.toggle_badge_aria', { name: badge.name })}
+                            aria-label={t('gamification.toggle_badge_aria', { name: displayName })}
                           />
                         </div>
                         <div className="flex flex-wrap items-center gap-2">

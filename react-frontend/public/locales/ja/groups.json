@@ -116,7 +116,7 @@
     "invite": "招待",
     "invite_link_desc": "誰でも参加できるリンクをシェアしましょう：",
     "invite_email_desc": "またはメールで招待（カンマ区切り）：",
-    "invite_email_placeholder": "email1@example.com、email2@example.com",
+    "invite_email_placeholder": "email1@example.com, email2@example.com",
     "invite_emails_aria": "招待するメールアドレス",
     "invite_message_label": "個人メッセージ（任意）",
     "invite_message_placeholder": "私たちのグループに参加しましょう！",
@@ -248,7 +248,11 @@
     "members_count_other": "{{count}}人のメンバー",
     "reply_count_other": "{{count}}件の返信",
     "tab_subgroups_count_other": "サブグループ ({{count}})",
-    "posts_count_other": "{{count}}件の投稿"
+    "posts_count_other": "{{count}}件の投稿",
+    "tab_subgroups_count_one": "サブグループ ({{count}})",
+    "members_count_one": "{{count}} メンバー",
+    "posts_count_one": "{{count}} 投稿",
+    "reply_count_one": "{{count}} 返信"
   },
   "form": {
     "create_title": "新しいグループを作成",
@@ -460,7 +464,8 @@
     "size_kb": "KB",
     "size_mb": "MB",
     "size_gb": "GB",
-    "folder_chip_other": "{{name}} ({{count}})"
+    "folder_chip_other": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "すべて",
@@ -525,7 +530,8 @@
     "cancel": "キャンセル",
     "create_btn": "Webhook を作成",
     "delete_confirm": "この Webhook を削除しますか?これを元に戻すことはできません。",
-    "failures_other": "{{count}} 件の失敗"
+    "failures_other": "{{count}} 件の失敗",
+    "failures_one": "{{count}} 失敗"
   },
   "toast": {
     "left": "グループを脱退",
@@ -662,7 +668,9 @@
     "vote_error": "投票に失敗しました",
     "accept_error": "回答を受け入れられませんでした",
     "answer_count_aria_other": "{{count}} 件の回答",
-    "answers_heading_other": "{{count}} 件の回答"
+    "answers_heading_other": "{{count}} 件の回答",
+    "answer_count_aria_one": "{{count}} 回答",
+    "answers_heading_one": "{{count}} 答え"
   },
   "wiki": {
     "load_failed": "Wiki ページの読み込みに失敗しました",
@@ -846,5 +854,8 @@
   },
   "members_other": "{{count}}人のメンバー",
   "members_count_label_other": "{{count}}人のメンバー",
-  "posts_count_label_other": "{{count}}件の投稿"
+  "posts_count_label_other": "{{count}}件の投稿",
+  "members_one": "{{count}} メンバー",
+  "members_count_label_one": "{{count}} メンバー",
+  "posts_count_label_one": "{{count}} 投稿"
 }

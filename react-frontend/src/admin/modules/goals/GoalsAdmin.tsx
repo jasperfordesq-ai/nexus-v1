@@ -196,7 +196,7 @@ export function GoalsAdmin() {
         toast.success(t('goals.goal_deleted'));
         loadGoals();
       } else {
-        toast.error(res?.error || t('goals.failed_to_delete_goal'));
+        toast.error(t('goals.failed_to_delete_goal'));
       }
     } catch {
       toast.error(t('goals.an_unexpected_error_occurred'));

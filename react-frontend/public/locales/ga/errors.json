@@ -49,5 +49,23 @@
   "extend_session": "Seisiún a leathnú",
   "dismiss": "Dún",
   "idle_logout_title": "Sínithe amach de bharr neamhghníomhaíochta",
-  "idle_logout_message": "Síníodh amach thú go huathoibríoch tar éis tréimhse neamhghníomhaíochta. Logáil isteach arís le leanúint ar aghaidh."
+  "idle_logout_message": "Síníodh amach thú go huathoibríoch tar éis tréimhse neamhghníomhaíochta. Logáil isteach arís le leanúint ar aghaidh.",
+  "api": {
+    "request_failed_title": "Theip ar an iarratas",
+    "request_failed": "Níorbh fhéidir an t-iarratas a chríochnú.",
+    "service_unavailable": "Tá an tseirbhís neamhghníomhach go sealadach. Déan iarracht arís níos déanaí.",
+    "invalid_response": "Thug an freastalaí freagra neamhbhailí.",
+    "request_timeout": "Tháinig deireadh leis an iarraidh. Déan iarracht arís le do thoil.",
+    "network_error": "Ní féidir nasc a dhéanamh. Seiceáil do nasc idirlín agus déan iarracht arís.",
+    "invalid_request": "Bhí an iarraidh neamhbhailí. Seiceáil do ionchur le do thoil.",
+    "permission_denied": "Níl cead agat an gníomh seo a dhéanamh.",
+    "resource_not_found": "Níor aimsíodh an acmhainn a iarradh.",
+    "too_many_requests": "Ró-mhór iarratais. Fan nóiméad agus déan iarracht arís le do thoil.",
+    "server_error": "Tharla earráid freastalaí neamhghnách. Déan iarracht arís níos déanaí le do thoil.",
+    "download_failed_status": "Theip ar an íoslódáil (HTTP {{status}}).",
+    "upload_failed": "Theip ar an uaslódáil.",
+    "upload_failed_retry": "Theip ar an uaslódáil. Déan iarracht arís, le do thoil.",
+    "upload_cancelled": "Uaslódáil curtha ar ceal.",
+    "upload_timeout": "Am an uaslódáil as am. Déan iarracht arís, le do thoil."
+  }
 }

@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { logError } from '@/lib/logger';
+import { formatPercentRatio } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 // Copyright © 2024–2026 Jasper Ford
@@ -144,7 +145,7 @@ export default function SmartNudgesAdminPage() {
         setData(res.data);
         setConfig(res.data.config);
       } else {
-        toast.error(res.error || t('smart_nudges.toasts.load_failed'));
+        toast.error(t('smart_nudges.toasts.load_failed'));
       }
     } catch (err) {
       logError('SmartNudgesAdminPage: load failed', err);
@@ -171,7 +172,7 @@ export default function SmartNudgesAdminPage() {
         toast.success(t('smart_nudges.toasts.config_saved'));
         void load();
       } else {
-        toast.error(res.error || t('smart_nudges.toasts.save_failed'));
+        toast.error(t('smart_nudges.toasts.save_failed'));
       }
     } catch (err) {
       logError('SmartNudgesAdminPage: save config failed', err);
@@ -199,7 +200,7 @@ export default function SmartNudgesAdminPage() {
             void load();
           }
         } else {
-          toast.error(res.error || t('smart_nudges.toasts.dispatch_failed'));
+          toast.error(t('smart_nudges.toasts.dispatch_failed'));
         }
       } catch (err) {
         logError('SmartNudgesAdminPage: dispatch failed', err);
@@ -218,7 +219,7 @@ export default function SmartNudgesAdminPage() {
   const statusLabel = (status: string) => {
     if (status === 'converted') return t('smart_nudges.status.converted');
     if (status === 'sent') return t('smart_nudges.status.sent');
-    return status;
+    return t('smart_nudges.status.unknown');
   };
 
   if (loading || !data || !config) {
@@ -295,7 +296,7 @@ export default function SmartNudgesAdminPage() {
         <StatCard
           icon={TrendingUp}
           label={t('smart_nudges.stats.conversion_30d')}
-          value={`${(stats.conversion_rate_30d * 100).toFixed(1)}%`}
+          value={formatPercentRatio(stats.conversion_rate_30d)}
           color="success"
         />
         <StatCard icon={Bell} label={t('smart_nudges.stats.eligible_candidates')} value={String(data.eligible_candidates)} color="warning" />

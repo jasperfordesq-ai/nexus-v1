@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,7 +79,7 @@ interface Scoreboard {
   };
 }
 
-const CHF = new Intl.NumberFormat('de-CH', {
+const CHF = new Intl.NumberFormat(getFormattingLocale(), {
   style: 'currency',
   currency: 'CHF',
   maximumFractionDigits: 0,
@@ -108,8 +108,8 @@ function formatValue(v: number | null, fmt: string): string {
   switch (fmt) {
     case 'int':    return v.toLocaleString(getFormattingLocale());
     case 'float':  return v.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 });
-    case 'pct':    return `${v.toFixed(1)}%`;
-    case 'hours':  return `${v.toFixed(1)} h`;
+    case 'pct':    return new Intl.NumberFormat(getFormattingLocale(), { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v / 100);
+    case 'hours':  return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'hour', unitDisplay: 'short', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v);
     case 'chf':    return CHF.format(v);
     case 'score':  return `${v.toFixed(2)} / 5`;
     default:       return String(v);
@@ -174,7 +174,7 @@ export default function PilotScoreboardAdminPage() {
         setPreNotes('');
         await load();
       } else {
-        showToast(res.error || t('pilot_scoreboard.toasts.pre_failed'), 'error');
+        showToast(t('pilot_scoreboard.toasts.pre_failed'), 'error');
       }
     } catch {
       showToast(t('pilot_scoreboard.toasts.pre_failed'), 'error');
@@ -197,7 +197,7 @@ export default function PilotScoreboardAdminPage() {
         setQuarterlyNotes('');
         await load();
       } else {
-        showToast(res.error || t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
+        showToast(t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
       }
     } catch {
       showToast(t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
@@ -335,7 +335,7 @@ export default function PilotScoreboardAdminPage() {
                         }
                       >
                         {pct > 0 ? '+' : ''}
-                        {pct.toFixed(1)}%
+                        {formatPercentValue(pct)}
                       </Chip>
                     );
                   }

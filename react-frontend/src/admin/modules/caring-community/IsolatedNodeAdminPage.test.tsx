@@ -49,28 +49,28 @@ const makeGate = (overrides: Partial<{
   closed: false,
   decided_count: 2,
   total_count: 5,
-  blockers: ['infrastructure_choice'],
+  blockers: ['deployment_mode'],
   status_counts: { pending: 2, in_progress: 1, decided: 2, blocked: 0 },
   ...overrides,
 });
 
 const makeItem = (overrides: Partial<{
   key: string;
-  label: string;
+  label_code: string;
   type: 'text' | 'enum' | 'url' | 'choice';
   value: string | null;
   status: 'pending' | 'in_progress' | 'decided' | 'blocked';
   choices: string[] | null;
-  help: string;
+  help_code: string;
   owner: string | null;
   notes: string | null;
   updated_at: string | null;
 }> = {}) => ({
-  key: 'infrastructure_choice',
-  label: 'Infrastructure Choice',
+  key: 'deployment_mode',
+  label_code: 'deployment_mode',
   type: 'enum' as const,
-  choices: ['azure', 'aws', 'gcp'],
-  help: 'Select the cloud provider',
+  choices: ['hosted_tenant', 'hosted_custom_domain', 'canton_isolated_node'],
+  help_code: 'deployment_mode',
   value: null,
   owner: null,
   status: 'pending' as const,
@@ -81,10 +81,11 @@ const makeItem = (overrides: Partial<{
 
 const MOCK_GATE_RESPONSE = {
   items: [
-    makeItem({ key: 'infra', label: 'Infrastructure Choice', value: null, status: 'pending' }),
+    makeItem({ key: 'deployment_mode', value: null, status: 'pending' }),
     makeItem({
-      key: 'domain',
-      label: 'Domain Name',
+      key: 'incident_runbook_url',
+      label_code: 'incident_runbook_url',
+      help_code: 'incident_runbook_url',
       type: 'url',
       choices: null,
       value: 'https://example.com',
@@ -97,7 +98,7 @@ const MOCK_GATE_RESPONSE = {
 
 const CLOSED_GATE_RESPONSE = {
   items: [
-    makeItem({ key: 'infra', label: 'Infrastructure Choice', value: 'azure', status: 'decided' }),
+    makeItem({ key: 'deployment_mode', value: 'hosted_tenant', status: 'decided' }),
   ],
   gate: makeGate({ closed: true, decided_count: 1, total_count: 1, blockers: [] }),
   last_updated_at: '2026-06-22T10:00:00Z',
@@ -123,8 +124,8 @@ describe('IsolatedNodeAdminPage — populated state', () => {
     render(<IsolatedNodeAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Infrastructure Choice')).toBeInTheDocument();
-      expect(screen.getByText('Domain Name')).toBeInTheDocument();
+      expect(screen.getByText('Deployment mode')).toBeInTheDocument();
+      expect(screen.getByText('Incident runbook URL')).toBeInTheDocument();
     });
   });
 
@@ -162,9 +163,9 @@ describe('IsolatedNodeAdminPage — populated state', () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: CLOSED_GATE_RESPONSE });
     render(<IsolatedNodeAdminPage />);
 
-    // 'azure' is the decided value
+    // The stable deployment choice is translated for display.
     await waitFor(() => {
-      expect(screen.getByText('azure')).toBeInTheDocument();
+      expect(screen.getByText('Hosted tenant')).toBeInTheDocument();
     });
     // gate.closed = true → progress should be at 100%
     const progressbar = screen.getByRole('progressbar');
@@ -179,7 +180,7 @@ describe('IsolatedNodeAdminPage — edit modal', () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: MOCK_GATE_RESPONSE });
     render(<IsolatedNodeAdminPage />);
 
-    await waitFor(() => screen.getByText('Infrastructure Choice'));
+    await waitFor(() => screen.getByText('Deployment mode'));
 
     const editBtns = screen.getAllByRole('button');
     const editBtn = editBtns.find(
@@ -192,20 +193,20 @@ describe('IsolatedNodeAdminPage — edit modal', () => {
 
     // Modal header includes the item label
     await waitFor(() => {
-      expect(screen.getAllByText('Infrastructure Choice').length).toBeGreaterThan(1);
+      expect(screen.getAllByText('Deployment mode').length).toBeGreaterThan(1);
     });
   });
 
   it('calls PUT when save is clicked in modal', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: MOCK_GATE_RESPONSE });
-    const updatedItem = makeItem({ key: 'infra', value: 'azure', status: 'decided' });
+    const updatedItem = makeItem({ key: 'deployment_mode', value: 'hosted_tenant', status: 'decided' });
     vi.mocked(api.put).mockResolvedValueOnce({
       success: true,
       data: { item: updatedItem, gate: makeGate() },
     });
 
     render(<IsolatedNodeAdminPage />);
-    await waitFor(() => screen.getByText('Infrastructure Choice'));
+    await waitFor(() => screen.getByText('Deployment mode'));
 
     // Open modal for first item
     const editBtns = screen.getAllByRole('button');
@@ -218,7 +219,7 @@ describe('IsolatedNodeAdminPage — edit modal', () => {
 
     // Wait for modal to open
     await waitFor(() => {
-      expect(screen.getAllByText('Infrastructure Choice').length).toBeGreaterThan(1);
+      expect(screen.getAllByText('Deployment mode').length).toBeGreaterThan(1);
     });
 
     // Click save in the modal
@@ -240,14 +241,14 @@ describe('IsolatedNodeAdminPage — edit modal', () => {
 
   it('shows success toast after save', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: MOCK_GATE_RESPONSE });
-    const updatedItem = makeItem({ key: 'infra', value: 'aws', status: 'decided' });
+    const updatedItem = makeItem({ key: 'deployment_mode', value: 'hosted_custom_domain', status: 'decided' });
     vi.mocked(api.put).mockResolvedValueOnce({
       success: true,
       data: { item: updatedItem, gate: makeGate() },
     });
 
     render(<IsolatedNodeAdminPage />);
-    await waitFor(() => screen.getByText('Infrastructure Choice'));
+    await waitFor(() => screen.getByText('Deployment mode'));
 
     const editBtns = screen.getAllByRole('button');
     const editBtn = editBtns.find(
@@ -258,7 +259,7 @@ describe('IsolatedNodeAdminPage — edit modal', () => {
     fireEvent.click(editBtn!);
 
     await waitFor(() => {
-      expect(screen.getAllByText('Infrastructure Choice').length).toBeGreaterThan(1);
+      expect(screen.getAllByText('Deployment mode').length).toBeGreaterThan(1);
     });
 
     const saveBtn = screen.getAllByRole('button').find(

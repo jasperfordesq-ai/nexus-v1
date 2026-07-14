@@ -84,7 +84,9 @@
     "quick_link_6_title": "フェデレーションのつながり",
     "quick_link_6_description": "パートナーコミュニティ間のつながりリクエストを管理します。",
     "view_all_other": "すべて表示 ({{count}})",
-    "member_count_other": "{{count}} メンバー"
+    "member_count_other": "{{count}} メンバー",
+    "view_all_one": "すべて表示 ({{count}})",
+    "member_count_one": "{{count}} メンバーたち"
   },
   "partners": {
     "page_title": "パートナーコミュニティ",
@@ -118,7 +120,8 @@
     "browse_listings": "リストを参照する",
     "close": "近い",
     "view_details": "詳細を見る",
-    "member_count_other": "{{count}} メンバー"
+    "member_count_other": "{{count}} メンバー",
+    "member_count_one": "{{count}} メンバーたち"
   },
   "members": {
     "page_title": "連盟メンバー",
@@ -164,7 +167,8 @@
     "external_source_note_external_only_other": "{{count}} 件の外部パートナー結果を表示しています。",
     "external_source_note_one": "{{count}} の外部パートナーの結果が含まれます。続きを読み込む。内部パートナーの結果を継続します。",
     "external_source_note_other": "{{count}} 件の外部パートナー結果を含みます。さらに読み込むと内部パートナーの結果を続けます。",
-    "more_skills_other": "+{{count}} 詳細"
+    "more_skills_other": "+{{count}} 詳細",
+    "more_skills_one": "+{{count}} 以上"
   },
   "messages": {
     "page_title": "フェデレーションメッセージ",
@@ -381,7 +385,8 @@
     "member_count": "{{count}}メンバー",
     "member_count_plural": "{{count}} メンバー",
     "private": "プライベート",
-    "member_count_other": "{{count}}メンバー"
+    "member_count_other": "{{count}}メンバー",
+    "member_count_one": "{{count}} メンバー"
   },
   "connections": {
     "page_title": "フェデレーション接続",
@@ -513,7 +518,8 @@
     "member_count_one": "{{count}} 人のメンバー",
     "member_count_other": "{{count}} 人のメンバー",
     "and_more": "ほか {{count}} 件",
-    "and_more_other": "ほか {{count}} 件"
+    "and_more_other": "ほか {{count}} 件",
+    "and_more_one": "+{{count}} 以上"
   },
   "member_profile": {
     "page_title": "メンバープロフィール",
@@ -569,7 +575,8 @@
     "tooltip_local_other": "このコミュニティの {{count}} レビューに基づく",
     "chip_label_other": "{{score}} ({{count}})",
     "aria_label_one": "{{count}} レビューからのフェデレーション評価 {{score}}",
-    "aria_label_other": "{{count}} レビューからの {{score}} のフェデレーション評価"
+    "aria_label_other": "{{count}} レビューからの {{score}} のフェデレーション評価",
+    "chip_label_one": "{{score}} ({{count}})"
   },
   "reviews": {
     "unavailable": "このフェデレーション メンバーのレビューはまだ利用できません",

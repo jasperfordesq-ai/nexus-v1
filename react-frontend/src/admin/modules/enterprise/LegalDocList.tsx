@@ -95,7 +95,7 @@ export function LegalDocList() {
         setDeleteTarget(null);
         loadData();
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.failed_to_delete_document');
+        const error = t('enterprise.failed_to_delete_document');
         toast.error(error);
       }
     } catch {
@@ -136,7 +136,7 @@ export function LegalDocList() {
       sortable: true,
       render: (doc) => (
         <Chip size="sm" variant="soft">
-          {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type] ?? '') : doc.type}
+          {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type] ?? '') : t('enterprise.doc_type_unknown')}
         </Chip>
       ),
     },

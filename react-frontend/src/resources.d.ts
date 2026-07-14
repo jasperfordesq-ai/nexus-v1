@@ -608,6 +608,7 @@ export default interface Resources {
       "col_to_url": "To URL",
       "col_url": "URL",
       "collaborative_filtering_title": "Collaborative Filtering",
+      "component_match_score_aria": "{{component}} score: {{score}}%",
       "connection_weight": "Connection Weight",
       "connection_weight_desc": "How strongly accepted member connections should influence CommunityRank",
       "copied": "Copied",
@@ -799,6 +800,9 @@ export default interface Resources {
       "listing_saves": "Listing Saves",
       "loading": "Loading",
       "loading_match_scores": "Loading match scores...",
+      "match_category": {
+        "value": "{{category}}"
+      },
       "match_count_one": "{{count}} match",
       "match_count_other": "{{count}} matches",
       "match_debug_panel_desc": "Inspect match scores and reasoning for any two members",
@@ -1229,9 +1233,11 @@ export default interface Resources {
       "placeholder_community_timebanking_platform": "Community Timebanking Platform...",
       "placeholder_current": "Enter current...",
       "placeholder_current_key": "Enter current: {{masked}}",
+      "placeholder_default_title_suffix": " | My Timebank",
       "placeholder_enter_api_key": "Enter API key...",
       "placeholder_exchange_skills_and_time_with_your_community": "Exchange Skills and Time with Your Community...",
       "placeholder_gocspx": "GOCSPX-xxxxx",
+      "placeholder_meta_keywords": "timebanking, community, exchange",
       "placeholder_my_timebank": "My Timebank...",
       "placeholder_noreply_example": "noreply@example.com",
       "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
@@ -1254,12 +1260,12 @@ export default interface Resources {
             "reload": "Reload"
           },
           "columns": {
-            "crawler": "CRAWLER",
-            "hits": "HITS",
-            "host": "HOST",
+            "crawler": "Crawler",
+            "hits": "Hits",
+            "host": "Host",
             "ip": "IP",
-            "status": "STATUS",
-            "time": "TIME",
+            "status": "Status",
+            "time": "Time",
             "uri": "URI",
             "url": "URL"
           },
@@ -1319,7 +1325,8 @@ export default interface Resources {
             "purge_unexpected": "Clean unexpected snapshots",
             "reset_all": "Reset and rebuild all",
             "reset_breaker": "Reset safety breaker",
-            "reset_queue": "Repair stuck queue"
+            "reset_queue": "Repair stuck queue",
+            "unknown": "Unknown action"
           },
           "buttons": {
             "export_csv": "Export CSV",
@@ -1351,7 +1358,8 @@ export default interface Resources {
           "outcomes": {
             "denied": "Denied",
             "failed": "Failed",
-            "ok": "Completed"
+            "ok": "Completed",
+            "unknown": "Unknown outcome"
           },
           "table_aria": "Audit history"
         },
@@ -1364,13 +1372,13 @@ export default interface Resources {
             "refresh_all_stale_other": "Refresh all stale ({{count}})"
           },
           "columns": {
-            "actions": "ACTIONS",
-            "asset": "ASSET",
-            "coverage": "COVERAGE",
-            "host": "HOST",
-            "missing": "MISSING",
-            "stale": "STALE",
-            "tenant": "TENANT"
+            "actions": "Actions",
+            "asset": "Asset",
+            "coverage": "Coverage",
+            "host": "Host",
+            "missing": "Missing",
+            "stale": "Stale",
+            "tenant": "Tenant"
           },
           "confirm": {
             "queue_recache": "Queue recache for {{count}} tenants?",
@@ -1538,7 +1546,8 @@ export default interface Resources {
             "sched_prerender-auto-recache": "Auto-recache heartbeat",
             "sched_prerender-detect-drift": "Drift detector heartbeat",
             "sched_prerender-reap-stale": "Stale-job cleanup heartbeat",
-            "stuck_jobs": "Stuck jobs"
+            "stuck_jobs": "Stuck jobs",
+            "unknown": "Unknown check"
           },
           "engine_healthy": "Engine healthy",
           "issue_count_one": "{{count}} issue",
@@ -1549,6 +1558,13 @@ export default interface Resources {
             "body_suffix": "job whose worker has been silent for more than 30 minutes back in the queue, and allow the queue to run again.",
             "title": "Repair stuck prerender queue",
             "warning": "Use this only when the queue appears stuck. It does not delete content or change tenant data, but a still-running worker could duplicate work."
+          },
+          "remediation": "Action: {{detail}}",
+          "statuses": {
+            "green": "Healthy",
+            "red": "Critical",
+            "unknown": "Unknown status",
+            "yellow": "Warning"
           },
           "toasts": {
             "breaker_reset": "Circuit breaker reset",
@@ -2055,6 +2071,11 @@ export default interface Resources {
             "match": "match: {{pattern}}",
             "other_pattern_item": "{{pattern}} -> {{ttl}} (specificity {{specificity}})",
             "other_patterns": "Other patterns that match this route:",
+            "sources": {
+              "default": "Default rule",
+              "pattern": "Matching pattern",
+              "unknown": "Unknown source"
+            },
             "ttl": "TTL: {{ttl}} ({{seconds}}s)"
           },
           "title": "Freshness rule lookup",
@@ -2138,11 +2159,77 @@ export default interface Resources {
       "send_test_email": "Send Test Email",
       "sendgrid_api_key_desc": "Enter your SendGrid API key to enable email delivery via SendGrid",
       "sendgrid_configuration": "SendGrid Configuration",
+      "seo_audit_check_blog_meta_description_one": "Checks {{count}} published blog post for meta titles and descriptions",
+      "seo_audit_check_blog_meta_description_other": "Checks {{count}} published blog posts for meta titles and descriptions",
+      "seo_audit_check_blog_meta_name": "Blog Post Metadata",
+      "seo_audit_check_canonical_urls_description": "Checks canonical URL configuration and custom overrides",
+      "seo_audit_check_canonical_urls_name": "Canonical URLs",
+      "seo_audit_check_content_quality_description": "Checks for thin content, missing titles, and other content-quality issues",
+      "seo_audit_check_content_quality_name": "Content Quality Signals",
+      "seo_audit_check_duplicate_titles_description": "Checks for duplicate meta titles across published content",
+      "seo_audit_check_duplicate_titles_name": "Unique Meta Titles",
+      "seo_audit_check_kb_meta_description_one": "Checks {{count}} published knowledge base article for a valid title",
+      "seo_audit_check_kb_meta_description_other": "Checks {{count}} published knowledge base articles for valid titles",
+      "seo_audit_check_kb_meta_name": "Knowledge Base Article Metadata",
+      "seo_audit_check_open_graph_description": "Checks Open Graph and Twitter Card configuration",
+      "seo_audit_check_open_graph_name": "Social Sharing Metadata",
+      "seo_audit_check_page_meta_description_one": "Checks {{count}} published CMS page for metadata",
+      "seo_audit_check_page_meta_description_other": "Checks {{count}} published CMS pages for metadata",
+      "seo_audit_check_page_meta_name": "CMS Page Metadata",
+      "seo_audit_check_redirect_health_description_one": "Checks {{count}} configured redirect for chains, loops, and self-redirects",
+      "seo_audit_check_redirect_health_description_other": "Checks {{count}} configured redirects for chains, loops, and self-redirects",
+      "seo_audit_check_redirect_health_name": "Redirect Health",
+      "seo_audit_check_seo_settings_description": "Checks that canonical URLs, Open Graph tags, and Twitter Cards are enabled",
+      "seo_audit_check_seo_settings_name": "SEO Configuration",
+      "seo_audit_check_sitemap_coverage_description_one": "Checks sitemap coverage for {{count}} URL",
+      "seo_audit_check_sitemap_coverage_description_other": "Checks sitemap coverage for {{count}} URLs",
+      "seo_audit_check_sitemap_coverage_name": "Sitemap Coverage",
+      "seo_audit_check_tenant_metadata_description": "Checks the tenant homepage's meta title, meta description, and H1 heading",
+      "seo_audit_check_tenant_metadata_name": "Homepage Metadata",
+      "seo_audit_check_unknown_description": "This audit check is not supported by this version of the admin panel",
+      "seo_audit_check_unknown_name": "Unknown Audit Check",
       "seo_audit_complete": "SEO audit complete",
       "seo_audit_completed": "SEO Audit Completed",
       "seo_audit_desc": "Run an automated SEO audit to identify issues with your site",
       "seo_audit_error": "SEO audit error",
       "seo_audit_failed": "SEO audit failed",
+      "seo_audit_issue_additional_results_truncated": "More issues may exist; only the first {{limit}} are shown.",
+      "seo_audit_issue_blog_post_meta_missing": "Blog post “{{title}}” ({{path}}) is missing a meta title or description.",
+      "seo_audit_issue_canonical_generation_disabled": "Canonical URL generation is disabled, which creates a duplicate-content risk.",
+      "seo_audit_issue_canonical_urls_not_enabled": "Canonical URLs are not enabled.",
+      "seo_audit_issue_cms_page_meta_title_missing": "CMS page “{{title}}” ({{path}}) is missing a meta title.",
+      "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} page has a custom canonical URL; confirm that it is still valid.",
+      "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} pages have custom canonical URLs; confirm that they are still valid.",
+      "seo_audit_issue_duplicate_meta_title_one": "The meta title “{{title}}” is used {{count}} time.",
+      "seo_audit_issue_duplicate_meta_title_other": "The meta title “{{title}}” is used {{count}} times.",
+      "seo_audit_issue_homepage_meta_title_too_long": "The homepage meta title is {{length}} characters long; the maximum is {{max}}.",
+      "seo_audit_issue_kb_article_titles_missing_one": "{{count}} published knowledge base article has an empty title.",
+      "seo_audit_issue_kb_article_titles_missing_other": "{{count}} published knowledge base articles have empty titles.",
+      "seo_audit_issue_legacy_result_requires_rerun": "This saved issue uses an older format. Run the audit again for full details.",
+      "seo_audit_issue_meta_description_too_long": "The homepage meta description is {{length}} characters long; the maximum is {{max}}.",
+      "seo_audit_issue_meta_description_too_short": "The homepage meta description is {{length}} characters long; the minimum is {{min}}.",
+      "seo_audit_issue_missing_homepage_h1": "The homepage is missing its H1 heading.",
+      "seo_audit_issue_missing_homepage_meta_title": "The homepage is missing its default meta title.",
+      "seo_audit_issue_missing_meta_description": "The homepage is missing its default meta description.",
+      "seo_audit_issue_open_graph_default_image_missing": "No default Open Graph image is configured, so social shares will not include an image.",
+      "seo_audit_issue_open_graph_not_enabled": "Open Graph tags are not enabled.",
+      "seo_audit_issue_open_graph_sharing_disabled": "Open Graph tags are disabled, so social shares will use generic previews.",
+      "seo_audit_issue_redirect_chain": "Redirect chain: {{from}} → {{via}} → {{destination}}",
+      "seo_audit_issue_redirect_loop": "Redirect loop: {{from}} ↔ {{to}}",
+      "seo_audit_issue_self_redirect": "Self-redirect: {{from}} → {{to}}",
+      "seo_audit_issue_sitemap_empty": "The sitemap contains no URLs, so no content is being indexed from it.",
+      "seo_audit_issue_sitemap_low_coverage_one": "The sitemap contains only {{count}} URL, indicating very low coverage.",
+      "seo_audit_issue_sitemap_low_coverage_other": "The sitemap contains only {{count}} URLs, indicating very low coverage.",
+      "seo_audit_issue_sitemap_profiles_missing": "The sitemap contains no member profiles, although some are expected.",
+      "seo_audit_issue_sitemap_static_pages_missing": "The sitemap contains no static pages, although some are expected.",
+      "seo_audit_issue_thin_blog_content_one": "{{count}} published blog post has fewer than {{minimum}} characters; thin content can hurt SEO.",
+      "seo_audit_issue_thin_blog_content_other": "{{count}} published blog posts have fewer than {{minimum}} characters; thin content can hurt SEO.",
+      "seo_audit_issue_title_suffix_missing": "No title suffix is configured, such as “ | Community Name”.",
+      "seo_audit_issue_twitter_cards_disabled": "Twitter Cards are disabled.",
+      "seo_audit_issue_twitter_cards_not_enabled": "Twitter Cards are not enabled.",
+      "seo_audit_issue_unknown": "This audit issue is not supported by this version of the admin panel.",
+      "seo_audit_issue_untitled_published_pages_one": "{{count}} published page has no title.",
+      "seo_audit_issue_untitled_published_pages_other": "{{count}} published pages have no title.",
       "seo_audit_no_results": "SEO audit returned no results",
       "seo_audit_summary": "SEO Audit Summary",
       "seo_audit_summary_counts": "{{passCount}} passed, {{warnCount}} warnings, {{failCount}} failed",
@@ -2153,6 +2240,17 @@ export default interface Resources {
       "seo_overview_title": "SEO Overview",
       "server_seo_audit_heading": "Server SEO Audit",
       "sitemap_cache_cleared": "Sitemap Cache Cleared",
+      "sitemap_content_type_blog_posts": "Blog posts",
+      "sitemap_content_type_events": "Events",
+      "sitemap_content_type_groups": "Groups",
+      "sitemap_content_type_jobs": "Jobs",
+      "sitemap_content_type_listings": "Listings",
+      "sitemap_content_type_members": "Members",
+      "sitemap_content_type_pages": "Pages",
+      "sitemap_content_type_podcasts": "Podcasts",
+      "sitemap_content_type_resources": "Resources",
+      "sitemap_content_type_unknown": "Other content",
+      "sitemap_content_type_volunteering": "Volunteering",
       "sitemap_heading": "Sitemap",
       "sitemap_total_urls": "Total URLs",
       "sitemap_url_label": "Sitemap URL",
@@ -2249,6 +2347,27 @@ export default interface Resources {
         "refresh": "Refresh",
         "reset": "Reset",
         "search": "Search"
+      },
+      "categories": {
+        "billing": "Billing",
+        "civic_digest": "Civic digest",
+        "donation_receipt": "Donation receipt",
+        "event_reminder": "Event reminder",
+        "federation_connection": "Federation connection",
+        "federation_message": "Federation message",
+        "federation_review": "Federation review",
+        "federation_transaction": "Federation transaction",
+        "goal_reminder": "Goal reminder",
+        "job_interview": "Job interview",
+        "listing_expiry": "Listing expiry",
+        "marketplace_dispute": "Marketplace dispute",
+        "marketplace_rating": "Marketplace rating",
+        "newsletter": "Newsletter",
+        "not_available": "Not available",
+        "safeguarding": "Safeguarding",
+        "safeguarding_review": "Safeguarding review",
+        "unknown": "Other email category",
+        "volunteer_reminder": "Volunteer reminder"
       },
       "empty": {
         "no_statuses": "No statuses yet"
@@ -2706,6 +2825,7 @@ export default interface Resources {
         "page_title": "Ad Campaigns",
         "performance_30_days": "Performance (30 days)",
         "placeholders": {
+          "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"gardening\"]}",
           "budget": "e.g. 5000 = EUR 50.00",
           "campaign_name": "Summer Sale - Cafe Helvetia"
         },
@@ -2713,7 +2833,8 @@ export default interface Resources {
           "all": "All placements",
           "discovery": "Discovery",
           "feed": "Feed",
-          "market": "Market"
+          "market": "Market",
+          "markt": "Market"
         },
         "reject_intro_prefix": "You are rejecting",
         "reject_intro_suffix": "Please provide a reason so the advertiser knows how to improve their submission.",
@@ -2759,6 +2880,7 @@ export default interface Resources {
           "targets": "Targets",
           "title_preview": "Title preview"
         },
+        "cost_per_send": "{{cost}} per send",
         "create_title": "New push campaign",
         "daily_breakdown": "Daily breakdown",
         "dates": {
@@ -2791,6 +2913,7 @@ export default interface Resources {
         "placeholders": {
           "body": "Max 400 characters",
           "campaign_name": "e.g. Spring Promotion - Cafe Seeblick",
+          "cta_url": "https://... or nexus://...",
           "title": "Max 100 characters"
         },
         "reject_intro_prefix": "Rejecting",
@@ -2952,6 +3075,17 @@ export default interface Resources {
         "refresh": "Refresh",
         "save": "Save"
       },
+      "agent_type": {
+        "activity_summariser": "Activity summariser",
+        "activity_summary": "Activity summary",
+        "help_routing": "Help routing",
+        "listing-enrichment": "Listing enrichment",
+        "matching": "Matching",
+        "matchmaker": "Matchmaker",
+        "notifications": "Notifications",
+        "nudge_dispatch": "Nudge dispatch",
+        "tandem_matching": "Tandem matching"
+      },
       "common": {
         "empty_dash": "-"
       },
@@ -2997,6 +3131,13 @@ export default interface Resources {
         "pending": "Pending",
         "pending_review": "Pending review",
         "rejected": "Rejected"
+      },
+      "proposal_type": {
+        "create_tandem": "Create tandem",
+        "match_suggestion": "Match suggestion",
+        "route_help_request": "Route help request",
+        "send_activity_summary": "Send activity summary",
+        "send_nudge": "Send nudge"
       },
       "proposals": {
         "actions": {
@@ -3093,7 +3234,13 @@ export default interface Resources {
         "enabled": "Enabled"
       },
       "tabs_aria": "Agent proposal status filter",
-      "toggle": "Enable or disable {{name}}"
+      "toggle": "Enable or disable {{name}}",
+      "triggered_by": {
+        "admin": "Administrator",
+        "manual": "Manual",
+        "schedule": "Schedule",
+        "scheduled": "Scheduled"
+      }
     },
     "common": {
       "actions": "Actions",
@@ -3246,6 +3393,12 @@ export default interface Resources {
           "description": "AG61 - Autonomous Agent Framework. Agents propose actions; humans approve before anything is applied.",
           "title": "KI-Agenten"
         },
+        "proposal_types": {
+          "create_tandem": "Create tandem",
+          "route_help_request": "Route help request",
+          "send_activity_summary": "Send activity summary",
+          "send_nudge": "Send nudge"
+        },
         "proposals": {
           "approve_all_help": "Approves all pending-review proposals whose confidence meets the auto-apply threshold.",
           "columns": {
@@ -3339,8 +3492,10 @@ export default interface Resources {
         },
         "triggered_by": {
           "manual": "Manual",
+          "schedule": "Schedule",
           "scheduled": "Scheduled"
-        }
+        },
+        "unknown_identifier": "Unknown"
       },
       "module_docs": {
         "about": {
@@ -3364,6 +3519,122 @@ export default interface Resources {
           "updated": "Updated"
         },
         "confirm_delete": "Delete \"{{title}}\"? This cannot be undone.",
+        "defaults": {
+          "accessibility": {
+            "title": "Accessibility — themes, languages, assistive tech"
+          },
+          "account_security": {
+            "title": "Account security — passwords, 2FA, passkeys"
+          },
+          "admin_overview": {
+            "title": "For community admins"
+          },
+          "ai_chat": {
+            "title": "AI assistant — the chat button"
+          },
+          "blog": {
+            "title": "Blog — community stories & news"
+          },
+          "caring_community": {
+            "title": "Caring Community — support for vulnerable members"
+          },
+          "connections": {
+            "title": "Connections — your network"
+          },
+          "dashboard": {
+            "title": "Dashboard — your starting point"
+          },
+          "events": {
+            "title": "Events — community gatherings"
+          },
+          "federation": {
+            "title": "Federation — connecting communities"
+          },
+          "feed": {
+            "title": "Feed — community activity stream"
+          },
+          "gamification": {
+            "title": "Gamification — badges, XP, and recognition"
+          },
+          "getting_started": {
+            "title": "Getting started — your first week"
+          },
+          "goals": {
+            "title": "Goals — personal & community targets"
+          },
+          "group_exchanges": {
+            "title": "Group exchanges — many-to-many time projects"
+          },
+          "groups": {
+            "title": "Groups — sub-communities"
+          },
+          "ideation": {
+            "title": "Ideation challenges — collaborative problem-solving"
+          },
+          "jobs": {
+            "title": "Job vacancies"
+          },
+          "listings": {
+            "title": "Listings — offers and requests"
+          },
+          "marketplace": {
+            "title": "Marketplace — items, not services"
+          },
+          "messages": {
+            "title": "Messages — private conversations"
+          },
+          "mobile_pwa": {
+            "title": "Mobile app & PWA"
+          },
+          "newsletter": {
+            "title": "Newsletter & email digests"
+          },
+          "notifications": {
+            "title": "Notifications"
+          },
+          "organisations": {
+            "title": "Organisations — partner profiles"
+          },
+          "overview": {
+            "title": "Platform overview — what this is"
+          },
+          "polls": {
+            "title": "Polls — community decisions"
+          },
+          "privacy_data": {
+            "title": "Privacy & data rights (GDPR)"
+          },
+          "profile": {
+            "title": "Profile & member directory"
+          },
+          "resources": {
+            "title": "Resources — knowledge base & files"
+          },
+          "reviews": {
+            "title": "Reviews & ratings"
+          },
+          "safety": {
+            "title": "Safety, trust & community guidelines"
+          },
+          "search": {
+            "title": "Search — finding anything"
+          },
+          "settings": {
+            "title": "Settings — manage your account"
+          },
+          "timebanking": {
+            "title": "Timebanking basics & philosophy"
+          },
+          "troubleshooting": {
+            "title": "Troubleshooting common issues"
+          },
+          "volunteering": {
+            "title": "Volunteering — opportunities & shifts"
+          },
+          "wallet": {
+            "title": "Wallet & time credit balance"
+          }
+        },
         "editor": {
           "create_title": "New module doc",
           "edit_title": "Edit \"{{title}}\"",
@@ -3627,7 +3898,8 @@ export default interface Resources {
           "language_distribution": "Language distribution",
           "member_growth_12m": "Member growth, last 12 months",
           "total_active_members": "{{total}} active members",
-          "total_with_data": "{{total}} members with demographic data"
+          "total_with_data": "{{total}} members with demographic data",
+          "unknown_language": "Unknown language"
         },
         "empty": {
           "infinity": "∞",
@@ -3650,6 +3922,12 @@ export default interface Resources {
         },
         "help": {
           "by_category": "Help requests by category",
+          "categories": {
+            "either": "Phone or message",
+            "message": "Message",
+            "phone": "Phone",
+            "unknown": "Unknown preference"
+          },
           "resolution_trend_6m": "Resolution trend, last 6 months"
         },
         "loading": {
@@ -3774,6 +4052,17 @@ export default interface Resources {
       "no_zero_results": "No zero-result searches in this period — every search found something.",
       "page_title": "Search Analytics",
       "period_label": "Period",
+      "result_types": {
+        "blog": "Blog",
+        "events": "Events",
+        "groups": "Groups",
+        "jobs": "Jobs",
+        "listings": "Listings",
+        "marketplace": "Marketplace",
+        "members": "Members",
+        "resources": "Resources",
+        "volunteering": "Volunteering"
+      },
       "searches": "Searches",
       "searches_by_type": "Searches by type",
       "total_searches": "Total searches",
@@ -4000,6 +4289,8 @@ export default interface Resources {
       "action_unknown": "Unknown action",
       "actions": "Actions",
       "active_tenants": "Active Tenants",
+      "amount_per_month": "{{amount}} per month",
+      "amount_per_year": "{{amount}} per year",
       "approaching_limit": "Approaching Limit",
       "arr": "ARR",
       "assign_plan": "Assign Plan",
@@ -4049,11 +4340,19 @@ export default interface Resources {
       "grace_period_modal_title": "Grace Period Modal",
       "in_grace": "In Grace",
       "in_grace_period": "In Grace Period",
+      "interval_monthly": "Monthly",
+      "interval_unknown": "Unknown interval",
+      "interval_yearly": "Yearly",
       "invoice_amount": "Invoice Amount",
       "invoice_date": "Invoice Date",
       "invoice_download": "Invoice Download",
       "invoice_number": "Invoice Number",
       "invoice_status": "Invoice Status",
+      "invoice_status_draft": "Draft",
+      "invoice_status_open": "Open",
+      "invoice_status_paid": "Paid",
+      "invoice_status_uncollectible": "Uncollectible",
+      "invoice_status_void": "Void",
       "invoice_view": "Invoice View",
       "invoices_description": "Invoices",
       "invoices_error": "Invoices error",
@@ -4105,6 +4404,7 @@ export default interface Resources {
       "status_ok": "Ok",
       "status_past_due": "Past Due",
       "status_trialing": "Trialing",
+      "status_unknown": "Unknown status",
       "subscribe": "Subscribe",
       "tier": "Tier",
       "title": "Billing",
@@ -5362,6 +5662,15 @@ export default interface Resources {
       },
       "favours": {
         "anonymous": "Anonymous",
+        "categories": {
+          "companionship": "Companionship",
+          "household": "Household help",
+          "other": "Other",
+          "shopping": "Shopping",
+          "technology": "Technology help",
+          "transport": "Transport",
+          "unknown": "Uncategorised"
+        },
         "empty": "No favours recorded yet.",
         "loading": "Loading...",
         "loading_favours": "Loading favours...",
@@ -5529,6 +5838,45 @@ export default interface Resources {
       },
       "predictive": {
         "active_members": "Active members",
+        "alert_actions": {
+          "open_reports": "Open reports",
+          "reassign_reviews": "Reassign reviews",
+          "review_now": "Review now",
+          "see_suggestions": "See suggestions",
+          "view_listings": "View listings",
+          "view_members": "View members",
+          "view_tandems": "View tandems"
+        },
+        "alerts": {
+          "coordinators_overloaded": {
+            "message": "One or more coordinators have over 10 pending reviews. Reassign work before a bottleneck develops.",
+            "title": "Coordinators are overloaded"
+          },
+          "inactive_members": {
+            "message": "These members logged hours in the last six months but not in the last 30 days. A friendly check-in may help them re-engage.",
+            "title": "Previously active members have gone quiet"
+          },
+          "low_supply": {
+            "message": "Active requests outnumber available offers in these categories. Highlight them to potential supporters.",
+            "title": "Categories have unmet demand"
+          },
+          "overdue_check_ins": {
+            "message": "These active recurring relationships have passed their scheduled check-in. Contact both participants to confirm that they are well.",
+            "title": "Tandem check-ins are overdue"
+          },
+          "overdue_reviews": {
+            "message": "These pending hour logs are older than {{sla}} days. Approve or escalate them so members receive their credit.",
+            "title": "Hour reviews have exceeded the service level"
+          },
+          "recipients_without_tandem": {
+            "message": "These members received help in the last six months but have no active recurring tandem. Pair them with a steady supporter to strengthen continuity.",
+            "title": "Recipients without a regular supporter"
+          },
+          "retention_dropping": {
+            "message": "This month's active member count ({{current}}) is below {{threshold_percent}}% of the recent {{months}}-month average ({{average}}). Consider a targeted outreach nudge.",
+            "title": "Active member participation is declining"
+          }
+        },
         "coefficient_drift": "Category coefficient drift",
         "coefficient_drift_aria": "Category coefficient drift",
         "coefficient_drift_note": "Categories with absolute drift > {{threshold}}% are flagged. Review baseline coefficients in the category coefficient editor.",
@@ -5549,6 +5897,11 @@ export default interface Resources {
           "sub_region": "Sub-region"
         },
         "confidence": "Confidence",
+        "confidence_levels": {
+          "high": "High",
+          "low": "Low",
+          "medium": "Medium"
+        },
         "drifting_count": "{{count}} drifting",
         "forecast": "Forecast",
         "helper_churn": "Helper churn (lapsed >= {{days}} days)",
@@ -5556,6 +5909,7 @@ export default interface Resources {
         "helper_churn_note": "{{lapsed}} of {{prior}} previously active helpers haven't logged hours recently.",
         "history": "History",
         "hours_forecast": "Hours forecast",
+        "load_failed": "Could not load predictive insights.",
         "no_forecast": "No forecast data available yet.",
         "not_enough_activity": "Not enough activity yet to forecast. Come back in a few weeks.",
         "overall_percent": "{{value}}% overall",
@@ -5677,6 +6031,15 @@ export default interface Resources {
         "age_hours": "{{count}}h",
         "age_hours_one": "{{count}}h",
         "age_hours_other": "{{count}}h",
+        "categories": {
+          "exploitation": "Exploitation",
+          "financial_concern": "Financial concern",
+          "inappropriate_behavior": "Inappropriate behaviour",
+          "medical_concern": "Medical concern",
+          "neglect": "Neglect",
+          "other": "Other",
+          "unknown": "Unknown category"
+        },
         "columns": {
           "action": "Action",
           "age": "Age",
@@ -5686,6 +6049,17 @@ export default interface Resources {
           "subject": "Subject"
         },
         "description": "Member-raised concerns about other members, coordinators, or organisations.",
+        "history_actions": {
+          "assigned": "Assigned",
+          "created": "Created",
+          "dismissed": "Dismissed",
+          "escalated": "Escalated",
+          "note_added": "Note added",
+          "resolved": "Resolved",
+          "status_changed": "Status changed",
+          "triaged": "Triaged",
+          "unknown": "Unknown action"
+        },
         "no_data": "No safeguarding data available yet.",
         "no_reports": "No reports yet.",
         "open": "Open",
@@ -5757,6 +6131,16 @@ export default interface Resources {
         "distance_km": "{{value}} km",
         "empty": "No suggestions right now. Add more members or adjust availability.",
         "load_failed": "Could not load tandem suggestions.",
+        "reason_join": "{{previous}}; {{next}}",
+        "reasons": {
+          "availability_overlap": "Has compatible availability",
+          "complementary_skills": "Has complementary skills",
+          "distance": "Lives {{distance_km}} km away",
+          "intergenerational": "Offers an intergenerational pairing",
+          "overall_fit": "Shows a reasonable overall fit",
+          "shared_interests": "Shares interests",
+          "shared_language": "Shares a language"
+        },
         "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
         "same_language": "Same language",
         "score": "Score {{value}}%",
@@ -5830,11 +6214,178 @@ export default interface Resources {
         "reset_default": "Reset to canonical default",
         "reset_default_aria": "Reset to default"
       },
+      "capabilities": {
+        "ai_chat_assistant": {
+          "description": "A member-facing assistant grounded in the tenant knowledge base for help and onboarding.",
+          "label": "AI chat assistant",
+          "notes": "Each tenant supplies its own OpenAI API credentials."
+        },
+        "appreciation_messages": {
+          "description": "A lightweight thank-you flow that lets recipients acknowledge supporters publicly.",
+          "label": "Appreciation messages",
+          "notes": ""
+        },
+        "caring_caregiver_links": {
+          "description": "A verified link between an informal caregiver and the person they support, allowing requests to be made on that person's behalf.",
+          "label": "Caregiver links",
+          "notes": ""
+        },
+        "caring_community_module": {
+          "description": "The umbrella feature flag that activates the complete Caring Community workflow for a tenant.",
+          "label": "Caring Community module",
+          "notes": "This is the master gate for the other caring features."
+        },
+        "caring_disclosure_pack": {
+          "description": "An editable Swiss data-protection disclosure pack for legal review before resident onboarding.",
+          "label": "FADP/nDSG disclosure pack",
+          "notes": ""
+        },
+        "caring_emergency_alerts": {
+          "description": "Emergency broadcasts from a recipient or caregiver to a vetted radius of trusted neighbours.",
+          "label": "Emergency alerts",
+          "notes": ""
+        },
+        "caring_help_requests": {
+          "description": "The caring help-request workflow, including caregiver requests made on another person's behalf, matching, and acceptance.",
+          "label": "Help requests",
+          "notes": ""
+        },
+        "caring_municipal_roi": {
+          "description": "A report of formal-care cost offsets and prevention value for public-sector procurement discussions.",
+          "label": "Municipal return-on-investment report",
+          "notes": ""
+        },
+        "caring_operating_policy": {
+          "description": "A schema-driven policy covering approval authority, service levels, legacy-hour settlement, rates, and review cadence.",
+          "label": "Operating policy workshop",
+          "notes": ""
+        },
+        "caring_pilot_scoreboard": {
+          "description": "A live KPI pack for pilot stand-ups and funder-facing progress reviews.",
+          "label": "Pilot scoreboard",
+          "notes": ""
+        },
+        "caring_research_consent": {
+          "description": "A member opt-in for inclusion in anonymised research datasets shared with academic or municipal partners.",
+          "label": "Research consent flag",
+          "notes": ""
+        },
+        "caring_sub_regions": {
+          "description": "Regional cells within a tenant, such as districts or neighbourhoods, with their own coordinator and KPI roll-up.",
+          "label": "Caring sub-regions",
+          "notes": ""
+        },
+        "caring_substitute_cover": {
+          "description": "Find substitute caregivers when the primary supporter is unavailable, with conflict detection and confirmation.",
+          "label": "Substitute and cover scheduling",
+          "notes": ""
+        },
+        "caring_support_relationships": {
+          "description": "Long-running caring relationships between a recipient and one or more supporters, with recurring check-ins.",
+          "label": "Support relationships",
+          "notes": ""
+        },
+        "caring_warmth_pass": {
+          "description": "A recipient-controlled dignity layer that governs who may see their needs and supports consent-based introductions.",
+          "label": "Warmth Pass",
+          "notes": ""
+        },
+        "embedding_recommendations": {
+          "description": "Embedding models power listing, member, and group recommendations across the platform.",
+          "label": "Embedding-based recommendations",
+          "notes": "Each tenant is responsible for its embedding-provider usage costs."
+        },
+        "ki_agenten_framework": {
+          "description": "A per-tenant agent runtime that lets coordinators define structured assistants for repeatable workflows.",
+          "label": "KI-Agenten framework",
+          "notes": "The code is AGPL-licensed; each tenant supplies its own language-model API credentials and pays the provider directly."
+        },
+        "local_advertising_campaigns": {
+          "description": "In-app placements sold to local merchants. The code is AGPL-licensed, participation is tenant-controlled, and revenue stays with the deployer.",
+          "label": "Local advertising campaigns",
+          "notes": "Opt-in per tenant; the public code does not impose a revenue share with the platform operator."
+        },
+        "merchant_loyalty_coupons": {
+          "description": "Local merchant loyalty cards and coupon redemption linked to time-credit balances.",
+          "label": "Merchant loyalty and coupons",
+          "notes": ""
+        },
+        "municipal_verification": {
+          "description": "An optional municipal verification marker on a member profile, based on residence or background checks.",
+          "label": "Municipal verification badge",
+          "notes": ""
+        },
+        "paid_push_campaigns": {
+          "description": "Targeted push-notification campaigns that merchants may purchase to reach opted-in members.",
+          "label": "Paid push campaigns",
+          "notes": "The tenant must enable the feature and accept responsibility for push-delivery costs."
+        },
+        "paid_regional_analytics": {
+          "description": "Cross-tenant aggregate analytics for regional and municipal procurement, offered separately to public-sector buyers.",
+          "label": "Paid regional analytics",
+          "notes": "This is a separate public-sector product that requires a commercial agreement with the platform operator."
+        },
+        "partner_api_access": {
+          "description": "A rate-limited API for research, government, and integration partners that may include cross-tenant aggregate queries.",
+          "label": "Partner API access",
+          "notes": "A commercial agreement is required; this access is not enabled for AGPL deployers by default."
+        },
+        "premium_member_tier": {
+          "description": "An optional paid membership tier with additional benefits, operated at the tenant's discretion.",
+          "label": "Premium member tier",
+          "notes": ""
+        },
+        "safeguarding_reports": {
+          "description": "A member-to-coordinator safeguarding concern workflow with an audit trail and escalation routing.",
+          "label": "Safeguarding reports",
+          "notes": ""
+        },
+        "smart_matching_engine": {
+          "description": "A heuristic matcher that pairs help requests with likely supporters using skills, distance, and history.",
+          "label": "Smart matching engine",
+          "notes": ""
+        },
+        "tenant_branded_native_app": {
+          "description": "An iOS and Android Capacitor app published under the tenant's brand. The source is AGPL-licensed; the release infrastructure is tenant-owned.",
+          "label": "Tenant-branded native app",
+          "notes": "Apple and Google developer accounts, signing keys, build pipelines, and store-review workflows are operational responsibilities outside the package."
+        },
+        "trust_tier_system": {
+          "description": "Member trust progression that controls which caring actions a new, trusted, or vetted member may perform.",
+          "label": "Trust tier system",
+          "notes": ""
+        },
+        "verein_dues_collection": {
+          "description": "Recurring association-dues collection through Stripe, with member statements and reconciliation.",
+          "label": "Association dues",
+          "notes": "The Stripe account is operational infrastructure; the application code remains AGPL-licensed."
+        },
+        "xp_badges_journeys": {
+          "description": "An engagement layer with XP, badges, journeys, and challenges that recognise caring participation.",
+          "label": "XP, badges, and journeys",
+          "notes": ""
+        }
+      },
+      "categories": {
+        "advanced_ai": "Advanced AI",
+        "commercial_layer": "Commercial layer",
+        "community_governance": "Community governance",
+        "core_caring": "Core caring community",
+        "gamification_engagement": "Gamification and engagement",
+        "mobile_native": "Native mobile apps",
+        "regional_intelligence": "Regional intelligence"
+      },
       "classification": {
         "agpl_public": "AGPL public",
         "commercial": "Commercial",
         "private_deployment": "Private deployment",
         "tenant_config": "Tenant config"
+      },
+      "classification_descriptions": {
+        "agpl_public": "AGPL-licensed source code in the public repository. Anyone may deploy it under the licence terms.",
+        "commercial": "A separately contracted service that is not included in the public AGPL package.",
+        "private_deployment": "An operational deployment layer such as infrastructure, build accounts, or signing-key ownership; this is not a code-licensing boundary.",
+        "tenant_config": "AGPL-licensed functionality controlled by tenant configuration or a feature toggle."
       },
       "empty": {
         "value": "-"
@@ -5942,6 +6493,72 @@ export default interface Resources {
         "refresh_checks": "Refresh checks",
         "view_affected_rows": "View affected rows"
       },
+      "checks": {
+        "duplicate_emails": {
+          "clear": "No duplicate email addresses were detected.",
+          "found": "Multiple users share the same email address. Merge or remove duplicate accounts before launch.",
+          "label": "Duplicate email addresses",
+          "schema_unavailable": "The users table or email column is not available in this tenant schema."
+        },
+        "duplicate_phones": {
+          "clear": "No duplicate phone numbers were detected.",
+          "found": "Several members share the same phone number. Confirm whether they are different residents.",
+          "label": "Duplicate phone numbers",
+          "schema_unavailable": "The users table or phone column is not available in this tenant schema."
+        },
+        "members_without_role": {
+          "clear": "Every member has a role.",
+          "found": "Assign every member a role so their permissions resolve correctly.",
+          "label": "Members without a role",
+          "schema_unavailable": "Member roles are not available in this tenant schema."
+        },
+        "missing_coordinator_assignment": {
+          "clear": "Every caring relationship has a coordinator.",
+          "column_unavailable": "Coordinator assignments are not available in this tenant schema.",
+          "found": "Assign a coordinator to every active caring relationship before launch.",
+          "label": "Caring relationships without a coordinator",
+          "table_unavailable": "Caring support relationships are not available in this tenant schema."
+        },
+        "missing_preferred_language": {
+          "clear": "Every member has a preferred language.",
+          "found": "Some members have not selected a preferred language. Set one before sending resident communications.",
+          "label": "Members without a preferred language",
+          "schema_unavailable": "The preferred-language field is not available in this tenant schema."
+        },
+        "missing_sub_region": {
+          "clear": "Every member is assigned to a sub-region.",
+          "column_unavailable": "Member sub-region assignments are not available in this tenant schema, so this check does not apply.",
+          "found": "Members without a sub-region will not appear in neighbourhood-scoped feeds.",
+          "label": "Members without a sub-region",
+          "no_regions": "No sub-regions have been configured, so this check does not apply.",
+          "regions_unavailable": "Sub-regions are not available in this tenant schema, so this check does not apply."
+        },
+        "seed_marker_users": {
+          "clear": "No demo or seed accounts were detected.",
+          "found": "Demo or seed accounts are still present. Remove them before onboarding real residents.",
+          "label": "Demo or seed accounts",
+          "table_unavailable": "Members are not available in this tenant schema."
+        },
+        "tenant_setting_completeness": {
+          "clear": "Every required pre-launch tenant setting is configured.",
+          "found": "One or more pre-launch settings are missing. Review the AG80 disclosure pack and AG81 operating policy.",
+          "label": "Tenant settings completeness",
+          "table_unavailable": "Tenant settings are not available in this tenant schema."
+        },
+        "unanswered_help_requests": {
+          "clear": "There are no stale help requests.",
+          "found": "Old pending help requests undermine trust. Close, decline, or match every one.",
+          "label": "Unanswered help requests older than 30 days",
+          "table_unavailable": "Caring help requests are not available in this tenant schema."
+        },
+        "unverified_organisations": {
+          "clear": "Every organisation has been reviewed.",
+          "found": "Approve or reject every pending organisation so members can trust its listings.",
+          "label": "Unverified organisations",
+          "table_unavailable": "Volunteer organisations are not available in this tenant schema.",
+          "verification_unavailable": "Organisation verification fields are not available in this tenant schema."
+        }
+      },
       "drilldown": {
         "empty": "No affected rows to show.",
         "subtitle": "Up to 50 affected rows - resolve or document before launch.",
@@ -5951,10 +6568,26 @@ export default interface Resources {
         "rows": "No rows",
         "value": "-"
       },
+      "identifiers": {
+        "user_id": "User #{{id}}"
+      },
       "meta": {
         "page_title": "Pilot Data Quality",
         "subtitle": "AG84 - readiness checks before onboarding real residents",
         "title": "Pilot Data Quality"
+      },
+      "notes": {
+        "drilldown_not_available": "A row-level drill-down is not available for this check."
+      },
+      "row_status": {
+        "active": "Active",
+        "approved": "Approved",
+        "completed": "Completed",
+        "inactive": "Inactive",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "unknown": "Unknown status",
+        "verified": "Verified"
       },
       "severity": {
         "danger": "Danger",
@@ -6006,12 +6639,28 @@ export default interface Resources {
         "refresh_aria": "Refresh disclosure pack",
         "save_changes": "Save changes"
       },
+      "default_copy": {
+        "destination_eu_azure": "European Union (Microsoft Azure)",
+        "destination_us_services": "United States (Cloudflare, Stripe, and OpenAI)",
+        "fadp_authority": "Federal Data Protection and Information Commissioner (FDPIC / EDÖB)",
+        "isolated_node_description": "Canton-controlled deployment with its own email delivery, storage, and backups. Federation can be disabled entirely.",
+        "safeguard_scc": "Standard Contractual Clauses (SCCs)",
+        "safeguard_swiss_us_framework": "Swiss–US Data Privacy Framework, where applicable",
+        "subprocessor_azure": "Microsoft Azure (hosting, EU)",
+        "subprocessor_cloudflare": "Cloudflare (CDN / WAF)",
+        "subprocessor_firebase": "Google Firebase Cloud Messaging (push notifications)",
+        "subprocessor_openai": "OpenAI (optional matching and summarisation)",
+        "subprocessor_stripe": "Stripe (payments and identity verification)"
+      },
       "descriptions": {
         "backup_owner": "Legal entity responsible for database backup storage and retention.",
         "hosting_owner": "Legal entity that controls the server infrastructure (e.g. the canton IT department).",
         "smtp_owner": "Legal entity responsible for outbound email delivery.",
         "storage_owner": "Legal entity controlling file/blob storage (uploads, exports).",
         "update_cadence": "How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')."
+      },
+      "export": {
+        "filename": "disclosure-pack.md"
       },
       "fields": {
         "address": "Address",
@@ -6066,6 +6715,68 @@ export default interface Resources {
         "no_cross_border_transfers": "No cross-border transfers",
         "no_member_opt_out": "No member opt-out"
       },
+      "structured": {
+        "fields": {
+          "access": "Access",
+          "active_account_data": "Active account data",
+          "caring": "Caring activity",
+          "communications": "Communications",
+          "erase": "Erasure",
+          "export": "Export",
+          "export_format": "Export format",
+          "help_requests": "Help requests",
+          "identity": "Identity",
+          "inactive_account_data": "Inactive account data",
+          "object": "Objection",
+          "portability": "Portability",
+          "profile": "Profile",
+          "rectify": "Rectification",
+          "research_consent": "Research consent",
+          "research_datasets": "Research datasets",
+          "restrict": "Restriction",
+          "safeguarding": "Safeguarding",
+          "safeguarding_reports": "Safeguarding reports",
+          "time_credits": "Time credits",
+          "transactions": "Transactions"
+        },
+        "values": {
+          "10_years_after_completion": "10 years after completion",
+          "24_months": "24 months",
+          "24_months_after_closure": "24 months after closure",
+          "24_months_then_anonymise": "24 months, then anonymise",
+          "7_years_after_resolution": "7 years after resolution",
+          "aggregate_dataset_inclusion": "aggregate dataset inclusion",
+          "announcements": "announcements",
+          "biography": "biography",
+          "caregiver_links": "caregiver links",
+          "consent": "Consent",
+          "contract": "Contract",
+          "date_of_birth": "date of birth",
+          "duration_of_research_partnership": "Duration of the research partnership",
+          "email": "email address",
+          "flag": "consent flag",
+          "flags": "flags",
+          "help_requests": "help requests",
+          "json+csv": "JSON and CSV",
+          "legitimate_interest": "Legitimate interest",
+          "lifetime_of_membership": "Lifetime of membership",
+          "messages": "messages",
+          "monthly": "Monthly",
+          "name": "name",
+          "no_personal_data_shared_outside_tenant": "No personal data shared outside the tenant",
+          "notifications": "notifications",
+          "phone": "phone number",
+          "photo": "photo",
+          "preferred_language": "preferred language",
+          "reports": "reports",
+          "skills": "skills",
+          "support_relationships": "support relationships",
+          "transactions": "transactions",
+          "verification_status": "verification status",
+          "volunteer_logs": "volunteer logs",
+          "wallet_balance": "wallet balance"
+        }
+      },
       "tabs": {
         "aria": "Disclosure sections",
         "controller": "Controller & Processor",
@@ -6117,6 +6828,32 @@ export default interface Resources {
         "payment": "Payment",
         "postal": "Postal",
         "professional_care": "Professional care"
+      },
+      "default_items": {
+        "ahv_submission_gateway": {
+          "name": "AHV submission gateway",
+          "notes": "Official channel for AHV-relevant volunteer-hour reports. The canonical submission interface still needs to be confirmed."
+        },
+        "cantonal_master_data": {
+          "name": "Cantonal master-data feed",
+          "notes": "Subscribed address and household data from the cantonal registry to keep care-recipient profiles current."
+        },
+        "postal_address_verification": {
+          "name": "Postal-address verification",
+          "notes": "Address normalisation and validation against the Swiss Post directory."
+        },
+        "postfinance_payment": {
+          "name": "PostFinance payment integration",
+          "notes": "Swiss banking partner for cash-out and treasury operations. A merchant agreement is required."
+        },
+        "spitex_handoff": {
+          "name": "Spitex care-coordination handoff",
+          "notes": "Two-way handoff with cantonal Spitex providers for care-recipient circles. A data-sharing agreement and interface specification are needed from each provider."
+        },
+        "twint_payment": {
+          "name": "Twint payment",
+          "notes": "Twint acceptance for membership fees and donations. Merchant onboarding through a partner bank is required."
+        }
       },
       "delete_modal": {
         "body_prefix": "This will permanently remove the backlog entry for",
@@ -6371,6 +7108,12 @@ export default interface Resources {
         "title": "Recently resolved (last 72h)",
         "user_id": "user #{{userId}}"
       },
+      "status": {
+        "closed": "Closed",
+        "matched": "Matched",
+        "pending": "Pending",
+        "unknown": "Unknown status"
+      },
       "table": {
         "bucket": "Bucket",
         "created": "Created",
@@ -6396,6 +7139,74 @@ export default interface Resources {
       },
       "empty": {
         "value": "-"
+      },
+      "manifest": {
+        "checklist": {
+          "allowed_scopes": "The approved scopes, such as read:users, read:listings, and write:wallet",
+          "data_sharing_agreement": "A draft data-sharing agreement and a named data protection contact",
+          "federation_public_key": "The federation aggregate signing public key, when the partner participates in federation",
+          "incident_runbook": "The incident-response runbook URL from the AG80 disclosure pack",
+          "oauth_credentials": "An OAuth client ID and client secret dedicated to this partner",
+          "openapi_spec": "The OpenAPI specification URL in JSON or YAML format",
+          "rate_limit_headers": "Documentation for the X-RateLimit-Limit and X-RateLimit-Remaining headers",
+          "sandbox_tenant": "A sandbox tenant slug for integration testing",
+          "webhook_subscription": "A webhook subscription, HMAC secret, and endpoint URL allow-list"
+        },
+        "endpoints": {
+          "community_aggregates": "Read community aggregates",
+          "create_subscription": "Create a webhook subscription",
+          "credit_wallet": "Credit a wallet",
+          "delete_subscription": "Delete a webhook subscription",
+          "list_listings": "List listings",
+          "list_subscriptions": "List webhook subscriptions",
+          "list_users": "List users",
+          "openapi_json": "JSON specification",
+          "openapi_yaml": "YAML specification",
+          "revoke_endpoint": "Revoke an access token",
+          "show_user": "Show a user",
+          "tenant_aggregate": "Read a tenant aggregate",
+          "token_endpoint": "Issue an access token",
+          "update_subscription": "Update a webhook subscription",
+          "wallet_balance": "Read a wallet balance"
+        },
+        "samples": {
+          "federation_aggregate": "Federation aggregate — signed JSON example",
+          "partner_aggregates": "Partner API community aggregates — example",
+          "webhook_event": "Webhook event — HMAC-signed example"
+        },
+        "sections": {
+          "federation": {
+            "body": "Each tenant exposes a read-only signed aggregate endpoint. Payloads contain counts, brackets, top categories, and locales, but never raw personal data.",
+            "title": "Federation aggregates"
+          },
+          "oauth": {
+            "body": "The standard OAuth 2.0 client-credentials flow for trusted partner servers, including token revocation.",
+            "title": "OAuth client credentials"
+          },
+          "openapi": {
+            "body": "A machine-readable specification for every public API surface, generated from the controllers shipped with this platform.",
+            "title": "OpenAPI specification"
+          },
+          "partner_api": {
+            "body": "An OAuth-secured API for third-party integrators, covering members, listings, wallet credit, community aggregates, and webhook subscriptions.",
+            "title": "Partner API v1"
+          },
+          "partner_checklist": {
+            "body": "Share this checklist with a prospective integration partner before implementation begins.",
+            "title": "What an integration partner receives"
+          },
+          "sample_payloads": {
+            "body": "Representative payloads for an integration partner. These examples are illustrative and do not contain live tenant data.",
+            "title": "Sample payloads"
+          },
+          "webhooks": {
+            "body": "Partners subscribe to event topics. Each payload is signed with HMAC-SHA256 over the complete body using that subscription's secret.",
+            "title": "Webhook subscriptions"
+          }
+        },
+        "verification_notes": {
+          "webhook_signature": "Verify the X-NEXUS-Signature header by computing HMAC-SHA256 over the complete request body with the subscription secret, then compare the signatures in constant time. Reject payloads older than the configured replay window, which defaults to five minutes."
+        }
       },
       "meta": {
         "page_title": "Developer Integration Reference",
@@ -6425,6 +7236,17 @@ export default interface Resources {
         "refresh_aria": "Refresh isolated-node decision gate",
         "save_changes": "Save changes"
       },
+      "choices": {
+        "canton_isolated_node": "Region-controlled isolated node",
+        "disabled": "Disabled",
+        "enabled": "Enabled",
+        "hosted_custom_domain": "Hosted tenant with a custom domain",
+        "hosted_tenant": "Hosted tenant",
+        "monthly": "Monthly",
+        "on_demand": "On demand",
+        "quarterly": "Quarterly",
+        "weekly": "Weekly"
+      },
       "empty": {
         "none": "none",
         "unassigned": "unassigned"
@@ -6446,6 +7268,52 @@ export default interface Resources {
         "decided_count": "{{decided}} of {{total}} items decided",
         "open": "Gate open - decisions still required",
         "progress_aria": "Decision-gate progress"
+      },
+      "items": {
+        "backup_owner": {
+          "help": "Name the organisation responsible for daily backups, retention, and tested database restores.",
+          "label": "Backup owner"
+        },
+        "deployment_mode": {
+          "help": "Choose whether this is a shared hosted tenant, a custom-domain hosted tenant, or a fully isolated node controlled by the regional authority.",
+          "label": "Deployment mode"
+        },
+        "dpo_appointed": {
+          "help": "Record the named data protection officer and their contact details for the isolated deployment.",
+          "label": "Data protection officer"
+        },
+        "federation_key_exchange": {
+          "help": "Describe whether and how this node federates with regional peers, including key custody and exchange protocol.",
+          "label": "Federation key exchange"
+        },
+        "hosting_owner": {
+          "help": "Name the organisation responsible for the node's servers, domain, and TLS configuration.",
+          "label": "Hosting owner"
+        },
+        "incident_runbook_url": {
+          "help": "Link to the operational runbook for downtime, breaches, key compromise, and restore drills.",
+          "label": "Incident runbook URL"
+        },
+        "smtp_owner": {
+          "help": "Name the organisation responsible for outbound email delivery and its mail provider account.",
+          "label": "SMTP and outbound email owner"
+        },
+        "source_release_workflow": {
+          "help": "Describe how AGPL source updates reach the isolated node, including repository mirrors, signed tags, and manual review.",
+          "label": "Source release workflow"
+        },
+        "storage_owner": {
+          "help": "Name the organisation responsible for file uploads, attachments, and persistent object storage.",
+          "label": "Storage owner"
+        },
+        "telemetry_default": {
+          "help": "Choose the default state for outbound telemetry and error reporting on this node.",
+          "label": "Telemetry default"
+        },
+        "update_cadence": {
+          "help": "Choose how often the node receives upstream NEXUS source updates.",
+          "label": "Update cadence"
+        }
       },
       "meta": {
         "page_title": "Isolated-Node Decision Gate",
@@ -6901,6 +7769,8 @@ export default interface Resources {
       "status": {
         "pending_dns": "Pending DNS",
         "revoked": "Revoked",
+        "unknown": "Unknown status",
+        "unverified": "Unverified",
         "verified": "Verified"
       },
       "toasts": {
@@ -6961,6 +7831,7 @@ export default interface Resources {
       "missing": {
         "acknowledgement": "Coordinator acknowledgement",
         "backlog_empty": "Integration backlog empty",
+        "blocked_integrations": "Blocked integrations",
         "controller_contact_email": "Controller contact email",
         "controller_data_protection_officer": "Data protection officer",
         "controller_name": "Controller name",
@@ -6968,7 +7839,11 @@ export default interface Resources {
         "incident_response_contact_email": "Incident response contact email",
         "policy_appendix_url": "Policy appendix URL",
         "pre_pilot_baseline": "Pre-pilot scoreboard baseline",
+        "quarterly_review": "Quarterly scoreboard review",
         "safeguarding_escalation_user_id": "Safeguarding escalation contact",
+        "undecided_items": "Undecided isolated-node items",
+        "unknown": "Unknown requirement",
+        "warning_checks": "Data quality warnings",
         "workshop_not_run": "Operating policy workshop not run"
       },
       "modal": {
@@ -6992,9 +7867,76 @@ export default interface Resources {
         "not_started": "Pilot evaluation not yet run",
         "ready": "Pilot is ready to launch"
       },
+      "overall_summaries": {
+        "blocked": "One or more sections are blocked, so launching the pilot is not safe.",
+        "fallback": "{{ready}} of {{total}} sections are ready.",
+        "needs_review": "{{ready}} of {{total}} sections are ready. A coordinator review is required before launch.",
+        "not_started": "{{ready}} of {{total}} sections are ready. The end-to-end pilot evaluation has not been completed.",
+        "ready": "Every section is ready and the pilot may launch."
+      },
       "progress": {
         "aria": "Launch readiness progress",
         "ready_count": "{{ready}} / {{total}} ready"
+      },
+      "section_labels": {
+        "commercial_boundary": "AG82 — Commercial boundary map",
+        "data_quality": "AG84 — Tenant data quality",
+        "disclosure_pack": "AG80 — FADP/nDSG disclosure pack",
+        "external_integrations": "AG87 — External integration backlog",
+        "isolated_node": "AG85 — Isolated-node decision gate",
+        "operating_policy": "AG81 — KISS operating policy",
+        "pilot_scoreboard": "AG83 — Pilot scoreboard baseline"
+      },
+      "section_summaries": {
+        "commercial_boundary": {
+          "needs_review": "Default classifications are in effect, but a coordinator has not acknowledged the matrix.",
+          "ready_default": "The default matrix has been acknowledged.",
+          "ready_with_overrides": "{{count}} override is applied and the matrix has been reviewed.",
+          "ready_with_overrides_one": "{{count}} override is applied and the matrix has been reviewed.",
+          "ready_with_overrides_other": "{{count}} overrides are applied and the matrix has been reviewed."
+        },
+        "data_quality": {
+          "blocked": "{{count}} blocking issue remains. Duplicate accounts or seed users are still present.",
+          "blocked_one": "{{count}} blocking issue remains. Duplicate accounts or seed users are still present.",
+          "blocked_other": "{{count}} blocking issues remain. Duplicate accounts or seed users are still present.",
+          "needs_review": "{{count}} warning requires review before launch.",
+          "needs_review_one": "{{count}} warning requires review before launch.",
+          "needs_review_other": "{{count}} warnings require review before launch.",
+          "ready": "Every check passes. The data is ready for real residents."
+        },
+        "disclosure_pack": {
+          "needs_review": "The controller, data protection officer, or incident contact is incomplete.",
+          "not_started": "The pack still uses platform defaults and has no named controller.",
+          "ready": "The controller, data protection officer, and incident contact are recorded."
+        },
+        "external_integrations": {
+          "blocked": "{{count}} integration is blocked, so partner-dependent features cannot launch.",
+          "blocked_one": "{{count}} integration is blocked, so partner-dependent features cannot launch.",
+          "blocked_other": "{{count}} integrations are blocked, so partner-dependent features cannot launch.",
+          "not_started": "The backlog is empty. Seed the defaults or confirm that no partner integrations are required.",
+          "ready": "{{count}} integration item is tracked and none are blocked.",
+          "ready_one": "{{count}} integration item is tracked and none are blocked.",
+          "ready_other": "{{count}} integration items are tracked and none are blocked."
+        },
+        "isolated_node": {
+          "blocked": "{{count}} blocked decision prevents the isolated deployment from launching.",
+          "blocked_one": "{{count}} blocked decision prevents the isolated deployment from launching.",
+          "blocked_other": "{{count}} blocked decisions prevent the isolated deployment from launching.",
+          "hosted_closed": "The gate is closed. It remains informational because this deployment is hosted.",
+          "hosted_informational": "The gate is not required for hosted deployments and remains informational.",
+          "needs_review": "{{decided}} of {{total}} decisions are recorded. An isolated deployment requires every decision to be complete.",
+          "ready": "Every gate decision is recorded. The isolated deployment is ready."
+        },
+        "operating_policy": {
+          "needs_review": "The workshop is complete, but the appendix URL or safeguarding owner is missing.",
+          "not_started": "The policy still uses platform defaults. Schedule the policy workshop.",
+          "ready": "The policy workshop is complete, the appendix is linked, and a safeguarding owner is assigned."
+        },
+        "pilot_scoreboard": {
+          "needs_review": "The pre-pilot baseline is captured, but the quarterly review is overdue.",
+          "not_started": "No pre-pilot baseline has been captured, so a before-and-after comparison is not yet possible.",
+          "ready": "The pre-pilot baseline is captured and the quarterly review cadence is on track."
+        }
       },
       "states": {
         "blocked_body": "Resolve every section below before the launch button is enabled.",
@@ -7125,6 +8067,18 @@ export default interface Resources {
         "quarterly_failed": "Failed to capture quarterly review"
       }
     },
+    "regional_points": {
+      "ledger_types": {
+        "admin_adjustment": "Administrator adjustment",
+        "admin_issue": "Administrator issue",
+        "earned_for_hours": "Earned for approved hours",
+        "redemption": "Redemption",
+        "reversal": "Reversal",
+        "transfer_in": "Transfer received",
+        "transfer_out": "Transfer sent",
+        "unknown": "Unknown transaction"
+      }
+    },
     "research_partnerships": {
       "about": {
         "body": "Research partnerships give approved academic or policy researchers controlled access to anonymised platform data for evaluation purposes. Each partnership defines a specific data scope, a duration, and a data sharing agreement. All access is logged. Partners never see individual member data - only aggregated or anonymised datasets.",
@@ -7213,6 +8167,20 @@ export default interface Resources {
         "placeholder_count_one": "{{count}} placeholder",
         "placeholder_count_other": "{{count}} placeholders",
         "placeholder_label": "{{placeholder}}",
+        "placeholders": {
+          "cohort_window_years": "Cohort window in years",
+          "dpo_email": "Data protection officer email",
+          "dpo_name": "Data protection officer name",
+          "jurisdiction": "Governing jurisdiction",
+          "partner_institution": "Research partner institution",
+          "partner_name": "Research partner name",
+          "period_end": "Reporting period end",
+          "period_start": "Reporting period start",
+          "pilot_region": "Pilot region",
+          "study_title": "Study title",
+          "tenant_name": "Community name",
+          "unknown": "Template value"
+        },
         "rendered_markdown": "Rendered Markdown ({{count}} chars)",
         "rendered_markdown_one": "Rendered Markdown ({{count}} chars)",
         "rendered_markdown_other": "Rendered Markdown ({{count}} chars)",
@@ -7323,7 +8291,8 @@ export default interface Resources {
       },
       "status": {
         "converted": "Converted",
-        "sent": "Sent"
+        "sent": "Sent",
+        "unknown": "Unknown status"
       },
       "table": {
         "score": "Score",
@@ -7463,6 +8432,26 @@ export default interface Resources {
         "title": "Remove success story",
         "warning": "This action cannot be undone."
       },
+      "demo_stories": {
+        "formal_care_offset": {
+          "evidence_source": "AG76 municipal ROI model (illustrative)",
+          "method_caveat": "Estimate using CHF 35 per hour across 350 hours; the comparison is against the pre-pilot baseline only.",
+          "narrative": "Volunteer hours coordinated through NEXUS represent a CHF 12,250 offset against formal home-care costs during the pilot window, valued at the Swiss formal-care assistant rate.",
+          "title": "CHF 12,250 in formal-care costs offset"
+        },
+        "information_distribution": {
+          "evidence_source": "Peer municipality page (illustrative)",
+          "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+          "narrative": "Coordinators spend roughly a third less time distributing updates after switching to NEXUS. Announcements, member-segment targeting, and confirmation tracking are consolidated in one place.",
+          "title": "30% lower information-distribution effort"
+        },
+        "volunteer_engagement": {
+          "evidence_source": "Peer municipality page (illustrative)",
+          "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+          "narrative": "Pilot communities report a quarter more active volunteer participation after adopting NEXUS, supported by clearer matching, low-friction sign-up, and visible Warmth Pass recognition.",
+          "title": "25% more volunteer engagement"
+        }
+      },
       "editor": {
         "after_value": "After value",
         "audience": "Audience",
@@ -7543,6 +8532,20 @@ export default interface Resources {
       "categories_admin_desc": "Create and manage categories for listings and volunteering",
       "categories_admin_title": "Categories Admin",
       "category_name_is_required": "Category name is required",
+      "color_blue": "Blue",
+      "color_cyan": "Cyan",
+      "color_fuchsia": "Fuchsia",
+      "color_gray": "Grey",
+      "color_green": "Green",
+      "color_indigo": "Indigo",
+      "color_orange": "Orange",
+      "color_pink": "Pink",
+      "color_purple": "Purple",
+      "color_red": "Red",
+      "color_slate": "Slate",
+      "color_teal": "Teal",
+      "color_unknown": "Unknown colour",
+      "color_yellow": "Yellow",
       "create_category": "Create category",
       "delete_category": "Delete category",
       "delete_confirm_message": "Delete {{name}}? This cannot be undone.",
@@ -7551,6 +8554,7 @@ export default interface Resources {
       "events": "Events",
       "failed_to_delete_category": "Failed to delete category",
       "failed_to_load_categories": "Failed to load categories",
+      "failed_to_save_category": "Failed to save category",
       "item_added": "Category added",
       "item_deleted": "Category deleted",
       "item_updated": "Category updated",
@@ -8011,6 +9015,7 @@ export default interface Resources {
       "option_category_expenses": "Expenses",
       "option_category_expiry_renewal": "Expiry & Renewal",
       "option_category_features": "Features",
+      "option_category_gamification": "Gamification",
       "option_category_general": "General",
       "option_category_hours_verification": "Hours & Verification",
       "option_category_job_types_posting_rules": "Job Types & Posting Rules",
@@ -8034,6 +9039,7 @@ export default interface Resources {
       "option_category_scope": "Scope",
       "option_category_sharing": "Sharing",
       "option_category_shifts_applications": "Shifts & Applications",
+      "option_category_social": "Social",
       "option_category_storage": "Storage",
       "option_category_tab_page_visibility": "Tab & Page Visibility",
       "option_category_tab_visibility": "Tab Visibility",
@@ -8068,6 +9074,14 @@ export default interface Resources {
       "option_count": "{{count}} options",
       "option_count_one": "{{count}} options",
       "option_count_other": "{{count}} options",
+      "option_courses_allow_member_authoring_desc": "Allow any member to create courses. Turn this off to restrict authoring to approved instructors and administrators.",
+      "option_courses_allow_member_authoring_label": "Member Authoring",
+      "option_courses_award_xp_desc": "Award gamification XP and a graduate badge when a member completes a course.",
+      "option_courses_award_xp_label": "Award XP & Badges",
+      "option_courses_moderation_enabled_desc": "Require an administrator to approve new courses before they are published.",
+      "option_courses_moderation_enabled_label": "Require Moderation",
+      "option_courses_post_completions_to_feed_desc": "Celebrate course completions in the community activity feed.",
+      "option_courses_post_completions_to_feed_label": "Post Completions to Feed",
       "option_dashboard_show_quick_actions_desc": "Display quick action buttons on the dashboard",
       "option_dashboard_show_quick_actions_label": "Show Quick Actions",
       "option_dashboard_show_recent_activity_desc": "Display recent activity feed on the dashboard",
@@ -8552,6 +9566,9 @@ export default interface Resources {
       "translation_glossary_management_desc": "Add custom translations for specific terms",
       "translation_language": "Language",
       "translation_load_failed": "Failed to load translation settings",
+      "translation_provider_deepl": "DeepL",
+      "translation_provider_google": "Google Translate",
+      "translation_provider_openai": "OpenAI",
       "translation_rate_limit_desc": "Prevents abuse of the translation API",
       "translation_rate_limit_label": "Max translations per user per hour",
       "translation_setting_update_failed": "Failed to update {{setting}}",
@@ -9809,6 +10826,7 @@ export default interface Resources {
       "failed_to_load_pages": "Failed to load pages",
       "failed_to_load_plans": "Failed to load plans",
       "failed_to_load_subscriptions": "Failed to load subscriptions",
+      "failed_to_save_attribute": "Failed to save attribute",
       "failed_to_save_reorder": "Failed to save reorder",
       "failed_to_update_item": "Failed to update item",
       "failed_to_update_menu": "Failed to update menu",
@@ -11096,6 +12114,8 @@ export default interface Resources {
       "optional_placeholder": "Optional...",
       "parent_item": "Parent item",
       "placeholder_css": "Enter css...",
+      "placeholder_external_url": "https://example.com",
+      "placeholder_internal_route": "/dashboard",
       "preview": "Preview",
       "route_about": "About",
       "route_explore": "Explore",
@@ -11353,6 +12373,15 @@ export default interface Resources {
       "action_mark_complete": "Mark Complete",
       "action_mark_in_progress": "Mark in Progress",
       "active_in_last_30": "Active in Last 30 Days",
+      "activity_description_exchange_completed": "Completed exchange with {{member_name}}",
+      "activity_description_group_joined": "Joined group: {{group_name}}",
+      "activity_description_listing_created": "Created listing: {{title}}",
+      "activity_description_login": "Logged in",
+      "activity_description_note_added": "Note added by {{author_name}}: {{content}}",
+      "activity_description_profile_updated": "Updated their profile",
+      "activity_description_signup": "Registered an account",
+      "activity_description_task_created": "Created task: {{title}}",
+      "activity_description_unknown": "Activity recorded",
       "activity_summary_desc": "Summary of recent member activity across your community",
       "activity_summary_title": "Activity Summary",
       "activity_timeline_desc": "Chronological timeline of member actions and coordinator interactions",
@@ -11365,10 +12394,22 @@ export default interface Resources {
       "activity_type_profile_updated": "Profile updated",
       "activity_type_signup": "Sign-up",
       "activity_type_task_created": "Task created",
+      "activity_type_unknown": "Unknown activity",
+      "activity_value_system": "System",
+      "activity_value_unknown_group": "Unknown group",
+      "activity_value_unknown_member": "Unknown member",
+      "activity_value_untitled_listing": "Untitled listing",
+      "activity_value_untitled_task": "Untitled task",
       "add_note": "Add Note",
       "add_note_title": "Add Note",
       "add_tag": "Add Tag",
       "add_tag_title": "Add Tag",
+      "admin_roles": {
+        "admin": "Administrator",
+        "super_admin": "Platform administrator",
+        "tenant_admin": "Tenant administrator",
+        "unknown": "Administrator"
+      },
       "all_members": "All Members",
       "back_to_all_tags": "Back to All Tags",
       "biggest_dropoff": "Biggest Drop-off",
@@ -11432,6 +12473,13 @@ export default interface Resources {
       "failed_to_update_task_status": "Failed to update task status",
       "funnel_focus_desc": "The handoffs most likely to benefit from coordinator attention right now.",
       "funnel_focus_title": "Attention Needed",
+      "funnel_stage_email_verified": "Email Verified",
+      "funnel_stage_first_exchange": "First Exchange",
+      "funnel_stage_first_listing": "First Listing",
+      "funnel_stage_profile_complete": "Profile Complete",
+      "funnel_stage_registered": "Registered",
+      "funnel_stage_repeat_user": "Repeat User",
+      "funnel_stage_unknown": "Unknown stage",
       "funnel_summary_desc": "A short readout of what the funnel is saying right now, before you dive into the detail below.",
       "funnel_summary_title": "What This Funnel Says Right Now",
       "guide_conversion_body": "Each conversion percentage compares a stage only to the stage immediately before it, not to the original starting group.",
@@ -12015,6 +13063,7 @@ export default interface Resources {
       "label_score_trend_30d": "Score Trend 30d",
       "label_top_10_percent_threshold": "Top 10 Percent Threshold",
       "label_user_i_d": "User ID",
+      "listing_id_placeholder": "e.g., 105",
       "matches_today": "Matches Today",
       "matching_diagnostic_desc": "Run a diagnostic on specific users or listings to understand match scores",
       "matching_diagnostic_title": "Matching Diagnostic",
@@ -12027,6 +13076,7 @@ export default interface Resources {
       "score_distribution_empty": "No score distribution found",
       "score_factors": "Score Factors",
       "score_factors_desc": "Score factors are weighted signals used to calculate member engagement.",
+      "user_id_placeholder": "e.g., 42",
       "user_prompt": "Enter a user ID and click Diagnose to see their matching analysis."
     },
     "diagnostics_matching": {
@@ -12441,6 +13491,111 @@ export default interface Resources {
       "yearly": "Yearly",
       "yearly_price_suffix": "{{price}}/yr"
     },
+    "grapesjs_core": {
+      "asset_manager": {
+        "add_image": "Add image",
+        "image_url_placeholder": "http://path/to/the/image.jpg",
+        "select_image": "Select image",
+        "upload_prompt": "Drop files here or click to upload"
+      },
+      "components": {
+        "body": "Body",
+        "box": "Box",
+        "comment": "Comment",
+        "image": "Image",
+        "label": "Label",
+        "link": "Link",
+        "map": "Map",
+        "table": "Table",
+        "table_body": "Table body",
+        "table_cell": "Table cell",
+        "table_foot": "Table foot",
+        "table_head": "Table head",
+        "table_row": "Table row",
+        "text": "Text",
+        "video": "Video"
+      },
+      "devices": {
+        "desktop": "Desktop",
+        "device": "Device",
+        "mobile_landscape": "Mobile landscape",
+        "mobile_portrait": "Mobile portrait",
+        "tablet": "Tablet"
+      },
+      "panels": {
+        "fullscreen": "Fullscreen",
+        "open_blocks": "Open blocks",
+        "open_layer_manager": "Open layer manager",
+        "open_style_manager": "Open style manager",
+        "preview": "Preview",
+        "settings": "Settings",
+        "view_code": "View code",
+        "view_components": "View components"
+      },
+      "selectors": {
+        "classes": "Classes",
+        "click": "Click",
+        "empty_state": "- State -",
+        "even_odd": "Even/Odd",
+        "hover": "Hover",
+        "selected": "Selected"
+      },
+      "storage": {
+        "recover_unsaved": "Do you want to recover unsaved changes?"
+      },
+      "styles": {
+        "empty": "Select an element before using the style manager",
+        "images": "Images",
+        "layer": "Layer",
+        "properties": {
+          "attachment": "Attachment",
+          "blur": "Blur",
+          "bottom": "Bottom",
+          "bottom_left": "Bottom left",
+          "bottom_right": "Bottom right",
+          "color": "Colour",
+          "duration": "Duration",
+          "image": "Image",
+          "left": "Left",
+          "position": "Position",
+          "property": "Property",
+          "repeat": "Repeat",
+          "right": "Right",
+          "rotate_x": "Rotate X",
+          "rotate_y": "Rotate Y",
+          "rotate_z": "Rotate Z",
+          "scale_x": "Scale X",
+          "scale_y": "Scale Y",
+          "scale_z": "Scale Z",
+          "size": "Size",
+          "spread": "Spread",
+          "style": "Style",
+          "timing": "Timing",
+          "top": "Top",
+          "top_left": "Top left",
+          "top_right": "Top right",
+          "type": "Type",
+          "width": "Width"
+        },
+        "sectors": {
+          "decorations": "Decorations",
+          "dimension": "Dimension",
+          "extra": "Extra",
+          "flex": "Flex",
+          "general": "General",
+          "layout": "Layout",
+          "typography": "Typography"
+        }
+      },
+      "traits": {
+        "component_settings": "Component settings",
+        "empty": "Select an element before using the trait manager",
+        "new_window": "New window",
+        "text_placeholder": "e.g. Text here",
+        "this_window": "This window",
+        "url_placeholder": "e.g. https://example.com"
+      }
+    },
     "page_builder": {
       "blocks": {
         "category_nexus": "NEXUS sections",
@@ -12465,6 +13620,127 @@ export default interface Resources {
       "code_modal_title": "Page HTML",
       "dismiss": "Dismiss",
       "empty_inspector": "Select an element on the page to edit its styles or settings.",
+      "grapesjs": {
+        "blocks": {
+          "button": "Button",
+          "checkbox": "Checkbox",
+          "column_one": "1 Column",
+          "column_three": "3 Columns",
+          "column_two": "2 Columns",
+          "columns_three_seven": "2 Columns 3/7",
+          "custom_code": "Custom code",
+          "form": "Form",
+          "image": "Image",
+          "input": "Input",
+          "label": "Label",
+          "link": "Link",
+          "link_block": "Link block",
+          "map": "Map",
+          "quote": "Quote",
+          "radio": "Radio button",
+          "select": "Select",
+          "tabs": "Tabs",
+          "text": "Text",
+          "text_section": "Text section",
+          "textarea": "Text area",
+          "tooltip": "Tooltip",
+          "video": "Video"
+        },
+        "categories": {
+          "basic": "Basic",
+          "extra": "Extra",
+          "forms": "Forms"
+        },
+        "components": {
+          "button": "Button",
+          "cell": "Cell",
+          "checkbox": "Checkbox",
+          "custom_code": "Custom code",
+          "form": "Form",
+          "input": "Input",
+          "label": "Label",
+          "option": "Option",
+          "radio": "Radio button",
+          "row": "Row",
+          "select": "Select",
+          "tab": "Tab",
+          "tab_container": "Tab container",
+          "tab_content": "Tab content",
+          "tab_contents": "Tab contents",
+          "tabs": "Tabs",
+          "textarea": "Text area",
+          "tooltip": "Tooltip"
+        },
+        "content": {
+          "custom_code": "Insert your custom code here",
+          "custom_code_script": "Custom code containing <script> cannot be rendered on the canvas.",
+          "form_email": "Email",
+          "form_female_short": "F",
+          "form_gender": "Gender",
+          "form_male_short": "M",
+          "form_message": "Message",
+          "form_name": "Name",
+          "form_send": "Send",
+          "label": "Label",
+          "link": "Link",
+          "option_one": "Option 1",
+          "option_two": "Option 2",
+          "quote": "Add your quotation here.",
+          "tab": "Tab",
+          "tab_content": "Tab content",
+          "text": "Insert your text here",
+          "text_body": "Add your text here.",
+          "text_heading": "Add a heading",
+          "tooltip": "Tooltip"
+        },
+        "dialogs": {
+          "custom_code_title": "Insert your code",
+          "import_button": "Import",
+          "import_help": "Paste the page HTML to import.",
+          "import_title": "Import",
+          "open_custom_code": "Open custom code",
+          "save": "Save"
+        },
+        "options": {
+          "bottom": "Bottom",
+          "button": "Button",
+          "email": "Email",
+          "fit": "Fit",
+          "large": "Large",
+          "left": "Left",
+          "medium": "Medium",
+          "number": "Number",
+          "one_line": "One line",
+          "password": "Password",
+          "reset": "Reset",
+          "right": "Right",
+          "small": "Small",
+          "submit": "Submit",
+          "text": "Text",
+          "top": "Top"
+        },
+        "traits": {
+          "action": "Action",
+          "add_tab": "Add tab",
+          "checked": "Checked",
+          "for": "For",
+          "id": "ID",
+          "method": "Method",
+          "name": "Name",
+          "options": "Options",
+          "placeholder": "Placeholder",
+          "required": "Required",
+          "style_active_tab": "Style active tab",
+          "style_tooltip": "Adjust this element's style settings",
+          "text": "Text",
+          "tooltip_length": "Length",
+          "tooltip_position": "Position",
+          "tooltip_text": "Tooltip text",
+          "tooltip_visible": "Visible",
+          "type": "Type",
+          "value": "Value"
+        }
+      },
       "hide_blocks": "Hide page blocks",
       "hide_inspector": "Hide page inspector",
       "hint_design": "Design a responsive web page with GrapesJS blocks, sections, forms, tabs, images and custom code.",
@@ -12661,6 +13937,32 @@ export default interface Resources {
       "btn_view": "View",
       "cancel": "Cancel",
       "cannot_save_config_not_loaded": "Cannot Save Config Not Loaded",
+      "caring_role_presets": {
+        "canton_admin": {
+          "description": "Regional operations, municipal coordination, reporting, and trusted-partner oversight.",
+          "name": "KISS Canton Admin"
+        },
+        "cooperative_coordinator": {
+          "description": "Member onboarding, matching, hour review, and sensitive-support escalation.",
+          "name": "KISS Cooperative Coordinator"
+        },
+        "municipality_admin": {
+          "description": "Local participation, help requests, organisations, and public-sector reporting.",
+          "name": "KISS Municipality Admin"
+        },
+        "national_admin": {
+          "description": "Cross-program oversight, reporting standards, federation visibility, and network governance.",
+          "name": "KISS National Foundation Admin"
+        },
+        "organisation_coordinator": {
+          "description": "Opportunity management, volunteer rosters, logged hours, and partner activity.",
+          "name": "KISS Organisation Coordinator"
+        },
+        "trusted_reviewer": {
+          "description": "Limited review authority for approved hour logs and community trust signals.",
+          "name": "KISS Trusted Volunteer Reviewer"
+        }
+      },
       "chip_draft": "Draft",
       "chip_inactive": "Inactive",
       "clear_log_confirm": "Clear this log file? This removes the current contents and cannot be undone.",
@@ -12722,6 +14024,7 @@ export default interface Resources {
       "config_currency_name_desc": "Display name for the time-bank currency.",
       "config_currency_symbol": "Currency symbol",
       "config_currency_symbol_desc": "Short symbol shown next to balances.",
+      "config_default_currency_name": "Hours",
       "config_digest_daily": "Daily",
       "config_digest_frequency": "Digest frequency",
       "config_digest_frequency_desc": "How often the activity digest email is sent.",
@@ -12805,6 +14108,7 @@ export default interface Resources {
       "disabled": "Disabled",
       "disconnected": "Disconnected",
       "disk": "Disk",
+      "doc_type_unknown": "Unknown document type",
       "document_acceptance_rates": "Document Acceptance Rates",
       "document_created": "Document created",
       "document_deleted": "Document Deleted",
@@ -12821,6 +14125,9 @@ export default interface Resources {
       "enabled": "Enabled",
       "enterprise_dashboard_desc": "Overview of GDPR compliance, system health, roles, and configuration",
       "enterprise_dashboard_title": "Enterprise Dashboard",
+      "error_log_action_auth_failed": "Authentication failed",
+      "error_log_action_permission_denied": "Permission denied",
+      "error_log_action_unknown": "Unknown system event",
       "error_logs": "Error Logs",
       "error_logs_desc": "View and manage system error logs",
       "error_logs_title": "Error Logs",
@@ -12880,12 +14187,26 @@ export default interface Resources {
       "gdpr_active_breaches_alert": "Active data breach alert",
       "gdpr_activity_timeline": "Activity timeline",
       "gdpr_add_note": "Add note",
+      "gdpr_admin_id": "Administrator #{{id}}",
       "gdpr_affected_users": "Affected users",
       "gdpr_apply": "Apply",
       "gdpr_assign": "Assign",
       "gdpr_assign_request": "GDPR Assign Request",
       "gdpr_assigned_to": "Assigned To",
       "gdpr_assignment": "GDPR Assignment",
+      "gdpr_audit_action_breach_created": "Breach created",
+      "gdpr_audit_action_breach_updated": "Breach updated",
+      "gdpr_audit_action_consent_granted": "Consent granted",
+      "gdpr_audit_action_consent_withdrawn": "Consent withdrawn",
+      "gdpr_audit_action_create": "Created",
+      "gdpr_audit_action_delete": "Deleted",
+      "gdpr_audit_action_delete_data": "Data deleted",
+      "gdpr_audit_action_export": "Exported",
+      "gdpr_audit_action_request_created": "Request created",
+      "gdpr_audit_action_request_updated": "Request updated",
+      "gdpr_audit_action_unknown": "Unknown action",
+      "gdpr_audit_action_update": "Updated",
+      "gdpr_audit_action_view_profile": "Profile viewed",
       "gdpr_audit_entry": "Audit entry",
       "gdpr_audit_log_desc": "Audit trail of all GDPR-related actions taken on this platform",
       "gdpr_audit_log_title": "GDPR Audit Log",
@@ -12929,6 +14250,7 @@ export default interface Resources {
       "gdpr_consent_rate_summary": "{{percentage}}% ({{granted}}/{{total}})",
       "gdpr_consent_type_created": "Consent type created",
       "gdpr_consent_type_deleted": "Consent type deleted",
+      "gdpr_consent_type_unknown": "Unknown consent type",
       "gdpr_consent_type_updated": "Consent type updated",
       "gdpr_consent_types_desc": "Manage the consent types members can grant or deny.",
       "gdpr_consent_types_page_title": "Consent types",
@@ -12948,6 +14270,18 @@ export default interface Resources {
       "gdpr_dashboard_title": "GDPR Dashboard",
       "gdpr_data_breaches": "Data breaches",
       "gdpr_data_categories_affected": "Data categories affected",
+      "gdpr_data_category_address": "Address",
+      "gdpr_data_category_communications": "Communications",
+      "gdpr_data_category_email": "Email address",
+      "gdpr_data_category_financial": "Financial data",
+      "gdpr_data_category_health": "Health data",
+      "gdpr_data_category_location": "Location data",
+      "gdpr_data_category_name": "Name",
+      "gdpr_data_category_phone": "Phone number",
+      "gdpr_data_category_profile": "Profile data",
+      "gdpr_data_category_special_category": "Special-category data",
+      "gdpr_data_category_technical": "Technical data",
+      "gdpr_data_category_unknown": "Unknown data category",
       "gdpr_date": "Date",
       "gdpr_deadline": "Deadline",
       "gdpr_deadline_approaching": "Deadline approaching",
@@ -12978,6 +14312,14 @@ export default interface Resources {
       "gdpr_edit_consent_type": "Edit consent type",
       "gdpr_enter_user_id_placeholder": "Enter user ID...",
       "gdpr_enter_valid_user_id": "Enter a valid user ID",
+      "gdpr_entity_type_consent": "Consent",
+      "gdpr_entity_type_consent_type": "Consent type",
+      "gdpr_entity_type_data_breach": "Data breach",
+      "gdpr_entity_type_gdpr_request": "GDPR request",
+      "gdpr_entity_type_legal_document": "Legal document",
+      "gdpr_entity_type_profile": "Profile",
+      "gdpr_entity_type_unknown": "Unknown entity",
+      "gdpr_entity_type_user": "User",
       "gdpr_escalate": "Escalate",
       "gdpr_export_available": "Export available",
       "gdpr_export_csv": "Export CSV",
@@ -13068,6 +14410,14 @@ export default interface Resources {
       "gdpr_report_breach": "Report breach",
       "gdpr_report_data_breach": "Report data breach",
       "gdpr_reported": "Reported",
+      "gdpr_request_action_assigned": "Assigned",
+      "gdpr_request_action_completed": "Completed",
+      "gdpr_request_action_created": "Created",
+      "gdpr_request_action_exported": "Export generated",
+      "gdpr_request_action_note_added": "Note added",
+      "gdpr_request_action_processing": "Processing started",
+      "gdpr_request_action_rejected": "Rejected",
+      "gdpr_request_action_unknown": "Unknown action",
       "gdpr_request_actions": "Request actions",
       "gdpr_request_assigned": "Request assigned",
       "gdpr_request_created": "Request created",
@@ -13097,7 +14447,12 @@ export default interface Resources {
       "gdpr_search_user_placeholder": "Search user...",
       "gdpr_select_request_type": "Select a request type",
       "gdpr_selected_user": "{{name}} ({{email}}) — ID #{{id}}",
+      "gdpr_severity_critical": "Critical",
+      "gdpr_severity_high": "High",
       "gdpr_severity_label": "Severity",
+      "gdpr_severity_low": "Low",
+      "gdpr_severity_medium": "Medium",
+      "gdpr_severity_unknown": "Unknown severity",
       "gdpr_sla": "SLA",
       "gdpr_sla_breached": "SLA breached",
       "gdpr_sla_days_left": "{{count}} days left",
@@ -13114,6 +14469,19 @@ export default interface Resources {
       "gdpr_timeline": "Timeline",
       "gdpr_title": "Title",
       "gdpr_type": "Type",
+      "gdpr_type_access": "Data access",
+      "gdpr_type_access_desc": "Provide the member with a copy of their personal data.",
+      "gdpr_type_erasure": "Data erasure",
+      "gdpr_type_erasure_desc": "Delete personal data where there is no lawful reason to retain it.",
+      "gdpr_type_objection": "Objection",
+      "gdpr_type_objection_desc": "Record and assess an objection to processing.",
+      "gdpr_type_portability": "Data portability",
+      "gdpr_type_portability_desc": "Provide personal data in a portable, machine-readable format.",
+      "gdpr_type_rectification": "Data rectification",
+      "gdpr_type_rectification_desc": "Correct inaccurate or incomplete personal data.",
+      "gdpr_type_restriction": "Processing restriction",
+      "gdpr_type_restriction_desc": "Restrict processing while the request is assessed.",
+      "gdpr_type_unknown": "Unknown request type",
       "gdpr_unassigned": "Unassigned",
       "gdpr_update": "Update",
       "gdpr_user": "User",
@@ -13129,6 +14497,13 @@ export default interface Resources {
       "health_check": "Health Check",
       "health_check_desc": "Run system health checks to verify database, Redis, and services",
       "health_check_history": "Health check history",
+      "health_check_name_api": "API",
+      "health_check_name_database": "Database",
+      "health_check_name_disk": "Disk storage",
+      "health_check_name_php_extension": "PHP extension: {{extension}}",
+      "health_check_name_php_version_minimum": "PHP {{version}} or later",
+      "health_check_name_redis": "Redis",
+      "health_check_name_unknown": "System check",
       "health_check_title": "Health Check",
       "history": "History",
       "ini_max_execution_time": "Maximum execution time",
@@ -13266,6 +14641,94 @@ export default interface Resources {
       "pending_users_count_other": "{{count}} members still need to accept this version",
       "permission_browser_desc": "Browse all available permissions in the system",
       "permission_browser_title": "Permission Browser",
+      "permission_categories": {
+        "admin": "Administration",
+        "caring": "Caring Community",
+        "content": "Content",
+        "events": "Events",
+        "federation": "Federation",
+        "gamification": "Gamification",
+        "gdpr": "GDPR",
+        "groups": "Groups",
+        "listings": "Listings",
+        "matching": "Matching",
+        "messages": "Messages",
+        "safeguarding": "Safeguarding",
+        "system": "System",
+        "unknown": "Other permissions",
+        "users": "Users",
+        "volunteering": "Volunteering",
+        "wallet": "Wallet"
+      },
+      "permission_category_unknown": "Other permissions",
+      "permission_unknown": "Unknown permission",
+      "permissions": {
+        "admin_legal_docs_manage": "Manage legal documents",
+        "admin_newsletters_manage": "Manage newsletters",
+        "admin_roles_manage": "Manage roles",
+        "admin_tenant_features": "Manage tenant features",
+        "caring_configure": "Configure Caring Community",
+        "caring_reports_export": "Export Caring Community reports",
+        "caring_reports_view": "View Caring Community reports",
+        "caring_view": "View Caring Community",
+        "caring_workflow_assign": "Assign Caring Community workflow items",
+        "caring_workflow_review": "Review Caring Community workflow items",
+        "content_blog_manage": "Manage blog content",
+        "content_categories_manage": "Manage categories",
+        "content_menus_manage": "Manage menus",
+        "content_pages_manage": "Manage pages",
+        "events_create": "Create events",
+        "events_delete": "Delete events",
+        "events_edit": "Edit events",
+        "events_view": "View events",
+        "federation_api_keys": "Manage federation API keys",
+        "federation_manage": "Manage federation",
+        "federation_nodes_view": "View federation nodes",
+        "federation_partnerships": "Manage federation partnerships",
+        "gamification_award_badges": "Award badges",
+        "gamification_campaigns": "Manage gamification campaigns",
+        "gamification_manage": "Manage gamification",
+        "gdpr_audit": "View GDPR audit log",
+        "gdpr_breaches": "Manage GDPR breaches",
+        "gdpr_consents": "Manage GDPR consents",
+        "gdpr_requests": "Manage GDPR requests",
+        "groups_create": "Create groups",
+        "groups_delete": "Delete groups",
+        "groups_edit": "Edit groups",
+        "groups_moderate": "Moderate groups",
+        "groups_view": "View groups",
+        "listings_approve": "Approve listings",
+        "listings_create": "Create listings",
+        "listings_delete": "Delete listings",
+        "listings_edit": "Edit listings",
+        "listings_view": "View listings",
+        "matching_analytics": "View matching analytics",
+        "matching_approvals": "Approve matches",
+        "matching_config": "Configure matching",
+        "messages_moderate": "Moderate messages",
+        "messages_view": "View messages",
+        "safeguarding_view": "View safeguarding records",
+        "system_cache": "Manage system cache",
+        "system_config": "Manage system configuration",
+        "system_cron": "Manage scheduled tasks",
+        "system_logs": "View system logs",
+        "system_monitoring": "View system monitoring",
+        "system_secrets": "Manage system secrets",
+        "users_ban": "Ban users",
+        "users_create": "Create users",
+        "users_delete": "Delete users",
+        "users_edit": "Edit users",
+        "users_impersonate": "Impersonate users",
+        "users_suspend": "Suspend users",
+        "users_view": "View users",
+        "volunteering_hours_review": "Review volunteering hours",
+        "volunteering_opportunities_manage": "Manage volunteering opportunities",
+        "volunteering_organisations_manage": "Manage volunteering organisations",
+        "wallet_adjust": "Adjust wallet balances",
+        "wallet_org_wallets": "Manage organisation wallets",
+        "wallet_transfer": "Transfer wallet credits",
+        "wallet_view": "View wallets"
+      },
       "permissions_count": "{{count}} permissions",
       "permissions_count_label": "Permissions",
       "permissions_count_one": "{{count}} permissions",
@@ -13347,10 +14810,10 @@ export default interface Resources {
       "set": "Set",
       "settings_not_loaded": "Settings have not loaded yet. Reload before saving.",
       "settings_saved": "Settings saved.",
-      "sla_days_left": "SLA Days Left",
-      "sla_days_left_plural": "SLA Days Left Plural",
-      "sla_overdue": "SLA Overdue",
-      "sla_overdue_plural": "SLA Overdue Plural",
+      "sla_days_left": "SLA day left",
+      "sla_days_left_plural": "SLA days left",
+      "sla_overdue": "SLA day overdue",
+      "sla_overdue_plural": "SLA days overdue",
       "some_warnings_detected": "Some warnings detected",
       "stat_pending": "Pending acceptance",
       "status_all": "All",
@@ -13366,6 +14829,7 @@ export default interface Resources {
       "status_published": "Published",
       "status_rejected": "Rejected",
       "status_unhealthy": "Unhealthy",
+      "status_unknown": "Unknown status",
       "summary_of_changes": "Summary of Changes",
       "system_config": {
         "content_desc": "Content.",
@@ -14025,6 +15489,57 @@ export default interface Resources {
       "api_doc_col_type": "Type",
       "api_doc_col_webhook": "Webhook",
       "api_doc_col_worry": "Worry",
+      "api_doc_endpoint_get_listings_description": "Search federated listings (offers and requests) across partner timebanks.",
+      "api_doc_endpoint_get_listings_id_description": "Get detailed information for a single federated listing.",
+      "api_doc_endpoint_get_listings_id_param_id": "Listing ID (URL parameter)",
+      "api_doc_endpoint_get_listings_param_category": "Category ID (integer)",
+      "api_doc_endpoint_get_listings_param_page": "Page number (default: 1)",
+      "api_doc_endpoint_get_listings_param_per_page": "Results per page (default: 20, max: 100)",
+      "api_doc_endpoint_get_listings_param_q": "Search query (title, description)",
+      "api_doc_endpoint_get_listings_param_timebank_id": "Filter by specific timebank ID",
+      "api_doc_endpoint_get_listings_param_type": "\"offer\" or \"request\"",
+      "api_doc_endpoint_get_members_description": "Search federated members across partner timebanks. Supports full-text search, filtering by skills, location, and timebank.",
+      "api_doc_endpoint_get_members_id_description": "Get detailed profile for a single federated member, including messaging and transaction preferences.",
+      "api_doc_endpoint_get_members_id_param_id": "Member ID (URL parameter)",
+      "api_doc_endpoint_get_members_param_location": "Location filter (partial match)",
+      "api_doc_endpoint_get_members_param_page": "Page number (default: 1)",
+      "api_doc_endpoint_get_members_param_per_page": "Results per page (default: 20, max: 100)",
+      "api_doc_endpoint_get_members_param_q": "Search query (name, username, skills)",
+      "api_doc_endpoint_get_members_param_skills": "Comma-separated skill filters",
+      "api_doc_endpoint_get_members_param_timebank_id": "Filter by specific timebank ID",
+      "api_doc_endpoint_get_messages_description": "Retrieve federated messages involving your tenant. Supports filtering by direction (inbound/outbound) and a since timestamp for incremental syncing.",
+      "api_doc_endpoint_get_messages_param_direction": "\"inbound\", \"outbound\", or \"all\" (default: \"all\")",
+      "api_doc_endpoint_get_messages_param_page": "Page number (default: 1)",
+      "api_doc_endpoint_get_messages_param_per_page": "Results per page (default: 20, max: 100)",
+      "api_doc_endpoint_get_messages_param_since": "ISO 8601 timestamp -- only return messages after this time",
+      "api_doc_endpoint_get_reviews_description": "Get federated reviews for a specific user. Only returns approved reviews where the user has federated reviews enabled.",
+      "api_doc_endpoint_get_reviews_param_page": "Page number (default: 1)",
+      "api_doc_endpoint_get_reviews_param_per_page": "Results per page (default: 20, max: 100)",
+      "api_doc_endpoint_get_reviews_param_user_id": "User ID to get reviews for",
+      "api_doc_endpoint_get_root_description": "Returns API version info and a list of available endpoints. Useful as a health check.",
+      "api_doc_endpoint_get_timebanks_description": "List all partner timebanks with active partnerships. Returns name, location, member count, and partnership status.",
+      "api_doc_endpoint_get_transactions_id_description": "Get the status and details of a specific federated transaction. Your tenant must be either the sender or receiver tenant.",
+      "api_doc_endpoint_get_transactions_id_param_id": "Transaction ID (URL parameter)",
+      "api_doc_endpoint_post_messages_description": "Send a federated message to a member in a partner timebank. The sender must belong to your tenant.",
+      "api_doc_endpoint_post_messages_param_body": "Message body text",
+      "api_doc_endpoint_post_messages_param_recipient_id": "Recipient user ID",
+      "api_doc_endpoint_post_messages_param_sender_id": "Sender user ID (must belong to your tenant)",
+      "api_doc_endpoint_post_messages_param_subject": "Message subject",
+      "api_doc_endpoint_post_oauth_token_description": "Exchange API credentials for a JWT bearer token. Uses OAuth2 client_credentials grant. Authenticate with HTTP Basic auth where client_id is the API key prefix and client_secret is the full API key.",
+      "api_doc_endpoint_post_oauth_token_param_grant_type": "Must be \"client_credentials\"",
+      "api_doc_endpoint_post_oauth_token_param_scope": "Space-separated list of requested scopes (e.g. \"members:read listings:read\")",
+      "api_doc_endpoint_post_reviews_description": "Create a federated review for a member in a partner timebank. The reviewer must belong to your tenant and the reviewee must have federated reviews enabled.",
+      "api_doc_endpoint_post_reviews_param_comment": "Review text (max 5000 characters)",
+      "api_doc_endpoint_post_reviews_param_rating": "Rating from 1 to 5",
+      "api_doc_endpoint_post_reviews_param_reviewee_id": "Reviewee user ID (must have federated reviews enabled)",
+      "api_doc_endpoint_post_reviews_param_reviewer_id": "Reviewer user ID (must belong to your tenant)",
+      "api_doc_endpoint_post_reviews_param_transaction_id": "Associated transaction ID (optional)",
+      "api_doc_endpoint_post_transactions_description": "Create a time credit transfer between members of partner timebanks. Requires an active credit agreement between tenants and sufficient sender balance.",
+      "api_doc_endpoint_post_transactions_param_amount": "Amount in whole hours (1-100)",
+      "api_doc_endpoint_post_transactions_param_description": "Transaction description",
+      "api_doc_endpoint_post_transactions_param_recipient_id": "Recipient user ID",
+      "api_doc_endpoint_post_transactions_param_sender_id": "Sender user ID (must belong to your tenant)",
+      "api_doc_endpoint_post_webhooks_test_description": "Verify HMAC signature correctness for webhook payloads. Tests that your signing implementation produces valid signatures.",
       "api_doc_error_bad_request": "Bad Request",
       "api_doc_error_bad_request_desc": "The request body is malformed or missing required fields. Check the validation error message for details.",
       "api_doc_error_codes_aria": "API error codes",
@@ -14153,12 +15668,25 @@ export default interface Resources {
       "api_logs_for": "API Logs",
       "approve": "Approve",
       "approve_partnership": "Approve Partnership",
+      "audit_actions": {
+        "partnership_approved": "Partnership approved",
+        "partnership_counter_accepted": "Counter-proposal accepted",
+        "partnership_counter_proposed": "Counter-proposal sent",
+        "partnership_permissions_updated": "Partnership permissions updated",
+        "partnership_reactivated": "Partnership reactivated",
+        "partnership_rejected": "Partnership rejected",
+        "partnership_requested": "Partnership requested",
+        "partnership_suspended": "Partnership suspended",
+        "partnership_terminated": "Partnership terminated",
+        "unknown": "Other partnership action"
+      },
       "audit_level_critical": "Critical",
       "audit_level_info": "Info",
       "audit_level_warning": "Warning",
       "auth_method_api_key": "API Key",
       "auth_method_hmac": "HMAC Signature",
       "auth_method_oauth2": "OAuth 2.0",
+      "auth_method_unknown": "Other authentication method",
       "auto_approve_partners": "Approve new partners automatically",
       "auto_approve_partners_desc": "When this is on, partnership requests from other timebanks are accepted straight away, without anyone checking them first. Most communities leave this off so a coordinator reviews each request.",
       "back": "Back",
@@ -14358,6 +15886,7 @@ export default interface Resources {
       "event_type_partnership_terminated": "Partnership ended",
       "event_type_profile_viewed": "Profile viewed",
       "event_type_transaction": "Transaction",
+      "event_type_unknown": "Other federation activity",
       "event_types_label": "Event Types",
       "events_enabled": "Events Enabled",
       "exchange_rate_description": "Exchange Rate",
@@ -14443,6 +15972,7 @@ export default interface Resources {
       "health_check_failed": "Health check failed",
       "health_check_partner_error": "{{name}}: {{error}}",
       "health_check_success": "{{name}} is connected and working ({{time}}ms)",
+      "health_check_success_formatted": "{{name}} is connected and working ({{time}})",
       "hide_partnered": "Hide Partnered",
       "import_choose_file": "Choose JSON file",
       "import_commit": "Import selected records",
@@ -14724,6 +16254,7 @@ export default interface Resources {
       "remove_tenant_title": "Remove Tenant",
       "request_partnership": "Request Partnership",
       "request_pending": "Request Pending",
+      "response_time_unknown": "Response time unavailable",
       "revoke": "Revoke",
       "revoke_failed": "Revoke Failed",
       "revoke_key_title": "Revoke Key",
@@ -14856,6 +16387,7 @@ export default interface Resources {
       "webhooks_retry": "Retry",
       "webhooks_retry_failed": "Failed to retry webhook",
       "webhooks_retry_success": "Retry successful ({{code}}, {{time}}ms)",
+      "webhooks_retry_success_formatted": "Retry successful ({{code}}, {{time}})",
       "webhooks_sample_message": "This is a test delivery from Project NEXUS Federation",
       "webhooks_sample_payload": "Sample Payload",
       "webhooks_save_failed": "Failed to save webhook",
@@ -14868,6 +16400,7 @@ export default interface Resources {
       "webhooks_test_preview_desc": "This sends a harmless test notification to the address below so you can check the connection works. No real member data is included.",
       "webhooks_test_preview_title": "Webhooks Test Preview",
       "webhooks_test_success": "Test delivery successful ({{code}}, {{time}}ms)",
+      "webhooks_test_success_formatted": "Test delivery successful ({{code}}, {{time}})",
       "webhooks_title": "Webhooks",
       "webhooks_updated": "Webhook updated",
       "webhooks_url_hint": "The endpoint URL that will receive webhook events",
@@ -15217,6 +16750,7 @@ export default interface Resources {
       "audience_inactive_users": "Inactive Users (30+ days)",
       "audience_level_range": "Users at specific level range",
       "audience_new_users": "New Users (last 30 days)",
+      "audience_unknown": "Other audience",
       "awarded_count": "Awarded",
       "back_to_badges": "Back to Badges",
       "back_to_campaigns": "Back to Campaigns",
@@ -15261,7 +16795,275 @@ export default interface Resources {
       },
       "badge_to_award": "Badge to Award",
       "badge_toggled": "Toggled",
+      "badge_type_built_in": "Built-in",
       "badge_type_custom": "Custom",
+      "badge_type_unknown": "Other badge type",
+      "badges": {
+        "5star_1": {
+          "description": "Receive your first 5-star review",
+          "name": "First 5-Star"
+        },
+        "5star_10": {
+          "description": "Receive 10 five-star reviews",
+          "name": "Highly Rated"
+        },
+        "5star_25": {
+          "description": "Receive 25 five-star reviews",
+          "name": "Excellence Award"
+        },
+        "connect_1": {
+          "description": "Make your first connection",
+          "name": "First Friend"
+        },
+        "connect_10": {
+          "description": "Make 10 connections",
+          "name": "Social Butterfly"
+        },
+        "connect_25": {
+          "description": "Make 25 connections",
+          "name": "Network Builder"
+        },
+        "connect_50": {
+          "description": "Make 50 connections",
+          "name": "Community Connector"
+        },
+        "diversity_10": {
+          "description": "Help 10 different people",
+          "name": "Diverse Giver"
+        },
+        "diversity_25": {
+          "description": "Help 25 different people",
+          "name": "Community Pillar"
+        },
+        "diversity_3": {
+          "description": "Help 3 different people",
+          "name": "Community Helper"
+        },
+        "early_adopter": {
+          "description": "Be an early adopter of the platform",
+          "name": "Early Adopter"
+        },
+        "earn_1": {
+          "description": "Earn your first time credit",
+          "name": "First Earn"
+        },
+        "earn_10": {
+          "description": "Earn 10 time credits",
+          "name": "Go Getter"
+        },
+        "earn_100": {
+          "description": "Earn 100 time credits",
+          "name": "Centurion"
+        },
+        "earn_250": {
+          "description": "Earn 250 time credits",
+          "name": "Credit Master"
+        },
+        "earn_50": {
+          "description": "Earn 50 time credits",
+          "name": "Credit Builder"
+        },
+        "event_attend_1": {
+          "description": "Attend your first event",
+          "name": "First Event"
+        },
+        "event_attend_10": {
+          "description": "Attend 10 events",
+          "name": "Event Regular"
+        },
+        "event_attend_25": {
+          "description": "Attend 25 events",
+          "name": "Event Enthusiast"
+        },
+        "event_host_1": {
+          "description": "Host your first event",
+          "name": "Event Host"
+        },
+        "event_host_5": {
+          "description": "Host 5 events",
+          "name": "Event Organizer"
+        },
+        "group_create": {
+          "description": "Create your first group",
+          "name": "Group Founder"
+        },
+        "group_join_1": {
+          "description": "Join your first group",
+          "name": "Team Player"
+        },
+        "group_join_5": {
+          "description": "Join 5 groups",
+          "name": "Community Member"
+        },
+        "level_10": {
+          "description": "Reach level 10",
+          "name": "Community Champion"
+        },
+        "level_5": {
+          "description": "Reach level 5",
+          "name": "Rising Star"
+        },
+        "likes_200": {
+          "description": "Receive 200 likes",
+          "name": "Popular Voice"
+        },
+        "likes_50": {
+          "description": "Receive 50 likes",
+          "name": "Getting Noticed"
+        },
+        "member_180d": {
+          "description": "Be a member for 6 months",
+          "name": "Semester Member"
+        },
+        "member_30d": {
+          "description": "Be a member for 30 days",
+          "name": "Monthly Member"
+        },
+        "member_365d": {
+          "description": "Be a member for one year",
+          "name": "Annual Member"
+        },
+        "msg_1": {
+          "description": "Send your first message",
+          "name": "Conversation Starter"
+        },
+        "msg_200": {
+          "description": "Send 200 messages",
+          "name": "Communication Pro"
+        },
+        "msg_50": {
+          "description": "Send 50 messages",
+          "name": "Active Communicator"
+        },
+        "offer_1": {
+          "description": "Post your first offer",
+          "name": "First Offer"
+        },
+        "offer_10": {
+          "description": "Post 10 offers",
+          "name": "Gift Giver"
+        },
+        "offer_25": {
+          "description": "Post 25 offers",
+          "name": "Offer Master"
+        },
+        "offer_5": {
+          "description": "Post 5 offers",
+          "name": "Generous Soul"
+        },
+        "post_1": {
+          "description": "Create your first post",
+          "name": "First Post"
+        },
+        "post_100": {
+          "description": "Create 100 posts",
+          "name": "Prolific Poster"
+        },
+        "post_25": {
+          "description": "Create 25 posts",
+          "name": "Content Creator"
+        },
+        "profile_complete": {
+          "description": "Complete your profile",
+          "name": "Profile Pro"
+        },
+        "request_1": {
+          "description": "Post your first request",
+          "name": "First Request"
+        },
+        "request_10": {
+          "description": "Make 10 requests",
+          "name": "Active Requester"
+        },
+        "request_5": {
+          "description": "Make 5 requests",
+          "name": "Community Seeker"
+        },
+        "review_1": {
+          "description": "Leave your first review",
+          "name": "First Feedback"
+        },
+        "review_10": {
+          "description": "Leave 10 reviews",
+          "name": "Trusted Reviewer"
+        },
+        "review_25": {
+          "description": "Leave 25 reviews",
+          "name": "Review Expert"
+        },
+        "spend_1": {
+          "description": "Spend your first time credit",
+          "name": "First Spend"
+        },
+        "spend_10": {
+          "description": "Spend 10 time credits",
+          "name": "Active Spender"
+        },
+        "spend_50": {
+          "description": "Spend 50 time credits",
+          "name": "Generous Spender"
+        },
+        "streak_100d": {
+          "description": "Maintain a 100-day streak",
+          "name": "Streak Master"
+        },
+        "streak_30d": {
+          "description": "Maintain a 30-day streak",
+          "name": "Monthly Dedication"
+        },
+        "streak_365d": {
+          "description": "Maintain a 365-day streak",
+          "name": "Year-Long Legend"
+        },
+        "streak_7d": {
+          "description": "Maintain a 7-day streak",
+          "name": "Week Warrior"
+        },
+        "transaction_1": {
+          "description": "Complete your first transaction",
+          "name": "First Exchange"
+        },
+        "transaction_10": {
+          "description": "Complete 10 transactions",
+          "name": "Active Trader"
+        },
+        "transaction_50": {
+          "description": "Complete 50 transactions",
+          "name": "Exchange Master"
+        },
+        "verified": {
+          "description": "Complete identity verification",
+          "name": "Verified Member"
+        },
+        "vol_100h": {
+          "description": "Volunteer 100 hours",
+          "name": "TimeBank Legend"
+        },
+        "vol_10h": {
+          "description": "Volunteer 10 hours",
+          "name": "Helping Hand"
+        },
+        "vol_1h": {
+          "description": "Log your first volunteer hour",
+          "name": "First Steps"
+        },
+        "vol_250h": {
+          "description": "Volunteer 250 hours",
+          "name": "Volunteer Hero"
+        },
+        "vol_500h": {
+          "description": "Volunteer 500 hours",
+          "name": "Volunteer Champion"
+        },
+        "vol_50h": {
+          "description": "Volunteer 50 hours",
+          "name": "Change Maker"
+        },
+        "volunteer_org": {
+          "description": "Create a volunteer organization",
+          "name": "Organization Partner"
+        }
+      },
       "bonus_xp": "Bonus XP",
       "bulk_award_badge_label": "Bulk Award Badge",
       "bulk_award_badge_placeholder": "Enter bulk award badge...",
@@ -15474,6 +17276,23 @@ export default interface Resources {
       "select_all_rows": "Select all rows",
       "select_row": "Select row {{id}}",
       "total_count": "{{count}} total"
+    }
+  },
+  "admin_glossary": {
+    "terms": {
+      "agm": "Annual general meeting",
+      "agpl": "GNU Affero General Public License v3 — the open-source licence under which NEXUS is publicly released",
+      "chf": "Swiss franc — the currency used for formal-care cost-offset calculations in Caring Community deployments",
+      "dsg": "Datenschutzgesetz — see nDSG / FADP",
+      "fadp": "Federal Act on Data Protection — revised Swiss data protection law (in force since September 2023)",
+      "gdpr": "General Data Protection Regulation — EU data protection law; Swiss deployments use FADP/nDSG instead",
+      "isco": "International Standard Classification of Occupations — used to categorise care-service types",
+      "kpi": "Key performance indicator — a measurable metric used to evaluate progress toward a defined goal",
+      "ndsg": "Neues Datenschutzgesetz — the revised Swiss Federal Data Protection Act (synonym for FADP)",
+      "nexus": "Project NEXUS — the multi-tenant timebanking and community-care platform",
+      "roi": "Return on investment — here: formal-care cost avoided per hour of informal support exchanged",
+      "sla": "Service-level agreement — the maximum committed response or resolution time for each priority tier",
+      "xp": "Experience points — gamification points awarded for completing exchanges and reaching milestones"
     }
   },
   "admin_goals": {
@@ -15786,11 +17605,11 @@ export default interface Resources {
       "audit_action_webhook_toggled": "Webhook toggled",
       "audit_action_wiki_page_deleted": "Wiki page deleted",
       "audit_all_actions": "Audit All Actions",
-      "audit_col_action": "Audit Col",
-      "audit_col_date": "Audit Col Date",
-      "audit_col_details": "Audit Col Details",
-      "audit_col_ip": "Audit Col IP",
-      "audit_col_user": "Audit Col User",
+      "audit_col_action": "Action",
+      "audit_col_date": "Date",
+      "audit_col_details": "Details",
+      "audit_col_ip": "IP address",
+      "audit_col_user": "User",
       "audit_empty": "No audit found",
       "audit_filter_label": "Audit Filter",
       "audit_load_failed": "Audit Load failed",
@@ -16023,6 +17842,7 @@ export default interface Resources {
       "pending": "Pending",
       "pending_approvals_message": "You have pending membership requests awaiting your review",
       "placeholder_enter_type_name": "Enter Type Name...",
+      "placeholder_icon_class": "e.g., fa-layer-group",
       "placeholder_optional_description": "Optional description...",
       "policies": "Policies",
       "policy_content": "Policy Content",
@@ -16115,6 +17935,1543 @@ export default interface Resources {
       "total_count": "{{count}} total"
     }
   },
+  "admin_help": {
+    "articles": {
+      "admin_ki_agents": {
+        "caution": "Never raise the auto-apply threshold for agents that can initiate financial transfers, safeguarding escalations, or member tier changes. These must always require human review.",
+        "related_paths": {
+          "0": {
+            "label": "Smart Nudges"
+          },
+          "1": {
+            "label": "National Caring Community Dashboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The proposals queue shows each agent's recommendation, the data evidence behind it, and the proposed action. Read the evidence carefully before approving.",
+            "label": "Review pending proposals"
+          },
+          "1": {
+            "detail": "Click \"Approve\" to execute the action immediately, \"Reject\" to dismiss it, or \"Defer\" to reconsider at a later date. Add a note explaining your decision.",
+            "label": "Approve or reject a proposal"
+          },
+          "2": {
+            "detail": "In Agent Settings, you can set a confidence threshold above which low-risk proposals are auto-applied (default: disabled). Only enable this for specific low-risk action types.",
+            "label": "Configure the auto-apply threshold"
+          },
+          "3": {
+            "detail": "The agent analytics tab shows how many proposals were made, approved, rejected, and deferred, plus the outcomes of approved actions (did they achieve the intended effect?).",
+            "label": "Review agent performance"
+          },
+          "4": {
+            "detail": "Use the Agent Registry to enable or disable specific agent types. Start with a small set and expand as you become confident in their recommendations.",
+            "label": "Add or disable agent types"
+          }
+        },
+        "summary": "The KI-Agenten (AI Agent) framework allows NEXUS to propose automated actions based on data patterns — for example, suggesting a Smart Nudge campaign, flagging a member at risk of dropping out, or recommending a coefficient adjustment. All proposals require human approval before they take effect. Agents never act unilaterally unless you explicitly raise the auto-apply threshold.",
+        "tips": {
+          "0": "The propose-then-approve model is a deliberate safety mechanism — do not disable it for consequential actions (e.g. safeguarding escalations, large credit transfers).",
+          "1": "Agents learn from your approve/reject decisions over time. Consistent rejections of a specific agent type are a signal to review its configuration."
+        },
+        "title": "KI-Agenten — Autonomous Agent Framework"
+      },
+      "admin_pilot_inquiries": {
+        "related_paths": {
+          "0": {
+            "label": "Lead Nurture"
+          },
+          "1": {
+            "label": "Launch Readiness"
+          },
+          "2": {
+            "label": "National Caring Community Dashboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "New inquiries arrive from the public-facing contact form, Caring Community national referrals, or manual entry. Each shows the municipality name, canton, contact person, and initial inquiry notes.",
+            "label": "Review new inquiries"
+          },
+          "1": {
+            "detail": "Use the qualification checklist to assess readiness: Is there a designated coordinator? Is there municipal council support? Is there a suitable existing community network? Score each factor.",
+            "label": "Qualify the inquiry"
+          },
+          "2": {
+            "detail": "Drag or advance the inquiry through stages: New → Qualifying → Proposal Sent → Pilot Agreement → Onboarding → Active. Each stage has required actions documented.",
+            "label": "Move through the pipeline"
+          },
+          "3": {
+            "detail": "At the Proposal Sent stage, use \"Generate Proposal\" to produce a customised PDF proposal using the municipality's details, their canton's care rate, and standard Caring Community methodology terms.",
+            "label": "Generate a pilot proposal"
+          },
+          "4": {
+            "detail": "Once a pilot agreement is signed and uploaded, use \"Create Cooperative Tenant\" to provision a new NEXUS tenant for them. This links the inquiry to the Live Launch Readiness gate.",
+            "label": "Trigger tenant creation"
+          }
+        },
+        "summary": "Manages the end-to-end pipeline for municipalities (Gemeinde) expressing interest in piloting NEXUS/Caring Community. Each inquiry is tracked from initial contact through to pilot agreement and cooperative launch. This is the starting point for all new cooperative onboarding.",
+        "tips": {
+          "0": "Inquiries that stall at \"Qualifying\" for more than 30 days usually lack internal municipal champion — focus outreach on finding a senior sponsor.",
+          "1": "The pipeline has a companion view in the Lead Nurture page — use whichever view fits your workflow, they share the same data."
+        },
+        "title": "Pilot Inquiries — Gemeinde Onboarding Pipeline"
+      },
+      "caring": {
+        "related_paths": {
+          "0": {
+            "label": "SLA Dashboard"
+          },
+          "1": {
+            "label": "Safeguarding"
+          },
+          "2": {
+            "label": "Launch Readiness"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The hub shows live counts for active members, open help requests, pending safeguarding reports, and SLA compliance rate.",
+            "label": "Review module health at a glance"
+          },
+          "1": {
+            "detail": "Each card links directly to its functional area. Cards with a red badge need immediate attention (e.g. overdue SLA, critical safeguarding report).",
+            "label": "Use the quick-links grid"
+          },
+          "2": {
+            "detail": "If your cantonal partner or the Caring Community national office has posted a notice, it appears pinned at the top of the hub.",
+            "label": "Check the announcement bar"
+          }
+        },
+        "summary": "The Caring Community module is the top-level entry point for all Caring Community cooperative features. From here you can navigate to every sub-section: member trust tiers, safeguarding, ROI reporting, pilot readiness, and more.",
+        "tips": {
+          "0": "Bookmark this page — it is the fastest way to spot issues that need your attention without navigating deep menus.",
+          "1": "The module only appears in the sidebar if the caring_community feature flag is enabled for this tenant."
+        },
+        "title": "Caring Community — Module Hub"
+      },
+      "caring_category_coefficients": {
+        "caution": "Changing a coefficient immediately affects all future ROI calculations. Historical reports are not retroactively updated — note the change date when presenting multi-year data.",
+        "related_paths": {
+          "0": {
+            "label": "Operating Policy"
+          },
+          "1": {
+            "label": "Municipal ROI"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The table shows every active care category with its current coefficient and the date it was last agreed with your cantonal partner.",
+            "label": "Review existing coefficients"
+          },
+          "1": {
+            "detail": "Click the pencil icon next to the category, enter the new value, add a justification note, and save. The change is versioned.",
+            "label": "Edit a coefficient"
+          },
+          "2": {
+            "detail": "Use \"Add Category\" to create a new care type (e.g. \"Physiotherapy Support\") and assign it an initial coefficient.",
+            "label": "Add a new category"
+          },
+          "3": {
+            "detail": "Use \"Export PDF\" to produce a formatted document for your cantonal partner's approval, listing all categories and their evidence basis.",
+            "label": "Generate a coefficient report"
+          }
+        },
+        "summary": "Each care category has a substitution coefficient that converts community exchange hours into formal-care equivalents. A coefficient of 1.0 means one hour of community care is counted as equivalent to one hour of professional care (CHF 35/hr). Intensive personal care may be 2.0; light social contact may be 0.5.",
+        "tips": {
+          "0": "Coefficients above 1.5 require written agreement from your cantonal health partner — document this in the justification field.",
+          "1": "The ROI report multiplies actual hours delivered by each category's coefficient to derive the total formal-care cost avoided.",
+          "2": "Review all coefficients at least annually — care practice standards change and your evidence base should stay current."
+        },
+        "title": "Category Substitution Coefficients"
+      },
+      "caring_civic_digest": {
+        "related_paths": {
+          "0": {
+            "label": "Smart Nudges"
+          },
+          "1": {
+            "label": "Communication Copilot"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Choose which frequencies members can opt into: Daily, Weekly, Bi-weekly, Monthly, or Never. The default for new members is Weekly.",
+            "label": "Set available digest frequencies"
+          },
+          "1": {
+            "detail": "Toggle which content blocks appear: Upcoming Events, Open Help Requests, New Members to Welcome, My Exchange Summary, Pilot Scoreboard highlights, etc.",
+            "label": "Configure digest content modules"
+          },
+          "2": {
+            "detail": "Coordinators can receive an enriched digest with SLA status and data quality warnings. Set this under \"Coordinator Digest Add-ons\".",
+            "label": "Set segment-specific rules"
+          },
+          "3": {
+            "detail": "Click \"Preview\" to see a sample digest rendered for a test member profile. Check layout, links, and content order.",
+            "label": "Preview the digest"
+          },
+          "4": {
+            "detail": "Use \"Send Now\" to dispatch a digest outside the normal schedule — useful for launching a campaign or sharing a milestone result.",
+            "label": "Send a one-off digest"
+          }
+        },
+        "summary": "The Civic Digest is a personalised summary email sent to each member based on their interests, activity, and community role. This page controls the global digest settings: frequency options, content modules to include, and which member segments receive which digest type.",
+        "tips": {
+          "0": "Members with \"Never\" selected still receive Emergency Alerts — the digest preference does not affect critical communications.",
+          "1": "Weekly digests sent on Tuesday or Wednesday mornings tend to get the highest open rates in community platforms."
+        },
+        "title": "Civic Digest — Personalised Member Digest Settings"
+      },
+      "caring_commercial_boundary": {
+        "related_paths": {
+          "0": {
+            "label": "Isolated Node"
+          },
+          "1": {
+            "label": "Disclosure Pack"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Each feature is listed with its AGPL classification (Public / Tenant Config / Private Deployment / Commercial) and a plain-language description.",
+            "label": "Browse the capability registry"
+          },
+          "1": {
+            "detail": "Use the filter tabs to view only commercial features, or only AGPL-public features, depending on what you need to communicate.",
+            "label": "Filter by classification"
+          },
+          "2": {
+            "detail": "Use \"Export PDF\" to produce a formatted document you can share with a municipality or funder who needs to understand what is open-source vs proprietary.",
+            "label": "Export for partner reference"
+          }
+        },
+        "summary": "This page classifies each platform capability according to whether it is covered by the AGPL-3.0 open-source licence, is configurable per tenant, requires a private deployment agreement, or is a commercial add-on. Use this as a reference when discussing licensing with partner municipalities or cooperatives.",
+        "tips": {
+          "0": "AGPL Public features must remain publicly available under AGPL-3.0 — you cannot restrict access to them in any deployment.",
+          "1": "Commercial features require a separate written agreement with Caring Community or the NEXUS platform operator."
+        },
+        "title": "Commercial Boundary — AGPL Capability Classification"
+      },
+      "caring_copilot": {
+        "caution": "Never send a Copilot draft to external stakeholders (canton, media, funders) without a human review. AI can misstate figures or use unsuitable phrasing for formal contexts.",
+        "related_paths": {
+          "0": {
+            "label": "Smart Nudges"
+          },
+          "1": {
+            "label": "Emergency Alerts"
+          },
+          "2": {
+            "label": "Civic Digest"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Select from: Member Announcement, Welcome Email, Impact Report Summary, Municipal Partner Update, or Free-form Draft.",
+            "label": "Choose the communication type"
+          },
+          "1": {
+            "detail": "Write 1–3 sentences describing the key points. For example: \"We held 120 exchanges in March. Loneliness scores improved by 12%. Thank members for their contribution.\"",
+            "label": "Describe what you want to say"
+          },
+          "2": {
+            "detail": "Click \"Generate Draft\". Read the output carefully — AI drafts may contain inaccuracies. Correct any figures or names before use.",
+            "label": "Generate and review the draft"
+          },
+          "3": {
+            "detail": "Use the sliders to adjust formality (informal ↔ formal) and length (brief ↔ detailed). Regenerate until you are happy.",
+            "label": "Adjust tone and length"
+          },
+          "4": {
+            "detail": "Use \"Copy to Clipboard\" and paste into your email client, announcement composer, or newsletter editor.",
+            "label": "Copy to your sending tool"
+          }
+        },
+        "summary": "An AI writing assistant trained on Caring Community community communication standards. Paste a rough idea and the Copilot returns a polished draft in a warm, inclusive tone appropriate for timebanking communities. You review and edit before sending.",
+        "tips": {
+          "0": "The Copilot works best with specific inputs — vague prompts produce generic drafts. Give it real numbers and named outcomes.",
+          "1": "Always fact-check AI-generated text. The Copilot cannot access live data — it writes based on what you tell it."
+        },
+        "title": "Communication Copilot — AI-Assisted Drafting"
+      },
+      "caring_data_quality": {
+        "related_paths": {
+          "0": {
+            "label": "Municipal ROI"
+          },
+          "1": {
+            "label": "Safeguarding"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"Run Check Now\". The scan typically takes 30–60 seconds. Results are cached for 6 hours — run again if you have made significant data changes.",
+            "label": "Run a full quality check"
+          },
+          "1": {
+            "detail": "Critical issues (red) must be resolved before generating municipal reports. Click each issue for a description of the problem and a direct link to fix it.",
+            "label": "Review Critical issues first"
+          },
+          "2": {
+            "detail": "High issues (orange) affect the accuracy of ROI calculations. Medium issues (yellow) are advisory — fix them when convenient.",
+            "label": "Work through High and Medium issues"
+          },
+          "3": {
+            "detail": "If a flagged issue is not actually a problem (e.g. a member legitimately has no email address), use \"Mark as Acknowledged\" with a reason. This silences the flag.",
+            "label": "Mark false positives"
+          },
+          "4": {
+            "detail": "The quality score (0–100) trends chart helps you identify whether data quality is improving after you action issues.",
+            "label": "Track quality score over time"
+          }
+        },
+        "summary": "Runs automated checks across your cooperative's data and reports issues by severity: Critical (blocks reporting), High (degrades report accuracy), Medium (advisory), Low (cosmetic). Fix Critical and High issues before generating any report for external stakeholders.",
+        "tips": {
+          "0": "Run the quality check as part of your monthly coordinator routine, not only before generating reports.",
+          "1": "Missing safeguarding resolution summaries are always flagged as Critical — see the Safeguarding page to add them."
+        },
+        "title": "Data Quality Checks"
+      },
+      "caring_disclosure_pack": {
+        "related_paths": {
+          "0": {
+            "label": "Isolated Node"
+          },
+          "1": {
+            "label": "Commercial Boundary"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The system pre-fills organisation name, data controller details, and retention periods from your Operating Policy. Check each field for accuracy.",
+            "label": "Review auto-populated fields"
+          },
+          "1": {
+            "detail": "List any third-party services that process member data (e.g. email service, hosting provider). Each sub-processor needs a name, location, and legal basis.",
+            "label": "Add sub-processors"
+          },
+          "2": {
+            "detail": "Review the default retention periods for each data category (e.g. exchange records: 7 years for financial audit; safeguarding reports: 10 years). Adjust if your cantonal rules differ.",
+            "label": "Set retention periods"
+          },
+          "3": {
+            "detail": "Click \"Generate Pack\" to produce a ZIP of PDF documents. Share with your data protection officer (or cantonal authority) for sign-off.",
+            "label": "Generate the full pack"
+          },
+          "4": {
+            "detail": "Once approved, use \"Publish Privacy Notice\" to make the notice available at your cooperative's Privacy Policy page.",
+            "label": "Publish the member-facing privacy notice"
+          }
+        },
+        "summary": "The Disclosure Pack assembles all data protection documentation required under Swiss FADP/nDSG: privacy notices, data processing agreements, retention schedules, sub-processor lists, and the right-to-access response template. Generate and review these before your cooperative goes live with personal data.",
+        "tips": {
+          "0": "Re-generate the pack whenever you add a new sub-processor, change retention periods, or enable Isolated Node mode.",
+          "1": "The pack includes a template right-to-access response — use it when a member requests their data under Article 25 nDSG."
+        },
+        "title": "FADP/nDSG Data Protection Disclosure Pack"
+      },
+      "caring_emergency_alerts": {
+        "caution": "Do not use Emergency Alerts for routine communications. Alert fatigue will cause members to ignore future genuine alerts.",
+        "related_paths": {
+          "0": {
+            "label": "Sub-Regions"
+          },
+          "1": {
+            "label": "Communication Copilot"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Select from: Safety Alert, Weather Warning, Service Disruption, or General Emergency. The type sets the visual style and the urgency of the push notification.",
+            "label": "Choose the alert type"
+          },
+          "1": {
+            "detail": "Keep it brief (under 160 characters for SMS compatibility). State what the situation is, what members should do, and when you will provide an update.",
+            "label": "Write the alert message"
+          },
+          "2": {
+            "detail": "Choose: In-App Banner, Email, Push Notification, or All Channels. Push is instant; email takes up to 5 minutes.",
+            "label": "Select delivery channels"
+          },
+          "3": {
+            "detail": "Alerts auto-expire after the time you set (default 24 hours). Expired alerts are dismissed from member screens automatically.",
+            "label": "Set an expiry time"
+          },
+          "4": {
+            "detail": "Click \"Send Alert\". The delivery dashboard shows send/read rates in real time. Post an \"All Clear\" message as a follow-up when the situation is resolved.",
+            "label": "Send and monitor"
+          }
+        },
+        "summary": "Send immediate, high-priority alerts to all members of your cooperative. Use this only for genuine emergencies: severe weather affecting travel to exchanges, safeguarding public notices, or urgent community health advice. All alerts are logged and time-stamped.",
+        "tips": {
+          "0": "Test the alert system monthly with a \"Test Mode\" alert (visible only to Coordinator-tier members) to verify all channels are working.",
+          "1": "If the alert affects only part of your community, use Sub-Regions to filter recipients instead of broadcasting to everyone."
+        },
+        "title": "Emergency Alerts — Broadcast to All Members"
+      },
+      "caring_external_integrations": {
+        "related_paths": {
+          "0": {
+            "label": "Developer Integration Reference"
+          },
+          "1": {
+            "label": "Disclosure Pack"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The list shows each integration owner, category, operational status, DSA status, sandbox status, and interface specification URL.",
+            "label": "Review dependency status"
+          },
+          "1": {
+            "detail": "Click \"Add\" when a new external party must provide an API, sandbox, data agreement, or operational contact before delivery can proceed.",
+            "label": "Add a tracked dependency"
+          },
+          "2": {
+            "detail": "Use this page to track whether a partner is ready. Use Inbound API Partners, External Protocol Partners, or Webhooks when credentials or endpoints need to be configured.",
+            "label": "Separate readiness from credentials"
+          },
+          "3": {
+            "detail": "Record blockers, next actions, and owner updates so stakeholders can see whether the delay is technical, legal, or external.",
+            "label": "Keep notes current"
+          },
+          "4": {
+            "detail": "Remove or archive dependencies that are no longer part of the Caring Community delivery plan.",
+            "label": "Close out stale entries"
+          }
+        },
+        "summary": "Track partner-dependent integrations that need an external owner, data sharing agreement, sandbox, or interface specification before they can go live. This page is a readiness tracker, not the Partner Timebanks federation setup page.",
+        "tips": {
+          "0": "Do not paste secrets or OAuth tokens into notes. Store credentials only on the appropriate credential page.",
+          "1": "A green sandbox does not mean the integration is approved. Check DSA and owner status before treating it as ready."
+        },
+        "title": "Partner Integration Tracker - External Dependencies"
+      },
+      "caring_feedback": {
+        "related_paths": {
+          "0": {
+            "label": "Communication Copilot"
+          },
+          "1": {
+            "label": "SLA Dashboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "New items appear at the top of the inbox. Read each one and assess its severity: Critical (service failure / formal complaint), High (significant concern), Medium (query), Low (suggestion).",
+            "label": "Review new feedback items"
+          },
+          "1": {
+            "detail": "Use \"Assign\" to allocate the item to the coordinator best placed to respond. They will receive an in-app notification.",
+            "label": "Assign to a coordinator"
+          },
+          "2": {
+            "detail": "Use the \"Reply\" panel to draft your response. For Critical items, use the Communication Copilot to ensure the tone is appropriate.",
+            "label": "Draft a response"
+          },
+          "3": {
+            "detail": "Sending the response logs the full thread in the item history. The municipal contact receives your reply by email.",
+            "label": "Send and log"
+          },
+          "4": {
+            "detail": "Mark as Resolved once the matter is concluded, or use \"Escalate to Caring Community National\" if the issue is beyond your cooperative's authority to address.",
+            "label": "Close or escalate"
+          }
+        },
+        "summary": "Centralises feedback submitted by municipal partners and stakeholders — concerns, questions, suggestions, and complaints. Each item is triaged by severity, assigned to a coordinator, and tracked through to resolution.",
+        "tips": {
+          "0": "Aim to acknowledge Critical feedback within 4 hours even if a full resolution takes longer. Acknowledgement alone prevents escalation.",
+          "1": "Pattern recognition: if three or more feedback items touch the same theme (e.g. \"slow coordinator response\"), it signals a systemic issue to investigate."
+        },
+        "title": "Feedback Inbox — Municipality Feedback Triage"
+      },
+      "caring_hour_transfers": {
+        "caution": "Manual transfers cannot be reversed automatically. Double-check amounts before confirming — corrections require a second manual transfer in the opposite direction.",
+        "related_paths": {
+          "0": {
+            "label": "Coordinator Workflow"
+          },
+          "1": {
+            "label": "Loyalty"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Search for the member whose hours will be deducted. Confirm their current balance before proceeding.",
+            "label": "Select the source member"
+          },
+          "1": {
+            "detail": "Search for the receiving member. The system warns if the destination member is on a different tenant.",
+            "label": "Select the destination member"
+          },
+          "2": {
+            "detail": "Enter the number of hours (decimals allowed, e.g. 0.5 for 30 minutes). Write a clear reason — this appears in both members' transaction histories.",
+            "label": "Enter the amount and reason"
+          },
+          "3": {
+            "detail": "Review the summary and click \"Confirm Transfer\". The adjustment takes effect immediately.",
+            "label": "Confirm and execute"
+          },
+          "4": {
+            "detail": "Check the audit log entry to confirm both balances have updated correctly.",
+            "label": "Verify the audit log"
+          }
+        },
+        "summary": "Allows coordinators to manually transfer hour credits between member accounts outside of a completed exchange. Use this for corrections, grants of community credits, or administrative adjustments. All transfers are permanently audited.",
+        "tips": {
+          "0": "You cannot overdraft a member's account to a negative balance without an override flag — contact a super-admin if a negative balance is genuinely needed.",
+          "1": "For bulk corrections (e.g. after a system error), use the CSV import for batch transfers rather than doing them one by one."
+        },
+        "title": "Manual Hour Credit Transfers"
+      },
+      "caring_integration_showcase": {
+        "related_paths": {
+          "0": {
+            "label": "Partner Integration Tracker"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Use the endpoint browser to explore available REST API paths grouped by domain (Members, Exchanges, Wallet, Events, etc.). Each entry shows the method, path, parameters, and response schema.",
+            "label": "Browse available endpoints"
+          },
+          "1": {
+            "detail": "Click \"Copy Sample\" next to any webhook event to get a realistic example JSON payload for use in your integration code or testing.",
+            "label": "Copy sample payloads"
+          },
+          "2": {
+            "detail": "The OAuth scopes table shows all available permission scopes, what data they grant access to, and the minimum trust tier required to authorise them.",
+            "label": "Review OAuth scopes"
+          },
+          "3": {
+            "detail": "Use \"Download OpenAPI 3.1 Spec\" to get the full machine-readable API definition, compatible with Postman, Insomnia, and code generation tools.",
+            "label": "Download the OpenAPI spec"
+          },
+          "4": {
+            "detail": "The built-in sandbox lets you make authenticated test calls against your cooperative's staging data without affecting live records.",
+            "label": "Test with the API sandbox"
+          }
+        },
+        "summary": "A developer-facing reference page for available Caring Community API endpoints, webhook event schemas, OAuth configuration, and sample payloads. Use it to explain implementation details after the correct integration type has been chosen.",
+        "tips": {
+          "0": "Share the OpenAPI spec with third-party developers rather than writing manual API documentation — it stays up to date automatically.",
+          "1": "The sandbox uses a separate set of test credentials from your live API keys — do not mix them up."
+        },
+        "title": "Developer Integration Reference"
+      },
+      "caring_isolated_node": {
+        "caution": "Enabling Isolated Node mode severs Warmth Pass portability for all members immediately. Notify members before switching on.",
+        "related_paths": {
+          "0": {
+            "label": "Commercial Boundary"
+          },
+          "1": {
+            "label": "Disclosure Pack"
+          },
+          "2": {
+            "label": "Partner Cooperatives"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Toggle the master switch on. You will be asked to confirm the geographic boundary (e.g. \"Kanton Bern\") and the legal basis for the restriction.",
+            "label": "Enable Isolated Node mode"
+          },
+          "1": {
+            "detail": "Some data flows (e.g. anonymised aggregate statistics for the national dashboard) can be whitelisted. Review each flow and approve or block it.",
+            "label": "Configure allowed data flows"
+          },
+          "2": {
+            "detail": "When Isolated Node is active, Warmth Pass federation sync and peer cooperative connections are suspended. Members will see a notice explaining this.",
+            "label": "Disable federation sync"
+          },
+          "3": {
+            "detail": "Use \"Generate Compliance Report\" to produce a record of data boundaries, retention periods, and lawful bases suitable for a FADP audit.",
+            "label": "Generate a FADP compliance record"
+          }
+        },
+        "summary": "Isolated Node mode configures this deployment to store all personal data within a defined geographic boundary and disables federation data sync with external Caring Community cooperatives. This is required for deployments that must comply with Switzerland's FADP/nDSG (Federal Act on Data Protection).",
+        "tips": {
+          "0": "Isolated Node mode does not affect local operations — members can still exchange hours, earn badges, and use all features within the cooperative.",
+          "1": "If you are unsure whether your deployment needs Isolated Node mode, consult the Caring Community technical team before enabling it."
+        },
+        "title": "Isolated Node — Data Sovereignty Mode"
+      },
+      "caring_kpi_baselines": {
+        "related_paths": {
+          "0": {
+            "label": "Municipal ROI"
+          },
+          "1": {
+            "label": "Pilot Scoreboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Before your pilot goes live, click \"Create Baseline Snapshot\". This locks the current values for all KPI dimensions (loneliness index, active members, exchanges/week, etc.).",
+            "label": "Create the launch baseline"
+          },
+          "1": {
+            "detail": "At each reporting milestone (3 months, 6 months, 12 months), create a new snapshot. The system automatically calculates the percentage change from the baseline.",
+            "label": "Record a comparison snapshot"
+          },
+          "2": {
+            "detail": "For KPIs that come from member surveys (e.g. self-reported wellbeing score), use the manual entry fields to input the results.",
+            "label": "Add survey-derived metrics"
+          },
+          "3": {
+            "detail": "The side-by-side comparison table shows each KPI, its baseline value, current value, and directional trend (positive/negative).",
+            "label": "Review the change dashboard"
+          },
+          "4": {
+            "detail": "The Impact Evidence Pack and Municipal ROI Report can both embed the baseline comparison. Use \"Link to Impact Pack\" to include it.",
+            "label": "Include in reports"
+          }
+        },
+        "summary": "KPI Baselines capture a snapshot of key community health indicators at a defined point in time (typically pilot launch). Subsequent snapshots are compared to the baseline to measure change — for example, a 15% reduction in reported loneliness or a 20% increase in social connections.",
+        "tips": {
+          "0": "Create the launch baseline before you enrol any members — a baseline taken after members have joined is not a true pre-launch measure.",
+          "1": "For loneliness and wellbeing KPIs, use an established validated scale (e.g. UCLA Loneliness Scale, ONS Wellbeing) for credibility with academic or health partners."
+        },
+        "title": "KPI Baselines — Before/After Impact Measurement"
+      },
+      "caring_launch_readiness": {
+        "caution": "Do not attempt to bypass the readiness gate manually. Launching without passing all criteria risks a poor member experience and undermines grant accountability.",
+        "related_paths": {
+          "0": {
+            "label": "Pilot Scoreboard"
+          },
+          "1": {
+            "label": "KPI Baselines"
+          },
+          "2": {
+            "label": "Operating Policy"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Municipal Value, Participation, Partner Network, and Local Exchange are each scored 0–100. All four must reach their configured threshold (default 70) before the gate opens.",
+            "label": "Review the four readiness signals"
+          },
+          "1": {
+            "detail": "Click any amber or red signal card to see the specific sub-criteria that are not yet met, with actionable guidance on how to address each.",
+            "label": "Drill into failing signals"
+          },
+          "2": {
+            "detail": "Some criteria require evidence upload (e.g. a signed municipal partnership letter, or a completed baseline survey). Use the upload button on the relevant criterion.",
+            "label": "Upload supporting evidence"
+          },
+          "3": {
+            "detail": "Once you believe all criteria are met, use \"Request Review\" to notify a senior coordinator or Caring Community national representative to validate the readiness gate.",
+            "label": "Request a coordinator review"
+          },
+          "4": {
+            "detail": "When the review approves all criteria, the \"Go Live\" button becomes available. This enables the Caring Community module for members.",
+            "label": "Unlock the live deployment"
+          }
+        },
+        "summary": "A gated checklist of criteria that must all pass before your pilot is considered ready to go live. Readiness is evaluated across four signal areas: municipal value alignment, community participation, partner network, and local exchange capacity. All must be green before launch.",
+        "tips": {
+          "0": "You can work on criteria in any order — there is no required sequence.",
+          "1": "Evidence documents are stored securely and are accessible to Caring Community national for their records.",
+          "2": "The readiness gate can be re-evaluated at any time — if circumstances change (e.g. a municipal partner withdraws), the gate status is updated automatically."
+        },
+        "title": "Pilot Launch Readiness Gate"
+      },
+      "caring_lead_nurture": {
+        "related_paths": {
+          "0": {
+            "label": "Municipal Surveys"
+          },
+          "1": {
+            "label": "Pilot Inquiries"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Contact\". Enter name, role, organisation, email, and the canton or municipality they represent.",
+            "label": "Add a contact"
+          },
+          "1": {
+            "detail": "Choose the pipeline stage: Prospect → Initial Outreach → Interested → Proposal Sent → Pilot Agreed → Onboarded → Declined. Move the stage as conversations progress.",
+            "label": "Set the inquiry stage"
+          },
+          "2": {
+            "detail": "After each interaction (email, call, meeting), add a note with the date, what was discussed, and the agreed next action. Notes are private to coordinators.",
+            "label": "Log a contact note"
+          },
+          "3": {
+            "detail": "Use \"Set Reminder\" to create a task that will appear in your coordinator dashboard on a chosen date.",
+            "label": "Set a follow-up reminder"
+          },
+          "4": {
+            "detail": "Once a municipality agrees to pilot, use \"Link to Tenant\" to associate the contact with the new NEXUS tenant being created for them.",
+            "label": "Link to a tenant"
+          }
+        },
+        "summary": "A lightweight contact management system for tracking conversations with potential pilot municipality contacts — local councillors, health department officers, cantonal staff, and community foundations. Track inquiry stage, last contact date, and next action for each lead.",
+        "tips": {
+          "0": "Keep notes brief but specific — \"Called Maria, she will review the proposal by Friday 14 Feb\" is more useful than \"Called contact\".",
+          "1": "Contacts who have been in the same pipeline stage for 60+ days are highlighted — consider whether they need a different approach or should be moved to Declined."
+        },
+        "title": "Lead Nurture — Municipal Contact CRM"
+      },
+      "caring_loyalty": {
+        "related_paths": {
+          "0": {
+            "label": "Regional Points"
+          },
+          "1": {
+            "label": "Pilot Scoreboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The rules table shows every active loyalty trigger: exchange milestones (1st, 5th, 25th exchange), referral bonuses, birthday credits, etc.",
+            "label": "Review active reward rules"
+          },
+          "1": {
+            "detail": "Click \"New Rule\". Set the trigger type (exchange count, review score, streak days, custom event), the reward amount in hours, and whether it is a one-time or recurring reward.",
+            "label": "Edit or add a rule"
+          },
+          "2": {
+            "detail": "Link a badge (created in the Badges admin) to a loyalty milestone so members receive both an hour reward and a visible recognition.",
+            "label": "Configure milestone badges"
+          },
+          "3": {
+            "detail": "Check the loyalty leaderboard for the top contributors this month. Consider sending them a personal thank-you via the Communication Copilot.",
+            "label": "Review the leaderboard"
+          },
+          "4": {
+            "detail": "The disbursement log shows every reward issued, to whom, and why. Use this to spot anomalies.",
+            "label": "Audit reward disbursements"
+          }
+        },
+        "summary": "Configure the loyalty reward programme: badges, milestone rewards, streak bonuses, and special recognition for long-term members and top contributors. Loyalty mechanics drive engagement without displacing the intrinsic value of mutual aid.",
+        "tips": {
+          "0": "Reciprocity bonuses (for members who both give and receive in the same month) are highly effective for improving the reciprocity ratio on the Pilot Scoreboard.",
+          "1": "Keep the programme simple — too many rules creates confusion. Three to five well-understood rewards outperform a complex points matrix."
+        },
+        "title": "Loyalty Programme — Member Rewards"
+      },
+      "caring_municipal_impact": {
+        "related_paths": {
+          "0": {
+            "label": "Municipal ROI"
+          },
+          "1": {
+            "label": "Success Stories"
+          },
+          "2": {
+            "label": "KPI Baselines"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Use the mode selector at the top: Canton for cantonal finance/health departments, Municipality for local council partners, Cooperative for your own board.",
+            "label": "Select audience mode"
+          },
+          "1": {
+            "detail": "Each mode highlights its most relevant figures: Canton sees CHF cost-avoidance; Municipality sees active members and exchange frequency; Cooperative sees retention and reciprocity rates.",
+            "label": "Review the headline metrics"
+          },
+          "2": {
+            "detail": "Charts are interactive — hover for tooltips, click to filter by time period, category, or sub-region.",
+            "label": "Drill into visualisations"
+          },
+          "3": {
+            "detail": "Use \"Export for Presentation\" to produce a slide-ready PDF with the key charts and headline numbers for your audience mode.",
+            "label": "Export a print pack"
+          }
+        },
+        "summary": "An interactive evidence dashboard for municipal partners, with three audience modes — Canton (cost-avoidance focus), Municipality (local partner focus), and Cooperative (member reciprocity focus). Each mode surfaces different metrics and visualisations suited to that audience.",
+        "tips": {
+          "0": "The Canton audience mode links directly to the Municipal ROI report figures — they should be consistent.",
+          "1": "For a council presentation, switch to Municipality mode and focus on the \"Member Stories\" section, which surfaces anonymised success stories."
+        },
+        "title": "Municipal Impact Evidence Pack"
+      },
+      "caring_municipal_roi": {
+        "related_paths": {
+          "0": {
+            "label": "Category Coefficients"
+          },
+          "1": {
+            "label": "Operating Policy"
+          },
+          "2": {
+            "label": "KPI Baselines"
+          },
+          "3": {
+            "label": "Data Quality"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Choose start and end dates. Typical periods are quarterly or annual, aligned with your grant reporting cycle.",
+            "label": "Select the reporting period"
+          },
+          "1": {
+            "detail": "Canton mode shows cantonal cost-avoidance figures. Municipality mode focuses on local partnership outcomes. Cooperative mode shows reciprocity and retention metrics.",
+            "label": "Choose the audience mode"
+          },
+          "2": {
+            "detail": "If the data quality score is below 80%, a warning appears. Review the Data Quality page before generating a formal report.",
+            "label": "Review the data quality warning"
+          },
+          "3": {
+            "detail": "Click \"Generate Report\". The system calculates: total exchange hours × per-category coefficient × formal-care hourly rate (CHF 35 default).",
+            "label": "Generate the report"
+          },
+          "4": {
+            "detail": "Download as PDF (formatted for official use) or CSV (for cantonal finance teams who need raw data).",
+            "label": "Export and distribute"
+          }
+        },
+        "summary": "Generates a formal cost-avoidance report for cantonal stakeholders showing how many hours of professional care were substituted by community exchanges, expressed in CHF. This is the primary financial evidence document for grant renewals and municipal partnership agreements.",
+        "tips": {
+          "0": "Lock the operating policy parameters before generating a report you will submit officially — changes after the fact make the figures inconsistent.",
+          "1": "Include the KPI Baseline snapshot alongside the ROI report to give context: how has participation, quality of life, and cost-avoidance trended over time?",
+          "2": "Run the Data Quality check first — a report with flagged gaps will undermine credibility with cantonal partners."
+        },
+        "title": "Municipal/Canton ROI Report"
+      },
+      "caring_nudges": {
+        "related_paths": {
+          "0": {
+            "label": "Communication Copilot"
+          },
+          "1": {
+            "label": "SLA Dashboard"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Nudge\". Set the trigger (e.g. \"member has not logged in for 14 days\"), the target segment (e.g. Tier 1+ members in Transport category), and the channel (email / in-app).",
+            "label": "Create a nudge rule"
+          },
+          "1": {
+            "detail": "Use the Communication Copilot assistant to draft a warm, personalised message. The member's first name is always merged in automatically.",
+            "label": "Write the nudge message"
+          },
+          "2": {
+            "detail": "Choose when nudges can be sent (e.g. weekdays 9am–6pm only) and the maximum frequency (e.g. no more than once per week per member).",
+            "label": "Set the sending schedule"
+          },
+          "3": {
+            "detail": "Review the preview list of members who would currently receive the nudge. If the count is sensible, toggle the rule to Active.",
+            "label": "Preview and activate"
+          },
+          "4": {
+            "detail": "The analytics panel shows open rate, click-through rate, and re-engagement rate (members who completed an exchange within 7 days of the nudge).",
+            "label": "Review nudge performance"
+          }
+        },
+        "summary": "Smart Nudges are automated, personalised messages sent to inactive or at-risk members to re-engage them. Rules are defined by inactivity threshold, member trust tier, and care category. All nudges are previewed before they go live.",
+        "tips": {
+          "0": "Start with a low frequency — one nudge per fortnight is usually enough. Over-nudging leads to opt-outs.",
+          "1": "Nudges are most effective for Tier 0–1 members who have not yet completed their first exchange.",
+          "2": "Never use nudges for safeguarding follow-up — use the Safeguarding module for that."
+        },
+        "title": "Smart Nudges — Automated Engagement"
+      },
+      "caring_operating_policy": {
+        "caution": "Changing the formal-care hourly rate mid-pilot will affect all future ROI reports. Agree with your cantonal partner first and document the reason for the change.",
+        "related_paths": {
+          "0": {
+            "label": "Category Coefficients"
+          },
+          "1": {
+            "label": "Municipal ROI"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Enter the current professional care rate in CHF (Swiss standard is CHF 35/hr). Adjust for your region or care type if your cantonal agreement specifies differently.",
+            "label": "Set the formal-care hourly rate"
+          },
+          "1": {
+            "detail": "This multiplier adjusts the coefficient-weighted hours to account for administration, volunteer coordination, and overhead. Default is 0.8.",
+            "label": "Set the cost-offset multiplier"
+          },
+          "2": {
+            "detail": "Set maximum single-exchange duration (e.g. 8 hours) and minimum (e.g. 15 minutes). Exchanges outside these limits require coordinator approval.",
+            "label": "Configure exchange limits"
+          },
+          "3": {
+            "detail": "Specify when these parameters take effect. Changes are versioned so historical reports remain accurate.",
+            "label": "Set the policy effective date"
+          },
+          "4": {
+            "detail": "Use \"Publish Policy\" to make the new values live. Consider notifying coordinators via the announcement system.",
+            "label": "Publish and notify"
+          }
+        },
+        "summary": "The Operating Policy stores the core economic parameters for your cooperative deployment: the formal-care hourly rate in CHF, the cost-offset multiplier, maximum exchange duration limits, and other global constraints. These values flow through to all ROI and impact calculations.",
+        "tips": {
+          "0": "Agree all parameter changes with your cantonal partner before publishing — unilateral changes can invalidate your grant reporting.",
+          "1": "The policy version history is fully audited — you can always view what parameters were in effect on any given date."
+        },
+        "title": "Operating Policy — Caring Community Parameters"
+      },
+      "caring_pilot_scoreboard": {
+        "related_paths": {
+          "0": {
+            "label": "KPI Baselines"
+          },
+          "1": {
+            "label": "SLA Dashboard"
+          },
+          "2": {
+            "label": "Launch Readiness"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The overall pilot score (0–100) is a composite of all methodology metrics. Aim for 75+ to qualify for the Caring Community \"Established Cooperative\" recognition.",
+            "label": "Review the top-line score"
+          },
+          "1": {
+            "detail": "Each metric has a target range defined in the Operating Policy. Green = on target; amber = within 10% of target; red = below threshold.",
+            "label": "Understand individual metric scores"
+          },
+          "2": {
+            "detail": "Toggle \"Show Caring Community Benchmark\" to overlay the anonymised median scores from all Caring Community cooperatives. This shows how you compare to peers.",
+            "label": "Compare to Caring Community benchmark"
+          },
+          "3": {
+            "detail": "Generate a Caring Community-formatted methodology report for submission to Caring Community at your quarterly review.",
+            "label": "Download the methodology report"
+          }
+        },
+        "summary": "The live scorecard for your Caring Community pilot, tracking progress against the Caring Community methodology metrics. Metrics include exchange volume, member retention, reciprocity ratio (helpers who are also recipients), coordinator response time, and safeguarding compliance rate.",
+        "tips": {
+          "0": "Reciprocity ratio (the proportion of members who give AND receive) is the most important single metric for Caring Community accreditation — aim for 60%+.",
+          "1": "A low coordinator response time score almost always reflects SLA breaches — check the SLA Dashboard for the root cause."
+        },
+        "title": "Caring Community Pilot Scoreboard"
+      },
+      "caring_projects": {
+        "related_paths": {
+          "0": {
+            "label": "Coordinator Workflow"
+          },
+          "1": {
+            "label": "Municipal ROI"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Project\", give it a name and description, set the hour budget, and assign a lead coordinator.",
+            "label": "Create a new project"
+          },
+          "1": {
+            "detail": "Use the member search to add helpers and recipients. Members can also self-enrol if the project is marked as open.",
+            "label": "Add participating members"
+          },
+          "2": {
+            "detail": "When creating or editing an exchange, use the \"Project\" dropdown to associate it. All linked exchanges appear in the project's progress report.",
+            "label": "Link exchanges to the project"
+          },
+          "3": {
+            "detail": "The project detail page shows hours delivered vs budget, active members, and a timeline of completed exchanges.",
+            "label": "Review progress milestones"
+          },
+          "4": {
+            "detail": "When the project ends, use \"Generate Report\" to produce a PDF summary suitable for cantonal stakeholders.",
+            "label": "Close and report"
+          }
+        },
+        "summary": "Projects are structured community initiatives that group multiple exchanges around a shared goal — for example, \"Winter Neighbour Support 2025\" or \"Elderly Mobility Network\". Each project has a budget in hours, a coordinator, start/end dates, and reporting milestones.",
+        "tips": {
+          "0": "Projects with zero exchanges after 14 days are flagged as \"Stalled\" — consider whether the goal is well-understood by members.",
+          "1": "The hour budget is a guide, not a hard cap. You can overspend; the system will flag it but not block exchanges.",
+          "2": "For grant-funded projects, use the \"External Reference\" field to store the funder's project code."
+        },
+        "title": "Caring Projects & Community Initiatives"
+      },
+      "caring_providers": {
+        "related_paths": {
+          "0": {
+            "label": "Care Recipient Circle"
+          },
+          "1": {
+            "label": "Coordinator Workflow"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Provider\". Enter the organisation name, contact details, care specialisms, geographic coverage, and whether they accept NEXUS referrals.",
+            "label": "Add a provider"
+          },
+          "1": {
+            "detail": "Upload evidence of the provider's registration or accreditation (e.g. KESB registration, professional body membership). Mark them as Verified once documentation is confirmed.",
+            "label": "Verify the provider"
+          },
+          "2": {
+            "detail": "Associate the provider with the care categories they cover. This allows the matching engine to suggest them when a help request exceeds volunteer capacity.",
+            "label": "Link to care categories"
+          },
+          "3": {
+            "detail": "Providers can update their available capacity (e.g. \"accepting new referrals\", \"at capacity\"). Check this before making referrals.",
+            "label": "Review provider capacity"
+          },
+          "4": {
+            "detail": "After referring a member, log the referral outcome in the member's exchange record — this feeds into the KPI data.",
+            "label": "Record referral outcomes"
+          }
+        },
+        "summary": "A curated directory of professional and semi-professional care providers affiliated with your cooperative. Providers are distinct from member volunteers — they are organisations or individuals who deliver specialised care services that complement community exchanges (e.g. professional physiotherapy, medical social work).",
+        "tips": {
+          "0": "Providers do not need NEXUS accounts — the directory is coordinator-managed. Members see a simplified version of the directory on their profile.",
+          "1": "Review the provider directory at least twice a year to remove organisations that have closed or changed their services."
+        },
+        "title": "Care Provider Directory"
+      },
+      "caring_recipient_circle": {
+        "caution": "Care plans may contain sensitive health information. Treat them as confidential records under FADP/nDSG.",
+        "related_paths": {
+          "0": {
+            "label": "Providers"
+          },
+          "1": {
+            "label": "Safeguarding"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Circle\". Select the care recipient (must be a member). Give the circle a descriptive name (e.g. \"Hans S. — Tuesday Morning Support Group\").",
+            "label": "Create a circle for a recipient"
+          },
+          "1": {
+            "detail": "Add volunteer helpers, the assigned coordinator, and any professional providers. Each member has a role (Helper / Lead Coordinator / Professional Provider).",
+            "label": "Add circle members"
+          },
+          "2": {
+            "detail": "Use the Care Plan field to document agreed support activities, frequency, and any health or safety notes relevant to helpers.",
+            "label": "Set a care plan"
+          },
+          "3": {
+            "detail": "Exchanges for the care recipient can be tagged with the circle. This gives a consolidated view of all support received by that person.",
+            "label": "Link exchanges to the circle"
+          },
+          "4": {
+            "detail": "The activity timeline shows recent exchanges, notes, and any safeguarding flags related to this recipient.",
+            "label": "Review circle activity"
+          }
+        },
+        "summary": "A care recipient circle groups the support network around a specific community member who needs regular care — for example, an elderly person who receives help from three neighbours, a coordinator, and a professional nurse. This page creates and manages those circles.",
+        "tips": {
+          "0": "Care plan content is confidential — only circle members and coordinators can see it.",
+          "1": "When a circle member leaves (e.g. a volunteer moves away), archive them from the circle rather than deleting the role — this preserves the care history."
+        },
+        "title": "Care Recipient Circles & Beneficiary Management"
+      },
+      "caring_regional_points": {
+        "related_paths": {
+          "0": {
+            "label": "Sub-Regions"
+          },
+          "1": {
+            "label": "Loyalty"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The ledger shows total points in circulation, issued this month, redeemed this month, and the outstanding liability.",
+            "label": "Review the regional points balance sheet"
+          },
+          "1": {
+            "detail": "Use \"Issue Points\" to credit points to a member or group of members. Enter the amount, sub-region, and reason (e.g. \"Neighbourhood clean-up participation\").",
+            "label": "Issue a batch of points"
+          },
+          "2": {
+            "detail": "Under \"Redemption Catalogue\", add items members can redeem points for (e.g. \"Local bakery voucher — 50 points\"). Each item needs a stock count or unlimited toggle.",
+            "label": "Configure redemption options"
+          },
+          "3": {
+            "detail": "Pending redemption requests appear in the queue. Approve or decline each one, with a reason for declines.",
+            "label": "Review redemption requests"
+          },
+          "4": {
+            "detail": "Generate a periodic ledger report for your sub-regional partner showing points issued and redeemed.",
+            "label": "Export the ledger"
+          }
+        },
+        "summary": "Regional Points are a complementary currency that sits alongside hour credits. They are issued by sub-regional bodies (Quartier councils, neighbourhood groups) and can be redeemed for local goods or services not covered by hour exchanges. This page manages the regional points ledger.",
+        "tips": {
+          "0": "Regional Points should complement, not compete with, hour credits. Avoid setting up redeemable items that could also be exchanged as hour-credit services.",
+          "1": "Keep the liability (unredeemed outstanding points) visible to your sub-regional partners — it represents a real commitment."
+        },
+        "title": "Regional Points — Third-Currency Ledger"
+      },
+      "caring_research": {
+        "related_paths": {
+          "0": {
+            "label": "KPI Baselines"
+          },
+          "1": {
+            "label": "Disclosure Pack"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Partnership\". Enter the institution name, lead researcher, research question, ethical approval reference, and agreed data scope.",
+            "label": "Create a research partnership record"
+          },
+          "1": {
+            "detail": "Upload the signed data processing agreement. Partnerships cannot be activated until a signed agreement is on file.",
+            "label": "Upload the data agreement"
+          },
+          "2": {
+            "detail": "Use the data scope selector to specify which anonymised datasets the partner can access: exchange aggregates, KPI trends, survey results, demographic breakdowns.",
+            "label": "Configure data access"
+          },
+          "3": {
+            "detail": "Once activated, use \"Issue Access\" to send the researcher a read-only API key or data export schedule.",
+            "label": "Issue researcher access credentials"
+          },
+          "4": {
+            "detail": "Partnerships expire after the agreed term (typically one academic year). Use the renewal workflow to extend with updated consent.",
+            "label": "Review and renew"
+          }
+        },
+        "summary": "Manage formal research partnerships with universities, public health institutes, and social research organisations. Partners can be granted read-only access to anonymised aggregate data for academic studies, subject to a signed data agreement.",
+        "tips": {
+          "0": "Never grant access to unanonymised member data. The platform anonymises data automatically for the research export endpoint, but verify this with your data protection officer.",
+          "1": "Keep the ethics reference number on file — external audits may ask for evidence of ethical oversight."
+        },
+        "title": "Research Partnerships — Academic Collaboration"
+      },
+      "caring_safeguarding": {
+        "caution": "Never close a safeguarding report without a written resolution summary. Blank closures are flagged in the data quality audit.",
+        "related_paths": {
+          "0": {
+            "label": "SLA Dashboard"
+          },
+          "1": {
+            "label": "Data Quality"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Reports are sorted by severity and time elapsed. Red rows are breaching or have breached their SLA.",
+            "label": "Review the open incidents queue"
+          },
+          "1": {
+            "detail": "Click the report, then \"Acknowledge\" to stop the SLA clock and signal that a coordinator has taken ownership.",
+            "label": "Acknowledge a report"
+          },
+          "2": {
+            "detail": "Use the Notes field to document steps taken, people contacted, and outcomes. Notes are confidential and not visible to members.",
+            "label": "Record your investigation notes"
+          },
+          "3": {
+            "detail": "For Critical incidents involving risk of harm, use \"Escalate Externally\" to log that you have contacted statutory services (police, social work, etc.).",
+            "label": "Escalate to external agencies"
+          },
+          "4": {
+            "detail": "Once resolved, mark the report as Closed with a resolution summary. Closed reports are archived but never deleted.",
+            "label": "Close the report"
+          }
+        },
+        "summary": "This page manages all safeguarding incident reports raised within your cooperative. Reports are triaged by severity: Critical (respond within 1 hour), High (24 hours), Medium (72 hours), Low (next scheduled meeting). Coordinators must acknowledge and action each report within the SLA window.",
+        "tips": {
+          "0": "Critical severity incidents also trigger an immediate push notification to all Coordinator-tier members.",
+          "1": "If you are unsure about severity, default to High — it is better to over-respond than miss a genuine safeguarding issue.",
+          "2": "All incident data is excluded from the Public Impact Report — it is coordinator-only."
+        },
+        "title": "Safeguarding — Incident Reports & SLAs"
+      },
+      "caring_sla_dashboard": {
+        "caution": "Snoozed requests still appear on the compliance report. Frequent snoozing of Critical requests will be flagged in the data quality audit.",
+        "related_paths": {
+          "0": {
+            "label": "Safeguarding"
+          },
+          "1": {
+            "label": "Smart Nudges"
+          },
+          "2": {
+            "label": "Operating Policy"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The four cards at the top show how many requests are in each severity tier and what percentage are within SLA. Red = breached; amber = within 20% of deadline.",
+            "label": "Review the SLA summary cards"
+          },
+          "1": {
+            "detail": "Click \"Overdue Only\" to see only requests that have already breached their SLA. These need immediate attention.",
+            "label": "Filter to overdue requests"
+          },
+          "2": {
+            "detail": "Click any request to open the detail panel. Use \"Assign to Coordinator\" to allocate responsibility. The assignee receives an in-app notification.",
+            "label": "Assign or reassign"
+          },
+          "3": {
+            "detail": "If a request cannot be actioned yet (e.g. waiting for external information), use \"Snooze\" and write a reason. Snoozed requests pause the SLA clock temporarily.",
+            "label": "Snooze with justification"
+          },
+          "4": {
+            "detail": "Generate a weekly SLA compliance CSV for your quality management records.",
+            "label": "Export compliance report"
+          }
+        },
+        "summary": "Tracks all open help requests against their SLA commitment from the Operating Policy: Critical (1 hour), High (24 hours), Medium (72 hours), Low (next scheduled meeting). At-a-glance colour-coding shows compliance in real time.",
+        "tips": {
+          "0": "The SLA dashboard refreshes every 60 seconds — you do not need to manually reload.",
+          "1": "High-volume periods (winter, events) often cause SLA pressure. Use Smart Nudges to pre-emptively activate helpers before requests pile up."
+        },
+        "title": "Help Request SLA Tracking Dashboard"
+      },
+      "caring_sub_regions": {
+        "related_paths": {
+          "0": {
+            "label": "Regional Points"
+          },
+          "1": {
+            "label": "Emergency Alerts"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Sub-Region\". Enter the name (e.g. \"Länggasse-Felsenau\"), type (Quartier / Ortsteil / Village / Custom), and optional boundary description.",
+            "label": "Create a sub-region"
+          },
+          "1": {
+            "detail": "Use the bulk-assign tool to assign members based on their postcode/address, or manually assign individual members.",
+            "label": "Assign members"
+          },
+          "2": {
+            "detail": "Assign a Coordinator-tier member as the responsible contact for this sub-region. They receive sub-region-specific SLA and digest notifications.",
+            "label": "Set a sub-region coordinator"
+          },
+          "3": {
+            "detail": "When sending Emergency Alerts, Smart Nudges, or Civic Digests, filter recipients by sub-region to target only relevant members.",
+            "label": "Use in communications"
+          },
+          "4": {
+            "detail": "The analytics tab shows exchange density, active member rate, and SLA compliance broken down by sub-region.",
+            "label": "Review sub-region analytics"
+          }
+        },
+        "summary": "Sub-regions subdivide your cooperative's geographic area into smaller administrative units such as Quartier (neighbourhood), Ortsteil (district quarter), or village. Members can be assigned to sub-regions for targeted communications, local reports, and Regional Points management.",
+        "tips": {
+          "0": "Sub-regions work best when they map to real community identities that members recognise — use names people actually use for their neighbourhood.",
+          "1": "Avoid creating too many sub-regions (more than 10 is usually too granular for a pilot cooperative)."
+        },
+        "title": "Sub-Regions — Geographic Subdivision Management"
+      },
+      "caring_success_stories": {
+        "caution": "Never publish a story without a consent record. Publishing without consent is a FADP/nDSG violation.",
+        "related_paths": {
+          "0": {
+            "label": "Municipal Impact"
+          },
+          "1": {
+            "label": "Disclosure Pack"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Story\". Enter the member's pseudonym (never their real name in public materials), the type of exchange, the outcome, and a direct quote (with consent noted).",
+            "label": "Collect a story"
+          },
+          "1": {
+            "detail": "Tag each story with the relevant impact themes: Reduced Loneliness, Improved Mobility, Practical Support, Intergenerational Connection, etc. These drive filtering in reports.",
+            "label": "Tag by impact category"
+          },
+          "2": {
+            "detail": "Every story must have a consent record before it can be published. Check \"Verbal Consent Obtained\" or upload a written consent form.",
+            "label": "Mark consent status"
+          },
+          "3": {
+            "detail": "Use \"Publish to Impact Pack\" to make the story available in the Municipal Impact dashboard and Evidence Pack exports.",
+            "label": "Review and publish"
+          },
+          "4": {
+            "detail": "Stories more than 2 years old should be reviewed for continued relevance. Archive those that no longer reflect current operations.",
+            "label": "Archive outdated stories"
+          }
+        },
+        "summary": "Collect and manage short anonymised stories from members about the difference caring exchanges made in their lives. Stories are used in impact reports, municipal presentations, and the public-facing Impact Evidence Pack.",
+        "tips": {
+          "0": "The most compelling stories are specific: \"Maria, 78, was able to stay independent for 6 more months because...\" beats generic wellbeing statements.",
+          "1": "Aim for at least 3 stories per care category — impact reports are more credible with a range of evidence."
+        },
+        "title": "Success Stories — Impact Proof Cards"
+      },
+      "caring_surveys": {
+        "related_paths": {
+          "0": {
+            "label": "Lead Nurture"
+          },
+          "1": {
+            "label": "Municipal Impact"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Click \"New Survey\". Choose from question types: multiple choice, rating scale (1–5 or 1–10), open text, and yes/no.",
+            "label": "Create a new survey"
+          },
+          "1": {
+            "detail": "The recipient picker pulls from your Lead Nurture contact list. Filter by role (e.g. \"Cantonal Health Officer\") or organisation.",
+            "label": "Add recipients from your municipal contact list"
+          },
+          "2": {
+            "detail": "Surveys can be sent straight away or scheduled for a specific date (e.g. ahead of a quarterly review meeting).",
+            "label": "Schedule or send immediately"
+          },
+          "3": {
+            "detail": "The results dashboard shows response rates, aggregate scores, and verbatim open-text answers. Filter by respondent role or organisation.",
+            "label": "Analyse responses"
+          },
+          "4": {
+            "detail": "Use \"Export CSV\" for raw data or \"Export Summary PDF\" for a formatted summary suitable for inclusion in your impact documentation.",
+            "label": "Export for reports"
+          }
+        },
+        "summary": "Create and distribute surveys to your municipality contacts — council officers, health department staff, and funding bodies. Surveys can be used to gather needs assessments, satisfaction feedback, or evidence for grant reporting.",
+        "tips": {
+          "0": "Keep surveys short (5 questions or fewer). Municipal contacts are busy — short surveys get significantly higher completion rates.",
+          "1": "Follow up non-respondents once after 7 days with an automated reminder. Do not send more than one reminder."
+        },
+        "title": "Municipal Surveys"
+      },
+      "caring_trust_tier": {
+        "caution": "Demoting a Trusted member (tier 2→1) immediately invalidates their Warmth Pass at all Caring Community cooperative sites. Notify the member before demoting.",
+        "related_paths": {
+          "0": {
+            "label": "Warmth Pass"
+          },
+          "1": {
+            "label": "Safeguarding"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The summary chart shows how many members are at each tier. A healthy cooperative has most members at Tier 1–2.",
+            "label": "View tier distribution"
+          },
+          "1": {
+            "detail": "Members who have met the criteria for the next tier appear in the \"Ready to Promote\" list. Review their activity and approve or defer.",
+            "label": "Review pending tier promotions"
+          },
+          "2": {
+            "detail": "Find the member, click their current tier badge, and select the new tier. Write a short note explaining the adjustment — this is audited.",
+            "label": "Manually adjust a tier"
+          },
+          "3": {
+            "detail": "Under \"Tier Settings\", adjust the number of completed exchanges and average review score required to reach each tier.",
+            "label": "Configure tier thresholds"
+          },
+          "4": {
+            "detail": "Members flagged for prolonged inactivity or safeguarding incidents may appear for tier review. Check context before demoting.",
+            "label": "Review demotion candidates"
+          }
+        },
+        "summary": "The Trust Tier system grades member reliability on a five-level scale: Newcomer (0) → Member (1) → Trusted (2) → Verified (3) → Coordinator (4). Tier determines what a member can do — for example, only Trusted+ members can export a Warmth Pass or take on intensive caring exchanges.",
+        "tips": {
+          "0": "Tier promotions are not automatic by default — a coordinator must approve each promotion. You can enable auto-promotion for Tier 0→1 in Tier Settings.",
+          "1": "Members cannot see their numeric tier score — they see a named badge (e.g. \"Trusted Member\") instead.",
+          "2": "Coordinator tier (4) should be rare and given only to people handling safeguarding or high-value exchanges."
+        },
+        "title": "Trust Tiers — Reputation Ladder"
+      },
+      "caring_verification": {
+        "related_paths": {
+          "0": {
+            "label": "Lead Nurture"
+          },
+          "1": {
+            "label": "Municipal Impact"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Find the municipal contact in Lead Nurture, click \"Initiate Verification\". The system generates a unique DNS TXT record value for them to add to their domain.",
+            "label": "Initiate verification for a municipality"
+          },
+          "1": {
+            "detail": "Share the DNS instruction guide (downloadable PDF) with the municipality's web administrator. They add the TXT record to their DNS.",
+            "label": "Instruct the municipality's IT team"
+          },
+          "2": {
+            "detail": "Once they confirm the record is added, click \"Check DNS\". The system queries the domain automatically. Verification is instant if the record is found.",
+            "label": "Trigger the DNS check"
+          },
+          "3": {
+            "detail": "Upload the signed attestation letter (on official letterhead, signed by a responsible officer). This is stored as part of the compliance record.",
+            "label": "Upload the attestation letter"
+          },
+          "4": {
+            "detail": "Once DNS and attestation are both confirmed, click \"Issue Verified Badge\". The badge appears on the municipality's partner profile immediately.",
+            "label": "Issue the badge"
+          }
+        },
+        "summary": "Verified municipality partners are awarded a digital badge displayed on their community profile and in impact reports. Verification requires DNS record confirmation (proving control of the municipality's official domain) and a signed attestation letter.",
+        "tips": {
+          "0": "DNS propagation can take up to 48 hours. Allow enough time before the check — do not retry more than once per hour.",
+          "1": "The badge is automatically revoked if the DNS record is later removed. Verified partners should be advised to keep the record permanently."
+        },
+        "title": "Municipal Verification — DNS/Attestation Badge"
+      },
+      "caring_warmth_pass": {
+        "caution": "Do not issue passes to members with any unresolved safeguarding reports, even if their tier technically qualifies them.",
+        "related_paths": {
+          "0": {
+            "label": "Trust Tiers"
+          },
+          "1": {
+            "label": "Partner Cooperatives"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Find the member (must be Tier 2+), click \"Issue Warmth Pass\". The system generates a signed QR code token with a 12-month expiry.",
+            "label": "Issue a Warmth Pass"
+          },
+          "1": {
+            "detail": "Default is 12 months. You can shorten to 3 or 6 months for members on a trial promotion.",
+            "label": "Set the validity period"
+          },
+          "2": {
+            "detail": "Click the active pass, then \"Revoke\". Revocation propagates to all Caring Community federation peers within minutes via the federation sync.",
+            "label": "Revoke a pass"
+          },
+          "3": {
+            "detail": "The audit log shows when and at which cooperative a pass was scanned. Unusual location patterns should trigger a coordinator review.",
+            "label": "Review pass usage"
+          }
+        },
+        "summary": "The Warmth Pass is a cryptographically signed credential that lets a Trusted+ member (tier 2+) demonstrate their reputation at any affiliated Caring Community cooperative, not just their home community. It is issued here and can be revoked at any time.",
+        "tips": {
+          "0": "A member can hold only one active Warmth Pass at a time. Issuing a new one invalidates the previous.",
+          "1": "Passes issued to members who are subsequently demoted below Tier 2 are automatically revoked — you do not need to do this manually.",
+          "2": "The pass QR code is available in the member's profile as a downloadable PDF."
+        },
+        "title": "Warmth Pass — Portable Trust Credential"
+      },
+      "caring_workflow": {
+        "related_paths": {
+          "0": {
+            "label": "Hour Transfers"
+          },
+          "1": {
+            "label": "SLA Dashboard"
+          },
+          "2": {
+            "label": "KPI Baselines"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "Use the top filter bar to narrow to a specific state (e.g. \"Matched\" only) or care category (e.g. Transport, Companionship).",
+            "label": "Filter by status or category"
+          },
+          "1": {
+            "detail": "Click any card to see the full detail panel: member profiles, agreed time, any coordinator notes, and the audit trail.",
+            "label": "Open an exchange card"
+          },
+          "2": {
+            "detail": "Use the three-dot menu on a card to reassign to another coordinator, add a note, or mark as escalated for review.",
+            "label": "Reassign or escalate"
+          },
+          "3": {
+            "detail": "Once both parties confirm, use \"Mark Complete\" to trigger the hour-credit transfer and unlock the review prompt for both members.",
+            "label": "Mark as complete"
+          }
+        },
+        "summary": "A real-time Kanban-style board showing every caring exchange in flight. Exchanges move through states: Request → Matched → In Progress → Completed → Reviewed. Coordinators use this page to spot bottlenecks, reassign exchanges, and escalate stalled requests.",
+        "tips": {
+          "0": "Exchanges stuck in \"Matched\" for more than 48 hours are highlighted in amber — follow up with both members.",
+          "1": "The \"My Exchanges\" toggle filters to only exchanges where you are the assigned coordinator.",
+          "2": "Completed exchanges that have not been reviewed after 7 days are flagged — reviews are important for the KPI baseline data."
+        },
+        "title": "Coordinator Workflow Dashboard"
+      },
+      "partner_timebanks_caring_peers": {
+        "related_paths": {
+          "0": {
+            "label": "Warmth Pass"
+          },
+          "1": {
+            "label": "Isolated Node"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The table shows each connected Caring Community cooperative, its instance URL, status, and last verified handshake.",
+            "label": "View active partner cooperatives"
+          },
+          "1": {
+            "detail": "Click \"Invite Peer Cooperative\". Enter their NEXUS instance URL. They receive an invitation to accept and sign the bilateral trust agreement.",
+            "label": "Invite a new cooperative"
+          },
+          "2": {
+            "detail": "Pending invitations appear in the \"Incoming\" tab. Review the requesting cooperative's profile before accepting.",
+            "label": "Accept an incoming invitation"
+          },
+          "3": {
+            "detail": "For each peer, choose which data you share: Warmth Pass validation only, or also aggregate exchange statistics for the Caring Community national dashboard.",
+            "label": "Configure data sharing rules"
+          },
+          "4": {
+            "detail": "If a cooperative is no longer active or has had a safeguarding issue, use \"Suspend\" to pause the federation link without permanently removing it.",
+            "label": "Suspend a peer connection"
+          }
+        },
+        "summary": "Manage the partner timebank connections between your cooperative and other Caring Community cooperatives. This page is for trusted cooperative-to-cooperative links, not generic API clients or third-party integrations.",
+        "tips": {
+          "0": "Only connect with cooperatives you have verified in person or through the Caring Community national network — automated spam invitations can occur.",
+          "1": "When Isolated Node mode is active, all federation peer data sync is automatically paused. Re-enable individually after reviewing FADP compliance."
+        },
+        "title": "Partner Cooperatives - Caring Community Federation"
+      },
+      "super_admin_national_kiss": {
+        "related_paths": {
+          "0": {
+            "label": "KI Agents"
+          },
+          "1": {
+            "label": "Pilot Inquiries"
+          }
+        },
+        "steps": {
+          "0": {
+            "detail": "The top row shows: total cooperatives active, total exchange hours (month/year), combined CHF cost-avoidance, and total unique members across all cooperatives.",
+            "label": "Review the national summary cards"
+          },
+          "1": {
+            "detail": "Click any cooperative's row in the table to open their detailed dashboard. You have read-only access to their data.",
+            "label": "Drill into a specific cooperative"
+          },
+          "2": {
+            "detail": "The federation health map shows which cooperatives are connected via Warmth Pass federation and which have recently sync-failed.",
+            "label": "Review federation health"
+          },
+          "3": {
+            "detail": "Use \"Export National Report\" to produce an aggregated PDF for Caring Community board meetings or federal health authority submissions.",
+            "label": "Export the national report"
+          },
+          "4": {
+            "detail": "Use the \"National Announcement\" to send a message to all cooperative coordinators simultaneously — for example, a methodology update or a system maintenance notice.",
+            "label": "Raise a national alert"
+          }
+        },
+        "summary": "A national-level aggregate dashboard visible only to Caring Community national staff and super-administrators. Aggregates key metrics across all active Caring Community cooperatives: total exchange hours, combined CHF cost-avoidance, cross-cooperative Warmth Pass usage, and federation health.",
+        "tips": {
+          "0": "The national dashboard does not contain any individually identifiable member data — only cooperative-level aggregates.",
+          "1": "Use the \"Benchmark View\" to show each cooperative's Caring Community pilot score alongside the national median."
+        },
+        "title": "Caring Community — National Cross-Cooperative Dashboard"
+      }
+    }
+  },
   "admin_help_module": {
     "admin_help": {
       "categories": {
@@ -16187,9 +19544,11 @@ export default interface Resources {
       "answer_required": "Answer is required",
       "category": "Category",
       "category_placeholder": "General",
+      "category_value": "{{category}}",
       "create": "Create FAQ",
       "created": "Created",
       "created_toast": "FAQ created",
+      "default_category": "General",
       "delete_confirm": "Delete the FAQ \"{{question}}\"? This cannot be undone.",
       "delete_failed": "Failed to delete FAQ",
       "delete_faq": "Delete FAQ",
@@ -16690,6 +20049,7 @@ export default interface Resources {
       "bias_stage": "Stage",
       "bias_total": "Total",
       "bias_total_applications": "Total Applications",
+      "category_value": "{{category}}",
       "col_actions": "Actions",
       "col_applications": "Applications",
       "col_deadline": "Deadline",
@@ -16783,6 +20143,7 @@ export default interface Resources {
       "stage_reviewed": "Reviewed",
       "stage_screening": "Screening",
       "stage_shortlisted": "Shortlisted",
+      "stage_unknown": "Other stage",
       "stage_withdrawn": "Withdrawn",
       "stat_applications": "Total Applications",
       "stat_conversion": "Conversion Rate",
@@ -16828,6 +20189,7 @@ export default interface Resources {
       "try_again": "Try Again",
       "type_paid": "Paid",
       "type_timebank": "Timebank",
+      "type_unknown": "Other job type",
       "type_volunteer": "Volunteer",
       "unexpected_error": "Unexpected error",
       "unfeature_job": "Remove from featured",
@@ -17687,6 +21049,11 @@ export default interface Resources {
       "tab_content": "Content",
       "tab_featured": "Featured",
       "type": "Type",
+      "types": {
+        "offer": "Offer",
+        "request": "Request",
+        "unknown": "Other listing type"
+      },
       "unfeature": "Unfeature",
       "unfeature_listing": "Unfeature Listing",
       "unfeatured_success": "Unfeatured successfully"
@@ -17897,6 +21264,13 @@ export default interface Resources {
       "moderation_page_title": "Listing Moderation",
       "moderation_queue": "Moderation Queue",
       "moderation_queue_desc": "Listings awaiting review",
+      "moderation_status": {
+        "approved": "Approved",
+        "flagged": "Flagged",
+        "pending": "Pending review",
+        "rejected": "Rejected",
+        "unknown": "Other moderation status"
+      },
       "moderation_tabs_aria": "Marketplace moderation status filter",
       "moderation_title": "Moderation Queue",
       "no_listings_created_yet": "No listings have been created yet",
@@ -17931,6 +21305,14 @@ export default interface Resources {
       "stat_total_listings": "Total Listings",
       "stat_total_orders": "Total Orders",
       "stat_total_sellers": "Total Sellers",
+      "status": {
+        "active": "Active",
+        "draft": "Draft",
+        "expired": "Expired",
+        "inactive": "Inactive",
+        "sold": "Sold",
+        "unknown": "Other listing status"
+      },
       "suspend_btn": "Suspend",
       "suspend_seller_message": "Are you sure you want to suspend this seller?",
       "suspend_seller_title": "Suspend Seller",
@@ -18086,6 +21468,7 @@ export default interface Resources {
       "dist_walking": "Walking distance",
       "distance": "Distance",
       "distance_distribution": "Distance Distribution",
+      "distance_unknown": "Other distance band",
       "distribution_aria": "{{label}}: {{count}} matches ({{percent}}%)",
       "distribution_aria_one": "{{label}}: {{count}} matches ({{percent}}%)",
       "distribution_aria_other": "{{label}}: {{count}} matches ({{percent}}%)",
@@ -18210,6 +21593,7 @@ export default interface Resources {
       "pillar_feasibility": "Feasibility",
       "pillar_relevance": "Relevance",
       "pillar_trust": "Trust",
+      "pillar_unknown": "Other matching pillar",
       "placeholder_explain_why_this_match_is_being_rejected": "Explain Why This Match is Being Rejected...",
       "please_provide_a_reason_for_rejection": "Please provide a reason for rejection",
       "proximity_bands": "Proximity Bands",
@@ -18220,6 +21604,7 @@ export default interface Resources {
       "reason_not_interested": "Not interested",
       "reason_other": "Other",
       "reason_too_far": "Too far away",
+      "reason_unknown": "Other reason",
       "reason_wrong_category": "Wrong category",
       "refresh": "Refresh",
       "reject_match": "Reject Match",
@@ -18241,6 +21626,7 @@ export default interface Resources {
       "score_range_hot": "80-100 Hot",
       "score_range_low": "0-40 Low",
       "score_range_medium": "40-60 Medium",
+      "score_range_unknown": "Other score range",
       "should_be_100": "Weights should sum to 100",
       "smart_matching_enabled": "Smart Matching Enabled",
       "smart_matching_enabled_desc": "Enable or disable the smart matching engine for this tenant",
@@ -18400,6 +21786,7 @@ export default interface Resources {
       "content_type_listing": "Listing",
       "content_type_post": "Post",
       "content_type_review": "Review",
+      "content_type_unknown": "Unknown content type",
       "content_type_user": "User",
       "delete": "Delete",
       "delete_comment": "Delete Comment",
@@ -18743,7 +22130,8 @@ export default interface Resources {
         "empty": "No trend data available.",
         "hours_axis": "Hours",
         "title": "National 12-month trend",
-        "total_hours_all": "Total hours (all cooperatives)"
+        "total_hours_all": "Total hours (all cooperatives)",
+        "unknown_period": "Unknown period"
       }
     },
     "shared": {
@@ -19093,6 +22481,7 @@ export default interface Resources {
     "caring_success_stories": "Success Stories",
     "caring_workflow": "Caring Community Workflow",
     "categories": "Categories",
+    "checking_permissions": "Checking permissions",
     "clear_search": "Clear search",
     "close_sidebar": "Close sidebar",
     "collapse_sidebar": "Collapse sidebar",
@@ -19176,6 +22565,79 @@ export default interface Resources {
       "choose_icon": "Choose Icon",
       "choose_icon_placeholder": "Search for an icon...",
       "clear_icon": "Clear Icon",
+      "icons": {
+        "Activity": "Activity",
+        "Archive": "Archive",
+        "ArrowRightLeft": "Exchange",
+        "BarChart": "Bar chart",
+        "BarChart3": "Bar chart",
+        "Bell": "Notifications",
+        "BookOpen": "Book",
+        "Bookmark": "Bookmark",
+        "Building2": "Organisation",
+        "Calendar": "Calendar",
+        "Camera": "Camera",
+        "ChevronDown": "Expand",
+        "Clock": "Clock",
+        "Coffee": "Coffee",
+        "Compass": "Compass",
+        "Cookie": "Cookies",
+        "ExternalLink": "External link",
+        "FileText": "Document",
+        "Flag": "Flag",
+        "FolderOpen": "Folder",
+        "Gift": "Gift",
+        "Globe": "Globe",
+        "Grid": "Grid",
+        "Handshake": "Handshake",
+        "Hash": "Number sign",
+        "Heart": "Heart",
+        "HelpCircle": "Help",
+        "Home": "Home",
+        "Image": "Image",
+        "Info": "Information",
+        "Layers": "Layers",
+        "LayoutDashboard": "Dashboard",
+        "Lightbulb": "Idea",
+        "Link": "Link",
+        "List": "List",
+        "ListTodo": "To-do list",
+        "LogOut": "Log out",
+        "Mail": "Email",
+        "MapPin": "Map pin",
+        "Medal": "Medal",
+        "Megaphone": "Announcement",
+        "MessageSquare": "Messages",
+        "Mic": "Microphone",
+        "Moon": "Moon",
+        "Music": "Music",
+        "Newspaper": "News",
+        "Package": "Package",
+        "Phone": "Phone",
+        "PieChart": "Pie chart",
+        "Plus": "Add",
+        "Podcast": "Podcast",
+        "Puzzle": "Puzzle",
+        "Search": "Search",
+        "Settings": "Settings",
+        "Shield": "Shield",
+        "Smile": "Smile",
+        "Sparkles": "Sparkles",
+        "Star": "Star",
+        "Stethoscope": "Healthcare",
+        "Sun": "Sun",
+        "Tag": "Tag",
+        "Target": "Target",
+        "ThumbsUp": "Like",
+        "TrendingUp": "Trending up",
+        "Trophy": "Trophy",
+        "UserCircle": "User profile",
+        "Users": "Users",
+        "Video": "Video",
+        "Wallet": "Wallet",
+        "Wrench": "Tools",
+        "Zap": "Lightning"
+      },
       "label": "Icon",
       "no_icons_found": "No icons found matching \"{{search}}\"",
       "search_for_icon": "Search for an icon...",
@@ -19256,6 +22718,25 @@ export default interface Resources {
     "safeguarding": "Safeguarding",
     "safeguarding_options": "Safeguarding Options",
     "search_analytics": "Search Analytics",
+    "search_keywords": {
+      "all_users": "members|accounts",
+      "bounces": "email failed|mail returned",
+      "deliverability": "deliverables|scheduled email",
+      "donation_refunds": "donations|refund|Stripe|giving",
+      "email_deliverability": "mail failed|SMTP health|delivery",
+      "email_settings": "SMTP|mail|SendGrid|from address",
+      "error_404_tracking": "not found|broken links",
+      "group_organization": "tags|collections|automatic assignment|bundles",
+      "groups": "clubs|circles|communities",
+      "help_faqs": "frequently asked questions|questions|help centre|answers",
+      "pending_approvals": "approval|waiting",
+      "podcasts": "audio|shows|episodes",
+      "residency_verifications": "residency|address|municipality|verification|attestation",
+      "retention_policies": "retention|GDPR|disposal|purge|archive",
+      "search_analytics": "queries|zero results|trending|Meilisearch",
+      "sso_providers": "single sign-on|OpenID Connect|Entra|identity|login",
+      "support_reports": "bugs|feedback|diagnostics|Sentry"
+    },
     "search_nav": "Search admin...",
     "secrets_vault": "Secrets Vault",
     "sections": {
@@ -19285,16 +22766,28 @@ export default interface Resources {
         "banned": "Banned",
         "bulk_tenants_updated": "Tenants updated",
         "bulk_users_moved": "Users moved",
+        "cancelled": "Cancelled",
         "completed": "Completed",
+        "critical": "Critical",
         "draft": "Draft",
         "failed": "Failed",
         "federation_lockdown": "Federation lockdown",
         "federation_updated": "Federation updated",
+        "high": "High",
         "idle": "Idle",
+        "in_progress": "In progress",
+        "in_review": "In review",
         "inactive": "Inactive",
+        "investigating": "Investigating",
+        "low": "Low",
+        "medium": "Medium",
+        "open": "Open",
         "pending": "Pending",
+        "planned": "Planned",
+        "processing": "Processing",
         "published": "Published",
         "rejected": "Rejected",
+        "resolved": "Resolved",
         "scheduled": "Scheduled",
         "sent": "Sent",
         "suspended": "Suspended",
@@ -19447,6 +22940,39 @@ export default interface Resources {
     "diagnostics": {
       "score_out_of": "out of {{maximum}}"
     },
+    "grapesjs_mjml": {
+      "components": {
+        "body": "Body",
+        "button": "Button",
+        "column": "Column",
+        "divider": "Divider",
+        "group": "Group",
+        "hero": "Hero",
+        "image": "Image",
+        "navbar": "Navigation bar",
+        "navbar_link": "Navigation link",
+        "one_column": "1 column",
+        "raw": "Raw",
+        "section": "Section",
+        "social_element": "Social element",
+        "social_group": "Social group",
+        "spacer": "Spacer",
+        "text": "Text",
+        "three_columns": "3 columns",
+        "two_columns": "2 columns",
+        "wrapper": "Wrapper"
+      },
+      "panels": {
+        "desktop": "Desktop",
+        "export_mjml": "Export MJML",
+        "import": "Import",
+        "import_mjml": "Import MJML",
+        "mobile": "Mobile",
+        "redo": "Redo",
+        "tablet": "Tablet",
+        "undo": "Undo"
+      }
+    },
     "newsletter_activity": {
       "all_events": "All events",
       "all_openers_clicked": "Every opener clicked at least one link.",
@@ -19493,6 +23019,7 @@ export default interface Resources {
       "bounce_type_complaint": "Complaint",
       "bounce_type_hard": "Hard bounce",
       "bounce_type_soft": "Soft bounce",
+      "bounce_type_unknown": "Unknown bounce type",
       "col_bounce_count": "Bounce count",
       "col_campaign": "Campaign",
       "col_date": "Date",
@@ -19563,6 +23090,78 @@ export default interface Resources {
       "empty_start_blank": "Start blank",
       "empty_start_template": "Browse templates",
       "empty_title": "Start your design",
+      "grapesjs": {
+        "content": {
+          "blank_canvas": "Start designing your email…",
+          "button": "Button",
+          "column_one": "Content 1",
+          "column_three": "Content 3",
+          "column_two": "Content 2",
+          "example_image": "Example image",
+          "hero_button": "ORDER YOUR TICKET NOW",
+          "hero_heading": "GO TO SPACE",
+          "link": "Link",
+          "nav_components": "Components",
+          "nav_getting_started": "Getting started",
+          "nav_templates": "Templates",
+          "nav_try_live": "Try it live",
+          "text": "Insert text here",
+          "wrapper_first_line": "First line of text",
+          "wrapper_second_line": "Second line of text"
+        },
+        "options": {
+          "bottom": "Bottom",
+          "center": "Centre",
+          "dashed": "Dashed",
+          "dotted": "Dotted",
+          "double": "Double",
+          "groove": "Groove",
+          "horizontal": "Horizontal",
+          "inset": "Inset",
+          "italic": "Italic",
+          "justify": "Justify",
+          "left": "Left",
+          "line_through": "Line-through",
+          "middle": "Middle",
+          "none": "None",
+          "normal": "Normal",
+          "off": "Off",
+          "on": "On",
+          "outset": "Outset",
+          "ridge": "Ridge",
+          "right": "Right",
+          "solid": "Solid",
+          "top": "Top",
+          "underline": "Underline",
+          "vertical": "Vertical"
+        },
+        "placeholders": {
+          "direction": "e.g. rtl",
+          "language": "e.g. en",
+          "owa": "e.g. desktop"
+        },
+        "styles": {
+          "align": "Alignment",
+          "background_image": "Background image",
+          "border": "Border",
+          "container_background_color": "Container background colour",
+          "font_style": "Font style",
+          "icon_size": "Icon size",
+          "text_decoration": "Text decoration",
+          "vertical_align": "Vertical align"
+        },
+        "traits": {
+          "direction": "Text direction",
+          "full_width": "Full width",
+          "hamburger": "Hamburger menu",
+          "icon": "Icon",
+          "language": "Language",
+          "mode": "Mode",
+          "owa": "Outlook Web App support",
+          "relationship": "Relationship",
+          "source": "Source"
+        }
+      },
       "hide_blocks": "Hide blocks",
       "hide_inspector": "Hide inspector",
       "insert_image": "Insert image",
@@ -19684,6 +23283,9 @@ export default interface Resources {
       "failure_penalty": "Failure Penalty",
       "gmail_api": "Gmail API",
       "health": "Health",
+      "health_at_least": "{{value}} or higher",
+      "health_below": "Below {{value}}",
+      "health_range": "{{min}}–{{max}}",
       "loading": "Loading",
       "no_penalties": "No penalties found",
       "pending": "Pending",
@@ -19716,6 +23318,7 @@ export default interface Resources {
       "volume_bonus": "Volume Bonus"
     },
     "newsletter_form": {
+      "ab_split_description": "Variant A receives {{variantA}} of the test audience; variant B receives {{variantB}}.",
       "ab_test_enabled": "Enabled ({{a}}/{{b}})",
       "ab_test_label": "Ab Test",
       "ab_test_short": "A/B",
@@ -19901,9 +23504,11 @@ export default interface Resources {
       "top_recommended": "Best send windows"
     },
     "newsletter_templates": {
+      "category_count": "{{category}} ({{count}})",
       "category_custom": "Custom",
       "category_saved": "Saved",
       "category_starter": "Starter",
+      "category_unknown": "Other",
       "col_created": "Created",
       "col_status": "Status",
       "col_template_name": "Template name",
@@ -19941,7 +23546,7 @@ export default interface Resources {
       "back_to_templates": "Back to Templates",
       "below_benchmark": "Below benchmark",
       "benchmark_desc": "Benchmark.",
-      "benchmark_difference": "{{pointSign}}{{pointValue}} pp ({{percentSign}}{{percentValue}}%)",
+      "benchmark_difference": "{{pointValue}} pp ({{percentValue}})",
       "bounce_type_all": "All bounce types",
       "bounce_type_complaint": "Complaint",
       "bounce_type_hard": "Hard bounce",
@@ -20247,7 +23852,11 @@ export default interface Resources {
       "stat_total_bounces_7d": "Bounces in 7 days",
       "stats": "Stats",
       "status_active": "Active",
+      "status_draft": "Draft",
       "status_inactive": "Inactive",
+      "status_scheduled": "Scheduled",
+      "status_sending": "Sending",
+      "status_sent": "Sent",
       "subscribe_link_copied_to_clipboard": "Subscribe Link Copied to Clipboard",
       "subscriber_added": "Subscriber Added",
       "subscriber_removed": "Subscriber Removed",
@@ -20337,6 +23946,7 @@ export default interface Resources {
       "field_profile_type": "Profile type",
       "field_town": "Town/City",
       "field_transaction_count": "Transaction count",
+      "field_unknown": "Unknown field",
       "field_user_role": "User role",
       "label_description": "Description",
       "label_field": "Field",
@@ -20361,12 +23971,14 @@ export default interface Resources {
       "operator_less_than": "Less than",
       "operator_not_equals": "Not equals",
       "operator_not_in": "Not in",
+      "operator_unknown": "Unknown operator",
       "operator_within_km": "Within (km)",
       "option_admin": "Admin",
       "option_broker": "Broker",
       "option_individual": "Individual",
       "option_member": "Member",
       "option_organisation": "Organisation",
+      "option_unknown": "Unknown option",
       "placeholder_description": "Describe what this segment targets...",
       "placeholder_enter_value": "Enter value...",
       "placeholder_segment_name": "Enter segment name...",
@@ -20377,9 +23989,9 @@ export default interface Resources {
       "section_smart_suggestions": "Smart Suggestions",
       "section_targeting_rules": "Targeting Rules",
       "status_active": "Active",
-      "status_active_hint": "Active Hint",
+      "status_active_hint": "Available for campaign targeting",
       "status_inactive": "Inactive",
-      "status_inactive_hint": "Inactive Hint",
+      "status_inactive_hint": "Excluded from campaign targeting",
       "title_create": "Create",
       "title_edit": "Edit",
       "value_no": "Value No",
@@ -20439,21 +24051,23 @@ export default interface Resources {
       "loading_preview": "Loading preview...",
       "loading_template": "Loading template...",
       "merge_variables_hint": "Merge Variables.",
+      "name_example": "For example, monthly community update",
       "name_required": "Name Required",
       "no_content": "No content found",
       "preview_text_placeholder": "Enter preview text...",
       "return_to_templates": "Return to Templates",
       "save_template": "Save Template",
+      "subject_example": "For example, What's happening this month",
       "subject_label": "Subject",
       "template_not_found": "Template Not Found",
       "template_preview": "Template Preview",
-      "tip_content_width": "Tip Content Width",
-      "tip_inline_css": "Tip Inline CSS",
-      "tip_web_safe_fonts": "Tip Web Safe Fonts",
+      "tip_content_width": "Keep email content around 600px wide for reliable rendering.",
+      "tip_inline_css": "Use simple inline styles for broad email client support.",
+      "tip_web_safe_fonts": "Prefer web-safe fonts for consistent display.",
       "unexpected_error_loading": "Unexpected Error Loading",
       "update_template": "Update Template",
-      "usage_stats_sent": "Usage Stats sent",
-      "usage_stats_sent_plural": "Usage Stats Sent Plural"
+      "usage_stats_sent": "sent",
+      "usage_stats_sent_plural": "sent"
     }
   },
   "admin_not_found_module": {
@@ -20609,7 +24223,8 @@ export default interface Resources {
       "tab_memory_spikes": "Memory Spikes",
       "tab_request_volume": "Request Volume",
       "tab_slow_queries": "Slow Queries",
-      "tab_slow_requests": "Slow Requests"
+      "tab_slow_requests": "Slow Requests",
+      "warning_unknown": "Performance warning"
     },
     "shared": {
       "broker_actions": "Broker Actions",
@@ -20749,7 +24364,8 @@ export default interface Resources {
         "missing_owner_email": "Add the directory owner email.",
         "missing_public_episodes": "Publish at least one approved public episode.",
         "missing_title": "Add a show title.",
-        "show_not_public": "The show must be public, published, and approved before directories can read it."
+        "show_not_public": "The show must be public, published, and approved before directories can read it.",
+        "unknown": "The feed has an unrecognised issue."
       },
       "feed_validation": {
         "errors": "Blocking issues",
@@ -20793,7 +24409,8 @@ export default interface Resources {
         "other": "Other",
         "rights": "Copyright or rights concern",
         "safety": "Safety or harm",
-        "spam": "Spam or misleading content"
+        "spam": "Spam or misleading content",
+        "unknown": "Unrecognised reason"
       },
       "report_unknown_episode": "Episode #{{id}}",
       "reporter": "Reported by {{name}}",
@@ -21170,13 +24787,13 @@ export default interface Resources {
       "subscribers_page": {
         "all": "All",
         "columns": {
-          "email": "EMAIL",
-          "interval": "INTERVAL",
-          "member": "MEMBER",
-          "next_billing": "NEXT BILLING",
-          "started": "STARTED",
-          "status": "STATUS",
-          "tier": "TIER"
+          "email": "Email",
+          "interval": "Interval",
+          "member": "Member",
+          "next_billing": "Next billing",
+          "started": "Started",
+          "status": "Status",
+          "tier": "Tier"
         },
         "description": "Members currently making a monthly or yearly donation.",
         "empty": "No subscribers match the filter.",
@@ -21318,6 +24935,16 @@ export default interface Resources {
       "approval_queued": "Approval queued - provisioning in progress",
       "approve_and_provision": "Approve & Provision",
       "approve_failed": "Failed to approve",
+      "categories": {
+        "agoris_node": "Agoris node",
+        "caring_community": "Caring Community",
+        "community": "Community",
+        "foundation": "Foundation",
+        "kiss_cooperative": "Caring Community cooperative",
+        "platform": "Platform",
+        "timebank": "Timebank",
+        "unknown": "Other community type"
+      },
       "close": "Close",
       "empty_status": "No provisioning requests in this status.",
       "empty_value": "-",
@@ -21350,6 +24977,15 @@ export default interface Resources {
       "retry_failed": "Failed to retry",
       "retry_queued": "Retry queued",
       "reviewed": "Reviewed",
+      "size_buckets": {
+        "1000_5000": "1,000–5,000 members",
+        "250_1000": "250–1,000 members",
+        "50-200": "50–200 members",
+        "5000_plus": "More than 5,000 members",
+        "50_250": "50–250 members",
+        "under_50": "Under 50 members",
+        "unknown": "Size not specified"
+      },
       "statuses": {
         "all": "All",
         "approved": "Approved",
@@ -21357,7 +24993,8 @@ export default interface Resources {
         "pending": "Pending",
         "provisioned": "Provisioned",
         "rejected": "Rejected",
-        "under_review": "Under Review"
+        "under_review": "Under Review",
+        "unknown": "Unknown status"
       },
       "submitted": "Submitted"
     },
@@ -21604,7 +25241,7 @@ export default interface Resources {
     },
     "municipal_impact": {
       "portfolio": {
-        "yoy_value": "{{sign}}{{value}}% YoY"
+        "yoy_value": "{{value}} YoY"
       }
     },
     "municipal_reports": {
@@ -21858,6 +25495,7 @@ export default interface Resources {
         "activities_one": "{{count}} activities",
         "activities_other": "{{count}} activities",
         "disabled": "Disabled",
+        "formatted_hours": "{{value}}h",
         "hours": "{{count}}h",
         "hours_one": "{{count}}h",
         "hours_other": "{{count}}h",
@@ -22071,8 +25709,10 @@ export default interface Resources {
       "tab_top_contributors": "Top Contributors",
       "top_contributors": "Top Contributors",
       "unknown_content_type": "Unknown type: {{type}}",
+      "unknown_period": "Unknown period",
       "unknown_status": "Unknown status: {{status}}",
-      "untitled": "Untitled"
+      "untitled": "Untitled",
+      "week_period": "Week {{week}}, {{year}}"
     },
     "shared": {
       "broker_actions": "Broker Actions",
@@ -23707,6 +27347,7 @@ export default interface Resources {
       "content": "Content",
       "create_resources": "Create Resources",
       "delete_attachment": "Delete attachment",
+      "delete_category_confirm": "Delete the category \"{{name}}\"? Resources assigned to it may become uncategorised.",
       "download_attachment": "Download",
       "drop_file": "Drop a file here or click to browse",
       "edit_article_title": "Edit: {{title}}",
@@ -23763,8 +27404,13 @@ export default interface Resources {
       "sort_order": "Sort Order",
       "sort_order_desc": "Lower numbers appear first. Default is 0.",
       "sort_order_placeholder": "0",
+      "status_archived": "Archived",
+      "status_draft": "Draft",
+      "status_inactive": "Inactive",
+      "status_published": "Published",
       "status_tabs_aria": "Resource status filter",
       "supported_formats": "Supported: Markdown (.md), PDF, Word (.doc, .docx), Text (.txt)",
+      "system": "System",
       "unknown": "Unknown",
       "updated": "Updated",
       "video_url": "YouTube Video URL",
@@ -24128,6 +27774,9 @@ export default interface Resources {
       "save_changes": "Save Changes",
       "save_failed": "Save Failed",
       "severity": "Severity",
+      "status_active": "Active",
+      "status_expired": "Expired",
+      "status_revoked": "Revoked",
       "tab_flagged_messages": "Flagged Messages",
       "tab_guardian_assignments": "Guardian Assignments",
       "tab_member_preferences": "Member Preferences",
@@ -24291,6 +27940,23 @@ export default interface Resources {
         "save_notes": "Save Notes",
         "save_stage": "Save Stage"
       },
+      "breakdown": {
+        "greenfield": "No existing digital tool",
+        "interest_modules": "Modules of interest",
+        "kiss_cooperative": "Caring Community cooperative",
+        "population": "Population",
+        "swiss_market": "Swiss market",
+        "timeline": "Timeline",
+        "unknown": "Other factor"
+      },
+      "budget_values": {
+        "10k_25k": "10,000–25,000",
+        "25k_plus": "More than 25,000",
+        "5k_10k": "5,000–10,000",
+        "medium": "Medium budget",
+        "under_5k": "Under 5,000",
+        "unknown": "Budget not specified"
+      },
       "empty": {
         "body": "Inquiries arrive via the public interest form on the NEXUS sales site. Once submitted, they appear here automatically. Use the stage filter above to check if inquiries exist in other stages.",
         "title": "No pilot inquiries yet."
@@ -24321,6 +27987,13 @@ export default interface Resources {
         "potential": "Potential - investigate further",
         "title": "Fit score scale (0-100):",
         "weak": "Weak fit - low priority"
+      },
+      "module_values": {
+        "caring_community": "Caring Community",
+        "local_marketplace": "Local marketplace",
+        "municipal_announcements": "Municipal announcements",
+        "time_banking": "Timebanking",
+        "unknown": "Other module"
       },
       "page_subtitle": "Manage incoming Gemeinde pilot region expressions of interest",
       "page_title": "Pilot Inquiries",
@@ -24362,6 +28035,7 @@ export default interface Resources {
       },
       "values": {
         "asap": "ASAP",
+        "country_region": "{{country}} · {{region}}",
         "empty": "-",
         "months": "{{count}} months",
         "months_one": "{{count}} months",
@@ -24410,10 +28084,10 @@ export default interface Resources {
       "account_status": "Account Status",
       "action_edit": "Edit",
       "action_failed": "Failed",
-      "action_grant_global_sa": "Grant Global Sa",
-      "action_grant_tenant_sa": "Grant Tenant Sa",
-      "action_revoke_global_sa": "Revoke Global Sa",
-      "action_revoke_tenant_sa": "Revoke Tenant Sa",
+      "action_grant_global_sa": "Grant global super-admin access",
+      "action_grant_tenant_sa": "Grant tenant super-admin access",
+      "action_revoke_global_sa": "Revoke global super-admin access",
+      "action_revoke_tenant_sa": "Revoke tenant super-admin access",
       "action_view": "View",
       "activate_lockdown": "Activate Lockdown",
       "activate_tenants": "Activate",
@@ -24432,6 +28106,36 @@ export default interface Resources {
       "apply_to_n_tenants_one": "Apply to {{count}} tenants",
       "apply_to_n_tenants_other": "Apply to {{count}} tenants",
       "aria_remove_admin": "Remove {{name}} as admin",
+      "audit_action_bulk_tenants_updated": "Tenants updated in bulk",
+      "audit_action_bulk_users_moved": "Users moved in bulk",
+      "audit_action_federation_controls_updated": "Federation controls updated",
+      "audit_action_federation_feature_toggle": "Federation feature changed",
+      "audit_action_federation_lockdown": "Partner network locked down",
+      "audit_action_federation_partnership_suspend": "Partnership suspended",
+      "audit_action_federation_partnership_terminate": "Partnership ended",
+      "audit_action_federation_updated": "Partner network updated",
+      "audit_action_federation_whitelist_add": "Tenant added to the federation allow-list",
+      "audit_action_federation_whitelist_remove": "Tenant removed from the federation allow-list",
+      "audit_action_tenant_created": "Tenant created",
+      "audit_action_tenant_updated": "Tenant updated",
+      "audit_action_unknown": "Unrecognised action",
+      "audit_action_user_created": "User created",
+      "audit_action_user_moved": "User moved",
+      "audit_bulk_action": {
+        "activate": "activate",
+        "deactivate": "deactivate",
+        "disable_hub": "disable hub",
+        "enable_hub": "enable hub",
+        "unknown": "unknown action"
+      },
+      "audit_display": {
+        "bulk_tenants_update_target": "Bulk tenant update: {{action}}",
+        "bulk_tenants_updated": "Tenant update completed — count: {{count}}, action: {{action}}.",
+        "bulk_users_move_target": "Bulk move to {{tenant}}",
+        "bulk_users_moved": "User move completed — count: {{count}}, target: {{tenant}}.",
+        "bulk_users_moved_with_super_admin": "User move with super-administrator access completed — count: {{count}}, target: {{tenant}}.",
+        "unknown": "Audit detail: {{code}}"
+      },
       "audit_log": "Audit Log",
       "back": "Back",
       "back_to_tenants": "Back to Tenants",
@@ -24481,7 +28185,7 @@ export default interface Resources {
       "cat_whitelist": "Whitelist",
       "clear": "Clear",
       "clear_filters": "Clear Filters",
-      "col_action": "Col",
+      "col_action": "Action",
       "col_actions": "Actions",
       "col_actor": "Actor",
       "col_category": "Category",
@@ -24515,28 +28219,28 @@ export default interface Resources {
       "confirm_delete_tenant_message": "This will permanently delete the tenant record. This action cannot be undone.",
       "confirm_delete_tenant_title": "Delete this tenant?",
       "confirm_delete_title": "Are you sure you want to delete title?",
-      "confirm_grant_global_label": "Confirm Grant Global",
-      "confirm_grant_global_message": "Confirm Grant Global",
-      "confirm_grant_global_message_detail": "Are you sure you want to grant global message detail?",
-      "confirm_grant_global_title": "Are you sure you want to grant global title?",
-      "confirm_grant_sa_label": "Confirm Grant Sa",
-      "confirm_grant_sa_message": "Confirm Grant Sa",
-      "confirm_grant_sa_message_detail": "Are you sure you want to grant sa message detail?",
-      "confirm_grant_sa_title": "Are you sure you want to grant sa title?",
+      "confirm_grant_global_label": "Grant access",
+      "confirm_grant_global_message": "Grant global super-admin access to this user?",
+      "confirm_grant_global_message_detail": "This user will be able to administer every tenant.",
+      "confirm_grant_global_title": "Grant global super-admin access?",
+      "confirm_grant_sa_label": "Grant access",
+      "confirm_grant_sa_message": "Grant tenant super-admin access to this user?",
+      "confirm_grant_sa_message_detail": "This user will be able to administer the selected tenant.",
+      "confirm_grant_sa_title": "Grant tenant super-admin access?",
       "confirm_reactivate": "Confirm Reactivate",
       "confirm_reactivate_label": "Confirm Reactivate",
       "confirm_reactivate_message": "Confirm Reactivate",
       "confirm_reactivate_tenant_message": "This tenant will be restored to active status.",
       "confirm_reactivate_tenant_title": "Reactivate this tenant?",
       "confirm_reactivate_title": "Are you sure you want to reactivate title?",
-      "confirm_revoke_global_label": "Confirm Revoke Global",
-      "confirm_revoke_global_message": "Confirm Revoke Global",
-      "confirm_revoke_global_message_detail": "Are you sure you want to revoke global message detail?",
-      "confirm_revoke_global_title": "Are you sure you want to revoke global title?",
-      "confirm_revoke_sa_label": "Confirm Revoke Sa",
-      "confirm_revoke_sa_message": "Confirm Revoke Sa",
-      "confirm_revoke_sa_message_detail": "Are you sure you want to revoke sa message detail?",
-      "confirm_revoke_sa_title": "Are you sure you want to revoke sa title?",
+      "confirm_revoke_global_label": "Revoke access",
+      "confirm_revoke_global_message": "Revoke this user's global super-admin access?",
+      "confirm_revoke_global_message_detail": "This user will no longer be able to administer every tenant.",
+      "confirm_revoke_global_title": "Revoke global super-admin access?",
+      "confirm_revoke_sa_label": "Revoke access",
+      "confirm_revoke_sa_message": "Revoke this user's tenant super-admin access?",
+      "confirm_revoke_sa_message_detail": "This user will no longer be able to administer the selected tenant.",
+      "confirm_revoke_sa_title": "Revoke tenant super-admin access?",
       "confirm_tenant_message": "{{message}}\n\nTenant: {{tenant}}",
       "confirm_toggle_hub": "Confirm Toggle Hub",
       "confirm_toggle_hub_label": "Confirm Toggle Hub",
@@ -24663,14 +28367,14 @@ export default interface Resources {
       "federation_whitelist_title": "Federation Whitelist",
       "first_name_email_and_password_are_requ": "First name, email, and password are required",
       "four_step_workflow": "Four-step workflow",
-      "global_sa": "Global Sa",
+      "global_sa": "Global super admin",
       "god_level_access": "God Level Access",
       "god_level_caution": "God Level Caution",
       "god_level_desc": "God Level.",
-      "grant_global_sa": "Grant Global Sa",
+      "grant_global_sa": "Grant global super-admin access",
       "grant_sa_on_arrival": "Grant tenant super-admin access on arrival",
       "grant_sa_on_arrival_desc": "Promote moved users to tenant super admins in the target tenant.",
-      "grant_tenant_sa": "Grant Tenant Sa",
+      "grant_tenant_sa": "Grant tenant super-admin access",
       "grant_tenant_sa_desc": "Allow this user to administer the selected tenant.",
       "granted": "Granted",
       "granted_god_level": "Granted god-level access",
@@ -24987,11 +28691,15 @@ export default interface Resources {
       "remove_from_whitelist": "Remove From Whitelist",
       "removed_from_whitelist": "Removed from Whitelist",
       "retry": "Retry",
-      "revoke_global_sa": "Revoke Global Sa",
-      "revoke_tenant_sa": "Revoke Tenant Sa",
-      "role_admin": "Role Admin",
-      "role_member": "Role Member",
-      "role_tenant_admin": "Role Tenant Admin",
+      "revoke_global_sa": "Revoke global super-admin access",
+      "revoke_tenant_sa": "Revoke tenant super-admin access",
+      "role_admin": "Admin",
+      "role_broker": "Broker",
+      "role_god": "Platform owner",
+      "role_member": "Member",
+      "role_super_admin": "Super admin",
+      "role_tenant_admin": "Tenant admin",
+      "role_unknown": "Unknown role",
       "search_tenants_placeholder": "Enter search tenants...",
       "search_users_placeholder": "Enter search users...",
       "section_actions": "Actions",
@@ -25026,8 +28734,11 @@ export default interface Resources {
       "standard_tenant": "Standard Tenant",
       "status_active": "Active",
       "status_active_label": "Active",
+      "status_banned": "Banned",
       "status_configured": "Configured",
+      "status_deleted": "Deleted",
       "status_disabled": "Disabled",
+      "status_inactive": "Inactive",
       "status_inactive_label": "Inactive",
       "status_lockdown": "Locked Down",
       "status_normal": "Normal",
@@ -25035,6 +28746,7 @@ export default interface Resources {
       "status_pending": "Pending",
       "status_suspended": "Suspended",
       "status_terminated": "Terminated",
+      "status_unknown": "Unknown status",
       "step_number": "Step {{number}}.",
       "subtenant_capability": "Subtenant Capability",
       "super_admin_privileges": "Super Admin Privileges",
@@ -25069,6 +28781,7 @@ export default interface Resources {
       "target_type_bulk": "Target Type Bulk",
       "target_type_federation": "Target Type Federation",
       "target_type_tenant": "Target Type Tenant",
+      "target_type_unknown": "Unknown target type",
       "target_type_user": "Target Type User",
       "tenant_action_succeeded": "Tenant action succeeded",
       "tenant_action_success": "Tenant Action succeeded",
@@ -25089,8 +28802,8 @@ export default interface Resources {
       "tenant_not_found": "Tenant Not Found",
       "tenant_reactivated": "Tenant Reactivated",
       "tenant_removed_from_whitelist": "Tenant Removed from Whitelist",
-      "tenant_sa": "Tenant Sa",
-      "tenant_sa_desc": "Tenant Sa.",
+      "tenant_sa": "Tenant super admin",
+      "tenant_sa_desc": "Can administer this tenant.",
       "tenant_super_admin": "Tenant Super Admin",
       "tenant_with_id": "Tenant {{id}}",
       "tenants": "Tenants",
@@ -25445,6 +29158,34 @@ export default interface Resources {
         "search": "Search reference, route, reporter, or summary",
         "status": "Status"
       },
+      "handoff": {
+        "field": "{{label}}: {{value}}",
+        "headings": {
+          "diagnostics": "Diagnostics:",
+          "summary": "Summary:",
+          "triage_notes": "Triage notes:",
+          "user_description": "User description:"
+        },
+        "labels": {
+          "created": "Created",
+          "impact": "Impact",
+          "page_url": "Page URL",
+          "reporter": "Reporter",
+          "route": "Route",
+          "sentry_event": "Sentry event",
+          "sentry_issue": "Sentry issue",
+          "status": "Status",
+          "tenant": "Community",
+          "user_agent": "User agent"
+        },
+        "no_diagnostics": "No diagnostics were included.",
+        "none_yet": "None yet.",
+        "not_provided": "Not provided",
+        "reporter_with_email": "{{name}} <{{email}}> (user {{id}})",
+        "reporter_without_email": "{{name}} (user {{id}})",
+        "title": "Support report {{reference}}",
+        "unknown_reporter": "Unknown reporter"
+      },
       "impact": {
         "all": "All impacts",
         "blocked": "Blocked",
@@ -25608,6 +29349,7 @@ export default interface Resources {
       "status_completed": "Completed",
       "status_failed": "Failed",
       "status_partial": "Partial",
+      "status_unknown": "Unknown status",
       "type_activity_log": "Activity log",
       "type_activity_log_desc": "Member and system activity trail (logins, record changes).",
       "type_admin_audit_log": "Admin audit log",
@@ -25618,6 +29360,7 @@ export default interface Resources {
       "type_login_attempts_desc": "Successful and failed sign-in attempt records.",
       "type_notifications": "Notifications",
       "type_notifications_desc": "In-app bell notifications delivered to members.",
+      "type_unknown": "Unknown data type",
       "type_vol_guardian_consents": "Guardian consents",
       "type_vol_guardian_consents_desc": "Guardian consent records for minors, purged this many days after the consent expires.",
       "type_vol_mood_checkins": "Volunteer mood check-ins",
@@ -25717,6 +29460,7 @@ export default interface Resources {
       "preset_entra_hint": "For Microsoft Entra ID, the issuer URL is https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
       "preset_generic": "Generic OIDC",
       "preset_hivebrite": "Hivebrite",
+      "preset_unknown": "Unknown preset",
       "refresh": "Refresh",
       "save": "Save",
       "save_failed": "Failed to save provider",
@@ -25810,6 +29554,7 @@ export default interface Resources {
         "safeguarding_preferences_viewed": "Safeguarding Preferences Viewed (User)",
         "safeguarding_triggers_activated": "Safeguarding Triggers Activated",
         "tenant_bootstrap": "Tenant Bootstrapped",
+        "unknown": "Unknown action",
         "updated_deliverable_status": "Deliverable Status Updated",
         "vetting_bulk_delete": "Bulk Delete Vetting Records",
         "vetting_bulk_reject": "Bulk Reject Vetting Records",
@@ -25823,8 +29568,22 @@ export default interface Resources {
         "welcome_credits_issued": "Welcome Credits Issued"
       },
       "active": "Active",
+      "activity_details": {
+        "blog_post_created": "Created blog post #{{id}}: {{title}}",
+        "blog_post_deleted": "Deleted blog post #{{id}}: {{title}}",
+        "blog_post_status_changed": "Changed blog post #{{id}} status from {{old_status}} to {{new_status}}.",
+        "blog_post_updated": "Updated blog post #{{id}}: {{title}}",
+        "blog_posts_bulk_deleted": "Blog posts deleted in bulk: {{count}}",
+        "blog_posts_bulk_published": "Blog posts published in bulk: {{count}}",
+        "unknown": "Activity detail: {{code}}"
+      },
       "activity_log_desc": "View a log of all admin actions taken on this platform",
       "activity_log_title": "Activity Log",
+      "activity_status": {
+        "draft": "draft",
+        "published": "published",
+        "unknown": "Unknown status"
+      },
       "additional_configuration": "Additional configuration",
       "additional_configuration_desc": "Localization, wallet, content moderation, notifications, and limits. These settings save independently from the form above.",
       "admin_approval_required": "Admin approval required",
@@ -25833,6 +29592,9 @@ export default interface Resources {
       "admin_settings_title": "Admin Settings",
       "advanced_custom_settings": "Advanced Custom Settings",
       "advanced_policy": "Advanced policy",
+      "alert_status_critical": "Critical",
+      "alert_status_healthy": "Healthy",
+      "alert_status_warning": "Warning",
       "all_checks_passed": "All checks passed",
       "all_health_checks_passed": "All health checks passed",
       "already_webp": "Already WebP",
@@ -25919,12 +29681,193 @@ export default interface Resources {
       "cron_gcp_step_1_title": "Step 1: SSH into your instance",
       "cron_gcp_step_2_title": "Step 2: Add a host crontab entry",
       "cron_http_warning_prefix": "call any HTTP cron endpoints. The host cron must invoke",
+      "cron_job_description_unknown": "Runs a scheduled background task.",
       "cron_job_logs_desc": "View logs for all scheduled cron job executions",
       "cron_job_logs_title": "Cron Job Logs",
+      "cron_job_name_unknown": "Scheduled task",
       "cron_job_settings_desc": "Configure settings for background job execution",
       "cron_job_settings_title": "Cron Job Settings",
       "cron_job_setup_desc": "Set up cron jobs to run on a custom schedule",
       "cron_job_setup_title": "Cron Job Setup",
+      "cron_jobs": {
+        "abuse_cleanup": {
+          "description": "Archives old alerts and dismisses low-severity items automatically.",
+          "name": "Abuse alert cleanup"
+        },
+        "abuse_daily_report": {
+          "description": "Sends the daily abuse detection report to administrators.",
+          "name": "Daily abuse report"
+        },
+        "abuse_detection": {
+          "description": "Scans transactions for possible abuse patterns.",
+          "name": "Abuse detection"
+        },
+        "badge_checker": {
+          "name": "Badge award checker"
+        },
+        "balance_alerts": {
+          "description": "Checks organisation wallet balances and sends low-balance alerts.",
+          "name": "Balance alerts"
+        },
+        "cleanup": {
+          "description": "Removes expired tokens, old queue entries, API tokens, and tracking data.",
+          "name": "System cleanup"
+        },
+        "daily_digest": {
+          "description": "Sends daily notification digest emails to members who selected daily delivery.",
+          "name": "Daily digest"
+        },
+        "digest_emails": {
+          "name": "Email digest sender"
+        },
+        "event_reminders": {
+          "description": "Sends reminders before upcoming events.",
+          "name": "Event reminders"
+        },
+        "expire_verifications": {
+          "description": "Expires verification sessions abandoned for more than 72 hours.",
+          "name": "Expire abandoned verifications"
+        },
+        "federation_weekly_digest": {
+          "description": "Sends a federation activity digest to participating communities.",
+          "name": "Monthly federation digest"
+        },
+        "gamification_campaigns": {
+          "description": "Processes recurring achievement campaigns.",
+          "name": "Process achievement campaigns"
+        },
+        "gamification_challenges": {
+          "description": "Expires completed challenges and updates their statuses.",
+          "name": "Check challenge expirations"
+        },
+        "gamification_cleanup": {
+          "description": "Removes old experience notifications, campaign awards, and analytics data.",
+          "name": "Gamification cleanup"
+        },
+        "gamification_daily": {
+          "description": "Processes streak resets, daily bonuses, and badge checks.",
+          "name": "Daily gamification tasks"
+        },
+        "gamification_leaderboard": {
+          "description": "Creates daily leaderboard snapshots and finalises seasons.",
+          "name": "Leaderboard snapshot"
+        },
+        "gamification_streaks": {
+          "description": "Checks and awards member streak milestones.",
+          "name": "Gamification streak milestones"
+        },
+        "gamification_weekly_digest": {
+          "description": "Sends monthly progress digest emails to members.",
+          "name": "Monthly gamification digest"
+        },
+        "geocode_batch": {
+          "description": "Geocodes members and listings that are missing coordinates.",
+          "name": "Batch geocoding"
+        },
+        "goal_reminders": {
+          "description": "Sends reminders for goals that are due or behind schedule.",
+          "name": "Goal reminders"
+        },
+        "group_weekly_digest": {
+          "description": "Sends monthly analytics digest emails to group owners.",
+          "name": "Monthly group digests"
+        },
+        "inactive_members": {
+          "description": "Finds and flags inactive members for follow-up.",
+          "name": "Inactive member detection"
+        },
+        "job_expiry": {
+          "description": "Expires job vacancies after their closing date.",
+          "name": "Job vacancy expiry"
+        },
+        "listing_expiry": {
+          "description": "Expires listings after their expiry date.",
+          "name": "Listing expiry processing"
+        },
+        "listing_expiry_reminders": {
+          "description": "Warns listing owners before a listing expires.",
+          "name": "Listing expiry reminders"
+        },
+        "match_digest_daily": {
+          "description": "Sends daily match recommendations to members.",
+          "name": "Daily match digest"
+        },
+        "match_digest_weekly": {
+          "description": "Sends a weekly match recommendation summary.",
+          "name": "Weekly match digest"
+        },
+        "notify_hot_matches": {
+          "description": "Notifies members about new high-scoring matches.",
+          "name": "Hot match notifications"
+        },
+        "process_newsletter_queue": {
+          "description": "Processes queued newsletter deliveries in batches.",
+          "name": "Newsletter queue processor"
+        },
+        "process_newsletters": {
+          "description": "Finds newsletters due for delivery and starts the sending process.",
+          "name": "Process scheduled newsletters"
+        },
+        "process_queue": {
+          "description": "Processes pending instant notifications for immediate delivery.",
+          "name": "Instant notification queue"
+        },
+        "process_recurring": {
+          "description": "Processes recurring and automated newsletters.",
+          "name": "Process recurring newsletters"
+        },
+        "purge_verification_sessions": {
+          "description": "Purges completed and expired verification sessions after 180 days.",
+          "name": "Purge old verification data"
+        },
+        "recurring_shifts": {
+          "description": "Generates upcoming volunteer shifts from recurring templates.",
+          "name": "Generate recurring shifts"
+        },
+        "retry_failed_webhooks": {
+          "description": "Retries webhook deliveries that previously failed.",
+          "name": "Retry failed webhooks"
+        },
+        "run_all": {
+          "description": "Runs the appropriate scheduled tasks for the current time. All other jobs run through this scheduler entry.",
+          "name": "Master cron runner"
+        },
+        "streak_updater": {
+          "name": "Login streak updater"
+        },
+        "update_featured_groups": {
+          "description": "Updates featured groups using the ranking rules.",
+          "name": "Update featured groups"
+        },
+        "verification_reminders": {
+          "description": "Reminds members about incomplete identity verifications.",
+          "name": "Verification reminders"
+        },
+        "volunteer_expire_consents": {
+          "description": "Expires guardian consent records after their expiry date.",
+          "name": "Expire guardian consents"
+        },
+        "volunteer_expiry_warnings": {
+          "description": "Warns volunteers about credentials and training that will soon expire.",
+          "name": "Volunteer credential expiry"
+        },
+        "volunteer_lapsed_nudge": {
+          "description": "Nudges volunteers who have not been active recently.",
+          "name": "Lapsed volunteer nudge"
+        },
+        "volunteer_post_shift": {
+          "description": "Requests feedback after completed volunteer shifts.",
+          "name": "Volunteer post-shift feedback"
+        },
+        "volunteer_pre_shift": {
+          "description": "Sends reminders before volunteer shifts.",
+          "name": "Volunteer pre-shift reminders"
+        },
+        "weekly_digest": {
+          "description": "Sends the monthly notification digest on the first day of each month.",
+          "name": "Monthly digest"
+        }
+      },
       "cron_jobs_desc": "Manage scheduled background jobs for your platform",
       "cron_jobs_title": "Cron Jobs",
       "cron_linux_step_1_title": "Step 1: Open your crontab",
@@ -26037,6 +29980,17 @@ export default interface Resources {
       "install_prompt": "Install Prompt",
       "install_prompt_desc": "Install Prompt.",
       "invite_code_deactivated": "Invite code deactivated",
+      "job_category_gamification": "Gamification",
+      "job_category_geocoding": "Geocoding",
+      "job_category_groups": "Groups",
+      "job_category_maintenance": "Maintenance",
+      "job_category_master": "Master",
+      "job_category_matching": "Matching",
+      "job_category_newsletters": "Newsletters",
+      "job_category_notifications": "Notifications",
+      "job_category_other": "Other",
+      "job_category_security": "Security",
+      "job_category_unknown": "Unknown category",
       "job_count": "Job",
       "job_settings_saved_successfully": "Job settings saved successfully",
       "job_triggered": "Job Triggered",
@@ -26375,7 +30329,7 @@ export default interface Resources {
       "platform_linux_vps": "Linux / VPS",
       "please_select_a_date": "Please Select a Date",
       "powered_by_branding_desc": "Configure the footer's right-hand 'Powered By' slot. Changes take effect immediately. God-only.",
-      "powered_by_branding_section": "Powered By Branding",
+      "powered_by_branding_section": "Powered-by branding",
       "powered_by_image_uploaded": "Image uploaded",
       "processing_heading": "Processing",
       "provider_available": "Provider Available",
@@ -26607,6 +30561,16 @@ export default interface Resources {
         "api_unavailable": "Health check API unavailable",
         "run_all": "Run all tests",
         "suites": "Test suites",
+        "tests": {
+          "api_health": "API health check",
+          "auth_token": "Authentication token generation",
+          "database": "Database connection",
+          "email_service": "Email service",
+          "file_upload": "File upload (S3 or local)",
+          "pusher": "Pusher WebSocket",
+          "redis": "Redis connection",
+          "tenant_bootstrap": "Tenant bootstrap"
+        },
         "unknown_test": "Diagnostic: {{name}}"
       },
       "test_runner_desc": "Run automated tests to verify platform functionality",
@@ -26628,6 +30592,12 @@ export default interface Resources {
       "user_approved_activated": "User Approved Activated",
       "user_verification_rejected": "User Verification Rejected",
       "verification_checklist": "Verification checklist",
+      "verification_level_document_only": "Document only",
+      "verification_level_document_selfie": "Document and selfie",
+      "verification_level_manual_review": "Manual review",
+      "verification_level_none": "None",
+      "verification_level_reusable_digital_id": "Reusable digital ID",
+      "verification_level_unknown": "Unknown verification level",
       "verify": "Verify",
       "webp_all_converted": "WebP All Converted",
       "webp_conversion_complete": "WebP Conversion Complete",
@@ -26642,6 +30612,11 @@ export default interface Resources {
       "your_community": "your community"
     },
     "verification": {
+      "actor_type_admin": "Administrator",
+      "actor_type_system": "System",
+      "actor_type_unknown": "Unknown actor",
+      "actor_type_user": "User",
+      "actor_type_webhook": "Webhook",
       "approve": "Approve",
       "approve_confirm_prefix": "Are you sure you want to",
       "approve_confirm_suffix": "? This will grant them verified status.",
@@ -26688,6 +30663,13 @@ export default interface Resources {
       "pending_reviews_aria": "Pending verification reviews",
       "pending_reviews_title": "Pending Reviews",
       "previous": "Previous",
+      "provider_idenfy": "iDenfy",
+      "provider_jumio": "Jumio",
+      "provider_mock": "Mock provider",
+      "provider_onfido": "Onfido",
+      "provider_stripe_identity": "Stripe Identity",
+      "provider_unknown": "Unknown provider",
+      "provider_veriff": "Veriff",
       "refresh_aria": "Refresh audit log",
       "refresh_pending_reviews_aria": "Refresh pending reviews",
       "reject": "Reject",
@@ -26702,6 +30684,7 @@ export default interface Resources {
       "status_pending": "Pending",
       "status_processing": "Processing",
       "status_started": "Started",
+      "status_unknown": "Unknown status",
       "total_events": "{{count}} events",
       "total_events_one": "{{count}} events",
       "total_events_other": "{{count}} events",
@@ -26793,6 +30776,13 @@ export default interface Resources {
       "adjust_balance": "Adjust Balance",
       "adjust_balance_for": "Adjust Balance for",
       "alert_status_updated": "Alert status updated",
+      "alert_type_balance_anomaly": "Balance anomaly",
+      "alert_type_circular_transfer": "Circular transfer",
+      "alert_type_high_velocity": "High transaction velocity",
+      "alert_type_inactive_high_balance": "Inactive account with a high balance",
+      "alert_type_large_transfer": "Large transfer",
+      "alert_type_rapid_transfers": "Rapid transfers",
+      "alert_type_unknown": "Unknown alert type",
       "an_unexpected_error_occurred": "An unexpected error occurred",
       "back_to_timebanking": "Back to Timebanking",
       "balance_adjusted": "Balance Adjusted",
@@ -27083,6 +31073,7 @@ export default interface Resources {
         "given": "Consent Given",
         "not_consented": "Not Consented",
         "not_given": "Consent not given",
+        "type_unknown": "Unknown consent type",
         "withdrawn_on": "Withdrawn on"
       },
       "descriptions": {
@@ -27126,6 +31117,23 @@ export default interface Resources {
         "status": "Status",
         "tagline": "Tagline",
         "tenant_super_admin": "Tenant Super Admin"
+      },
+      "insurance": {
+        "status_expired": "Expired",
+        "status_none": "None",
+        "status_pending": "Pending",
+        "status_rejected": "Rejected",
+        "status_revoked": "Revoked",
+        "status_submitted": "Submitted",
+        "status_unknown": "Unknown status",
+        "status_verified": "Verified",
+        "type_employers_liability": "Employers' liability",
+        "type_other": "Other",
+        "type_personal_accident": "Personal accident",
+        "type_product_liability": "Product liability",
+        "type_professional_indemnity": "Professional indemnity",
+        "type_public_liability": "Public liability",
+        "type_unknown": "Unknown insurance type"
       },
       "loading": {
         "compliance": "Loading Compliance",
@@ -27376,6 +31384,7 @@ export default interface Resources {
       "placeholder_select_status": "Select a status...",
       "placeholder_select_type": "Select Type...",
       "reason_placeholder": "Enter reason...",
+      "reset_2fa_reason": "Reset by an administrator",
       "result_failed": "Result failed",
       "result_partial": "Result Partial",
       "result_success": "Result succeeded",
@@ -27386,6 +31395,7 @@ export default interface Resources {
       "role_moderator": "Moderator",
       "role_newsletter_admin": "Newsletter Admin",
       "role_super_admin": "Super Admin",
+      "role_super_admin_short": "Super Admin",
       "role_tenant_admin": "Tenant Admin",
       "role_tenant_super_admin": "Tenant Super Admin",
       "role_unknown": "Unknown role",
@@ -27483,6 +31493,12 @@ export default interface Resources {
       "mark_completed": "Mark completed",
       "page_title": "Donation Refunds",
       "payment_method": "Payment method",
+      "payment_method_bank_transfer": "Bank transfer",
+      "payment_method_card": "Card",
+      "payment_method_cash": "Cash",
+      "payment_method_paypal": "PayPal",
+      "payment_method_stripe": "Stripe",
+      "payment_method_unknown": "Unknown payment method",
       "payment_route": "Payment route",
       "platform_account": "Platform account",
       "refund": "Refund",
@@ -27494,12 +31510,14 @@ export default interface Resources {
       "refunded_total": "Refunded total",
       "route_platform_default": "Platform fallback",
       "route_tenant_connect": "Tenant Connect",
+      "route_unknown": "Unknown payment route",
       "search_placeholder": "Search donations...",
       "status": "Status",
       "status_completed": "Completed",
       "status_failed": "Failed",
       "status_pending": "Pending",
       "status_refunded": "Refunded",
+      "status_unknown": "Unknown status",
       "stripe_account": "Stripe account",
       "total_donations": "Total donations",
       "user_number": "User #{{id}}"
@@ -27536,7 +31554,7 @@ export default interface Resources {
     "volunteering": {
       "action": "Action",
       "action_taken": "Taken",
-      "action_taken_placeholder": "Taken Placeholder",
+      "action_taken_placeholder": "Describe the action taken...",
       "activate": "Activate",
       "active": "Active",
       "active_projects": "Active Projects",
@@ -27546,6 +31564,7 @@ export default interface Resources {
       "activity_type_application_pending": "Application pending",
       "activity_type_donation": "Donation",
       "activity_type_hours_logged": "Hours logged",
+      "activity_type_unknown": "Unknown activity",
       "add_field": "Add",
       "add_webhook": "Add Webhook",
       "adjust_balance": "Adjust",
@@ -27566,6 +31585,7 @@ export default interface Resources {
       "applies_to_opportunity": "Opportunity",
       "applies_to_profile": "Profile",
       "applies_to_shift": "Shift",
+      "applies_to_unknown": "Unknown destination",
       "approvals_tabs_aria": "Volunteer approval status filter",
       "approve": "Approve",
       "approved_abbr": "approved",
@@ -27622,8 +31642,10 @@ export default interface Resources {
       "channel_email": "Email",
       "channel_push": "Push",
       "channel_sms": "SMS",
+      "channel_unknown": "Unknown channel",
       "chart_applications": "Applications",
       "chart_hours": "Hours",
+      "chart_period_unknown": "Unknown period",
       "chart_volunteers": "Volunteers",
       "clear_dates": "Clear dates",
       "clear_selection": "Clear selection",
@@ -27654,7 +31676,7 @@ export default interface Resources {
       "col_guardian_name": "Guardian Name",
       "col_hours": "Hours",
       "col_incident_type": "Incident Type",
-      "col_label": "Col",
+      "col_label": "Label",
       "col_members": "Members",
       "col_minor_name": "Minor Name",
       "col_name": "Name",
@@ -27759,6 +31781,7 @@ export default interface Resources {
       "expense_type_parking": "Parking",
       "expense_type_supplies": "Supplies",
       "expense_type_travel": "Travel",
+      "expense_type_unknown": "Unknown expense type",
       "expense_updated": "Expense updated",
       "expenses_desc": "Review and manage volunteer expense claims.",
       "expenses_page_title": "Volunteer expenses",
@@ -27774,6 +31797,25 @@ export default interface Resources {
       "expiry_alert_title_other": "{{count}} training record expiring within 30 days",
       "expiry_alert_title_plural": "{{count}} training records expiring within 30 days",
       "export": "Export",
+      "export_columns": {
+        "amount": "Amount",
+        "applied": "Applied",
+        "currency": "Currency",
+        "date": "Date",
+        "email": "Email",
+        "has_receipt": "Has receipt",
+        "hours": "Hours",
+        "name": "Name",
+        "opportunity": "Opportunity",
+        "organization": "Organisation",
+        "paid": "Paid",
+        "paid_amount": "Paid amount",
+        "payment_reference": "Payment reference",
+        "status": "Status",
+        "submitted": "Submitted",
+        "type": "Type",
+        "volunteer": "Volunteer"
+      },
       "export_csv": "Export CSV",
       "export_donations": "Export Donations",
       "export_failed": "Export failed",
@@ -27848,6 +31890,7 @@ export default interface Resources {
       "field_type_select": "Select",
       "field_type_text": "Text",
       "field_type_textarea": "Long text",
+      "field_type_unknown": "Unknown field type",
       "field_updated": "Custom field updated",
       "filter_all": "All",
       "filter_by_status": "Filter by status",
@@ -28151,6 +32194,10 @@ export default interface Resources {
       "training_verified": "Training record verified",
       "transaction_by_admin": " by {{name}}",
       "transaction_history": "Transaction History",
+      "transaction_type_admin_adjustment": "Administrator adjustment",
+      "transaction_type_deposit": "Deposit",
+      "transaction_type_unknown": "Unknown transaction type",
+      "transaction_type_volunteer_payment": "Volunteer payment",
       "transactions": "Transactions",
       "trends_title": "Trends",
       "type_children_first": "Children First",
@@ -28196,6 +32243,7 @@ export default interface Resources {
       "webhook_url_placeholder": "https://example.com/webhook",
       "webhooks_heading": "Webhooks",
       "website_placeholder": "https://",
+      "week_period": "{{year}}, week {{week}}",
       "weekly": "Weekly",
       "wellbeing_acknowledge": "Acknowledge",
       "wellbeing_alert_update_failed": "Failed to update wellbeing alert",
@@ -28777,6 +32825,7 @@ export default interface Resources {
       "try_again": "Try another email"
     },
     "login": {
+      "admin_twofa_required": "Two-factor authentication is required for administrator accounts.",
       "back": "Back",
       "back_to_home": "Back to home",
       "community_label": "Community",
@@ -28786,6 +32835,7 @@ export default interface Resources {
       "create_account_link": "Create one",
       "email_label": "Email",
       "email_placeholder": "you@example.com",
+      "failed": "Sign-in failed. Please check your details and try again.",
       "forgot_password": "Forgot password?",
       "hide_password": "Hide password",
       "no_account": "Don't have an account?",
@@ -28811,6 +32861,9 @@ export default interface Resources {
       "twofa_code_label": "Authentication Code",
       "twofa_code_placeholder": "000000",
       "twofa_help": "Lost access to your authenticator? Use a backup code to sign in, or contact your timebank coordinator for help recovering your account.",
+      "twofa_invalid_code": "That authentication code is not valid. Please try again.",
+      "twofa_no_session": "Your two-factor authentication session is no longer active. Please sign in again.",
+      "twofa_session_expired": "Your two-factor authentication session expired. Please sign in again.",
       "twofa_subtitle": "Enter the code from your authenticator app",
       "twofa_title": "Two-Factor Authentication",
       "twofa_trust_device": "Trust this device for {{days}} days",
@@ -28866,6 +32919,7 @@ export default interface Resources {
       "data_protection_title": "Data Protection Notice",
       "email_label": "Email",
       "email_placeholder": "you@example.com",
+      "failed": "Registration failed. Please try again.",
       "first_name_label": "First Name",
       "first_name_placeholder": "John",
       "go_to_login": "Go to Login",
@@ -30276,8 +34330,11 @@ export default interface Resources {
       "retry": "Retry",
       "stage_email_verified": "Email Verified",
       "stage_first_exchange": "First Exchange",
+      "stage_first_listing": "First Listing",
       "stage_profile_complete": "Profile Complete",
       "stage_registered": "Registered",
+      "stage_repeat_user": "Repeat User",
+      "stage_unknown": "Unknown Stage",
       "title": "Onboarding",
       "trend_aria": "Monthly registrations trend chart",
       "trend_registrations": "Registrations",
@@ -30458,6 +34515,7 @@ export default interface Resources {
       "revoked": "Revoked",
       "submitted": "Submitted",
       "suspended": "Suspended",
+      "unknown": "Unknown",
       "unreviewed": "Unreviewed",
       "verified": "Verified"
     },
@@ -31278,6 +35336,7 @@ export default interface Resources {
           "empty": "No analytics data available yet.",
           "modal_title": "Analytics - {{title}}",
           "no_open_text": "No open-text responses yet.",
+          "option_percentage_aria": "{{option}}: {{percentage}}",
           "total_responses": "Total responses"
         },
         "common": {
@@ -35315,6 +39374,7 @@ export default interface Resources {
       "stat_published": "Published",
       "stat_total": "Total courses",
       "status": "Status",
+      "status_unknown": "Unknown status",
       "subtitle": "Moderate courses, manage instructors and categories",
       "tab_courses": "Courses",
       "tab_instructors": "Instructors",
@@ -37310,6 +41370,24 @@ export default interface Resources {
         "must_be_array": ":field must be an array",
         "unknown_key": "Unknown key: :key"
       }
+    },
+    "api": {
+      "download_failed_status": "Download failed (HTTP {{status}}).",
+      "invalid_request": "The request was invalid. Please check your input.",
+      "invalid_response": "The server returned an invalid response.",
+      "network_error": "Unable to connect. Please check your internet connection and try again.",
+      "permission_denied": "You do not have permission to perform this action.",
+      "request_failed": "The request could not be completed.",
+      "request_failed_title": "Request failed",
+      "request_timeout": "The request timed out. Please try again.",
+      "resource_not_found": "The requested resource was not found.",
+      "server_error": "An unexpected server error occurred. Please try again later.",
+      "service_unavailable": "The service is temporarily unavailable. Please try again later.",
+      "too_many_requests": "Too many requests. Please wait a moment and try again.",
+      "upload_cancelled": "Upload cancelled.",
+      "upload_failed": "Upload failed.",
+      "upload_failed_retry": "Upload failed. Please try again.",
+      "upload_timeout": "The upload timed out. Please try again."
     },
     "community_not_found": "Community not found",
     "community_not_found_detail": "This timebank may have moved, been renamed, or may not exist yet.",
@@ -44090,6 +48168,8 @@ export default interface Resources {
     "interview_inline": "Interview: {{date}} ({{type}})",
     "interview_join": "Join Meeting",
     "jobs": {
+      "category_value": "{{category}}",
+      "type_unknown": "Unknown type",
       "view_details": "View job details"
     },
     "kanban": {
@@ -45062,6 +49142,9 @@ export default interface Resources {
       "cta_title": "Have Questions?",
       "effective_label": "Effective: {{date}}",
       "view_previous_versions": "View previous versions of this document"
+    },
+    "custom_document": {
+      "introduction": "Introduction"
     },
     "fadp": {
       "fadp_accept": "Accept AI features",
@@ -46865,6 +50948,7 @@ export default interface Resources {
       "misleading": "Misleading information",
       "other": "Other",
       "payment_issue": "Payment issue",
+      "unknown": "Other reason",
       "unsafe": "Unsafe item"
     },
     "report": {
@@ -46909,7 +50993,8 @@ export default interface Resources {
       "received": "Received",
       "resolved_buyer": "Resolved for buyer",
       "resolved_seller": "Resolved for seller",
-      "under_review": "Under review"
+      "under_review": "Under review",
+      "unknown": "Other case status"
     }
   },
   "matches": {
@@ -49376,6 +53461,23 @@ export default interface Resources {
     },
     "home": {
       "audience_cards": {
+        "defaults": {
+          "exchange": {
+            "cta": "Browse listings",
+            "description": "Browse what people are offering, or post your own request.",
+            "title": "Offer or find help"
+          },
+          "new_here": {
+            "cta": "Get started",
+            "description": "Learn how our community works and how to get involved.",
+            "title": "New here?"
+          },
+          "partner": {
+            "cta": "Learn more",
+            "description": "For organisations, funders, and professionals supporting our members.",
+            "title": "Partner or refer"
+          }
+        },
         "title": "Where would you like to start?"
       },
       "badge": "The Future of Time Banking",
@@ -50713,9 +54815,37 @@ export default interface Resources {
   "success_stories": {
     "after_label": "After",
     "audience_label": "Audience",
+    "audiences": {
+      "all_residents": "All residents",
+      "kanton": "Canton",
+      "municipality": "Municipality",
+      "recipients": "Care recipients",
+      "verein_members": "Association members",
+      "volunteers": "Volunteers"
+    },
     "before_label": "Before",
     "caveat_label": "Method",
     "demo_label": "Demo / illustrative",
+    "demo_stories": {
+      "formal_care_offset": {
+        "evidence_source": "AG76 municipal ROI model (illustrative)",
+        "method_caveat": "Estimate using CHF 35 per hour across 350 hours; the comparison is against the pre-pilot baseline only.",
+        "narrative": "Volunteer hours coordinated through NEXUS represent a CHF 12,250 offset against formal home-care costs during the pilot window, valued at the Swiss formal-care assistant rate.",
+        "title": "CHF 12,250 in formal-care costs offset"
+      },
+      "information_distribution": {
+        "evidence_source": "Peer municipality page (illustrative)",
+        "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+        "narrative": "Coordinators spend roughly a third less time distributing updates after switching to NEXUS. Announcements, member-segment targeting, and confirmation tracking are consolidated in one place.",
+        "title": "30% lower information-distribution effort"
+      },
+      "volunteer_engagement": {
+        "evidence_source": "Peer municipality page (illustrative)",
+        "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+        "narrative": "Pilot communities report a quarter more active volunteer participation after adopting NEXUS, supported by clearer matching, low-friction sign-up, and visible Warmth Pass recognition.",
+        "title": "25% more volunteer engagement"
+      }
+    },
     "empty_state": "No success stories have been published yet. Check back soon — community coordinators are putting cards together.",
     "error_loading": "We couldn't load the success stories right now. Please try again in a moment.",
     "evidence_label": "Evidence",
@@ -51505,7 +55635,7 @@ export default interface Resources {
         "god_has_access": "User has GLOBAL super admin access",
         "god_revoke_btn": "Revoke Global Super Admin",
         "god_revoke_confirm": "REVOKE global super admin? This user will lose access to ALL tenants.",
-        "god_warning": "WARNING:",
+        "god_warning": "Warning:",
         "god_warning_text": "Global Super Admins can access ALL tenants on the platform.",
         "grant_super_admin_btn": "Grant Tenant Super Admin",
         "grant_super_admin_confirm": "Grant Tenant Super Admin privileges to this user? They will be able to manage tenants in their hierarchy.",

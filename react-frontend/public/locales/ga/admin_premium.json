@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Síntiúsóirí",
       "user_fallback": "Úsáideoir #{{id}}",
       "columns": {
-        "member": "COMHALTACH",
-        "email": "EMAIL",
-        "tier": "SRAITH",
-        "interval": "INTERVAL",
-        "status": "STÁDAS",
-        "next_billing": "AN CHÉAD BILLEADH",
-        "started": "TOSAITHE"
+        "member": "Ball",
+        "email": "R-phost",
+        "tier": "Sraith",
+        "interval": "Idirghabháil",
+        "status": "Stádas",
+        "next_billing": "Billeála eile",
+        "started": "Tosaíodh"
       },
       "status": {
         "active": "Gníomhach",
@@ -134,14 +134,14 @@
     "table": {
       "aria": "Sraitheanna préimhe",
       "name": "AINM",
-      "slug": "SLUG",
       "price_month": "PRAGHAS / MÍ",
       "price_year": "PRAGHAS / BLIAIN",
       "features": "GNÉITHE",
       "status": "STÁDAS",
       "subscribers": "SUBSCRIBERS",
       "stripe": "STRIPE",
-      "actions": "GNÍOMHAÍOCHTAÍ"
+      "actions": "GNÍOMHAÍOCHTAÍ",
+      "slug": "SLUG"
     },
     "status": {
       "active": "Gníomhach",
@@ -184,36 +184,36 @@
       "settings_load_failed": "Níorbh fhéidir socruithe ródaithe síntiús a lódáil.",
       "settings_saved": "Sábháladh socruithe ródaithe síntiús.",
       "settings_save_failed": "Níorbh fhéidir socruithe ródaithe síntiús a shábháil.",
-      "onboarding_failed": "Níorbh fhéidir tús a chur le stripe onboarding.",
       "finance_load_failed": "Níorbh fhéidir oibríochtaí airgeadais síntiús a luchtú.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Níorbh fhéidir easpórtáil admhála bliantúil a íoslódáil."
+      "annual_receipts_export_failed": "Níorbh fhéidir easpórtáil admhála bliantúil a íoslódáil.",
+      "gift_aid_export_failed": "Níorbh fhéidir an easpórtáil Gift Aid a íoslódáil.",
+      "onboarding_failed": "Níorbh fhéidir tús a chur le onboarding Stripe."
     },
     "settings": {
-      "title": "Ródú stripe",
       "description": "Fág é seo folamh chun cuntas Stripe an ardáin a úsáid le meiteashonraí tionónta. Ceangail cuntas Stripe tionónta chun síntiúis aonuaire agus rialta sa todhchaí a sheoladh chuig an gcuntas tionónta sin.",
       "stripe_connect_account_id": "Aitheantas cuntais Tionónta Stripe Connect",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Cuireann sé seo isteach ar sheiceanna deonacha amach anseo. Leibhéil tacaíochta a athshioncronú tar éis cuntas tionónta a chur leis ionas go mbeidh praghsanna athfhillteacha sa chuntas Stripe sin.",
       "route_platform_default": "Cúlbhrat ardán",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Tosaigh Stripe ar bordáil",
       "continue_onboarding": "Lean ar aghaidh ag dul ar bord Stripe",
-      "requirements_due": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
       "save": "Sábháil ródú",
       "status": {
         "not_connected": "Gan ceangal",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Gníomh de dhíth",
-        "unknown": "Stádas anaithnid"
+        "unknown": "Stádas anaithnid",
+        "pending": "Ar feitheamh",
+        "ready": "Réidh"
       },
       "connect_fallback_active": "Tá cuntas Stripe Connect cumraithe, ach níl sé réidh le haghaidh deonacháin bheo go fóill. Bainfidh íocaíochtaí úsáid as an ardán cúltaca go dtí go mbeidh an bordáil críochnaithe.",
       "requirements_due_few": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
       "requirements_due_many": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
-      "requirements_due_one": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
-      "requirements_due_other": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
-      "requirements_due_two": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}."
+      "requirements_due_two": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
+      "title": "Ródú Stripe",
+      "requirements_due": "Riachtanais cuntais Stripe ag teastáil aire: {{count}}.",
+      "requirements_due_one": "Riachtanais cuntais Stripe ag teastáil aire: {{count}}.",
+      "requirements_due_other": "Riachtanais cuntais Stripe ag teastáil aire: {{count}}.",
+      "route_tenant_connect": "Ceangal Le Cóirí"
     },
     "finance": {
       "title": "Oibríochtaí airgeadais",
@@ -221,16 +221,9 @@
       "completed_volume": "Toirt críochnaithe",
       "platform_fallback_volume": "Toilleadh cúlaithe an ardáin",
       "tenant_connect_volume": "toirte Tenant Connect",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Díospóidí oscailte",
       "active_recurring": "Gníomhach athfhillteach",
       "failed_receipts": "Admhálacha teipthe",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Fáltais bhliantúla a onnmhairiú",
       "empty": "Níl aon ghníomhaíocht airgeadais taifeadta go fóill.",
       "donation_count_few": "{{count}} donation",
@@ -245,7 +238,14 @@
       "past_due_count_many": "{{count}} past due",
       "past_due_count_one": "{{count}} dlite roimhe seo",
       "past_due_count_other": "{{count}} dlite roimhe seo",
-      "past_due_count_two": "{{count}} past due"
+      "past_due_count_two": "{{count}} past due",
+      "gift_aid_ready": "Gift Aid réidh",
+      "export_gift_aid": "Easpórtáil Gift Aid",
+      "donation_count": "{{count}} deontas",
+      "donation_count_other": "{{count}} deontais",
+      "declaration_count": "{{count}} ráiteas",
+      "declaration_count_other": "{{count}} ráitis",
+      "past_due_count": "{{count}} as dáta"
     }
   }
 }

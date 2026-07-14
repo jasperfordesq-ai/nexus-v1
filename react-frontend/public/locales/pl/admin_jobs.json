@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "jobs": {
     "add_edit_notes": "Dodaj / edytuj notatki",
@@ -270,7 +270,10 @@
     "pipeline_minutes_few": "{{count}}min",
     "pipeline_minutes_many": "{{count}}min",
     "pipeline_minutes_one": "{{count}}min",
-    "pipeline_minutes_other": "{{count}}min"
+    "pipeline_minutes_other": "{{count}}min",
+    "stage_unknown": "Inny etap",
+    "type_unknown": "Inny typ pracy",
+    "category_value": "{{category}}"
   },
   "moderation": {
     "action_failed": "Nie udało się",
@@ -295,7 +298,6 @@
     "col_description": "Opis",
     "col_rating": "Ocena",
     "col_reason": "Powód",
-    "col_reporter": "Reporter",
     "col_reviewee": "Recenzent",
     "col_reviewer": "Recenzent",
     "col_status": "Stan",
@@ -489,7 +491,8 @@
     "load_error": "Nie udało się załadować kolejki moderacji.",
     "pagination_label": "Paginacja kolejki moderacji",
     "user_fallback": "Nieznany użytkownik",
-    "rating_aria": "{{n}} z 5 gwiazdek"
+    "rating_aria": "{{n}} z 5 gwiazdek",
+    "col_reporter": "Dziennikarz"
   },
   "something_wrong": "Coś poszło nie tak. Spróbuj ponownie.",
   "spam": {

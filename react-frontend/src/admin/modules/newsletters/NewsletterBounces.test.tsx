@@ -122,7 +122,7 @@ describe('NewsletterBounces — bounce list (default tab)', () => {
 
   it('shows the hard bounce type chip', async () => {
     render(<NewsletterBounces />);
-    const chips = await screen.findAllByText('hard');
+    const chips = await screen.findAllByText('Hard bounce');
     expect(chips.length).toBeGreaterThan(0);
   });
 });

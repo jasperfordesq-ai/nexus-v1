@@ -132,7 +132,7 @@ export default function ReviewsModeration() {
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || t('something_wrong'));
+        toast.error(t('something_wrong'));
       }
     } catch {
       toast.error(t('something_wrong'));

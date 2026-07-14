@@ -37,12 +37,11 @@ function csvCell(value: unknown): string {
   return JSON.stringify(/^[=+\-@\t\r]/.test(str) ? `'${str}` : str);
 }
 
-function exportToCsv(data: Array<Record<string, unknown>>, filename: string) {
-  if (data.length === 0) return;
-  const headers = Object.keys(data[0] ?? {});
+function exportToCsv(headers: string[], rows: unknown[][], filename: string) {
+  if (rows.length === 0) return;
   const csv = [
-    headers.join(','),
-    ...data.map(r => headers.map(h => csvCell(r[h])).join(',')),
+    headers.map(csvCell).join(','),
+    ...rows.map((row) => row.map(csvCell).join(',')),
   ].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -226,14 +225,21 @@ export function VolunteerApprovals() {
   }, [pendingFilteredItems, selectedIds.size]);
 
   const handleExport = useCallback(() => {
-    const exportData = filteredItems.map(i => ({
-      name: `${i.first_name} ${i.last_name}`,
-      email: i.email,
-      opportunity: i.opportunity_title,
-      status: i.status,
-      applied: i.created_at ? new Date(i.created_at).toLocaleDateString(getFormattingLocale()) : '',
-    }));
-    exportToCsv(exportData as Array<Record<string, unknown>>, 'volunteer-approvals.csv');
+    const headers = [
+      t('volunteering.export_columns.name'),
+      t('volunteering.export_columns.email'),
+      t('volunteering.export_columns.opportunity'),
+      t('volunteering.export_columns.status'),
+      t('volunteering.export_columns.applied'),
+    ];
+    const rows = filteredItems.map((item) => [
+      `${item.first_name} ${item.last_name}`,
+      item.email,
+      item.opportunity_title,
+      t(`volunteering.status_${item.status}`, { defaultValue: t('volunteering.status_unknown') }),
+      item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '',
+    ]);
+    exportToCsv(headers, rows, 'volunteer-approvals.csv');
     toast.success(t('volunteering.export_success'));
   }, [filteredItems, toast, t]);
 

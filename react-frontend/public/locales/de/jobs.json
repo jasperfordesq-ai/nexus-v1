@@ -660,7 +660,7 @@
     "time_credits_label": "Angebotene Zeitguthaben",
     "time_credits_placeholder": "z.B. 5,00",
     "contact_email_label": "Kontakt-E-Mail",
-    "contact_email_placeholder": "kontakt@beispiel.de",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Kontakttelefon",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Bewerbungsfrist",
@@ -1081,7 +1081,9 @@
     }
   },
   "jobs": {
-    "view_details": "Stellendetails anzeigen"
+    "view_details": "Stellendetails anzeigen",
+    "type_unknown": "Unbekannter Typ",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Jobansicht",
   "match_badge_one": "{{count}}% Übereinstimmung",

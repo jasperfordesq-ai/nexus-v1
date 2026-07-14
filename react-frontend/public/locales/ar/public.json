@@ -23,7 +23,7 @@
     "security_title": "الإفصاح الأمني",
     "security_body_before": "هل اكتشفت مشكلة أمنية؟ يُرجى الإبلاغ عنها بشكل خاص إلى ",
     "security_body_after": " بدلًا من فتح بلاغ عام. توجد سياسة الإفصاح الكاملة عن الثغرات في ملف SECURITY.md داخل مستودع الشيفرة المصدرية.",
-    "security_email": "جاسبر@hour-timebank.ie",
+    "security_email": "jasper@hour-timebank.ie",
     "tech_stack": {
       "ai_label": "الذكاء الاصطناعي",
       "ai_value": "OpenAI تضمين النص-3-صغير",
@@ -457,7 +457,24 @@
     },
     "scroll_down": "قم بالتمرير لأسفل",
     "audience_cards": {
-      "title": "أين تريد أن تبدأ؟"
+      "title": "أين تريد أن تبدأ؟",
+      "defaults": {
+        "new_here": {
+          "title": "جديد هنا؟",
+          "description": "تعلم كيف تعمل مجتمعنا وكيفية المشاركة.",
+          "cta": "ابدأ الآن"
+        },
+        "exchange": {
+          "title": "عرض أو طلب المساعدة",
+          "description": "تصفح ما يقدمه الناس، أو قم بنشر طلبك الخاص.",
+          "cta": "تصفح القوائم"
+        },
+        "partner": {
+          "title": "شريك أو إحالة",
+          "description": "للمنظمات والمموّلين والمحترفين الذين يدعمون أعضائنا.",
+          "cta": "اعرف المزيد"
+        }
+      }
     },
     "how_it_works": {
       "title": "كيف يعمل",

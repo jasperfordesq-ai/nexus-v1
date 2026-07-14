@@ -49,5 +49,23 @@
   "extend_session": "Sitzung verlängern",
   "dismiss": "Schließen",
   "idle_logout_title": "Wegen Inaktivität abgemeldet",
-  "idle_logout_message": "Sie wurden nach einer Phase der Inaktivität automatisch abgemeldet. Bitte melden Sie sich erneut an, um fortzufahren."
+  "idle_logout_message": "Sie wurden nach einer Phase der Inaktivität automatisch abgemeldet. Bitte melden Sie sich erneut an, um fortzufahren.",
+  "api": {
+    "request_failed_title": "Anforderung fehlgeschlagen",
+    "request_failed": "Die Anfrage konnte nicht abgeschlossen werden.",
+    "service_unavailable": "Der Dienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+    "invalid_response": "Der Server hat eine ungültige Antwort zurückgegeben.",
+    "request_timeout": "Die Anfrage ist abgelaufen. Bitte versuchen Sie es erneut.",
+    "network_error": "Verbindung konnte nicht hergestellt werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    "invalid_request": "Die Anfrage war ungültig. Bitte überprüfen Sie Ihre Eingabe.",
+    "permission_denied": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
+    "resource_not_found": "Die angeforderte Ressource wurde nicht gefunden.",
+    "too_many_requests": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "server_error": "Ein unerwarteter Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+    "download_failed_status": "Download fehlgeschlagen (HTTP {{status}}).",
+    "upload_failed": "Upload fehlgeschlagen.",
+    "upload_failed_retry": "Upload fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "upload_cancelled": "Upload abgebrochen.",
+    "upload_timeout": "Der Upload hat ein Zeitlimit überschritten. Bitte versuchen Sie es erneut."
+  }
 }

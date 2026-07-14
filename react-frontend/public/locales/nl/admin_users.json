@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "users": {
     "action_approve": "Goedkeuren",
@@ -168,7 +168,7 @@
     "placeholder_a_short_biography_for_this_user": "Een korte biografie voor deze gebruiker...",
     "placeholder_eg_community_centre": "Bv gemeenschapscentrum...",
     "placeholder_eg_community_volunteer": "Bijvoorbeeld gemeenschapsvrijwilliger...",
-    "placeholder_email": "e-mail@voorbeeld.com",
+    "placeholder_email": "email@example.com",
     "placeholder_first_name": "Voornaam...",
     "placeholder_enter_first_name": "Voer de voornaam in...",
     "placeholder_enter_last_name": "Voer achternaam in...",
@@ -197,7 +197,6 @@
     "role_admin": "Beheerder",
     "role_broker": "Makelaar",
     "role_member": "Lid",
-    "role_moderator": "Moderator",
     "role_newsletter_admin": "Nieuwsbrief beheerder",
     "role_tenant_admin": "Huurder beheerder",
     "send_welcome_email": "Welkomstmail verzenden",
@@ -220,7 +219,10 @@
     "permissions_editor_unavailable_title": "Rechten zijn hier alleen-lezen",
     "permissions_editor_unavailable_desc": "Deze pagina toont de rol en toegekende rechten van de gebruiker, maar wijzigingen zijn hier niet mogelijk. Beheer toegang door de rol van de gebruiker te wijzigen op de bewerkingspagina.",
     "role_unknown": "Onbekende rol",
-    "role_tenant_super_admin": "Superbeheerder van tenant"
+    "role_tenant_super_admin": "Superbeheerder van tenant",
+    "role_super_admin_short": "Superbeheerder",
+    "reset_2fa_reason": "Reset door een beheerder",
+    "role_moderator": "Moderator"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "Toestemming gegeven",
       "not_consented": "Niet goedgekeurd",
       "not_given": "Toestemming niet gegeven",
-      "withdrawn_on": "Ingetrokken op"
+      "withdrawn_on": "Ingetrokken op",
+      "type_unknown": "Onbekend toestemmingssoort"
     },
     "descriptions": {
       "balance_amount": "Gebruik negatieve waarden om tijdskredieten van dit lid af te trekken",
@@ -326,7 +329,7 @@
       "balance_amount": "bijv. 2 of -1,5",
       "balance_reason": "Waarom past u dit saldo aan?",
       "bio": "Een korte biografie voor deze gebruiker...",
-      "email": "gebruiker@voorbeeld.com",
+      "email": "user@example.com",
       "first_name": "Voer de voornaam in...",
       "last_name": "Voer achternaam in...",
       "location": "bijv. New York, VS",
@@ -346,9 +349,9 @@
       "admin": "Beheerder",
       "broker": "Makelaar",
       "member": "Lid",
-      "moderator": "Moderator",
       "newsletter_admin": "Nieuwsbrief beheerder",
-      "tenant_admin": "Huurder beheerder"
+      "tenant_admin": "Huurder beheerder",
+      "moderator": "Moderator"
     },
     "sections": {
       "account_actions": "Accountacties",
@@ -433,12 +436,28 @@
       "decision_confirmed": "Attest bevestigd",
       "decision_revoked": "Attest ingetrokken",
       "decision_not_confirmed": "Attest niet bevestigd"
+    },
+    "insurance": {
+      "status_none": "Geen",
+      "status_pending": "In afwachting",
+      "status_submitted": "Ingediend",
+      "status_verified": "Geverifieerd",
+      "status_expired": "Verlopen",
+      "status_rejected": "Afgewezen",
+      "status_revoked": "Ingetrokken",
+      "status_unknown": "Onbekende status",
+      "type_public_liability": "Aansprakelijkheid tegenover derden",
+      "type_professional_indemnity": "Beroepsaansprakelijkheid",
+      "type_employers_liability": "Werkgeversaansprakelijkheid",
+      "type_product_liability": "Productaansprakelijkheid",
+      "type_personal_accident": "Ongevallenverzekering",
+      "type_other": "Overig",
+      "type_unknown": "Onbekend type verzekering"
     }
   },
   "aria": {
     "breadcrumbs": "Broodkruimels"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "Woonplaatsverificaties",
     "page_desc": "Beoordeel woonplaatsverklaringen die door leden zijn ingediend en ken de badge voor geverifieerde woonplaats toe.",
@@ -450,7 +469,6 @@
     "filter_all": "Alle",
     "col_member": "Lid",
     "col_municipality": "Gemeente",
-    "col_postcode": "Postcode",
     "col_details": "Details",
     "col_status": "Status",
     "col_submitted": "Ingediend",
@@ -475,7 +493,8 @@
     "rejected_success": "Woonplaatsverklaring afgewezen",
     "action_failed": "Kan de verklaring niet bijwerken",
     "reason_required": "Een reden van afwijzing is verplicht",
-    "attested_on": "Beoordeeld op {{date}}"
+    "attested_on": "Beoordeeld op {{date}}",
+    "col_postcode": "Postcode"
   },
   "sections": {
     "content": "Inhoud",
@@ -483,5 +502,6 @@
     "intelligence": "Intelligentie",
     "engagement": "Betrokkenheid",
     "system": "Systeem"
-  }
+  },
+  "loading": "Laden"
 }

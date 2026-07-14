@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "jobs": {
     "add_edit_notes": "Notities toevoegen/bewerken",
@@ -80,7 +80,6 @@
     "applied_date": "Toegepast:",
     "col_actions": "Acties",
     "col_applications": "Toepassingen",
-    "col_deadline": "Deadline",
     "col_featured": "Uitgelicht",
     "col_organization": "Organisatie",
     "col_status": "Status",
@@ -102,7 +101,6 @@
     "hide_notes": "Verberg notities",
     "internal_notes": "Interne opmerkingen",
     "cv_label": "CV",
-    "interview_label": "Interview",
     "offer_label": "Aanbieding",
     "job_deleted": "Taak verwijderd",
     "jobs_count": "{{count}}-banen",
@@ -143,7 +141,6 @@
     "pipeline_title": "Pijpleiding voor inhuren",
     "pipeline_description": "Volg sollicitatiegesprekken en aanbiedingen voor alle sollicitaties",
     "pipeline_tabs": "Pijplijntabbladen",
-    "pipeline_interviews": "Interviews",
     "pipeline_offers": "Aanbiedingen",
     "pipeline_filter_status": "Filter op status",
     "pipeline_all": "Allemaal",
@@ -197,7 +194,6 @@
     "bias_avg_time_stage": "Gem. tijd per fase",
     "bias_avg_time_stage_table": "Gemiddelde tijd in etappe",
     "bias_source_effectiveness": "Broneffectiviteit",
-    "bias_source_direct": "Direct",
     "bias_source_referral": "Verwijzing",
     "bias_skills_accepted": "Vaardigheden — Geaccepteerd",
     "bias_skills_rejected": "Vaardigheden — Afgewezen",
@@ -227,10 +223,8 @@
     "templates_deleted": "Sjabloon verwijderd",
     "stage_applied": "Toegepast",
     "stage_pending": "In behandeling",
-    "stage_screening": "Screening",
     "stage_reviewed": "Beoordeeld",
     "stage_shortlisted": "Op de shortlist",
-    "stage_interview": "Interview",
     "stage_offer": "Aanbieding",
     "stage_accepted": "Geaccepteerd",
     "stage_rejected": "Afgewezen",
@@ -260,7 +254,16 @@
     "stat_pending_offers_one": "{{count}}lopende aanbiedingen",
     "stat_pending_offers_other": "{{count}}lopende aanbiedingen",
     "pipeline_minutes_one": "{{count}}min",
-    "pipeline_minutes_other": "{{count}}min"
+    "pipeline_minutes_other": "{{count}}min",
+    "stage_unknown": "Andere fase",
+    "type_unknown": "Ander functietype",
+    "category_value": "{{category}}",
+    "col_deadline": "Deadline",
+    "interview_label": "Interview",
+    "pipeline_interviews": "Interviews",
+    "bias_source_direct": "Direct",
+    "stage_screening": "Screening",
+    "stage_interview": "Interview"
   },
   "moderation": {
     "action_failed": "Mislukt",
@@ -312,7 +315,6 @@
     "content_type_event": "Evenement",
     "content_type_group": "Groep",
     "content_type_listing": "Lijst",
-    "content_type_post": "Post",
     "content_type_review": "Beoordeling",
     "content_type_user": "Gebruiker",
     "delete": "Verwijderen",
@@ -479,7 +481,8 @@
     "load_error": "Kan de moderatiewachtrij niet laden.",
     "pagination_label": "Paginering van wachtrijen voor moderatie",
     "user_fallback": "Onbekende gebruiker",
-    "rating_aria": "{{n}} van 5 sterren"
+    "rating_aria": "{{n}} van 5 sterren",
+    "content_type_post": "Post"
   },
   "something_wrong": "Er is iets misgegaan. Probeer het opnieuw.",
   "spam": {

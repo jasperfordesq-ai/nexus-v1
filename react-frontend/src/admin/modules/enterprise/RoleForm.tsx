@@ -19,11 +19,15 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
+import {
+  caringRolePresetDescription,
+  caringRolePresetKey,
+  caringRolePresetName,
+  type CaringRolePresetKey,
+} from './caringRolePresetTranslations';
 
-function permissionLabel(value: string): string {
-  return value
-    .replace(/[._-]+/g, ' ')
-    .replace(/\b\w/g, (match) => match.toUpperCase());
+function permissionToken(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase();
 }
 
 export function RoleForm() {
@@ -37,6 +41,11 @@ export function RoleForm() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [presetKey, setPresetKey] = useState<CaringRolePresetKey | null>(null);
+  const [storedName, setStoredName] = useState('');
+  const [storedDescription, setStoredDescription] = useState('');
+  const [presetDisplayName, setPresetDisplayName] = useState('');
+  const [presetDisplayDescription, setPresetDisplayDescription] = useState('');
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [allPermissions, setAllPermissions] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
@@ -55,9 +64,21 @@ export function RoleForm() {
       if (isEdit && id) {
         const roleRes = await adminEnterprise.getRole(parseInt(id));
         if (roleRes.success && roleRes.data) {
-          const role = roleRes.data as unknown as { name: string; description: string; permissions: string[] };
-          setName(role.name || '');
-          setDescription(role.description || '');
+          const role = roleRes.data as unknown as { name: string; description: string | null; permissions: string[] };
+          const nextPresetKey = caringRolePresetKey(role.name || '');
+          const nextStoredDescription = role.description || '';
+          const nextDisplayName = nextPresetKey ? caringRolePresetName(t, nextPresetKey) : role.name || '';
+          const nextDisplayDescription = nextPresetKey
+            ? caringRolePresetDescription(t, nextPresetKey)
+            : nextStoredDescription;
+
+          setPresetKey(nextPresetKey);
+          setStoredName(role.name || '');
+          setStoredDescription(nextStoredDescription);
+          setPresetDisplayName(nextDisplayName);
+          setPresetDisplayDescription(nextDisplayDescription);
+          setName(nextDisplayName);
+          setDescription(nextDisplayDescription);
           setSelectedPermissions(new Set(role.permissions || []));
         }
       }
@@ -108,8 +129,10 @@ export function RoleForm() {
     setSaving(true);
     try {
       const payload = {
-        name: name.trim(),
-        description: description.trim(),
+        name: presetKey && name.trim() === presetDisplayName ? storedName : name.trim(),
+        description: presetKey && description.trim() === presetDisplayDescription
+          ? storedDescription
+          : description.trim(),
         permissions: Array.from(selectedPermissions),
       };
 
@@ -124,7 +147,7 @@ export function RoleForm() {
         toast.success(isEdit ? t('enterprise.role_updated') : t('enterprise.role_created'));
         navigate(tenantPath('/admin/enterprise/roles'));
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.save_failed');
+        const error = t('enterprise.save_failed');
         toast.error(error);
       }
     } catch (err) {
@@ -200,7 +223,9 @@ export function RoleForm() {
                       }
                       onValueChange={() => toggleCategory(category)}
                     >
-                      <span className="font-medium">{permissionLabel(category)}</span>
+                      <span className="font-medium">
+                        {t(`enterprise.permission_categories.${permissionToken(category)}`, { defaultValue: t('enterprise.permission_category_unknown') })}
+                      </span>
                     </Checkbox>
                   </div>
                   <div className="ml-6 grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -211,7 +236,9 @@ export function RoleForm() {
                         onValueChange={() => togglePermission(perm)}
                         size="sm"
                       >
-                        <span className="text-sm text-muted">{permissionLabel(perm)}</span>
+                        <span className="text-sm text-muted">
+                          {t(`enterprise.permissions.${permissionToken(perm)}`, { defaultValue: t('enterprise.permission_unknown') })}
+                        </span>
                       </Checkbox>
                     ))}
                   </div>

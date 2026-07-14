@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api, type ApiResponse, type PaginationMeta } from '@/lib/api';
 
 interface UseApiState<T> {
@@ -35,6 +36,7 @@ export function useApi<T>(
   options: UseApiOptions = {},
 ): UseApiReturn<T> {
   const { immediate = true, deps = [] } = options;
+  const { t } = useTranslation('errors');
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     // A null endpoint is not a pending request.
@@ -69,13 +71,13 @@ export function useApi<T>(
         setState((previous) => ({
           ...previous,
           isLoading: false,
-          error: response.error ?? 'Request failed',
+          error: t('api.request_failed'),
         }));
       }
     }
 
     return response;
-  }, [endpoint]);
+  }, [endpoint, t]);
 
   const reset = useCallback(() => {
     setState({ data: null, isLoading: false, error: null, meta: null });

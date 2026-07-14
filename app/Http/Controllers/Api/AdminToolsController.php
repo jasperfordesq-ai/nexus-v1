@@ -185,36 +185,36 @@ class AdminToolsController extends BaseApiController
         $start = microtime(true);
         try {
             DB::selectOne("SELECT 1");
-            $tests[] = ['name' => 'Database Connection', 'status' => 'pass', 'duration_ms' => round((microtime(true) - $start) * 1000)];
+            $tests[] = ['code' => 'database', 'status' => 'pass', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Database Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
+            $tests[] = ['code' => 'database', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Redis
         $start = microtime(true);
         try {
             $stats = $this->redisCache->getStats();
-            $tests[] = ['name' => 'Redis Connection', 'status' => ($stats['enabled'] ?? false) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
+            $tests[] = ['code' => 'redis', 'status' => ($stats['enabled'] ?? false) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
+            $tests[] = ['code' => 'redis', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Token Service
         $start = microtime(true);
         try {
             $testToken = $this->tokenService->generateToken(0, $tenantId);
-            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => !empty($testToken) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
+            $tests[] = ['code' => 'auth_token', 'status' => !empty($testToken) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
+            $tests[] = ['code' => 'auth_token', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Tenant
         $start = microtime(true);
         try {
             $tenant = DB::selectOne("SELECT id, name FROM tenants WHERE id = ?", [$tenantId]);
-            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => $tenant ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
+            $tests[] = ['code' => 'tenant_bootstrap', 'status' => $tenant ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
+            $tests[] = ['code' => 'tenant_bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         $passCount = count(array_filter($tests, fn($t) => $t['status'] === 'pass'));
@@ -374,12 +374,8 @@ class AdminToolsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $audit = DB::selectOne("SELECT * FROM seo_audits WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1", [$tenantId]);
-            if ($audit && !empty($audit->results)) {
-                $audit = (array) $audit;
-                $audit['results'] = json_decode($audit['results'], true) ?: [];
-            }
-            return $this->respondWithData($audit ? (array) $audit : null);
+            $auditService = app(\App\Services\SeoAuditService::class);
+            return $this->respondWithData($auditService->getLatestAudit($tenantId));
         } catch (\Throwable $e) {
             return $this->respondWithData(null);
         }

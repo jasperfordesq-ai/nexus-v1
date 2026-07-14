@@ -483,7 +483,7 @@ describe('API Client', () => {
           headers: new Headers(),
         } as Response);
 
-      await expect(api.download('/v2/export')).rejects.toThrow('Session expired');
+      await expect(api.download('/v2/export')).rejects.toThrow('Your session has expired');
 
       expect(fetch).toHaveBeenCalledTimes(3);
       expect(tokenManager.getAccessToken()).toBeNull();

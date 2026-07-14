@@ -1081,7 +1081,9 @@
     }
   },
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "View job details",
+    "type_unknown": "Unknown type",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Jobs view",
   "match_badge_one": "{{count}}% match",

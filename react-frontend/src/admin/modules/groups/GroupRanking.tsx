@@ -47,7 +47,7 @@ export default function GroupRanking() {
         success(t('groups.rankings_updated'));
         loadGroups();
       } else {
-        error(res.error || t('groups.failed_to_update_rankings'));
+        error(t('groups.failed_to_update_rankings'));
       }
     } catch {
       error(t('groups.failed_to_update_rankings'));
@@ -63,7 +63,7 @@ export default function GroupRanking() {
         success(t('groups.featured_status_updated'));
         loadGroups();
       } else {
-        error(res.error || t('groups.failed_to_update_featured_status'));
+        error(t('groups.failed_to_update_featured_status'));
       }
     } catch {
       error(t('groups.failed_to_update_featured_status'));

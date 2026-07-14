@@ -286,7 +286,6 @@
     "reviews_intro": "Erfassen Sie kontrollierte Entscheidungen ohne Freitextnotizen, Kontaktdaten oder Vorfallaufzeichnungen.",
     "review_member": "Veranstaltungsteilnehmer",
     "review_member_choose": "Wählen Sie einen Teilnehmer",
-    "member_fallback": "Mitgliedsnummer:id",
     "review_decision": "Entscheidung",
     "decisions": {
       "deny": "Teilnahme verweigern",
@@ -319,6 +318,7 @@
     },
     "reviewed_by": "Bewertet von",
     "withdraw_review": "Entscheidung zurückziehen",
-    "ledger_empty": "Für diese Veranstaltung wurden keine Teilnahmebewertungen erfasst."
+    "ledger_empty": "Für diese Veranstaltung wurden keine Teilnahmebewertungen erfasst.",
+    "member_fallback": "Mitglied #:id"
   }
 }

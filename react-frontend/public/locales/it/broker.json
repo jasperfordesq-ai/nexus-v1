@@ -321,7 +321,10 @@
     "members_error_title": "Impossibile caricare i membri in sospeso",
     "members_error_hint": "Il caricamento della coda di approvazione non è riuscito. Riprova per recuperarla di nuovo.",
     "retry": "Riprova",
-    "empty_pending_title": "Tutto in pari"
+    "empty_pending_title": "Tutto in pari",
+    "stage_first_listing": "Prima Inserzione",
+    "stage_repeat_user": "Utente Ripetuto",
+    "stage_unknown": "Fase sconosciuta"
   },
   "safeguarding": {
     "title": "Tutela",
@@ -1128,7 +1131,7 @@
     "field_show_broker_name_help": "Mostra ai membri il nome del broker assegnato.",
     "field_broker_contact_email_label": "E-mail di contatto del broker",
     "field_broker_contact_email_help": "E-mail pubblica di contatto per le richieste al broker.",
-    "field_broker_contact_email_placeholder": "broker@esempio.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "E-mail di contatto del broker",
     "field_broker_approval_required_label": "Approvazione del broker richiesta",
     "field_broker_approval_required_help": "Richiedi l'approvazione del broker prima che gli scambi possano procedere.",
@@ -1290,7 +1293,8 @@
     "pending_confirmation": "In attesa di conferma",
     "confirmed": "Confermato",
     "review_requested": "Richiesta revisione",
-    "not_confirmed": "Non confermato"
+    "not_confirmed": "Non confermato",
+    "unknown": "Sconosciuto"
   },
   "common": {
     "loading": "Caricamento...",

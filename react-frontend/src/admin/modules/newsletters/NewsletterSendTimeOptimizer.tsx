@@ -8,6 +8,7 @@ import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { SendTimeData } from '../../api/types';
+import { getFormattingLocale } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,9 +22,10 @@ import type { SendTimeData } from '../../api/types';
 
 
 const formatHour = (hour: number) => {
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const h = hour % 12 || 12;
-  return `${h}${ampm}`;
+  return new Intl.DateTimeFormat(getFormattingLocale(), {
+    hour: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(2000, 0, 1, hour)));
 };
 
 export function NewsletterSendTimeOptimizer() {

@@ -99,7 +99,7 @@ export function UserCreate() {
         toast.success(t('users.create_success'));
         navigate(tenantPath('/admin/users'));
       } else {
-        toast.error(res.error || t('users.create_failed'));
+        toast.error(t('users.create_failed'));
       }
     } catch {
       toast.error(t('users.error_occurred'));

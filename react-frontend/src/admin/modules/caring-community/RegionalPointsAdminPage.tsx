@@ -30,7 +30,6 @@ import { StatCard } from '../../components/StatCard';
  * - View tenant-wide ledger and stats
  * - Manually issue / adjust points for a member
  *
- * Admin English only — no t() calls.
  */
 
 
@@ -41,6 +40,7 @@ import { StatCard } from '../../components/StatCard';
 interface RegionalPointsConfig {
   enabled: boolean;
   label: string;
+  label_code?: 'default' | null;
   symbol: string;
   auto_issue_enabled: boolean;
   points_per_approved_hour: number;
@@ -105,7 +105,7 @@ export default function RegionalPointsAdminPage() {
         api.get<LedgerResponse>('/v2/admin/caring-community/regional-points/ledger?limit=100'),
       ]);
       if (cfgRes.success && cfgRes.data) setConfig(cfgRes.data);
-      else if (cfgRes.error) toast.error(cfgRes.error);
+      else if (!cfgRes.success) toast.error(t('admin.regional_points.errors.load'));
       if (ledRes.success && ledRes.data) setLedger(ledRes.data);
       // ledger may 403 if disabled — that's fine, show empty
     } catch (err) {
@@ -134,7 +134,7 @@ export default function RegionalPointsAdminPage() {
         toast.success(t('admin.regional_points.messages.config_saved'));
         void loadAll();
       } else {
-        toast.error(res.error || t('admin.regional_points.errors.save_config'));
+        toast.error(t('admin.regional_points.errors.save_config'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: save config failed', err);
@@ -167,7 +167,7 @@ export default function RegionalPointsAdminPage() {
         setIssueDescription('');
         void loadAll();
       } else {
-        toast.error(res.error || t('admin.regional_points.errors.issue'));
+        toast.error(t('admin.regional_points.errors.issue'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: issue failed', err);
@@ -200,7 +200,7 @@ export default function RegionalPointsAdminPage() {
         setAdjustDescription('');
         void loadAll();
       } else {
-        toast.error(res.error || t('admin.regional_points.errors.adjust'));
+        toast.error(t('admin.regional_points.errors.adjust'));
       }
     } catch (err) {
       logError('RegionalPointsAdminPage: adjust failed', err);
@@ -308,7 +308,7 @@ export default function RegionalPointsAdminPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label={t('admin.regional_points.config.display_label')}
-              value={config.label}
+              value={config.label || t('admin.regional_points.title')}
               onValueChange={(v) => setConfig({ ...config, label: v })}
               description={t('admin.regional_points.config.display_label_description')}
             />
@@ -497,7 +497,7 @@ export default function RegionalPointsAdminPage() {
                   </TableCell>
                   <TableCell className="text-sm">
                     <Chip size="sm" variant="soft">
-                      {row.type}
+                      {tAdmin(`regional_points.ledger_types.${row.type}`, { defaultValue: tAdmin('regional_points.ledger_types.unknown') })}
                     </Chip>
                   </TableCell>
                   <TableCell className="hidden text-sm text-muted md:table-cell">

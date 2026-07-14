@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "admin": {
     "providers": {
@@ -109,7 +109,7 @@
         "match_percent": "{{percent}}% 一致",
         "scanning": "重複をスキャン中…",
         "summary": "重複する可能性のある{{count}}が見つかりました。",
-        "vs": "vs"
+        "vs": "対"
       },
       "errors": {
         "deactivate": "プロバイダーの無効化に失敗しました。",
@@ -396,9 +396,9 @@
       },
       "messages": {
         "recomputed": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
-        "saved": "Trust tier settings saved.",
         "recomputed_one": "{{count}} メンバーの信頼層が再計算されました。",
-        "recomputed_other": "{{count}} 人のメンバーの信頼レベルを再計算しました。"
+        "recomputed_other": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
+        "saved": "信頼レベルの設定が保存されました。変更は次回の再計算実行時に適用されます。"
       },
       "recompute_confirm": "すべてのメンバーの信頼層を再計算しますか?これには数分かかる場合があります。"
     },
@@ -495,7 +495,7 @@
         }
       },
       "placeholders": {
-        "url": "NEXUSTERM0トークン"
+        "url": "https://..."
       },
       "errors": {
         "load_failed": "運用ポリシーの読み込みに失敗しました。",
@@ -690,8 +690,8 @@
   "caring_workflow": {
     "meta": {
       "page_title": "思いやりのあるコミュニティのワークフロー",
-      "title": "Caring Community Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "title": "ケアするコミュニティのワークフロー",
+      "description": "これはあなたの日次業務ダッシュボードです。保留中の時間承認の確認、期限切れ項目の監視、コーディネーターの割り当て管理、メンバー明細の生成、ワークフローポリシーの設定に使用してください。SLAを超えた保留中の項目はアンバーでハイライト表示されます。"
     },
     "actions": {
       "refresh": "リフレッシュ",
@@ -707,7 +707,7 @@
       "workflow": "思いやりのあるコミュニティのワークフローを読み込んでいます..."
     },
     "toast": {
-      "load_failed": "Failed to load Caring Community workflow data."
+      "load_failed": "ケアリングコミュニティワークフローを読み込めませんでした。"
     },
     "empty": {
       "value": "-",
@@ -716,8 +716,8 @@
     "stats": {
       "pending_reviews": "保留中のレビュー",
       "pending_hours": "保留中の時間",
-      "approved_30d": "Approved in 30 days",
-      "coordinators": "コーディネーター"
+      "coordinators": "コーディネーター",
+      "approved_30d": "承認済み（30日）"
     },
     "pending": {
       "title": "保留中のレビュー",
@@ -748,33 +748,36 @@
       "manual_escalation_note_other": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
       "escalated_count_other": "{{count}} がエスカレーションされました",
       "overdue_count_other": "{{count}} 期限切れ",
-      "age_days_other": "{{count}} 1 日目"
+      "age_days_other": "{{count}} 1 日目",
+      "escalated_count_one": "{{count}} エスカレート",
+      "overdue_count_one": "{{count}} 延滞",
+      "age_days_one": "{{count}} 日経過"
     },
     "paper_onboarding": {
-      "title": "Paper Form Intake",
-      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
-      "file_label": "Scanned form",
-      "name_label": "Extracted full name",
-      "name_placeholder": "Name on the paper form",
       "dob_label": "生年月日",
-      "email_label": "Extracted email",
       "email_placeholder": "member@example.com",
-      "phone_label": "Extracted phone",
-      "phone_placeholder": "+41 79 123 45 67",
-      "address_label": "Extracted address",
-      "address_placeholder": "Street, postcode, municipality",
-      "note_label": "Review note",
-      "note_placeholder": "What did the coordinator verify before creating the account?",
-      "upload_cta": "Upload For Review",
-      "confirm_cta": "Confirm And Create Account",
+      "phone_placeholder": "+1 555 123 4567",
       "review_cta": "レビュー",
-      "no_email": "No email captured",
-      "file_required": "Choose a scanned form first.",
       "load_failed": "オンボーディングインテークに用紙をロードできませんでした。",
       "upload_success": "紙の摂取量をアップロードしました。",
-      "upload_failed": "Could not upload the paper form.",
       "confirm_success": "メンバーが確認され、アカウントが作成されました。",
-      "confirm_failed": "Could not confirm this paper onboarding intake."
+      "title": "紙のオンボーディング（OCR）",
+      "description": "スキャンしたフォームまたは写真をアップロードしてください。フィールドを抽出し、アカウントを作成する前に確認できます。",
+      "file_label": "スキャンしたフォームまたは写真",
+      "name_label": "氏名",
+      "name_placeholder": "フォームに記載されている通り",
+      "email_label": "メール",
+      "phone_label": "電話",
+      "address_label": "住所",
+      "address_placeholder": "住所（通り、市、郵便番号）",
+      "note_label": "コーディネーターのメモ",
+      "note_placeholder": "この入力に対する任意のコンテキスト",
+      "upload_cta": "アップロードして抽出",
+      "confirm_cta": "確認してアカウントを作成",
+      "no_email": "メールがありません",
+      "file_required": "最初にアップロードするファイルを選択してください。",
+      "upload_failed": "書面による入力をアップロードできませんでした。",
+      "confirm_failed": "用紙の受け取りを確認できませんでした。"
     },
     "tandem": {
       "title": "Tandem の提案",
@@ -791,7 +794,17 @@
       "shared_interests": "共通の興味",
       "score": "スコア {{value}}%",
       "dismiss": "却下する",
-      "create": "Tandem を作成"
+      "create": "Tandem を作成",
+      "reason_join": "{{previous}}; {{next}}",
+      "reasons": {
+        "distance": "{{distance_km}} km 離れて住んでいる",
+        "shared_language": "同じ言語を話す",
+        "complementary_skills": "補完的なスキルがある",
+        "availability_overlap": "都合の良い時間が合う",
+        "shared_interests": "共通の興味を持っている",
+        "intergenerational": "世代間ペアリングを提供する",
+        "overall_fit": "全体的に見て妥当な適合を示す"
+      }
     },
     "safeguarding": {
       "title": "レポートの保護",
@@ -827,7 +840,29 @@
         "dismissed": "解雇されました"
       },
       "age_hours_other": "{{count}}h",
-      "age_days_other": "{{count}}日"
+      "age_days_other": "{{count}}日",
+      "categories": {
+        "exploitation": "搾取",
+        "financial_concern": "経済的懸念",
+        "inappropriate_behavior": "不適切な行動",
+        "medical_concern": "医療上の懸念",
+        "neglect": "虐待・怠慢",
+        "other": "その他",
+        "unknown": "不明なカテゴリ"
+      },
+      "history_actions": {
+        "assigned": "割り当て済み",
+        "created": "作成済み",
+        "dismissed": "却下",
+        "escalated": "エスカレーション済み",
+        "note_added": "メモ追加済み",
+        "resolved": "解決済み",
+        "status_changed": "ステータスが変更されました",
+        "triaged": "トリアージ済み",
+        "unknown": "未知の操作"
+      },
+      "age_hours_one": "{{count}}h",
+      "age_days_one": "{{count}}d"
     },
     "role_pack": {
       "title": "役割のプリセット",
@@ -872,62 +907,62 @@
     },
     "policy": {
       "title": "ワークフローポリシー",
-      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
       "save": "ポリシーの保存",
-      "review_sla_days": "Review SLA days",
       "review_sla_days_description": "この日数以内にレビューされなかった時間には、キュー内で期限超過としてフラグが立てられます。",
-      "escalation_sla_days": "Escalation SLA days",
       "escalation_sla_days_description": "この追加日数以内に対応されなかった期限を過ぎた項目は、自動的にエスカレーションされます。",
-      "monthly_statement_day": "Statement day",
       "monthly_statement_day_description": "メンバーステートメントが生成される月の日 (例: 1 = 毎月 1 日)。",
-      "default_hour_value_chf": "Hour value CHF",
       "default_hour_value_chf_description": "ステートメントや自治体の報告書の社会的価値の推定値を計算するために使用されます。",
       "municipal_report_default_period": "デフォルトのレポート期間",
-      "approval_required": "Require hour approval",
-      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
       "auto_approve_trusted_reviewers": "信頼できるレビュー担当者を自動承認する",
-      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
-      "allow_member_self_log": "Allow member self logging",
-      "allow_member_self_log_description": "Members can record their own support activity before review.",
-      "require_organisation_for_partner_hours": "Require partner organisation",
-      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
       "include_social_value_estimate": "社会的価値の推定を含める",
-      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
       "save_success": "ワークフローポリシーが保存されました。",
-      "save_failed": "Failed to save workflow policy.",
       "periods": {
         "last_30_days": "過去 30 日間",
         "last_90_days": "過去90日間",
         "year_to_date": "年初から現在まで",
         "previous_quarter": "前四半期"
-      }
+      },
+      "review_sla_days": "SLAレビュー（日数）",
+      "escalation_sla_days": "エスカレーションSLA（日数）",
+      "description": "SLA、承認ルール、およびレポートのデフォルトを構成します。変更は保存時に直ちに反映され、その時点以降のすべての新しい時間申請に適用されます。",
+      "monthly_statement_day": "月次明細日",
+      "default_hour_value_chf": "デフォルト時間値（CHF）",
+      "approval_required": "承認が必要",
+      "approval_required_description": "ウォレットに時間を追加する前にコーディネーターの承認が必要です。",
+      "auto_approve_trusted_reviewers_description": "信頼できるレビュアーによって記録された時間はキューをスキップします。",
+      "allow_member_self_log": "メンバーの自己記録を許可する",
+      "allow_member_self_log_description": "メンバーがコーディネーターの入力なしで自分のサポート時間を記録できるようにする。",
+      "require_organisation_for_partner_hours": "パートナーの時間には組織の指定が必要です",
+      "require_organisation_for_partner_hours_description": "パートナーに代わって提供された時間は、組織に紐付ける必要があります。",
+      "include_social_value_estimate_description": "明細書および報告書に推定社会的価値（CHF）を表示します。",
+      "save_failed": "ワークフローポリシーを保存できませんでした。"
     },
     "member_statement": {
-      "title": "Member statements",
-      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
       "member_id": "会員ID",
-      "start_date": "From",
-      "end_date": "To",
       "preview": "プレビュー",
       "export_csv": "CSVのエクスポート",
       "approved_support_hours": "承認されたサポート時間",
       "pending_support_hours": "保留中のサポート時間",
       "wallet_hours_earned": "ウォレットで獲得した時間数",
       "wallet_hours_spent": "ウォレットに費やした時間数",
-      "empty": "Enter a member ID to generate a statement.",
       "chf_value": "推定社会的価値: CHF{{value}}",
       "invalid_member": "有効な会員IDを入力してください。",
-      "load_failed": "Failed to load the member statement.",
-      "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "title": "会員明細書",
+      "description": "単一メンバーの時間と影響に関するステートメントを生成します。これを使用して、サポート時間、ウォレット残高、および推定社会的価値の正式な記録を共有できます。これは、助成金申請、レビュー、またはメンバーからの問い合わせに役立ちます。メンバーIDとオプションの日付範囲を入力し、プレビューまたはCSVでエクスポートしてください。",
+      "start_date": "開始日",
+      "end_date": "終了日",
+      "empty": "メンバーIDを入力し、プレビューを押してステートメントを表示してください。",
+      "load_failed": "メンバーステートメントを読み込めませんでした。",
+      "export_success": "ステートメントをエクスポートしました。",
+      "export_failed": "ステートメントをエクスポートできませんでした。"
     },
     "signals": {
       "title": "コーディネーター信号",
-      "description": "Quick operating indicators for matching, oversight, and partner activity.",
-      "active_requests": "Active requests",
-      "active_offers": "Active offers",
       "trusted_organisations": "信頼できる組織",
-      "declined_30d": "Declined in 30 days"
+      "active_requests": "アクティブなサポートリクエスト",
+      "active_offers": "アクティブサポートオファー",
+      "description": "コーディネーターの注意が必要な可能性のあるアクティビティのリアルタイムスナップショット - オープンリクエスト、利用可能なオファー、信頼できる組織、最近の拒否。",
+      "declined_30d": "拒否（30日）"
     },
     "favours": {
       "title": "非公式の好意",
@@ -937,27 +972,37 @@
       "empty": "まだ好意は記録されていません。",
       "anonymous": "匿名",
       "unknown": "未知",
-      "total_recorded_other": "合計 {{count}} 件記録済み"
+      "total_recorded_other": "合計 {{count}} 件記録済み",
+      "categories": {
+        "transport": "輸送",
+        "shopping": "買い物",
+        "companionship": "同伴",
+        "household": "家事援助",
+        "technology": "技術サポート",
+        "other": "その他",
+        "unknown": "未分類"
+      },
+      "total_recorded_one": "{{count}} 合計記録"
     },
     "assisted_onboarding": {
-      "title": "Assisted Onboarding",
-      "description": "Create a member account on behalf of a participant who cannot self-register.",
       "name_label": "フルネーム",
-      "name_placeholder": "e.g. Marie Curie",
-      "email_label": "Email address",
       "email_placeholder": "member@example.com",
       "phone_label": "電話（オプション）",
-      "phone_placeholder": "+41 79 123 45 67",
+      "phone_placeholder": "+1 555 123 4567",
       "note_label": "コーディネーターのメモ (オプション)",
-      "note_placeholder": "e.g. Met at Tuesday drop-in",
-      "create_cta": "Create Member Account",
       "required": "名前とメールアドレスは必須です。",
-      "created": "Member account created successfully.",
-      "create_failed": "Could not create member account. Please check the email is not already registered.",
-      "created_for": "Account created for {{name}} ({{email}})",
-      "password_note": "The member should change this password on first login.",
       "copy": "コピー",
-      "copied": "コピーしました！"
+      "copied": "コピーしました！",
+      "title": "支援付きオンボーディング",
+      "description": "自己登録できないメンバーの代わりにアカウントを作成し、その一時パスワードを共有します。",
+      "name_placeholder": "メンバーの氏名",
+      "email_label": "メール",
+      "note_placeholder": "コーディネーターが覚えておくべきこと",
+      "create_cta": "メンバーアカウントを作成する",
+      "created": "メンバーアカウントが作成されました。",
+      "create_failed": "メンバーアカウントを作成できませんでした。",
+      "created_for": "{{name}}（{{email}}）のアカウントが作成されました。",
+      "password_note": "この一時パスワードをメンバーと共有してください。初回ログイン時に変更を求められます。"
     },
     "invite_codes": {
       "title": "招待コード",
@@ -991,28 +1036,28 @@
       }
     },
     "stages": {
-      "title": "Caring Community operating model",
-      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
       "intake": {
         "title": "摂取量",
-        "description": "A member, family, organisation, or coordinator records a need or offer."
+        "description": "新しいメンバーを歓迎し、彼らのサポートニーズを把握する。"
       },
       "match": {
         "title": "一致",
-        "description": "Coordinators connect people, organisations, or trusted volunteers."
+        "description": "スキルと空き状況に基づいて、支援者と受益者をペアリングする。"
       },
       "log": {
-        "title": "Log hours",
-        "description": "Support time is recorded against the member, organisation, or activity."
+        "title": "時間を記録する",
+        "description": "サポート時間を発生時に記録する。"
       },
       "verify": {
         "title": "検証する",
-        "description": "A trusted coordinator approves or declines the logged hours."
+        "description": "コーディネーターは記録された時間を確認して承認します。"
       },
       "statement": {
         "title": "声明",
-        "description": "Accepted hours feed member statements and municipal evidence packs."
-      }
+        "description": "月次報告書と影響報告書を発行します。"
+      },
+      "title": "ワークフローステージ",
+      "description": "5段階のケアリングコミュニティの流れを一望。"
     },
     "predictive": {
       "title": "予測的洞察",
@@ -1064,6 +1109,51 @@
         "critical": "致命的",
         "warning": "警告",
         "info": "情報"
+      },
+      "load_failed": "予測インサイトを読み込めませんでした。",
+      "confidence_levels": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "alert_actions": {
+        "see_suggestions": "提案を見る",
+        "view_members": "メンバーを見る",
+        "review_now": "今すぐレビュー",
+        "reassign_reviews": "レビューを再割り当て",
+        "open_reports": "レポートを開く",
+        "view_tandems": "タンデムを見る",
+        "view_listings": "リストを表示"
+      },
+      "alerts": {
+        "recipients_without_tandem": {
+          "title": "定期的なサポーターがいない受信者",
+          "message": "これらのメンバーは過去6か月間に支援を受けましたが、現在は継続的なタンデムがありません。継続性を強化するために、安定したサポーターと組ませてください。"
+        },
+        "inactive_members": {
+          "title": "以前は活動的だったメンバーが静かになっています",
+          "message": "これらのメンバーは過去6か月間に時間を記録しましたが、過去30日間では記録していません。親しみやすい確認を行うことで、再び関与を促すことができるかもしれません。"
+        },
+        "overdue_reviews": {
+          "title": "時間のレビューがサービスレベルを超過しています",
+          "message": "これらの保留中の時間ログは{{sla}}日以上前のものです。承認するかエスカレーションして、メンバーがクレジットを受け取れるようにしてください。"
+        },
+        "coordinators_overloaded": {
+          "title": "コーディネーターが過負荷です",
+          "message": "1人以上のコーディネーターが10件以上の保留中のレビューを抱えています。ボトルネックが発生する前に作業を再割り当てしてください。"
+        },
+        "retention_dropping": {
+          "title": "アクティブメンバーの参加が減少しています。",
+          "message": "今月のアクティブメンバー数（{{current}}）は、最近の{{months}}か月間の平均（{{average}}）の{{threshold_percent}}％を下回っています。ターゲットを絞った呼びかけを検討してください。"
+        },
+        "overdue_check_ins": {
+          "title": "タンデムのチェックインが遅れています。",
+          "message": "これらのアクティブな定期的関係は、予定されたチェックインを過ぎています。両方の参加者に連絡して、元気であることを確認してください。"
+        },
+        "low_supply": {
+          "title": "カテゴリーには未対応の需要があります",
+          "message": "これらのカテゴリーでは、アクティブなリクエストが利用可能なオファーより多くなっています。潜在的な支援者にこれらを強調してください。"
+        }
       }
     },
     "relationships": {
@@ -1117,10 +1207,10 @@
       }
     },
     "invite_card": {
-      "brand": "Community Caring",
       "subtitle": "隣人から隣人への招待状",
       "instructions": "このコードを入力するか、下のリンクにアクセスして参加してください。",
-      "valid_until": "{{date}} まで有効"
+      "valid_until": "{{date}} まで有効",
+      "brand": "コミュニティのケア"
     }
   },
   "category_coefficients": {
@@ -1237,7 +1327,175 @@
       "exported": "境界マップがエクスポートされました",
       "export_failed": "境界マップのエクスポートに失敗しました"
     },
-    "overrides_count_other": "{{count}} オーバーライド"
+    "overrides_count_other": "{{count}} オーバーライド",
+    "capabilities": {
+      "caring_help_requests": {
+        "notes": "",
+        "label": "支援リクエスト",
+        "description": "他人の代理で作成されたケアギバーリクエスト、マッチング、承認を含むケアリング支援リクエストワークフロー。"
+      },
+      "caring_support_relationships": {
+        "notes": "",
+        "label": "支援関係",
+        "description": "受け手と一人以上の支援者との間の長期にわたるケア関係で、定期的な確認が行われます。"
+      },
+      "caring_caregiver_links": {
+        "notes": "",
+        "label": "介護者リンク",
+        "description": "非公式な介護者と支援する人との間の認証済みリンクで、その人に代わってリクエストを行うことができます。"
+      },
+      "caring_substitute_cover": {
+        "notes": "",
+        "label": "代替およびカバーのスケジュール管理",
+        "description": "主なサポーターが利用できない場合に、代替ケア提供者を見つけ、衝突の検出と確認を行う。"
+      },
+      "caring_warmth_pass": {
+        "notes": "",
+        "label": "ウォームスパス",
+        "description": "受給者が管理する尊厳レイヤーで、誰が自分のニーズを見られるかを管理し、同意に基づく紹介をサポートする。"
+      },
+      "caring_emergency_alerts": {
+        "notes": "",
+        "label": "緊急アラート",
+        "description": "受信者または介護者から、信頼できる近隣住民の確認された範囲への緊急放送。"
+      },
+      "caring_sub_regions": {
+        "notes": "",
+        "label": "ケア担当のサブ地域",
+        "description": "地区や近隣など、テナント内の地域セルで、それぞれのコーディネーターとKPI集計を持つ。"
+      },
+      "caring_research_consent": {
+        "notes": "",
+        "label": "研究同意フラグ",
+        "description": "学術的または自治体のパートナーと共有される匿名化された研究データセットへの参加のためのメンバーのオプトイン。"
+      },
+      "caring_municipal_roi": {
+        "notes": "",
+        "label": "自治体の投資収益報告書",
+        "description": "公共部門の調達に関する議論のための正式介護のコストオフセットと予防価値の報告書。"
+      },
+      "caring_pilot_scoreboard": {
+        "notes": "",
+        "label": "パイロットスコアボード",
+        "description": "パイロットスタンドアップや出資者向け進捗レビュー用のライブKPIパック。"
+      },
+      "caring_disclosure_pack": {
+        "notes": "",
+        "label": "FADP/nDSG開示パック",
+        "description": "入居者オンボーディング前に法務レビュー用の編集可能なスイスのデータ保護開示パック。"
+      },
+      "caring_operating_policy": {
+        "notes": "",
+        "label": "運用方針ワークショップ",
+        "description": "承認権限、サービスレベル、旧時間決済、料金、およびレビューの周期をカバーするスキーマ駆動型ポリシー。"
+      },
+      "safeguarding_reports": {
+        "notes": "",
+        "label": "保護レポート",
+        "description": "監査証跡とエスカレーションルーティングを備えた、メンバーからコーディネーターへの保護懸念ワークフロー。"
+      },
+      "trust_tier_system": {
+        "notes": "",
+        "label": "信頼層システム",
+        "description": "新しい、信頼された、または審査済みのメンバーが行うことができるケア行動を制御するメンバー信頼度の進行。"
+      },
+      "municipal_verification": {
+        "notes": "",
+        "label": "自治体認証バッジ",
+        "description": "居住地や身元確認に基づいた、メンバープロフィール上のオプションの自治体認証マーカー。"
+      },
+      "xp_badges_journeys": {
+        "notes": "",
+        "label": "XP、バッジ、およびジャーニー",
+        "description": "ケアへの参加を認識するXP、バッジ、ジャーニー、チャレンジを備えたエンゲージメントレイヤー。"
+      },
+      "appreciation_messages": {
+        "notes": "",
+        "label": "感謝のメッセージ",
+        "description": "受信者が支援者に公に感謝を示せる軽量のサンキューフロー。"
+      },
+      "premium_member_tier": {
+        "notes": "",
+        "label": "プレミアム会員階層",
+        "description": "追加の特典があるオプションの有料会員階層で、テナントの裁量で運営されます。"
+      },
+      "merchant_loyalty_coupons": {
+        "notes": "",
+        "label": "加盟店のロイヤルティとクーポン",
+        "description": "地元商店のロイヤルティカードおよびクーポンの引き換えが時間クレジット残高に連動。"
+      },
+      "smart_matching_engine": {
+        "notes": "",
+        "label": "スマートマッチングエンジン",
+        "description": "スキル、距離、履歴を使って、支援リクエストを可能性の高い支援者とペアリングするヒューリスティックマッチャー。"
+      },
+      "caring_community_module": {
+        "label": "ケアリングコミュニティモジュール",
+        "description": "テナントの完全なケアリングコミュニティワークフローを有効にする傘下の機能フラグ。",
+        "notes": "これは他のケアリング機能のマスターゲートです。"
+      },
+      "local_advertising_campaigns": {
+        "label": "地域広告キャンペーン",
+        "description": "アプリ内の広告枠が地元の商人に販売されます。コードはAGPLライセンスで提供され、参加はテナントが管理し、収益は導入者に留まります。",
+        "notes": "テナントごとにオプトイン; 公開コードはプラットフォーム運営者との収益分配を強制しません。"
+      },
+      "paid_push_campaigns": {
+        "label": "有料プッシュキャンペーン",
+        "description": "商人がオプトインしたメンバーにリーチするために購入できるターゲットプッシュ通知キャンペーン。",
+        "notes": "テナントは機能を有効にし、プッシュ配信コストに対する責任を負う必要があります。"
+      },
+      "verein_dues_collection": {
+        "label": "会費",
+        "description": "Stripeを通じた定期的な会費徴収、会員向け明細書と照合付き。",
+        "notes": "Stripeアカウントは運用インフラであり、アプリケーションコードは依然としてAGPLライセンスのまま。"
+      },
+      "ki_agenten_framework": {
+        "label": "KI-Agentenフレームワーク",
+        "description": "各テナント向けエージェントランタイムで、コーディネーターが反復可能なワークフローのために構造化されたアシスタントを定義できるもの。",
+        "notes": "このコードはAGPLライセンスです。各テナントは自分の言語モデルAPIの認証情報を提供し、プロバイダーに直接支払います。"
+      },
+      "ai_chat_assistant": {
+        "label": "AIチャットアシスタント",
+        "description": "メンバー向けアシスタントで、ヘルプやオンボーディングのためにテナントのナレッジベースに基づいて動作します。",
+        "notes": "各テナントは自分のOpenAI APIの認証情報を提供します。"
+      },
+      "embedding_recommendations": {
+        "label": "埋め込みベースの推奨",
+        "description": "埋め込みモデルは、プラットフォーム全体でのリスティング、メンバー、グループの推奨を可能にします。",
+        "notes": "各テナントは、自身の埋め込みプロバイダ使用料金に責任を負います。"
+      },
+      "tenant_branded_native_app": {
+        "label": "テナントブランドのネイティブアプリ",
+        "description": "テナントのブランドで公開されたiOSおよびAndroidのCapacitorアプリ。ソースコードはAGPLライセンスで提供されており、リリースインフラはテナント所有。",
+        "notes": "AppleおよびGoogleの開発者アカウント、署名キー、ビルドパイプライン、ストアレビューのワークフローは、パッケージの外部における運用責任。"
+      },
+      "paid_regional_analytics": {
+        "label": "有料の地域別分析",
+        "description": "地域および自治体の調達向けのテナント間集約分析で、公共部門の購入者向けに個別に提供されます。",
+        "notes": "これは、プラットフォーム運営者との商業契約を必要とする別の公共部門向け製品です。"
+      },
+      "partner_api_access": {
+        "label": "パートナーAPIアクセス",
+        "description": "研究、政府、および統合パートナー向けのレート制限付きAPIで、テナント間集約クエリを含む場合があります。",
+        "notes": "商業契約が必要です。このアクセスは、AGPLの展開者に対してデフォルトでは有効になっていません。"
+      }
+    },
+    "classification_descriptions": {
+      "agpl_public": "パブリックリポジトリのAGPLライセンスのソースコード。誰でもライセンス条件の下でこれを展開できます。",
+      "tenant_config": "テナント構成または機能トグルによって制御されるAGPLライセンスの機能。",
+      "private_deployment": "インフラストラクチャ、ビルドアカウント、署名キー所有権などの運用デプロイメント層。これはコードライセンスの境界ではありません。",
+      "commercial": "パブリックAGPLパッケージに含まれていない、個別契約のサービス。"
+    },
+    "categories": {
+      "core_caring": "コアケアリングコミュニティ",
+      "community_governance": "コミュニティガバナンス",
+      "gamification_engagement": "ゲーミフィケーションとエンゲージメント",
+      "commercial_layer": "商業層",
+      "advanced_ai": "高度なAI",
+      "mobile_native": "ネイティブモバイルアプリ",
+      "regional_intelligence": "地域インテリジェンス"
+    },
+    "overrides_count_one": "{{count}} 上書き"
   },
   "data_quality": {
     "meta": {
@@ -1275,7 +1533,8 @@
       "count": "{{count}} {{label}}",
       "generated": "生成 {{date}}",
       "affected": "影響を受ける",
-      "count_other": "{{count}} {{label}}"
+      "count_other": "{{count}} {{label}}",
+      "count_one": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "影響を受ける行は最大 50 行 - 起動前に解決または文書化します。",
@@ -1296,6 +1555,88 @@
     "toasts": {
       "load_failed": "データ品質レポートのロードに失敗しました",
       "rows_failed": "影響を受ける行のロードに失敗しました"
+    },
+    "checks": {
+      "duplicate_emails": {
+        "label": "重複するメールアドレス",
+        "schema_unavailable": "このテナントスキーマには、users テーブルまたは email 列は利用できません。",
+        "found": "複数のユーザーが同じメールアドレスを共有しています。リリース前に重複するアカウントを統合するか削除してください。",
+        "clear": "重複するメールアドレスは検出されませんでした。"
+      },
+      "duplicate_phones": {
+        "label": "重複する電話番号",
+        "schema_unavailable": "このテナントスキーマには users テーブルまたは phone 列が存在しません。",
+        "found": "複数のメンバーが同じ電話番号を共有しています。異なる居住者かどうかを確認してください。",
+        "clear": "重複する電話番号は検出されませんでした。"
+      },
+      "missing_preferred_language": {
+        "label": "希望言語を持たないメンバー",
+        "schema_unavailable": "希望言語フィールドはこのテナントスキーマでは利用できません。",
+        "found": "一部のメンバーは希望する言語を選択していません。居住者への連絡を送信する前に設定してください。",
+        "clear": "すべてのメンバーには希望する言語があります。"
+      },
+      "missing_sub_region": {
+        "label": "サブリージョンがないメンバー",
+        "regions_unavailable": "このテナントスキーマではサブリージョンは利用できないため、このチェックは適用されません。",
+        "column_unavailable": "このテナントスキーマではメンバーのサブリージョンの割り当てが利用できないため、このチェックは適用されません。",
+        "no_regions": "サブリージョンが設定されていないため、このチェックは適用されません。",
+        "found": "サブリージョンがないメンバーは、地域スコープのフィードに表示されません。",
+        "clear": "すべてのメンバーはサブリージョンに割り当てられています。"
+      },
+      "missing_coordinator_assignment": {
+        "label": "コーディネーターのいないケア関係",
+        "table_unavailable": "このテナントスキーマではケア支援関係は利用できません。",
+        "column_unavailable": "このテナントスキーマではコーディネーターの割り当ては利用できません。",
+        "found": "起動前に、すべてのアクティブなケア関係にコーディネーターを割り当ててください。",
+        "clear": "すべてのケア関係にはコーディネーターがいます。"
+      },
+      "unverified_organisations": {
+        "label": "未確認の組織",
+        "table_unavailable": "ボランティア組織はこのテナントスキーマでは利用できません。",
+        "verification_unavailable": "組織の確認フィールドはこのテナントスキーマでは利用できません。",
+        "found": "全ての保留中の組織を承認または拒否して、メンバーがそのリストを信頼できるようにしてください。",
+        "clear": "全ての組織がレビューされました。"
+      },
+      "seed_marker_users": {
+        "label": "デモまたはシードアカウント",
+        "table_unavailable": "このテナントスキーマではメンバーは利用できません。",
+        "found": "デモまたはシードアカウントがまだ存在しています。本物の居住者をオンボーディングする前に削除してください。",
+        "clear": "デモまたはシードアカウントは検出されませんでした。"
+      },
+      "unanswered_help_requests": {
+        "label": "30日以上未回答のヘルプリクエスト",
+        "table_unavailable": "このテナントスキーマでは、ケアのヘルプリクエストは利用できません。",
+        "found": "古い保留中のヘルプリクエストは信頼を損ないます。すべて閉じる、拒否する、またはマッチングしてください。",
+        "clear": "古いヘルプリクエストはありません。"
+      },
+      "members_without_role": {
+        "label": "役割のないメンバー",
+        "schema_unavailable": "このテナントスキーマでは、メンバーの役割は利用できません。",
+        "found": "すべてのメンバーに役割を割り当て、権限が正しく解決されるようにします。",
+        "clear": "すべてのメンバーに役割があります。"
+      },
+      "tenant_setting_completeness": {
+        "label": "テナント設定の完了状況",
+        "table_unavailable": "このテナントスキーマではテナント設定は利用できません。",
+        "found": "1つ以上の事前起動設定が欠けています。AG80開示パックおよびAG81運用方針を確認してください。",
+        "clear": "必要なすべてのプレローンチテナント設定が構成されています。"
+      }
+    },
+    "notes": {
+      "drilldown_not_available": "このチェックでは行レベルの詳細表示は利用できません。"
+    },
+    "identifiers": {
+      "user_id": "ユーザー #{{id}}"
+    },
+    "row_status": {
+      "active": "アクティブ",
+      "approved": "承認済み",
+      "completed": "完了",
+      "inactive": "非アクティブ",
+      "pending": "保留中",
+      "rejected": "却下",
+      "unknown": "状態不明",
+      "verified": "確認済み"
     }
   },
   "disclosure_pack": {
@@ -1389,6 +1730,84 @@
       "export_empty": "エクスポートが空で返されました",
       "exported": "開示パックがエクスポートされました",
       "export_failed": "開示パックのエクスポートに失敗しました"
+    },
+    "export": {
+      "filename": "disclosure-pack.md"
+    },
+    "default_copy": {
+      "subprocessor_azure": "Microsoft Azure（ホスティング、EU）",
+      "subprocessor_cloudflare": "Cloudflare（CDN / WAF）",
+      "subprocessor_stripe": "Stripe（支払いおよび本人確認）",
+      "subprocessor_openai": "OpenAI（オプションのマッチングおよび要約）",
+      "subprocessor_firebase": "Google Firebase Cloud Messaging（プッシュ通知）",
+      "isolated_node_description": "カントン管理の展開で、独自のメール配信、ストレージ、およびバックアップを備えています。フェデレーションは完全に無効にできます。",
+      "fadp_authority": "連邦データ保護・情報委員会（FDPIC / EDÖB）",
+      "destination_eu_azure": "欧州連合（Microsoft Azure）",
+      "destination_us_services": "アメリカ合衆国（Cloudflare、Stripe、OpenAI）",
+      "safeguard_scc": "標準契約条項（SCCs）",
+      "safeguard_swiss_us_framework": "スイス–米国データプライバシーフレームワーク、該当する場合"
+    },
+    "structured": {
+      "fields": {
+        "identity": "本人確認",
+        "profile": "プロフィール",
+        "caring": "介護活動",
+        "time_credits": "時間クレジット",
+        "communications": "通信",
+        "safeguarding": "保護",
+        "research_consent": "研究同意",
+        "active_account_data": "アクティブアカウントデータ",
+        "inactive_account_data": "非アクティブアカウントデータ",
+        "transactions": "取引",
+        "help_requests": "支援リクエスト",
+        "safeguarding_reports": "保護レポート",
+        "research_datasets": "研究データセット",
+        "access": "アクセス",
+        "export": "エクスポート",
+        "rectify": "訂正",
+        "erase": "消去",
+        "restrict": "制限",
+        "object": "異議",
+        "portability": "可搬性",
+        "export_format": "エクスポート形式"
+      },
+      "values": {
+        "name": "名前",
+        "email": "メールアドレス",
+        "phone": "電話番号",
+        "date_of_birth": "生年月日",
+        "biography": "経歴",
+        "photo": "写真",
+        "skills": "スキル",
+        "preferred_language": "使用言語",
+        "help_requests": "助けのリクエスト",
+        "support_relationships": "支援関係",
+        "caregiver_links": "介護者リンク",
+        "transactions": "取引",
+        "volunteer_logs": "ボランティア記録",
+        "wallet_balance": "ウォレット残高",
+        "messages": "メッセージ",
+        "notifications": "通知",
+        "announcements": "お知らせ",
+        "reports": "報告書",
+        "flags": "フラグ",
+        "verification_status": "検証ステータス",
+        "flag": "同意フラグ",
+        "aggregate_dataset_inclusion": "集計データセットへの含有",
+        "contract": "契約",
+        "consent": "同意",
+        "legitimate_interest": "正当な利益",
+        "lifetime_of_membership": "会員期間",
+        "24_months_then_anonymise": "24か月、その後匿名化",
+        "10_years_after_completion": "完了後10年",
+        "24_months_after_closure": "終了後24か月",
+        "7_years_after_resolution": "解決後7年",
+        "24_months": "24か月",
+        "duration_of_research_partnership": "研究パートナーシップの期間",
+        "json+csv": "JSONとCSV",
+        "no_personal_data_shared_outside_tenant": "テナント外に個人データを共有しない",
+        "monthly": "毎月"
+      }
     }
   },
   "external_integrations": {
@@ -1495,6 +1914,32 @@
       "create_failed": "作成に失敗しました",
       "removed": "統合が削除されました",
       "delete_failed": "削除に失敗しました"
+    },
+    "default_items": {
+      "ahv_submission_gateway": {
+        "name": "AHV提出ゲートウェイ",
+        "notes": "AHV関連のボランティア時間報告の公式チャネル。公式の提出インターフェースはまだ確認が必要。"
+      },
+      "spitex_handoff": {
+        "name": "Spitexケア調整の引き継ぎ",
+        "notes": "介護対象者のサークルに対する州のSpitexプロバイダーとの双方向ハンドオフ。各プロバイダーからデータ共有契約とインターフェース仕様が必要です。"
+      },
+      "cantonal_master_data": {
+        "name": "州のマスターデータフィード",
+        "notes": "介護対象者のプロフィールを最新の状態に保つために、州の登録簿から取得した登録済み住所および世帯データ。"
+      },
+      "postfinance_payment": {
+        "name": "PostFinance支払い統合",
+        "notes": "現金引き出しおよび財務運用のためのスイスの銀行パートナー。加盟店契約が必要です。"
+      },
+      "twint_payment": {
+        "name": "Twint支払い",
+        "notes": "会費および寄付のためのTwint受け入れ。加盟店登録はパートナーバンクを通じて行う必要があります。"
+      },
+      "postal_address_verification": {
+        "name": "郵便住所の確認",
+        "notes": "スイス郵便のディレクトリに対する住所の正規化と検証。"
+      }
     }
   },
   "federation_peers_admin": {
@@ -1644,7 +2089,11 @@
       "all_count_other": "すべて ({{count}})",
       "breached_count_other": "侵害されました ({{count}})",
       "at_risk_count_other": "危険にさらされています ({{count}})",
-      "on_track_count_other": "順調に進んでいます ({{count}})"
+      "on_track_count_other": "順調に進んでいます ({{count}})",
+      "all_count_one": "すべて ({{count}})",
+      "breached_count_one": "違反 ({{count}})",
+      "at_risk_count_one": "リスクあり ({{count}})",
+      "on_track_count_one": "進行中 ({{count}})"
     },
     "resolved": {
       "title": "最近解決されました (過去 72 時間)",
@@ -1685,6 +2134,12 @@
     },
     "toasts": {
       "load_failed": "SLA ダッシュボードのロードに失敗しました"
+    },
+    "status": {
+      "closed": "完了",
+      "matched": "一致",
+      "pending": "保留中",
+      "unknown": "状態不明"
     }
   },
   "integration_showcase": {
@@ -1711,6 +2166,74 @@
     },
     "toasts": {
       "load_failed": "統合ショーケースの読み込みに失敗しました"
+    },
+    "manifest": {
+      "sections": {
+        "openapi": {
+          "title": "OpenAPI仕様",
+          "body": "このプラットフォームで提供されるコントローラーから生成された、すべての公開APIサーフェス向けの機械可読仕様。"
+        },
+        "partner_api": {
+          "title": "パートナーAPI v1",
+          "body": "サードパーティ統合向けのOAuth保護されたAPI。メンバー、リスティング、ウォレットのクレジット、コミュニティ集計、ウェブフック購読をカバー。"
+        },
+        "oauth": {
+          "title": "OAuthクライアント資格情報",
+          "body": "信頼されたパートナーサーバー向けの標準OAuth 2.0クライアント資格情報フロー（トークン失効を含む）。"
+        },
+        "webhooks": {
+          "title": "ウェブフック購読",
+          "body": "パートナーはイベントトピックを購読します。各ペイロードは、その購読のシークレットを使用して、完全な本文に対してHMAC-SHA256で署名されます。"
+        },
+        "federation": {
+          "title": "フェデレーションは集約します",
+          "body": "各テナントは読み取り専用の署名付き集約エンドポイントを公開します。ペイロードにはカウント、区間、上位カテゴリー、ロケールが含まれますが、生の個人データは決して含まれません。"
+        },
+        "sample_payloads": {
+          "title": "サンプルペイロード",
+          "body": "統合パートナー向けの代表的なペイロード。これらの例は説明用であり、実際のテナントデータは含まれていません。"
+        },
+        "partner_checklist": {
+          "title": "統合パートナーが受け取るもの",
+          "body": "実装を開始する前に、このチェックリストを見込みの統合パートナーと共有してください。"
+        }
+      },
+      "endpoints": {
+        "openapi_json": "JSON 仕様",
+        "openapi_yaml": "YAML 仕様",
+        "list_users": "ユーザーを一覧表示",
+        "show_user": "ユーザーを表示",
+        "list_listings": "リスティングを一覧表示",
+        "wallet_balance": "ウォレット残高を確認",
+        "credit_wallet": "ウォレットに入金",
+        "community_aggregates": "コミュニティ集計を確認",
+        "list_subscriptions": "ウェブフック購読を一覧表示",
+        "create_subscription": "ウェブフック購読を作成する",
+        "token_endpoint": "アクセストークンを発行する",
+        "revoke_endpoint": "アクセストークンを取り消す",
+        "update_subscription": "ウェブフック購読を更新する",
+        "delete_subscription": "ウェブフック購読を削除する",
+        "tenant_aggregate": "テナント集計を読み取る"
+      },
+      "verification_notes": {
+        "webhook_signature": "X-NEXUS-Signature ヘッダーを検証するには、サブスクリプションシークレットを使ってリクエスト本文全体に対して HMAC-SHA256 を計算し、その後、署名を定数時間で比較します。既定のリプレイウィンドウは 5 分ですが、それより古いペイロードは拒否してください。"
+      },
+      "samples": {
+        "federation_aggregate": "フェデレーション集約 — 署名付き JSON の例",
+        "webhook_event": "Webhook イベント — HMAC 署名付きの例",
+        "partner_aggregates": "パートナー API コミュニティ集約 — 例"
+      },
+      "checklist": {
+        "oauth_credentials": "このパートナー専用のOAuthクライアントIDとクライアントシークレット",
+        "allowed_scopes": "read:users、read:listings、write:walletなどの承認済みスコープ",
+        "webhook_subscription": "ウェブフックのサブスクリプション、HMACシークレット、およびエンドポイントURLの許可リスト",
+        "openapi_spec": "JSONまたはYAML形式のOpenAPI仕様URL",
+        "sandbox_tenant": "統合テスト用のサンドボックステナントスラッグ",
+        "federation_public_key": "パートナーが連邦に参加する際の、連邦集約署名公開鍵",
+        "rate_limit_headers": "X-RateLimit-Limit および X-RateLimit-Remaining ヘッダーのドキュメント",
+        "data_sharing_agreement": "ドラフトデータ共有契約および指定データ保護担当者",
+        "incident_runbook": "AG80 開示パックのインシデント対応マニュアル URL"
+      }
     }
   },
   "isolated_node": {
@@ -1752,7 +2275,11 @@
       "pending_other": "保留中: {{count}}",
       "in_progress_other": "進行中: {{count}}",
       "decided_other": "決定: {{count}}",
-      "blocked_other": "ブロックされました: {{count}}"
+      "blocked_other": "ブロックされました: {{count}}",
+      "pending_one": "保留中: {{count}}",
+      "in_progress_one": "進行中: {{count}}",
+      "decided_one": "決定済み: {{count}}",
+      "blocked_one": "ブロック中: {{count}}"
     },
     "gate": {
       "closed": "ゲートは閉じています - 発射準備完了",
@@ -1760,7 +2287,8 @@
       "decided_count": "{{total}} 件中 {{decided}} 件が決定しました",
       "blocked_count": "- {{count}} がブロックされました",
       "progress_aria": "意思決定ゲートの進捗状況",
-      "blocked_count_other": "- {{count}} がブロックされました"
+      "blocked_count_other": "- {{count}} がブロックされました",
+      "blocked_count_one": "- {{count}} ブロックされました"
     },
     "fields": {
       "value": "価値",
@@ -1786,6 +2314,63 @@
       "load_failed": "ディシジョンゲートデータのロードに失敗しました",
       "item_updated": "決定事項を更新しました",
       "save_failed": "決定項目の保存に失敗しました"
+    },
+    "items": {
+      "deployment_mode": {
+        "label": "展開モード",
+        "help": "これは共有ホステッドテナントか、カスタムドメインホステッドテナントか、地域当局が管理する完全に隔離されたノードのいずれかを選択してください。"
+      },
+      "hosting_owner": {
+        "label": "ホスティング所有者",
+        "help": "ノードのサーバー、ドメイン、およびTLS構成に責任を持つ組織の名前を記入してください。"
+      },
+      "smtp_owner": {
+        "label": "SMTPおよび送信メールの所有者",
+        "help": "送信メールの配信を担当している組織と、そのメールプロバイダーアカウントの名称を記入してください。"
+      },
+      "storage_owner": {
+        "label": "ストレージの所有者",
+        "help": "ファイルアップロード、添付ファイル、および永続的なオブジェクトストレージを担当している組織の名称を記入してください。"
+      },
+      "backup_owner": {
+        "label": "バックアップの所有者",
+        "help": "毎日のバックアップ、保持、テスト済みデータベースの復元に責任を持つ組織の名前。"
+      },
+      "update_cadence": {
+        "label": "更新の頻度",
+        "help": "ノードが上流のNEXUSソース更新を受信する頻度を選択します。"
+      },
+      "source_release_workflow": {
+        "label": "ソースリリースのワークフロー",
+        "help": "AGPLソースの更新が孤立したノードにどのように到達するかを、リポジトリミラー、署名付きタグ、手動レビューを含めて説明してください。"
+      },
+      "telemetry_default": {
+        "label": "テレメトリデフォルト",
+        "help": "このノードでの送信テレメトリおよびエラー報告のデフォルト状態を選択してください。"
+      },
+      "federation_key_exchange": {
+        "label": "フェデレーションキー交換",
+        "help": "このノードが地域のピアと連携しているかどうか、またどのように連携しているかを、主要なカストディおよび取引プロトコルを含めて説明してください。"
+      },
+      "dpo_appointed": {
+        "label": "データ保護責任者",
+        "help": "孤立展開のために指名されたデータ保護責任者とその連絡先を記録してください。"
+      },
+      "incident_runbook_url": {
+        "label": "インシデント・ランブックのURL",
+        "help": "ダウンタイム、違反、キー漏えい、および復旧訓練のための運用ランブックへのリンク。"
+      }
+    },
+    "choices": {
+      "hosted_tenant": "ホステッドテナント",
+      "hosted_custom_domain": "カスタムドメイン付きホステッドテナント",
+      "canton_isolated_node": "リージョン制御の孤立したノード",
+      "weekly": "週次",
+      "monthly": "毎月",
+      "quarterly": "四半期ごと",
+      "on_demand": "オンデマンド",
+      "enabled": "有効",
+      "disabled": "無効"
     }
   },
   "kpi_baselines": {
@@ -1906,7 +2491,8 @@
       "title": "連絡先 ({{count}})",
       "empty": "現在のフィルターに一致する連絡先がありません。",
       "table_aria": "リードナーチャリングの連絡先",
-      "title_other": "連絡先 ({{count}})"
+      "title_other": "連絡先 ({{count}})",
+      "title_one": "連絡先 ({{count}})"
     },
     "table": {
       "name_email": "名前/メールアドレス",
@@ -1994,7 +2580,8 @@
       "polished_text": "洗練されたテキスト",
       "reason": "理由",
       "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?",
-      "character_count_other": "{{count}} / 4000 文字"
+      "character_count_other": "{{count}} / 4000 文字",
+      "character_count_one": "{{count}} / 4000文字"
     },
     "status": {
       "proposed": "提案された",
@@ -2157,7 +2744,9 @@
     "status": {
       "verified": "確認済み",
       "pending_dns": "保留中 DNS",
-      "revoked": "取り消されました"
+      "revoked": "取り消されました",
+      "unverified": "未確認",
+      "unknown": "状態不明"
     },
     "current": {
       "title": "現在の状況",
@@ -2175,7 +2764,7 @@
     "fields": {
       "municipality_domain": "自治体ドメイン",
       "domain_or_organisation": "ドメインまたは組織",
-      "domain_placeholder": "例えばチューリッヒ",
+      "domain_placeholder": "例えば zurich.ch",
       "attestation_note": "証明書メモ（オプション）",
       "attestation_description": "DNS 検証を行わずにこれを証明するのはなぜですか? (監査証跡。)"
     },
@@ -2250,7 +2839,12 @@
       "acknowledgement": "コーディネーターの承認",
       "pre_pilot_baseline": "パイロット前のスコアボードのベースライン",
       "danger_checks": "データ品質の問題",
-      "backlog_empty": "統合バックログが空です"
+      "backlog_empty": "統合バックログが空です",
+      "warning_checks": "データ品質の警告",
+      "quarterly_review": "四半期ごとのスコアボードレビュー",
+      "blocked_integrations": "ブロックされた統合",
+      "undecided_items": "未決定の孤立ノード項目",
+      "unknown": "不明な要件"
     },
     "states": {
       "launched_title": "試験運用開始",
@@ -2277,7 +2871,7 @@
     },
     "isolated_node": {
       "required": "分離ノード ゲートがアクティブです - この展開はカントン分離ノード (AG85) として構成されています。すべてのアイテムは、発売前に決定ステータスに到達する必要があります。",
-      "informational": "分離ノード ゲートは、標準のホスト型展開に関する情報です。 AG85deployment_mode が canton_isoulated_node に設定されている場合にのみ起動をブロックします。自治体が分離ノード要件を指定していない場合は、このセクションの項目を無視できます。"
+      "informational": "孤立ノードゲートは、標準のホスト型デプロイメントに関する情報です。AG85 deployment_mode が canton_isolated_node に設定されている場合にのみ起動をブロックします。お住まいの自治体で孤立ノード要件が指定されていない場合、このセクションの項目は無視して構いません。"
     },
     "timestamps": {
       "last_updated": "最終更新日 {{date}}",
@@ -2313,7 +2907,75 @@
       "unexpected_response": "打ち上げ準備状況レポートから予期しない応答が返されました。",
       "unavailable_title": "準備状況レポートは利用できません"
     },
-    "more_count_other": "+{{count}} もっと見る"
+    "more_count_other": "+{{count}} もっと見る",
+    "section_labels": {
+      "disclosure_pack": "AG80 — FADP/nDSG 開示パック",
+      "operating_policy": "AG81 — KISS 運用方針",
+      "commercial_boundary": "AG82 — 商業境界マップ",
+      "pilot_scoreboard": "AG83 — パイロットスコアボードの基準",
+      "data_quality": "AG84 — テナントデータの品質",
+      "isolated_node": "AG85 — 孤立ノードの意思決定ゲート",
+      "external_integrations": "AG87 — 外部統合バックログ"
+    },
+    "section_summaries": {
+      "disclosure_pack": {
+        "not_started": "パックはまだプラットフォームのデフォルトを使用しており、名前付きコントローラーはありません。",
+        "needs_review": "コントローラー、データ保護担当者、またはインシデント連絡先が不完全です。",
+        "ready": "コントローラー、データ保護担当者、およびインシデント連絡先が記録されています。"
+      },
+      "operating_policy": {
+        "not_started": "ポリシーはまだプラットフォームのデフォルトを使用しています。ポリシーワークショップをスケジュールしてください。",
+        "needs_review": "ワークショップは完了しましたが、付録のURLまたは保護担当者が欠けています。",
+        "ready": "ポリシーワークショップは完了しており、付録はリンクされ、保護担当者が割り当てられています。"
+      },
+      "commercial_boundary": {
+        "needs_review": "デフォルトの分類が適用されていますが、コーディネーターはマトリックスを確認していません。",
+        "ready_with_overrides": "{{count}}のオーバーライドが適用され、マトリックスがレビューされました。",
+        "ready_with_overrides_one": "{{count}}のオーバーライドが適用され、マトリックスがレビューされました。",
+        "ready_with_overrides_other": "{{count}}のオーバーライドが適用され、マトリックスがレビューされました。",
+        "ready_default": "デフォルトのマトリックスが確認されました。"
+      },
+      "pilot_scoreboard": {
+        "not_started": "パイロット前のベースラインは取得されていないため、事前・事後の比較はまだ不可能です。",
+        "needs_review": "パイロット前のベースラインは取得されましたが、四半期レビューは遅れています。",
+        "ready": "パイロット前のベースラインは取得済みで、四半期ごとのレビューのペースも順調です。"
+      },
+      "data_quality": {
+        "blocked": "{{count}}の重大な問題が残っています。重複アカウントやシードユーザーがまだ存在します。",
+        "blocked_one": "{{count}}の重大な問題が残っています。重複アカウントやシードユーザーがまだ存在します。",
+        "blocked_other": "{{count}}の重大な問題が残っています。重複アカウントやシードユーザーがまだ存在します。",
+        "needs_review": "{{count}}の警告は、ローンチ前に確認が必要です。",
+        "needs_review_one": "{{count}}の警告は、ローンチ前に確認が必要です。",
+        "needs_review_other": "{{count}} 警告は起動前に確認が必要です。",
+        "ready": "すべてのチェックが通過しました。データは実際の居住者向けに準備されています。"
+      },
+      "isolated_node": {
+        "hosted_closed": "ゲートは閉じています。このデプロイメントはホストされているため、情報提供用のままです。",
+        "hosted_informational": "ホストされたデプロイメントにはゲートは必要なく、情報提供用のままです。",
+        "blocked": "{{count}} のブロックされた決定により、孤立したデプロイメントの起動が妨げられています。",
+        "blocked_one": "{{count}} のブロックされた決定により、孤立したデプロイメントの起動が妨げられています。",
+        "blocked_other": "{{count}} のブロックされた決定により、孤立したデプロイメントの起動が妨げられています。",
+        "needs_review": "{{total}} 件の {{decided}} の決定が記録されています。孤立したデプロイメントには、すべての決定が完了している必要があります。",
+        "ready": "すべてのゲート決定が記録されています。孤立したデプロイメントは準備完了です。"
+      },
+      "external_integrations": {
+        "not_started": "バックログは空です。デフォルトを設定するか、パートナー統合が不要であることを確認してください。",
+        "blocked": "{{count}} の統合はブロックされているため、パートナー依存の機能は起動できません。",
+        "blocked_one": "{{count}} の統合はブロックされているため、パートナー依存の機能は起動できません。",
+        "blocked_other": "{{count}} の統合はブロックされているため、パートナー依存の機能は起動できません。",
+        "ready": "{{count}} の統合項目は追跡されており、ブロックされているものはありません。",
+        "ready_one": "{{count}} の統合項目は追跡されており、ブロックされているものはありません。",
+        "ready_other": "{{count}} の統合項目は追跡されており、ブロックされていません。"
+      }
+    },
+    "overall_summaries": {
+      "blocked": "1つ以上のセクションがブロックされているため、パイロットを開始するのは安全ではありません。",
+      "ready": "すべてのセクションが準備完了しており、パイロットを開始できます。",
+      "needs_review": "{{ready}} の {{total}} セクションが準備完了です。開始前にコーディネーターのレビューが必要です。",
+      "not_started": "{{ready}} の {{total}} セクションが準備完了です。エンドツーエンドのパイロット評価は完了していません。",
+      "fallback": "{{ready}} の {{total}} セクションが準備完了です。"
+    },
+    "more_count_one": "+{{count}} 以上"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2332,10 +2994,10 @@
       "title": "このページについて",
       "body": "すべての指標は 90 日のローリング ウィンドウを使用します。実際の居住者をオンボーディングする前にパイロット前のベースラインを取得し、3 か月ごとに四半期レビューのスナップショットを実行します。比較表は、各メトリックがそのベースラインに対してどのように変化したかを示します。",
       "methodology_prefix": "コスト オフセットは、次の方法を使用して計算されます。",
-      "age_stiftung": "Caring Community",
       "age_stiftung_title": "Stiftung für das Alter",
       "methodology_middle": "方法論: 非公式ケアの時間 x",
-      "methodology_suffix": "35/時間（スイスのフォーマル・ケア・アシスタントのレート）× 2（回避されたフォーマル・ケア費用を反映した予防乗数）。この方法論は、試験的な報告に関してスイス州の社会サービスによって認められています。"
+      "methodology_suffix": "35/時間（スイスのフォーマル・ケア・アシスタントのレート）× 2（回避されたフォーマル・ケア費用を反映した予防乗数）。この方法論は、試験的な報告に関してスイス州の社会サービスによって認められています。",
+      "age_stiftung": "思いやりのあるコミュニティ"
     },
     "quarterly": {
       "next_review": "次の四半期レビュー:",
@@ -2387,9 +3049,9 @@
     "quarterly_modal": {
       "title": "四半期レビューを取得する",
       "body": "パイロットの開始後、3 か月ごとに実行します。スナップショット ラベルはデフォルトで現在の四半期 (例: Q2_2026) ですが、カスタマイズできます。メモを追加して、到達したマイルストーン、ポリシーの変更、常駐者のフィードバックなど、前回のレビュー以降に変更された内容を記録します。スナップショットは、今日から直近の 90 日間をカバーします。",
-      "label_placeholder": "季刊_2026_07",
-      "label_description": "Q2_2026 や 2026_Q3 などの認識可能なラベルを使用します。デフォルトは四半期_YYYY_MMです。",
-      "notes_placeholder": "この四半期に何が変化したか、マイルストーンが達成されました..."
+      "notes_placeholder": "この四半期に何が変化したか、マイルストーンが達成されました...",
+      "label_placeholder": "quarterly_2026_07",
+      "label_description": "Q2_2026や2026_Q3のような認識可能なラベルを使用してください。デフォルトは quarterly_YYYY_MM です。"
     },
     "empty": {
       "value": "-"
@@ -2457,7 +3119,21 @@
       "missing_placeholder_count_one": "{{count}} プレースホルダーがありません",
       "missing_placeholder_count_other": "{{count}} プレースホルダーがありません",
       "rendered_markdown_one": "レンダリングされたマークダウン ({{count}} 文字)",
-      "rendered_markdown_other": "レンダリングされた Markdown ({{count}} 文字)"
+      "rendered_markdown_other": "レンダリングされた Markdown ({{count}} 文字)",
+      "placeholders": {
+        "partner_name": "研究パートナー名",
+        "partner_institution": "研究パートナーの所属機関",
+        "tenant_name": "コミュニティ名",
+        "dpo_name": "データ保護責任者の名前",
+        "dpo_email": "データ保護責任者のメール",
+        "period_start": "報告期間開始",
+        "period_end": "報告期間終了",
+        "jurisdiction": "管轄法域",
+        "cohort_window_years": "コホート期間（年単位）",
+        "pilot_region": "パイロット地域",
+        "study_title": "研究タイトル",
+        "unknown": "テンプレート値"
+      }
     },
     "exports": {
       "title": "データセットのエクスポート履歴",
@@ -2568,7 +3244,8 @@
       "candidates": "{{count}} 人の候補者",
       "empty": "現在適格な候補者はいません。",
       "table_aria": "ナッジ候補のドライラン",
-      "candidates_other": "{{count}} 人の候補者"
+      "candidates_other": "{{count}} 人の候補者",
+      "candidates_one": "{{count}} 候補者"
     },
     "recent": {
       "title": "最近のナッジ",
@@ -2585,7 +3262,8 @@
     },
     "status": {
       "sent": "送信済み",
-      "converted": "変換された"
+      "converted": "変換された",
+      "unknown": "状態不明"
     },
     "dispatch_modal": {
       "title": "今すぐナッジを派遣しますか？",
@@ -2601,7 +3279,8 @@
       "dispatch_failed": "派遣失敗",
       "dry_run_one": "予行演習: {{count}} の適格な候補者",
       "dry_run_other": "予行演習: {{count}} 人の適格な候補者",
-      "dispatched_other": "{{count}} ナッジをディスパッチしました"
+      "dispatched_other": "{{count}} ナッジをディスパッチしました",
+      "dispatched_one": "{{count}} 送信済み通知"
     }
   },
   "sub_regions": {
@@ -2752,9 +3431,7 @@
       "narrative": "物語",
       "narrative_placeholder": "調達担当者または資金提供者にストーリーを説明する 2 ～ 4 文。",
       "metric_source": "メトリクスソース",
-      "metric_source_description": "pilot_scoreboard: AG83 から自動取得します。自治体_roi: AG76 から自動プルします。手動: 値を手動で入力します。",
       "metric_key": "メトリックキー",
-      "metric_key_placeholder": "例えば承認済み_時間、フォーマル_ケア_オフセット_chf",
       "metric_key_description": "手動以外のソースには必須",
       "before_value": "前の値",
       "after_value": "後の値",
@@ -2772,7 +3449,9 @@
       "demo_label": "デモ/説明",
       "demo_description": "カードはギャラリー上でデモとしてラベル付けされています",
       "published_label": "発行済み",
-      "published_description": "会員向けギャラリーに表示されます"
+      "published_description": "会員向けギャラリーに表示されます",
+      "metric_source_description": "pilot_scoreboard: AG83 から自動取得; municipal_roi: AG76 から自動取得; 手動: 値を手で入力します。",
+      "metric_key_placeholder": "例: approved_hours、formal_care_offset_chf"
     },
     "delete_modal": {
       "title": "成功事例を削除する",
@@ -2792,6 +3471,38 @@
       "delete_failed": "削除に失敗しました",
       "metric_refreshed": "ライブメトリクスが更新されました",
       "refresh_failed": "更新に失敗しました"
+    },
+    "demo_stories": {
+      "information_distribution": {
+        "title": "情報配信の労力を30％削減",
+        "narrative": "コーディネーターはNEXUSに切り替えた後、更新の配布にかかる時間をおよそ3分の1削減できます。お知らせ、メンバーセグメントのターゲティング、確認追跡が一箇所に統合されます。",
+        "method_caveat": "ピアコミュニティの主張に基づく例示的な例です。これはこのテナントに対して測定されたものではありません。",
+        "evidence_source": "ピア自治体ページ（例示）"
+      },
+      "volunteer_engagement": {
+        "title": "ボランティア参加率が25％増加",
+        "narrative": "パイロットコミュニティでは、NEXUS導入後、より明確なマッチング、低摩擦のサインアップ、目に見えるウォームスパス認識のサポートにより、アクティブなボランティア参加が4分の1増加したと報告されています。",
+        "method_caveat": "ピアコミュニティの主張に基づく例示的な例です。これはこのテナントに対して測定されたものではありません。",
+        "evidence_source": "ピア自治体ページ（例示）"
+      },
+      "formal_care_offset": {
+        "title": "正式介護費用の相殺額 12,250スイスフラン",
+        "narrative": "NEXUSを通じて調整されたボランティア時間は、パイロット期間中の正式な在宅介護費用に対して12,250スイスフランの相殺となり、スイスの正式介護助手のレートで評価されています。",
+        "method_caveat": "1時間あたり35スイスフランで350時間を見積もり；比較はパイロット前のベースラインのみです。",
+        "evidence_source": "AG76 町村ROIモデル（例示）"
+      }
+    }
+  },
+  "regional_points": {
+    "ledger_types": {
+      "admin_adjustment": "管理者による調整",
+      "admin_issue": "管理者発行",
+      "earned_for_hours": "承認された時間に対して獲得",
+      "redemption": "交換",
+      "reversal": "逆転",
+      "transfer_in": "送金受信",
+      "transfer_out": "送金済み",
+      "unknown": "不明な取引"
     }
   }
 }

@@ -201,7 +201,8 @@
         "language_distribution": "Language distribution",
         "member_growth_12m": "Member growth, last 12 months",
         "total_with_data": "{{total}} members with demographic data",
-        "total_active_members": "{{total}} active members"
+        "total_active_members": "{{total}} active members",
+        "unknown_language": "Unknown language"
       },
       "volunteer": {
         "total_hours": "Total hours",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "Help requests by category",
-        "resolution_trend_6m": "Resolution trend, last 6 months"
+        "resolution_trend_6m": "Resolution trend, last 6 months",
+        "categories": {
+          "either": "Phone or message",
+          "message": "Message",
+          "phone": "Phone",
+          "unknown": "Unknown preference"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -258,6 +265,17 @@
     "avg_results": "Avg. results per search",
     "daily_volume": "Daily search volume",
     "searches_by_type": "Searches by type",
+    "result_types": {
+      "blog": "Blog",
+      "events": "Events",
+      "groups": "Groups",
+      "jobs": "Jobs",
+      "listings": "Listings",
+      "marketplace": "Marketplace",
+      "members": "Members",
+      "resources": "Resources",
+      "volunteering": "Volunteering"
+    },
     "trending_title": "Trending searches",
     "zero_results_title": "Zero-result searches",
     "searches": "Searches",

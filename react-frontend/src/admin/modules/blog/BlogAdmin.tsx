@@ -54,7 +54,7 @@ export function BlogAdmin() {
 
   const handleBulkResult = (res: { success: boolean; error?: string; data?: BulkActionResult | unknown }) => {
     if (!res.success) {
-      toast.error(res.error || t('bulk.result_failed'));
+      toast.error(t('bulk.result_failed'));
       return;
     }
     const data = (res.data as BulkActionResult) || { success: 0, failed: 0 };
@@ -109,7 +109,7 @@ export function BlogAdmin() {
         toast.success(t('blog.blog_post_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
+        toast.error(t('blog.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('blog.an_unexpected_error_occurred'));
@@ -126,7 +126,7 @@ export function BlogAdmin() {
         toast.success(t('blog.item_updated'));
         loadItems();
       } else {
-        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
+        toast.error(t('blog.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('blog.an_unexpected_error_occurred'));

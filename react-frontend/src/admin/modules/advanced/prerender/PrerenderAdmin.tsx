@@ -31,6 +31,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useAuth } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
 import { isPlatformSuperAdminUser } from '@/lib/access';
+import { formatPercentValue, formatUnit, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../../components/PageHeader';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import {
@@ -455,7 +456,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       )}
       {/* KPI grid — 11 cards, breakpoints chosen so every row fills cleanly. */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3">
-        <KpiCard label={t('kpi.coverage')} value={`${summary.coverage_pct}%`} hint={`${summary.expected_rendered_count} / ${summary.expected_count}`} />
+        <KpiCard label={t('kpi.coverage')} value={formatPercentValue(summary.coverage_pct)} hint={`${summary.expected_rendered_count} / ${summary.expected_count}`} />
         <KpiCard label={t('kpi.missing')} value={summary.missing_count} hint={t('hints.tenants_routes', { tenants: summary.tenant_count, routes: summary.expected_routes.length })} tone={summary.missing_count > 0 ? 'warning' : 'default'} />
         <KpiCard label={t('kpi.unexpected')} value={summary.unexpected_count} hint={t('hints.unexpected')} tone={summary.unexpected_count > 0 ? 'warning' : 'default'} />
         <KpiCard label={t('kpi.age_stale')} value={summary.stale_count} hint={t('hints.aging', { count: summary.warn_count })} tone={summary.stale_count > 0 ? 'warning' : 'default'} />
@@ -1531,7 +1532,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
                   </Tooltip>
                 ) : (
                   <Chip color={color} variant="soft" size="sm">
-                    {r.rendered}/{r.expected} ({pct}%)
+                    {r.rendered}/{r.expected} ({formatPercentValue(pct)})
                   </Chip>
                 )}
               </TableCell>
@@ -1657,7 +1658,7 @@ function AnalyticsTab() {
         <KpiCard label={t('kpi.total_bot_hits')} value={data.total_hits} />
         <KpiCard
           label={t('kpi.ip_verified')}
-          value={`${verifiedPct}%`}
+          value={formatPercentValue(verifiedPct)}
           hint={t('hints.verified_of_total', { verified: data.verified_hits, total: data.total_hits })}
           tone={verifiedPct >= 80 ? 'default' : 'warning'}
         />
@@ -1747,7 +1748,9 @@ function AnalyticsTab() {
                   <TableCell className="text-xs">{r.host}</TableCell>
                   <TableCell className="text-xs font-mono">{r.uri}</TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="soft" color={httpStatusColor(r.status)}>{r.status}</Chip>
+                    <Chip size="sm" variant="soft" color={httpStatusColor(r.status)}>
+                      {new Intl.NumberFormat(getFormattingLocale(), { useGrouping: false }).format(r.status)}
+                    </Chip>
                   </TableCell>
                   <TableCell className="text-xs font-mono">{r.ip}</TableCell>
                 </TableRow>
@@ -1893,7 +1896,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 </TableCell>
                 <TableCell className="text-xs">
                   {j.rendered_count != null
-                    ? `${j.rendered_count}/${j.planned_count ?? '?'}${j.invalid_count ? ` (${t('result.invalid', { count: j.invalid_count })})` : ''}${j.duration_s != null ? ` | ${j.duration_s}s` : ''}`
+                    ? `${j.rendered_count}/${j.planned_count ?? '?'}${j.invalid_count ? ` (${t('result.invalid', { count: j.invalid_count })})` : ''}${j.duration_s != null ? ` | ${new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'second', unitDisplay: 'short' }).format(j.duration_s)}` : ''}`
                     : '—'}
                 </TableCell>
                 <TableCell className="text-xs">{formatTs(j.queued_at)}</TableCell>
@@ -1950,7 +1953,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                       <Info label={t('detail.tenant')} value={expanded.tenant_slug || t('detail.all')} />
                       <Info label={t('detail.routes')} value={expanded.routes || t('detail.all')} mono />
                       <Info label={t('detail.exit_code')} value={String(expanded.exit_code ?? '—')} />
-                      <Info label={t('detail.duration')} value={expanded.duration_s != null ? `${expanded.duration_s}s` : '—'} />
+                      <Info label={t('detail.duration')} value={expanded.duration_s != null ? formatUnit(expanded.duration_s, 'second') : '—'} />
                       <Info label={t('detail.claimed_by')} value={expanded.claimed_by || '—'} />
                       <Info label={t('detail.queued_at')} value={formatTs(expanded.queued_at)} />
                       <Info label={t('detail.fence_ready_at')} value={formatTs(expanded.fence_ready_at ?? null)} />
@@ -2181,9 +2184,7 @@ const HEALTH_DOT_CLASSES: Record<ReturnType<typeof statusToColor>, string> = {
 };
 
 function readableHealthCheckName(t: (key: string, options?: Record<string, unknown>) => string, name: string): string {
-  const translated = t(`checks.${name}`);
-  if (translated !== `checks.${name}`) return translated;
-  return name.replace(/_/g, ' ');
+  return t(`checks.${name}`, { defaultValue: t('checks.unknown') });
 }
 
 function HealthCheckList({
@@ -2205,7 +2206,11 @@ function HealthCheckList({
         <li key={c.name}>
           <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${HEALTH_DOT_CLASSES[statusToColor(c.status)]}`} />
           <strong>{readableHealthCheckName(t, c.name)}:</strong> {c.detail}
-          {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
+          {c.action && (
+            <span className="block ml-4 text-xs opacity-80">
+              → {t('health.remediation', { detail: c.action })}
+            </span>
+          )}
         </li>
       ))}
       {health.breaker_until && isSuperAdmin && (
@@ -2313,7 +2318,9 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   return (
     <div role="alert" className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
       <div className="flex flex-wrap items-center gap-2">
-        <Chip size="sm" color={tone} variant="soft">{health.status.toUpperCase()}</Chip>
+        <Chip size="sm" color={tone} variant="soft">
+          {t(`statuses.${health.status}`, { defaultValue: t('statuses.unknown') })}
+        </Chip>
         <span className="font-medium">{t('issue_count', { count: failing.length })}</span>
         <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
           {expanded ? t('actions.hide') : t('actions.details')}
@@ -2388,8 +2395,8 @@ function AuditTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  const actionLabel = (action: string) => t(`actions.${action}`, { defaultValue: action });
-  const outcomeLabel = (outcome: string) => t(`outcomes.${outcome}`, { defaultValue: outcome });
+  const actionLabel = (action: string) => t(`actions.${action}`, { defaultValue: t('actions.unknown') });
+  const outcomeLabel = (outcome: string) => t(`outcomes.${outcome}`, { defaultValue: t('outcomes.unknown') });
   const exportAudit = async () => {
     setExporting(true);
     try {
@@ -2551,7 +2558,7 @@ function TtlInspector() {
                 {t('result.ttl', { ttl: fmt(result.ttl_seconds), seconds: result.ttl_seconds })}
               </Chip>
               <Chip variant="soft" size="sm" color={result.source === 'pattern' ? 'success' : 'default'}>
-                {result.source}
+                {t(`result.sources.${result.source}`, { defaultValue: t('result.sources.unknown') })}
               </Chip>
               {result.matched_pattern && (
                 <Code size="sm">{t('result.match', { pattern: result.matched_pattern })}</Code>

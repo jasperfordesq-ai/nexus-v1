@@ -57,7 +57,7 @@ export default function EventSettings() {
         adminConfig.getEventConfig(),
         adminConfig.getEventConfigAuditLog(),
       ]);
-      if (!response.success || !response.data) throw new Error(response.error || 'load_failed');
+      if (!response.success || !response.data) throw new Error(t('load_failed'));
       setSnapshot(response.data);
       setDraft(response.data.config);
       setReason('');
@@ -108,7 +108,7 @@ export default function EventSettings() {
     setSaving(true);
     try {
       const response = await adminConfig.updateEventConfig(snapshot.version, draft, reason.trim(), hasDisruptiveChange);
-      if (!response.success || !response.data) throw new Error(response.error || 'save_failed');
+      if (!response.success || !response.data) throw new Error(t('save_failed'));
       setSnapshot(response.data);
       setDraft(response.data.config);
       setReason('');
@@ -134,7 +134,7 @@ export default function EventSettings() {
     setSaving(true);
     try {
       const response = await adminConfig.restoreEventConfigDefaults(snapshot.version, reason.trim(), keys);
-      if (!response.success || !response.data) throw new Error(response.error || 'restore_failed');
+      if (!response.success || !response.data) throw new Error(t('restore_failed'));
       setSnapshot(response.data);
       setDraft(response.data.config);
       setReason('');

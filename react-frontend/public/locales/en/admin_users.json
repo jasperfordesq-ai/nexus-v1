@@ -217,6 +217,8 @@
     "smart_search_role_chip": "Role: {{role}}",
     "smart_search_text_chip": "Query: {{query}}",
     "role_super_admin": "Super Admin",
+    "role_super_admin_short": "Super Admin",
+    "reset_2fa_reason": "Reset by an administrator",
     "permissions_editor_unavailable_title": "Permissions are read-only here",
     "permissions_editor_unavailable_desc": "This page shows the user's role and granted permissions but can't change them. Manage access by changing the user's role on the user edit page.",
     "role_unknown": "Unknown role",
@@ -255,7 +257,25 @@
       "given": "Consent Given",
       "not_consented": "Not Consented",
       "not_given": "Consent not given",
-      "withdrawn_on": "Withdrawn on"
+      "withdrawn_on": "Withdrawn on",
+      "type_unknown": "Unknown consent type"
+    },
+    "insurance": {
+      "status_none": "None",
+      "status_pending": "Pending",
+      "status_submitted": "Submitted",
+      "status_verified": "Verified",
+      "status_expired": "Expired",
+      "status_rejected": "Rejected",
+      "status_revoked": "Revoked",
+      "status_unknown": "Unknown status",
+      "type_public_liability": "Public liability",
+      "type_professional_indemnity": "Professional indemnity",
+      "type_employers_liability": "Employers' liability",
+      "type_product_liability": "Product liability",
+      "type_personal_accident": "Personal accident",
+      "type_other": "Other",
+      "type_unknown": "Unknown insurance type"
     },
     "descriptions": {
       "balance_amount": "Use negative values to deduct time credits from this member",

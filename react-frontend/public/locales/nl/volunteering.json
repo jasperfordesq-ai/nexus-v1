@@ -815,7 +815,7 @@
     "add_group_member": "Groepslid toevoegen",
     "add_member_description": "Voer het e-mailadres in van de persoon die u aan deze groepsreservering wilt toevoegen. Zij ontvangen een uitnodiging om lid te worden.",
     "email_label": "E-mailadres",
-    "email_placeholder": "lid@voorbeeld.com",
+    "email_placeholder": "member@example.com",
     "searching": "Zoeken...",
     "lookup_error": "Kan lid niet opzoeken. Probeer het opnieuw.",
     "no_member_found": "Er is geen lid gevonden met dat e-mailadres.",

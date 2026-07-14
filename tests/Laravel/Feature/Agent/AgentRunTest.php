@@ -39,14 +39,14 @@ class AgentRunTest extends TestCase
                         'recipient' => ['id' => 202, 'name' => 'Bob'],
                         'score'     => 0.82,
                         'signals'   => ['distance' => 1.0, 'language' => 1.0],
-                        'reason'    => 'Both prefer English and live nearby.',
+                        'reasons'   => [['code' => 'shared_language', 'params' => []]],
                     ],
                     [
                         'supporter' => ['id' => 103, 'name' => 'Carol'],
                         'recipient' => ['id' => 204, 'name' => 'Dave'],
                         'score'     => 0.65,
                         'signals'   => ['distance' => 0.7],
-                        'reason'    => 'Reasonable distance match.',
+                        'reasons'   => [['code' => 'distance', 'params' => ['distance_km' => 4.2]]],
                     ],
                 ];
             }

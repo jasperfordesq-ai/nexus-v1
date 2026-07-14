@@ -207,7 +207,8 @@
     "moderated": "Kurs zaktualizowany",
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
     "no_courses": "Nie ma jeszcze żadnych kursów.",
-    "no_instructors": "Nie przyznano jeszcze żadnych instruktorów."
+    "no_instructors": "Nie przyznano jeszcze żadnych instruktorów.",
+    "status_unknown": "Nieznany status"
   },
   "builder": {
     "add_section": "Dodaj sekcję",

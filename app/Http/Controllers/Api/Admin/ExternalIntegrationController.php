@@ -61,7 +61,7 @@ class ExternalIntegrationController extends BaseApiController
         if (isset($result['error']) && $result['error'] === 'already_seeded') {
             return $this->respondWithError(
                 'ALREADY_SEEDED',
-                'Backlog already contains items — refusing to seed defaults.',
+                __('api.integration_backlog_already_seeded'),
                 null,
                 409,
             );
@@ -103,7 +103,7 @@ class ExternalIntegrationController extends BaseApiController
         $result = $this->service->update(TenantContext::getId(), $itemId, $payload);
 
         if (isset($result['error']) && $result['error'] === 'not_found') {
-            return $this->respondNotFound('Integration backlog item not found.');
+            return $this->respondNotFound(__('api.integration_backlog_item_not_found'));
         }
 
         if (isset($result['errors']) && $result['errors'] !== []) {
@@ -124,7 +124,7 @@ class ExternalIntegrationController extends BaseApiController
         $result = $this->service->delete(TenantContext::getId(), $itemId);
 
         if (isset($result['error']) && $result['error'] === 'not_found') {
-            return $this->respondNotFound('Integration backlog item not found.');
+            return $this->respondNotFound(__('api.integration_backlog_item_not_found'));
         }
 
         return $this->respondWithData(['ok' => true]);
@@ -139,7 +139,7 @@ class ExternalIntegrationController extends BaseApiController
         $this->requireAdmin();
 
         if (!TenantContext::hasFeature('caring_community')) {
-            return $this->respondForbidden('Caring Community feature is not enabled for this tenant.');
+            return $this->respondForbidden(__('api.caring_community_feature_disabled'));
         }
 
         return null;

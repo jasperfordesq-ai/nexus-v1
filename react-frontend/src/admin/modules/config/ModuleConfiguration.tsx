@@ -82,7 +82,7 @@ export default function ModuleConfiguration() {
       } else {
         setConfig(null);
         setLoadError(true);
-        toast.error(res.error || t('config.module_config_load_failed'));
+        toast.error(t('config.module_config_load_failed'));
       }
     } catch {
       setConfig(null);
@@ -123,15 +123,13 @@ export default function ModuleConfiguration() {
           return { ...prev, features: { ...prev.features, [id]: enabled } };
         });
         const mod = [...coreModules, ...featureModules].find(m => m.id === id);
-        const nameKey = mod ? `config.module_name_${mod.id}` : '';
-        const translatedName = nameKey ? t(nameKey) : id;
-        const moduleName = mod && translatedName === nameKey ? mod.name : translatedName;
+        const moduleName = mod ? t(`config.module_name_${mod.id}`) : id;
         toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: moduleName }));
         refreshTenant();
         return true;
       }
 
-      toast.error(res.error || t('config.failed_to_update_module'));
+      toast.error(t('config.failed_to_update_module'));
       return false;
     } catch {
       toast.error(t('config.failed_to_update_module'));
@@ -159,10 +157,8 @@ export default function ModuleConfiguration() {
       m => {
         const nameKey = `config.module_name_${m.id}`;
         const descKey = `config.module_desc_${m.id}`;
-        const translatedName = t(nameKey);
-        const translatedDesc = t(descKey);
-        const name = translatedName === nameKey ? m.name : translatedName;
-        const description = translatedDesc === descKey ? m.description : translatedDesc;
+        const name = t(nameKey);
+        const description = t(descKey);
         return name.toLowerCase().includes(q) || description.toLowerCase().includes(q);
       }
     );

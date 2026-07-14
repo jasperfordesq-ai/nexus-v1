@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -53,15 +53,13 @@ interface RevenueDashboardData {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const currencyFormatter = new Intl.NumberFormat('en-IE', {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-});
-
 function formatCurrency(amount: number): string {
-  return currencyFormatter.format(amount);
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 function actionChipColor(
@@ -216,12 +214,12 @@ export function RevenueDashboard() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
               label={t('billing.mrr')}
-              value={`${formatCurrency(data.mrr)}/mo`}
+              value={t('billing.amount_per_month', { amount: formatCurrency(data.mrr) })}
               icon={<DollarSign aria-hidden="true" className="w-4 h-4" />}
             />
             <StatCard
               label={t('billing.arr')}
-              value={`${formatCurrency(data.arr)}/yr`}
+              value={t('billing.amount_per_year', { amount: formatCurrency(data.arr) })}
               color="success"
               icon={<TrendingUp aria-hidden="true" className="w-4 h-4" />}
             />
@@ -290,7 +288,7 @@ export function RevenueDashboard() {
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
-                            <span className="text-sm text-muted w-9 text-right">{pct}%</span>
+                            <span className="text-sm text-muted w-9 text-right">{formatPercentValue(pct)}</span>
                           </div>
                         </TableCell>
                       </TableRow>

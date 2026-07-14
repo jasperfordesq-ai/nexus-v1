@@ -102,7 +102,27 @@
       "approved": "Approved",
       "provisioned": "Provisioned",
       "rejected": "Rejected",
-      "failed": "Failed"
+      "failed": "Failed",
+      "unknown": "Unknown status"
+    },
+    "categories": {
+      "community": "Community",
+      "timebank": "Timebank",
+      "kiss_cooperative": "Caring Community cooperative",
+      "caring_community": "Caring Community",
+      "agoris_node": "Agoris node",
+      "foundation": "Foundation",
+      "platform": "Platform",
+      "unknown": "Other community type"
+    },
+    "size_buckets": {
+      "under_50": "Under 50 members",
+      "50_250": "50–250 members",
+      "250_1000": "250–1,000 members",
+      "1000_5000": "1,000–5,000 members",
+      "5000_plus": "More than 5,000 members",
+      "50-200": "50–200 members",
+      "unknown": "Size not specified"
     },
     "fields": {
       "applicant": "Applicant",

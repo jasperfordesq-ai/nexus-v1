@@ -199,7 +199,8 @@
     "moderated": "コースを更新しました",
     "error": "何か問題が発生しました。もう一度試してください。",
     "no_courses": "まだコースはありません。",
-    "no_instructors": "まだ講師は決まっていません。"
+    "no_instructors": "まだ講師は決まっていません。",
+    "status_unknown": "状態不明"
   },
   "builder": {
     "add_section": "セクションを追加",

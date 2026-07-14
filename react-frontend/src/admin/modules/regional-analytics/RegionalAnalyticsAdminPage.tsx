@@ -15,6 +15,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency, formatDateValue } from '@/lib/helpers';
 
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Download from 'lucide-react/icons/download';
@@ -114,7 +115,7 @@ export default function RegionalAnalyticsAdminPage() {
         toast.success(t('regional_analytics_admin.toasts.status_updated', { status: t(`regional_analytics_admin.statuses.${status}`) }));
         void load();
       } else {
-        toast.error(res.error || t('regional_analytics_admin.toasts.update_failed'));
+        toast.error(t('regional_analytics_admin.toasts.update_failed'));
       }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.update_failed'));
@@ -127,7 +128,7 @@ export default function RegionalAnalyticsAdminPage() {
       if (res.success) {
         toast.success(t('regional_analytics_admin.toasts.report_queued'));
       } else {
-        toast.error(res.error || t('regional_analytics_admin.toasts.report_failed'));
+        toast.error(t('regional_analytics_admin.toasts.report_failed'));
       }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.report_failed'));
@@ -207,10 +208,12 @@ export default function RegionalAnalyticsAdminPage() {
                       </Chip>
                     </TableCell>
                     <TableCell className="text-xs">
-                      {s.current_period_end ? s.current_period_end.slice(0, 10) : t('regional_analytics_admin.empty.value')}
+                      {s.current_period_end
+                        ? formatDateValue(s.current_period_end, { year: 'numeric', month: 'short', day: 'numeric' })
+                        : t('regional_analytics_admin.empty.value')}
                     </TableCell>
                     <TableCell>
-                      {(s.monthly_price_cents / 100).toFixed(2)} {s.currency}
+                      {formatCurrency(s.monthly_price_cents / 100, s.currency)}
                     </TableCell>
                     <TableCell className="text-xs">
                       {(s.enabled_modules ?? []).map((module) => t(`regional_analytics_admin.modules.${module}`)).join(', ') ||
@@ -383,7 +386,7 @@ function CreateSubscriptionModal({
         reset();
         onCreated();
       } else {
-        toast.error(res.error || t('regional_analytics_admin.toasts.create_failed'));
+        toast.error(t('regional_analytics_admin.toasts.create_failed'));
       }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.create_failed'));

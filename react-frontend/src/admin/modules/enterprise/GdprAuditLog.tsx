@@ -40,6 +40,10 @@ function getActionColor(action: string): ActionColor {
   return 'default';
 }
 
+function translationToken(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
+
 interface AuditFilters {
   action: string;
   entity_type: string;
@@ -172,7 +176,7 @@ export function GdprAuditLog() {
         sortable: true,
         render: (e) => (
           <Chip size="sm" variant="soft" color={getActionColor(e.action)}>
-            {e.action}
+            {t(`enterprise.gdpr_audit_action_${translationToken(e.action)}`, { defaultValue: t('enterprise.gdpr_audit_action_unknown') })}
           </Chip>
         ),
       },
@@ -181,7 +185,7 @@ export function GdprAuditLog() {
         label: t('enterprise.gdpr_col_entity_type'),
         render: (e) => (
           <Chip size="sm" variant="soft" color="default">
-            {e.entity_type}
+            {t(`enterprise.gdpr_entity_type_${translationToken(e.entity_type)}`, { defaultValue: t('enterprise.gdpr_entity_type_unknown') })}
           </Chip>
         ),
       },
@@ -263,7 +267,9 @@ export function GdprAuditLog() {
               }}
             >
               {allActions.map((a) => (
-                <SelectItem key={a} id={a}>{a}</SelectItem>
+                <SelectItem key={a} id={a}>
+                  {t(`enterprise.gdpr_audit_action_${translationToken(a)}`, { defaultValue: t('enterprise.gdpr_audit_action_unknown') })}
+                </SelectItem>
               ))}
             </Select>
 
@@ -278,7 +284,9 @@ export function GdprAuditLog() {
               }}
             >
               {allEntityTypes.map((et) => (
-                <SelectItem key={et} id={et}>{et}</SelectItem>
+                <SelectItem key={et} id={et}>
+                  {t(`enterprise.gdpr_entity_type_${translationToken(et)}`, { defaultValue: t('enterprise.gdpr_entity_type_unknown') })}
+                </SelectItem>
               ))}
             </Select>
 
@@ -351,13 +359,13 @@ export function GdprAuditLog() {
                       <div>
                         <p className="text-xs text-muted">{t('enterprise.gdpr_detail_action')}</p>
                         <Chip size="sm" variant="soft" color={getActionColor(selectedEntry.action)}>
-                          {selectedEntry.action}
+                          {t(`enterprise.gdpr_audit_action_${translationToken(selectedEntry.action)}`, { defaultValue: t('enterprise.gdpr_audit_action_unknown') })}
                         </Chip>
                       </div>
                       <div>
                         <p className="text-xs text-muted">{t('enterprise.gdpr_detail_entity_type')}</p>
                         <Chip size="sm" variant="soft" color="default">
-                          {selectedEntry.entity_type}
+                          {t(`enterprise.gdpr_entity_type_${translationToken(selectedEntry.entity_type)}`, { defaultValue: t('enterprise.gdpr_entity_type_unknown') })}
                         </Chip>
                       </div>
                       <div>
@@ -366,7 +374,9 @@ export function GdprAuditLog() {
                       </div>
                       <div>
                         <p className="text-xs text-muted">{t('enterprise.gdpr_detail_admin_user')}</p>
-                        <p className="text-sm">{selectedEntry.user_name || `ID ${selectedEntry.admin_id}`}</p>
+                        <p className="text-sm">
+                          {selectedEntry.user_name || t('enterprise.gdpr_admin_id', { id: selectedEntry.admin_id })}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-muted">{t('enterprise.gdpr_detail_ip_address')}</p>

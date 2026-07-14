@@ -694,7 +694,7 @@
     "time_credits_label": "Oferowane Kredyty Czasowe",
     "time_credits_placeholder": "np. 5.00",
     "contact_email_label": "Adres e-mail kontaktowy",
-    "contact_email_placeholder": "kontakt@example.com",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Telefon kontaktowy",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Termin składania wniosków",
@@ -1121,7 +1121,9 @@
     }
   },
   "jobs": {
-    "view_details": "Zobacz szczegóły oferty"
+    "view_details": "Zobacz szczegóły oferty",
+    "type_unknown": "Nieznany typ",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Widok zadań",
   "deadline_countdown_few": "Zamknie się za {{count}} dni",

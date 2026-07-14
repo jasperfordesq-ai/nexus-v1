@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -79,13 +79,13 @@ interface SubRegionListResponse {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const CHF = new Intl.NumberFormat('de-CH', {
+const CHF = new Intl.NumberFormat(getFormattingLocale(), {
   style: 'currency',
   currency: 'CHF',
   maximumFractionDigits: 0,
 });
 
-const NUM = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 0 });
+const NUM = new Intl.NumberFormat(getFormattingLocale(), { maximumFractionDigits: 0 });
 
 function startOfYearISO(): string {
   const now = new Date();
@@ -432,7 +432,7 @@ export default function MunicipalRoiAdminPage() {
                     }
                   >
                     {t('municipal_roi_page.roi.yoy', {
-                      value: `${yoyPct > 0 ? '+' : ''}${yoyPct.toFixed(1)}%`,
+                      value: formatPercentValue(yoyPct, { signDisplay: yoyPct > 0 ? 'always' : 'auto' }),
                     })}
                   </Chip>
                 )}

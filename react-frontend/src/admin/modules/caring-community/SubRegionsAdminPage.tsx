@@ -225,7 +225,7 @@ export default function SubRegionsAdminPage() {
         : await api.post('/v2/admin/caring-community/sub-regions', payload);
 
       if (!res.success) {
-        showToast(res.error || t('sub_regions.errors.save_failed'), 'error');
+        showToast(t('sub_regions.errors.save_failed'), 'error');
         return;
       }
 
@@ -269,7 +269,7 @@ export default function SubRegionsAdminPage() {
         showToast(t('sub_regions.toasts.marked_inactive'), 'success');
         void fetchRegions();
       } else {
-        showToast(res.error || t('sub_regions.errors.delete_failed'), 'error');
+        showToast(t('sub_regions.errors.delete_failed'), 'error');
       }
     } catch (err) {
       logError('SubRegionsAdminPage.delete', err);

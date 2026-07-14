@@ -140,7 +140,7 @@ export function UserEdit() {
         setIsGlobalSuperAdmin(userData.is_super_admin || false);
         setIsMunicipalityAnnouncer(Array.isArray(userData.roles) ? userData.roles.includes('municipality_announcer') : false);
       } else {
-        setLoadError(res.error || t('errors.load_error'));
+        setLoadError(t('errors.load_error'));
       }
     } catch {
       setLoadError(t('errors.load_unexpected'));
@@ -222,7 +222,7 @@ export function UserEdit() {
         toast.success(t('toasts.update_success'));
         loadUser();
       } else {
-        toast.error(res.error || t('toasts.update_failed'));
+        toast.error(t('toasts.update_failed'));
       }
     } catch {
       toast.error(t('toasts.generic_error'));
@@ -240,7 +240,7 @@ export function UserEdit() {
         setIsTenantSuperAdmin(!isTenantSuperAdmin);
         toast.success(!isTenantSuperAdmin ? t('toasts.tenant_super_admin_granted') : t('toasts.tenant_super_admin_revoked'));
       } else {
-        toast.error(res.error || t('toasts.tenant_super_admin_failed'));
+        toast.error(t('toasts.tenant_super_admin_failed'));
       }
     } catch {
       toast.error(t('toasts.tenant_super_admin_failed'));
@@ -258,7 +258,7 @@ export function UserEdit() {
         setIsGlobalSuperAdmin(!isGlobalSuperAdmin);
         toast.success(!isGlobalSuperAdmin ? t('toasts.global_super_admin_granted') : t('toasts.global_super_admin_revoked'));
       } else {
-        toast.error(res.error || t('toasts.global_super_admin_failed'));
+        toast.error(t('toasts.global_super_admin_failed'));
       }
     } catch {
       toast.error(t('toasts.global_super_admin_failed'));
@@ -277,7 +277,7 @@ export function UserEdit() {
           setIsMunicipalityAnnouncer(false);
           toast.success(t('toasts.announcer_revoked'));
         } else {
-          toast.error(res.error || t('toasts.announcer_failed'));
+          toast.error(t('toasts.announcer_failed'));
         }
       } else {
         const res = await api.post('/v2/admin/feed/grant-announcer', { user_id: Number(id) });
@@ -285,7 +285,7 @@ export function UserEdit() {
           setIsMunicipalityAnnouncer(true);
           toast.success(t('toasts.announcer_granted'));
         } else {
-          toast.error(res.error || t('toasts.announcer_failed'));
+          toast.error(t('toasts.announcer_failed'));
         }
       }
     } catch {
@@ -316,7 +316,7 @@ export function UserEdit() {
           toast.success(t('toasts.impersonate_success'));
         }
       } else {
-        toast.error(res.error || t('toasts.impersonate_failed'));
+        toast.error(t('toasts.impersonate_failed'));
       }
     } catch {
       toast.error(t('toasts.impersonate_failed'));
@@ -339,7 +339,7 @@ export function UserEdit() {
         setBalanceReason('');
         loadUser();
       } else {
-        toast.error(res.error || t('toasts.balance_failed'));
+        toast.error(t('toasts.balance_failed'));
       }
     } catch {
       toast.error(t('toasts.balance_failed'));
@@ -359,7 +359,7 @@ export function UserEdit() {
           prev ? { ...prev, badges: prev.badges.filter((b) => b.id !== badgeToRemove.id) } : prev
         );
       } else {
-        toast.error(res.error || t('toasts.remove_badge_failed'));
+        toast.error(t('toasts.remove_badge_failed'));
       }
     } catch {
       toast.error(t('toasts.generic_error'));
@@ -381,7 +381,7 @@ export function UserEdit() {
         }
         toast.success(t('toasts.recheck_complete'));
       } else {
-        toast.error(res.error || t('toasts.recheck_failed'));
+        toast.error(t('toasts.recheck_failed'));
       }
     } catch {
       toast.error(t('toasts.recheck_failed'));
@@ -401,7 +401,7 @@ export function UserEdit() {
         setPasswordModalOpen(false);
         setNewPassword('');
       } else {
-        toast.error(res.error || t('toasts.password_failed'));
+        toast.error(t('toasts.password_failed'));
       }
     } catch {
       toast.error(t('toasts.password_failed'));
@@ -418,7 +418,7 @@ export function UserEdit() {
       if (res.success) {
         toast.success(t('toasts.password_reset_sent'));
       } else {
-        toast.error(res.error || t('toasts.password_reset_failed'));
+        toast.error(t('toasts.password_reset_failed'));
       }
     } catch {
       toast.error(t('toasts.password_reset_failed'));
@@ -435,7 +435,7 @@ export function UserEdit() {
       if (res.success) {
         toast.success(t('toasts.welcome_email_sent'));
       } else {
-        toast.error(res.error || t('toasts.welcome_email_failed'));
+        toast.error(t('toasts.welcome_email_failed'));
       }
     } catch {
       toast.error(t('toasts.welcome_email_failed'));
@@ -458,7 +458,7 @@ export function UserEdit() {
           toast.success(t('toasts.verification_email_sent'));
         }
       } else {
-        toast.error(res.error || t('toasts.verification_email_failed'));
+        toast.error(t('toasts.verification_email_failed'));
       }
     } catch {
       toast.error(t('toasts.verification_email_failed'));
@@ -895,7 +895,7 @@ export function UserEdit() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-foreground">
-                          {consent.name || consent.consent_type.replace(/_/g, ' ')}
+                          {consent.name || t(`consents.type_${consent.consent_type}`, { defaultValue: t('consents.type_unknown') })}
                         </p>
                         {consent.is_required && (
                           <Chip size="sm" variant="soft" color="warning">{t('badges.required')}</Chip>
@@ -1027,7 +1027,7 @@ export function UserEdit() {
                         }
                         className="capitalize"
                       >
-                        {user?.insurance_status || 'none'}
+                        {t(`insurance.status_${user?.insurance_status ?? 'none'}`, { defaultValue: t('insurance.status_unknown') })}
                       </Chip>
                       <Button
                         as={Link}
@@ -1045,7 +1045,7 @@ export function UserEdit() {
                         <div key={ic.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                           <div>
                             <p className="text-sm font-medium text-foreground">
-                              {ic.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                              {t(`insurance.type_${ic.insurance_type}`, { defaultValue: t('insurance.type_unknown') })}
                             </p>
                             <p className="text-xs text-muted">
                               {ic.provider_name || t('values.unknown_provider')}
@@ -1063,7 +1063,7 @@ export function UserEdit() {
                             }
                             className="capitalize"
                           >
-                            {ic.status}
+                            {t(`insurance.status_${ic.status}`, { defaultValue: t('insurance.status_unknown') })}
                           </Chip>
                         </div>
                       ))}

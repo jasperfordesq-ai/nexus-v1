@@ -8,11 +8,24 @@ import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 import { ConfirmDialogProvider } from '@/components/ui';
 import { createMockContexts } from '@/test/mock-contexts';
 
-const { mockEditor, mockGrapesInit } = vi.hoisted(() => {
+const { mockBlockModels, mockEditor, mockGrapesInit } = vi.hoisted(() => {
+  const blockModels = new Map<string, { set: ReturnType<typeof vi.fn> }>();
   const editor = {
-    BlockManager: { add: vi.fn() },
+    BlockManager: {
+      add: vi.fn((id: string) => {
+        const block = { set: vi.fn() };
+        blockModels.set(id, block);
+        return block;
+      }),
+      get: vi.fn((id: string) => blockModels.get(id)),
+      render: vi.fn(),
+    },
     AssetManager: { add: vi.fn() },
     Css: { setRule: vi.fn() },
+    I18n: { addMessages: vi.fn(), setLocale: vi.fn() },
+    StyleManager: { render: vi.fn() },
+    TraitManager: { render: vi.fn() },
+    LayerManager: { render: vi.fn() },
     addStyle: vi.fn(),
     addComponents: vi.fn(() => ({ id: 'image-component' })),
     select: vi.fn(),
@@ -30,6 +43,7 @@ const { mockEditor, mockGrapesInit } = vi.hoisted(() => {
   };
 
   return {
+    mockBlockModels: blockModels,
     mockEditor: editor,
     mockGrapesInit: vi.fn(() => editor),
   };
@@ -88,6 +102,7 @@ function renderBuilder(designJson: string | null, readOnly = false) {
 describe('PageDesignBuilder', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockBlockModels.clear();
     mockEditor.loadProjectData.mockReset();
     mockEditor.setComponents.mockClear();
     mockEditor.addStyle.mockClear();

@@ -66,6 +66,14 @@ import {
   type EditorLike,
 } from './builderImage';
 import { attachBackgroundTraits } from './builderTraits';
+import {
+  escapeBuilderText,
+  getGrapesJsCoreMessages,
+  getMjmlMessages,
+  mergeGrapesJsMessages,
+  normalizeGrapesJsLocale,
+  type GrapesJsMessages,
+} from './grapesJsLocale';
 
 const AssetLibraryModal = lazy(() =>
   import('./AssetLibraryModal').then((module) => ({ default: module.AssetLibraryModal })),
@@ -91,8 +99,156 @@ interface NewsletterBuilderProps {
 const AUTOSAVE_DEBOUNCE_MS = 1000;
 
 /** Blank starting canvas — establishes the mjml > mj-body wrapper blocks drop into. */
-const DEFAULT_MJML =
-  '<mjml><mj-body><mj-section><mj-column><mj-text>Start designing your email…</mj-text></mj-column></mj-section></mj-body></mjml>';
+type BuilderTranslate = (key: string) => string;
+
+const MJML_IMAGE_PLACEHOLDER = 'https://via.placeholder.com/350x250/78c5d6/fff';
+const MJML_HERO_PLACEHOLDER =
+  'https://cloud.githubusercontent.com/assets/1830348/15354890/1442159a-1cf0-11e6-92b1-b861dadf1750.jpg';
+
+function defaultNewsletterMjml(t: BuilderTranslate): string {
+  const prompt = escapeBuilderText(t('newsletter_builder.grapesjs.content.blank_canvas'));
+  return `<mjml><mj-body><mj-section><mj-column><mj-text>${prompt}</mj-text></mj-column></mj-section></mj-body></mjml>`;
+}
+
+function newsletterBlockOverrides(id: string, t: BuilderTranslate): Record<string, unknown> {
+  const text = (key: string) => escapeBuilderText(t(`newsletter_builder.grapesjs.content.${key}`));
+
+  switch (id) {
+    case 'mj-1-column':
+      return { content: `<mj-section><mj-column><mj-text>${text('column_one')}</mj-text></mj-column></mj-section>` };
+    case 'mj-2-columns':
+      return {
+        content: `<mj-section><mj-column><mj-text>${text('column_one')}</mj-text></mj-column><mj-column><mj-text>${text('column_two')}</mj-text></mj-column></mj-section>`,
+      };
+    case 'mj-3-columns':
+      return {
+        content: `<mj-section><mj-column><mj-text>${text('column_one')}</mj-text></mj-column><mj-column><mj-text>${text('column_two')}</mj-text></mj-column><mj-column><mj-text>${text('column_three')}</mj-text></mj-column></mj-section>`,
+      };
+    case 'mj-text':
+      return { content: `<mj-text>${text('text')}</mj-text>` };
+    case 'mj-button':
+      return { content: `<mj-button>${text('button')}</mj-button>` };
+    case 'mj-navbar':
+      return {
+        content: `<mj-navbar><mj-navbar-link>${text('nav_getting_started')}</mj-navbar-link><mj-navbar-link>${text('nav_try_live')}</mj-navbar-link><mj-navbar-link>${text('nav_templates')}</mj-navbar-link><mj-navbar-link>${text('nav_components')}</mj-navbar-link></mj-navbar>`,
+      };
+    case 'mj-navbar-link':
+      return { content: `<mj-navbar-link>${text('link')}</mj-navbar-link>` };
+    case 'mj-hero':
+      return {
+        content: `<mj-hero mode="fixed-height" height="469px" background-width="600px" background-height="469px" background-url="${MJML_HERO_PLACEHOLDER}" background-color="#2a3448" padding="100px 0px"><mj-text padding="20px" color="#ffffff" font-family="Helvetica" align="center" font-size="45px" line-height="45px" font-weight="900">${text('hero_heading')}</mj-text><mj-button href="https://mjml.io/" align="center">${text('hero_button')}</mj-button></mj-hero>`,
+      };
+    case 'mj-wrapper':
+      return {
+        content: `<mj-wrapper border="1px solid #000000" padding="50px 30px"><mj-section border-top="1px solid #aaaaaa" border-left="1px solid #aaaaaa" border-right="1px solid #aaaaaa" padding="20px"><mj-column><mj-image padding="0" src="${MJML_IMAGE_PLACEHOLDER}" /></mj-column></mj-section><mj-section border-left="1px solid #aaaaaa" border-right="1px solid #aaaaaa" padding="20px" border-bottom="1px solid #aaaaaa"><mj-column border="1px solid #dddddd"><mj-text padding="20px">${text('wrapper_first_line')}</mj-text><mj-divider border-width="1px" border-style="dashed" border-color="lightgrey" padding="0 20px" /><mj-text padding="20px">${text('wrapper_second_line')}</mj-text></mj-column></mj-section></mj-wrapper>`,
+      };
+    case 'mj-raw': {
+      const images = [141, 142, 143, 144, 145, 146]
+        .map((height) => `<img class="item" src="https://source.unsplash.com/random/200x${height}" alt="${text('example_image')}">`)
+        .join('');
+      return { content: `<mj-raw><div class="container">${images}</div></mj-raw>` };
+    }
+    default:
+      return {};
+  }
+}
+
+function newsletterEditorMessages(
+  t: BuilderTranslate,
+  coreT: BuilderTranslate,
+  language?: string,
+): GrapesJsMessages {
+  const value = (key: string) => t(`newsletter_builder.grapesjs.${key}`);
+
+  return mergeGrapesJsMessages(
+    getGrapesJsCoreMessages(language, coreT),
+    getMjmlMessages(language, t),
+    {
+      styleManager: {
+        properties: {
+          'icon-size': value('styles.icon_size'),
+          'vertical-align': value('styles.vertical_align'),
+          align: value('styles.align'),
+          'text-decoration': value('styles.text_decoration'),
+          'font-style': value('styles.font_style'),
+          'container-background-color': value('styles.container_background_color'),
+          'background-url': value('styles.background_image'),
+          'border-detached': value('styles.border'),
+        },
+        options: {
+          'vertical-align': {
+            top: value('options.top'),
+            middle: value('options.middle'),
+            bottom: value('options.bottom'),
+          },
+          'text-align': {
+            left: value('options.left'),
+            center: value('options.center'),
+            right: value('options.right'),
+            justify: value('options.justify'),
+          },
+          align: {
+            left: value('options.left'),
+            center: value('options.center'),
+            right: value('options.right'),
+            justify: value('options.justify'),
+          },
+          'text-decoration': {
+            none: value('options.none'),
+            underline: value('options.underline'),
+            'line-through': value('options.line_through'),
+          },
+          'font-style': {
+            normal: value('options.normal'),
+            italic: value('options.italic'),
+          },
+          'border-style': {
+            none: value('options.none'),
+            solid: value('options.solid'),
+            dotted: value('options.dotted'),
+            dashed: value('options.dashed'),
+            double: value('options.double'),
+            groove: value('options.groove'),
+            ridge: value('options.ridge'),
+            inset: value('options.inset'),
+            outset: value('options.outset'),
+          },
+        },
+      },
+      traitManager: {
+        traits: {
+          labels: {
+            'full-width': value('traits.full_width'),
+            hamburger: value('traits.hamburger'),
+            name: value('traits.icon'),
+            src: value('traits.source'),
+            rel: value('traits.relationship'),
+            mode: value('traits.mode'),
+            owa: value('traits.owa'),
+            lang: value('traits.language'),
+            dir: value('traits.direction'),
+          },
+          attributes: {
+            owa: { placeholder: value('placeholders.owa') },
+            lang: { placeholder: value('placeholders.language') },
+            dir: { placeholder: value('placeholders.direction') },
+          },
+          options: {
+            hamburger: {
+              hamburger: value('options.on'),
+              OFF: value('options.off'),
+              false: value('options.off'),
+            },
+            mode: {
+              horizontal: value('options.horizontal'),
+              vertical: value('options.vertical'),
+            },
+          },
+        },
+      },
+    },
+  );
+}
 
 /** Resolve the plugin whether Vite hands us `fn` or `{ default: fn }`. */
 type MjmlPluginFn = (editor: Editor, opts: Record<string, unknown>) => void;
@@ -125,7 +281,7 @@ function exportIsValid(ed: Editor): boolean {
 }
 
 export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, enableTemplates, onChange }: NewsletterBuilderProps) {
-  const { t } = useTranslation('admin_newsletters');
+  const { t, i18n } = useTranslation(['admin_newsletters', 'admin_editor']);
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -203,6 +359,11 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
 
     let ed: Editor;
     try {
+      const editorLocale = normalizeGrapesJsLocale(i18n.resolvedLanguage ?? i18n.language);
+      const coreT = i18n.getFixedT(editorLocale, 'admin_editor') as BuilderTranslate;
+      const editorMessages = newsletterEditorMessages(t, coreT, editorLocale);
+      const englishT = i18n.getFixedT('en', 'admin_newsletters') as BuilderTranslate;
+      const englishCoreT = i18n.getFixedT('en', 'admin_editor') as BuilderTranslate;
       ed = grapesjs.init({
         container: canvasRef.current,
         height: '100%',
@@ -210,6 +371,15 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         fromElement: false,
         storageManager: { type: 'none' },
         undoManager: { trackSelection: false },
+        i18n: {
+          locale: editorLocale,
+          localeFallback: 'en',
+          detectLocale: false,
+          messages: {
+            en: newsletterEditorMessages(englishT, englishCoreT, 'en'),
+            [editorLocale]: editorMessages,
+          },
+        },
         // Suppress GrapesJS's default (icon-less) panels; we own the chrome.
         panels: { defaults: [] },
         // Pin each manager into our own React layout.
@@ -224,6 +394,8 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
               resetStyleManager: true,
               resetDevices: true,
               hideSelector: true,
+              block: (id: string) => newsletterBlockOverrides(id, t),
+              i18n: { [editorLocale]: getMjmlMessages(editorLocale, t) },
             }),
         ],
         assetManager: {
@@ -259,6 +431,20 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
 
     editorRef.current = ed;
 
+    const syncEditorLocale = (language: string) => {
+      const locale = normalizeGrapesJsLocale(language);
+      const fixedT = i18n.getFixedT(language, 'admin_newsletters') as BuilderTranslate;
+      const fixedCoreT = i18n.getFixedT(language, 'admin_editor') as BuilderTranslate;
+      ed.I18n.addMessages({ [locale]: newsletterEditorMessages(fixedT, fixedCoreT, locale) });
+      ed.I18n.setLocale(locale);
+      ed.BlockManager.render();
+      ed.StyleManager.render();
+      ed.TraitManager.render();
+      ed.LayerManager.render();
+    };
+    syncEditorLocale(i18n.resolvedLanguage ?? i18n.language);
+    i18n.on('languageChanged', syncEditorLocale);
+
     // Surface the missing mj-hero / mj-section background traits so the hero
     // image (and section backgrounds) become editable from the Settings tab.
     const disposeTraits = attachBackgroundTraits(
@@ -290,7 +476,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     if (!restored) {
       const mjml = initialMjmlRef.current;
       const hasStarterMjml = Boolean(mjml && mjml.trim().startsWith('<mjml'));
-      ed.setComponents(hasStarterMjml ? mjml! : DEFAULT_MJML);
+      ed.setComponents(hasStarterMjml ? mjml! : defaultNewsletterMjml(t));
       seededBlank = !hasStarterMjml;
     }
     // Offer starter templates over a genuinely blank canvas. Arm the dismiss
@@ -353,6 +539,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       ed.off('component:selected component:deselected', syncSelection);
       ed.off('change:device', syncDevice);
       ed.off('component:add', handleComponentAdd);
+      i18n.off('languageChanged', syncEditorLocale);
       disposeTraits();
       if (debounceRef.current) clearTimeout(debounceRef.current);
       try {
@@ -402,7 +589,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       confirmLabel: t('newsletter_content_editor.builder_reset'),
     });
     if (!ok) return;
-    editorRef.current?.setComponents(DEFAULT_MJML);
+    editorRef.current?.setComponents(defaultNewsletterMjml(t));
     setLegacyNotice(false);
   };
   const copyCode = async () => {

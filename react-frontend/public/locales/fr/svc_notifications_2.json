@@ -169,7 +169,7 @@
     "item_not_found": "Élément de la file de modération introuvable.",
     "already_reviewed": "Cet article a déjà été examiné.",
     "rejection_reason_required": "Le motif du refus est requis.",
-    "content_decision": "Le contenu a été : décision."
+    "content_decision": "Le contenu a été :decision."
   },
   "tenant_settings": {
     "pending_verification": "Votre vérification d'identité est en attente. Veuillez attendre l'approbation.",
@@ -181,10 +181,10 @@
     "provider_not_configured": "Fournisseur non configuré (clé API manquante)",
     "connection_successful": "Connexion réussie",
     "ollama_not_configured": "URL de l'hôte Ollama non configurée",
-    "ollama_cannot_connect": "Impossible de se connecter à Ollama : erreur",
-    "ollama_connected": "Connecté à Ollama (: nombre de modèles disponibles)",
     "ollama_http_error": "Ollama a renvoyé HTTP :code",
-    "provider_error": "Une erreur s'est produite lors du traitement de votre demande AI. Veuillez réessayer."
+    "provider_error": "Une erreur s'est produite lors du traitement de votre demande AI. Veuillez réessayer.",
+    "ollama_cannot_connect": "Impossible de se connecter à Ollama : :error",
+    "ollama_connected": "Connecté à Ollama (:count modèles disponibles)"
   },
   "report_export": {
     "no_data": "Aucune donnée trouvée pour le rapport et les filtres sélectionnés."

@@ -54,12 +54,12 @@ class OnboardingConfigService
      * Step definitions in display order.
      */
     private const STEPS = [
-        'welcome' => ['key' => 'step_welcome', 'label' => 'Welcome'],
-        'profile' => ['key' => 'step_profile', 'label' => 'Your Profile'],
-        'interests' => ['key' => 'step_interests', 'label' => 'Interests'],
-        'skills' => ['key' => 'step_skills', 'label' => 'Skills'],
-        'safeguarding' => ['key' => 'step_safeguarding', 'label' => 'Support & Safeguarding'],
-        'confirm' => ['key' => 'step_confirm', 'label' => 'Confirm'],
+        'welcome' => ['key' => 'step_welcome'],
+        'profile' => ['key' => 'step_profile'],
+        'interests' => ['key' => 'step_interests'],
+        'skills' => ['key' => 'step_skills'],
+        'safeguarding' => ['key' => 'step_safeguarding'],
+        'confirm' => ['key' => 'step_confirm'],
     ];
 
     /** Cache key for the per-tenant config blob. */
@@ -122,7 +122,7 @@ class OnboardingConfigService
             if (!empty($config[$enabledKey])) {
                 $steps[] = [
                     'slug' => $slug,
-                    'label' => $meta['label'],
+                    'label_code' => $slug,
                     'required' => !empty($config[$requiredKey] ?? false),
                 ];
             }

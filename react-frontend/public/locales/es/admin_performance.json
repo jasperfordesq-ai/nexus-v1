@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,9 +67,10 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "performance": {
     "label_performance_metrics": "Métricas de rendimiento",
@@ -83,19 +83,20 @@
     "label_n_plus_one_warnings": "Advertencias de N Plus One",
     "label_slow_queries": "Consultas lentas",
     "label_total_requests": "Solicitudes totales",
-    "n_plus_one_body": "N Plus One Body",
     "n_plus_one_title": "N más uno",
     "no_memory_spikes": "No se encontraron picos de memoria",
     "no_slow_queries": "No se encontraron consultas lentas",
     "no_slow_requests": "No se encontraron solicitudes lentas",
     "no_volume_data": "No se encontraron datos de volumen",
-    "page_description": "Page.",
     "peak_memory": "Memoria máxima",
     "query_count": "Recuento de consultas",
     "refresh": "Refrescar",
     "tab_memory_spikes": "Picos de memoria",
     "tab_request_volume": "Volumen de solicitud",
     "tab_slow_queries": "Consultas lentas",
-    "tab_slow_requests": "Solicitudes lentas"
+    "tab_slow_requests": "Solicitudes lentas",
+    "warning_unknown": "Advertencia de rendimiento",
+    "n_plus_one_body": "Se detectaron patrones potenciales de consultas N+1. Revise la solicitud lenta y los detalles de la consulta para la carga repetida de relaciones.",
+    "page_description": "Métricas de rendimiento de base de datos, solicitudes y memoria para el período seleccionado."
   }
 }

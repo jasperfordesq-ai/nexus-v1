@@ -165,7 +165,7 @@
     "form_description_required": "Beschreibung ist erforderlich",
     "form_description_min_length": "Die Beschreibung muss mindestens 20 Zeichen lang sein",
     "form_email_label": "Kontakt-E-Mail",
-    "form_email_placeholder": "kontakt@ihreorg.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "Kontakt-E-Mail ist erforderlich",
     "form_email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
     "form_website_label": "Webseite (optional)",
@@ -273,7 +273,7 @@
     "add_member_heading": "Gruppenmitglied hinzufügen",
     "add_member_desc": "Geben Sie die E-Mail-Adresse der Person ein, die Sie zur Gruppenreservierung hinzufügen möchten. Sie erhält eine Einladung.",
     "email_label": "E-Mail-Adresse",
-    "email_placeholder": "mitglied@beispiel.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Abbrechen",
     "add_member_failed": "Mitglied konnte nicht hinzugefügt werden. Möglicherweise ist es bereits in der Gruppe oder die E-Mail-Adresse ist ungültig.",
     "add_member_error": "Mitglied kann nicht hinzugefügt werden. Bitte überprüfen Sie die E-Mail und versuchen Sie es erneut."

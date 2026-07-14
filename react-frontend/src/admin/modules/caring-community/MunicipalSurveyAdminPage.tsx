@@ -1,4 +1,4 @@
-import { formatNumber, getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -167,7 +167,10 @@ function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'c
             <div key={b.option} className="grid gap-2 sm:grid-cols-[minmax(0,10rem)_1fr_5rem] sm:items-center">
               <span className="min-w-0 truncate text-xs">{b.option}</span>
               <Progress
-                aria-label={`${b.option}: ${b.percentage}%`}
+                aria-label={t('admin.surveys.analytics.option_percentage_aria', {
+                  option: b.option,
+                  percentage: formatPercentValue(b.percentage),
+                })}
                 value={b.percentage}
                 className="min-w-0"
                 classNames={{ indicator: 'bg-accent' }}
@@ -292,7 +295,7 @@ export default function MunicipalSurveyAdminPage() {
         createModal.onClose();
         await fetchSurveys();
       } else {
-        setCreateError(res.error || t('admin.surveys.errors.create'));
+        setCreateError(t('admin.surveys.errors.create'));
       }
     } catch (e: unknown) {
       setCreateError(e instanceof Error ? e.message : t('admin.surveys.errors.create'));
@@ -328,7 +331,7 @@ export default function MunicipalSurveyAdminPage() {
         showToast(t('admin.surveys.toasts.published'), 'success');
         await fetchSurveys();
       } else {
-        showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');
+        showToast(tAdmin('common.an_unexpected_error'), 'error');
       }
     } finally {
       setActionId(null);
@@ -343,7 +346,7 @@ export default function MunicipalSurveyAdminPage() {
         showToast(t('admin.surveys.toasts.closed'), 'success');
         await fetchSurveys();
       } else {
-        showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');
+        showToast(tAdmin('common.an_unexpected_error'), 'error');
       }
     } finally {
       setActionId(null);

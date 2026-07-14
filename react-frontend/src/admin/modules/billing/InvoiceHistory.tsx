@@ -36,7 +36,7 @@ function invoiceStatusColor(status: string): 'success' | 'warning' | 'danger' | 
 }
 
 const formatAmount = (amount: number, currency: string) => {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getFormattingLocale(), {
     style: 'currency',
     currency: currency || 'EUR',
     minimumFractionDigits: 2,
@@ -108,7 +108,7 @@ export function InvoiceHistory() {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="soft" color={invoiceStatusColor(item.status)}>
-          {item.status}
+          {t(`billing.invoice_status_${item.status}`, { defaultValue: t('billing.status_unknown') })}
         </Chip>
       ),
     },

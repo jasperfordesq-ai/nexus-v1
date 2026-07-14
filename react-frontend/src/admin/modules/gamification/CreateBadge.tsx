@@ -119,9 +119,7 @@ export function CreateBadge() {
       toast.success(t('gamification.badge_created'));
       navigate(tenantPath('/admin/custom-badges'));
     } else {
-      const errorMsg = (res as { error?: string }).error
-        || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-        || t('gamification.failed_to_create_badge');
+      const errorMsg = t('gamification.failed_to_create_badge');
       toast.error(errorMsg);
     }
 

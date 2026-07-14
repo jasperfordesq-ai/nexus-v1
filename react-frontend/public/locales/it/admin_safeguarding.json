@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,9 +67,10 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "safeguarding": {
     "active": "Attivo",
@@ -329,12 +329,11 @@
     "pending": "In sospeso",
     "placeholder_description_help": "Descrizione Aiuto...",
     "placeholder_display_label": "ad es. Potrei aver bisogno di ulteriore supporto durante gli scambi",
-    "placeholder_guardian_email": "guardian@esempio.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "ad es. necessita_di_supporto_aggiuntivo",
     "placeholder_review_notes": "Note di revisione...",
     "placeholder_search_messages": "Cerca messaggi...",
-    "placeholder_ward_email": "reparto@esempio.com",
+    "placeholder_ward_email": "ward@example.com",
     "reason": "Motivo",
     "refresh": "Aggiorna",
     "required": "Obbligatorio",
@@ -368,7 +367,6 @@
     "ward": "reparto",
     "aria_deactivate_option": "Disattiva opzione",
     "aria_edit_option": "Modifica opzione",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Controllo dell'accesso Ni",
     "vetting_dbs_basic": "Controllo Dbs Base",
     "vetting_dbs_enhanced": "Controllo Dbs migliorato",
@@ -377,6 +375,11 @@
     "vetting_international": "Controllo internazionale",
     "vetting_other": "Controllo Altro",
     "vetting_pvg_scotland": "Controllo Pvg Scozia",
-    "tabs_aria": "Sezioni di salvaguardia"
+    "tabs_aria": "Sezioni di salvaguardia",
+    "status_active": "Attivo",
+    "status_revoked": "Revocato",
+    "status_expired": "Scaduto",
+    "deactivate_confirm_question": "Disattiva",
+    "placeholder_option_key": "ad es. needs_additional_support"
   }
 }

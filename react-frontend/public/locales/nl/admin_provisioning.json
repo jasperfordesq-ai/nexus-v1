@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "provisioning_requests": {
     "page_title": "Voorzieningenwachtrij",
@@ -102,7 +102,8 @@
       "approved": "Goedgekeurd",
       "provisioned": "Voorzien",
       "rejected": "Afgewezen",
-      "failed": "Mislukt"
+      "failed": "Mislukt",
+      "unknown": "Onbekende status"
     },
     "fields": {
       "applicant": "Aanvrager",
@@ -117,8 +118,27 @@
       "rejection_reason": "Reden van afwijzing",
       "provisioning_log": "Inrichtingslogboek"
     },
-    "loading": "Inrichtingsverzoeken laden…"
+    "loading": "Inrichtingsverzoeken laden…",
+    "categories": {
+      "community": "Gemeenschap",
+      "timebank": "Tijdbank",
+      "kiss_cooperative": "Caring Community coöperatie",
+      "caring_community": "Zorgzame Gemeenschap",
+      "agoris_node": "Agoris knooppunt",
+      "foundation": "Stichting",
+      "platform": "Platform",
+      "unknown": "Ander type gemeenschap"
+    },
+    "size_buckets": {
+      "under_50": "Minder dan 50 leden",
+      "50_250": "50–250 leden",
+      "250_1000": "250–1.000 leden",
+      "1000_5000": "1.000–5.000 leden",
+      "5000_plus": "Meer dan 5.000 leden",
+      "50-200": "50–200 leden",
+      "unknown": "Grootte niet gespecificeerd"
+    }
   },
-  "loading": "Loading",
-  "refresh": "Vernieuwen"
+  "refresh": "Vernieuwen",
+  "loading": "Laden"
 }

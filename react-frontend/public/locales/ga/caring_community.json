@@ -688,7 +688,8 @@
         "answer_count_other": "Freagraí{{count}}",
         "no_open_text": "Níl freagraí téacs oscailte ar bith fós.",
         "modal_title": "Anailísíocht -{{title}}",
-        "empty": "Níl aon sonraí anailíse ar fáil go fóill."
+        "empty": "Níl aon sonraí anailíse ar fáil go fóill.",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "Tá",

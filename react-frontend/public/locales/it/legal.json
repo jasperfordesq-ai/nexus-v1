@@ -812,5 +812,8 @@
     "contact_cta_body": "Mettiti in contatto e un coordinatore ti ricontatterà. Alla maggior parte dei messaggi viene data risposta entro un giorno lavorativo.",
     "contact_cta_button": "Contattaci",
     "community_guidelines_link": "Leggi le Linee guida della community"
+  },
+  "custom_document": {
+    "introduction": "Introduzione"
   }
 }

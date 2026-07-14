@@ -111,7 +111,7 @@ export default function HourTransferAdminPage() {
       if (res.success && res.data) {
         setPending(res.data.items ?? []);
       } else {
-        toast.error(res.error || t('admin.hour_transfers.errors.load_pending'));
+        toast.error(t('admin.hour_transfers.errors.load_pending'));
       }
     } catch (err) {
       logError('HourTransferAdminPage: load pending failed', err);
@@ -130,7 +130,7 @@ export default function HourTransferAdminPage() {
       if (res.success && res.data) {
         setInbound(res.data.items ?? []);
       } else {
-        toast.error(res.error || t('admin.hour_transfers.errors.load_inbound'));
+        toast.error(t('admin.hour_transfers.errors.load_inbound'));
       }
     } catch (err) {
       logError('HourTransferAdminPage: load inbound failed', err);
@@ -159,7 +159,7 @@ export default function HourTransferAdminPage() {
           toast.success(t('admin.hour_transfers.messages.approved'));
           void loadPending();
         } else {
-          toast.error(res.error || t('admin.hour_transfers.errors.approve'));
+          toast.error(t('admin.hour_transfers.errors.approve'));
         }
       } catch (err) {
         logError('HourTransferAdminPage: approve failed', err);
@@ -188,7 +188,7 @@ export default function HourTransferAdminPage() {
           setRejectReason('');
           void loadPending();
         } else {
-          toast.error(res.error || t('admin.hour_transfers.errors.reject'));
+          toast.error(t('admin.hour_transfers.errors.reject'));
         }
       } catch (err) {
         logError('HourTransferAdminPage: reject failed', err);

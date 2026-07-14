@@ -42,24 +42,20 @@ const MOCK_SHOWCASE = {
   sections: [
     {
       id: 'openapi',
-      title: 'OpenAPI Spec',
       icon: 'FileJson',
-      body: 'This section describes the OpenAPI specification.',
       items: [
-        { label: 'List users', path: '/v2/users', method: 'GET' as const },
-        { label: 'Create user', path: '/v2/users', method: 'POST' as const },
+        { code: 'openapi_json', path: '/v2/users', method: 'GET' as const },
+        { code: 'openapi_yaml', path: '/v2/users', method: 'POST' as const },
       ],
       docs_link: 'https://example.com/docs',
     },
     {
-      id: 'partner_api',
-      title: 'Partner API',
-      icon: 'Plug',
-      body: 'Partner integration details.',
-      checklist: ['Check rate limits', 'Verify credentials'],
+      id: 'partner_checklist',
+      icon: 'ClipboardList',
+      checklist_codes: ['rate_limit_headers', 'oauth_credentials'],
       samples: [
         {
-          label: 'Sample JSON payload',
+          code: 'partner_aggregates',
           kind: 'json' as const,
           body: '{"key":"value"}',
           headers: ['Content-Type: application/json'],
@@ -86,9 +82,9 @@ describe('IntegrationShowcaseAdminPage', () => {
     vi.mocked(api.get).mockResolvedValue({ data: MOCK_SHOWCASE });
     render(<IntegrationShowcaseAdminPage />);
     await waitFor(() => {
-      expect(screen.getByText('OpenAPI Spec')).toBeInTheDocument();
+      expect(screen.getByText('OpenAPI specification')).toBeInTheDocument();
     });
-    expect(screen.getByText('Partner API')).toBeInTheDocument();
+    expect(screen.getByText('What an integration partner receives')).toBeInTheDocument();
   });
 
   it('renders API endpoint items with method chips', async () => {
@@ -105,9 +101,9 @@ describe('IntegrationShowcaseAdminPage', () => {
     vi.mocked(api.get).mockResolvedValue({ data: MOCK_SHOWCASE });
     render(<IntegrationShowcaseAdminPage />);
     await waitFor(() => {
-      expect(screen.getByText('Check rate limits')).toBeInTheDocument();
+      expect(screen.getByText('Documentation for the X-RateLimit-Limit and X-RateLimit-Remaining headers')).toBeInTheDocument();
     });
-    expect(screen.getByText('Verify credentials')).toBeInTheDocument();
+    expect(screen.getByText('An OAuth client ID and client secret dedicated to this partner')).toBeInTheDocument();
   });
 
   it('calls showToast with error variant when the API call fails', async () => {
@@ -128,7 +124,7 @@ describe('IntegrationShowcaseAdminPage', () => {
       expect(busySpinners).toHaveLength(0);
     });
     // No accordion items
-    expect(screen.queryByText('OpenAPI Spec')).not.toBeInTheDocument();
+    expect(screen.queryByText('OpenAPI specification')).not.toBeInTheDocument();
   });
 
   it('re-fetches data when refresh button is pressed', async () => {
@@ -151,7 +147,7 @@ describe('IntegrationShowcaseAdminPage', () => {
     vi.mocked(api.get).mockResolvedValue({ data: MOCK_SHOWCASE });
     render(<IntegrationShowcaseAdminPage />);
     await waitFor(() => {
-      expect(screen.getByText('OpenAPI Spec')).toBeInTheDocument();
+      expect(screen.getByText('OpenAPI specification')).toBeInTheDocument();
     });
     // The about card is always rendered; it has a "last refreshed" line
     // i18n key integration_showcase.about.last_refreshed interpolates the date

@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "crm": {
     "action_cancel": "يلغي",
@@ -344,7 +344,6 @@
     "status_pending": "قيد الانتظار",
     "days_ago": "منذ {{count}} يوم",
     "hours_ago": "منذ {{count}} ساعة",
-    "just_now": "Just Now",
     "minutes_ago": "منذ {{count}} دقيقة",
     "loss_between_stages_few": "{{count}}ضاع بين المراحل",
     "loss_between_stages_many": "{{count}}ضاع بين المراحل",
@@ -377,6 +376,35 @@
     "activity_type_note_added": "تمت إضافة الملاحظة",
     "activity_type_task_created": "تم إنشاء المهمة",
     "activity_type_profile_updated": "تم تحديث الملف الشخصي",
-    "activity_type_group_joined": "انضمت المجموعة"
+    "activity_type_group_joined": "انضمت المجموعة",
+    "activity_type_unknown": "نشاط غير معروف",
+    "admin_roles": {
+      "admin": "المسؤول",
+      "tenant_admin": "مسؤول المستأجر",
+      "super_admin": "مسؤول المنصة",
+      "unknown": "المسؤول"
+    },
+    "funnel_stage_registered": "مسجل",
+    "funnel_stage_email_verified": "البريد الإلكتروني تم التحقق منه",
+    "funnel_stage_profile_complete": "اكتمال الملف الشخصي",
+    "funnel_stage_first_listing": "أول إدراج",
+    "funnel_stage_first_exchange": "أول تبادل",
+    "funnel_stage_repeat_user": "مستخدم متكرر",
+    "funnel_stage_unknown": "مرحلة غير معروفة",
+    "activity_description_login": "تم تسجيل الدخول",
+    "activity_description_signup": "تم تسجيل حساب",
+    "activity_description_listing_created": "تم إنشاء القائمة: {{title}}",
+    "activity_description_exchange_completed": "اكتمل التبادل مع {{member_name}}",
+    "activity_description_note_added": "تمت إضافة ملاحظة بواسطة {{author_name}}: {{content}}",
+    "activity_description_task_created": "تم إنشاء مهمة: {{title}}",
+    "activity_description_group_joined": "انضم إلى المجموعة: {{group_name}}",
+    "activity_description_profile_updated": "تم تحديث ملفه الشخصي",
+    "activity_description_unknown": "تم تسجيل النشاط",
+    "activity_value_untitled_listing": "قائمة بدون عنوان",
+    "activity_value_unknown_member": "عضو غير معروف",
+    "activity_value_system": "النظام",
+    "activity_value_untitled_task": "مهمة بدون عنوان",
+    "activity_value_unknown_group": "مجموعة غير معروفة",
+    "just_now": "الآن"
   }
 }

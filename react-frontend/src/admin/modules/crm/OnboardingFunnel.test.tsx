@@ -66,10 +66,10 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 const makeFunnelData = (overrides = {}) => ({
   stages: [
-    { name: 'Registered', count: 500, color: '#3b82f6' },
-    { name: 'Profile Complete', count: 350, color: '#10b981' },
-    { name: 'First Exchange', count: 200, color: '#f59e0b' },
-    { name: 'Active', count: 120, color: '#8b5cf6' },
+    { code: 'registered', name: 'SERVER COPY MUST NOT RENDER', count: 500, color: '#3b82f6' },
+    { code: 'profile_complete', count: 350, color: '#10b981' },
+    { code: 'first_exchange', count: 200, color: '#f59e0b' },
+    { code: 'repeat_user', count: 120, color: '#8b5cf6' },
   ],
   monthly_registrations: [
     { month: '2024-10', count: 45 },
@@ -105,7 +105,8 @@ describe('OnboardingFunnel', () => {
       expect(screen.getAllByText('Registered').length).toBeGreaterThan(0);
     }, { timeout: 3000 });
     expect(screen.getAllByText('Profile Complete').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Repeat User').length).toBeGreaterThan(0);
+    expect(screen.queryByText('SERVER COPY MUST NOT RENDER')).not.toBeInTheDocument();
   });
 
   it('renders member counts from stages', async () => {

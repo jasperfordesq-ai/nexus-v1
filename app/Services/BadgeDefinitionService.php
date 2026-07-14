@@ -276,11 +276,18 @@ class BadgeDefinitionService
     private static function mergeBadgeWithOverride(Badge $badge, ?TenantBadgeOverride $override): array
     {
         $config = $badge->config_json ? json_decode($badge->config_json, true) : null;
+        $usesBuiltInCopy = in_array($badge->badge_tier, ['core', 'template'], true);
 
         return [
             'key'               => $badge->badge_key,
             'name'              => $override?->custom_name ?? $badge->name,
             'description'       => $override?->custom_description ?? $badge->description,
+            'name_code'         => $usesBuiltInCopy && $override?->custom_name === null
+                ? 'badges.' . $badge->badge_key . '.name'
+                : null,
+            'description_code'  => $usesBuiltInCopy && $override?->custom_description === null
+                ? 'badges.' . $badge->badge_key . '.description'
+                : null,
             'icon'              => $override?->custom_icon ?? $badge->icon,
             'type'              => $badge->category,
             'threshold'         => $override?->custom_threshold ?? $badge->threshold,

@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "performance": {
     "label_performance_metrics": "Mesures de performances",
@@ -83,19 +83,20 @@
     "label_n_plus_one_warnings": "Avertissements N Plus Un",
     "label_slow_queries": "Requêtes lentes",
     "label_total_requests": "Total des demandes",
-    "n_plus_one_body": "N Plus One Body",
     "n_plus_one_title": "N Plus Un",
     "no_memory_spikes": "Aucun pic de mémoire trouvé",
     "no_slow_queries": "Aucune requête lente trouvée",
     "no_slow_requests": "Aucune requête lente trouvée",
     "no_volume_data": "Aucune donnée de volume trouvée",
-    "page_description": "Page.",
     "peak_memory": "Mémoire maximale",
     "query_count": "Nombre de requêtes",
     "refresh": "Rafraîchir",
     "tab_memory_spikes": "Pointes de mémoire",
     "tab_request_volume": "Volume de demande",
     "tab_slow_queries": "Requêtes lentes",
-    "tab_slow_requests": "Requêtes lentes"
+    "tab_slow_requests": "Requêtes lentes",
+    "warning_unknown": "Avertissement de performance",
+    "n_plus_one_body": "Des motifs de requêtes N+1 potentiels ont été détectés. Examinez la demande lente et les détails de la requête pour les chargements répétés de relations.",
+    "page_description": "Mesures de performance de la base de données, des requêtes et de la mémoire pour la période sélectionnée."
   }
 }

@@ -67,7 +67,7 @@ export function FeedAlgorithm() {
       if (res.success) {
         toast.success(t('feed_algorithm_settings_saved_successful'));
       } else {
-        const error = (res as { error?: string }).error || t('save_failed');
+        const error = t('save_failed');
         toast.error(error);
       }
     } catch {

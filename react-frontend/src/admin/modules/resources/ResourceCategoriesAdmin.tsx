@@ -175,7 +175,7 @@ export function ResourceCategoriesAdmin() {
         closeModal();
         loadItems();
       } else {
-        toast.error(res.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(t('resources.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('resources.an_unexpected_error_occurred'));
@@ -196,7 +196,7 @@ export function ResourceCategoriesAdmin() {
         toast.success(t('resources.category_deleted'));
         loadItems();
       } else {
-        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(t('resources.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('resources.an_unexpected_error_occurred'));
@@ -211,7 +211,7 @@ export function ResourceCategoriesAdmin() {
   const columns: Column<ResourceCategory>[] = [
     {
       key: 'name',
-      label: "Name",
+      label: t('resources.name'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.name}</span>
@@ -244,7 +244,7 @@ export function ResourceCategoriesAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('resources.resources_admin_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -322,7 +322,7 @@ export function ResourceCategoriesAdmin() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label={"Name"}
+              label={t('resources.name')}
               placeholder={t('resources.category_name_placeholder')}
               value={form.name}
               onValueChange={(val) => setForm((prev) => ({ ...prev, name: val }))}
@@ -383,7 +383,7 @@ export function ResourceCategoriesAdmin() {
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
           title={`${t('common.delete')} ${t('breadcrumbs.categories')}`}
-          message={`Delete Campaign`}
+          message={t('resources.delete_category_confirm', { name: confirmDelete.name })}
           confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}

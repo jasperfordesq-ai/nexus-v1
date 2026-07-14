@@ -109,6 +109,7 @@ const SKIP_NAMESPACES = new Set([
 // formatter fragments, sample values, and product/technology names).
 const HARD_NO_TRANSLATE_PATTERNS = [
   /^https?:\/\//,           // URLs
+  /^\/[A-Za-z0-9_./*-]+$/, // internal routes and route patterns
   /^\{\{.*\}\}$/,           // pure Handlebars templates
   /^\d+$/,                  // pure numbers
   /^[A-Z_]+$/,              // ALL_CAPS constants
@@ -163,6 +164,7 @@ const IDENTICAL_VALUE_ALLOWLIST = new Set([
   'Heroku / Render / Fly.io:',
   'Komunitin (JSON:API)',
   'Linux / VPS',
+  'Microsoft Azure (hosting, EU)',
   'Ordnance Survey Places (UK, UPRN)',
   'OS Places (PSGA)',
   'Plesk / cPanel / IIS:',
@@ -170,6 +172,8 @@ const IDENTICAL_VALUE_ALLOWLIST = new Set([
   'Tandems <->',
   'Twitter / X',
   'USD ($)',
+  'User-agent: *\nDisallow: /admin/',
+  'Cloudflare (CDN / WAF)',
   'application.created, shift.completed, hours.logged',
   '⌘K',
 ]);

@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,7 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
+    "loading": "読み込み中",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,7 +68,7 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
+    "select_row": "行を選択 {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
   },
@@ -208,7 +208,22 @@
     "verify_seller_title": "販売者の確認",
     "view_all": "すべて見る",
     "moderation_tabs_aria": "マーケットプレイスのモデレーションステータスフィルター",
-    "seller_tabs_aria": "販売者ステータスフィルター"
+    "seller_tabs_aria": "販売者ステータスフィルター",
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "sold": "販売済み",
+      "expired": "期限切れ",
+      "draft": "下書き",
+      "unknown": "その他のリスティングステータス"
+    },
+    "moderation_status": {
+      "approved": "承認済み",
+      "pending": "審査中",
+      "rejected": "却下",
+      "flagged": "フラグ付き",
+      "unknown": "その他のモデレーションステータス"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} が選択されました",

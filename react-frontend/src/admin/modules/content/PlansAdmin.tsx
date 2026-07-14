@@ -29,6 +29,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Spinner, Tooltip } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
 
 const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success' | 'warning'> = {
   0: 'default',
@@ -37,7 +38,7 @@ const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success
   3: 'warning',
 };
 
-const planPriceFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' });
+const planPriceFormatter = new Intl.NumberFormat(getFormattingLocale(), { style: 'currency', currency: 'EUR' });
 
 export function PlansAdmin() {
   const { t } = useTranslation('admin_content');

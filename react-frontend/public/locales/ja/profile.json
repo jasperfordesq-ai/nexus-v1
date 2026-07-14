@@ -135,7 +135,8 @@
     "cancel": "キャンセル",
     "submit": "レビューを送信",
     "submit_failed_fallback": "レビューの送信に失敗しました",
-    "characters_count_other": "{{count}}/{{max}}文字"
+    "characters_count_other": "{{count}}/{{max}}文字",
+    "characters_count_one": "{{count}}/{{max}} 文字"
   },
   "page_meta": {
     "title": "プロフィール",
@@ -187,5 +188,6 @@
   "read_less": "折りたたむ",
   "hours_abbrev": "{{hours}}時間",
   "not_available_abbrev": "該当なし",
-  "show_more_skills_other": "{{count}}件をさらに表示"
+  "show_more_skills_other": "{{count}}件をさらに表示",
+  "show_more_skills_one": "さらに {{count}} 件表示"
 }

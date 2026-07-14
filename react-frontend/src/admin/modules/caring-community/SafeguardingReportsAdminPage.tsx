@@ -77,6 +77,7 @@ const ALL_SEVERITIES: Severity[] = ['critical', 'high', 'medium', 'low'];
 
 export default function SafeguardingReportsAdminPage(): ReactNode {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.safeguarding_reports.meta_title'));
   useAdminPageMeta({
     title: t('admin.safeguarding_reports.meta_title'),
@@ -165,7 +166,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
         await openDetail(selectedId);
         await load();
       } else {
-        showToast(res.error || t('admin.safeguarding_reports.errors.assign'), 'error');
+        showToast(t('admin.safeguarding_reports.errors.assign'), 'error');
       }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.assign'), 'error');
@@ -184,7 +185,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
         await openDetail(selectedId);
         await load();
       } else {
-        showToast(res.error || t('admin.safeguarding_reports.errors.escalate'), 'error');
+        showToast(t('admin.safeguarding_reports.errors.escalate'), 'error');
       }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.escalate'), 'error');
@@ -204,7 +205,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
         await openDetail(selectedId);
         await load();
       } else {
-        showToast(res.error || t('admin.safeguarding_reports.errors.status'), 'error');
+        showToast(t('admin.safeguarding_reports.errors.status'), 'error');
       }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.status'), 'error');
@@ -224,7 +225,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
         setNewNote('');
         await openDetail(selectedId);
       } else {
-        showToast(res.error || t('admin.safeguarding_reports.errors.note'), 'error');
+        showToast(t('admin.safeguarding_reports.errors.note'), 'error');
       }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.note'), 'error');
@@ -393,7 +394,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
                 <TableColumn>{t('admin.safeguarding_reports.table.status')}</TableColumn>
                 <TableColumn>{t('admin.safeguarding_reports.table.assigned')}</TableColumn>
                 <TableColumn>
-                  <Abbr term={t('admin.safeguarding_reports.table.sla')}>
+                  <Abbr term="SLA">
                     {t('admin.safeguarding_reports.table.sla_abbr')}
                   </Abbr>
                 </TableColumn>
@@ -408,7 +409,11 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
                         {severityLabel(r.severity)}
                       </Chip>
                     </TableCell>
-                    <TableCell>{r.category}</TableCell>
+                    <TableCell>
+                      {tAdmin(`caring_workflow.safeguarding.categories.${r.category}`, {
+                        defaultValue: tAdmin('caring_workflow.safeguarding.categories.unknown'),
+                      })}
+                    </TableCell>
                     <TableCell>{r.reporter_name || actorLabel(r.reporter_id)}</TableCell>
                     <TableCell>{subjectLabel(r)}</TableCell>
                     <TableCell>
@@ -475,7 +480,11 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
 
                 <div>
                   <p className="text-xs uppercase tracking-wide text-muted">{t('admin.safeguarding_reports.fields.category')}</p>
-                  <p className="text-sm">{detail.category}</p>
+                  <p className="text-sm">
+                    {tAdmin(`caring_workflow.safeguarding.categories.${detail.category}`, {
+                      defaultValue: tAdmin('caring_workflow.safeguarding.categories.unknown'),
+                    })}
+                  </p>
                 </div>
 
                 <div>
@@ -608,7 +617,11 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
                       {detail.actions.map((a) => (
                         <li key={a.id} className="rounded-2xl border border-divider/70 bg-surface-secondary/40 p-3">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium">{a.action}</p>
+                            <p className="text-sm font-medium">
+                              {tAdmin(`caring_workflow.safeguarding.history_actions.${a.action}`, {
+                                defaultValue: tAdmin('caring_workflow.safeguarding.history_actions.unknown'),
+                              })}
+                            </p>
                             <p className="text-xs text-muted">
                               {new Date(a.created_at).toLocaleString(getFormattingLocale())}
                             </p>

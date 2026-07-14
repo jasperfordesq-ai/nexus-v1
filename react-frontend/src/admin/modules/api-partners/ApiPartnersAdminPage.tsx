@@ -120,7 +120,7 @@ export default function ApiPartnersAdminPage() {
         toast.success(t('api_partners.toasts.suspended'));
         void load();
       } else {
-        toast.error(res.error || t('api_partners.toasts.suspend_failed'));
+        toast.error(t('api_partners.toasts.suspend_failed'));
       }
     } catch {
       toast.error(t('api_partners.toasts.suspend_failed'));
@@ -134,7 +134,7 @@ export default function ApiPartnersAdminPage() {
         toast.success(t('api_partners.toasts.activated'));
         void load();
       } else {
-        toast.error(res.error || t('api_partners.toasts.activate_failed'));
+        toast.error(t('api_partners.toasts.activate_failed'));
       }
     } catch {
       toast.error(t('api_partners.toasts.activate_failed'));

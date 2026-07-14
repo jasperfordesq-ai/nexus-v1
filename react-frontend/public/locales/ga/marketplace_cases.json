@@ -23,7 +23,8 @@
     "escalated": "Ardaithe",
     "resolved_buyer": "Réitithe don cheannaitheoir",
     "resolved_seller": "Réitithe don díoltóir",
-    "closed": "Dúnta"
+    "closed": "Dúnta",
+    "unknown": "Stádas cás eile"
   },
   "reason": {
     "counterfeit": "Earra bréige",
@@ -37,7 +38,8 @@
     "payment_issue": "Fadhb íocaíochta",
     "damaged": "Earra damáistithe",
     "fraud": "Amhras faoi chalaois",
-    "other": "Eile"
+    "other": "Eile",
+    "unknown": "Cúis eile"
   },
   "action": {
     "none": "Gan ghníomh forfheidhmithe",

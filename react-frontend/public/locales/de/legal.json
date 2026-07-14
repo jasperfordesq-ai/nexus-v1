@@ -810,5 +810,8 @@
     "contact_cta_body": "Nehmen Sie Kontakt mit uns auf und ein Koordinator wird sich bei Ihnen melden. Die meisten Nachrichten werden innerhalb eines Werktages beantwortet.",
     "contact_cta_button": "Kontaktieren Sie uns",
     "community_guidelines_link": "Lesen Sie die Community-Richtlinien"
+  },
+  "custom_document": {
+    "introduction": "Einführung"
   }
 }

@@ -46,6 +46,15 @@ class ExternalIntegrationBacklogService
         'other',
     ];
 
+    private const DEFAULT_COPY_CODES = [
+        'ahv_submission_gateway',
+        'spitex_handoff',
+        'cantonal_master_data',
+        'postfinance_payment',
+        'twint_payment',
+        'postal_address_verification',
+    ];
+
     /**
      * Return the stored backlog for the tenant.
      *
@@ -80,41 +89,36 @@ class ExternalIntegrationBacklogService
         $now = now()->toIso8601String();
         $seeds = [
             [
-                'name' => 'AHV submission gateway',
+                'copy_code' => 'ahv_submission_gateway',
                 'category' => 'ahv',
-                'notes' => 'Official channel for AHV-relevant volunteer-hour reports. Awaiting confirmation of canonical submission interface.',
             ],
             [
-                'name' => 'Spitex care-coordination handoff',
+                'copy_code' => 'spitex_handoff',
                 'category' => 'professional_care',
-                'notes' => 'Bi-directional handoff with cantonal Spitex providers for care-recipient circles. Needs DSA + interface spec from each cantonal Spitex.',
             ],
             [
-                'name' => 'Cantonal master-data feed',
+                'copy_code' => 'cantonal_master_data',
                 'category' => 'municipal_data',
-                'notes' => 'Subscribed feed of address/household master data from cantonal registry to keep care-recipient profiles current.',
             ],
             [
-                'name' => 'PostFinance payment integration',
+                'copy_code' => 'postfinance_payment',
                 'category' => 'payment',
-                'notes' => 'Swiss banking partner for cash-out / treasury operations. Requires merchant agreement.',
             ],
             [
-                'name' => 'Twint payment',
+                'copy_code' => 'twint_payment',
                 'category' => 'payment',
-                'notes' => 'Twint acceptance for membership fees and donations. Requires Twint merchant onboarding via partner bank.',
             ],
             [
-                'name' => 'Postal-address verification',
+                'copy_code' => 'postal_address_verification',
                 'category' => 'postal',
-                'notes' => 'Address normalisation and validation against Swiss Post directory.',
             ],
         ];
 
         $newItems = [];
         foreach ($seeds as $seed) {
             $newItems[] = $this->makeItem([
-                'name' => $seed['name'],
+                'copy_code' => $seed['copy_code'],
+                'name' => '',
                 'category' => $seed['category'],
                 'owner_name' => '',
                 'owner_email' => '',
@@ -122,7 +126,7 @@ class ExternalIntegrationBacklogService
                 'interface_spec_url' => '',
                 'dsa_status' => 'not_required',
                 'sandbox_url' => '',
-                'notes' => $seed['notes'],
+                'notes' => '',
             ], $now);
         }
 
@@ -184,6 +188,9 @@ class ExternalIntegrationBacklogService
         $now = now()->toIso8601String();
 
         $merged = array_merge($existing, [
+            'copy_code' => array_key_exists('name', $payload) || array_key_exists('notes', $payload)
+                ? null
+                : ($existing['copy_code'] ?? null),
             'name' => isset($payload['name'])
                 ? trim((string) $payload['name'])
                 : ($existing['name'] ?? ''),
@@ -322,6 +329,9 @@ class ExternalIntegrationBacklogService
     {
         return [
             'id' => $this->generateId(),
+            'copy_code' => in_array(($payload['copy_code'] ?? null), self::DEFAULT_COPY_CODES, true)
+                ? (string) $payload['copy_code']
+                : null,
             'name' => trim((string) ($payload['name'] ?? '')),
             'category' => (string) ($payload['category'] ?? 'other'),
             'owner_name' => trim((string) ($payload['owner_name'] ?? '')),

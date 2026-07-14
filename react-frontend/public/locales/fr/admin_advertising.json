@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "advertising": {
     "status": {
@@ -107,11 +107,11 @@
         "create_campaign": "Créer une campagne",
         "details": "Détails",
         "new_campaign": "Nouvelle campagne",
-        "pause": "Pause",
         "reject": "Rejeter",
         "reject_campaign": "Rejeter la campagne",
         "submit_for_review": "Soumettre pour examen",
-        "view_details": "Afficher les détails"
+        "view_details": "Afficher les détails",
+        "pause": "Pause"
       },
       "columns": {
         "actions": "Actes",
@@ -120,8 +120,8 @@
         "clicks": "Clics",
         "ctr": "CTR",
         "id": "ID",
-        "impressions": "Impressions",
-        "status": "Statut"
+        "status": "Statut",
+        "impressions": "Impressions"
       },
       "empty": {
         "no_campaigns": "Aucune campagne trouvée."
@@ -162,11 +162,13 @@
         "all": "Tous les emplacements",
         "discovery": "Découverte",
         "feed": "Alimentation",
-        "market": "Marché"
+        "market": "Marché",
+        "markt": "Marché"
       },
       "placeholders": {
         "budget": "par ex. 5000 = EUR 50,00",
-        "campaign_name": "Soldes d'été - Cafe Helvetia"
+        "campaign_name": "Soldes d'été - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"jardinage\"]}"
       },
       "stats": {
         "active_campaigns": "Campagnes actives",
@@ -241,7 +243,8 @@
       "placeholders": {
         "body": "400 caractères maximum",
         "campaign_name": "par ex. Promotion de printemps - Cafe Seeblick",
-        "title": "100 caractères maximum"
+        "title": "100 caractères maximum",
+        "cta_url": "https://... ou nexus://..."
       },
       "stats": {
         "needs_attention": "A besoin d'attention",
@@ -261,7 +264,8 @@
         "rejected": "Campagne \"{{name}}\" rejetée.",
         "reject_failed": "Échec du rejet de la campagne.",
         "required_fields": "Le nom, le titre et le corps sont requis."
-      }
+      },
+      "cost_per_send": "{{cost}} par envoi"
     },
     "tabs_aria": "Filtre de statut de campagne publicitaire"
   }

@@ -15,67 +15,66 @@
     "federation_audit": "Controllo della Federazione",
     "platform_admin": "Amministratore della piattaforma",
     "back_to_platform_admin": "Torna all'amministrazione della piattaforma",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Richieste Pilota",
+    "provisioning_queue": "Coda di provisioning",
+    "billing_control": "Controllo fatturazione",
+    "revenue_dashboard": "Cruscotto delle entrate",
+    "regional_analytics": "Analisi regionale",
+    "national_dashboard": "Cruscotto nazionale"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Caricamento super amministratore",
+    "skip_to_main": "Vai al contenuto principale",
+    "close_navigation": "Chiudi navigazione super amministratore",
+    "navigation": "Navigazione super amministratore"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Torna all'amministrazione",
+    "toggle_sidebar": "Attiva/disattiva barra laterale",
+    "notifications": "Notifiche",
+    "my_profile": "Il Mio Profilo",
+    "sign_out": "Disconnettersi",
+    "user_fallback": "Super Amministratore",
+    "user_menu": "Menu super amministratore"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Panoramica",
+    "section_tenants": "Inquilini",
+    "section_federation": "Federazione",
+    "section_commercial": "Commerciale",
+    "expand": "Espandi barra laterale",
+    "collapse": "Comprimi barra laterale",
+    "nav_label": "Navigazione super amministratore"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Super Amministratore",
+    "tenants": "Inquilini",
+    "create": "Crea",
+    "edit": "Modifica",
+    "hierarchy": "Gerarchia",
+    "users": "Utenti",
+    "federation": "Federazione",
+    "whitelist": "Lista Bianca",
+    "partnerships": "Partnership",
+    "tenant": "Inquilino",
+    "features": "Funzionalità",
+    "billing": "Fatturazione",
+    "revenue": "Entrate",
+    "platform": "Piattaforma",
+    "pilot_inquiries": "Richieste Pilota",
+    "provisioning_requests": "Richieste di Provisioning",
+    "national": "Nazionale",
+    "regional_analytics": "Analisi regionale",
+    "subscriptions": "Abbonamenti",
+    "aria_label": "Pangrattato",
+    "bulk": "Operazioni di massa",
+    "audit": "Registro di controllo"
   },
   "dashboard": {
     "title": "Cruscotto dell'infrastruttura",
     "subtitle_global": "Panoramica globale di tutti gli inquilini e delle infrastrutture",
-    "subtitle_scoped": "Panoramica di:tenant_name e dei sub-tenant",
     "create_tenant_btn": "Crea inquilino",
     "stat_total_tenants": "Inquilini totali",
     "stat_active_tenants": "Inquilini attivi",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Azioni rapide",
     "create_new_tenant": "Crea nuovo inquilino",
     "view_super_admins": "Visualizza super amministratori",
-    "back_to_platform_admin": "Torna all'amministrazione della piattaforma"
+    "back_to_platform_admin": "Torna all'amministrazione della piattaforma",
+    "subtitle_scoped": "Panoramica di :tenant_name e dei sub-tenant"
   },
   "common": {
     "active": "Attivo",
@@ -188,7 +188,6 @@
       "actions_card_title": "Azioni",
       "view_tenant_btn": "Visualizza inquilino",
       "god_card_title": "Super amministratore globale (God Only)",
-      "god_warning": "WARNING:",
       "god_warning_text": "I super amministratori globali possono accedere a TUTTI i tenant sulla piattaforma.",
       "god_has_access": "L'utente ha accesso super amministratore GLOBALE",
       "god_revoke_btn": "Revoca il super amministratore globale",
@@ -206,12 +205,12 @@
       "stat_user_id": "ID utente",
       "stat_tenant_id": "ID inquilino",
       "stat_status": "Stato",
-      "stat_approved": "Approvato"
+      "stat_approved": "Approvato",
+      "god_warning": "Avviso:"
     },
     "create": {
       "breadcrumb_create": "Crea",
       "title": "Crea nuovo utente",
-      "subtitle_selected": "Creazione utente per:tenant_name",
       "subtitle_default": "Seleziona un tenant per creare un nuovo utente",
       "card_title": "Dettagli utente",
       "tenant_label": "Inquilino",
@@ -229,7 +228,8 @@
       "super_admin_label": "Concedere privilegi di super amministratore",
       "super_admin_help": "I super amministratori possono accedere al pannello di super amministratore e gestire i sub-tenant del proprio tenant. Disponibile solo per i tenant dell'hub (tenant con funzionalità sub-tenant).",
       "submit_btn": "Crea utente",
-      "cancel_btn": "Annulla"
+      "cancel_btn": "Annulla",
+      "subtitle_selected": "Creazione utente per :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Modifica",
@@ -272,23 +272,22 @@
       "stat_active": "Attivo",
       "stat_pending": "In sospeso",
       "super_admin_card_title": "Stato di super amministratore",
-      "super_admin_toggle_desc": "Attiva/disattiva Super amministratore per: nome_tenant",
       "revoke_btn": "Revoca il super amministratore",
       "revoke_confirm": "Revocare i privilegi di super amministratore?",
       "grant_btn": "Concedi super amministratore",
       "grant_confirm": "Concedere i privilegi di super amministratore?",
-      "no_hub_text": "Impossibile concedere il super amministratore perché:tenant_name non è un tenant dell'hub.",
       "no_hub_move_text": "Utilizzare la funzionalità \"Sposta e concedi super amministratore\" per assegnare questo utente a un tenant dell'hub.",
       "quick_links_card_title": "Collegamenti rapidi",
       "view_profile_btn": "Visualizza profilo",
       "view_tenant_btn": "Visualizza inquilino",
-      "tenant_users_btn": "Utenti inquilini"
+      "tenant_users_btn": "Utenti inquilini",
+      "super_admin_toggle_desc": "Attiva Super Admin per :tenant_name",
+      "no_hub_text": "Impossibile concedere Super Admin perché :tenant_name non è un tenant Hub."
     }
   },
   "tenants": {
     "index": {
       "title": "Gestisci gli inquilini",
-      "subtitle": ":conta gli inquilini nel tuo ambito",
       "create_btn": "Crea inquilino",
       "filter_search_placeholder": "Cerca inquilini...",
       "filter_hub_label": "Solo inquilini dell'hub",
@@ -304,9 +303,10 @@
       "col_status": "Stato",
       "col_actions": "Azioni",
       "parent_root": "Radice",
-      "level_label": "Livello: profondità",
       "you_badge": "Tu",
-      "no_tenants": "Nessun inquilino trovato"
+      "no_tenants": "Nessun inquilino trovato",
+      "subtitle": ":count tenant nel tuo ambito",
+      "level_label": "Livello :depth"
     },
     "show": {
       "breadcrumb_tenants": "Inquilini",
@@ -319,11 +319,9 @@
       "field_slug": "Lumaca",
       "field_domain": "Dominio",
       "field_hierarchy_level": "Livello di gerarchia",
-      "field_level": "Livello: profondità",
       "field_parent": "Genitore",
       "field_total_users": "Utenti totali",
       "field_sub_tenants": "Subaffittuari",
-      "field_sub_tenants_direct": ":conta direttamente",
       "field_description": "Descrizione",
       "not_configured": "Non configurato",
       "root_tenant": "Inquilino principale",
@@ -355,18 +353,18 @@
       "reactivate_card_title": "Riattiva inquilino",
       "reactivate_desc": "Questo inquilino è attualmente inattivo. La riattivazione ripristinerà l'accesso dell'utente.",
       "reactivate_btn": "Riattiva inquilino",
-      "tenant_id_label": "ID inquilino::id | Percorso::percorso"
+      "field_level": "Livello :depth",
+      "field_sub_tenants_direct": ":count diretto",
+      "tenant_id_label": "ID Tenant: :id | Percorso: :path"
     },
     "create": {
       "breadcrumb_create": "Crea",
       "title": "Crea nuovo inquilino",
-      "subtitle_selected": "Creazione del sub-tenant in:parent_name",
       "subtitle_default": "Seleziona un tenant principale per creare un nuovo tenant secondario",
       "card_title": "Dettagli dell'inquilino",
       "parent_label": "Locatario genitore",
       "parent_placeholder": "-- Seleziona locatario principale --",
       "parent_help": "Vengono visualizzati solo i tenant con funzionalità di subtenant. Il nuovo tenant verrà creato come figlio del genitore selezionato.",
-      "depth_label": "(Profondità::profondità)",
       "name_label": "Nome dell'inquilino",
       "slug_label": "Lumaca",
       "slug_help": "Solo lettere minuscole, numeri e trattini",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Illimitato",
       "max_depth_help": "Limita il numero di livelli di sub-tenant che possono essere creati sotto questo tenant (si applica solo se l'hub è abilitato)",
       "submit_btn": "Crea inquilino",
-      "cancel_btn": "Annulla"
+      "cancel_btn": "Annulla",
+      "depth_label": "(Profondità: :depth)",
+      "subtitle_selected": "Creazione sub-tenant sotto :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "Modifica",
       "title": "Modifica inquilino",
-      "subtitle": "Modifica::nome (Livello:profondità)",
       "back_btn": "Torna ai dettagli",
       "details_card_title": "Dettagli dell'inquilino",
       "name_label": "Nome dell'inquilino",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "Locatario standard",
       "max_depth_label": "Profondità massima del sub-tenant",
       "max_depth_unlimited": "Illimitato",
-      "max_depth_levels": ":conta i livelli",
       "disable_hub_btn": "Disabilita Hub",
       "disable_hub_confirm": "Ciò impedirà la creazione di nuovi sub-tenant. I subaffittuari esistenti rimarranno.",
       "enable_hub_btn": "Abilita Hub",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "Sei sicuro di voler disattivare questo tenant? Gli utenti perderanno l'accesso.",
       "reactivate_card_title": "Riattiva inquilino",
       "reactivate_desc": "Questo inquilino è attualmente inattivo. La riattivazione ripristinerà l'accesso dell'utente.",
-      "reactivate_btn": "Riattiva inquilino"
+      "reactivate_btn": "Riattiva inquilino",
+      "subtitle": "Modifica: :name (Livello :depth)",
+      "max_depth_levels": "Livelli :count"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Inquilini",
@@ -577,7 +577,6 @@
     "source_tenant_all": "Tutti gli inquilini",
     "user_selection_label": "Seleziona Utenti",
     "user_select_hint": "Seleziona un tenant di origine per caricare gli utenti",
-    "users_selected": ":conta gli utenti selezionati",
     "target_tenant_label": "Locatario target",
     "target_tenant_placeholder": "-- Seleziona destinazione --",
     "grant_super_admin_label": "Concedi Super Admin a tutti gli utenti spostati",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Operazioni in blocco degli inquilini",
     "bulk_tenants_desc": "Abilita/disabilita più tenant o attiva/disattiva la funzionalità dell'hub in blocco.",
     "select_tenants_label": "Seleziona inquilini",
-    "tenants_selected": ":conta gli inquilini selezionati",
     "select_all": "Seleziona tutto",
     "deselect_all": "Deseleziona tutto",
     "action_label": "Azione",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Abilita Hub",
     "action_disable_hub": "Disabilita Hub",
     "apply_btn": "Applica a selezionati",
-    "apply_confirm": "Applicare questa azione a tutti gli inquilini selezionati?"
+    "apply_confirm": "Applicare questa azione a tutti gli inquilini selezionati?",
+    "users_selected": "Utente(i) :count selezionato(i)",
+    "tenants_selected": "Tenant(i) :count selezionato(i)"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Attività recente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Nessuna attività della federazione ancora",
-      "by_label": "by",
       "activity_title": "Attività della Federazione (30 giorni)",
       "stat_total_actions": "Azioni totali",
       "stat_messages": "Messaggi",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Eventi critici",
       "most_active_partnerships": "Partenariati più attivi",
       "quick_nav_title": "Navigazione rapida",
-      "tenant_whitelist_btn": "Lista bianca degli inquilini"
+      "tenant_whitelist_btn": "Lista bianca degli inquilini",
+      "by_label": "da"
     },
     "system_controls": {
       "title": "Controlli del sistema federativo",
@@ -735,7 +735,6 @@
       "level_critical": "Critico",
       "level_warning": "Avvertimento",
       "level_info": "Informazioni",
-      "level_debug": "Debug",
       "category_label": "Categoria",
       "category_all": "Tutte le categorie",
       "category_system": "Sistema",
@@ -768,7 +767,8 @@
       "modal_actor": "Attore:",
       "modal_ip": "Indirizzo IP:",
       "modal_user_agent": "Agente utente:",
-      "modal_data": "Dati:"
+      "modal_data": "Dati:",
+      "level_debug": "Debug"
     },
     "tenant_features": {
       "subtitle": "Impostazioni della federazione per questo tenant",

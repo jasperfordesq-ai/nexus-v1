@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,9 +67,10 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "agents": {
     "actions": {
@@ -220,6 +220,30 @@
         "rejected": "Propuesta rechazada"
       }
     },
-    "tabs_aria": "Filtro de estado de propuesta de agente"
+    "tabs_aria": "Filtro de estado de propuesta de agente",
+    "agent_type": {
+      "activity_summary": "Resumen de actividad",
+      "activity_summariser": "Resumen de actividades",
+      "help_routing": "Ayuda para enrutamiento",
+      "listing-enrichment": "Enriquecimiento de listado",
+      "matchmaker": "Casamentero",
+      "matching": "Coincidencia",
+      "notifications": "Notificaciones",
+      "nudge_dispatch": "Envío de empujón",
+      "tandem_matching": "Emparejamiento en tándem"
+    },
+    "triggered_by": {
+      "admin": "Administrador",
+      "schedule": "Horario",
+      "scheduled": "Programado",
+      "manual": "Manual"
+    },
+    "proposal_type": {
+      "create_tandem": "Crear tándem",
+      "match_suggestion": "Sugerencia de coincidencia",
+      "route_help_request": "Solicitud de ayuda de ruta",
+      "send_activity_summary": "Enviar resumen de actividad",
+      "send_nudge": "Enviar empujón"
+    }
   }
 }

@@ -30,9 +30,10 @@ type SectionStatus = 'ready' | 'needs_review' | 'not_started' | 'blocked';
 
 interface ReadinessSection {
   key: string;
-  label: string;
+  label_code: string;
   status: SectionStatus;
-  summary: string;
+  summary_code: string;
+  summary_params: Record<string, string | number>;
   admin_path: string;
   last_updated_at: string | null;
   missing: string[];
@@ -46,7 +47,6 @@ interface ReadinessLaunchedState {
 
 interface ReadinessBlocker {
   key: string;
-  label: string;
   status: string;
 }
 
@@ -56,7 +56,8 @@ interface ReadinessReport {
     status: SectionStatus;
     ready_section_count: number;
     total_section_count: number;
-    summary: string;
+    summary_code: string;
+    summary_params: Record<string, string | number>;
   };
   sections: ReadinessSection[];
   isolated_node_required: boolean;
@@ -83,6 +84,10 @@ const MISSING_LABEL_KEYS: Record<string, string> = {
   acknowledgement: 'acknowledgement',
   pre_pilot_baseline: 'pre_pilot_baseline',
   danger_checks: 'danger_checks',
+  warning_checks: 'warning_checks',
+  quarterly_review: 'quarterly_review',
+  blocked_integrations: 'blocked_integrations',
+  undecided_items: 'undecided_items',
   backlog_empty: 'backlog_empty',
 };
 
@@ -90,7 +95,28 @@ type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
 function missingLabel(t: AdminT, slug: string): string {
   const key = MISSING_LABEL_KEYS[slug];
-  return key ? t(`pilot_launch_readiness.missing.${key}`) : slug.replace(/[._]/g, ' ');
+  return key ? t(`pilot_launch_readiness.missing.${key}`) : t('pilot_launch_readiness.missing.unknown');
+}
+
+function localizedParams(params: Record<string, string | number>): Record<string, string | number> {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      typeof value === 'number' ? value.toLocaleString(getFormattingLocale()) : value,
+    ]),
+  );
+}
+
+function sectionLabel(t: AdminT, code: string): string {
+  return t(`pilot_launch_readiness.section_labels.${code}`);
+}
+
+function sectionSummary(
+  t: AdminT,
+  code: string,
+  params: Record<string, string | number>,
+): string {
+  return t(`pilot_launch_readiness.section_summaries.${code}`, localizedParams(params));
 }
 
 function statusIcon(status: SectionStatus) {
@@ -107,7 +133,8 @@ function isReadinessReport(value: unknown): value is ReadinessReport {
     !!candidate.overall &&
     typeof candidate.overall === 'object' &&
     typeof candidate.overall.status === 'string' &&
-    typeof candidate.overall.summary === 'string' &&
+    typeof candidate.overall.summary_code === 'string' &&
+    typeof candidate.overall.summary_params === 'object' &&
     typeof candidate.overall.ready_section_count === 'number' &&
     typeof candidate.overall.total_section_count === 'number' &&
     Array.isArray(candidate.sections)
@@ -133,7 +160,7 @@ export default function PilotLaunchReadinessAdminPage() {
       const res = await api.get<ReadinessReport>('/v2/admin/caring-community/launch-readiness');
       if (!res.success) {
         setReport(null);
-        setLoadError(res.error ?? t('pilot_launch_readiness.errors.load_failed'));
+        setLoadError(t('pilot_launch_readiness.errors.load_failed'));
         return;
       }
 
@@ -378,7 +405,12 @@ export default function PilotLaunchReadinessAdminPage() {
                         ? t('pilot_launch_readiness.overall.not_started')
                         : t('pilot_launch_readiness.overall.needs_review')}
                     </p>
-                    <p className="text-sm text-muted">{overall.summary}</p>
+                    <p className="text-sm text-muted">
+                      {t(
+                        `pilot_launch_readiness.overall_summaries.${overall.summary_code}`,
+                        localizedParams(overall.summary_params),
+                      )}
+                    </p>
                   </div>
                 </div>
                 <Chip color={STATUS_COLORS[overall.status]} variant="soft" size="lg">
@@ -407,8 +439,10 @@ export default function PilotLaunchReadinessAdminPage() {
               <Card key={section.key} className="border border-[var(--color-border)]">
                 <CardHeader className="flex flex-wrap items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{section.label}</p>
-                    <p className="text-xs text-muted mt-0.5">{section.summary}</p>
+                    <p className="text-sm font-semibold">{sectionLabel(t, section.label_code)}</p>
+                    <p className="text-xs text-muted mt-0.5">
+                      {sectionSummary(t, section.summary_code, section.summary_params)}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Chip size="sm" variant="soft" color={STATUS_COLORS[section.status]}>
@@ -513,7 +547,7 @@ export default function PilotLaunchReadinessAdminPage() {
                 <ul className="space-y-0.5">
                   {report.sections.map((s) => (
                     <li key={s.key} className="flex items-center justify-between gap-2">
-                      <span>{s.label}</span>
+                      <span>{sectionLabel(t, s.label_code)}</span>
                       <Chip size="sm" variant="soft" color={STATUS_COLORS[s.status]}>
                         {t(`pilot_launch_readiness.status.${s.status}`)}
                       </Chip>

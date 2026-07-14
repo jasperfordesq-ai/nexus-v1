@@ -595,7 +595,7 @@
     "modal_title": "إضافة حساب مرتبط",
     "modal_description": "أدخل عنوان البريد الإلكتروني للشخص الذي تريد ربطه. سيتلقى إشعارًا للموافقة على الطلب.",
     "email_label": "عنوان البريد الإلكتروني",
-    "email_placeholder": "Child@example.com",
+    "email_placeholder": "child@example.com",
     "name_label": "الاسم (اختياري)",
     "name_placeholder": "اسم العرض الخاص بهم",
     "cancel": "إلغاء",

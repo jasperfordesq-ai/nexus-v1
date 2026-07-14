@@ -432,6 +432,12 @@ class GamificationService
             ['key' => 'volunteer_org', 'name' => 'Organization Partner', 'icon' => "\xF0\x9F\x8F\xA2", 'type' => 'vol_org', 'threshold' => 1, 'msg' => 'creating a volunteer organization'],
         ];
 
+        self::$badgeDefinitionsCache = array_map(static fn (array $badge): array => [
+            ...$badge,
+            'name_code' => 'badges.' . $badge['key'] . '.name',
+            'description_code' => 'badges.' . $badge['key'] . '.description',
+        ], self::$badgeDefinitionsCache);
+
         return self::$badgeDefinitionsCache;
     }
 

@@ -106,7 +106,7 @@ export function GdprRequests() {
         toast.success(t('enterprise.gdpr_request_status_updated'));
         loadData();
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.gdpr_failed_update_request_status');
+        const error = t('enterprise.gdpr_failed_update_request_status');
         toast.error(error);
       }
     } catch (err) {
@@ -122,7 +122,7 @@ export function GdprRequests() {
       key: 'type',
       label: t('enterprise.gdpr_type'),
       sortable: true,
-      render: (r) => <span className="capitalize">{r.type}</span>,
+      render: (r) => <span>{t(`enterprise.gdpr_type_${r.type}`, { defaultValue: t('enterprise.gdpr_type_unknown') })}</span>,
     },
     {
       key: 'status',

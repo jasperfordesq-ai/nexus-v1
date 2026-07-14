@@ -208,8 +208,8 @@ export function MemberPremiumAdminPage() {
       }
       onClose();
       await load();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.save_failed'));
+    } catch {
+      toast.error(t('member_premium_admin.toasts.save_failed'));
     } finally {
       setSaving(false);
     }
@@ -234,8 +234,8 @@ export function MemberPremiumAdminPage() {
       }
       toast.success(t('member_premium_admin.toasts.synced', { name: tier.name }));
       await load();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.stripe_sync_failed'));
+    } catch {
+      toast.error(t('member_premium_admin.toasts.stripe_sync_failed'));
     } finally {
       setSyncing(null);
     }
@@ -253,8 +253,8 @@ export function MemberPremiumAdminPage() {
       setFallbackReason(settings?.fallback_reason ?? null);
       setAccountStatus(settings?.account_status ?? null);
       toast.success(t('member_premium_admin.toasts.settings_saved'));
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.settings_save_failed'));
+    } catch {
+      toast.error(t('member_premium_admin.toasts.settings_save_failed'));
     } finally {
       setSettingsSaving(false);
     }
@@ -280,8 +280,8 @@ export function MemberPremiumAdminPage() {
       } else {
         toast.error(t('member_premium_admin.toasts.onboarding_failed'));
       }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.onboarding_failed'));
+    } catch {
+      toast.error(t('member_premium_admin.toasts.onboarding_failed'));
     } finally {
       setOnboarding(false);
     }
@@ -299,8 +299,8 @@ export function MemberPremiumAdminPage() {
       await memberPremiumAdminApi.deleteTier(tier.id);
       toast.success(t('member_premium_admin.toasts.deleted'));
       await load();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.delete_failed'));
+    } catch {
+      toast.error(t('member_premium_admin.toasts.delete_failed'));
     } finally {
       setDeleting(null);
     }
@@ -428,7 +428,7 @@ export function MemberPremiumAdminPage() {
             ) : null}
             {accountStatus?.error ? (
               <p className="text-sm text-danger">
-                {accountStatus.error}
+                {t('member_premium_admin.toasts.settings_load_failed')}
               </p>
             ) : null}
             <Input
@@ -551,8 +551,8 @@ export function MemberPremiumAdminPage() {
                     <TableRow key={tier.id}>
                       <TableCell>{tier.name}</TableCell>
                       <TableCell><code className="text-xs">{tier.slug}</code></TableCell>
-                      <TableCell>{centsToInput(tier.monthly_price_cents)}</TableCell>
-                      <TableCell>{centsToInput(tier.yearly_price_cents)}</TableCell>
+                      <TableCell>{formatAmount(tier.monthly_price_cents)}</TableCell>
+                      <TableCell>{formatAmount(tier.yearly_price_cents)}</TableCell>
                       <TableCell>
                         <span className="text-xs">
                           {(tier.features ?? []).slice(0, 3).join(', ') || t('member_premium_admin.empty.value')}

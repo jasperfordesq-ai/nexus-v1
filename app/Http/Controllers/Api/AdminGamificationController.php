@@ -40,6 +40,7 @@ class AdminGamificationController extends BaseApiController
         $totalXp = 0;
         $activeCampaigns = 0;
         $badgeDistribution = [];
+        $builtInBadgeNameCodes = [];
 
         try { $totalBadgesAwarded = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
         try { $activeUsers = (int) DB::selectOne("SELECT COUNT(DISTINCT ub.user_id) as cnt FROM user_badges ub JOIN users u ON ub.user_id = u.id WHERE u.tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
@@ -47,12 +48,26 @@ class AdminGamificationController extends BaseApiController
         try { $activeCampaigns = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM achievement_campaigns WHERE tenant_id = ? AND status = 'active'", [$tenantId])->cnt; } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         try {
+            foreach ($this->gamificationService->getBadgeDefinitions() as $definition) {
+                $badgeKey = (string) ($definition['key'] ?? '');
+                if ($badgeKey !== '') {
+                    $builtInBadgeNameCodes[$badgeKey] = self::badgeTranslationCode($definition, $badgeKey, 'name');
+                }
+            }
+        } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
+
+        try {
             $rows = DB::select(
-                "SELECT ub.name as badge_name, COUNT(*) as count FROM user_badges ub JOIN users u ON ub.user_id = u.id
+                "SELECT ub.badge_key, ub.name as badge_name, COUNT(*) as count FROM user_badges ub JOIN users u ON ub.user_id = u.id
                  WHERE u.tenant_id = ? GROUP BY ub.badge_key, ub.name ORDER BY count DESC LIMIT 10",
                 [$tenantId]
             );
-            $badgeDistribution = array_map(fn($r) => ['badge_name' => $r->badge_name, 'count' => (int) $r->count], $rows);
+            $badgeDistribution = array_map(fn($r) => [
+                'badge_key' => $r->badge_key,
+                'badge_name' => $r->badge_name,
+                'name_code' => $builtInBadgeNameCodes[$r->badge_key] ?? null,
+                'count' => (int) $r->count,
+            ], $rows);
         } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData([
@@ -75,8 +90,18 @@ class AdminGamificationController extends BaseApiController
         try {
             $definitions = $this->gamificationService->getBadgeDefinitions();
             foreach ($definitions as $def) {
-                $badgeKey = $def['key'] ?? '';
-                $badges[] = ['id' => null, 'key' => $badgeKey, 'name' => $def['name'] ?? $badgeKey, 'description' => $def['msg'] ?? $def['description'] ?? '', 'icon' => $def['icon'] ?? 'award', 'type' => 'built_in', 'awarded_count' => 0];
+                $badgeKey = (string) ($def['key'] ?? '');
+                $badges[] = [
+                    'id' => null,
+                    'key' => $badgeKey,
+                    'name' => $def['name'] ?? $badgeKey,
+                    'name_code' => self::badgeTranslationCode($def, $badgeKey, 'name'),
+                    'description' => $def['msg'] ?? $def['description'] ?? '',
+                    'description_code' => self::badgeTranslationCode($def, $badgeKey, 'description'),
+                    'icon' => $def['icon'] ?? 'award',
+                    'type' => 'built_in',
+                    'awarded_count' => 0,
+                ];
             }
         } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
@@ -96,6 +121,27 @@ class AdminGamificationController extends BaseApiController
         } catch (\Throwable $e) { Log::warning('AdminGamificationController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
         return $this->respondWithData($badges);
+    }
+
+    /**
+     * Return a stable translation code for a built-in badge while preserving
+     * any explicit semantic code supplied by the badge-definition service.
+     *
+     * @param array<string, mixed> $definition
+     */
+    private static function badgeTranslationCode(array $definition, string $badgeKey, string $field): ?string
+    {
+        if ($badgeKey === '') {
+            return null;
+        }
+
+        $codeField = $field . '_code';
+        if (array_key_exists($codeField, $definition)) {
+            $explicitCode = $definition[$codeField];
+            return is_string($explicitCode) && $explicitCode !== '' ? $explicitCode : null;
+        }
+
+        return "badges.{$badgeKey}.{$field}";
     }
 
     /** POST /api/v2/admin/gamification/badges */

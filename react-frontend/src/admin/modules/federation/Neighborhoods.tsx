@@ -176,7 +176,7 @@ export function Neighborhoods() {
         toast.success(t('federation.tenant_removed_from_neighborhood'));
         loadData();
       } else {
-        toast.error(res.error || t('federation.failed_to_remove_tenant'));
+        toast.error(t('federation.failed_to_remove_tenant'));
       }
     } catch (err) {
       logError('Neighborhoods.removeTenant', err);
@@ -194,7 +194,7 @@ export function Neighborhoods() {
         toast.success(t('federation.neighborhood_deleted'));
         loadData();
       } else {
-        toast.error(res.error || t('federation.failed_to_delete_neighborhood'));
+        toast.error(t('federation.failed_to_delete_neighborhood'));
       }
     } catch (err) {
       logError('Neighborhoods.delete', err);
@@ -336,7 +336,7 @@ export function Neighborhoods() {
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
                               <p className="text-xs text-muted">
-                                {t('federation.members_count_value', { count: tenant.member_count })} Â· {tenant.slug}
+                                {t('federation.members_count_value', { count: tenant.member_count })} {' · '} {tenant.slug}
                               </p>
                             </div>
                           </div>

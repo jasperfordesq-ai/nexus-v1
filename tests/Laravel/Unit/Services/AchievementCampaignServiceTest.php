@@ -81,6 +81,8 @@ class AchievementCampaignServiceTest extends TestCase
         $this->assertNotEmpty(AchievementCampaignService::AUDIENCES);
         $this->assertArrayHasKey('one_time', AchievementCampaignService::TYPES);
         $this->assertArrayHasKey('all_users', AchievementCampaignService::AUDIENCES);
+        $this->assertSame('one_time', AchievementCampaignService::TYPES['one_time']);
+        $this->assertSame('all_users', AchievementCampaignService::AUDIENCES['all_users']);
     }
 
     public function test_type_to_db_mapping_works(): void

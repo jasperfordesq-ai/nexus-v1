@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "analytics": {
     "category_demand_title": "カテゴリーの需要",
@@ -201,7 +201,8 @@
         "language_distribution": "言語の分布",
         "member_growth_12m": "過去 12 か月間のメンバーの増加",
         "total_with_data": "人口統計データのあるメンバー {{total}} 人",
-        "total_active_members": "アクティブメンバー {{total}} 人"
+        "total_active_members": "アクティブメンバー {{total}} 人",
+        "unknown_language": "不明な言語"
       },
       "volunteer": {
         "total_hours": "合計時間",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "カテゴリ別のヘルプ リクエスト",
-        "resolution_trend_6m": "過去 6 か月間の解決傾向"
+        "resolution_trend_6m": "過去 6 か月間の解決傾向",
+        "categories": {
+          "either": "電話またはメッセージ",
+          "message": "メッセージ",
+          "phone": "電話",
+          "unknown": "不明な設定"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -238,15 +245,16 @@
       },
       "age_groups": {
         "under_25": "25歳未満",
-        "25_34": "NEXUSTERM0トークン",
-        "35_44": "NEXUSTERM0トークン",
-        "45_54": "NEXUSTERM0トークン",
-        "55_64": "NEXUSTERM0トークン",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
         "65_plus": "65歳以上",
         "unknown": "未知"
       }
     },
-    "location_marker_title_other": "{{area}}:{{count}}メンバー"
+    "location_marker_title_other": "{{area}}:{{count}}メンバー",
+    "location_marker_title_one": "{{area}}: {{count}} メンバー"
   },
   "search_analytics": {
     "page_title": "検索アナリティクス",
@@ -272,6 +280,18 @@
     "empty_description": "選択した期間に検索は記録されていません。",
     "no_trending": "この期間に人気の検索はありません。",
     "no_zero_results": "この期間に結果ゼロの検索はありません。すべての検索で何かが見つかりました。",
-    "count_value_other": "{{count}}回"
+    "count_value_other": "{{count}}回",
+    "result_types": {
+      "blog": "ブログ",
+      "events": "イベント",
+      "groups": "グループ",
+      "jobs": "仕事",
+      "listings": "リスティング",
+      "marketplace": "マーケットプレイス",
+      "members": "メンバー",
+      "resources": "リソース",
+      "volunteering": "ボランティア"
+    },
+    "count_value_one": "{{count}}×"
   }
 }

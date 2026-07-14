@@ -260,7 +260,7 @@ export default function CoordinatorTasks() {
         resetForm();
         await loadTasks();
       } else {
-        toast.error(res.error || (editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task')));
+        toast.error((editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task')));
       }
     } catch {
       toast.error(editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task'));
@@ -280,7 +280,7 @@ export default function CoordinatorTasks() {
         setDeletingTask(null);
         await loadTasks();
       } else {
-        toast.error(res.error || t('crm.failed_to_delete_task'));
+        toast.error(t('crm.failed_to_delete_task'));
       }
     } catch {
       toast.error(t('crm.failed_to_delete_task'));
@@ -296,7 +296,7 @@ export default function CoordinatorTasks() {
         toast.success(t('crm.task_status_changed'));
         await loadTasks();
       } else {
-        toast.error(res.error || t('crm.failed_to_update_task_status'));
+        toast.error(t('crm.failed_to_update_task_status'));
       }
     } catch {
       toast.error(t('crm.failed_to_update_task_status'));
@@ -595,7 +595,9 @@ export default function CoordinatorTasks() {
                   >
                     {admins.map((admin) => (
                       <SelectItem key={String(admin.id)} id={String(admin.id)}>
-                        {admin.name} ({admin.role})
+                        {admin.name} ({t(`crm.admin_roles.${admin.role}`, {
+                          defaultValue: t('crm.admin_roles.unknown'),
+                        })})
                       </SelectItem>
                     ))}
                   </Select>

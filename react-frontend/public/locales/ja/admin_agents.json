@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "agents": {
     "actions": {
@@ -219,6 +219,30 @@
         "rejected": "提案は拒否されました"
       }
     },
-    "tabs_aria": "エージェントの提案ステータス フィルター"
+    "tabs_aria": "エージェントの提案ステータス フィルター",
+    "agent_type": {
+      "activity_summary": "アクティビティ概要",
+      "activity_summariser": "アクティビティサマライザー",
+      "help_routing": "ルーティング支援",
+      "listing-enrichment": "リスティングの充実化",
+      "matchmaker": "マッチメーカー",
+      "matching": "マッチング",
+      "notifications": "通知",
+      "nudge_dispatch": "ナッジ送信",
+      "tandem_matching": "タンデムマッチング"
+    },
+    "triggered_by": {
+      "admin": "管理者",
+      "manual": "マニュアル",
+      "schedule": "スケジュール",
+      "scheduled": "予定済み"
+    },
+    "proposal_type": {
+      "create_tandem": "タンデムを作成",
+      "match_suggestion": "マッチ提案",
+      "route_help_request": "ヘルプリクエストをルート",
+      "send_activity_summary": "アクティビティサマリーを送信",
+      "send_nudge": "ナッジを送信"
+    }
   }
 }

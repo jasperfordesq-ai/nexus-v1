@@ -15,67 +15,66 @@
     "federation_audit": "Iniúchadh Cónaidhm",
     "platform_admin": "Ardán Riarachán",
     "back_to_platform_admin": "Ar ais chuig Ardán Riarachán",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Fiosrúcháin Tástála",
+    "provisioning_queue": "Méarlán Soláthair",
+    "billing_control": "Rialú Bhilleála",
+    "revenue_dashboard": "Painéal Tuillimh",
+    "regional_analytics": "Anailís Réigiúnach",
+    "national_dashboard": "Painéal Náisiúnta"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Ag luchtú super riarthóir",
+    "skip_to_main": "Sleamhnaigh go dtí an príomhtheachtaireacht",
+    "close_navigation": "Dún nascleanúint super riarthóra",
+    "navigation": "Nascleanúint super riarthóra"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Ar ais chuig an riarthóir",
+    "toggle_sidebar": "Tógáil an barra taobh",
+    "notifications": "Fógraí",
+    "my_profile": "Mo Phróifíl",
+    "sign_out": "Sín Amach",
+    "user_fallback": "Super Fheidhmeannach",
+    "user_menu": "Biachlár super riarthóra"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Forbhreathnú",
+    "section_tenants": "Tónaí",
+    "section_federation": "Feis",
+    "section_commercial": "Tráchtála",
+    "expand": "Leathnaigh barra taobh",
+    "collapse": "Dún barra taobh",
+    "nav_label": "Nascleanúint super riarthóra"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Super Fheidhmeannach",
+    "tenants": "Tónaí",
+    "create": "Cruthaigh",
+    "edit": "Cuir in eagar",
+    "hierarchy": "Hidirghrúpa",
+    "users": "Úsáideoirí",
+    "federation": "Feis",
+    "whitelist": "Liosta Bán",
+    "partnerships": "Comhpháirteachais",
+    "tenant": "Tiarnóir",
+    "features": "Gnéithe",
+    "billing": "Billeáil",
+    "revenue": "Ioncam",
+    "platform": "Ardán",
+    "pilot_inquiries": "Fiosrúcháin Tástála",
+    "provisioning_requests": "Iarratais Soláthair",
+    "national": "Náisiúnta",
+    "regional_analytics": "Anailís Réigiúnach",
+    "subscriptions": "Síntiús",
+    "aria_label": "Arán cróicín",
+    "bulk": "Oibríochtaí Móra",
+    "audit": "Loga Iniúchta"
   },
   "dashboard": {
     "title": "Painéal an Bhonneagair",
     "subtitle_global": "Forbhreathnú domhanda ar gach tionónta agus bonneagar",
-    "subtitle_scoped": "Forbhreathnú ar:tenant_name agus fo-thionóntaí",
     "create_tenant_btn": "Cruthaigh Tionónta",
     "stat_total_tenants": "Tionóntaí Iomlána",
     "stat_active_tenants": "Tionóntaí Gníomhacha",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Gníomhartha Tapa",
     "create_new_tenant": "Cruthaigh Tionónta Nua",
     "view_super_admins": "Féach ar Sár-Riarthóirí",
-    "back_to_platform_admin": "Ar ais chuig Ardán Riarachán"
+    "back_to_platform_admin": "Ar ais chuig Ardán Riarachán",
+    "subtitle_scoped": "Forbhreathnú ar :tenant_name agus sub-thiarnaithe"
   },
   "common": {
     "active": "Gníomhach",
@@ -188,7 +188,6 @@
       "actions_card_title": "Gníomhartha",
       "view_tenant_btn": "Féach Tionónta",
       "god_card_title": "Sár-Riarachán Domhanda (Dia amháin)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Is féidir le Global Super Admins rochtain a fháil ar GACH tionónta ar an ardán.",
       "god_has_access": "Tá sár-rochtain admin DOMHANDA ag an úsáideoir",
       "god_revoke_btn": "Sár-Riarachán Domhanda a chúlghairm",
@@ -206,12 +205,12 @@
       "stat_user_id": "Aitheantas Úsáideora",
       "stat_tenant_id": "ID an Tionónta",
       "stat_status": "Stádas",
-      "stat_approved": "Ceadaithe"
+      "stat_approved": "Ceadaithe",
+      "god_warning": "Rabhadh:"
     },
     "create": {
       "breadcrumb_create": "Cruthaigh",
       "title": "Cruthaigh Úsáideoir Nua",
-      "subtitle_selected": "Úsáideoir á chruthú do:tenant_name",
       "subtitle_default": "Roghnaigh tionónta chun úsáideoir nua a chruthú",
       "card_title": "Sonraí Úsáideora",
       "tenant_label": "Tionónta",
@@ -229,7 +228,8 @@
       "super_admin_label": "Deonaigh Pribhléidí Sár-Riaracháin",
       "super_admin_help": "Is féidir le Sár-Riarthóirí rochtain a fháil ar an bPainéal Sár-Riaracháin agus fo-thionóntaí a dtionónta a bhainistiú. Ar fáil do thionóntaí Mol amháin (tionóntaí a bhfuil cumas fo-thionónta acu).",
       "submit_btn": "Cruthaigh Úsáideoir",
-      "cancel_btn": "Cealaigh"
+      "cancel_btn": "Cealaigh",
+      "subtitle_selected": "Ag cruthú úsáideora do :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Cuir in eagar",
@@ -272,23 +272,22 @@
       "stat_active": "Gníomhach",
       "stat_pending": "Ar feitheamh",
       "super_admin_card_title": "Stádas Sár-Riaracháin",
-      "super_admin_toggle_desc": "Scoránaigh Sár-Riarachán le haghaidh:tenant_name",
       "revoke_btn": "Sár-Riarachán a chúlghairm",
       "revoke_confirm": "An bhfuil fonn ort pribhléidí Sár-Riaracháin a chúlghairm?",
       "grant_btn": "Deontas Sár-Riarachán",
       "grant_confirm": "Deonaigh pribhléidí Sár-Riaracháin?",
-      "no_hub_text": "Ní féidir Sár-Riarachán a dheonú toisc nach tionónta Mol é:tenant_name.",
       "no_hub_move_text": "Úsáid an ghné \"Bog & Deonaigh Sár-Riarachán\" chun an t-úsáideoir seo a shannadh do thionónta Mol.",
       "quick_links_card_title": "Naisc Thapa",
       "view_profile_btn": "Próifíl Amharc",
       "view_tenant_btn": "Féach Tionónta",
-      "tenant_users_btn": "Úsáideoirí Tionóntaí"
+      "tenant_users_btn": "Úsáideoirí Tionóntaí",
+      "super_admin_toggle_desc": "Sleamhnán Super Admin do :tenant_name",
+      "no_hub_text": "Ní féidir a thabhairt Super Admin mar níl :tenant_name ina thiarnán Hub."
     }
   },
   "tenants": {
     "index": {
       "title": "Tionóntaí a bhainistiú",
-      "subtitle": ":tionónta(í) comhairimh i do scóip",
       "create_btn": "Cruthaigh Tionónta",
       "filter_search_placeholder": "Cuardaigh tionóntaí...",
       "filter_hub_label": "Tionóntaí moil amháin",
@@ -304,9 +303,10 @@
       "col_status": "Stádas",
       "col_actions": "Gníomhartha",
       "parent_root": "Fréamh",
-      "level_label": "Leibhéal: doimhneacht",
       "you_badge": "tu",
-      "no_tenants": "Níor aimsíodh aon tionóntaí"
+      "no_tenants": "Níor aimsíodh aon tionóntaí",
+      "subtitle": "Cácálaí :count i do raon",
+      "level_label": "Leibhéal :depth"
     },
     "show": {
       "breadcrumb_tenants": "Tionóntaithe",
@@ -319,11 +319,9 @@
       "field_slug": "Drúchtín",
       "field_domain": "Fearann",
       "field_hierarchy_level": "Leibhéal Ordlathais",
-      "field_level": "Leibhéal: doimhneacht",
       "field_parent": "Tuismitheoir",
       "field_total_users": "Úsáideoirí Iomlán",
       "field_sub_tenants": "Fo-thionóntaí",
-      "field_sub_tenants_direct": ": comhaireamh díreach",
       "field_description": "Cur síos",
       "not_configured": "Gan cumraithe",
       "root_tenant": "Tionónta fréamhacha",
@@ -355,22 +353,21 @@
       "reactivate_card_title": "Tionónta a athghníomhachtú",
       "reactivate_desc": "Tá an tionónta seo neamhghníomhach faoi láthair. Cuirfidh athghníomhachtú rochtain úsáideora ar ais.",
       "reactivate_btn": "Tionónta a athghníomhachtú",
-      "tenant_id_label": "ID an Tionónta::id | cosán:: cosán"
+      "field_level": "Leibhéal :depth",
+      "field_sub_tenants_direct": ":count díreach",
+      "tenant_id_label": "Aitheantas Tenant: :id | Cosán: :path"
     },
     "create": {
       "breadcrumb_create": "Cruthaigh",
       "title": "Cruthaigh Tionónta Nua",
-      "subtitle_selected": "Fothionónta á chruthú faoi:parent_name",
       "subtitle_default": "Roghnaigh tionónta tuismitheora chun fo-thionónta nua a chruthú",
       "card_title": "Sonraí Tionónta",
       "parent_label": "Tionónta Tuismitheora",
       "parent_placeholder": "-- Roghnaigh Tuismitheoir Tionónta --",
       "parent_help": "Ní thaispeántar ach tionóntaí le cumas fo-thionóntaí. Cruthófar an tionónta nua mar leanbh de chuid an tuismitheora roghnaithe.",
-      "depth_label": "(Doimhneacht::doimhneacht)",
       "name_label": "Ainm an Tionónta",
       "slug_label": "Drúchtín",
       "slug_help": "Litreacha i gcás íochtair, uimhreacha, agus fleiscíní amháin",
-      "tagline_label": "Tagline",
       "domain_label": "Fearann ​​an Chustaim",
       "domain_help": "Fearann saincheaptha roghnach don tionónta seo. Ní mór DNS a chumrú ar leithligh.",
       "description_label": "Cur síos",
@@ -383,18 +380,19 @@
       "max_depth_unlimited": "Gan teorainn",
       "max_depth_help": "Teorainn a chur le líon na leibhéil fo-thionóntaí is féidir a chruthú faoin tionónta seo (ní bhaineann sé seo ach amháin má tá Mol cumasaithe)",
       "submit_btn": "Cruthaigh Tionónta",
-      "cancel_btn": "Cealaigh"
+      "cancel_btn": "Cealaigh",
+      "depth_label": "(Doimhne: :depth)",
+      "subtitle_selected": "Ag cruthú sub-thiarnán faoi :parent_name",
+      "tagline_label": "Slogán"
     },
     "edit": {
       "breadcrumb_edit": "Cuir in eagar",
       "title": "Cuir Tionónta in Eagar",
-      "subtitle": "Modhnú::ainm (Leibhéal: doimhneacht)",
       "back_btn": "Ar ais go Sonraí",
       "details_card_title": "Sonraí Tionónta",
       "name_label": "Ainm an Tionónta",
       "slug_label": "Drúchtín",
       "slug_help": "Litreacha i gcás íochtair, uimhreacha, agus fleiscíní amháin",
-      "tagline_label": "Tagline",
       "domain_label": "Fearann ​​an Chustaim",
       "domain_help": "Fearann ​​saincheaptha roghnach. Ní mór DNS a chumrú ar leithligh.",
       "description_label": "Cur síos",
@@ -461,7 +459,6 @@
       "standard_tenant_badge": "Tionónta Caighdeánach",
       "max_depth_label": "Uas Doimhneacht Fo-thionónta",
       "max_depth_unlimited": "Gan teorainn",
-      "max_depth_levels": ": leibhéil chomhairimh",
       "disable_hub_btn": "Díchumasaigh Mol",
       "disable_hub_confirm": "Cuirfidh sé seo cosc ar fhothionóntaí nua a chruthú. Fanfaidh na fo-thionóntaí láithreacha.",
       "enable_hub_btn": "Cumasaigh Mol",
@@ -483,7 +480,10 @@
       "deactivate_confirm": "An bhfuil tú cinnte gur mhaith leat an tionónta seo a dhíghníomhachtú? Caillfidh úsáideoirí rochtain.",
       "reactivate_card_title": "Tionónta a athghníomhachtú",
       "reactivate_desc": "Tá an tionónta seo neamhghníomhach faoi láthair. Cuirfidh athghníomhachtú rochtain úsáideora ar ais.",
-      "reactivate_btn": "Tionónta a athghníomhachtú"
+      "reactivate_btn": "Tionónta a athghníomhachtú",
+      "subtitle": "Ag athrú: :name (Leibhéal :depth)",
+      "max_depth_levels": ":count leibhéil",
+      "tagline_label": "Slogán"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Tionóntaithe",
@@ -577,7 +577,6 @@
     "source_tenant_all": "Gach Tionónta",
     "user_selection_label": "Roghnaigh Úsáideoirí",
     "user_select_hint": "Roghnaigh tionónta foinse chun úsáideoirí a luchtú",
-    "users_selected": ": úsáideoir comhairimh roghnaithe",
     "target_tenant_label": "Spriocthionónta",
     "target_tenant_placeholder": "-- Roghnaigh Sprioc --",
     "grant_super_admin_label": "Deonaigh Sár-Riarachán do gach úsáideoir bogtha",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Oibríochtaí Bulc Tionóntaí",
     "bulk_tenants_desc": "Cumasaigh/díchumasaigh ilthionóntaí nó scoránaigh cumas an Mhoil ar an mórchóir.",
     "select_tenants_label": "Roghnaigh Tionóntaí",
-    "tenants_selected": ":tionónta(í) comhairimh roghnaithe",
     "select_all": "Roghnaigh Uile",
     "deselect_all": "Díroghnaigh Uile",
     "action_label": "Gníomh",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Cumasaigh Mol",
     "action_disable_hub": "Díchumasaigh Mol",
     "apply_btn": "Cuir iarratas isteach ar Roghnaithe",
-    "apply_confirm": "Cuir an gníomh seo i bhfeidhm ar gach tionónta roghnaithe?"
+    "apply_confirm": "Cuir an gníomh seo i bhfeidhm ar gach tionónta roghnaithe?",
+    "users_selected": ":count úsáideoir(í) roghnaithe",
+    "tenants_selected": ":count tenant(í) roghnaithe"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Gníomhaíocht le Déanaí",
       "full_log_btn": "Log Iomlán",
       "no_federation_activity": "Níl aon ghníomhaíocht chónaidhme fós",
-      "by_label": "by",
       "activity_title": "Gníomhaíocht Cónaidhme (30 lá)",
       "stat_total_actions": "Gníomhartha Iomlána",
       "stat_messages": "Teachtaireachtaí",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Imeachtaí Criticiúla",
       "most_active_partnerships": "Comhpháirtíochtaí is Gníomhaí",
       "quick_nav_title": "Nascleanúint Thapa",
-      "tenant_whitelist_btn": "Liosta Bán Tionóntaí"
+      "tenant_whitelist_btn": "Liosta Bán Tionóntaí",
+      "by_label": "le"
     },
     "system_controls": {
       "title": "Rialuithe Córais Cónaidhm",

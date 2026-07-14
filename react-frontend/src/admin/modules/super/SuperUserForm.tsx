@@ -98,7 +98,7 @@ export function SuperUserForm() {
         navigate(tenantPath(newId ? `/super-admin/users/${newId}` : '/super-admin/users'));
       }
     } else {
-      toast.error(res?.error || t('super.failed_to_save_user'));
+      toast.error(t('super.failed_to_save_user'));
     }
     setSaving(false);
   };
@@ -112,7 +112,7 @@ export function SuperUserForm() {
       setMoveTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_user'));
+      toast.error(t('super.failed_to_move_user'));
     }
     setMoveLoading(false);
   };
@@ -126,7 +126,7 @@ export function SuperUserForm() {
       setPromoteTargetTenant('');
       loadUser();
     } else {
-      toast.error(res?.error || t('super.failed_to_move_and_promote'));
+      toast.error(t('super.failed_to_move_and_promote'));
     }
     setPromoteLoading(false);
   };
@@ -343,7 +343,7 @@ export function SuperUserForm() {
                 <div className="flex flex-col gap-3">
                   <div>
                     <p className="text-xs text-muted">{t('super.account_status')}</p>
-                    <p className="text-sm font-medium capitalize">{user.status}</p>
+                    <p className="text-sm font-medium">{t(`super.status_${user.status}`, { defaultValue: t('super.status_unknown') })}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted">{t('super.label_tenant')}</p>

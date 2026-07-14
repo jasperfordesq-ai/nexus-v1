@@ -18,6 +18,7 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
+import { formatPercentValue } from '@/lib/helpers';
 import { useToast } from '@/contexts/ToastContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -297,7 +298,7 @@ export default function EmailDeliverability() {
       toast.success(t('email_deliverability.suppressions.removed', { email }));
       loadSuppressions();
     } else {
-      toast.error(r.error || t('email_deliverability.suppressions.remove_failed'));
+      toast.error(t('email_deliverability.suppressions.remove_failed'));
     }
   };
 
@@ -344,6 +345,14 @@ export default function EmailDeliverability() {
       : t('email_deliverability.suppressions.reasons.unknown', { reason })
   );
 
+  const categoryLabel = (category: string | null) => (
+    category
+      ? t(`email_deliverability.categories.${category}`, {
+          defaultValue: t('email_deliverability.categories.unknown'),
+        })
+      : t('email_deliverability.categories.not_available')
+  );
+
   const statusChip = (status: string) => (
     <Chip size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="soft">
       {statusLabel(status)}
@@ -380,7 +389,7 @@ export default function EmailDeliverability() {
     {
       key: 'accepted',
       label: t('email_deliverability.metrics.accepted'),
-      value: summary?.accepted_pct !== null && summary?.accepted_pct !== undefined ? `${summary.accepted_pct}%` : '-',
+      value: summary?.accepted_pct !== null && summary?.accepted_pct !== undefined ? formatPercentValue(summary.accepted_pct) : '-',
       icon: CheckCircle2,
       color: 'text-[var(--color-success)]',
       detail: t('email_deliverability.metrics.unconfirmed', { count: summary?.unconfirmed_sent ?? 0 }),
@@ -388,7 +397,7 @@ export default function EmailDeliverability() {
     {
       key: 'delivered',
       label: t('email_deliverability.metrics.delivered'),
-      value: summary?.delivered_pct !== null && summary?.delivered_pct !== undefined ? `${summary.delivered_pct}%` : '-',
+      value: summary?.delivered_pct !== null && summary?.delivered_pct !== undefined ? formatPercentValue(summary.delivered_pct) : '-',
       icon: Clock3,
       color: 'text-[var(--color-success)]',
       detail: t('email_deliverability.metrics.webhook_confirmed'),
@@ -396,7 +405,7 @@ export default function EmailDeliverability() {
     {
       key: 'bounced',
       label: t('email_deliverability.metrics.bounced'),
-      value: summary?.bounced_pct !== null && summary?.bounced_pct !== undefined ? `${summary.bounced_pct}%` : '-',
+      value: summary?.bounced_pct !== null && summary?.bounced_pct !== undefined ? formatPercentValue(summary.bounced_pct) : '-',
       icon: ShieldAlert,
       color: 'text-[var(--color-error)]',
       detail: t('email_deliverability.metrics.bad_outcomes', {
@@ -502,7 +511,7 @@ export default function EmailDeliverability() {
                   { key: 'delivered', label: t('email_deliverability.push.delivered'), value: pushSummary?.delivered ?? 0, color: 'text-[var(--color-success)]' },
                   { key: 'partial', label: t('email_deliverability.push.partial'), value: pushSummary?.partial ?? 0, color: 'text-[var(--color-warning)]' },
                   { key: 'failed', label: t('email_deliverability.push.failed'), value: pushSummary?.failed ?? 0, color: 'text-[var(--color-error)]' },
-                  { key: 'success', label: t('email_deliverability.push.success_rate'), value: pushSummary?.success_pct != null ? `${pushSummary.success_pct}%` : '-', color: 'text-theme-primary' },
+                  { key: 'success', label: t('email_deliverability.push.success_rate'), value: pushSummary?.success_pct != null ? formatPercentValue(pushSummary.success_pct) : '-', color: 'text-theme-primary' },
                   { key: 'fcm', label: t('email_deliverability.push.fcm'), value: `${pushSummary?.fcm_sent ?? 0}/${pushSummary?.fcm_failed ?? 0}`, color: 'text-theme-primary' },
                   { key: 'web', label: t('email_deliverability.push.web'), value: pushSummary?.web_delivered ?? 0, color: 'text-theme-primary' },
                 ].map((tile) => (
@@ -521,7 +530,11 @@ export default function EmailDeliverability() {
                     {pushSummary!.recent_failures.slice(0, 8).map((f) => (
                       <div key={f.id} className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] p-2 text-sm">
                         <div className="flex min-w-0 items-center gap-2">
-                          <Chip size="sm" color={f.status === 'failed' ? 'danger' : 'warning'} variant="soft">{f.status}</Chip>
+                          <Chip size="sm" color={f.status === 'failed' ? 'danger' : 'warning'} variant="soft">
+                            {t(`admin_advanced:email_deliverability.status.${f.status}`, {
+                              defaultValue: t('admin_advanced:email_deliverability.status.unknown', { status: f.status }),
+                            })}
+                          </Chip>
                           <span className="truncate text-theme-secondary">{f.activity_type}{f.user_id ? ` · #${f.user_id}` : ''}</span>
                         </div>
                         {f.error ? <span className="max-w-[45%] truncate text-xs text-theme-subtle" title={f.error}>{f.error}</span> : null}
@@ -659,7 +672,7 @@ export default function EmailDeliverability() {
                     <TableCell className="font-mono text-xs">{row.email ?? '-'}</TableCell>
                     <TableCell>
                       <div className="max-w-xs">
-                        <div className="font-mono text-xs">{row.category ?? '-'}</div>
+                        <div className="text-xs">{categoryLabel(row.category)}</div>
                         <div className="truncate text-xs text-theme-secondary">{row.subject ?? ''}</div>
                       </div>
                     </TableCell>
@@ -732,7 +745,7 @@ export default function EmailDeliverability() {
                 {logRows.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell className="font-mono text-xs">{row.recipient_email}</TableCell>
-                    <TableCell>{row.category ? <Chip size="sm" variant="soft">{row.category}</Chip> : '-'}</TableCell>
+                    <TableCell><Chip size="sm" variant="soft">{categoryLabel(row.category)}</Chip></TableCell>
                     <TableCell className="max-w-xs truncate">{row.subject ?? '-'}</TableCell>
                     <TableCell>{statusChip(row.status)}</TableCell>
                     <TableCell className="text-xs">{row.provider ?? '-'}</TableCell>

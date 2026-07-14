@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,21 +67,20 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "admin_settings": {
     "logo_uploaded": "Przesłano logo partnera",
     "upload_failed": "Przesyłanie nie powiodło się",
-    "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "Pokazane w lewym slocie stopki. PNG, JPEG, WebP lub SVG — maksymalnie 2 MB.",
     "replace_image": "Zamień obraz",
     "upload_image": "Prześlij obraz",
     "remove_light_image": "Usuń obraz w trybie jasnym",
     "remove_dark_image": "Usuń obraz w trybie ciemnym",
     "remove_partner_logo": "Usuń logo partnera",
-    "header_logo_section": "Header Logo",
     "header_colors_section": "Dostępny kolor nagłówka",
     "header_colors_desc": "Wybierz kolor dostępnego nagłówka witryny (w stylu GOV.UK). Pozostaw nieustawione, aby zachować standardowy czarny nagłówek z niebieską linią.",
     "header_bg_color_label": "Kolor tła nagłówka",
@@ -90,7 +88,6 @@
     "header_accent_color_label": "Kolor linii akcentującej",
     "header_accent_color_hint": "Cienka linia pod nagłówkiem. Pozostaw puste, aby dopasować je do tła (bez widocznej linii) lub wybierz kontrastowy kolor, np. biały.",
     "header_colors_reset": "Przywróć ustawienia domyślne",
-    "header_colors_preview": "Preview",
     "header_logo_desc": "Prześlij niestandardowe logo, które będzie wyświetlane w nagłówku witryny zamiast inicjałów Twojej społeczności. Pozostaw puste, aby użyć wartości domyślnej.",
     "header_logo_light_label": "Logo nagłówka (tryb jasny)",
     "header_logo_dark_label": "Logo nagłówka (tryb ciemny)",
@@ -99,29 +96,32 @@
     "header_logo_uploaded": "Zaktualizowano logo nagłówka",
     "header_logo_removed": "Usunięto logo nagłówka",
     "remove_header_logo": "Usuń logo nagłówka",
-    "remove_header_logo_dark": "Usuń logo nagłówka trybu ciemnego"
+    "remove_header_logo_dark": "Usuń logo nagłówka trybu ciemnego",
+    "partner_logo_label": "Logo partnera",
+    "header_logo_section": "Logo nagłówka",
+    "header_colors_preview": "Podgląd"
   },
   "operations": {
-    "title": "Operations",
     "description": "Statystyki pamięci podręcznej i kontrola zadań w tle.",
-    "refresh": "Refresh",
-    "cache_heading": "Cache",
-    "bg_jobs_heading": "Background Jobs",
     "redis_label": "Redis",
-    "redis_connected": "Connected",
-    "redis_disconnected": "Disconnected",
     "memory_used": "Używana pamięć",
-    "keys": "Keys",
     "clear_cache": "Wyczyść pamięć podręczną dzierżawy",
     "cache_cleared": "Pamięć podręczna została pomyślnie wyczyszczona",
     "cache_clear_failed": "Nie udało się wyczyścić pamięci podręcznej",
     "job_triggered": "Zadanie zostało pomyślnie uruchomione",
     "job_trigger_failed": "Nie udało się uruchomić zadania",
-    "run_job_label": "Run {{name}}",
-    "last_run": "Last run: {{date}}",
     "never_run": "Nigdy nie biegaj",
     "no_jobs": "Nie skonfigurowano żadnych zadań w tle",
-    "loading": "Loading"
+    "refresh": "Odśwież",
+    "keys": "Klucze",
+    "loading": "Ładowanie",
+    "title": "Operacje",
+    "cache_heading": "Pamięć podręczna",
+    "bg_jobs_heading": "Procesy w tle",
+    "redis_connected": "Połączono",
+    "redis_disconnected": "Odłączono",
+    "run_job_label": "Uruchom {{name}}",
+    "last_run": "Ostatnie uruchomienie: {{date}}"
   },
   "retention": {
     "page_title": "Retencja danych",
@@ -160,7 +160,9 @@
     "type_vol_safeguarding_incidents": "Incydenty ochrony",
     "type_vol_safeguarding_incidents_desc": "Akta spraw ochrony. Usuwane są tylko sprawy rozwiązane lub zamknięte; przed włączeniem sprawdź ustawowe obowiązki przechowywania.",
     "type_vol_guardian_consents": "Zgody opiekunów",
-    "type_vol_guardian_consents_desc": "Zgody opiekunów dla nieletnich, usuwane po upływie tylu dni od wygaśnięcia zgody."
+    "type_vol_guardian_consents_desc": "Zgody opiekunów dla nieletnich, usuwane po upływie tylu dni od wygaśnięcia zgody.",
+    "status_unknown": "Nieznany status",
+    "type_unknown": "Nieznany typ danych"
   },
   "seed_generator": {
     "count_aria_label": "Liczba {{label}}",
@@ -183,62 +185,63 @@
     "option_messages_desc": "Wygeneruj przykładowe wiadomości członków",
     "option_badges_label": "Odznaki",
     "option_badges_desc": "Wygeneruj przykładowe nagrody w postaci odznak",
-    "warning_body": "Warning Body"
+    "warning_body": "Uruchamiaj generowanie danych testowych tylko w środowiskach deweloperskich lub testowych. Tworzy przykładowe rekordy i może wpływać na raporty."
   },
   "sso": {
-    "page_title": "Single Sign-On",
     "page_subtitle": "Skonfiguruj dostawców tożsamości OpenID Connect dla tej społeczności",
     "loading": "Ładowanie dostawców SSO",
     "load_failed": "Nie udało się załadować dostawców logowania jednokrotnego",
-    "refresh": "Refresh",
     "add_provider": "Dodaj dostawcę",
     "intro": "Członkowie logują się za pośrednictwem dostawcy tożsamości Twojej organizacji, korzystając z OpenID Connect Connect. Na stronach logowania i rejestracji dla każdego włączonego dostawcy pojawi się przycisk.",
     "no_providers": "Nie skonfigurowano jeszcze żadnego dostawcy logowania jednokrotnego.",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "updated_at": "Updated {{date}}",
-    "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
     "preset_entra_hint": "W przypadku identyfikatora Microsoft Entra adres URL wystawcy to https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "Połączenie testowe",
     "testing": "Testowanie…",
-    "test_ok": "Connection OK",
     "test_error": "Połączenie nie powiodło się",
     "test_failed": "Test nie powiódł się. Spróbuj ponownie.",
-    "edit": "Edit",
-    "edit_provider_title": "Edit {{name}}",
-    "delete": "Delete",
     "delete_title": "Usuń dostawcę logowania jednokrotnego",
     "delete_body": "Usunąć „{{name}}”? Członkowie nie będą już mogli logować się u tego dostawcy.",
-    "delete_confirm": "Delete",
     "deleted": "Dostawca usunięty",
     "delete_failed": "Nie udało się usunąć dostawcy",
     "saved": "Dostawca zapisany",
-    "save": "Save",
     "saving": "Oszczędność…",
     "save_failed": "Nie udało się zapisać dostawcy",
-    "cancel": "Cancel",
     "key_invalid": "Klucz dostawcy musi składać się z 2–20 znaków: małych liter, cyfr, łączników lub podkreśleń i zaczynać się od litery lub cyfry.",
     "field_key": "Klucz dostawcy",
     "field_key_desc": "Krótki unikalny identyfikator używany w adresach URL (np. Coventry). Nie można go później zmienić.",
     "field_display_name": "Nazwa wyświetlana",
     "field_display_name_desc": "Wyświetlana na przycisku logowania, np. „Zaloguj się w Radzie Miasta Coventry” .",
-    "field_preset": "Preset",
-    "field_issuer_url": "Issuer URL",
     "field_issuer_url_desc": "Emitent OIDC; wykrywanie działa przeciwko {issuer}/.well-known/openid-configuration.",
-    "field_client_id": "Client ID",
     "field_client_secret": "Sekret klienta",
     "secret_keep_placeholder": "Pozostaw puste, aby zachować bieżący sekret",
     "secret_keep_desc": "Przechowywany jest sekret. Wprowadź nową wartość, aby ją zastąpić, lub pozostaw pustą, aby ją zachować.",
-    "field_scopes": "Scopes",
     "field_scopes_desc": "Oddzielone spacjami zakresy OIDC. Wartość domyślna: adres e-mail profilu openid",
     "field_domains": "Dozwolone domeny e-mail",
-    "field_domains_desc": "Oddzielone przecinkami, np. coventry.gov.uk, przykład.org. Pozostaw puste, aby zezwolić na dowolną domenę.",
+    "field_domains_desc": "Oddzielone przecinkami, np. coventry.gov.uk, example.org. Pozostaw puste, aby zezwolić na dowolną domenę.",
     "field_auto_provision": "Automatyczne udostępnianie kont",
     "field_auto_provision_desc": "Automatycznie utwórz konto członkowskie przy pierwszym logowaniu. Gdy ta opcja jest wyłączona, tylko obecni członkowie mogą logować się za pomocą logowania jednokrotnego.",
-    "field_enabled": "Enabled",
-    "field_enabled_desc": "Pokaż tego dostawcę na stronach logowania i rejestracji."
+    "field_enabled_desc": "Pokaż tego dostawcę na stronach logowania i rejestracji.",
+    "preset_unknown": "Nieznane ustawienie wstępne",
+    "refresh": "Odśwież",
+    "enabled": "Włączone",
+    "disabled": "Wyłączone",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "page_title": "Logowanie jednokrotne",
+    "updated_at": "Zaktualizowano {{date}}",
+    "preset_generic": "Ogólny OIDC",
+    "test_ok": "Połączenie OK",
+    "edit_provider_title": "Edytuj {{name}}",
+    "delete_confirm": "Usuń",
+    "field_preset": "Ustawienie wstępne",
+    "field_issuer_url": "URL wystawcy",
+    "field_client_id": "ID klienta",
+    "field_scopes": "Zakresy",
+    "field_enabled": "Włączone"
   },
   "system": {
     "active": "Aktywny",
@@ -317,7 +320,6 @@
     "cron_success_title": "To wszystko!",
     "currency_aud": "AUD – dolar australijski",
     "currency_cad": "CAD – dolar kanadyjski",
-    "currency_eur": "EUR - Euro",
     "currency_gbp": "GBP – funt brytyjski",
     "currency_jpy": "JPY – jen japoński",
     "currency_usd": "USD – dolar amerykański",
@@ -327,7 +329,6 @@
     "platform_azure_vm": "Maszyna wirtualna platformy Azure",
     "platform_cpanel": "cPanel",
     "platform_docker": "Doker",
-    "platform_gcp": "GCP",
     "platform_linux_vps": "Linux/VPS",
     "recommended": "Zalecony",
     "replace": "Zastępować",
@@ -578,12 +579,8 @@
       "preset_applied": "Zastosowano ustawienie wstępne",
       "preset_confirm": "Czy na pewno chcesz zastosować to ustawienie wstępne? Spowoduje to zastąpienie bieżących ustawień.",
       "preset_created_options": "Zastosowano ustawienie wstępne i utworzono opcje",
-      "preset_custom": "Custom",
       "preset_england_wales": "Anglia i Walia",
-      "preset_ireland": "Ireland",
-      "preset_northern_ireland": "Northern Ireland",
       "preset_note": "Zastosowanie ustawienia wstępnego spowoduje zastąpienie bieżących ustawień zasad rejestracji",
-      "preset_scotland": "Scotland",
       "profile_requirements": "Wymagania dotyczące profilu",
       "profile_requirements_desc": "Ustaw minimalne wymagania dotyczące profilu, które muszą spełnić członkowie",
       "require_avatar_visibility": "Wymagaj widoczności awatara",
@@ -630,7 +627,11 @@
       "n_active_other": "{{count}}aktywny",
       "preset_united_kingdom": "Zjednoczone Kr?lestwo",
       "n_active_few": "{{count}}aktywny",
-      "n_active_many": "{{count}}aktywny"
+      "n_active_many": "{{count}}aktywny",
+      "preset_custom": "Niestandardowe",
+      "preset_ireland": "Irlandia",
+      "preset_northern_ireland": "Irlandia Północna",
+      "preset_scotland": "Szkocja"
     },
     "overdue_jobs": "Zaległe prace",
     "page_title": "Systemu",
@@ -750,7 +751,6 @@
       "provider_idenfy": "Identyfikacja dostawcy",
       "provider_jumio": "Dostawca Jumio",
       "provider_onfido": "Dostawca Onfido",
-      "provider_stripe": "Pasek dostawcy",
       "provider_veriff": "Weryfikacja dostawcy",
       "providers_available": "Dostępni dostawcy",
       "registration_method": "Metoda rejestracji",
@@ -760,14 +760,12 @@
       "require_email_desc": "Wymagaj od członków weryfikacji adresu e-mail przed uzyskaniem dostępu do platformy",
       "require_email_tooltip": "To ustawienie mogą zmieniać tylko superadministratorzy platformy",
       "save_credentials": "Zapisz dane uwierzytelniające",
-      "save_policy": "Save Policy",
       "show_api_key": "Pokaż klucz API",
       "show_webhook": "Pokaż webhooka",
       "tip_change_modes": "Zmiana trybu rejestracji obowiązuje natychmiast w przypadku nowych rejestracji",
       "total_codes": "Razem kody",
       "total_codes_count": "Łączna liczba kodów: {{count}}",
       "unavailable": "Nie płynny",
-      "understanding_modes": "Understanding Modes",
       "verification_settings": "Ustawienia weryfikacji",
       "verification_settings_desc": "Skonfiguruj wymagania dotyczące weryfikacji tożsamości dla nowych rejestracji członków",
       "waitlist_info": "Członkowie na liście oczekujących są zatwierdzani ręcznie przez administratora",
@@ -785,10 +783,12 @@
       "n_available_few": "{{count}} dostępne",
       "n_available_many": "{{count}} dostępne",
       "total_codes_count_few": "Łączna liczba kodów: {{count}}",
-      "total_codes_count_many": "Łączna liczba kodów: {{count}}"
+      "total_codes_count_many": "Łączna liczba kodów: {{count}}",
+      "save_policy": "Zapisz Politykę Rejestracji",
+      "understanding_modes": "Zrozumienie trybów rejestracji",
+      "provider_stripe": "Dostawca Stripe"
     },
     "registration_policy_saved_successfully": "Zasady rejestracji zostały pomyślnie zapisane",
-    "registration_policy_settings_title": "Registration Policy Settings",
     "run_now": "Uruchom teraz",
     "running": "Bieganie",
     "schedule": "Harmonogram",
@@ -818,16 +818,13 @@
     "label_default_currency": "Domyślna waluta",
     "desc_default_currency": "Używane do ustalania cen subskrypcji i rynku",
     "section_branding_legal": "Marka i kwestie prawne",
-    "powered_by_branding_section": "Powered By Branding",
     "powered_by_branding_desc": "Skonfiguruj prawe miejsce w stopce „Powered By”. Zmiany wchodzą w życie natychmiast. Tylko Bóg.",
     "god_only_chip": "Tylko Bóg",
     "label_partner_logo_label": "Etykieta z logo partnera",
-    "placeholder_partner_logo_label": "Community Partner",
     "desc_partner_logo_label": "Krótka etykieta pokazana nad logo partnera (pozostaw puste, aby użyć domyślnego tekstu „Partner społeczności”)",
     "label_powered_by_label": "Tekst etykiety",
     "placeholder_powered_by_label": "Obsługiwane przez",
     "desc_powered_by_label": "Krótka etykieta pokazana nad obrazem (pozostaw puste, aby użyć domyślnego tekstu „Obsługiwane przez”)",
-    "label_powered_by_url": "Link URL",
     "placeholder_powered_by_url": "https://example.com",
     "desc_powered_by_url": "Sprawia, że ​​obraz jest klikalny. Pozostaw puste, jeśli nie ma linku.",
     "label_powered_by_image_light": "Obraz w trybie jasnym",
@@ -889,9 +886,7 @@
     "advanced_custom_settings": "Zaawansowane ustawienia niestandardowe",
     "app_configuration_heading": "Konfiguracja aplikacji",
     "auto_convert_webp": "Automatyczna konwersja WebP",
-    "auto_convert_webp_desc": "Auto Convert WebP.",
     "auto_resize": "Automatyczna zmiana rozmiaru",
-    "auto_resize_desc": "Auto Resize.",
     "avg_completion_minutes": "Średnia liczba minut ukończenia",
     "avg_completion_seconds": "Średnie sekundy ukończenia",
     "blog_restore_warning": "Ostrzeżenie dotyczące przywracania bloga",
@@ -907,9 +902,6 @@
     "col_provider": "Dostawca",
     "col_time": "Czas",
     "conversion_failed": "Konwersja nie powiodła się",
-    "desc_comma_separated_emails": "Comma Separated Emails.",
-    "desc_job_will_run_when_enabled": "Job Will Run When Enabled.",
-    "desc_notify_on_failure": "Notify on Failure.",
     "enable_push_notifications": "Włącz powiadomienia push",
     "enable_push_notifications_desc": "Włącz powiadomienia push.",
     "failed_to_action_verification": "Nie udało się zweryfikować działania",
@@ -917,7 +909,6 @@
     "failed_to_load_provider_health": "Nie udało się załadować kondycji dostawcy",
     "failed_count": "Niepowodzenie{{count}}",
     "generate_thumbnails": "Generuj miniatury",
-    "generate_thumbnails_desc": "Generate Thumbnails.",
     "generated_data_for": "Wygenerowano dane dla {{count}} wybranych typów danych",
     "health_check_complete": "Kontrola stanu zakończona",
     "health_check_failed": "Kontrola stanu nie powiodła się",
@@ -948,7 +939,6 @@
     "n_hours_ago": "N godzin temu",
     "n_minutes_ago": "N minut temu",
     "n_sessions": "Sesje N",
-    "no_backups_available": "No backups available found",
     "no_failed_sessions": "Nie znaleziono nieudanych sesji",
     "no_identity_providers": "Nie znaleziono dostawców tożsamości",
     "not_available_short": "Nie dotyczy",
@@ -1000,7 +990,6 @@
     "stat_pending": "Statystyka w oczekiwaniu",
     "stat_total": "Statystyka ogółem",
     "strip_exif": "Usuń Exif",
-    "strip_exif_desc": "Strip Exif.",
     "success_rate_label": "Wskaźnik sukcesu",
     "system_requirements_desc": "Wymagania systemowe.",
     "system_requirements_title": "Wymagania systemowe",
@@ -1032,8 +1021,6 @@
     "not_writable_status": "Nie do zapisu",
     "search_extensions_placeholder": "Rozszerzenia wyszukiwania...",
     "some_warnings_detected": "Wykryto pewne ostrzeżenia",
-    "status_fail": "FAIL",
-    "status_ok": "OK",
     "writable_status": "Możliwość zapisu",
     "action": {
       "admin_approve_group_member": "Zatwierdź członka grupy",
@@ -1123,9 +1110,9 @@
       "vetting_record_rejected": "Odrzucono protokół lustracyjny",
       "vetting_record_updated": "Zaktualizowano rejestr weryfikacji",
       "vetting_record_verified": "Zweryfikowano protokół lustracji",
-      "welcome_credits_issued": "Wydano kredyty powitalne"
+      "welcome_credits_issued": "Wydano kredyty powitalne",
+      "unknown": "Nieznana akcja"
     },
-    "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Opcjonalny link do strony internetowej z logo partnera w stopce.",
     "label_inactivity_timeout": "Limit bezczynności (minuty)",
     "desc_inactivity_timeout": "Automatycznie wylogowuj członków po tylu minutach bez aktywności. 0 wyłącza limit; dozwolony zakres to 5–480 minut. Zalecane: 120.",
@@ -1157,7 +1144,31 @@
       "api_unavailable": "Interfejs API kontroli stanu jest niedostępny",
       "run_all": "Uruchom wszystkie testy",
       "suites": "Zestawy testów",
-      "unknown_test": "Diagnostyka: {{name}}"
+      "unknown_test": "Diagnostyka: {{name}}",
+      "tests": {
+        "api_health": "Kontrola stanu API",
+        "database": "Połączenie z bazą danych",
+        "redis": "Połączenie z Redis",
+        "auth_token": "Generowanie tokenu uwierzytelniającego",
+        "tenant_bootstrap": "Inicjalizacja najemcy",
+        "file_upload": "Przesyłanie plików (S3 lub lokalnie)",
+        "email_service": "Usługa poczty elektronicznej",
+        "pusher": "Pusher WebSocket"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "Utworzono wpis na blogu nr {{id}}: {{title}}",
+      "blog_post_updated": "Zaktualizowano wpis na blogu nr {{id}}: {{title}}",
+      "blog_post_deleted": "Usunięto wpis na blogu nr {{id}}: {{title}}",
+      "blog_post_status_changed": "Zmieniono status wpisu na blogu nr {{id}} z {{old_status}} na {{new_status}}.",
+      "blog_posts_bulk_deleted": "Zbiorczo usunięto wpisy na blogu: {{count}}",
+      "blog_posts_bulk_published": "Zbiorczo opublikowano wpisy na blogu: {{count}}",
+      "unknown": "Szczegóły aktywności: {{code}}"
+    },
+    "activity_status": {
+      "unknown": "Nieznany status",
+      "draft": "wersja robocza",
+      "published": "opublikowano"
     },
     "generated_data_for_few": "Wygenerowano dane dla {{count}} wybranych typów danych",
     "generated_data_for_many": "Wygenerowano dane dla {{count}} wybranych typów danych",
@@ -1182,7 +1193,225 @@
     "blog_posts_restored_few": "Posty na blogu{{count}}przywrócone z{{filename}}",
     "blog_posts_restored_many": "Posty na blogu{{count}}przywrócone z{{filename}}",
     "available_backups_few": "Dostępne kopie zapasowe ({{count}})",
-    "available_backups_many": "Dostępne kopie zapasowe ({{count}})"
+    "available_backups_many": "Dostępne kopie zapasowe ({{count}})",
+    "alert_status_healthy": "Zdrowy",
+    "alert_status_warning": "Ostrzeżenie",
+    "alert_status_critical": "Krytyczny",
+    "verification_level_none": "Brak",
+    "verification_level_document_only": "Tylko dokument",
+    "verification_level_document_selfie": "Dokument i selfie",
+    "verification_level_reusable_digital_id": "Wielokrotnego użytku cyfrowa tożsamość",
+    "verification_level_manual_review": "Ręczna kontrola",
+    "verification_level_unknown": "Nieznany poziom weryfikacji",
+    "job_category_notifications": "Powiadomienia",
+    "job_category_newsletters": "Biuletyny",
+    "job_category_matching": "Dopasowywanie",
+    "job_category_geocoding": "Geokodowanie",
+    "job_category_maintenance": "Konserwacja",
+    "job_category_master": "Mistrz",
+    "job_category_gamification": "Gamifikacja",
+    "job_category_groups": "Grupy",
+    "job_category_security": "Bezpieczeństwo",
+    "job_category_other": "Inne",
+    "job_category_unknown": "Nieznana kategoria",
+    "cron_job_name_unknown": "Zaplanowane zadanie",
+    "cron_job_description_unknown": "Uruchamia zaplanowane zadanie w tle.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "Główny uruchamiacz crona",
+        "description": "Uruchamia odpowiednie zaplanowane zadania dla bieżącego czasu. Wszystkie inne zadania uruchamiane są przez ten wpis harmonogramu."
+      },
+      "process_queue": {
+        "name": "Kolejka powiadomień natychmiastowych",
+        "description": "Przetwarza oczekujące powiadomienia natychmiastowe w celu ich natychmiastowej dostawy."
+      },
+      "daily_digest": {
+        "name": "Codzienny skrót",
+        "description": "Wysyła codzienne e-maile ze skrótem powiadomień do członków, którzy wybrali dostawę codzienną."
+      },
+      "weekly_digest": {
+        "name": "Miesięczny skrót",
+        "description": "Wysyła miesięczny digests powiadomień pierwszego dnia każdego miesiąca."
+      },
+      "process_newsletters": {
+        "name": "Przetwarzaj zaplanowane newslettery",
+        "description": "Znajduje newslettery gotowe do wysyłki i rozpoczyna proces wysyłki."
+      },
+      "process_recurring": {
+        "name": "Przetwarzaj powtarzające się newslettery",
+        "description": "Przetwarza powtarzające się i automatyczne newslettery."
+      },
+      "process_newsletter_queue": {
+        "name": "Procesor kolejki newslettera",
+        "description": "Przetwarza oczekujące wysyłki newsletterów w partiach."
+      },
+      "notify_hot_matches": {
+        "name": "Powiadomienia o gorących dopasowaniach",
+        "description": "Powiadamia członków o nowych dopasowaniach o wysokim wyniku."
+      },
+      "match_digest_daily": {
+        "name": "Codzienny przegląd dopasowań",
+        "description": "Wysyła codzienne rekomendacje dopasowań do członków."
+      },
+      "match_digest_weekly": {
+        "name": "Cotygodniowy przegląd meczów",
+        "description": "Wysyła cotygodniowe podsumowanie rekomendacji meczów."
+      },
+      "gamification_daily": {
+        "name": "Codzienne zadania gamifikacyjne",
+        "description": "Przetwarza reset streaków, codzienne bonusy i sprawdzenie odznak."
+      },
+      "gamification_campaigns": {
+        "name": "Przetwarzanie kampanii osiągnięć",
+        "description": "Przetwarza powtarzające się kampanie osiągnięć."
+      },
+      "gamification_leaderboard": {
+        "name": "Migawka rankingu",
+        "description": "Tworzy codzienne migawki rankingu i finalizuje sezony."
+      },
+      "gamification_challenges": {
+        "name": "Sprawdź wygaśnięcia wyzwań",
+        "description": "Wygaśnięcia ukończonych wyzwań i aktualizuje ich statusy."
+      },
+      "gamification_weekly_digest": {
+        "name": "Miesięczny przegląd grywalizacji",
+        "description": "Wysyła członkom miesięczne podsumowanie postępów w formie e-maili."
+      },
+      "gamification_streaks": {
+        "name": "Kamienie milowe ciągłości w gamifikacji",
+        "description": "Sprawdza i przyznaje członkom kamienie milowe ciągłości."
+      },
+      "gamification_cleanup": {
+        "name": "Czyszczenie gamifikacji",
+        "description": "Usuwa stare powiadomienia o doświadczeniu, nagrody z kampanii i dane analityczne."
+      },
+      "update_featured_groups": {
+        "name": "Aktualizuj wyróżnione grupy",
+        "description": "Aktualizuje wyróżnione grupy według zasad rankingu."
+      },
+      "group_weekly_digest": {
+        "name": "Miesięczne podsumowania grup",
+        "description": "Wysyła miesięczne e-maile z analizą do właścicieli grup."
+      },
+      "abuse_detection": {
+        "name": "Wykrywanie nadużyć",
+        "description": "Skanuje transakcje w poszukiwaniu możliwych wzorców nadużyć."
+      },
+      "abuse_daily_report": {
+        "name": "Codzienny raport nadużyć",
+        "description": "Wysyła codzienny raport wykrywania nadużyć do administratorów."
+      },
+      "abuse_cleanup": {
+        "name": "Czyszczenie alertów nadużyć",
+        "description": "Automatycznie archiwizuje stare alerty i odrzuca elementy o niskiej ważności."
+      },
+      "verification_reminders": {
+        "name": "Przypomnienia weryfikacyjne",
+        "description": "Przypomina członkom o nieukończonych weryfikacjach tożsamości."
+      },
+      "expire_verifications": {
+        "name": "Wygasa porzucone weryfikacje",
+        "description": "Wygasa sesje weryfikacyjne porzucone na ponad 72 godziny."
+      },
+      "purge_verification_sessions": {
+        "name": "Usuwa stare dane weryfikacyjne",
+        "description": "Usuwa zakończone i wygasłe sesje weryfikacyjne po 180 dniach."
+      },
+      "volunteer_pre_shift": {
+        "name": "Przypomnienia dla wolontariuszy przed zmianą",
+        "description": "Wysyła przypomnienia przed zmianami wolontariuszy."
+      },
+      "volunteer_post_shift": {
+        "name": "Opinie wolontariuszy po zmianie",
+        "description": "Prosi o opinię po zakończonych zmianach wolontariuszy."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "Przypomnienie dla wolontariuszy, którzy przestali uczestniczyć",
+        "description": "Dotyka wolontariuszy, którzy nie byli ostatnio aktywni."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "Wygasanie uprawnień wolontariusza",
+        "description": "Ostrzega wolontariuszy o uprawnieniach i szkoleniach, które wkrótce wygasną."
+      },
+      "recurring_shifts": {
+        "name": "Generuj powtarzające się dyżury",
+        "description": "Generuje nadchodzące dyżury wolontariuszy na podstawie powtarzających się szablonów."
+      },
+      "volunteer_expire_consents": {
+        "name": "Wygasające zgody opiekuna",
+        "description": "Wygasza zapisy zgody opiekuna po upływie ich daty ważności."
+      },
+      "cleanup": {
+        "name": "Czyszczenie systemu",
+        "description": "Usuwa wygasłe tokeny, stare wpisy w kolejce, tokeny API oraz dane śledzenia."
+      },
+      "geocode_batch": {
+        "name": "Partia geokodowania",
+        "description": "Geokoduje członków i ogłoszenia, którym brakuje współrzędnych."
+      },
+      "event_reminders": {
+        "name": "Przypomnienia o wydarzeniach",
+        "description": "Wysyła przypomnienia przed nadchodzącymi wydarzeniami."
+      },
+      "inactive_members": {
+        "name": "Wykrywanie nieaktywnych członków",
+        "description": "Znajduje i oznacza nieaktywnych członków do monitorowania."
+      },
+      "listing_expiry": {
+        "name": "Przetwarzanie wygaśnięcia ogłoszeń",
+        "description": "Usuwa listingi po dacie ich wygaśnięcia."
+      },
+      "listing_expiry_reminders": {
+        "name": "Przypomnienia o wygaśnięciu ogłoszeń",
+        "description": "Ostrzega właścicieli ogłoszeń przed wygaśnięciem ogłoszenia."
+      },
+      "job_expiry": {
+        "name": "Wygaśnięcie ofert pracy",
+        "description": "Usuwa oferty pracy po dacie ich zakończenia."
+      },
+      "federation_weekly_digest": {
+        "name": "Miesięczny digest federacji",
+        "description": "Wysyła streszczenie aktywności w federacji do uczestniczących społeczności."
+      },
+      "balance_alerts": {
+        "name": "Alerty o saldzie",
+        "description": "Sprawdza salda portfeli organizacji i wysyła alerty o niskim saldzie."
+      },
+      "goal_reminders": {
+        "name": "Przypomnienia o celach",
+        "description": "Wysyła przypomnienia o celach, które są na termin lub opóźnione."
+      },
+      "retry_failed_webhooks": {
+        "name": "Ponów nieudane webhooki",
+        "description": "Ponawia dostarczenie webhooków, które wcześniej nie powiodły się."
+      },
+      "digest_emails": {
+        "name": "Nadawca zbiorczych wiadomości e-mail"
+      },
+      "badge_checker": {
+        "name": "Sprawdzacz przyznawania odznak"
+      },
+      "streak_updater": {
+        "name": "Aktualizator serii logowania"
+      }
+    },
+    "partner_logo_link_url": "Adres URL linku do logo partnera",
+    "registration_policy_settings_title": "Rejestracja i weryfikacja tożsamości",
+    "auto_convert_webp_desc": "Twórz wersje WebP obsługiwanych przesyłek dla mniejszych pobrań obrazów.",
+    "auto_resize_desc": "Zmień rozmiar obrazów, które przekraczają skonfigurowane maksymalne wymiary.",
+    "desc_comma_separated_emails": "Wprowadź jeden lub więcej adresów e-mail oddzielonych przecinkami.",
+    "desc_job_will_run_when_enabled": "To zadanie będzie wykonywane zgodnie z skonfigurowanym harmonogramem, gdy jest włączone.",
+    "desc_notify_on_failure": "Wyślij powiadomienie e-mail, gdy to zadanie nie powiedzie się.",
+    "generate_thumbnails_desc": "Generuj mniejsze wersje miniatur dla ofert, profili i kart.",
+    "no_backups_available": "Brak dostępnych kopii zapasowych",
+    "strip_exif_desc": "Usuń metadane EXIF z przesłanych obrazów przed ich przechowywaniem.",
+    "status_fail": "PONIEŚĆ PORAŻKĘ",
+    "status_ok": "OK",
+    "placeholder_partner_logo_label": "Partner Społecznościowy",
+    "label_powered_by_url": "Adres URL linku",
+    "platform_gcp": "GCP",
+    "currency_eur": "EUR - Euro",
+    "powered_by_branding_section": "Branding \"Powered-by\""
   },
   "verification": {
     "approve": "Zatwierdź",
@@ -1254,7 +1483,20 @@
     "n_pending_few": "{{count}} w oczekiwaniu",
     "n_pending_many": "{{count}} w oczekiwaniu",
     "total_events_few": "Wydarzenia {{count}}",
-    "total_events_many": "Wydarzenia {{count}}"
+    "total_events_many": "Wydarzenia {{count}}",
+    "provider_mock": "Symulowany dostawca",
+    "provider_idenfy": "iDenfy",
+    "provider_unknown": "Nieznany dostawca",
+    "actor_type_system": "System",
+    "actor_type_user": "Użytkownik",
+    "actor_type_admin": "Administrator",
+    "actor_type_webhook": "Webhook",
+    "actor_type_unknown": "Nieznany aktor",
+    "status_unknown": "Nieznany status",
+    "provider_stripe_identity": "Stripe Tożsamość",
+    "provider_veriff": "Veriff",
+    "provider_jumio": "Jumio",
+    "provider_onfido": "Onfido"
   },
   "cancel": "Anuluj"
 }

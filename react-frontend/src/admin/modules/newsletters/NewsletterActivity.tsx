@@ -229,22 +229,22 @@ export function NewsletterActivity() {
   const handleExport = () => {
     if (activeTab === 'openers') {
       downloadCsv(
-        [['Email', 'First Opened', 'Open Count'], ...openers.map((r) => [r.email, r.first_opened, String(r.open_count)])],
+        [[t('newsletter_activity.col_email'), t('newsletter_activity.col_first_opened'), t('newsletter_activity.col_open_count')], ...openers.map((r) => [r.email, r.first_opened, String(r.open_count)])],
         `newsletter-${id}-openers.csv`,
       );
     } else if (activeTab === 'clickers') {
       downloadCsv(
-        [['Email', 'First Clicked', 'Click Count', 'Unique Links'], ...clickers.map((r) => [r.email, r.first_clicked, String(r.click_count), String(r.unique_links)])],
+        [[t('newsletter_activity.col_email'), t('newsletter_activity.col_first_clicked'), t('newsletter_activity.col_click_count'), t('newsletter_activity.col_unique_links')], ...clickers.map((r) => [r.email, r.first_clicked, String(r.click_count), String(r.unique_links)])],
         `newsletter-${id}-clickers.csv`,
       );
     } else if (activeTab === 'non-openers') {
       downloadCsv(
-        [['Email', 'Name', 'Sent At'], ...nonOpeners.map((r) => [r.email, r.name ?? '', r.sent_at])],
+        [[t('newsletter_activity.col_email'), t('newsletter_activity.col_name'), t('newsletter_activity.col_sent_at')], ...nonOpeners.map((r) => [r.email, r.name ?? '', r.sent_at])],
         `newsletter-${id}-non-openers.csv`,
       );
     } else if (activeTab === 'opened-no-click') {
       downloadCsv(
-        [['Email', 'Name', 'First Opened', 'Open Count'], ...openedNoClick.map((r) => [r.email, r.name ?? '', r.first_opened, String(r.open_count)])],
+        [[t('newsletter_activity.col_email'), t('newsletter_activity.col_name'), t('newsletter_activity.col_first_opened'), t('newsletter_activity.col_open_count')], ...openedNoClick.map((r) => [r.email, r.name ?? '', r.first_opened, String(r.open_count)])],
         `newsletter-${id}-opened-no-click.csv`,
       );
     }
@@ -396,7 +396,7 @@ export function NewsletterActivity() {
                         variant="soft"
                         startContent={event.action_type === 'open' ? <Eye size={12} /> : <MousePointer size={12} />}
                       >
-                        {event.action_type}
+                        {event.action_type === 'open' ? t('newsletters.action_opened') : t('newsletters.action_clicked')}
                       </Chip>
                     </TableCell>
                     <TableCell>

@@ -9,6 +9,7 @@ import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -69,15 +70,13 @@ interface PlanItem {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const eurFormatter = new Intl.NumberFormat('en-IE', {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-});
-
 function formatEur(amount: number): string {
-  return eurFormatter.format(amount);
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 const formatUserCount = (row: TenantSnapshot): string => {
@@ -198,7 +197,7 @@ export function BillingControl() {
       onAssignClose();
       void fetchSnapshot();
     } else {
-      toast.error(response.error ?? t('billing.failed_to_assign'));
+      toast.error(t('billing.failed_to_assign'));
     }
     setAssigning(false);
   };
@@ -217,7 +216,7 @@ export function BillingControl() {
       toast.success(tenant.is_paused ? t('billing.resume_billing') : t('billing.pause_billing'));
       void fetchSnapshot();
     } else {
-      toast.error(response.error ?? t('billing.failed_to_assign'));
+      toast.error(t('billing.failed_to_assign'));
     }
     setPausingId(null);
   };
@@ -245,7 +244,7 @@ export function BillingControl() {
       onGraceClose();
       void fetchSnapshot();
     } else {
-      toast.error(response.error ?? t('billing.failed_to_assign'));
+      toast.error(t('billing.failed_to_assign'));
     }
     setSettingGrace(false);
   };

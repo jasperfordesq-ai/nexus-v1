@@ -179,5 +179,259 @@
     "provider_subject": "Project NEXUS — メールプロバイダーテスト",
     "provider_heading": "メールプロバイダーテスト",
     "body_tenant_ok": "テナントのメールプロバイダーが設定され、正常に機能しています。"
+  },
+  "help": {
+    "feedback_recorded": "フィードバックが記録されました",
+    "missing_article_slug": "記事_slugが見つかりません",
+    "article_not_found": "記事が見つかりません"
+  },
+  "job_vacancies": {
+    "job_not_found": "仕事が見つかりません",
+    "only_poster_can_rank": "候補者の評価は求人投稿者のみ可能です",
+    "ai_not_configured": "AIは設定されていません",
+    "no_active_applications": "評価するアクティブな応募がありません",
+    "ai_parse_error": "AIランキングの応答の解析に失敗しました",
+    "ai_ranking_failed": "AIランキングに失敗しました",
+    "template_name_required": "テンプレート名は必須です",
+    "template_not_found": "テンプレートが見つかりません",
+    "employer_id_required": "employer_idは必須です",
+    "rating_must_be_1_5": "評価は1〜5でなければなりません",
+    "only_review_after_completing": "雇用主との仕事を完了した後でのみレビューできます",
+    "already_reviewed_employer": "この雇用主はすでにレビュー済みです",
+    "interview_not_found": "面接が見つかりません",
+    "access_denied": "アクセスが拒否されました",
+    "message_required": "メッセージは必須です",
+    "ai_chat_failed": "AIチャットに失敗しました"
+  },
+  "knowledge_base": {
+    "feedback_submitted": "フィードバックが正常に送信されました",
+    "article_not_found": "記事が見つかりません",
+    "attachment_not_found": "添付ファイルが見つかりません",
+    "file_not_found_on_disk": "ディスク上にファイルが見つかりません"
+  },
+  "legal": {
+    "all_accepted": "すべての法的文書が受理されました",
+    "acceptance_recorded": "受理が記録されました"
+  },
+  "listings": {
+    "cannot_report_own": "自分の出品は報告できません。",
+    "valid_reason_required": "有効な理由が必要です。",
+    "details_max_500": "詳細は500文字を超えてはいけません。",
+    "already_reported": "このリスティングはすでに報告されています。",
+    "report_thank_you": "報告ありがとうございます。弊社チームが確認いたします。",
+    "no_images_uploaded": "画像がアップロードされていません。",
+    "image_not_found": "画像が見つかりません。",
+    "image_ids_non_empty": "image_ids は空でない配列でなければなりません。"
+  },
+  "marketplace_ai": {
+    "feature_disabled": "このコミュニティではマーケットプレイス機能が有効になっていません。",
+    "auth_required": "認証が必要です。",
+    "listing_not_found": "リストが見つかりません。",
+    "only_owner_auto_reply": "リストの所有者のみが自動返信を生成できます。"
+  },
+  "marketplace_delivery": {
+    "feature_disabled": "このコミュニティではマーケットプレイス機能が有効になっていません。",
+    "auth_required": "認証が必要です。",
+    "offer_accepted": "配送オファーが承認されました",
+    "delivery_confirmed": "配達が確認され、時間クレジットが付与されました。"
+  },
+  "marketplace_listing": {
+    "feature_disabled": "このコミュニティではマーケットプレイス機能が有効になっていません。",
+    "no_permission_modify": "この出品を変更する権限がありません。",
+    "not_found": "マーケットプレイスの出品が見つかりません。",
+    "create_failed": "出品の作成に失敗しました。もう一度お試しください。",
+    "update_failed": "出品の更新に失敗しました。もう一度お試しください。",
+    "no_image_files": "画像ファイルが提供されていません。",
+    "no_valid_images": "有効な画像をアップロードできませんでした。許可されている形式: JPEG、PNG、GIF、WebP（最大 10 MB）。",
+    "image_not_found": "この出品には画像が見つかりませんでした。",
+    "no_video_file": "動画ファイルが提供されていません。",
+    "invalid_video_type": "無効な動画形式です。許可されている形式: MP4、WebM、MOV。",
+    "video_too_large": "ビデオファイルが50 MBのサイズ制限を超えています。",
+    "ai_description_failed": "説明を生成できませんでした。もう一度試すか、手動で記入してください。",
+    "lat_lng_required": "緯度と経度が必要です。",
+    "invalid_coordinates": "無効な座標です。",
+    "csv_read_failed": "CSVファイルを読み取ることができませんでした。",
+    "csv_header_required": "CSVファイルにはヘッダー行と少なくとも1行のデータが必要です。",
+    "max_images_reached": "リストごとの最大画像数 :max に達しました。",
+    "csv_missing_column": "CSVファイルには ':col' 列が含まれている必要があります。",
+    "imported_as_drafts": ":count 件のリスティングがドラフトとしてインポートされました。"
+  },
+  "marketplace_offer": {
+    "feature_disabled": "このコミュニティではマーケットプレイス機能が有効になっていません。",
+    "not_own_listing": "このリスティングの所有者ではありません。",
+    "only_seller_accept": "このオファーを受け入れることができるのは売り手だけです。",
+    "only_seller_decline": "このオファーを断ることができるのは売り手だけです。",
+    "only_seller_counter": "このオファーに対してカウンターを出すことができるのは売り手だけです。",
+    "only_buyer_accept_counter": "カウンターオファーを受け入れることができるのは買い手だけです。",
+    "only_buyer_withdraw": "自分のオファーを撤回できるのは買い手だけです。",
+    "withdrawn": "オファーが正常に撤回されました。"
+  },
+  "marketplace_report": {
+    "feature_disabled": "このコミュニティではマーケットプレイス機能が有効になっていません。",
+    "report_submitted": "あなたの報告は送信されました。デジタルサービス法に基づき、24時間以内に確認いたします。"
+  },
+  "member_availability": {
+    "slot_deleted": "スロットが削除されました"
+  },
+  "menu": {
+    "cache_cleared": "メニューキャッシュが正常にクリアされました"
+  },
+  "newsletter": {
+    "already_unsubscribed": "すでに購読解除されています。"
+  },
+  "notifications": {
+    "deleted": "通知が削除されました"
+  },
+  "onboarding": {
+    "already_completed": "オンボーディングは既に完了しています",
+    "safeguarding_saved": "保護設定が保存されました"
+  },
+  "openapi": {
+    "spec_not_found": "OpenAPI仕様が見つかりません"
+  },
+  "identity": {
+    "dob_locked": "本人確認後、氏名と生年月日はロックされます。",
+    "dob_required": "生年月日は必須です。",
+    "dob_invalid": "有効な生年月日を入力してください。",
+    "dob_must_be_past": "生年月日は過去の日付である必要があります。",
+    "must_be_16": "少なくとも16歳である必要があります。",
+    "no_fee_required": "料金は不要です。",
+    "payment_failed": "支払いを処理できません。もう一度お試しください。",
+    "user_not_found": "ユーザーが見つかりません。",
+    "provide_dob_first": "まず生年月日を入力してください。",
+    "complete_payment_first": "まず支払いを完了してください。",
+    "not_available": "現在、本人確認は利用できません。",
+    "start_failed": "確認を開始できません。"
+  },
+  "password_reset": {
+    "link_sent": "そのメールアドレスに関連するアカウントが存在する場合、パスワードリセットリンクが送信されました。",
+    "updated": "パスワードが正常に更新されました。新しいパスワードでログインしてください。",
+    "changed_bell": "パスワードが変更されました。心当たりがない場合は、直ちにサポートに連絡してください。"
+  },
+  "peer_endorsement": {
+    "recorded": "ピア承認が記録されました"
+  },
+  "push": {
+    "unsubscribed": "購読解除が正常に完了しました",
+    "no_subscribers": "購読者が見つかりませんでした",
+    "token_pending": "トークンを受け取りました - ログイン時に関連付けられます",
+    "device_registered": "デバイスがプッシュ通知用に登録されました"
+  },
+  "registration": {
+    "email_verified": "メールが正常に確認されました",
+    "verification_sent": "アカウントが存在する場合、確認メールが送信されました"
+  },
+  "resource_category": {
+    "reordered": "リソースが正常に並べ替えられました"
+  },
+  "skill_taxonomy": {
+    "category_deleted": "カテゴリが削除されました",
+    "skill_removed": "スキルが削除されました"
+  },
+  "sub_account": {
+    "relationship_revoked": "関係が解除されました"
+  },
+  "two_factor": {
+    "disabled": "二要素認証が無効になりました",
+    "enabled_notification": "二要素認証があなたのアカウントで有効になりました。",
+    "disabled_notification": "二要素認証があなたのアカウントで無効になりました。もしこれを行っていない場合は、直ちにアカウントを保護してください。",
+    "disabled_email_title": "二段階認証が無効化されました",
+    "disabled_email_preview": "あなたのアカウントで2FAが無効化されました。",
+    "disabled_email_body": "あなたのアカウントで二段階認証が無効化されました。もしこの変更を行っていない場合は、パスワードを変更し、2FAを再有効化してアカウントを直ちに保護してください。",
+    "disabled_email_subject": "セキュリティ警告: 2FA無効化 — {{tenant}}"
+  },
+  "users": {
+    "theme_updated": "テーマの設定が更新されました",
+    "password_updated": "パスワードが正常に更新されました",
+    "account_deleted": "アカウントが正常に削除されました",
+    "prefs_updated": "通知の設定が更新されました",
+    "notification_settings_update_failed": "通知設定の更新に失敗しました",
+    "invalid_context_type": "無効なコンテキストタイプ",
+    "invalid_frequency": "無効な周波数",
+    "context_id_required": "コンテキストIDが必要です",
+    "invalid_group_id": "無効なグループID",
+    "invalid_thread_id": "無効なスレッドID"
+  },
+  "volunteer_checkin": {
+    "checked_out": "正常にチェックアウトされました"
+  },
+  "volunteer_community": {
+    "joined_waitlist": "正常にウェイトリストに参加しました",
+    "claimed_spot": "シフトの場所を正常に取得しました",
+    "swap_request_sent": "交換リクエストを送信しました",
+    "swap_admin_pending": "交換が承認されましたが、管理者の承認が必要です",
+    "reserved_slots": "予約済み :slots スロット",
+    "member_added_reservation": "メンバーがグループ予約に追加されました",
+    "recurring_deactivated": "繰り返しパターンが無効化されました",
+    "guardian_consent_granted": "保護者の同意が正常に承認されました。"
+  },
+  "volunteer": {
+    "access_denied": "アクセスが拒否されました",
+    "amount_gt_zero": "金額は0より大きくなければなりません",
+    "no_fields_to_update": "更新するフィールドがありません",
+    "signed_up_for_shift": "シフトの登録に成功しました",
+    "hours_logged_pending": "時間が正常に記録されました。確認待ちです",
+    "review_submitted": "レビューが正常に送信されました"
+  },
+  "volunteer_wellbeing": {
+    "emergency_alert_sent": "緊急警報を送信しました"
+  },
+  "wallet": {
+    "donation_successful": "寄付が成功しました。ありがとうございます！",
+    "category_deleted": "カテゴリが削除されました",
+    "name_required": "名前は必須です",
+    "create_category_failed": "カテゴリの作成に失敗しました",
+    "update_category_failed": "カテゴリの更新に失敗しました",
+    "cannot_delete_category": "このカテゴリは削除できません（システムカテゴリの可能性があります）",
+    "rating_required": "評価は必須です (1-5)",
+    "amount_required": "金額は必須です",
+    "starting_balance_failed": "開始残高の更新に失敗しました",
+    "starting_balance_updated": "開始残高が更新されました",
+    "statement_exported": "明細書がエクスポートされました"
+  },
+  "webauthn": {
+    "passkey_registered": "パスキーが正常に登録されました",
+    "auth_successful": "認証に成功しました",
+    "credentials_removed": "資格情報が削除されました",
+    "all_removed": "削除されたパスキー数: :count。これで任意のデバイスで再登録できます。",
+    "passkey_removed_bell": "アカウントからパスキーが削除されました。もし自分で行っていない場合は、ただちにアカウントを保護してください。",
+    "all_passkeys_removed_bell": "あなたのアカウントからすべてのパスキー（{{count}}）が削除されました。もしこれを行っていない場合は、直ちにアカウントを保護してください。"
+  },
+  "maintenance": {
+    "under_maintenance": "プラットフォームは現在メンテナンス中です。しばらくしてから再度ご確認ください。"
+  },
+  "block_user": {
+    "cannot_block_self": "自分自身をブロックすることはできません"
+  },
+  "group_conversation": {
+    "body_required": "メッセージ本文は必須です",
+    "message_too_long": "メッセージが長すぎます"
+  },
+  "marketplace_group": {
+    "auth_required": "認証が必要です。"
+  },
+  "connections": {
+    "accepted_connection": "接続を受け入れました",
+    "connection_accepted": "接続を受け入れました"
+  },
+  "admin_crm": {
+    "invalid_type": "無効なタイプパラメータ"
+  },
+  "endorsement": {
+    "cannot_endorse_self": "自分自身を推薦することはできません",
+    "member_not_found": "メンバーが見つかりません",
+    "already_endorsed": "このスキルはすでに推薦しています"
+  },
+  "feed": {
+    "content_or_image_required": "投稿には内容または画像が必要です",
+    "quoted_post_not_found": "引用された投稿が見つかりません",
+    "post_not_found_or_not_owned": "投稿が見つからないか、あなたの所有ではありません",
+    "must_be_group_member": "投稿するにはグループのメンバーである必要があります",
+    "create_post_failed": "投稿の作成に失敗しました"
+  },
+  "verification_badge": {
+    "user_not_found": "ユーザーが見つかりません",
+    "badge_already_active": "バッジはすでにアクティブです",
+    "invalid_badge_type": "無効なバッジタイプ: :type"
   }
 }

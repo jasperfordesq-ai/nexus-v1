@@ -68,16 +68,21 @@ class AdminResourcesController extends BaseApiController
                 'rc.name as category_name'
             )
             ->get()
-            ->map(fn ($row) => [
+            ->map(static function ($row): array {
+                $authorName = trim(($row->author_first_name ?? '') . ' ' . ($row->author_last_name ?? ''));
+
+                return [
                 'id'            => (int) $row->id,
                 'title'         => $row->title,
                 'category'      => $row->category_name ?? '',
-                'author_name'   => trim(($row->author_first_name ?? '') . ' ' . ($row->author_last_name ?? '')) ?: 'System',
+                'author_name'   => $authorName !== '' ? $authorName : null,
+                'author_code'   => $authorName === '' ? 'system' : null,
                 'views'         => (int) $row->views_count,
                 'helpful_votes' => (int) $row->helpful_yes,
                 'status'        => $row->is_published ? 'published' : 'draft',
                 'updated_at'    => $row->updated_at,
-            ])
+                ];
+            })
             ->all();
 
         return response()->json([

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,7 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
+    "loading": "Ag lódáil",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,7 +68,7 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
+    "select_row": "Roghnaigh sraith {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
   },
@@ -92,18 +92,16 @@
       "notes_hint": "Mínigh an cinneadh ionas gur féidir leis an gcruthaitheoir na hathruithe riachtanacha a dhéanamh.",
       "audio_unsupported": "Ní féidir le do bhrabhsálaí an fhuaim seo a sheinm."
     },
-    "title": "Podcasts",
     "description": "Déan athbhreithniú ar sheónna agus eipeasóidí pobail, lena n-áirítear ábhar a choinnítear le haghaidh modhnóireachta tionóntaí.",
     "load_failed": "Níorbh fhéidir modhnóireacht podchraoltaí a lódáil.",
     "action_failed": "Níorbh fhéidir modhnóireacht podchraoltaí a nuashonrú.",
     "empty_value": "-",
-    "count": "{{count}} items",
     "actions": {
       "inspect": "Athbhreithnigh agus modhnaigh",
-      "refresh": "Refresh",
-      "approve": "Approve",
-      "reject": "Reject",
-      "flag": "Flag",
+      "refresh": "Athnuaigh",
+      "approve": "Cheadaigh",
+      "reject": "Diúltaigh",
+      "flag": "Bratach",
       "resolve_report": "Réitigh an tuarascáil",
       "dismiss_report": "An tuairisc a dhíbhe",
       "escalate_report": "Tuairisc a ardú",
@@ -111,30 +109,48 @@
     },
     "filters": {
       "label": "Scagaire modhnóireachta podchraoladh",
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "Ar feitheamh",
+      "approved": "Ceadaithe",
+      "rejected": "Diúltaithe",
+      "flagged": "Bratach",
+      "all": "Gach"
     },
     "sections": {
-      "shows": "Shows",
-      "episodes": "Episodes",
       "top_episodes": "Eipeasóid is fearr",
       "client_breakdown": "Miondealú cliant",
-      "retention": "Retention",
-      "reports": "Tuarascálacha oscailte"
+      "reports": "Tuarascálacha oscailte",
+      "shows": "Taispeánann",
+      "episodes": "Eipeasóidí",
+      "retention": "Coinneáil"
     },
     "review_values": {
-      "visibility": { "public": "Poiblí", "members": "Baill", "private": "Príobháideach", "inherit": "Faigh ón gclár" },
-      "media_scan": { "pending": "Scanadh ar feitheamh", "clean": "Glan", "infected": "Ionfhabhtaithe", "scan_unavailable": "Níl an scanóir ar fáil", "not_required": "Níl gá leis" },
-      "media_processing": { "pending": "Ar feitheamh", "ready_for_processing": "Réidh le próiseáil", "complete": "Críochnaithe", "failed": "Theip" },
-      "report_status": { "open": "Oscailte", "resolved": "Réitithe", "dismissed": "Díbháilte", "escalated": "Ardaithe" }
+      "visibility": {
+        "public": "Poiblí",
+        "members": "Baill",
+        "private": "Príobháideach",
+        "inherit": "Faigh ón gclár"
+      },
+      "media_scan": {
+        "pending": "Scanadh ar feitheamh",
+        "clean": "Glan",
+        "infected": "Ionfhabhtaithe",
+        "scan_unavailable": "Níl an scanóir ar fáil",
+        "not_required": "Níl gá leis"
+      },
+      "media_processing": {
+        "pending": "Ar feitheamh",
+        "ready_for_processing": "Réidh le próiseáil",
+        "complete": "Críochnaithe",
+        "failed": "Theip"
+      },
+      "report_status": {
+        "open": "Oscailte",
+        "resolved": "Réitithe",
+        "dismissed": "Díbháilte",
+        "escalated": "Ardaithe"
+      }
     },
     "readiness": {
-      "moderation": "Moderation",
-      "reports": "Reports",
-      "media": "Media",
       "rss": "RSS",
       "pending_items_one": "{{count}} mír ag fanacht le hathbhreithniú",
       "pending_items_other": "{{count}} míreanna ag fanacht le hathbhreithniú",
@@ -155,12 +171,15 @@
       "media_jobs_two": "{{count}} poist sna meáin ag fanacht",
       "rss_ready_few": "Is féidir seónna foilsithe {{count}} a sheiceáil",
       "rss_ready_many": "Is féidir seónna foilsithe {{count}} a sheiceáil",
-      "rss_ready_two": "Is féidir seónna foilsithe {{count}} a sheiceáil"
+      "rss_ready_two": "Is féidir seónna foilsithe {{count}} a sheiceáil",
+      "moderation": "Measúnú",
+      "reports": "Tuarascálacha",
+      "media": "Meán"
     },
     "feed_validation": {
       "title": "Bailíochtú RSS",
       "subtitle": "Seiceáil is déanaí le haghaidh {{title}}",
-      "valid": "Ready",
+      "valid": "Réidh",
       "invalid": "Teastaíonn obair",
       "errors": "Saincheisteanna blocála",
       "warnings": "Ceartúcháin molta"
@@ -175,61 +194,62 @@
       "missing_artwork": "Cuir saothar ealaíne taispeántais leis le haghaidh ullmhachta eolaire podchraoltaí.",
       "episode_missing_audio_url": "Tá URL fuaime HTTP bailí in easnamh ar eipeasóid.",
       "episode_missing_audio_length": "Tá méid an chomhaid fuaime in easnamh ar eipeasóid.",
-      "episode_missing_audio_mime": "Tá an cineál fuaime MIME in easnamh ar eipeasóid."
+      "episode_missing_audio_mime": "Tá an cineál fuaime MIME in easnamh ar eipeasóid.",
+      "unknown": "Tá fadach le fadhb nach bhfuil aitheanta."
     },
     "columns": {
-      "title": "Title",
-      "owner": "Owner",
-      "show": "Show",
-      "author": "Author",
-      "status": "Status",
-      "moderation": "Moderation",
-      "updated": "Updated",
-      "actions": "Actions",
-      "listens": "Listens",
-      "client": "Client",
-      "bucket": "Bucket",
-      "episode": "Episode",
-      "reason": "Reason",
-      "details": "Details"
+      "title": "Teideal",
+      "owner": "Úinéir",
+      "author": "Údar",
+      "updated": "Nuashonraithe",
+      "actions": "Gníomhartha",
+      "listens": "Éisteachtaí",
+      "details": "Sonraí",
+      "show": "Taispeáin",
+      "status": "Stádas",
+      "moderation": "Measúnú",
+      "client": "Cliant",
+      "bucket": "Buicéad",
+      "episode": "Eipeasóid",
+      "reason": "Cúis"
     },
-    "report_unknown_episode": "Episode #{{id}}",
-    "reporter": "Reported by {{name}}",
+    "reporter": "Tuairiscithe ag {{name}}",
     "report_meta": "{{show}} · {{reporter}}",
     "report_reasons": {
       "safety": "Sábháilteacht nó dochar",
       "spam": "Turscar nó ábhar míthreorach",
       "rights": "Baineann cóipcheart nó cearta",
-      "other": "Other"
+      "unknown": "Cúis nach bhfuil aitheanta",
+      "other": "Eile"
     },
     "stats": {
-      "total_shows": "Shows",
       "published_shows": "Seónna foilsithe",
       "pending_shows": "Seónna ar feitheamh",
-      "total_episodes": "Episodes",
       "published_episodes": "Eipeasóidí foilsithe",
       "pending_episodes": "Eipeasóidí ar feitheamh",
-      "total_listens": "Listens",
+      "total_listens": "Éisteachtaí",
       "completed_listens": "Éisteann críochnaithe",
       "completion_rate": "Ráta críochnaithe",
       "unique_listeners": "Éisteoirí uathúla",
       "open_reports": "Tuarascálacha oscailte",
-      "subscribers": "Followers",
       "pending_media_scans": "Scananna ar feitheamh",
       "media_scan_unavailable": "Níl an scanóir ar fáil",
       "pending_media_processing": "Poist sna meáin ar feitheamh",
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "total_shows": "Taispeánann",
+      "total_episodes": "Eipeasóidí",
+      "subscribers": "Leanúna"
     },
     "status": {
-      "draft": "Draft",
-      "published": "Published",
-      "archived": "Archived"
+      "draft": "Dréacht",
+      "published": "Foilsithe",
+      "archived": "Cartlannaithe"
     },
     "moderation": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "Ar feitheamh",
+      "approved": "Ceadaithe",
+      "rejected": "Diúltaithe",
+      "flagged": "Bratach"
     },
     "empty": {
       "shows": "Níl aon seónna ag teacht leis an scagaire reatha.",
@@ -278,6 +298,9 @@
     "count_many": "{{count}} items",
     "count_one": "{{count}} míreanna",
     "count_other": "{{count}} míreanna",
-    "count_two": "{{count}} items"
+    "count_two": "{{count}} items",
+    "title": "Podchraoltaí",
+    "count": "{{count}} míreanna",
+    "report_unknown_episode": "Eipeasóid #{{id}}"
   }
 }

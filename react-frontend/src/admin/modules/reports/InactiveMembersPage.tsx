@@ -32,7 +32,7 @@ import Activity from 'lucide-react/icons/activity';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api, tokenManager } from '@/lib/api';
-import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 
@@ -64,11 +64,6 @@ interface InactiveListResponse {
 interface ApiResponseWithMeta {
   data?: unknown;
   meta?: { total_pages?: number };
-}
-
-interface NotifyResult {
-  message?: string;
-  updated?: number;
 }
 
 interface InactivityStats {
@@ -203,7 +198,7 @@ export function InactiveMembersPage() {
         toast.success(t('reports.detection_complete'));
         await loadData();
       } else {
-        toast.error(res.error || t('reports.detection_failed'));
+        toast.error(t('reports.detection_failed'));
       }
     } catch {
       toast.error(t('reports.detection_failed'));
@@ -224,12 +219,11 @@ export function InactiveMembersPage() {
       const userIds = Array.from(selectedIds);
       const res = await api.post('/v2/admin/members/inactive/notify', { user_ids: userIds });
       if (res.success) {
-        const result = res.data as NotifyResult | undefined;
-        toast.success(result?.message || t('reports.members_marked_notified'));
+        toast.success(t('reports.members_marked_notified'));
         setSelectedIds(new Set());
         await loadData();
       } else {
-        toast.error(res.error || t('reports.failed_to_mark_members_as_notified'));
+        toast.error(t('reports.failed_to_mark_members_as_notified'));
       }
     } catch {
       toast.error(t('reports.failed_to_mark_members_as_notified'));
@@ -341,7 +335,7 @@ export function InactiveMembersPage() {
         />
         <StatCard
           label={t('reports.label_inactivity_rate')}
-          value={stats ? `${(stats.inactivity_rate * 100).toFixed(1)}%` : '\u2014'}
+          value={stats ? formatNumber(stats.inactivity_rate, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
           icon={Activity}
           color="default"
           loading={!stats}

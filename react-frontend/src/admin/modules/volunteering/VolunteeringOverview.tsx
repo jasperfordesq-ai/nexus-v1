@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Avatar, Skeleton, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { ButtonGroup } from '@/components/ui';
@@ -107,14 +107,6 @@ const ACTIVITY_TYPE_COLORS: Record<string, 'success' | 'warning' | 'danger' | 'p
   donation: 'primary',
 };
 
-/**
- * Fallback humanizer for unknown activity types — known types resolve through
- * `volunteering.activity_type_*` translation keys at the call site.
- */
-function formatActivityType(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function formatTimestamp(ts: string, t: TFunction): string {
   const date = new Date(ts);
   const now = new Date();
@@ -127,6 +119,23 @@ function formatTimestamp(ts: string, t: TFunction): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return t('volunteering.time_days_ago', { count: days });
   return date.toLocaleDateString(getFormattingLocale());
+}
+
+function formatTrendPeriod(period: string, granularity: 'week' | 'month', t: TFunction): string {
+  if (granularity === 'month') {
+    const match = /^(\d{4})-(\d{2})$/.exec(period);
+    if (match) {
+      const date = new Date(Number(match[1]), Number(match[2]) - 1, 1);
+      return date.toLocaleDateString(getFormattingLocale(), { month: 'short', year: 'numeric' });
+    }
+  } else {
+    const match = /^(\d{4})-W(\d{1,2})$/.exec(period);
+    if (match) {
+      return t('volunteering.week_period', { year: Number(match[1]), week: Number(match[2]) });
+    }
+  }
+
+  return t('volunteering.chart_period_unknown');
 }
 
 // ── Wellbeing alerts ───────────────────────────────────────────────────────────
@@ -574,9 +583,20 @@ export function VolunteeringOverview() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-default-200, #e5e7eb)" />
-                <XAxis dataKey="period" tick={{ fontSize: 12 }} stroke="var(--color-default-400, #9ca3af)" />
-                <YAxis tick={{ fontSize: 12 }} stroke="var(--color-default-400, #9ca3af)" />
+                <XAxis
+                  dataKey="period"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value: string) => formatTrendPeriod(value, trendPeriod, t)}
+                  stroke="var(--color-default-400, #9ca3af)"
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value: number) => formatNumber(value)}
+                  stroke="var(--color-default-400, #9ca3af)"
+                />
                 <Tooltip
+                  labelFormatter={(value) => formatTrendPeriod(String(value), trendPeriod, t)}
+                  formatter={(value) => formatNumber(Number(value))}
                   contentStyle={{
                     backgroundColor: 'var(--color-surface, #fff)',
                     border: '1px solid var(--color-default-200, #e5e7eb)',
@@ -668,7 +688,7 @@ export function VolunteeringOverview() {
                       </p>
                   </div>
                   <Chip size="sm" variant="soft" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">
-                    {t(`volunteering.status_${opp.status || 'unknown'}`, opp.status)}
+                    {t(`volunteering.status_${opp.status || 'unknown'}`, { defaultValue: t('volunteering.status_unknown') })}
                   </Chip>
                 </div>
               ))}
@@ -714,7 +734,7 @@ export function VolunteeringOverview() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium">{item.user_name}</span>
                         <Chip size="sm" variant="soft" color={typeColor} className="capitalize">
-                          {t(`volunteering.activity_type_${item.type}`, formatActivityType(item.type))}
+                          {t(`volunteering.activity_type_${item.type}`, { defaultValue: t('volunteering.activity_type_unknown') })}
                         </Chip>
                       </div>
                       <p className="text-sm text-muted mt-0.5">{item.description}</p>

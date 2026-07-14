@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,16 +67,16 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "gamification": {
     "activate": "Aktivieren",
     "active": "Aktiv",
     "active_badge_desc": "Dieses Abzeichen ist aktiv und kann an Mitglieder vergeben werden",
     "analytics": "Analytik",
-    "and_more": "And More",
     "awarded_count": "Ausgezeichnet",
     "back_to_badges": "Zurück zu Abzeichen",
     "back_to_campaigns": "Zurück zu Kampagnen",
@@ -177,7 +176,6 @@
     "no_campaigns_yet": "Noch keine Kampagnen",
     "no_custom_badges": "Keine benutzerdefinierten Abzeichen",
     "page_title": "Gamifizierung",
-    "pause": "Pause",
     "placeholder_auto_generated": "Automatisch generiert...",
     "placeholder_campaign_desc": "Beschreiben Sie, worum es in dieser Kampagne geht...",
     "placeholder_campaign_name": "Kampagnenname...",
@@ -314,6 +312,277 @@
     "threshold_count_one": "Schwellenwert:{{count}}",
     "threshold_count_other": "Schwellenwert:{{count}}",
     "xp_count_one": "{{count}}XP",
-    "xp_count_other": "{{count}}XP"
+    "xp_count_other": "{{count}}XP",
+    "badge_type_built_in": "Eingebaut",
+    "badge_type_unknown": "Andere Abzeichenart",
+    "audience_unknown": "Anderes Publikum",
+    "badges": {
+      "vol_1h": {
+        "name": "Erste Schritte",
+        "description": "Protokolliere deine erste Freiwilligenstunde"
+      },
+      "vol_10h": {
+        "name": "Hilfreiche Hand",
+        "description": "10 Stunden freiwillig arbeiten"
+      },
+      "vol_50h": {
+        "name": "Veränderer",
+        "description": "50 Stunden freiwillig arbeiten"
+      },
+      "vol_100h": {
+        "name": "TimeBank Legende",
+        "description": "100 Stunden freiwillig arbeiten"
+      },
+      "vol_250h": {
+        "name": "Freiwilligenheld",
+        "description": "250 Stunden freiwillig arbeiten"
+      },
+      "vol_500h": {
+        "name": "Freiwilligen-Champion",
+        "description": "500 Stunden freiwillig arbeiten"
+      },
+      "offer_1": {
+        "name": "Erstes Angebot",
+        "description": "Veröffentliche dein erstes Angebot"
+      },
+      "offer_5": {
+        "name": "Großzügige Seele",
+        "description": "Veröffentliche 5 Angebote"
+      },
+      "offer_10": {
+        "name": "Geschenkgeber",
+        "description": "Veröffentliche 10 Angebote"
+      },
+      "offer_25": {
+        "name": "Angebotsmeister",
+        "description": "Veröffentliche 25 Angebote"
+      },
+      "request_1": {
+        "name": "Erste Anfrage",
+        "description": "Veröffentliche deine erste Anfrage"
+      },
+      "request_5": {
+        "name": "Community-Suchender",
+        "description": "Mach 5 Anfragen"
+      },
+      "request_10": {
+        "name": "Aktiver Anfragender",
+        "description": "Mach 10 Anfragen"
+      },
+      "earn_1": {
+        "name": "Erste Einnahme",
+        "description": "Verdiene dein erstes Zeitguthaben"
+      },
+      "earn_10": {
+        "name": "Ehrgeiziger",
+        "description": "Verdiene 10 Zeitguthaben"
+      },
+      "earn_50": {
+        "name": "Guthabenaufbauer",
+        "description": "Verdiene 50 Zeitguthaben"
+      },
+      "earn_100": {
+        "name": "Zenturio",
+        "description": "Verdiene 100 Zeitguthaben"
+      },
+      "earn_250": {
+        "name": "Guthabenmeister",
+        "description": "Verdiene 250 Zeitguthaben"
+      },
+      "spend_1": {
+        "name": "Erste Ausgabe",
+        "description": "Gib dein erstes Zeitguthaben aus"
+      },
+      "spend_10": {
+        "name": "Aktiver Ausgeber",
+        "description": "Gib 10 Zeitguthaben aus"
+      },
+      "spend_50": {
+        "name": "Großzügiger Spender",
+        "description": "Gib 50 Zeitguthaben aus"
+      },
+      "transaction_1": {
+        "name": "Erster Austausch",
+        "description": "Schließe deine erste Transaktion ab"
+      },
+      "transaction_10": {
+        "name": "Aktiver Händler",
+        "description": "Schließe 10 Transaktionen ab"
+      },
+      "transaction_50": {
+        "name": "Tauschspezialist",
+        "description": "Schließe 50 Transaktionen ab"
+      },
+      "diversity_3": {
+        "name": "Gemeinschaftshilfe",
+        "description": "Hilf 3 verschiedenen Personen"
+      },
+      "diversity_10": {
+        "name": "Vielfältiger Geber",
+        "description": "Hilf 10 verschiedenen Personen"
+      },
+      "diversity_25": {
+        "name": "Stütze der Gemeinschaft",
+        "description": "Hilf 25 verschiedenen Personen"
+      },
+      "connect_1": {
+        "name": "Erster Freund",
+        "description": "Stelle deine erste Verbindung her"
+      },
+      "connect_10": {
+        "name": "Soziales Schmetterling",
+        "description": "Stelle 10 Verbindungen her"
+      },
+      "connect_25": {
+        "name": "Netzwerk-Erbauer",
+        "description": "Stelle 25 Verbindungen her"
+      },
+      "connect_50": {
+        "name": "Gemeinschaftsvermittler",
+        "description": "50 Kontakte herstellen"
+      },
+      "msg_1": {
+        "name": "Gesprächsstarter",
+        "description": "Sende deine erste Nachricht"
+      },
+      "msg_50": {
+        "name": "Aktiver Kommunikator",
+        "description": "50 Nachrichten senden"
+      },
+      "msg_200": {
+        "name": "Kommunikationsprofi",
+        "description": "200 Nachrichten senden"
+      },
+      "review_1": {
+        "name": "Erstes Feedback",
+        "description": "Hinterlasse deine erste Bewertung"
+      },
+      "review_10": {
+        "name": "Vertrauenswürdiger Bewerter",
+        "description": "Hinterlasse 10 Bewertungen"
+      },
+      "review_25": {
+        "name": "Bewertungsexperte",
+        "description": "Hinterlasse 25 Bewertungen"
+      },
+      "5star_1": {
+        "name": "Erste 5-Sterne-Bewertung",
+        "description": "Erhalten Sie Ihre erste 5-Sterne-Bewertung"
+      },
+      "5star_10": {
+        "name": "Hoch bewertet",
+        "description": "Erhalten Sie 10 Fünf-Sterne-Bewertungen"
+      },
+      "5star_25": {
+        "name": "Exzellenz-Auszeichnung",
+        "description": "Erhalten Sie 25 Fünf-Sterne-Bewertungen"
+      },
+      "event_attend_1": {
+        "name": "Erstes Ereignis",
+        "description": "Nehme an deinem ersten Event teil"
+      },
+      "event_attend_10": {
+        "name": "Regelmäßiger Teilnehmer",
+        "description": "Nehme an 10 Events teil"
+      },
+      "event_attend_25": {
+        "name": "Event-Enthusiast",
+        "description": "Nehme an 25 Events teil"
+      },
+      "event_host_1": {
+        "name": "Event-Gastgeber",
+        "description": "Veranstalte dein erstes Event"
+      },
+      "event_host_5": {
+        "name": "Veranstalter",
+        "description": "Veranstalte 5 Events"
+      },
+      "group_join_1": {
+        "name": "Teamspieler",
+        "description": "Tritt deiner ersten Gruppe bei"
+      },
+      "group_join_5": {
+        "name": "Gemeinschaftsmitglied",
+        "description": "Tritt 5 Gruppen bei"
+      },
+      "group_create": {
+        "name": "Gruppenbegründer",
+        "description": "Erstelle deine erste Gruppe"
+      },
+      "post_1": {
+        "name": "Erster Beitrag",
+        "description": "Erstelle deinen ersten Beitrag"
+      },
+      "post_25": {
+        "name": "Inhaltsersteller",
+        "description": "Erstelle 25 Beiträge"
+      },
+      "post_100": {
+        "name": "Produktiver Poster",
+        "description": "Erstelle 100 Beiträge"
+      },
+      "likes_50": {
+        "name": "Aufsehen erregen",
+        "description": "50 Likes erhalten"
+      },
+      "likes_200": {
+        "name": "Beliebte Stimme",
+        "description": "200 Likes erhalten"
+      },
+      "profile_complete": {
+        "name": "Profil-Profi",
+        "description": "Vervollständige dein Profil"
+      },
+      "member_30d": {
+        "name": "Monatsmitglied",
+        "description": "Sei 30 Tage Mitglied"
+      },
+      "member_180d": {
+        "name": "Semestermitglied",
+        "description": "Sei 6 Monate Mitglied"
+      },
+      "member_365d": {
+        "name": "Jahresmitglied",
+        "description": "Sei ein Jahr Mitglied"
+      },
+      "streak_7d": {
+        "name": "Wochenkrieger",
+        "description": "Halte eine 7-Tage-Serie aufrecht"
+      },
+      "streak_30d": {
+        "name": "Monatliche Hingabe",
+        "description": "Halte eine 30-Tage-Serie aufrecht"
+      },
+      "streak_100d": {
+        "name": "Serienmeister",
+        "description": "Halte eine 100-Tage-Serie aufrecht"
+      },
+      "streak_365d": {
+        "name": "Jahreslange Legende",
+        "description": "Halte eine 365-Tage-Serie aufrecht"
+      },
+      "level_5": {
+        "name": "Aufstrebender Star",
+        "description": "Erreiche Stufe 5"
+      },
+      "level_10": {
+        "name": "Community-Champion",
+        "description": "Erreiche Stufe 10"
+      },
+      "early_adopter": {
+        "name": "Frühzeitiger Anwender",
+        "description": "Sei ein frühzeitiger Anwender der Plattform"
+      },
+      "verified": {
+        "name": "Verifiziertes Mitglied",
+        "description": "Schließe die Identitätsprüfung ab"
+      },
+      "volunteer_org": {
+        "name": "Organisationspartner",
+        "description": "Eine Freiwilligenorganisation gründen"
+      }
+    },
+    "and_more": "Und mehr",
+    "pause": "Pause"
   }
 }

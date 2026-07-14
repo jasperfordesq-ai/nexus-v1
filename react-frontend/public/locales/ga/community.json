@@ -165,7 +165,7 @@
     "form_description_required": "Tá cur síos riachtanach",
     "form_description_min_length": "Caithfidh an cur síos a bheith ar a laghad 20 carachtar",
     "form_email_label": "Ríomhphost Teagmhála",
-    "form_email_placeholder": "teagmhail@deagras.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "Tá ríomhphost teagmhála riachtanach",
     "form_email_invalid": "Cuir isteach seoladh ríomhphoist bailí le do thoil",
     "form_website_label": "Suíomh Gréasáin (roghnach)",
@@ -285,7 +285,7 @@
     "add_member_heading": "Cuir Ball Grúpa Leis",
     "add_member_desc": "Cuir seoladh ríomhphoist an duine ar mhaith leat a chur leis an áirithint ghrúpa seo isteach. Gheobhaidh siad cuireadh chun páirt a ghlacadh.",
     "email_label": "Seoladh Ríomhphoist",
-    "email_placeholder": "ball@sampla.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Cealaigh",
     "add_member_failed": "Theip ar bhall a chur leis. B'fhéidir go bhfuil siad sa ghrúpa cheana féin nó go bhfuil an ríomhphost neamhbhailí.",
     "add_member_error": "Ní féidir ball a chur leis. Seiceáil an ríomhphost agus bain triail eile as le do thoil."

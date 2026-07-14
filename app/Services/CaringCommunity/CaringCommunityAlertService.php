@@ -33,10 +33,11 @@ class CaringCommunityAlertService
      * @return list<array{
      *     id: string,
      *     severity: 'info'|'warning'|'critical',
-     *     title: string,
-     *     message: string,
+     *     title_code: string,
+     *     message_code: string,
+     *     message_params: array<string, int|float|string>,
      *     count: int,
-     *     action_label: string|null,
+     *     action_code: string|null,
      *     action_url: string|null,
      * }>
      */
@@ -65,7 +66,7 @@ class CaringCommunityAlertService
      * active recurring relationship — coordinator should pair them with
      * a regular supporter.
      *
-     * @return array{id:string,severity:string,title:string,message:string,count:int,action_label:?string,action_url:?string}|null
+     * @return array{id:string,severity:string,title_code:string,message_code:string,message_params:array<string,mixed>,count:int,action_code:?string,action_url:?string}|null
      */
     private function recipientsWithoutTandem(int $tenantId): ?array
     {
@@ -94,10 +95,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'recipients_without_tandem',
             'severity' => 'warning',
-            'title' => __('caring_community.alerts.recipients_without_tandem_title'),
-            'message' => __('caring_community.alerts.recipients_without_tandem_message'),
+            'title_code' => 'recipients_without_tandem',
+            'message_code' => 'recipients_without_tandem',
+            'message_params' => [],
             'count' => $count,
-            'action_label' => 'See suggestions',
+            'action_code' => 'see_suggestions',
             'action_url' => '/admin/caring-community/workflow#tandem-suggestions',
         ];
     }
@@ -133,10 +135,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'inactive_members',
             'severity' => 'info',
-            'title' => __('caring_community.alerts.inactive_members_title'),
-            'message' => __('caring_community.alerts.inactive_members_message'),
+            'title_code' => 'inactive_members',
+            'message_code' => 'inactive_members',
+            'message_params' => [],
             'count' => $count,
-            'action_label' => 'View members',
+            'action_code' => 'view_members',
             'action_url' => '/admin/members',
         ];
     }
@@ -163,10 +166,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'overdue_reviews',
             'severity' => 'warning',
-            'title' => __('caring_community.alerts.overdue_reviews_title'),
-            'message' => __('caring_community.alerts.overdue_reviews_message', ['sla' => $sla]),
+            'title_code' => 'overdue_reviews',
+            'message_code' => 'overdue_reviews',
+            'message_params' => ['sla' => $sla],
             'count' => $count,
-            'action_label' => 'Review now',
+            'action_code' => 'review_now',
             'action_url' => '/admin/caring-community/workflow',
         ];
     }
@@ -194,10 +198,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'coordinators_overloaded',
             'severity' => 'critical',
-            'title' => __('caring_community.alerts.coordinators_overloaded_title'),
-            'message' => __('caring_community.alerts.coordinators_overloaded_message'),
+            'title_code' => 'coordinators_overloaded',
+            'message_code' => 'coordinators_overloaded',
+            'message_params' => [],
             'count' => $count,
-            'action_label' => 'Reassign reviews',
+            'action_code' => 'reassign_reviews',
             'action_url' => '/admin/caring-community/workflow',
         ];
     }
@@ -253,14 +258,16 @@ class CaringCommunityAlertService
         return [
             'id' => 'retention_dropping',
             'severity' => 'warning',
-            'title' => 'Active member count is sliding',
-            'message' => sprintf(
-                'This month\'s active members (%d) are below 85%% of the recent 3-month average (%.0f). Consider an outreach nudge.',
-                $current,
-                $avg,
-            ),
+            'title_code' => 'retention_dropping',
+            'message_code' => 'retention_dropping',
+            'message_params' => [
+                'current' => $current,
+                'average' => round($avg),
+                'threshold_percent' => 85,
+                'months' => 3,
+            ],
             'count' => $drop,
-            'action_label' => 'Open reports',
+            'action_code' => 'open_reports',
             'action_url' => '/admin/reports/members',
         ];
     }
@@ -285,10 +292,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'overdue_check_ins',
             'severity' => 'warning',
-            'title' => __('caring_community.alerts.overdue_check_ins_title'),
-            'message' => __('caring_community.alerts.overdue_check_ins_message'),
+            'title_code' => 'overdue_check_ins',
+            'message_code' => 'overdue_check_ins',
+            'message_params' => [],
             'count' => $count,
-            'action_label' => 'View tandems',
+            'action_code' => 'view_tandems',
             'action_url' => '/admin/caring-community/workflow#support-relationships',
         ];
     }
@@ -318,10 +326,11 @@ class CaringCommunityAlertService
         return [
             'id' => 'low_supply',
             'severity' => 'info',
-            'title' => __('caring_community.alerts.low_supply_title'),
-            'message' => __('caring_community.alerts.low_supply_message'),
+            'title_code' => 'low_supply',
+            'message_code' => 'low_supply',
+            'message_params' => [],
             'count' => $count,
-            'action_label' => 'View listings',
+            'action_code' => 'view_listings',
             'action_url' => '/admin/listings',
         ];
     }

@@ -161,7 +161,9 @@ export function JobTemplatesAdmin() {
           color={typeColors[tpl.type] ?? 'default'}
           className="capitalize"
         >
-          {tpl.type}
+          {t(`jobs.type_${tpl.type}`, {
+            defaultValue: t('jobs.type_unknown'),
+          })}
         </Chip>
       ),
     },

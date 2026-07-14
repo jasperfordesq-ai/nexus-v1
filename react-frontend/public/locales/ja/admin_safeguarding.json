@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "safeguarding": {
     "active": "アクティブ",
@@ -329,12 +329,11 @@
     "pending": "保留中",
     "placeholder_description_help": "説明 ヘルプ...",
     "placeholder_display_label": "例:交換中に追加のサポートが必要になる場合があります",
-    "placeholder_guardian_email": "ガーディアン@example.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "例:追加サポートが必要",
     "placeholder_review_notes": "ノートを確認...",
     "placeholder_search_messages": "メッセージを検索...",
-    "placeholder_ward_email": "区@example.com",
+    "placeholder_ward_email": "ward@example.com",
     "reason": "理由",
     "refresh": "リフレッシュ",
     "required": "必須",
@@ -368,7 +367,6 @@
     "ward": "区",
     "aria_deactivate_option": "オプションを無効にする",
     "aria_edit_option": "編集オプション",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "審査アクセス Ni",
     "vetting_dbs_basic": "DB ベーシックの審査",
     "vetting_dbs_enhanced": "強化されたデータベースの検査",
@@ -377,6 +375,11 @@
     "vetting_international": "国際審査",
     "vetting_other": "その他の審査",
     "vetting_pvg_scotland": "Pvg スコットランドの審査",
-    "tabs_aria": "セクションの保護"
+    "tabs_aria": "セクションの保護",
+    "status_active": "アクティブ",
+    "status_revoked": "取り消し済み",
+    "status_expired": "期限切れ",
+    "deactivate_confirm_question": "無効化",
+    "placeholder_option_key": "例: needs_additional_support"
   }
 }

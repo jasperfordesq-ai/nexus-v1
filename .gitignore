@@ -97,6 +97,12 @@ CLAUDE.md
 !/scripts/refresh-schema-dump.sh
 !/scripts/check-i18n.sh
 !/scripts/check-i18n-literals.mjs
+!/scripts/check-i18n-json-integrity.mjs
+!/scripts/check-admin-ui-literals.mjs
+!/scripts/check-admin-api-literals.mjs
+!/scripts/check-admin-i18n-token-integrity.mjs
+!/scripts/lib/
+!/scripts/lib/load-php-array.mjs
 !/scripts/generate-announcement-pdf.mjs
 !/scripts/check-i18n-drift.mjs
 !/scripts/check-i18n-stubs.mjs

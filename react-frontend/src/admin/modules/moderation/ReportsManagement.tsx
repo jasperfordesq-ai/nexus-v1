@@ -158,7 +158,7 @@ export default function ReportsManagement() {
         execute();
         refetchStats();
       } else {
-        toast.error(response.error || t('moderation.action_failed'));
+        toast.error(t('moderation.action_failed'));
       }
     } catch {
       toast.error(t('moderation.an_error_occurred'));
@@ -170,8 +170,8 @@ export default function ReportsManagement() {
   const reports = data || [];
   const totalPages = meta?.total_pages || 1;
 
-  // Known content types get a translated label; unknown enum values fall back
-  // to the raw type string.
+  // Known content types get a translated label; unknown enum values remain
+  // human-readable without leaking a backend identifier into the UI.
   const CONTENT_TYPE_LABELS: Record<string, string> = {
     post: t('moderation.content_type_post'),
     comment: t('moderation.content_type_comment'),
@@ -180,7 +180,7 @@ export default function ReportsManagement() {
     listing: t('moderation.content_type_listing'),
     event: t('moderation.content_type_event'),
   };
-  const typeLabel = (type: string) => CONTENT_TYPE_LABELS[type] ?? type;
+  const typeLabel = (type: string) => CONTENT_TYPE_LABELS[type] ?? t('moderation.content_type_unknown');
 
   // Compact "Reported" cell: the member or piece of content a report targets.
   const renderTargetSummary = (report: AdminReport) => {

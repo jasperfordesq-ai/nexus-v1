@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,12 +67,12 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "Algoritmestatus laden...",
     "404_entry_dismissed": "404-inzending afgewezen",
     "a_i_settings_saved_successfully": "AI-instellingen succesvol opgeslagen",
@@ -109,7 +108,6 @@
     "chronological_mode_desc": "Toon feeditems in strikt chronologische volgorde in plaats van gerangschikt",
     "col_created": "Gemaakt",
     "col_from_url": "Van URL",
-    "col_hits": "Hits",
     "col_last_seen": "Laatst gezien",
     "col_referrer": "Verwijzer",
     "col_status_code": "Statuscode",
@@ -134,7 +132,6 @@
     "dismiss_404_entry": "Negeren",
     "dismiss_404_message": "404 afwijzen",
     "dismiss_404_title": "404 afwijzen",
-    "direct_referrer": "Direct",
     "diversity_factor": "Diversiteitsfactor",
     "email_provider_heading": "E-mailprovider",
     "email_settings_desc": "Configureer de e-mailprovider die wordt gebruikt om meldingen en nieuwsbrieven te verzenden",
@@ -222,7 +219,6 @@
     "label_meta_description": "Metabeschrijving",
     "label_meta_keywords": "Meta-trefwoorden",
     "label_meta_title": "Metatitel",
-    "label_model": "Model",
     "label_open_graph": "Grafiek openen",
     "label_password": "Wachtwoord",
     "label_port": "Haven",
@@ -275,14 +271,14 @@
     "placeholder_exchange_skills_and_time_with_your_community": "Wissel vaardigheden en tijd uit met uw community...",
     "placeholder_gocspx": "GOCSPX-xxxxx",
     "placeholder_my_timebank": "Mijn tijdbank...",
-    "placeholder_noreply_example": "noreply@voorbeeld.com",
-    "placeholder_robots_txt": "User-agent: *\nNiet toestaan: /admin/",
+    "placeholder_noreply_example": "noreply@example.com",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxx...",
     "placeholder_search_users_by_name_or_email": "Zoek gebruikers op naam of e-mailadres...",
     "placeholder_smtpexamplecom": "Smtpevoorbeeldcom...",
     "placeholder_smtp_port": "587",
-    "placeholder_test_example": "test@voorbeeld.com",
-    "placeholder_user_example": "gebruiker@voorbeeld.com",
+    "placeholder_test_example": "test@example.com",
+    "placeholder_user_example": "user@example.com",
     "placeholder_welcome_to_our_community": "Welkom bij onze gemeenschap...",
     "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
     "placeholder_your_timebank_name": "Uw tijdbanknaam...",
@@ -351,7 +347,6 @@
     "chip_active": "Actief",
     "chip_fail": "Mislukt",
     "chip_key_configured": "Sleutel geconfigureerd",
-    "chip_pass": "Pass",
     "chip_warning": "Waarschuwing",
     "desc_api_key_new": "API-sleutel Nieuw.",
     "desc_api_key_replace": "API-sleutel vervangen.",
@@ -410,7 +405,6 @@
     "label_ollama_host_url": "Ollama-host-URL",
     "last_run_label": "Laatste run",
     "meta_description_count": "{{count}}/160 metabeschrijvingstekens",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "OG-afbeeldingsvoorbeeld",
     "param_activity_weight": "Activiteitsgewicht",
     "param_activity_weight_desc": "Hoe sterk recente activiteit de ranking verbetert",
@@ -505,7 +499,6 @@
       "workflows": {
         "title": "Wat probeer je te doen?",
         "description": "Begin met de eenvoudige taak en gebruik vervolgens het tabblad dat wordt geopend. Dit houdt routinewerk buiten de risicovolle controles.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "Vernieuw één tenant",
           "body": "Gebruiken wanneer openbare inhoud voor één community is gewijzigd. Voer de tenant-slug in voordat u het werk in de wachtrij zet."
@@ -525,21 +518,22 @@
         "check_tenant_safety": {
           "title": "Controleer of één huurder veilig is",
           "body": "Bekijk precies wat deze tenant moet hebben, wat er wordt opgeslagen en of eventuele snapshots ergens anders thuishoren."
-        }
+        },
+        "open": "Open"
       },
       "analytics": {
         "actions": {
           "reload": "Herladen"
         },
         "columns": {
-          "crawler": "CRAWLER",
-          "hits": "HITS",
-          "host": "HOST",
           "ip": "IP",
-          "status": "STATUS",
-          "time": "TIME",
           "uri": "URI",
-          "url": "URL"
+          "url": "URL",
+          "crawler": "Crawler",
+          "hits": "Hits",
+          "host": "Host",
+          "status": "Status",
+          "time": "Tijd"
         },
         "empty": "Geen analyses beschikbaar. Bottoegangslogboek is mogelijk leeg.",
         "empty_bot_traffic": "Nog geen botverkeer",
@@ -554,7 +548,7 @@
         "hints": {
           "spoofed": "claimde grote bot, mislukte IP-reeks",
           "top_50_cap": "van top-50 cap",
-          "verified_of_total": "{{verified}} of {{total}}"
+          "verified_of_total": "{{verified}} van {{total}}"
         },
         "kpi": {
           "ip_verified": "IP-geverifieerd",
@@ -595,13 +589,13 @@
           "refresh_all_stale_other": "Alles vernieuwen ({{count}})"
         },
         "columns": {
-          "actions": "ACTIONS",
-          "asset": "ASSET",
-          "coverage": "COVERAGE",
-          "host": "HOST",
-          "missing": "MISSING",
-          "stale": "STALE",
-          "tenant": "TENANT"
+          "actions": "Acties",
+          "asset": "Middel",
+          "coverage": "Dekking",
+          "host": "Host",
+          "missing": "Ontbrekend",
+          "stale": "Verouderd",
+          "tenant": "Huurder"
         },
         "confirm": {
           "queue_recache": "Wachtrij opnieuw cachen voor {{count}}-tenants?",
@@ -717,7 +711,15 @@
           "last_failed_pass": "Laatste mislukte run",
           "sched_prerender-detect-drift": "Hartslag van driftdetector",
           "sched_prerender-auto-recache": "Hartslag automatisch opnieuw ophalen",
-          "sched_prerender-reap-stale": "Hartslag bij het opruimen van verouderde banen"
+          "sched_prerender-reap-stale": "Hartslag bij het opruimen van verouderde banen",
+          "unknown": "Onbekende controle"
+        },
+        "remediation": "Actie: {{detail}}",
+        "statuses": {
+          "green": "Gezond",
+          "yellow": "Waarschuwing",
+          "red": "Kritiek",
+          "unknown": "Onbekende status"
         }
       },
       "inventory": {
@@ -741,9 +743,9 @@
           "age": "Leeftijd",
           "host": "Gastheer",
           "http": "HTTP",
-          "route": "Route",
           "size": "Maat",
-          "status": "Status"
+          "status": "Status",
+          "route": "Route"
         },
         "empty": "Er zijn geen momentopnamen die overeenkomen met filters",
         "errors": {
@@ -858,11 +860,11 @@
           "log_tail": "Stam (staart)",
           "queued_at": "In de rij gestaan ​​bij",
           "requested_by": "Aangevraagd door",
-          "routes": "Routes",
           "started_at": "Begonnen om",
           "status": "Status",
           "tenant": "Huurder",
-          "title": "Taak #{{id}}"
+          "title": "Taak #{{id}}",
+          "routes": "Routes"
         },
         "empty": "Geen banen",
         "errors": {
@@ -967,7 +969,6 @@
       "audit": {
         "actions": {
           "reset_all": "Alles resetten en opnieuw opbouwen",
-          "auto_recache": "Auto-recache",
           "cancel": "Taak annuleren",
           "detect_drift": "Detecteer drift",
           "enqueue": "Wachtrij vernieuwen",
@@ -975,7 +976,9 @@
           "purge": "Verwijder momentopnamen",
           "purge_unexpected": "Maak onverwachte momentopnamen schoon",
           "reset_breaker": "Veiligheidsonderbreker resetten",
-          "reset_queue": "Repareer vastgelopen wachtrij"
+          "reset_queue": "Repareer vastgelopen wachtrij",
+          "unknown": "Onbekende actie",
+          "auto_recache": "Automatisch opnieuw cachen"
         },
         "buttons": {
           "export_csv": "CSV exporteren",
@@ -1005,9 +1008,10 @@
         },
         "table_aria": "Auditgeschiedenis",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "Onbekende uitkomst",
+          "denied": "Geweigerd",
+          "failed": "Mislukt",
+          "ok": "Voltooid"
         },
         "details_empty": "Geen extra details"
       },
@@ -1024,8 +1028,8 @@
           "load_summary": "Kan samenvatting niet laden"
         },
         "fields": {
-          "routes": "Routes",
-          "tenant_slug": "Huurderslak"
+          "tenant_slug": "Huurderslak",
+          "routes": "Routes"
         },
         "force_refresh": {
           "description": "Zet een nieuwe weergave in de wachtrij. Laat beide velden leeg om elke tenant en route te vernieuwen. De hostprocessor pikt de taak binnen ongeveer 60 seconden op.",
@@ -1080,8 +1084,8 @@
           "job_queued": "Taak #{{id}} in wachtrij geplaatst"
         },
         "placeholders": {
-          "routes": "/over,/blog (leeg = alles)",
-          "tenant_slug": "bijv. urenbank (leeg = alles)"
+          "tenant_slug": "bijv. urenbank (leeg = alles)",
+          "routes": "/about,/blog (leeg = alles)"
         },
         "super_admin_only": "Alleen superbeheerder"
       },
@@ -1095,7 +1099,6 @@
           "continue_to_delete": "Ga door met live verwijderen"
         },
         "description_middle": "voor één padsegment,",
-        "description_prefix": "Verwijder momentopnamen die overeenkomen met een glob-patroon. Gebruik",
         "description_suffix": "voor elke afstammeling. Voorbeelden:",
         "all_tenants_warning": {
           "body": "Als u de tenant-slug leeg laat, worden overeenkomende momentopnamen voor elke tenant verwijderd. Dit is alleen bedoeld voor het opschonen van het hele platform nadat u een voorbeeld van de exacte bestanden hebt bekeken.",
@@ -1141,7 +1144,8 @@
           "ready": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven.",
           "ready_one": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven.",
           "ready_other": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven."
-        }
+        },
+        "description_prefix": "Verwijder opgeslagen HTML snapshots die overeenkomen met een padpatroon. Voeg een tenant-slug toe wanneer de route bij een tenant hoort. Gebruik"
       },
       "ttl_inspector": {
         "actions": {
@@ -1155,13 +1159,18 @@
         },
         "path_only": "Alleen pad - geen schema of host",
         "placeholders": {
-          "route": "/blog/mijn-post"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "overeenkomst: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (specificiteit {{specificity}})",
           "other_patterns": "Andere patronen die bij deze route passen:",
-          "ttl": "TTL: {{ttl}} ({{seconds}}'s)"
+          "ttl": "TTL: {{ttl}} ({{seconds}}'s)",
+          "sources": {
+            "default": "Standaardregel",
+            "pattern": "Overeenkomend patroon",
+            "unknown": "Onbekende bron"
+          }
         },
         "title": "TTL-inspecteur",
         "units": {
@@ -1210,8 +1219,8 @@
       },
       "readonly": {
         "prefix": "Alleen-lezen weergave: actieknoppen zijn uitgeschakeld omdat de prerender-engine voor elke tenant werkt. Meld u aan met een",
-        "role": "platform super-admin",
-        "suffix": "account om taken in de wachtrij te plaatsen, momentopnamen op te schonen of driftdetectie te activeren."
+        "suffix": "account om taken in de wachtrij te plaatsen, momentopnamen op te schonen of driftdetectie te activeren.",
+        "role": "platform super-admin"
       },
       "tabs": {
         "analytics": "Analyses",
@@ -1253,13 +1262,13 @@
           "needs_attention_other": "{{count}} item heeft aandacht nodig"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
+          "expected": "Verwacht",
+          "missing": "Ontbrekend",
+          "unexpected": "Onverwacht",
+          "stale": "Verouderd",
+          "static": "Statisch",
+          "snapshots": "Opgeslagen",
+          "asset_invalid": "Activa",
           "sitemap": "Sitemap"
         },
         "sections": {
@@ -1270,10 +1279,10 @@
         "empty": "Voer een tenant-slug in om het routeplan en de opgeslagen momentopnamen te inspecteren.",
         "empty_attention": "Deze tenant heeft geen ontbrekende, verouderde, kapotte of onverwachte momentopnamen.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
+          "why": "Waarom het hier is",
+          "source": "Bron",
           "status": "Status",
-          "why": "Waarom het hier is"
+          "route": "Route"
         },
         "tables": {
           "attention_aria": "Momentopname-items van de huurder die aandacht behoeven"
@@ -1281,12 +1290,12 @@
         "sources": {
           "static": "Statisch traject",
           "sitemap": "Sitemap-route",
-          "unexpected": "Unexpected"
+          "unexpected": "Onverwacht"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "Probleem met activa",
-          "content": "Inhoud verouderd"
+          "content": "Inhoud verouderd",
+          "unexpected": "Onverwacht"
         },
         "reasons": {
           "sitemap": "Gepubliceerd door deze huurdersitemap als openbare inhoud.",
@@ -1309,9 +1318,9 @@
           "body": "Onverwachte snapshots kunnen meestal worden verwijderd met de opruimtool in Overzicht. Eerst een voorbeeld bekijken en pas toepassen als de huurderslijst correct is."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "Vers",
+          "stale": "Verouderd",
+          "warn": "Veroudering"
         }
       }
     },
@@ -1324,7 +1333,6 @@
     "seo_health_check_heading": "SEO-gezondheidscontrole",
     "server_seo_audit_heading": "SEO-audit van server",
     "sitemap_cache_cleared": "Sitemapcache gewist",
-    "sitemap_heading": "Sitemap",
     "sitemap_total_urls": "Totaal aantal URL's",
     "sitemap_url_label": "Sitemap-URL",
     "sitemap_urls_by_type": "URL's op type",
@@ -1345,13 +1353,12 @@
     "next_public": {
       "title": "Next.js publieke frontend gereedheid",
       "description": "Alleen-lezen schaduwmodusstatus voor de openbare frontend Next.js. Deze pagina schakelt geen openbare routering in en wijzigt het pre-rendergedrag niet.",
-      "refresh": "Refresh",
       "loading": "Next.js publieke frontend-gereedheid laden",
       "error": "De gereedheid voor Next.js kan niet worden geladen.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "Productieroutering",
-        "prerender": "Terugval vooraf renderen"
+        "prerender": "Terugval vooraf renderen",
+        "mode": "Modus"
       },
       "values": {
         "shadow_mode": "Schaduwmodus",
@@ -1389,8 +1396,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "Openbare Laravel GET-route",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "Laravel-route is niet geregistreerd",
+        "auth": "Laravel-route vereist authenticatie"
       },
       "edge_canary": {
         "title": "Edge kanarie voorbeeld",
@@ -1405,7 +1412,6 @@
         "included_by_deploy": "Inbegrepen bij implementatie",
         "not_included_by_deploy": "Niet inbegrepen bij implementatie",
         "route_audit_title": "Sjabloonroute-audit",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "Alleen openbare routes",
         "not_public_only": "Niet alleen openbare routes",
         "no_private_collisions": "Geen botsingen op privéroutes",
@@ -1419,7 +1425,8 @@
         "preview_only": "Alleen voorbeeld",
         "not_preview_only": "De voorbeeldmodus is niet bevestigd",
         "reviewed_config_required": "Beoordeelde configuratie vereist",
-        "explicit_instruction_required": "Afzonderlijke cutover-instructie vereist"
+        "explicit_instruction_required": "Afzonderlijke cutover-instructie vereist",
+        "exact_path_count": "{{count}} exacte paden"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1430,9 +1437,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist",
         "next_shadow_checks_required": "Volgende schaduwcontroles vereist",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Prerender fallback moet blijven bestaan"
+        "prerender_fallback_must_remain": "Prerender fallback moet blijven bestaan",
+        "apache_configtest_required": "Apache configtest vereist",
+        "react_private_regression_required": "React privé-route regressie vereist"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Bewerk Plesk-vhosts niet rechtstreeks",
@@ -1446,17 +1453,17 @@
       },
       "remaining_route_work": {
         "title": "Resterende werkzaamheden op de openbare route",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} API-ondersteunde route",
         "api_backed_routes_plural": "{{count}} API-ondersteunde routes",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Er zijn activeringscontroles beschikbaar",
-        "activation_unavailable": "Geen activeringscontroles"
+        "activation_unavailable": "Geen activeringscontroles",
+        "public_routes": "{{count}} openbare route",
+        "public_routes_plural": "{{count}} openbare routes",
+        "remaining_routes": "{{count}} route resterend",
+        "remaining_routes_plural": "{{count}} routes resterend",
+        "unclassified_routes": "{{count}} niet-geclassificeerde route",
+        "unclassified_routes_plural": "{{count}} niet-geclassificeerde routes",
+        "route_count": "{{count}} routes"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "Statische/handmatige beoordelingsroutes",
@@ -1515,13 +1522,13 @@
       },
       "artifacts": {
         "title": "Cutover-artefactinventaris",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "Vereiste commando's",
         "required_before_cutover": "Vereist vóór de omschakeling",
         "activation_available": "Er zijn activeringscontroles beschikbaar",
-        "no_activation_control": "Geen activeringscontroles"
+        "no_activation_control": "Geen activeringscontroles",
+        "path": "Pad",
+        "present": "Aanwezig",
+        "missing": "Ontbrekend"
       },
       "artifact_items": {
         "route_ownership_manifest": "Eigendomsmanifest routeren",
@@ -1532,11 +1539,11 @@
         "prerender_fallback": "Terugval vooraf renderen"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "Edge-configuratie",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "guard": "Bewaker",
+        "fallback": "Terugval",
+        "manifest": "Manifest",
+        "runtime": "Runtime"
       },
       "production_effects": {
         "none": "Geen productie-effect"
@@ -1545,13 +1552,13 @@
         "title": "Geschiktheid voor een overstap",
         "eligible": "Komt in aanmerking voor een omschakeling",
         "blocked": "Komt niet in aanmerking voor een omschakeling",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} API-ondersteunde openbare routes",
         "remaining_public_routes": "{{count}} resterende openbare routes",
         "activation_available": "Activeringsopties beschikbaar",
         "activation_unavailable": "Geen activeringscontroles",
-        "blockers": "Blockers",
-        "required_actions": "Vereiste acties"
+        "required_actions": "Vereiste acties",
+        "blockers": "Blokkeringen",
+        "public_routes": "{{count}} openbare routes"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "Kennelijke validatie is geblokkeerd",
@@ -1586,15 +1593,15 @@
         "prerender_retained": "De huidige pre-rendering fallback blijft behouden",
         "vite_private_routes_retained": "Het eigendom van de Private Vite-route blijft behouden",
         "public_edge_not_configured": "Er is geen productierandroute geconfigureerd voor Next.js",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Pariteitstests zijn nog steeds vereist vóór elke omschakeling"
+        "parity_tests_required_before_cutover": "Pariteitstests zijn nog steeds vereist vóór elke omschakeling",
+        "apache_canary_template_not_included": "Apache kanarie-sjabloon is niet inbegrepen bij deploy"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
+        "pass": "Passeren",
+        "blocker": "Blokkering",
         "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "fail": "Mislukt",
+        "blocked": "Geblokkeerd"
       },
       "runtime": {
         "title": "Schaduwlooptijd",
@@ -1616,9 +1623,9 @@
         "monitor_and_keep_prerender_fallback": "Bewaak de reacties en houd pre-render beschikbaar als fallback totdat de pariteit is bewezen."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} privé patronen bewerken/maken"
+        "private_patterns": "{{count}} privé patronen bewerken/maken",
+        "public_routes": "{{count}} openbare routes",
+        "private_prefixes": "{{count}} privé-voorvoegsels"
       },
       "validation": {
         "title": "Duidelijke validatie",
@@ -1684,7 +1691,8 @@
         "public_routes_only": "Alleen openbare routes",
         "do_not_remove_prerender": "Verwijder prerender fallback niet.",
         "rollback_path_required": "Terugdraaipad vereist"
-      }
+      },
+      "refresh": "Vernieuwen"
     },
     "health_meta_description_length_one": "{{count}}-tekens (ideaal: 150–160)",
     "health_meta_description_length_other": "{{count}}-tekens (ideaal: 150–160)",
@@ -1708,7 +1716,97 @@
     "failed_count_with_value_other": "{{count}}is mislukt",
     "total_count_one": "Totaal: {{count}}",
     "total_count_other": "Totaal: {{count}}",
-    "score_out_of": "van {{maximum}}"
+    "score_out_of": "van {{maximum}}",
+    "placeholder_default_title_suffix": "| Mijn Tijdbank",
+    "placeholder_meta_keywords": "tijdbankieren, gemeenschap, uitwisseling",
+    "sitemap_content_type_unknown": "Andere inhoud",
+    "sitemap_content_type_blog_posts": "Blogposts",
+    "sitemap_content_type_events": "Evenementen",
+    "sitemap_content_type_groups": "Groepen",
+    "sitemap_content_type_jobs": "Banen",
+    "sitemap_content_type_listings": "Lijsten",
+    "sitemap_content_type_members": "Leden",
+    "sitemap_content_type_pages": "Pagina's",
+    "sitemap_content_type_podcasts": "Podcasts",
+    "sitemap_content_type_resources": "Hulpmiddelen",
+    "sitemap_content_type_volunteering": "Vrijwilligerswerk",
+    "seo_audit_check_blog_meta_description_one": "Controleert {{count}} gepubliceerd blogbericht op meta-titels en beschrijvingen",
+    "seo_audit_check_blog_meta_description_other": "Controleert {{count}} gepubliceerde blogberichten op meta-titels en beschrijvingen",
+    "seo_audit_check_blog_meta_name": "Blogbericht Metadata",
+    "seo_audit_check_canonical_urls_description": "Controleert canonieke URL-configuratie en aangepaste overschrijvingen",
+    "seo_audit_check_canonical_urls_name": "Canonieke URL's",
+    "seo_audit_check_content_quality_description": "Controleert op dunne inhoud, ontbrekende titels en andere kwesties met de inhoudskwaliteit",
+    "seo_audit_check_content_quality_name": "Inhoudskwaliteitssignalen",
+    "seo_audit_check_duplicate_titles_description": "Controleert op dubbele metatitels in gepubliceerde inhoud",
+    "seo_audit_check_duplicate_titles_name": "Unieke metatitels",
+    "seo_audit_check_kb_meta_description_one": "Controleert of {{count}} gepubliceerde kennisbankartikel een geldige titel heeft",
+    "seo_audit_check_kb_meta_description_other": "Controleert {{count}} gepubliceerde kennisbankartikelen op geldige titels",
+    "seo_audit_check_kb_meta_name": "Metadata van kennisbankartikel",
+    "seo_audit_check_open_graph_description": "Controleert Open Graph- en Twitter Card-configuratie",
+    "seo_audit_check_open_graph_name": "Metadata voor sociale delen",
+    "seo_audit_check_page_meta_description_one": "Controleert {{count}} gepubliceerde CMS-pagina op metadata",
+    "seo_audit_check_page_meta_description_other": "Controleert {{count}} gepubliceerde CMS-pagina's op metadata",
+    "seo_audit_check_page_meta_name": "CMS Pagina Metadata",
+    "seo_audit_check_redirect_health_description_one": "Controleert of {{count}} geconfigureerde omleidingen heeft voor ketens, lussen en zelfomleidingen",
+    "seo_audit_check_redirect_health_description_other": "Controleert of {{count}} geconfigureerde omleidingen heeft voor ketens, lussen en zelfomleidingen",
+    "seo_audit_check_redirect_health_name": "Omleidingsgezondheid",
+    "seo_audit_check_seo_settings_description": "Controleert of canonieke URL's, Open Graph-tags en Twitter-kaarten zijn ingeschakeld",
+    "seo_audit_check_seo_settings_name": "SEO-configuratie",
+    "seo_audit_check_sitemap_coverage_description_one": "Controleert de sitemapdekking voor {{count}} URL",
+    "seo_audit_check_sitemap_coverage_description_other": "Controleert de sitemapdekking voor {{count}} URLs",
+    "seo_audit_check_sitemap_coverage_name": "Sitemapdekking",
+    "seo_audit_check_tenant_metadata_description": "Controleert de meta-titel, meta-beschrijving en H1-kop van de startpagina van de huurder",
+    "seo_audit_check_tenant_metadata_name": "Startpagina Metadata",
+    "seo_audit_check_unknown_description": "Deze auditcontrole wordt niet ondersteund door deze versie van het beheerderspaneel",
+    "seo_audit_check_unknown_name": "Onbekende auditcontrole",
+    "seo_audit_issue_additional_results_truncated": "Er kunnen meer problemen bestaan; alleen de eerste {{limit}} worden weergegeven.",
+    "seo_audit_issue_blog_post_meta_missing": "Blogpost “{{title}}” ({{path}}) mist een meta-titel of beschrijving.",
+    "seo_audit_issue_canonical_generation_disabled": "Generatie van de canonieke URL is uitgeschakeld, wat een risico op dubbele inhoud creëert.",
+    "seo_audit_issue_canonical_urls_not_enabled": "Canonieke URL's zijn niet ingeschakeld.",
+    "seo_audit_issue_cms_page_meta_title_missing": "CMS-pagina “{{title}}” ({{path}}) mist een meta-titel.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} pagina heeft een aangepaste canonieke URL; bevestig dat deze nog steeds geldig is.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} pagina's hebben aangepaste canonieke URL's; bevestig dat deze nog steeds geldig zijn.",
+    "seo_audit_issue_duplicate_meta_title_one": "De meta-titel “{{title}}” wordt {{count}} keer gebruikt.",
+    "seo_audit_issue_duplicate_meta_title_other": "De meta-titel “{{title}}” wordt {{count}} keer gebruikt.",
+    "seo_audit_issue_homepage_meta_title_too_long": "De meta-titel van de startpagina is {{length}} tekens lang; het maximum is {{max}}.",
+    "seo_audit_issue_kb_article_titles_missing_one": "{{count}} gepubliceerd kennisbankartikel heeft een lege titel.",
+    "seo_audit_issue_kb_article_titles_missing_other": "{{count}} gepubliceerde kennisbankartikelen hebben lege titels.",
+    "seo_audit_issue_legacy_result_requires_rerun": "Dit opgeslagen probleem gebruikt een ouder formaat. Voer de audit opnieuw uit voor volledige details.",
+    "seo_audit_issue_meta_description_too_long": "De meta beschrijving van de startpagina is {{length}} tekens lang; het maximum is {{max}}.",
+    "seo_audit_issue_meta_description_too_short": "De meta beschrijving van de startpagina is {{length}} tekens lang; het minimum is {{min}}.",
+    "seo_audit_issue_missing_homepage_h1": "De startpagina mist zijn H1-kop.",
+    "seo_audit_issue_missing_homepage_meta_title": "De startpagina mist zijn standaard meta-titel.",
+    "seo_audit_issue_missing_meta_description": "De startpagina mist de standaard meta beschrijving.",
+    "seo_audit_issue_open_graph_default_image_missing": "Er is geen standaard Open Graph-afbeelding ingesteld, dus sociale shares zullen geen afbeelding bevatten.",
+    "seo_audit_issue_open_graph_not_enabled": "Open Graph-tags zijn niet ingeschakeld.",
+    "seo_audit_issue_open_graph_sharing_disabled": "Open Graph-tags zijn uitgeschakeld, dus sociale shares zullen generieke previews gebruiken.",
+    "seo_audit_issue_redirect_chain": "Omleidingsketen: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "Redirect-lus: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "Zelf-redirect: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "De sitemap bevat geen URL's, dus er wordt geen inhoud uit geïndexeerd.",
+    "seo_audit_issue_sitemap_low_coverage_one": "De sitemap bevat slechts {{count}} URL, wat wijst op een zeer lage dekking.",
+    "seo_audit_issue_sitemap_low_coverage_other": "De sitemap bevat slechts {{count}} URL's, wat wijst op een zeer lage dekking.",
+    "seo_audit_issue_sitemap_profiles_missing": "De sitemap bevat geen ledenprofielen, hoewel sommige verwacht worden.",
+    "seo_audit_issue_sitemap_static_pages_missing": "De sitemap bevat geen statische pagina's, hoewel sommige verwacht worden.",
+    "seo_audit_issue_thin_blog_content_one": "De door {{count}} gepubliceerde blogpost bevat minder dan {{minimum}} tekens; dunne inhoud kan SEO schaden.",
+    "seo_audit_issue_thin_blog_content_other": "De door {{count}} gepubliceerde blogposts bevatten minder dan {{minimum}} tekens; dunne inhoud kan SEO schaden.",
+    "seo_audit_issue_title_suffix_missing": "Er is geen titelachtervoegsel geconfigureerd, zoals “ | Community Name”.",
+    "seo_audit_issue_twitter_cards_disabled": "Twitter-kaarten zijn uitgeschakeld.",
+    "seo_audit_issue_twitter_cards_not_enabled": "Twitter-kaarten zijn niet ingeschakeld.",
+    "seo_audit_issue_unknown": "Dit auditprobleem wordt niet ondersteund door deze versie van het beheerpaneel.",
+    "seo_audit_issue_untitled_published_pages_one": "{{count}} gepubliceerde pagina heeft geen titel.",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} gepubliceerde pagina's hebben geen titel.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "Laden",
+    "no_audit_results_prompt": "Nog geen auditresultaten",
+    "col_hits": "Hits",
+    "direct_referrer": "Direct",
+    "label_model": "Model",
+    "component_match_score_aria": "{{component}} score: {{score}}%",
+    "chip_pass": "Pass",
+    "sitemap_heading": "Sitemap"
   },
   "email_deliverability": {
     "title": "E-mailbezorgbaarheid",
@@ -1787,10 +1885,10 @@
       "columns": {
         "event": "Evenement",
         "issue": "Probleem",
-        "module": "Module",
         "params": "Bewijs",
         "severity": "Ernst",
-        "tenant": "Huurder"
+        "tenant": "Huurder",
+        "module": "Module"
       }
     },
     "queues": {
@@ -2105,16 +2203,37 @@
       "title": "Pushmeldingen",
       "subtitle": "Bezorging van web- en mobiele pushmeldingen in de geselecteerde periode",
       "unavailable": "Logboekregistratie van pushbezorging is nog niet beschikbaar.",
-      "total": "Pushes",
       "delivered": "Bezorgd",
       "partial": "Gedeeltelijk",
       "failed": "Mislukt",
       "success_rate": "Slagingspercentage",
       "fcm": "Mobiel verzonden/mislukt",
       "web": "Web bezorgd",
-      "recent_failures": "Recente fouten"
+      "recent_failures": "Recente fouten",
+      "total": "Pushes"
     },
     "trigger_coverage_one": "{{issues}}-problemen in de door {{count}} bewaakte stromen",
-    "trigger_coverage_other": "{{issues}}-problemen in de door {{count}} bewaakte stromen"
+    "trigger_coverage_other": "{{issues}}-problemen in de door {{count}} bewaakte stromen",
+    "categories": {
+      "billing": "Facturering",
+      "civic_digest": "Burgelijk overzicht",
+      "donation_receipt": "Donatiebewijs",
+      "event_reminder": "Evenementherinnering",
+      "federation_connection": "Federatieverbinding",
+      "federation_message": "Federatiebericht",
+      "federation_review": "Federatiereview",
+      "federation_transaction": "Federatietransactie",
+      "goal_reminder": "Doelherinnering",
+      "job_interview": "Sollicitatiegesprek",
+      "listing_expiry": "Vermelding vervalt",
+      "marketplace_dispute": "Geschil op de marktplaats",
+      "marketplace_rating": "Marktplaatsbeoordeling",
+      "newsletter": "Nieuwsbrief",
+      "safeguarding": "Bescherming",
+      "safeguarding_review": "Beoordeling van bescherming",
+      "volunteer_reminder": "Vrijwilliger herinnering",
+      "not_available": "Niet beschikbaar",
+      "unknown": "Andere e-mailcategorie"
+    }
   }
 }

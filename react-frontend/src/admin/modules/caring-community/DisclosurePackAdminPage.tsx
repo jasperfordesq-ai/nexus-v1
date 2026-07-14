@@ -10,6 +10,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -51,6 +52,18 @@ interface PackResponse {
   pack: DisclosurePack;
   last_updated_at: string | null;
   is_customised: boolean;
+}
+
+function disclosureValue(value: string, t: TFunction): string {
+  if (value.startsWith('@copy:')) {
+    return t(`disclosure_pack.default_copy.${value.slice(6)}`, { defaultValue: value });
+  }
+
+  return t(`disclosure_pack.structured.values.${value}`, { defaultValue: value });
+}
+
+function disclosureField(field: string, t: TFunction): string {
+  return t(`disclosure_pack.structured.fields.${field}`, { defaultValue: field });
 }
 
 export default function DisclosurePackAdminPage() {
@@ -95,9 +108,8 @@ export default function DisclosurePackAdminPage() {
       setDraft(updated);
       setData((prev) => (prev ? { ...prev, pack: updated, is_customised: true } : prev));
       showToast(t('disclosure_pack.toasts.saved'), 'success');
-    } catch (err) {
-      const msg = (err as { message?: string })?.message ?? t('disclosure_pack.toasts.save_failed');
-      showToast(msg, 'error');
+    } catch {
+      showToast(t('disclosure_pack.toasts.save_failed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -118,7 +130,7 @@ export default function DisclosurePackAdminPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = payload.filename || 'disclosure-pack.md';
+      a.download = payload.filename || t('disclosure_pack.export.filename');
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -257,7 +269,7 @@ export default function DisclosurePackAdminPage() {
                   <Input label={t('disclosure_pack.fields.contact_email')} type="email" value={draft.processor.contact_email}
                     onValueChange={(v) => setProcessorField('contact_email', v)} />
                   <Textarea label={t('disclosure_pack.fields.sub_processors')}
-                    value={draft.processor.sub_processors.join('\n')}
+                    value={draft.processor.sub_processors.map((value) => disclosureValue(value, t)).join('\n')}
                     onValueChange={(v) => setProcessorField('sub_processors', v.split('\n').map((l) => l.trim()).filter(Boolean))}
                     minRows={5}
                   />
@@ -273,8 +285,10 @@ export default function DisclosurePackAdminPage() {
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.data_categories).map(([cat, fields]) => (
                     <p key={cat} className="text-sm">
-                      <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
-                      <span className="text-muted">{(fields as string[]).join(', ')}</span>
+                      <span className="text-sm font-medium text-foreground">{disclosureField(cat, t)}</span>:{' '}
+                      <span className="text-muted">
+                        {(fields as string[]).map((field) => disclosureValue(field, t)).join(', ')}
+                      </span>
                     </p>
                   ))}
                 </CardBody>
@@ -285,8 +299,8 @@ export default function DisclosurePackAdminPage() {
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.lawful_basis).map(([cat, basis]) => (
                     <p key={cat} className="text-sm">
-                      <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
-                      <span className="text-muted">{basis as string}</span>
+                      <span className="text-sm font-medium text-foreground">{disclosureField(cat, t)}</span>:{' '}
+                      <span className="text-muted">{disclosureValue(basis as string, t)}</span>
                     </p>
                   ))}
                 </CardBody>
@@ -298,8 +312,8 @@ export default function DisclosurePackAdminPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {Object.entries(draft.retention_defaults).map(([k, v]) => (
                       <p key={k} className="text-sm">
-                        <span className="font-mono text-xs text-accent">{k}</span>:{' '}
-                        <span className="text-muted">{v as string}</span>
+                        <span className="text-sm font-medium text-foreground">{disclosureField(k, t)}</span>:{' '}
+                        <span className="text-muted">{disclosureValue(v as string, t)}</span>
                       </p>
                     ))}
                   </div>
@@ -313,13 +327,13 @@ export default function DisclosurePackAdminPage() {
               <CardBody className="grid grid-cols-1 sm:grid-cols-2 gap-2 py-4">
                 {Object.entries(draft.data_subject_rights).map(([k, v]) => (
                   <p key={k} className="text-sm">
-                    <span className="font-mono text-xs text-accent">{k}</span>:{' '}
+                    <span className="text-sm font-medium text-foreground">{disclosureField(k, t)}</span>:{' '}
                     {typeof v === 'boolean' ? (
                       <Chip size="sm" color={v ? 'success' : 'default'} variant="soft">
                         {v ? t('disclosure_pack.status.enabled_lower') : t('disclosure_pack.status.disabled_lower')}
                       </Chip>
                     ) : (
-                      <span className="text-muted">{v as string}</span>
+                      <span className="text-muted">{disclosureValue(v as string, t)}</span>
                     )}
                   </p>
                 ))}
@@ -333,7 +347,8 @@ export default function DisclosurePackAdminPage() {
                 <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.federation_policy')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-2">
                   <p className="text-sm">
-                    {t('disclosure_pack.labels.aggregate_policy')}: <span className="font-mono text-xs">{draft.federation.aggregate_policy}</span>
+                    {t('disclosure_pack.labels.aggregate_policy')}:{' '}
+                    <span className="text-muted">{disclosureValue(draft.federation.aggregate_policy, t)}</span>
                   </p>
                   <Chip size="sm" color={draft.federation.enabled ? 'success' : 'default'} variant="soft">
                     {draft.federation.enabled ? t('disclosure_pack.status.enabled') : t('disclosure_pack.status.disabled')}
@@ -364,7 +379,7 @@ export default function DisclosurePackAdminPage() {
                   <Input label={t('disclosure_pack.fields.backup_owner')} value={draft.isolated_node.backup_owner}
                     onValueChange={(v) => setIsolatedField('backup_owner', v)}
                     description={t('disclosure_pack.descriptions.backup_owner')} />
-                  <Input label={t('disclosure_pack.fields.update_cadence')} value={draft.isolated_node.update_cadence}
+                  <Input label={t('disclosure_pack.fields.update_cadence')} value={disclosureValue(draft.isolated_node.update_cadence, t)}
                     onValueChange={(v) => setIsolatedField('update_cadence', v)}
                     description={t('disclosure_pack.descriptions.update_cadence')} />
                 </CardBody>
@@ -388,7 +403,7 @@ export default function DisclosurePackAdminPage() {
                     if (!isNaN(n)) setIncidentField('notification_window_hours', n);
                   }}
                 />
-                <Input label={t('disclosure_pack.fields.fadp_authority')} value={draft.incident_response.fadp_authority}
+                <Input label={t('disclosure_pack.fields.fadp_authority')} value={disclosureValue(draft.incident_response.fadp_authority, t)}
                   onValueChange={(v) => setIncidentField('fadp_authority', v)} />
               </CardBody>
             </Card>
@@ -405,13 +420,13 @@ export default function DisclosurePackAdminPage() {
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.destinations')}</p>
                   <ul className="list-disc pl-6 text-sm text-muted">
-                    {draft.cross_border_transfers.destinations.map((d) => <li key={d}>{d}</li>)}
+                    {draft.cross_border_transfers.destinations.map((d) => <li key={d}>{disclosureValue(d, t)}</li>)}
                   </ul>
                 </div>
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.safeguards')}</p>
                   <ul className="list-disc pl-6 text-sm text-muted">
-                    {draft.cross_border_transfers.safeguards.map((s) => <li key={s}>{s}</li>)}
+                    {draft.cross_border_transfers.safeguards.map((s) => <li key={s}>{disclosureValue(s, t)}</li>)}
                   </ul>
                 </div>
               </CardBody>

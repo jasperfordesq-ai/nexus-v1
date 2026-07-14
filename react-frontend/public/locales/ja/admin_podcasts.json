@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,7 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
+    "loading": "読み込み中",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,7 +68,7 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
+    "select_row": "行を選択 {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
   },
@@ -92,18 +92,18 @@
       "notes_hint": "作成者が必要な修正を行えるよう、判断理由を説明してください。",
       "audio_unsupported": "このブラウザーでは音声を再生できません。"
     },
-    "title": "Podcasts",
+    "title": "ポッドキャスト",
     "description": "テナントのモデレーションのために保持されているコンテンツを含む、コミュニティの番組やエピソードを確認します。",
     "load_failed": "ポッドキャスト モデレーションを読み込めませんでした。",
     "action_failed": "ポッドキャストのモデレーションを更新できませんでした。",
     "empty_value": "-",
-    "count": "{{count}} items",
+    "count": "{{count}} アイテム",
     "actions": {
       "inspect": "確認してモデレート",
-      "refresh": "Refresh",
-      "approve": "Approve",
-      "reject": "Reject",
-      "flag": "Flag",
+      "refresh": "更新",
+      "approve": "承認する",
+      "reject": "拒否する",
+      "flag": "旗",
       "resolve_report": "レポートを解決する",
       "dismiss_report": "レポートを却下する",
       "escalate_report": "レポートをエスカレーションする",
@@ -111,30 +111,51 @@
     },
     "filters": {
       "label": "ポッドキャストモデレーションフィルター",
-      "all": "All",
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "all": "すべて",
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "拒否されました",
+      "flagged": "フラグ付き"
     },
     "sections": {
-      "shows": "Shows",
-      "episodes": "Episodes",
       "top_episodes": "人気のエピソード",
       "client_breakdown": "クライアントの内訳",
-      "retention": "Retention",
-      "reports": "レポートを開く"
+      "retention": "保持",
+      "reports": "レポートを開く",
+      "shows": "番組",
+      "episodes": "エピソード"
     },
     "review_values": {
-      "visibility": { "public": "公開", "members": "メンバー", "private": "非公開", "inherit": "番組から継承" },
-      "media_scan": { "pending": "スキャン待ち", "clean": "問題なし", "infected": "感染", "scan_unavailable": "スキャナーを利用できません", "not_required": "不要" },
-      "media_processing": { "pending": "保留中", "ready_for_processing": "処理準備完了", "complete": "完了", "failed": "失敗" },
-      "report_status": { "open": "未対応", "resolved": "解決済み", "dismissed": "却下", "escalated": "エスカレーション済み" }
+      "visibility": {
+        "public": "公開",
+        "members": "メンバー",
+        "private": "非公開",
+        "inherit": "番組から継承"
+      },
+      "media_scan": {
+        "pending": "スキャン待ち",
+        "clean": "問題なし",
+        "infected": "感染",
+        "scan_unavailable": "スキャナーを利用できません",
+        "not_required": "不要"
+      },
+      "media_processing": {
+        "pending": "保留中",
+        "ready_for_processing": "処理準備完了",
+        "complete": "完了",
+        "failed": "失敗"
+      },
+      "report_status": {
+        "open": "未対応",
+        "resolved": "解決済み",
+        "dismissed": "却下",
+        "escalated": "エスカレーション済み"
+      }
     },
     "readiness": {
-      "moderation": "Moderation",
-      "reports": "Reports",
-      "media": "Media",
+      "moderation": "節度",
+      "reports": "レポート",
+      "media": "メディア",
       "rss": "RSS",
       "pending_items_one": "{{count}} アイテムがレビュー待ち",
       "pending_items_other": "{{count}} アイテムがレビュー待ち",
@@ -148,7 +169,7 @@
     "feed_validation": {
       "title": "RSS検証",
       "subtitle": "{{title}} の最新チェック",
-      "valid": "Ready",
+      "valid": "準備完了",
       "invalid": "仕事が必要です",
       "errors": "ブロッキングの問題",
       "warnings": "推奨される修正"
@@ -163,61 +184,62 @@
       "missing_artwork": "ポッドキャスト ディレクトリの準備のためにショー アートワークを追加します。",
       "episode_missing_audio_url": "エピソードに有効な HTTP オーディオ URL がありません。",
       "episode_missing_audio_length": "エピソードに音声ファイルのサイズがありません。",
-      "episode_missing_audio_mime": "エピソードにオーディオ MIME タイプがありません。"
+      "episode_missing_audio_mime": "エピソードにオーディオ MIME タイプがありません。",
+      "unknown": "フィードに認識されない問題があります。"
     },
     "columns": {
-      "title": "Title",
-      "owner": "Owner",
-      "show": "Show",
-      "author": "Author",
-      "status": "Status",
-      "moderation": "Moderation",
-      "updated": "Updated",
-      "actions": "Actions",
-      "listens": "Listens",
-      "client": "Client",
-      "bucket": "Bucket",
-      "episode": "Episode",
-      "reason": "Reason",
-      "details": "Details"
+      "title": "タイトル",
+      "owner": "所有者",
+      "author": "著者",
+      "status": "状態",
+      "moderation": "節度",
+      "updated": "更新されました",
+      "actions": "アクション",
+      "listens": "再生数",
+      "bucket": "バケツ",
+      "reason": "理由",
+      "details": "詳細",
+      "show": "ショー",
+      "client": "クライアント",
+      "episode": "エピソード"
     },
-    "report_unknown_episode": "Episode #{{id}}",
-    "reporter": "Reported by {{name}}",
+    "reporter": "{{name}} による報告",
     "report_meta": "{{show}} · {{reporter}}",
     "report_reasons": {
       "safety": "安全か害か",
       "spam": "スパムまたは誤解を招くコンテンツ",
       "rights": "著作権または権利に関する懸念",
-      "other": "Other"
+      "other": "その他",
+      "unknown": "認識されない理由"
     },
     "stats": {
-      "total_shows": "Shows",
       "published_shows": "公開された番組",
       "pending_shows": "保留中の番組",
-      "total_episodes": "Episodes",
       "published_episodes": "公開されたエピソード",
       "pending_episodes": "保留中のエピソード",
-      "total_listens": "Listens",
+      "total_listens": "再生数",
       "completed_listens": "リスニングが完了しました",
       "completion_rate": "完了率",
       "unique_listeners": "ユニークなリスナー",
       "open_reports": "レポートを開く",
-      "subscribers": "Followers",
+      "subscribers": "フォロワー",
       "pending_media_scans": "保留中のスキャン",
       "media_scan_unavailable": "スキャナーが使用できません",
       "pending_media_processing": "保留中のメディア ジョブ",
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "total_shows": "番組",
+      "total_episodes": "エピソード"
     },
     "status": {
-      "draft": "Draft",
-      "published": "Published",
-      "archived": "Archived"
+      "draft": "下書き",
+      "published": "発行済み",
+      "archived": "アーカイブ済み"
     },
     "moderation": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "拒否されました",
+      "flagged": "フラグ付き"
     },
     "empty": {
       "shows": "現在のフィルターに一致する番組はありません。",
@@ -254,6 +276,7 @@
       "confirm_reject_message_one": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
     },
     "count_other": "{{count}} アイテム",
-    "count_one": "{{count}} アイテム"
+    "count_one": "{{count}} アイテム",
+    "report_unknown_episode": "エピソード #{{id}}"
   }
 }

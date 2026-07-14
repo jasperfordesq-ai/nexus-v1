@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Frank szwajcarski — waluta używana do obliczeń kosztów opieki formalnej w wdrożeniach Caring Community",
+    "fadp": "Federalna ustawa o ochronie danych — zrewidowane szwajcarskie prawo ochrony danych (obowiązuje od września 2023)",
+    "ndsg": "Neues Datenschutzgesetz — znowelizowana Szwajcarska Federalna Ustawa o Ochronie Danych (synonim FADP)",
+    "dsg": "Datenschutzgesetz — patrz nDSG / FADP",
+    "gdpr": "General Data Protection Regulation — unijne prawo ochrony danych; w przypadku wdrożeń w Szwajcarii stosuje się zamiast tego FADP/nDSG",
+    "sla": "Service-level agreement — maksymalny zobowiązany czas reakcji lub rozwiązania dla każdego poziomu priorytetu",
+    "agpl": "GNU Affero General Public License v3 — otwarta licencja, na mocy której NEXUS jest publicznie udostępniany",
+    "kpi": "Kluczowy wskaźnik efektywności — mierzalna metryka używana do oceny postępu w kierunku określonego celu",
+    "roi": "Zwrot z inwestycji — tutaj: koszty formalnej opieki uniknięte na godzinę wymienionej nieformalnej pomocy",
+    "nexus": "Projekt NEXUS — wielomieszkaniowa platforma banku czasu i opieki społecznej",
+    "agm": "Coroczne walne zgromadzenie",
+    "xp": "Punkty doświadczenia — punkty gamifikacyjne przyznawane za realizację wymian i osiąganie kamieni milowych",
+    "isco": "Międzynarodowa Standardowa Klasyfikacja Zawodów — używana do kategoryzowania typów usług opiekuńczych"
+  }
+}

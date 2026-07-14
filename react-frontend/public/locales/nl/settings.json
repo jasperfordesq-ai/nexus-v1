@@ -595,7 +595,7 @@
     "modal_title": "Gekoppeld Account Toevoegen",
     "modal_description": "Voer het e-mailadres in van de persoon die je wilt koppelen. Ze ontvangen een melding om het verzoek goed te keuren.",
     "email_label": "E-mailadres",
-    "email_placeholder": "kind@example.com",
+    "email_placeholder": "child@example.com",
     "name_label": "Naam (optioneel)",
     "name_placeholder": "Hun weergavenaam",
     "cancel": "Annuleren",

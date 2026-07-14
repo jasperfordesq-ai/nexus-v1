@@ -57,7 +57,7 @@ export function CreditCommonsConfig() {
   // Form state
   const [nodeSlug, setNodeSlug] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [currencyFormat, setCurrencyFormat] = useState('<quantity> hours');
+  const [currencyFormat, setCurrencyFormat] = useState(() => t('federation.cc_currency_format_placeholder'));
   const [exchangeRate, setExchangeRate] = useState('1.0');
   const [validatedWindow, setValidatedWindow] = useState('300');
   const [parentNodeUrl, setParentNodeUrl] = useState('');
@@ -72,7 +72,7 @@ export function CreditCommonsConfig() {
         setConfig(data);
         setNodeSlug(data.node_slug || '');
         setDisplayName(data.display_name || '');
-        setCurrencyFormat(data.currency_format || '<quantity> hours');
+        setCurrencyFormat(data.currency_format || t('federation.cc_currency_format_placeholder'));
         setExchangeRate(String(data.exchange_rate ?? 1.0));
         setValidatedWindow(String(data.validated_window ?? 300));
         setParentNodeUrl(data.parent_node_url || '');
@@ -118,7 +118,7 @@ export function CreditCommonsConfig() {
         toast.success(t('federation.cc_config_saved'));
         loadConfig();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.cc_config_save_failed');
+        const errorMsg = t('federation.cc_config_save_failed');
         toast.error(errorMsg);
       }
     } catch (err) {

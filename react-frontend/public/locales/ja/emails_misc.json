@@ -203,10 +203,10 @@
     "reminder_email_cta": "イベントを見る",
     "created_subject": "イベントが公開されました",
     "created_heading": "イベントが公開されました",
-    "created_greeting": "こんにちは:nameさん、",
     "created_body": "イベント<strong>:title</strong>が公開され、コミュニティに表示されるようになりました。",
     "created_details_label": "イベントの詳細",
-    "created_cta": "イベントを見る"
+    "created_cta": "イベントを見る",
+    "created_greeting": "こんにちは :name、"
   },
   "vol_org_wallet": {
     "payment_subject": "{{org}} からタイムクレジット受領",

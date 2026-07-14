@@ -1,0 +1,1537 @@
+{
+  "articles": {
+    "caring": {
+      "title": "Zorgende Gemeenschap — Module Hub",
+      "summary": "De Caring Community-module is het toegangspunt op het hoogste niveau voor alle cooperative functies van de Caring Community. Vanaf hier kunt u naar elke subsectie navigeren: vertrouwensniveaus van leden, bescherming, ROI-rapportage, pilot-bereidheid en meer.",
+      "steps": {
+        "0": {
+          "label": "Modulegezondheid in één oogopslag bekijken",
+          "detail": "Het dashboard toont live aantallen van actieve leden, open hulpverzoeken, lopende beschermingsrapporten en het SLA-nalevingspercentage."
+        },
+        "1": {
+          "label": "Gebruik het quick-links raster",
+          "detail": "Elke kaart linkt direct naar zijn functioneel gebied. Kaarten met een rood label hebben onmiddellijke aandacht nodig (bijv. verlopen SLA, kritisch meldingsrapport over bescherming)."
+        },
+        "2": {
+          "label": "Controleer de aankondigingsbalk",
+          "detail": "Als uw kantonale partner of het nationale kantoor van de Caring Community een bericht heeft geplaatst, verschijnt dit vastgezet bovenaan de hub."
+        }
+      },
+      "tips": {
+        "0": "Markeer deze pagina als bladwijzer — het is de snelste manier om problemen te zien die je aandacht nodig hebben zonder diep in menu's te navigeren.",
+        "1": "De module verschijnt alleen in de zijbalk als de caring_community functieflag ingeschakeld is voor deze huurder."
+      },
+      "related_paths": {
+        "0": {
+          "label": "SLA-dashboard"
+        },
+        "1": {
+          "label": "Bescherming"
+        },
+        "2": {
+          "label": "Lancering Gereedheid"
+        }
+      }
+    },
+    "caring_workflow": {
+      "title": "Dashboard Coördinator Workflow",
+      "summary": "Een realtime Kanban-stijl bord dat elke lopende zorguitwisseling toont. Uitwisselingen bewegen door de volgende staten: Verzoek → Gematcht → In uitvoering → Voltooid → Beoordeeld. Coördinatoren gebruiken deze pagina om knelpunten te signaleren, uitwisselingen opnieuw toe te wijzen en vastgelopen verzoeken te escaleren.",
+      "steps": {
+        "0": {
+          "label": "Filter op status of categorie",
+          "detail": "Gebruik de bovenste filterbalk om te beperken tot een specifieke staat (bijv. alleen \"Gematcht\") of zorgcategorie (bijv. Transport, Gezelschap)."
+        },
+        "1": {
+          "label": "Open een wisselkaart",
+          "detail": "Klik op een kaart om het volledige detailpaneel te zien: ledenprofielen, afgesproken tijd, eventuele coördinatornotities en het auditspoor."
+        },
+        "2": {
+          "label": "Toewijzen of escaleren",
+          "detail": "Gebruik het drie-puntjes-menu op een kaart om het toe te wijzen aan een andere coördinator, een notitie toe te voegen of te markeren als geëscaleerd voor beoordeling."
+        },
+        "3": {
+          "label": "Markeren als voltooid",
+          "detail": "Zodra beide partijen bevestigen, gebruik 'Markeer als voltooid' om de overdracht van het uurkrediet te activeren en de beoordelingsprompt voor beide leden te ontgrendelen."
+        }
+      },
+      "tips": {
+        "0": "Uitwisselingen die langer dan 48 uur in 'Gekoppeld' vastzitten, worden gemarkeerd in amber — volg dit op met beide leden.",
+        "1": "De 'Mijn Uitwisselingen'-schakelaar filtert alleen uitwisselingen waarbij jij de toegewezen coördinator bent.",
+        "2": "Voltooide uitwisselingen die na 7 dagen nog niet zijn beoordeeld, worden gemarkeerd — beoordelingen zijn belangrijk voor de KPI-baselinegegevens."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Uuroverdrachten"
+        },
+        "1": {
+          "label": "SLA-dashboard"
+        },
+        "2": {
+          "label": "KPI-baselines"
+        }
+      }
+    },
+    "caring_projects": {
+      "title": "Zorgprojecten & Gemeenschapsinitiatieven",
+      "summary": "Projecten zijn gestructureerde gemeenschapsinitiatieven die meerdere uitwisselingen rond een gedeeld doel groeperen — bijvoorbeeld \"Winterbuurtondersteuning 2025\" of \"Netwerk voor Mobiliteit van Ouderen\". Elk project heeft een urenbudget, een coördinator, start-/einddata en rapportagemijlpalen.",
+      "steps": {
+        "0": {
+          "label": "Maak een nieuw project",
+          "detail": "Klik op \"Nieuw Project\", geef het een naam en beschrijving, stel het urenbudget in, en wijs een hoofcoördinator toe."
+        },
+        "1": {
+          "label": "Voeg deelnemende leden toe",
+          "detail": "Gebruik de ledensuche om helpers en ontvangers toe te voegen. Leden kunnen zich ook zelf inschrijven als het project als open is gemarkeerd."
+        },
+        "2": {
+          "label": "Koppel uitwisselingen aan het project",
+          "detail": "Bij het maken of bewerken van een uitwisseling, gebruik de vervolgkeuzelijst \"Project\" om deze te koppelen. Alle gekoppelde uitwisselingen verschijnen in het voortgangsrapport van het project."
+        },
+        "3": {
+          "label": "Beoordeel voortgangsmijlpalen",
+          "detail": "De projectdetailpagina toont geleverde uren versus budget, actieve leden en een tijdlijn van voltooide uitwisselingen."
+        },
+        "4": {
+          "label": "Sluiten en rapporteren",
+          "detail": "Wanneer het project eindigt, gebruik 'Rapport Genereren' om een PDF-samenvatting te maken die geschikt is voor kantonnale belanghebbenden."
+        }
+      },
+      "tips": {
+        "0": "Projecten zonder uitwisselingen na 14 dagen worden gemarkeerd als \"Vastgelopen\" — overweeg of het doel goed begrepen wordt door de leden.",
+        "1": "Het uurbudget is een richtlijn, geen harde limiet. Je kunt meer uitgegeven worden; het systeem zal dit aangeven maar de uitwisselingen niet blokkeren.",
+        "2": "Voor projecten gefinancierd door subsidies, gebruik het veld \"Externe Referentie\" om de projectcode van de financier op te slaan."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Coördinatorworkflow"
+        },
+        "1": {
+          "label": "Gemeentelijke ROI"
+        }
+      }
+    },
+    "caring_trust_tier": {
+      "title": "Vertrouwensniveaus — Reputatieladder",
+      "summary": "Het Vertrouwensniveausysteem beoordeelt de betrouwbaarheid van leden op een vijf-niveauschaal: Nieuweling (0) → Lid (1) → Vertrouwd (2) → Geverifieerd (3) → Coördinator (4). Het niveau bepaalt wat een lid kan doen — bijvoorbeeld, alleen Vertrouwd+-leden kunnen een Warmtepas exporteren of intensieve zorguitwisselingen aangaan.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de verdeling van niveaus",
+          "detail": "Het samenvattende diagram toont hoeveel leden zich in elk niveau bevinden. Een gezonde coöperatie heeft de meeste leden op niveau 1–2."
+        },
+        "1": {
+          "label": "Beoordeling van lopende niveaubevorderingen",
+          "detail": "Leden die aan de criteria voor het volgende niveau hebben voldaan, verschijnen op de lijst \"Klaar om te bevorderen\". Beoordeel hun activiteit en keur goed of stel uit."
+        },
+        "2": {
+          "label": "Pas een niveau handmatig aan",
+          "detail": "Zoek het lid, klik op hun huidige tier-badge en selecteer het nieuwe tier. Schrijf een korte notitie waarin de aanpassing wordt uitgelegd — dit wordt gecontroleerd."
+        },
+        "3": {
+          "label": "Configureer tier-drempels",
+          "detail": "Pas onder \"Tier-instellingen\" het aantal voltooide uitwisselingen en de gemiddelde beoordelingsscore aan dat nodig is om elk tier te bereiken."
+        },
+        "4": {
+          "label": "Beoordeel kandidaten voor degradatie",
+          "detail": "Leden die zijn gemarkeerd vanwege langdurige inactiviteit of incidenten met betrekking tot bescherming kunnen ter beoordeling van het niveau worden voorgelegd. Controleer de context voordat u een verlaging doorvoert."
+        }
+      },
+      "tips": {
+        "0": "Niveau-promoties zijn standaard niet automatisch — een coördinator moet elke promotie goedkeuren. U kunt automatische promotie voor Niveau 0→1 inschakelen in de Instellingen voor Niveau.",
+        "1": "Leden kunnen hun numerieke niveauscore niet zien — ze zien in plaats daarvan een benoemd badge (bijv. \"Vertrouwd Lid\").",
+        "2": "Coördinatorniveau (4) zou zeldzaam moeten zijn en alleen gegeven worden aan mensen die bezig zijn met bescherming of waardevolle uitwisselingen."
+      },
+      "caution": "Het degraderen van een Vertrouwd lid (niveau 2→1) maakt hun Warmtepas op alle Caring Community coöperatieve locaties onmiddellijk ongeldig. Breng het lid op de hoogte voordat u degradeert.",
+      "related_paths": {
+        "0": {
+          "label": "Warmtepas"
+        },
+        "1": {
+          "label": "Bescherming"
+        }
+      }
+    },
+    "caring_warmth_pass": {
+      "title": "Warmtepas — Draagbare Vertrouwensreferentie",
+      "summary": "Het Warmtepas is een cryptografisch ondertekend bewijs dat een Trusted+-lid (niveau 2+) in staat stelt hun reputatie aan te tonen bij elke aangesloten Caring Community-coöperatie, niet alleen bij hun thuissgemeenschap. Het wordt hier uitgegeven en kan op elk moment worden ingetrokken.",
+      "steps": {
+        "0": {
+          "label": "Een Warmtepas uitgeven",
+          "detail": "Zoek het lid (moet Niveau 2+ zijn), klik op \"Warmtepas uitgeven\". Het systeem genereert een ondertekend QR-code token met een geldigheidsduur van 12 maanden."
+        },
+        "1": {
+          "label": "Stel de geldigheidsduur in",
+          "detail": "Standaard is 12 maanden. Je kunt dit verkorten naar 3 of 6 maanden voor leden met een proefpromotie."
+        },
+        "2": {
+          "label": "Intrekken van een pas",
+          "detail": "Klik op de actieve pas en vervolgens op \"Intrekken\". Intrekking wordt binnen enkele minuten via de federatiesynchronisatie doorgegeven aan alle Caring Community-federatiepartners."
+        },
+        "3": {
+          "label": "Bekijk het gebruik van de pas",
+          "detail": "Het auditlogboek toont wanneer en bij welke coöperatie een pas is gescand. Ongebruikelijke locatiepatronen zouden een beoordeling door een coördinator moeten triggeren."
+        }
+      },
+      "tips": {
+        "0": "Een lid kan slechts één actieve Warmth Pass tegelijk hebben. Het uitgeven van een nieuwe maakt de vorige ongeldig.",
+        "1": "Passen die aan leden zijn uitgegeven die vervolgens worden gedegradeerd tot onder Niveau 2, worden automatisch ingetrokken — u hoeft dit niet handmatig te doen.",
+        "2": "De toegang QR-code is beschikbaar in het profiel van het lid als een downloadbare PDF."
+      },
+      "caution": "Geef geen passen uit aan leden met onbehandelde meldingen van beveiligingsproblemen, ook niet als hun niveau technisch in aanmerking komt.",
+      "related_paths": {
+        "0": {
+          "label": "Vertrouwensniveaus"
+        },
+        "1": {
+          "label": "Partnercoöperaties"
+        }
+      }
+    },
+    "caring_safeguarding": {
+      "title": "Beveiliging — Incidentrapporten & SLA's",
+      "summary": "Deze pagina beheert alle meldingen van incidenten inzake bescherming die binnen uw coöperatie zijn ingediend. Meldingen worden ingedeeld op ernst: Kritiek (reageer binnen 1 uur), Hoog (24 uur), Gemiddeld (72 uur), Laag (volgende geplande vergadering). Coördinatoren moeten elke melding binnen de SLA-periode erkennen en afhandelen.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de wachtrij van openstaande incidenten",
+          "detail": "Meldingen zijn gesorteerd op ernst en verstreken tijd. Rode rijen overschrijden hun SLA of hebben dit gedaan."
+        },
+        "1": {
+          "label": "Erken een rapport",
+          "detail": "Klik op het rapport en vervolgens op \"Erkennen\" om de SLA-klok te stoppen en aan te geven dat een coördinator de verantwoordelijkheid heeft overgenomen."
+        },
+        "2": {
+          "label": "Noteer uw onderzoeksnotities",
+          "detail": "Gebruik het veld Notities om de genomen stappen, contactpersonen en resultaten vast te leggen. Notities zijn vertrouwelijk en niet zichtbaar voor leden."
+        },
+        "3": {
+          "label": "Naar externe instanties escaleren",
+          "detail": "Voor kritieke incidenten waarbij risico op schade bestaat, gebruik 'Extern escaleren' om te registreren dat u contact heeft opgenomen met wettelijke diensten (politie, maatschappelijk werk, enz.)."
+        },
+        "4": {
+          "label": "Sluit het rapport",
+          "detail": "Zodra het is opgelost, markeer het rapport als Gesloten met een samenvatting van de oplossing. Gesloten rapporten worden gearchiveerd maar nooit verwijderd."
+        }
+      },
+      "tips": {
+        "0": "Incidenten met kritieke ernst veroorzaken ook een onmiddellijke pushmelding naar alle leden op coördinatorniveau.",
+        "1": "Als je niet zeker bent over de ernst, ga standaard uit van Hoog — het is beter te veel te reageren dan een echt veiligheidsprobleem te missen.",
+        "2": "Alle incidentgegevens worden uitgesloten van het Publieke Impactrapport — het is alleen voor coördinatoren."
+      },
+      "caution": "Sluit een meldingsrapport over bescherming nooit zonder een schriftelijke samenvatting van de oplossing. Lege afsluitingen worden gemarkeerd in de gegevenskwaliteitsaudit.",
+      "related_paths": {
+        "0": {
+          "label": "SLA-dashboard"
+        },
+        "1": {
+          "label": "Gegevenskwaliteit"
+        }
+      }
+    },
+    "caring_category_coefficients": {
+      "title": "Categorie Substitutiecoëfficiënten",
+      "summary": "Elke zorgcategorie heeft een substitutiecoëfficiënt die gemeenschapsruiluren omzet in formele zorg-equivalenten. Een coëfficiënt van 1,0 betekent dat één uur gemeenschapszorg telt als gelijk aan één uur professionele zorg (CHF 35/uur). Intensieve persoonlijke zorg kan 2,0 zijn; licht sociaal contact kan 0,5 zijn.",
+      "steps": {
+        "0": {
+          "label": "Bestaande coëfficiënten herzien",
+          "detail": "De tabel toont elke actieve zorgcategorie met de huidige coëfficiënt en de datum waarop deze voor het laatst is overeengekomen met uw kantonale partner."
+        },
+        "1": {
+          "label": "Een coëfficiënt bewerken",
+          "detail": "Klik op het potloodpictogram naast de categorie, voer de nieuwe waarde in, voeg een verantwoordingsnotitie toe en sla op. De wijziging wordt gearchiveerd met versie."
+        },
+        "2": {
+          "label": "Een nieuwe categorie toevoegen",
+          "detail": "Gebruik \"Categorie Toevoegen\" om een nieuw zorgtype te creëren (bijv. \"Fysiotherapie Ondersteuning\") en wijs het een initiële coëfficiënt toe."
+        },
+        "3": {
+          "label": "Genereer een coëfficiëntrapport",
+          "detail": "Gebruik \"Exporteer PDF\" om een geformatteerd document te maken voor goedkeuring door uw kantonale partner, met een lijst van alle categorieën en hun bewijsbasis."
+        }
+      },
+      "tips": {
+        "0": "Coefficients boven 1,5 vereisen schriftelijke goedkeuring van uw kantonnale gezondheidspartner — documenteer dit in het veld voor rechtvaardiging.",
+        "1": "Het ROI-rapport vermenigvuldigt de daadwerkelijk geleverde uren met de coëfficiënt van elke categorie om de totale vermeden formele zorgkosten te berekenen.",
+        "2": "Beoordeel alle coëfficiënten minstens jaarlijks — de zorgpraktijkstandaarden veranderen en uw bewijsbasis moet actueel blijven."
+      },
+      "caution": "Het wijzigen van een coëfficiënt heeft onmiddellijk invloed op alle toekomstige ROI-berekeningen. Historische rapporten worden niet retroactief bijgewerkt — noteer de wijzigingsdatum bij het presenteren van gegevens over meerdere jaren.",
+      "related_paths": {
+        "0": {
+          "label": "Bedrijfsbeleid"
+        },
+        "1": {
+          "label": "Gemeentelijke ROI"
+        }
+      }
+    },
+    "caring_operating_policy": {
+      "title": "Bedrijfsbeleid — Parameters voor een zorgzame gemeenschap",
+      "summary": "Het Bedrijfsbeleid slaat de kern economische parameters op voor uw coöperatieve inzet: het formele zorg-uurloon in CHF, de kostencompensatie-multiplier, maximale uitwisselingsduurbeperkingen en andere globale beperkingen. Deze waarden vloeien door naar alle ROI- en impactberekeningen.",
+      "steps": {
+        "0": {
+          "label": "Stel het formele zorg-uurloon in",
+          "detail": "Voer het huidige tarief voor professionele zorg in CHF in (de Zwitserse standaard is CHF 35/uur). Pas aan voor uw regio of type zorg als uw kantonnaal akkoord dit anders specificeert."
+        },
+        "1": {
+          "label": "Stel de kostencompensatiemiddelingsfactor in",
+          "detail": "Deze factor past de gewogen uren volgens de coëfficiënt aan om administratie, vrijwilligerscoördinatie en overhead te dekken. Standaard is 0,8."
+        },
+        "2": {
+          "label": "Configureer de uitwisselinglimieten",
+          "detail": "Stel de maximale duur van een enkele uitwisseling in (bijv. 8 uur) en de minimale duur (bijv. 15 minuten). Uitwisselingen buiten deze limieten vereisen goedkeuring van de coördinator."
+        },
+        "3": {
+          "label": "Stel de ingangsdatum van het beleid in",
+          "detail": "Geef aan wanneer deze parameters van kracht worden. Wijzigingen worden versioneerd zodat historische rapporten nauwkeurig blijven."
+        },
+        "4": {
+          "label": "Publiceren en informeren",
+          "detail": "Gebruik \"Publicatiebeleid\" om de nieuwe waarden live te maken. Overweeg om coördinatoren via het aankondigingssysteem te informeren."
+        }
+      },
+      "tips": {
+        "0": "Stem alle parametrerewijzigingen af met uw kantonale partner voordat u publiceert — eenzijdige wijzigingen kunnen uw subsidie-rapportage ongeldig maken.",
+        "1": "De versiegeschiedenis van het beleid is volledig gecontroleerd — u kunt altijd bekijken welke parameters op een bepaalde datum van kracht waren."
+      },
+      "caution": "Het wijzigen van het uurtarief voor formele zorg halverwege de pilot zal alle toekomstige ROI-rapporten beïnvloeden. Stem dit eerst af met uw kantonnale partner en documenteer de reden voor de wijziging.",
+      "related_paths": {
+        "0": {
+          "label": "Categoriecoëfficiënten"
+        },
+        "1": {
+          "label": "Gemeentelijke ROI"
+        }
+      }
+    },
+    "caring_isolated_node": {
+      "title": "Geïsoleerde knoop — Data-soevereiniteitsmodus",
+      "summary": "De modus Geïsoleerde Knoop configureert deze implementatie om alle persoonlijke gegevens binnen een bepaald geografisch gebied op te slaan en schakelt de synchronisatie van federatiegegevens met externe Caring Community-coöperaties uit. Dit is vereist voor implementaties die moeten voldoen aan de Zwitserse FADP/nDSG (Federaal Wet op Gegevensbescherming).",
+      "steps": {
+        "0": {
+          "label": "Schakel de modus Geïsoleerde Knoop in",
+          "detail": "Schakel de hoofdschakelaar in. U wordt gevraagd om de geografische grens te bevestigen (bijv. \"Kanton Bern\") en de juridische basis voor de beperking."
+        },
+        "1": {
+          "label": "Configureer toegestane gegevensstromen",
+          "detail": "Sommige gegevensstromen (bijv. geanonimiseerde geaggregeerde statistieken voor het nationale dashboard) kunnen op de witte lijst worden gezet. Beoordeel elke stroom en keur deze goed of blokkeer deze."
+        },
+        "2": {
+          "label": "Schakel federatiesynchronisatie uit",
+          "detail": "Wanneer Isolated Node actief is, worden Warmth Pass-federatiesynchronisatie en peer-coöperatieve verbindingen opgeschort. Leden zullen een melding zien die dit uitlegt."
+        },
+        "3": {
+          "label": "Genereer een FADP-nalevingsrecord",
+          "detail": "Gebruik \"Genereer Nalevingsrapport\" om een record van gegevensgrenzen, bewaartermijnen en rechtsgrondslagen te produceren die geschikt is voor een FADP-audit."
+        }
+      },
+      "tips": {
+        "0": "De modus Geïsoleerde Node heeft geen invloed op lokale operaties — leden kunnen nog steeds uren uitwisselen, badges verdienen en alle functies binnen de coöperatie gebruiken.",
+        "1": "Als je niet zeker weet of je implementatie de modus Geïsoleerde Node nodig heeft, raadpleeg dan het technische team van Caring Community voordat je deze inschakelt."
+      },
+      "caution": "Het inschakelen van de modus Geïsoleerde Node verbreekt onmiddellijk de draagbaarheid van Warmth Pass voor alle leden. Stel de leden op de hoogte voordat je deze activeert.",
+      "related_paths": {
+        "0": {
+          "label": "Commerciële Grens"
+        },
+        "1": {
+          "label": "Openbaarmakingspakket"
+        },
+        "2": {
+          "label": "Partnercoöperaties"
+        }
+      }
+    },
+    "caring_commercial_boundary": {
+      "title": "Commerciële Grens — AGPL Mogelijkheidsclassificatie",
+      "summary": "Deze pagina classificeert elke platformcapaciteit volgens of deze wordt gedekt door de AGPL-3.0 open-sourcelicentie, per huurder configureerbaar is, een privé-implementatieovereenkomst vereist, of een commercieel add-on is. Gebruik dit als referentie bij het bespreken van licenties met partnergemeenten of coöperaties.",
+      "steps": {
+        "0": {
+          "label": "Blader door het capaciteitenregister",
+          "detail": "Elke functie wordt vermeld met zijn AGPL-classificatie (Openbaar / Huurderconfiguratie / Privé-implementatie / Commercieel) en een beschrijving in gewone taal."
+        },
+        "1": {
+          "label": "Filter op classificatie",
+          "detail": "Gebruik de filtertabs om alleen commerciële functies te bekijken, of alleen AGPL-openbare functies, afhankelijk van wat u moet communiceren."
+        },
+        "2": {
+          "label": "Exporteren voor partnerreferentie",
+          "detail": "Gebruik \"PDF exporteren\" om een geformatteerd document te maken dat u kunt delen met een gemeente of financier die moet begrijpen wat open-source is versus propriëtaire software."
+        }
+      },
+      "tips": {
+        "0": "AGPL-publieke functies moeten publiek beschikbaar blijven onder AGPL-3.0 — u mag de toegang daartoe bij enige implementatie niet beperken.",
+        "1": "Commerciële functies vereisen een aparte schriftelijke overeenkomst met Caring Community of de NEXUS-platformbeheerder."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Geïsoleerde Knoop"
+        },
+        "1": {
+          "label": "Openbaarmakingspakket"
+        }
+      }
+    },
+    "caring_disclosure_pack": {
+      "title": "FADP/nDSG Gegevensbescherming Openbaarmakingspakket",
+      "summary": "Het Openbaarmakingspakket verzamelt alle documentatie inzake gegevensbescherming die vereist is onder de Zwitserse FADP/nDSG: privacyverklaringen, gegevensverwerkingsovereenkomsten, bewaarschema's, lijsten van subverwerkers en het sjabloon voor recht-op-toegang-antwoorden. Genereer en controleer deze voordat uw coöperatie live gaat met persoonlijke gegevens.",
+      "steps": {
+        "0": {
+          "label": "Controleer automatisch ingevulde velden",
+          "detail": "Het systeem vult de naam van de organisatie, gegevens van de gegevensbeheerder en bewaartermijnen uit je Operationeel Beleid automatisch in. Controleer elk veld op juistheid."
+        },
+        "1": {
+          "label": "Voeg subverwerkers toe",
+          "detail": "Noteer alle derde-dienstverleners die ledengegevens verwerken (bijv. e-mailservice, hostingprovider). Elke subverwerker heeft een naam, locatie en rechtsgrond nodig."
+        },
+        "2": {
+          "label": "Stel bewaartermijnen in",
+          "detail": "Beoordeel de standaard bewaartermijnen voor elke datacategorie (bijv. uitwisselingsgegevens: 7 jaar voor financiële audit; beschermingsrapporten: 10 jaar). Pas aan als uw kantonnale regels anders zijn."
+        },
+        "3": {
+          "label": "Genereer het volledige pakket",
+          "detail": "Klik op \"Genereer Pakket\" om een ZIP met PDF-documenten te maken. Deel dit met uw functionaris gegevensbescherming (of kantonnale autoriteit) voor goedkeuring."
+        },
+        "4": {
+          "label": "Publiceer de privacyverklaring voor leden",
+          "detail": "Gebruik, zodra goedgekeurd, 'Privacyverklaring publiceren' om de verklaring beschikbaar te maken op de Privacybeleid-pagina van uw coöperatie."
+        }
+      },
+      "tips": {
+        "0": "Genereer het pakket opnieuw telkens wanneer u een nieuwe subverwerker toevoegt, bewaartermijnen wijzigt of de Isolated Node-modus inschakelt.",
+        "1": "Het pakket bevat een sjabloon voor een recht-op-toegang reactie — gebruik dit wanneer een lid zijn of haar gegevens opvraagt op grond van Artikel 25 nDSG."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Geïsoleerde Knoop"
+        },
+        "1": {
+          "label": "Commerciële Grens"
+        }
+      }
+    },
+    "caring_municipal_roi": {
+      "title": "Gemeentelijk/Kantonnaal ROI-rapport",
+      "summary": "Genereert een formeel rapport over kostenvermijding voor kantonnale belanghebbenden, waarin wordt getoond hoeveel uren professionele zorg zijn vervangen door gemeenschapsuitwisselingen, uitgedrukt in CHF. Dit is het belangrijkste financiële bewijsdocument voor subsidieverlengen en gemeentelijke samenwerkingsovereenkomsten.",
+      "steps": {
+        "0": {
+          "label": "Selecteer de rapportageperiode",
+          "detail": "Kies begin- en einddatum. Typische perioden zijn driemaandelijks of jaarlijks, afgestemd op uw subsidie-rapportagecyclus."
+        },
+        "1": {
+          "label": "Kies de publieksmodus",
+          "detail": "De kantonmodus toont cijfers van kostvermijding per kanton. De gemeentemodus richt zich op lokale partnerschapsresultaten. De coöperatieve modus toont wederkerigheid- en retentiemaatstaven."
+        },
+        "2": {
+          "label": "Beoordeel de waarschuwing over de gegevenskwaliteit",
+          "detail": "Als de score voor gegevenskwaliteit lager is dan 80%, verschijnt er een waarschuwing. Beoordeel de pagina Gegevenskwaliteit voordat u een formeel rapport genereert."
+        },
+        "3": {
+          "label": "Genereer het rapport",
+          "detail": "Klik op \"Rapport genereren\". Het systeem berekent: totaal uitwisselingsuren × coëfficiënt per categorie × uurloon voor formele zorg (standaard CHF 35)."
+        },
+        "4": {
+          "label": "Exporteren en verspreiden",
+          "detail": "Download als PDF (geformatteerd voor officieel gebruik) of CSV (voor kantonnale financiële teams die ruwe gegevens nodig hebben)."
+        }
+      },
+      "tips": {
+        "0": "Vergrendel de parameters van het operationeel beleid voordat u een rapport genereert dat u officieel zult indienen — wijzigingen achteraf maken de cijfers inconsistent.",
+        "1": "Voeg de KPI-baseline momentopname toe naast het ROI-rapport om context te geven: hoe hebben deelname, kwaliteit van leven en kostenvermijding zich in de loop der tijd ontwikkeld?",
+        "2": "Voer eerst de controle van de datakwaliteit uit — een rapport met gemarkeerde hiaten zal de geloofwaardigheid bij de kantonnale partners ondermijnen."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Categoriecoëfficiënten"
+        },
+        "1": {
+          "label": "Bedrijfsbeleid"
+        },
+        "2": {
+          "label": "KPI-baselines"
+        },
+        "3": {
+          "label": "Gegevenskwaliteit"
+        }
+      }
+    },
+    "caring_municipal_impact": {
+      "title": "Bewijspakket voor gemeentelijke impact",
+      "summary": "Een interactief bewijsscherm voor gemeentelijke partners, met drie publieksmodi — Canton (focus op kostenvermijding), Gemeente (focus op lokale partners) en Coöperatie (focus op wederkerigheid van leden). Elke modus toont verschillende statistieken en visualisaties die geschikt zijn voor dat publiek.",
+      "steps": {
+        "0": {
+          "label": "Selecteer publieksmodus",
+          "detail": "Gebruik de moduskiezer bovenaan: Canton voor cantonale financiën/gezondheidsafdelingen, Gemeente voor lokale raadsledenpartners, Coöperatie voor uw eigen bestuur."
+        },
+        "1": {
+          "label": "Beoordeel de belangrijkste cijfers",
+          "detail": "Elke modus belicht zijn meest relevante cijfers: Kanton ziet CHF kostenvermijding; Gemeente ziet actieve leden en uitwisselingsfrequentie; Coöperatie ziet retentie- en wederkerigheidspercentages."
+        },
+        "2": {
+          "label": "Diep in de visualisaties",
+          "detail": "Grafieken zijn interactief — zweef voor tooltips, klik om te filteren op tijdsperiode, categorie of subregio."
+        },
+        "3": {
+          "label": "Exporteer een printpakket",
+          "detail": "Gebruik \"Exporteren voor presentatie\" om een PDF klaar voor dia's te maken met de belangrijkste grafieken en kerncijfers voor je publieksmodus."
+        }
+      },
+      "tips": {
+        "0": "De Canton-publieksmodus is direct gekoppeld aan de cijfers uit het gemeentelijk ROI-rapport — ze moeten consistent zijn.",
+        "1": "Voor een raadsvoorstelling, schakel over naar de gemeentemodus en richt je op de sectie \"Ledenverhalen\", die geanonimiseerde succesverhalen toont."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Gemeentelijke ROI"
+        },
+        "1": {
+          "label": "Succesverhalen"
+        },
+        "2": {
+          "label": "KPI-baselines"
+        }
+      }
+    },
+    "caring_kpi_baselines": {
+      "title": "KPI-basislijnen — Meting van impact voor/na",
+      "summary": "KPI-baselinewaarden leggen een momentopname vast van belangrijke indicatoren voor de gezondheid van de gemeenschap op een bepaald tijdstip (meestal bij de lancering van een pilot). Latere momentopnames worden vergeleken met de baseline om veranderingen te meten — bijvoorbeeld een daling van 15% in gemelde eenzaamheid of een toename van 20% in sociale contacten.",
+      "steps": {
+        "0": {
+          "label": "Maak de lanceringsbaseline",
+          "detail": "Voordat uw pilot live gaat, klik op \"Creëer Baseline Snapshot\". Dit vergrendelt de huidige waarden voor alle KPI-dimensies (eenzaamheid index, actieve leden, uitwisselingen/week, enz.)."
+        },
+        "1": {
+          "label": "Neem een vergelijking snapshot op",
+          "detail": "Bij elke rapportagemijlpaal (3 maanden, 6 maanden, 12 maanden), maak een nieuwe snapshot. Het systeem berekent automatisch het procentuele verschil ten opzichte van de baseline."
+        },
+        "2": {
+          "label": "Voeg op enquêtes gebaseerde metrics toe",
+          "detail": "Voor KPI's die afkomstig zijn uit ledenenquêtes (bijv. zelfgerapporteerde welzijnsscore), gebruik de handmatige invoervelden om de resultaten in te voeren."
+        },
+        "3": {
+          "label": "Bekijk het veranderdashboard",
+          "detail": "De naast elkaar geplaatste vergelijkingstabel toont elke KPI, de basiswaarde, de huidige waarde en de richting van de trend (positief/negatief)."
+        },
+        "4": {
+          "label": "Opnemen in rapporten",
+          "detail": "Het Impact Evidence Pack en het Municipal ROI Report kunnen beide de basislijnvergelijking bevatten. Gebruik \"Link naar Impact Pack\" om het op te nemen."
+        }
+      },
+      "tips": {
+        "0": "Maak de lancering basislijn aan voordat je leden inschrijft — een basislijn die wordt genomen nadat leden zich hebben aangemeld is geen echte pre-lanceringsmeting.",
+        "1": "Voor eenzaamheid- en welzijn-KPI's, gebruik een gevestigde gevalideerde schaal (bijv. UCLA Eenzaamheidsschaal, ONS Welzijn) voor geloofwaardigheid bij academische of gezondheidspartners."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Gemeentelijke ROI"
+        },
+        "1": {
+          "label": "Pilot Scorebord"
+        }
+      }
+    },
+    "caring_sla_dashboard": {
+      "title": "Dashboard voor het bijhouden van SLA-hulpverzoeken",
+      "summary": "Houdt alle open helpaanvragen bij in relatie tot hun SLA-verplichting volgens het Operationeel Beleid: Kritiek (1 uur), Hoog (24 uur), Midden (72 uur), Laag (volgende geplande vergadering). Kleurcodering in één oogopslag toont naleving in real-time.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de SLA-samenvattingskaarten",
+          "detail": "De vier kaarten bovenaan tonen hoeveel aanvragen zich in elk ernstniveau bevinden en welk percentage binnen de SLA valt. Rood = overschreden; amber = binnen 20% van de deadline."
+        },
+        "1": {
+          "label": "Filter op achterstallige verzoeken",
+          "detail": "Klik op \"Alleen achterstallig\" om alleen verzoeken te zien die hun SLA al hebben overschreden. Deze hebben onmiddellijke aandacht nodig."
+        },
+        "2": {
+          "label": "Toewijzen of opnieuw toewijzen",
+          "detail": "Klik op een verzoek om het detailpaneel te openen. Gebruik \"Toewijzen aan coördinator\" om verantwoordelijkheid toe te wijzen. De toegewezen persoon ontvangt een melding in de app."
+        },
+        "3": {
+          "label": "Sluimer met rechtvaardiging",
+          "detail": "Als een verzoek nog niet kan worden uitgevoerd (bijv. wachten op externe informatie), gebruik 'Sluimer' en schrijf een reden. Gesluimerde verzoeken pauzeren tijdelijk de SLA-klok."
+        },
+        "4": {
+          "label": "Exporteer nalevingsrapport",
+          "detail": "Genereer een wekelijkse SLA-nalevings-CSV voor uw kwaliteitsbeheerregistraties."
+        }
+      },
+      "tips": {
+        "0": "Het SLA-dashboard verversen elke 60 seconden — je hoeft het niet handmatig opnieuw te laden.",
+        "1": "Periodes met veel volume (winter, evenementen) veroorzaken vaak SLA-druk. Gebruik Smart Nudges om hulpverleners preventief te activeren voordat verzoeken zich opstapelen."
+      },
+      "caution": "Uitgestelde verzoeken verschijnen nog steeds in het nalevingsrapport. Frequent uitstellen van Kritieke verzoeken wordt gemarkeerd in de gegevenskwaliteitsaudit.",
+      "related_paths": {
+        "0": {
+          "label": "Bescherming"
+        },
+        "1": {
+          "label": "Slimme duwtjes"
+        },
+        "2": {
+          "label": "Bedrijfsbeleid"
+        }
+      }
+    },
+    "caring_data_quality": {
+      "title": "Gegevenskwaliteitscontroles",
+      "summary": "Voert geautomatiseerde controles uit op de gegevens van uw coöperatie en rapporteert problemen op basis van ernst: Kritiek (blokkeert rapportage), Hoog (vermindert de nauwkeurigheid van rapporten), Middel (advies), Laag (cosmetisch). Los Kritieke en Hoge problemen op voordat u een rapport genereert voor externe belanghebbenden.",
+      "steps": {
+        "0": {
+          "label": "Voer een volledige kwaliteitscontrole uit",
+          "detail": "Klik op \"Controleer nu\". De scan duurt meestal 30–60 seconden. Resultaten worden 6 uur opgeslagen — voer opnieuw uit als u aanzienlijke gegevenswijzigingen hebt doorgevoerd."
+        },
+        "1": {
+          "label": "Beoordeel eerst Kritieke problemen",
+          "detail": "Kritieke problemen (rood) moeten worden opgelost voordat gemeentelijke rapporten worden gegenereerd. Klik op elk probleem voor een beschrijving van het probleem en een directe link om het op te lossen."
+        },
+        "2": {
+          "label": "Werk de Hoge en Middelmatige problemen door",
+          "detail": "Hoge kwesties (oranje) beïnvloeden de nauwkeurigheid van ROI-berekeningen. Middelmatige kwesties (geel) zijn adviserend — los ze op wanneer het uitkomt."
+        },
+        "3": {
+          "label": "Markeer valse positieven",
+          "detail": "Als een gemarkeerde kwestie eigenlijk geen probleem is (bijv. een lid heeft terecht geen e-mailadres), gebruik dan \"Markeren als erkend\" met een reden. Dit schakelt de markering uit."
+        },
+        "4": {
+          "label": "Volg de kwaliteitscore in de loop van de tijd",
+          "detail": "De grafiek met trends van de kwaliteitscore (0–100) helpt je te identificeren of de datakwaliteit verbetert nadat je problemen hebt aangepakt."
+        }
+      },
+      "tips": {
+        "0": "Voer de kwaliteitscontrole uit als onderdeel van je maandelijkse coördinatorroutine, niet alleen voordat je rapporten genereert.",
+        "1": "Ontbrekende samenvattingen van de bescherming worden altijd als Kritiek gemarkeerd — zie de pagina Bescherming om ze toe te voegen."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Gemeentelijke ROI"
+        },
+        "1": {
+          "label": "Bescherming"
+        }
+      }
+    },
+    "caring_launch_readiness": {
+      "title": "Klaar voor Pilootlancering Gate",
+      "summary": "Een afgebakende checklist van criteria die allemaal moeten slagen voordat uw pilot als klaar wordt beschouwd om live te gaan. De gereedheid wordt geëvalueerd op vier signaalgebieden: afstemming op gemeentelijke waarde, deelname van de gemeenschap, partnernetwerk en lokale uitwisselingscapaciteit. Alles moet groen zijn voordat de lancering plaatsvindt.",
+      "steps": {
+        "0": {
+          "label": "Beoordeel de vier gereedheidssignalen",
+          "detail": "Gemeentelijke Waarde, Participatie, Partnernetwerk en Lokale Uitwisseling worden elk gescoord van 0–100. Alle vier moeten hun geconfigureerde drempelwaarde bereiken (standaard 70) voordat de poort opent."
+        },
+        "1": {
+          "label": "Diep in de falende signalen",
+          "detail": "Klik op een amber- of roodsignaalkaart om de specifieke subcriteria te zien die nog niet zijn gehaald, met uitvoerbare richtlijnen over hoe elk aan te pakken."
+        },
+        "2": {
+          "label": "Ondersteunend bewijs uploaden",
+          "detail": "Sommige criteria vereisen het uploaden van bewijs (bijv. een ondertekende gemeentelijke partnerschapsbrief, of een ingevulde nulmeting). Gebruik de uploadknop bij het betreffende criterium."
+        },
+        "3": {
+          "label": "Vraag een beoordeling door een coördinator aan",
+          "detail": "Wanneer u van mening bent dat aan alle criteria is voldaan, gebruikt u \"Beoordeling aanvragen\" om een senior coördinator of nationale vertegenwoordiger van Caring Community te informeren om de gereedheidsfase te valideren."
+        },
+        "4": {
+          "label": "Ontgrendel de live-implementatie",
+          "detail": "Wanneer de beoordeling alle criteria goedkeurt, wordt de knop \"Live gaan\" beschikbaar. Hierdoor wordt de Caring Community-module voor leden ingeschakeld."
+        }
+      },
+      "tips": {
+        "0": "Je kunt aan criteria werken in willekeurige volgorde — er is geen verplichte volgorde.",
+        "1": "Bewijsmateriaaldocumenten worden veilig opgeslagen en zijn toegankelijk voor Caring Community nationaal voor hun administratie.",
+        "2": "De gereedheidspoort kan te allen tijde opnieuw worden geëvalueerd — als de omstandigheden veranderen (bijv. als een gemeentelijke partner zich terugtrekt), wordt de status van de poort automatisch bijgewerkt."
+      },
+      "caution": "Probeer de gereedheidspoort niet handmatig te omzeilen. Lanceren zonder dat aan alle criteria is voldaan, brengt het risico van een slechte ledenervaring met zich mee en ondermijnt de verantwoording van subsidies.",
+      "related_paths": {
+        "0": {
+          "label": "Pilot Scorebord"
+        },
+        "1": {
+          "label": "KPI-baselines"
+        },
+        "2": {
+          "label": "Bedrijfsbeleid"
+        }
+      }
+    },
+    "caring_pilot_scoreboard": {
+      "title": "Scorebord voor de Caring Community Pilot",
+      "summary": "De live scorekaart voor uw Caring Community-pilot, die de voortgang bijhoudt volgens de metrics van de Caring Community-methodologie. Metrics omvatten uitwisselingsvolume, ledenretentie, wederkerigheidsratio (helpers die ook ontvangers zijn), reactietijd van coördinatoren en nalevingspercentage voor bescherming.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de belangrijkste score",
+          "detail": "De algemene pilotscore (0–100) is een samenstelling van alle methodologiemetingen. Streef naar 75+ om in aanmerking te komen voor de erkenning 'Established Cooperative' van Caring Community."
+        },
+        "1": {
+          "label": "Begrijp individuele meetscores",
+          "detail": "Elke metriek heeft een streefbereik dat is gedefinieerd in het Bedrijfsbeleid. Groen = op doel; amber = binnen 10% van het doel; rood = onder de drempel."
+        },
+        "2": {
+          "label": "Vergelijk met de benchmark van Caring Community",
+          "detail": "Schakel \"Toon Zorgzame Gemeenschapsbenchmark\" in om de geanonimiseerde mediaanscores van alle Zorgzame Gemeenschap coöperaties te tonen. Dit laat zien hoe je in vergelijking met je collega's staat."
+        },
+        "3": {
+          "label": "Download het methodologierapport",
+          "detail": "Genereer een methodologierapport in het format van de Zorgzame Gemeenschap voor indiening bij Zorgzame Gemeenschap tijdens je kwartaalbeoordeling."
+        }
+      },
+      "tips": {
+        "0": "De wederkerigheidsratio (het aandeel leden dat GEEFT EN ONTVANGT) is de belangrijkste enkele maatstaf voor Caring Community-accreditatie — streef naar 60%+.",
+        "1": "Een lage score voor reactietijd van de coördinator duidt bijna altijd op het schenden van de SLA — controleer het SLA-dashboard voor de oorzaak."
+      },
+      "related_paths": {
+        "0": {
+          "label": "KPI-baselines"
+        },
+        "1": {
+          "label": "SLA-dashboard"
+        },
+        "2": {
+          "label": "Lancering Gereedheid"
+        }
+      }
+    },
+    "caring_nudges": {
+      "title": "Slimme Sturing — Geautomatiseerde Betrokkenheid",
+      "summary": "Slimme Nudges zijn geautomatiseerde, gepersonaliseerde berichten die worden gestuurd naar inactieve of risicovolle leden om hen opnieuw te betrekken. Regels worden gedefinieerd op basis van inactiviteitsdrempel, vertrouwensniveau van het lid en zorgcategorie. Alle nudges worden vooraf bekeken voordat ze live gaan.",
+      "steps": {
+        "0": {
+          "label": "Maak een nudge-regel",
+          "detail": "Klik op \"Nieuwe Nudge\". Stel de trigger in (bijv. \"lid heeft 14 dagen niet ingelogd\"), het doelsegment (bijv. Tier 1+ leden in de Transportcategorie) en het kanaal (e-mail / in-app)."
+        },
+        "1": {
+          "label": "Schrijf het aanmoedigingsbericht",
+          "detail": "Gebruik de Communication Copilot-assistent om een warme, persoonlijke boodschap op te stellen. De voornaam van het lid wordt altijd automatisch ingevoegd."
+        },
+        "2": {
+          "label": "Stel het verzendschema in",
+          "detail": "Kies wanneer aanmoedigingen kunnen worden verzonden (bijv. alleen op weekdagen van 9.00–18.00 uur) en de maximale frequentie (bijv. niet meer dan één keer per week per lid)."
+        },
+        "3": {
+          "label": "Voorbeeld en activeren",
+          "detail": "Bekijk de voorbeeldlijst van leden die momenteel de aanmoediging zouden ontvangen. Als het aantal redelijk is, schakel de regel in op Actief."
+        },
+        "4": {
+          "label": "Bekijk de prestaties van de aanmoediging",
+          "detail": "Het analyspanel toont het openingspercentage, doorklikpercentage en herbetrokkenheidspercentage (leden die binnen 7 dagen na de aanmoediging een ruil hebben voltooid)."
+        }
+      },
+      "tips": {
+        "0": "Begin met een lage frequentie — één duwtje per veertien dagen is meestal voldoende. Teveel duwtjes leiden tot uitschrijvingen.",
+        "1": "Duwtjes zijn het meest effectief voor Tier 0–1 leden die hun eerste uitwisseling nog niet hebben voltooid.",
+        "2": "Gebruik nooit duwtjes voor het opvolgen van veiligheid — gebruik daarvoor de module Veiligheid."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Communicatie Copilot"
+        },
+        "1": {
+          "label": "SLA-dashboard"
+        }
+      }
+    },
+    "caring_emergency_alerts": {
+      "title": "Noodmeldingen — Uitzenden naar alle leden",
+      "summary": "Stuur onmiddellijke, hoog-prioritaire meldingen naar alle leden van uw coöperatie. Gebruik dit alleen voor echte noodsituaties: zwaar weer dat reizen naar uitwisselingen beïnvloedt, het beschermen van publieke mededelingen, of dringend gemeenschapsgezondheidsadvies. Alle meldingen worden geregistreerd en van een tijdstempel voorzien.",
+      "steps": {
+        "0": {
+          "label": "Kies het type melding",
+          "detail": "Selecteer uit: Veiligheidswaarschuwing, Weeralarm, Onderbreking van de Dienst of Algemene Noodsituatie. Het type bepaalt de visuele stijl en de urgentie van de pushmelding."
+        },
+        "1": {
+          "label": "Schrijf het waarschuwingbericht",
+          "detail": "Houd het kort (minder dan 160 tekens voor SMS-compatibiliteit). Geef aan wat de situatie is, wat leden moeten doen en wanneer je een update zult geven."
+        },
+        "2": {
+          "label": "Selecteer de leveringskanalen",
+          "detail": "Kies: In-App Banner, E-mail, Pushmelding of Alle kanalen. Push is onmiddellijk; e-mail kan tot 5 minuten duren."
+        },
+        "3": {
+          "label": "Stel een vervaltijd in",
+          "detail": "Meldingen vervallen automatisch na de tijd die je instelt (standaard 24 uur). Verlopen meldingen worden automatisch van de schermen van leden verwijderd."
+        },
+        "4": {
+          "label": "Verzenden en volgen",
+          "detail": "Klik op \"Waarschuwing Verzenden\". Het leveringsdashboard toont verzend-/leespercentages in realtime. Plaats een \"Alles Klaar\"-bericht als vervolg wanneer de situatie is opgelost."
+        }
+      },
+      "tips": {
+        "0": "Test het waarschuwingssysteem maandelijks met een \"Testmodus\"-waarschuwing (zichtbaar alleen voor leden op coördinatorniveau) om te verifiëren dat alle kanalen werken.",
+        "1": "Als de waarschuwing slechts een deel van uw gemeenschap betreft, gebruik dan Subregio's om ontvangers te filteren in plaats van naar iedereen te sturen."
+      },
+      "caution": "Gebruik geen Noodmeldingen voor routinematige communicatie. Alertmoeheid zal ervoor zorgen dat leden toekomstige echte meldingen negeren.",
+      "related_paths": {
+        "0": {
+          "label": "Deelregio's"
+        },
+        "1": {
+          "label": "Communicatie Copilot"
+        }
+      }
+    },
+    "caring_surveys": {
+      "title": "Gemeente-enquêtes",
+      "summary": "Maak en verspreid enquêtes naar uw gemeentelijke contactpersonen — raadsfunctionarissen, medewerkers van de gezondheidsafdeling en financieringsinstanties. Enquêtes kunnen worden gebruikt om behoeftenbeoordelingen, tevredenheidsfeedback of bewijs voor subsidie-rapportage te verzamelen.",
+      "steps": {
+        "0": {
+          "label": "Maak een nieuwe enquête",
+          "detail": "Klik op \"Nieuwe enquête\". Kies uit vraagtypes: meerkeuze, beoordelingsschaal (1–5 of 1–10), open tekst en ja/nee."
+        },
+        "1": {
+          "label": "Voeg ontvangers toe vanuit uw gemeentelijke contactlijst",
+          "detail": "De ontvangerkiezer haalt gegevens uit uw Lead Nurture-contactlijst. Filter op functie (bijvoorbeeld \"Kantonale gezondheidsfunctionaris\") of organisatie."
+        },
+        "2": {
+          "label": "Planning of onmiddellijk verzenden",
+          "detail": "Enquêtes kunnen direct worden verzonden of worden gepland voor een specifieke datum (bijv. voorafgaand aan een kwartaalbeoordelingsvergadering)."
+        },
+        "3": {
+          "label": "Analyseer reacties",
+          "detail": "Het resultatendashboard toont responspercentages, gezamenlijke scores en letterlijk weergegeven open-tekstantwoorden. Filter op rol van respondent of organisatie."
+        },
+        "4": {
+          "label": "Exporteren voor rapporten",
+          "detail": "Gebruik \"CSV exporteren\" voor ruwe data of \"Samenvatting PDF exporteren\" voor een geformatteerde samenvatting die geschikt is voor opname in uw impactdocumentatie."
+        }
+      },
+      "tips": {
+        "0": "Houd enquêtes kort (5 vragen of minder). Gemeentelijke contacten zijn druk — korte enquêtes behalen aanzienlijk hogere invulpercentages.",
+        "1": "Volg niet-reageerders één keer op na 7 dagen met een geautomatiseerde herinnering. Stuur niet meer dan één herinnering."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Leid nurture"
+        },
+        "1": {
+          "label": "Gemeentelijke Impact"
+        }
+      }
+    },
+    "caring_copilot": {
+      "title": "Communicatie Copilot — AI-ondersteund Opstellen",
+      "summary": "Een AI-schrijfassistent getraind op de communicatie standaarden van de Caring Community. Plak een ruwe schets en de Copilot levert een gepolijste versie in een warme, inclusieve toon die geschikt is voor tijdbankgemeenschappen. Je bekijkt en bewerkt deze voordat je hem verzendt.",
+      "steps": {
+        "0": {
+          "label": "Kies het communicatietype",
+          "detail": "Selecteer uit: Aankondiging voor leden, Welkomstmail, Samenvatting van impactrapport, Update voor gemeentelijke partners, of Vrije vorm concept."
+        },
+        "1": {
+          "label": "Beschrijf wat u wilt zeggen",
+          "detail": "Schrijf 1–3 zinnen waarin de belangrijkste punten worden beschreven. Bijvoorbeeld: \"We hebben in maart 120 uitwisselingen gehouden. De eenzaamheidscores verbeterden met 12%. Bedank de leden voor hun bijdrage.\""
+        },
+        "2": {
+          "label": "Genereer en bekijk het concept",
+          "detail": "Klik op \"Concept genereren\". Lees de output zorgvuldig door — AI-concepten kunnen onjuistheden bevatten. Corrigeer eventuele cijfers of namen voordat u ze gebruikt."
+        },
+        "3": {
+          "label": "Pas toon en lengte aan",
+          "detail": "Gebruik de schuifregelaars om de formaliteit (informeel ↔ formeel) en lengte (kort ↔ gedetailleerd) aan te passen. Genereer opnieuw totdat je tevreden bent."
+        },
+        "4": {
+          "label": "Kopieer naar je verzendtool",
+          "detail": "Gebruik 'Kopieer naar klembord' en plak in je e-mailclient, aankondigingsmaker of nieuwsbrief-editor."
+        }
+      },
+      "tips": {
+        "0": "De Copilot werkt het beste met specifieke invoer — vage prompts leveren generieke concepten op. Geef het echte cijfers en benoemde uitkomsten.",
+        "1": "Controleer altijd de feiten van door AI gegenereerde tekst. De Copilot heeft geen toegang tot live gegevens — het schrijft op basis van wat je het vertelt."
+      },
+      "caution": "Stuur nooit een Copilot-concept naar externe belanghebbenden (kanton, media, financiers) zonder menselijke controle. AI kan cijfers verkeerd weergeven of ongeschikte bewoordingen gebruiken voor formele contexten.",
+      "related_paths": {
+        "0": {
+          "label": "Slimme duwtjes"
+        },
+        "1": {
+          "label": "Noodmeldingen"
+        },
+        "2": {
+          "label": "Burgerlijk overzicht"
+        }
+      }
+    },
+    "caring_civic_digest": {
+      "title": "Civic Digest — Gepersonaliseerde instellingen voor ledenoverzicht",
+      "summary": "De Civic Digest is een gepersonaliseerde samenvattings-e-mail die naar elk lid wordt gestuurd op basis van hun interesses, activiteit en rol in de gemeenschap. Op deze pagina kunnen de globale instellingen van de digest worden beheerd: frequentie-opties, inhoudmodules om op te nemen, en welke ledensegmenten welk type digest ontvangen.",
+      "steps": {
+        "0": {
+          "label": "Stel beschikbare samenvattingsfrequenties in",
+          "detail": "Kies welke frequenties leden kunnen kiezen: Dagelijks, Wekelijks, Tweewekelijks, Maandelijks, of Nooit. De standaard voor nieuwe leden is Wekelijks."
+        },
+        "1": {
+          "label": "Configureer inhoudsmodules van de samenvatting",
+          "detail": "Schakel in welke inhoudsblokken verschijnen: Aankomende Evenementen, Open Hulpverzoeken, Nieuwe Leden om te Verwachten, Mijn Uitwisselingssamenvatting, Hoogtepunten van het Pilot Scorebord, enz."
+        },
+        "2": {
+          "label": "Stel segment-specifieke regels in",
+          "detail": "Coördinatoren kunnen een verrijkte samenvatting ontvangen met SLA-status en waarschuwingen over datakwaliteit. Stel dit in onder \"Coördinator Samenvatting Add-ons\"."
+        },
+        "3": {
+          "label": "Bekijk de samenvatting",
+          "detail": "Klik op \"Bekijk\" om een voorbeeld van de samenvatting te zien voor een testledenprofiel. Controleer lay-out, links en inhoudsvolgorde."
+        },
+        "4": {
+          "label": "Verzend een eenmalige samenvatting",
+          "detail": "Gebruik \"Nu verzenden\" om een samenvatting buiten het normale schema te versturen — handig voor het starten van een campagne of het delen van een belangrijke mijlpaal."
+        }
+      },
+      "tips": {
+        "0": "Leden met \"Nooit\" geselecteerd ontvangen nog steeds Noodmeldingen — de voorkeur voor samenvattingen beïnvloedt geen kritieke communicatie.",
+        "1": "Wekelijkse samenvattingen die op dinsdag- of woensdagochtenden worden verzonden, hebben doorgaans de hoogste open rates op communityplatforms."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Slimme duwtjes"
+        },
+        "1": {
+          "label": "Communicatie Copilot"
+        }
+      }
+    },
+    "caring_lead_nurture": {
+      "title": "Lead Nurture — Gemeentelijk Contact CRM",
+      "summary": "Een lichtgewicht contactbeheersysteem voor het bijhouden van gesprekken met potentiële pilotgemeentelijke contacten — lokale raadsleden, medewerkers van de gezondheidsafdeling, kantonnale medewerkers en gemeenschapsfondsen. Houd de fase van de aanvraag, de laatste contactdatum en de volgende actie voor elke lead bij.",
+      "steps": {
+        "0": {
+          "label": "Een contact toevoegen",
+          "detail": "Klik op \"Nieuw contact\". Voer naam, rol, organisatie, e-mail en het kanton of de gemeente die ze vertegenwoordigen in."
+        },
+        "1": {
+          "label": "Stel de vraagfase in",
+          "detail": "Kies de pijplijnfase: Prospect → Eerste contact → Geïnteresseerd → Voorstel verzonden → Pilot afgesproken → Onboarded → Afgewezen. Verplaats de fase naarmate de gesprekken vorderen."
+        },
+        "2": {
+          "label": "Een contactnotitie registreren",
+          "detail": "Voeg na elk contactmoment (e-mail, telefoongesprek, vergadering) een notitie toe met de datum, wat is besproken, en de afgesproken volgende actie. Notities zijn privé voor coördinatoren."
+        },
+        "3": {
+          "label": "Stel een opvolgingsherinnering in",
+          "detail": "Gebruik \"Herinnering instellen\" om een taak aan te maken die op een gekozen datum in je coördinatordashboard verschijnt."
+        },
+        "4": {
+          "label": "Koppelen aan een huurder",
+          "detail": "Zodra een gemeente instemt met een pilot, gebruik \"Koppelen aan huurder\" om het contact te koppelen aan de nieuwe NEXUS-huurder die voor hen wordt aangemaakt."
+        }
+      },
+      "tips": {
+        "0": "Houd aantekeningen kort maar specifiek — \"Maria gebeld, zij zal het voorstel tegen vrijdag 14 feb bekijken\" is nuttiger dan \"Contact gebeld\".",
+        "1": "Contacten die al 60+ dagen in dezelfde pijplijnfase zitten, worden gemarkeerd — overweeg of ze een andere aanpak nodig hebben of naar Afgewezen moeten worden verplaatst."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Gemeente-enquêtes"
+        },
+        "1": {
+          "label": "Pilotvragen"
+        }
+      }
+    },
+    "caring_success_stories": {
+      "title": "Succesverhalen — Impactbewijskaarten",
+      "summary": "Verzamel en beheer korte anonieme verhalen van leden over het verschil dat zorgzame uitwisselingen in hun leven hebben gemaakt. Verhalen worden gebruikt in impactrapporten, gemeentelijke presentaties en het voor het publiek bestemde Impact Evidence Pack.",
+      "steps": {
+        "0": {
+          "label": "Verzamel een verhaal",
+          "detail": "Klik op \"Nieuw Verhaal\". Voer de pseudoniem van het lid in (nooit hun echte naam in openbare materialen), het type uitwisseling, het resultaat en een directe quote (met toestemming genoteerd)."
+        },
+        "1": {
+          "label": "Tag op impactcategorie",
+          "detail": "Tag elk verhaal met de relevante impactthema's: Verminderde Eenzaamheid, Verbeterde Mobiliteit, Praktische Ondersteuning, Intergenerationele Verbinding, enz. Deze sturen de filtering in rapporten."
+        },
+        "2": {
+          "label": "Markeer toestemmingsstatus",
+          "detail": "Elk verhaal moet een toestemmingsrecord hebben voordat het kan worden gepubliceerd. Vink \"Mondelinge Toestemming Verkregen\" aan of upload een schriftelijke toestemmingsformulier."
+        },
+        "3": {
+          "label": "Beoordelen en publiceren",
+          "detail": "Gebruik \"Publiceren naar Impact Pack\" om het verhaal beschikbaar te maken in het gemeentelijke Impact-dashboard en de Evidence Pack-exporten."
+        },
+        "4": {
+          "label": "Verouderde verhalen archiveren",
+          "detail": "Verhalen die ouder zijn dan 2 jaar moeten worden beoordeeld op blijvende relevantie. Archiveer degenen die niet langer de huidige operaties weerspiegelen."
+        }
+      },
+      "tips": {
+        "0": "De meest overtuigende verhalen zijn specifiek: \"Maria, 78, kon 6 maanden langer zelfstandig blijven omdat...\" is beter dan algemene uitspraken over welzijn.",
+        "1": "Streef naar minstens 3 verhalen per zorgcategorie — impactrapporten zijn overtuigender met een scala aan bewijsmateriaal."
+      },
+      "caution": "Publiceer nooit een verhaal zonder een toestemmingsdocument. Publiceren zonder toestemming is een overtreding van de FADP/nDSG.",
+      "related_paths": {
+        "0": {
+          "label": "Gemeentelijke Impact"
+        },
+        "1": {
+          "label": "Openbaarmakingspakket"
+        }
+      }
+    },
+    "caring_feedback": {
+      "title": "Feedback Inbox — Gemeentelijke Feedbacktriage",
+      "summary": "Centraliseert feedback ingediend door gemeentelijke partners en belanghebbenden — zorgen, vragen, suggesties en klachten. Elk item wordt beoordeeld op ernst, toegewezen aan een coördinator en gevolgd tot de oplossing.",
+      "steps": {
+        "0": {
+          "label": "Bekijk nieuwe feedbackitems",
+          "detail": "Nieuwe items verschijnen bovenaan de inbox. Lees elk item en beoordeel de ernst: Kritiek (storingsmelding / formele klacht), Hoog (aanzienlijke zorg), Midden (vraag), Laag (suggestie)."
+        },
+        "1": {
+          "label": "Toewijzen aan een coördinator",
+          "detail": "Gebruik \"Toewijzen\" om het item toe te wijzen aan de coördinator die het beste in staat is te reageren. Zij ontvangen een melding in de app."
+        },
+        "2": {
+          "label": "Een reactie opstellen",
+          "detail": "Gebruik het \"Reply\"-paneel om je antwoord op te stellen. Voor Kritieke items gebruik je de Communication Copilot om te zorgen dat de toon geschikt is."
+        },
+        "3": {
+          "label": "Verzenden en loggen",
+          "detail": "Het verzenden van het antwoord registreert de volledige thread in de itemgeschiedenis. De gemeentelijke contactpersoon ontvangt je antwoord per e-mail."
+        },
+        "4": {
+          "label": "Sluiten of escaleren",
+          "detail": "Markeer als opgelost zodra de zaak is afgerond, of gebruik \"Escaleren naar Caring Community National\" als het probleem buiten de bevoegdheid van uw coöperatie valt om aan te pakken."
+        }
+      },
+      "tips": {
+        "0": "Streef ernaar om Kritische feedback binnen 4 uur te erkennen, zelfs als een volledige oplossing langer duurt. Alleen erkenning voorkomt escalatie.",
+        "1": "Patroonherkenning: als drie of meer feedbackitems betrekking hebben op hetzelfde thema (bijv. \"langzame reactie van coördinator\"), duidt dit op een systemisch probleem dat onderzocht moet worden."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Communicatie Copilot"
+        },
+        "1": {
+          "label": "SLA-dashboard"
+        }
+      }
+    },
+    "caring_verification": {
+      "title": "Gemeentelijke Verificatie — DNS/Attestatiebadge",
+      "summary": "Geverifieerde gemeentepartners krijgen een digitale badge die wordt weergegeven op hun gemeenschapprofiel en in impactrapporten. Verificatie vereist bevestiging van het DNS-record (waardoor wordt aangetoond dat men controle heeft over het officiële domein van de gemeente) en een ondertekende attestatiebrief.",
+      "steps": {
+        "0": {
+          "label": "Verificatie voor een gemeente starten",
+          "detail": "Zoek het gemeentelijke contact in Lead Nurture, klik op \"Verificatie starten\". Het systeem genereert een unieke DNS TXT-recordwaarde die zij aan hun domein moeten toevoegen."
+        },
+        "1": {
+          "label": "Geef instructies aan het IT-team van de gemeente",
+          "detail": "Deel de DNS-instructiegids (downloadbare PDF) met de webbeheerder van de gemeente. Zij voegen het TXT-record toe aan hun DNS."
+        },
+        "2": {
+          "label": "Activeer de DNS-controle",
+          "detail": "Zodra ze bevestigen dat het record is toegevoegd, klik op \"Controleer DNS\". Het systeem vraagt automatisch het domein op. Verificatie is onmiddellijk als het record wordt gevonden."
+        },
+        "3": {
+          "label": "Upload de verklaring",
+          "detail": "Upload de ondertekende verklaring (op officieel briefpapier, ondertekend door een verantwoordelijke). Dit wordt opgeslagen als onderdeel van het nalevingsrecord."
+        },
+        "4": {
+          "label": "Geef het badge uit",
+          "detail": "Zodra zowel DNS als attestatie zijn bevestigd, klik op \"Geverifieerde Badge Uitgeven\". De badge verschijnt direct op het partnerprofiel van de gemeente."
+        }
+      },
+      "tips": {
+        "0": "DNS-propagatie kan tot 48 uur duren. Laat voldoende tijd voordat u de controle uitvoert — probeer het niet meer dan één keer per uur opnieuw.",
+        "1": "De badge wordt automatisch ingetrokken als het DNS-record later wordt verwijderd. Geverifieerde partners moeten worden geadviseerd om het record permanent te behouden."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Leid nurture"
+        },
+        "1": {
+          "label": "Gemeentelijke Impact"
+        }
+      }
+    },
+    "caring_hour_transfers": {
+      "title": "Handmatige Overdracht van Uurcredits",
+      "summary": "Stelt coördinatoren in staat om handmatig uurcredits over te dragen tussen ledenaccounts buiten een voltooide uitwisseling. Gebruik dit voor correcties, toekenning van gemeenschapscredits of administratieve aanpassingen. Alle overdrachten worden permanent gecontroleerd.",
+      "steps": {
+        "0": {
+          "label": "Selecteer het bronlid",
+          "detail": "Zoek het lid waarvan de uren worden afgetrokken. Bevestig hun huidige saldo voordat u doorgaat."
+        },
+        "1": {
+          "label": "Selecteer het bestemmingslid",
+          "detail": "Zoek het ontvangende lid. Het systeem waarschuwt als het bestemmingslid bij een andere huurder hoort."
+        },
+        "2": {
+          "label": "Voer het bedrag en de reden in",
+          "detail": "Voer het aantal uren in (decimale getallen toegestaan, bijv. 0,5 voor 30 minuten). Schrijf een duidelijke reden — dit verschijnt in de transactiesgeschiedenis van beide leden."
+        },
+        "3": {
+          "label": "Bevestigen en uitvoeren",
+          "detail": "Bekijk de samenvatting en klik op \"Overdracht bevestigen\". De aanpassing wordt onmiddellijk doorgevoerd."
+        },
+        "4": {
+          "label": "Controleer het logboek",
+          "detail": "Controleer het auditlogboek om te bevestigen dat beide saldi correct zijn bijgewerkt."
+        }
+      },
+      "tips": {
+        "0": "U kunt het account van een lid niet tot een negatief saldo overtrekken zonder een override-vlag — neem contact op met een superbeheerders als een negatief saldo echt nodig is.",
+        "1": "Voor bulkcorrecties (bijv. na een systeemfout) gebruikt u de CSV-import voor batchoverboekingen in plaats van deze één voor één te doen."
+      },
+      "caution": "Handmatige overboekingen kunnen niet automatisch ongedaan worden gemaakt. Controleer de bedragen dubbel voordat u bevestigt — correcties vereisen een tweede handmatige overboeking in de tegenovergestelde richting.",
+      "related_paths": {
+        "0": {
+          "label": "Coördinatorworkflow"
+        },
+        "1": {
+          "label": "Loyaliteit"
+        }
+      }
+    },
+    "caring_loyalty": {
+      "title": "Loyaliteitsprogramma — Ledenbeloningen",
+      "summary": "Configureer het loyaliteitsbeloningsprogramma: badges, mijlpaalbeloningen, reeksbonussen en speciale erkenning voor langdurige leden en topbijdragers. Loyaliteitmechanismen stimuleren betrokkenheid zonder de intrinsieke waarde van wederzijdse hulp te verdringen.",
+      "steps": {
+        "0": {
+          "label": "Bekijk actieve beloningsregels",
+          "detail": "De regelentabel toont elke actieve loyaliteitstrigger: uitwisselingsmijlpalen (1e, 5e, 25e uitwisseling), verwijzingsbonussen, verjaardagskredieten, enz."
+        },
+        "1": {
+          "label": "Regel bewerken of toevoegen",
+          "detail": "Klik op \"Nieuwe regel\". Stel het type trigger in (aantal uitwisselingen, beoordelingsscore, opeenvolgende dagen, aangepast evenement), het beloningsbedrag in uren en of het een eenmalige of terugkerende beloning is."
+        },
+        "2": {
+          "label": "Configureer mijlpaalbadges",
+          "detail": "Koppel een badge (gemaakt in de Badges-beheer) aan een loyaliteitsmijlpaal zodat leden zowel een beloning in uren als een zichtbare erkenning ontvangen."
+        },
+        "3": {
+          "label": "Bekijk het klassement",
+          "detail": "Bekijk het loyaliteitsklassement voor de beste bijdragers van deze maand. Overweeg hen een persoonlijk bedankje te sturen via de Communication Copilot."
+        },
+        "4": {
+          "label": "Controleer beloningsuitkeringen",
+          "detail": "Het uitkeringslogboek toont elke uitgegeven beloning, aan wie en waarom. Gebruik dit om afwijkingen op te sporen."
+        }
+      },
+      "tips": {
+        "0": "Wederkerigheidsbonussen (voor leden die zowel geven als ontvangen in dezelfde maand) zijn zeer effectief om de wederkerigheidsratio op het Pilot Scoreboard te verbeteren.",
+        "1": "Houd het programma eenvoudig — te veel regels creëren verwarring. Drie tot vijf goed begrepen beloningen presteren beter dan een complex puntenmatrix."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Regionale Punten"
+        },
+        "1": {
+          "label": "Pilot Scorebord"
+        }
+      }
+    },
+    "caring_regional_points": {
+      "title": "Regionale Punten — Derde-Valuta Grootboek",
+      "summary": "Regionale Punten zijn een aanvullende valuta die naast uurtegoeden bestaat. Ze worden uitgegeven door subregionale organen (wijkraden, buurtgroepen) en kunnen worden ingewisseld voor lokale goederen of diensten die niet worden gedekt door uuruitwisselingen. Deze pagina beheert het register van regionale punten.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de balans van regionale punten",
+          "detail": "Het register toont het totaal aantal punten in omloop, uitgegeven deze maand, ingewisseld deze maand, en de uitstaande verplichting."
+        },
+        "1": {
+          "label": "Een batch punten uitgeven",
+          "detail": "Gebruik \"Punten Uitgeven\" om punten toe te kennen aan een lid of een groep leden. Voer het bedrag, de subregio en de reden in (bijv. \"Deelname aan buurt schoonmaak\")."
+        },
+        "2": {
+          "label": "Stel inwisselingsopties in",
+          "detail": "Voeg onder \"Inwisselingscatalogus\" items toe waarvoor leden punten kunnen inwisselen (bijv. \"Lokale bakker voucher — 50 punten\"). Elk item heeft een voorraadnummer of een schakelaar voor onbeperkt nodig."
+        },
+        "3": {
+          "label": "Beoordeel inwisselingsverzoeken",
+          "detail": "In afwachting zijnde inwisselingsverzoeken verschijnen in de wachtrij. Keur elk verzoek goed of af, met een reden voor de afkeuring."
+        },
+        "4": {
+          "label": "Exporteer het grootboek",
+          "detail": "Genereer een periodiek grootboekrapport voor uw subregionale partner met vermelding van uitgegeven en ingewisselde punten."
+        }
+      },
+      "tips": {
+        "0": "Regionale punten moeten een aanvulling zijn, geen concurrentie voor uurtegoed. Vermijd het opzetten van inwisselbare items die ook als uurtegoeddiensten ingewisseld kunnen worden.",
+        "1": "Houd de verplichting (niet ingewisselde uitstaande punten) zichtbaar voor je subregionale partners — het vertegenwoordigt een echte verplichting."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Deelregio's"
+        },
+        "1": {
+          "label": "Loyaliteit"
+        }
+      }
+    },
+    "caring_sub_regions": {
+      "title": "Subregio's — Beheer van geografische onderverdeling",
+      "summary": "Subregio's verdelen het geografische gebied van uw coöperatie in kleinere administratieve eenheden zoals Quartier (buurt), Ortsteil (districtsdeel) of dorp. Leden kunnen worden toegewezen aan subregio's voor gerichte communicatie, lokale rapporten en beheer van Regionale Punten.",
+      "steps": {
+        "0": {
+          "label": "Maak een subregio aan",
+          "detail": "Klik op \"Nieuwe Subregio\". Voer de naam in (bijv. \"Länggasse-Felsenau\"), het type (Quartier / Ortsteil / Dorp / Aangepast), en een optionele grensbeschrijving."
+        },
+        "1": {
+          "label": "Leden toewijzen",
+          "detail": "Gebruik het bulk-toewijzingstool om leden toe te wijzen op basis van hun postcode/adres, of wijs handmatig individuele leden toe."
+        },
+        "2": {
+          "label": "Een subregiocoördinator instellen",
+          "detail": "Wijs een Coördinator-niveau lid aan als de verantwoordelijke contactpersoon voor deze subregio. Zij ontvangen subregio-specifieke SLA- en samenvattingsmeldingen."
+        },
+        "3": {
+          "label": "Gebruik in communicatie",
+          "detail": "Filter bij het verzenden van Noodmeldingen, Slimme Aanmoedigingen of Burgeroverzichten de ontvangers op subregio om alleen relevante leden te bereiken."
+        },
+        "4": {
+          "label": "Bekijk subregio-analyses",
+          "detail": "Het analysetabblad toont de uitwisselingsdichtheid, het percentage actieve leden en de naleving van SLA uitgesplitst per subregio."
+        }
+      },
+      "tips": {
+        "0": "Subregio's werken het beste wanneer ze aansluiten bij echte gemeenschapsidentiteiten die leden herkennen — gebruik namen die mensen daadwerkelijk gebruiken voor hun buurt.",
+        "1": "Voorkom dat je te veel subregio's creëert (meer dan 10 is meestal te gedetailleerd voor een pilotcoöperatie)."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Regionale Punten"
+        },
+        "1": {
+          "label": "Noodmeldingen"
+        }
+      }
+    },
+    "partner_timebanks_caring_peers": {
+      "title": "Partnercoöperaties - Caring Community Federation",
+      "summary": "Beheer de partnertijdbankverbindingen tussen uw coöperatie en andere Caring Community coöperaties. Deze pagina is voor vertrouwde coöperatie-tot-coöperatie koppelingen, niet voor generieke API-clients of integraties van derden.",
+      "steps": {
+        "0": {
+          "label": "Bekijk actieve partnercoöperaties",
+          "detail": "De tabel toont elke verbonden Caring Community coöperatie, de URL van de instantie, de status en de laatst geverifieerde handdruk."
+        },
+        "1": {
+          "label": "Nodig een nieuwe coöperatie uit",
+          "detail": "Klik op \"Coöperatie uitnodigen\". Voer de NEXUS-instance-URL van hen in. Ze ontvangen een uitnodiging om het bilaterale vertrouwenscontract te accepteren en te ondertekenen."
+        },
+        "2": {
+          "label": "Accepteer een binnenkomende uitnodiging",
+          "detail": "In afwachting zijnde uitnodigingen verschijnen in het tabblad \"Binnenkomend\". Bekijk het profiel van de aanvraagdoende coöperatie voordat u accepteert."
+        },
+        "3": {
+          "label": "Configureer regels voor gegevensdeling",
+          "detail": "Kies voor elke peer welke gegevens je deelt: alleen Warmth Pass-validatie, of ook geaggregeerde uitwisselingsstatistieken voor het nationale dashboard van de Caring Community."
+        },
+        "4": {
+          "label": "Onderbreek een peerverbinding",
+          "detail": "Als een coöperatie niet meer actief is of een veiligheidsprobleem heeft gehad, gebruik dan \"Onderbreken\" om de federatielink te pauzeren zonder deze permanent te verwijderen."
+        }
+      },
+      "tips": {
+        "0": "Maak alleen verbinding met coöperaties die je persoonlijk hebt geverifieerd of via het nationale netwerk van Caring Community — automatische spamuitnodigingen kunnen voorkomen.",
+        "1": "Wanneer de modus Geïsoleerde Knoop actief is, wordt alle synchronisatie van gegevens met federatiepartners automatisch gepauzeerd. Schakel deze opnieuw in na een individuele beoordeling van de FADP-naleving."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Warmtepas"
+        },
+        "1": {
+          "label": "Geïsoleerde Knoop"
+        }
+      }
+    },
+    "caring_providers": {
+      "title": "Gids van zorgverleners",
+      "summary": "Een samengestelde lijst van professionele en semi-professionele zorgverleners die aangesloten zijn bij uw coöperatie. Zorgverleners zijn anders dan vrijwillige leden — het zijn organisaties of individuen die gespecialiseerde zorgdiensten leveren die gemeenschapsuitwisselingen aanvullen (bijv. professionele fysiotherapie, medisch maatschappelijk werk).",
+      "steps": {
+        "0": {
+          "label": "Voeg een zorgverlener toe",
+          "detail": "Klik op \"Nieuwe aanbieder\". Voer de naam van de organisatie, contactgegevens, zorgspecialismen, geografische dekking en of ze NEXUS-verwijzingen accepteren in."
+        },
+        "1": {
+          "label": "Verifieer de aanbieder",
+          "detail": "Upload bewijs van de registratie of accreditatie van de aanbieder (bijv. KESB-registratie, lidmaatschap van een beroepsorganisatie). Markeer hen als Gecontroleerd zodra de documentatie is bevestigd."
+        },
+        "2": {
+          "label": "Koppelen aan zorgcategorieën",
+          "detail": "Koppel de zorgverlener aan de zorgcategorieën die zij dekken. Hierdoor kan de matchingsengine hen voorstellen wanneer een hulpverzoek de capaciteit van vrijwilligers overschrijdt."
+        },
+        "3": {
+          "label": "Controleer de capaciteit van de zorgverlener",
+          "detail": "Zorgverleners kunnen hun beschikbare capaciteit bijwerken (bijvoorbeeld \"accepteert nieuwe doorverwijzingen\", \"volledig bezet\"). Controleer dit voordat u doorverwijzingen doet."
+        },
+        "4": {
+          "label": "Leg de resultaten van doorverwijzingen vast",
+          "detail": "Na het doorverwijzen van een lid, registreer het resultaat van de verwijzing in het wisselrecord van het lid — dit wordt meegenomen in de KPI-gegevens."
+        }
+      },
+      "tips": {
+        "0": "Aanbieders hebben geen NEXUS-accounts nodig — het directory wordt beheerd door de coördinator. Leden zien een vereenvoudigde versie van het directory in hun profiel.",
+        "1": "Beoordeel het aanbieder-directory minstens twee keer per jaar om organisaties te verwijderen die zijn gesloten of hun diensten hebben veranderd."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Kring van Zorgontvangers"
+        },
+        "1": {
+          "label": "Coördinatorworkflow"
+        }
+      }
+    },
+    "caring_recipient_circle": {
+      "title": "Kringen van Zorgontvangers & Beheer van Begunstigden",
+      "summary": "Een kring van zorgontvangers groepeert het ondersteuningsnetwerk rond een specifiek lid van de gemeenschap dat regelmatige zorg nodig heeft — bijvoorbeeld een oudere persoon die hulp krijgt van drie buren, een coördinator en een professionele verpleegkundige. Op deze pagina worden deze kringen aangemaakt en beheerd.",
+      "steps": {
+        "0": {
+          "label": "Maak een kring voor een ontvanger",
+          "detail": "Klik op \"Nieuwe Cirkel\". Selecteer de zorgontvanger (moet een lid zijn). Geef de cirkel een beschrijvende naam (bijv. \"Hans S. — Dinsdagochtend Ondersteuningsgroep\")."
+        },
+        "1": {
+          "label": "Voeg cirkelleden toe",
+          "detail": "Voeg vrijwillige helpers, de toegewezen coördinator en eventuele professionele zorgverleners toe. Elk lid heeft een rol (Helper / Hoofdcoördinator / Professionele Zorgverlener)."
+        },
+        "2": {
+          "label": "Stel een zorgplan in",
+          "detail": "Gebruik het veld Zorgplan om afgesproken ondersteuningsactiviteiten, frequentie en eventuele gezondheids- of veiligheidsnotities die relevant zijn voor helpers te documenteren."
+        },
+        "3": {
+          "label": "Koppel uitwisselingen aan de cirkel",
+          "detail": "Uitwisselingen voor de zorgontvanger kunnen worden gemarkeerd met de cirkel. Dit geeft een overzicht van alle ondersteuning die door die persoon is ontvangen."
+        },
+        "4": {
+          "label": "Beoordeel de activiteiten van de cirkel",
+          "detail": "De activiteiten-tijdlijn toont recente uitwisselingen, notities en eventuele waarschuwingssignaleringen met betrekking tot deze ontvanger."
+        }
+      },
+      "tips": {
+        "0": "De inhoud van het zorgplan is vertrouwelijk — alleen cirkelleden en coördinatoren kunnen het zien.",
+        "1": "Wanneer een cirkel-lid vertrekt (bijv. een vrijwilliger verhuist), archiveer hen dan uit de cirkel in plaats van de rol te verwijderen — dit behoudt de zorggeschiedenis."
+      },
+      "caution": "Zorgplannen kunnen gevoelige gezondheidsinformatie bevatten. Behandel ze als vertrouwelijke dossiers onder FADP/nDSG.",
+      "related_paths": {
+        "0": {
+          "label": "Zorgaanbieders"
+        },
+        "1": {
+          "label": "Bescherming"
+        }
+      }
+    },
+    "caring_research": {
+      "title": "Onderzoeks­partnerschappen — Academische samenwerking",
+      "summary": "Beheer formele onderzoeks­partnerschappen met universiteiten, openbare gezondheidsinstituten en sociale onderzoeksorganisaties. Partners kunnen alleen-lezen toegang krijgen tot geanonimiseerde geaggregeerde gegevens voor academische studies, onder voorbehoud van een ondertekende gegevensovereenkomst.",
+      "steps": {
+        "0": {
+          "label": "Maak een onderzoeks­partnerschapsrecord aan",
+          "detail": "Klik op \"Nieuw Partnerschap\". Voer de naam van de instelling, de hoofdonderzoeker, de onderzoeksvraag, het referentienummer van de ethische goedkeuring en de afgesproken gegevensomvang in."
+        },
+        "1": {
+          "label": "Upload de gegevensovereenkomst",
+          "detail": "Upload de ondertekende gegevensverwerkingsovereenkomst. Partnerschappen kunnen niet worden geactiveerd totdat een ondertekende overeenkomst in het bestand aanwezig is."
+        },
+        "2": {
+          "label": "Configureer gegevens toegang",
+          "detail": "Gebruik de gegevensomvang-selector om aan te geven tot welke geanonimiseerde datasets de partner toegang heeft: uitwisselingsaggregaten, KPI-trends, enquête-resultaten, demografische uitsplitsingen."
+        },
+        "3": {
+          "label": "Onderzoekerstoegangscertificaten uitgeven",
+          "detail": "Zodra geactiveerd, gebruik \"Toegang uitgeven\" om de onderzoeker een alleen-lezen API-sleutel of gegevensexportschema te sturen."
+        },
+        "4": {
+          "label": "Beoordelen en verlengen",
+          "detail": "Partnerschappen verlopen na de afgesproken termijn (meestal één academisch jaar). Gebruik de verlengingsworkflow om te verlengen met bijgewerkte toestemming."
+        }
+      },
+      "tips": {
+        "0": "Verleen nooit toegang tot niet-geanonimiseerde ledengegevens. Het platform anonimiseert gegevens automatisch voor het onderzoeks-exportendpoint, maar verifieer dit met je functionaris voor gegevensbescherming.",
+        "1": "Bewaar het ethische referentienummer in je administratie — externe audits kunnen om bewijs van ethisch toezicht vragen."
+      },
+      "related_paths": {
+        "0": {
+          "label": "KPI-baselines"
+        },
+        "1": {
+          "label": "Openbaarmakingspakket"
+        }
+      }
+    },
+    "caring_external_integrations": {
+      "title": "Partnerintegratietracker - Externe afhankelijkheden",
+      "summary": "Volg partnerafhankelijke integraties die een externe eigenaar, gegevensuitwisselingsovereenkomst, testomgeving of interfacespecificatie nodig hebben voordat ze live kunnen gaan. Deze pagina is een gereedheidstracker, geen opzetpagina voor de Partner Timebanks-federatie.",
+      "steps": {
+        "0": {
+          "label": "Beoordeel de afhankelijkheidsstatus",
+          "detail": "De lijst toont elke integratie-eigenaar, categorie, operationele status, DSA-status, testomgevingsstatus en URL van de interfacespecificatie."
+        },
+        "1": {
+          "label": "Voeg een gevolgde afhankelijkheid toe",
+          "detail": "Klik op \"Toevoegen\" wanneer een nieuwe externe partij een API, sandbox, gegevensovereenkomst of operationeel contact moet leveren voordat de levering kan doorgaan."
+        },
+        "2": {
+          "label": "Scheid gereedheid van referenties",
+          "detail": "Gebruik deze pagina om bij te houden of een partner gereed is. Gebruik Inkomende API-partners, Externe Protocolpartners of Webhooks wanneer referenties of eindpunten geconfigureerd moeten worden."
+        },
+        "3": {
+          "label": "Houd notities actueel",
+          "detail": "Registreer blokkades, volgende acties en updates van de eigenaar zodat belanghebbenden kunnen zien of de vertraging technisch, juridisch of extern is."
+        },
+        "4": {
+          "label": "Sluit verouderde vermeldingen af",
+          "detail": "Verwijder of archiveer afhankelijkheden die geen onderdeel meer zijn van het leverschema van de Caring Community."
+        }
+      },
+      "tips": {
+        "0": "Plak geen geheimen of OAuth-tokens in notities. Sla inloggegevens alleen op op de juiste inlogpagina.",
+        "1": "Een groene sandbox betekent niet dat de integratie is goedgekeurd. Controleer DSA- en eigenaarstatus voordat je het als gereed beschouwt."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Ontwikkelaar Integratie Referentie"
+        },
+        "1": {
+          "label": "Openbaarmakingspakket"
+        }
+      }
+    },
+    "caring_integration_showcase": {
+      "title": "Ontwikkelaar Integratie Referentie",
+      "summary": "Een referentiepagina voor ontwikkelaars voor beschikbare Caring Community API-eindpunten, webhook-gebeurtenisschema's, OAuth-configuratie en voorbeeldgegevens. Gebruik het om implementatiedetails uit te leggen nadat het juiste integratietype is gekozen.",
+      "steps": {
+        "0": {
+          "label": "Beschikbare eindpunten bekijken",
+          "detail": "Gebruik de eindpuntenbrowser om beschikbare REST API-paden te verkennen, gegroepeerd op domein (Leden, Uitwisselingen, Portemonnee, Gebeurtenissen, enz.). Elke vermelding toont de methode, het pad, de parameters en het responschema."
+        },
+        "1": {
+          "label": "Voorbeeldgegevens kopiëren",
+          "detail": "Klik op \"Kopieer Voorbeeld\" naast een willekeurige webhook-gebeurtenis om een realistisch voorbeeld van een JSON-payload te krijgen voor gebruik in je integratiecode of testen."
+        },
+        "2": {
+          "label": "OAuth-scopes bekijken",
+          "detail": "De tabel met OAuth-scopes toont alle beschikbare machtigingsscopes, welke gegevens ze toegankelijk maken en de minimale vertrouwensniveau die nodig is om ze te autoriseren."
+        },
+        "3": {
+          "label": "Download de OpenAPI-specificatie",
+          "detail": "Gebruik \"Download OpenAPI 3.1-spec\" om de volledige machineleesbare API-definitie te krijgen, compatibel met Postman, Insomnia en codegeneratietools."
+        },
+        "4": {
+          "label": "Test met de API-sandbox",
+          "detail": "De ingebouwde sandbox stelt je in staat om geauthenticeerde testaanroepen te doen tegen de staginggegevens van je coöperatie zonder live-gegevens te beïnvloeden."
+        }
+      },
+      "tips": {
+        "0": "Deel de OpenAPI-specificatie met externe ontwikkelaars in plaats van handmatige API-documentatie te schrijven — het blijft automatisch up-to-date.",
+        "1": "De sandbox gebruikt een aparte set testreferenties van je live API-sleutels — verwissel ze niet."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Partner Integratie Tracker"
+        }
+      }
+    },
+    "super_admin_national_kiss": {
+      "title": "Zorgzame Gemeenschap — Nationaal Cross-Coöperatief Dashboard",
+      "summary": "Een dashboard op nationaal niveau dat alleen zichtbaar is voor het nationale personeel van Caring Community en superbeheerders. Het verzamelt kernstatistieken van alle actieve Caring Community coöperaties: het totaal aantal uitwisselingsuren, gecombineerde CHF-kostenbesparing, gebruik van de Warmth Pass over coöperaties heen, en de gezondheid van de federatie.",
+      "steps": {
+        "0": {
+          "label": "Bekijk de nationale overzichtskaarten",
+          "detail": "De bovenste rij toont: het totale aantal actieve coöperaties, het totale aantal uitgewisselde uren (maand/jaar), de gecombineerde CHF-kostenbesparing en het totaal aantal unieke leden in alle coöperaties."
+        },
+        "1": {
+          "label": "Diep in een specifieke coöperatie",
+          "detail": "Klik op een rij van een coöperatie in de tabel om hun gedetailleerd dashboard te openen. Je hebt alleen-lezen toegang tot hun gegevens."
+        },
+        "2": {
+          "label": "Beoordeel de gezondheid van de federatie",
+          "detail": "De federatiegezondheidskaart toont welke coöperaties verbonden zijn via de Warmtepas-federatie en welke recentelijk een synchronisatiefout hebben gehad."
+        },
+        "3": {
+          "label": "Exporteer het nationale rapport",
+          "detail": "Gebruik \"Exporteer Nationaal Rapport\" om een samengevoegd PDF-bestand te maken voor vergaderingen van de Caring Community-raad of voor indieningen bij de federale gezondheidsautoriteit."
+        },
+        "4": {
+          "label": "Geef een nationale waarschuwing af",
+          "detail": "Gebruik de \"Nationale Aankondiging\" om een bericht tegelijkertijd naar alle coöperatieve coördinatoren te sturen — bijvoorbeeld een methodologie-update of een kennisgeving over systeemonderhoud."
+        }
+      },
+      "tips": {
+        "0": "Het nationale dashboard bevat geen individueel identificeerbare ledengegevens — alleen groepsniveau-aggregaten van de coöperaties.",
+        "1": "Gebruik de \"Benchmarkweergave\" om de Caring Community-pilotscore van elke coöperatie naast de nationale mediaan te tonen."
+      },
+      "related_paths": {
+        "0": {
+          "label": "KI-agents"
+        },
+        "1": {
+          "label": "Pilotvragen"
+        }
+      }
+    },
+    "admin_ki_agents": {
+      "title": "AI-agenten — framework voor autonome agenten",
+      "summary": "Het KI-Agenten (AI Agent) framework stelt NEXUS in staat om geautomatiseerde acties voor te stellen op basis van gegevenspatronen — bijvoorbeeld het voorstellen van een Smart Nudge-campagne, het markeren van een lid dat risico loopt om uit te vallen, of het aanbevelen van een aanpassing van een coefficient. Alle voorstellen vereisen menselijke goedkeuring voordat ze van kracht worden. Agents handelen nooit eenzijdig tenzij u expliciet de drempel voor automatisch toepassen verhoogt.",
+      "steps": {
+        "0": {
+          "label": "Beoordeling van lopende voorstellen",
+          "detail": "De voorstellenwachtrij toont de aanbeveling van elke agent, het bewijsmateriaal achter deze aanbeveling en de voorgestelde actie. Lees het bewijs zorgvuldig voordat u goedkeurt."
+        },
+        "1": {
+          "label": "Een voorstel goedkeuren of afwijzen",
+          "detail": "Klik op \"Goedkeuren\" om de actie onmiddellijk uit te voeren, \"Afwijzen\" om het te verwerpen, of \"Uitstellen\" om het op een later tijdstip opnieuw te overwegen. Voeg een opmerking toe waarin u uw beslissing uitlegt."
+        },
+        "2": {
+          "label": "Configureer de drempel voor automatisch toepassen",
+          "detail": "In Agentinstellingen kunt u een vertrouwensdrempel instellen waarboven voorstellen met laag risico automatisch worden toegepast (standaard: uitgeschakeld). Schakel dit alleen in voor specifieke acties met laag risico."
+        },
+        "3": {
+          "label": "Beoordeel de prestaties van de agent",
+          "detail": "Het tabblad agentanalyse toont hoeveel voorstellen werden gedaan, goedgekeurd, afgewezen en uitgesteld, plus de resultaten van goedgekeurde acties (hebben ze het beoogde effect bereikt?)."
+        },
+        "4": {
+          "label": "Agenttypes toevoegen of uitschakelen",
+          "detail": "Gebruik het Agentenregister om specifieke agenttypes in of uit te schakelen. Begin met een kleine set en breid uit naarmate je vertrouwen krijgt in hun aanbevelingen."
+        }
+      },
+      "tips": {
+        "0": "Het voorstel-then-goedkeuringsmodel is een opzettelijk veiligheidsmechanisme — schakel het niet uit voor gevolgrijke acties (bijv. het waarborgen van escalaties, grote kredietoverboekingen).",
+        "1": "Agenten leren in de loop van de tijd van uw goedkeur-/afwijsbeslissingen. Consequente afwijzingen van een specifiek agenttype zijn een signaal om de configuratie ervan te herzien."
+      },
+      "caution": "Verhoog nooit de drempel voor automatische toepassing voor agenten die financiële overboekingen kunnen initiëren, escalaties kunnen beveiligen of lidmaatschapsniveauwijzigingen kunnen doorvoeren. Deze moeten altijd menselijke beoordeling vereisen.",
+      "related_paths": {
+        "0": {
+          "label": "Slimme duwtjes"
+        },
+        "1": {
+          "label": "Nationaal Zorgzaam Gemeenschapsdashboard"
+        }
+      }
+    },
+    "admin_pilot_inquiries": {
+      "title": "Pilotvragen — Gemeinde Onboarding Pipeline",
+      "summary": "Beheert de end-to-end pipeline voor gemeenten (Gemeinde) die interesse tonen in het pilootproject NEXUS/Caring Community. Elke aanvraag wordt bijgehouden vanaf het eerste contact tot de pilotovereenkomst en het gezamenlijke lanceren. Dit is het startpunt voor alle nieuwe coöperatieve onboarding.",
+      "steps": {
+        "0": {
+          "label": "Nieuwe aanvragen beoordelen",
+          "detail": "Nieuwe vragen komen binnen via het voor het publiek toegankelijke contactformulier, nationale verwijzingen van Caring Community, of handmatige invoer. Elke vraag toont de naam van de gemeente, kanton, contactpersoon en eerste aantekeningen over de vraag."
+        },
+        "1": {
+          "label": "Beoordeel de vraag",
+          "detail": "Gebruik de beoordelingschecklist om de gereedheid te beoordelen: Is er een aangewezen coördinator? Is er gemeenteraadsondersteuning? Is er een geschikt bestaand gemeenschapsnetwerk? Beoordeel elke factor."
+        },
+        "2": {
+          "label": "Beweeg door de pijplijn",
+          "detail": "Sleep of verplaats de aanvraag door de fasen: Nieuw → Kwalificeren → Voorstel Verzonden → Pilotovereenkomst → Onboarding → Actief. Voor elke fase zijn de vereiste acties gedocumenteerd."
+        },
+        "3": {
+          "label": "Genereer een pilotvoorstel",
+          "detail": "In de fase Voorstel Verzonden, gebruik \"Voorstel Genereren\" om een aangepast PDF-voorstel te maken met de gegevens van de gemeente, het zorgtarief van hun kanton en de standaardvoorwaarden van de Caring Community-methodologie."
+        },
+        "4": {
+          "label": "Trigger het aanmaken van een tenant",
+          "detail": "Zodra een pilotovereenkomst is ondertekend en geüpload, gebruik \"Coöperatieve Tenant Aanmaken\" om een nieuwe NEXUS-tenant voor hen te voorzien. Dit koppelt de aanvraag aan de Live Launch Readiness-gate."
+        }
+      },
+      "tips": {
+        "0": "Aanvragen die langer dan 30 dagen vastlopen bij \"Kwalificeren\" hebben meestal geen interne gemeentelijke sponsor — richt de benadering op het vinden van een senior sponsor.",
+        "1": "De pijplijn heeft een bijbehorende weergave op de Lead Nurture-pagina — gebruik welke weergave dan ook het beste bij je workflow past, ze delen dezelfde gegevens."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Leid nurture"
+        },
+        "1": {
+          "label": "Lancering Gereedheid"
+        },
+        "2": {
+          "label": "Nationaal Zorgzaam Gemeenschapsdashboard"
+        }
+      }
+    }
+  }
+}

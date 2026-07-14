@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { formatPercentRatio, formatPercentValue } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 // Copyright © 2024–2026 Jasper Ford
@@ -104,12 +105,7 @@ function JobBiasAudit() {
   }, [fetchReport]);
 
   const formatStage = (stage: string): string =>
-    t(
-      `jobs.stage_${stage}`,
-      stage
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase())
-    );
+    t(`jobs.stage_${stage}`, { defaultValue: t('jobs.stage_unknown') });
 
   const maxFunnel = report
     ? Math.max(...Object.values(report.funnel), 1)
@@ -218,13 +214,13 @@ function JobBiasAudit() {
             />
             <StatCard
               label={t('jobs.bias_skills_accepted')}
-              value={`${(report.skills_match_correlation.accepted_avg * 100).toFixed(1)}%`}
+              value={formatPercentRatio(report.skills_match_correlation.accepted_avg)}
               icon={Target}
               color="success"
             />
             <StatCard
               label={t('jobs.bias_skills_rejected')}
-              value={`${(report.skills_match_correlation.rejected_avg * 100).toFixed(1)}%`}
+              value={formatPercentRatio(report.skills_match_correlation.rejected_avg)}
               icon={Target}
               color="danger"
             />
@@ -258,7 +254,7 @@ function JobBiasAudit() {
                       </span>
                     </div>
                     <span className="w-16 text-sm text-muted text-right">
-                      {pct.toFixed(1)}%
+                      {formatPercentValue(pct)}
                     </span>
                   </div>
                 );
@@ -299,7 +295,7 @@ function JobBiasAudit() {
                             variant="soft"
                             color={data.rate > 50 ? 'danger' : data.rate > 30 ? 'warning' : 'success'}
                           >
-                            {data.rate.toFixed(1)}%
+                            {formatPercentValue(data.rate)}
                           </Chip>
                         </TableCell>
                       </TableRow>
@@ -386,7 +382,7 @@ function JobBiasAudit() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {report.source_effectiveness.direct.rate.toFixed(1)}%
+                        {formatPercentValue(report.source_effectiveness.direct.rate)}
                       </p>
                       <p className="text-xs text-muted">
                         {t('jobs.bias_rate')}
@@ -422,7 +418,7 @@ function JobBiasAudit() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {report.source_effectiveness.referral.rate.toFixed(1)}%
+                        {formatPercentValue(report.source_effectiveness.referral.rate)}
                       </p>
                       <p className="text-xs text-muted">
                         {t('jobs.bias_rate')}

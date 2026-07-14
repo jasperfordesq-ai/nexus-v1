@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "categories": {
     "categories_admin_desc": "Creëer en beheer categorieën voor vermeldingen en vrijwilligerswerk",
@@ -97,7 +97,6 @@
     "label_type": "Typ",
     "listings": "Advertenties",
     "page_title": "Categorieën",
-    "placeholder_name": "Name...",
     "save_changes": "Wijzigingen opslaan",
     "search_placeholder": "Categorieën zoeken...",
     "volunteering": "Vrijwilligerswerk",
@@ -106,6 +105,22 @@
     "type_listing": "Lijst",
     "type_resource": "Bron",
     "type_vol_opportunity": "Vol kansen",
-    "tabs_aria": "Filter voor categorietype"
+    "tabs_aria": "Filter voor categorietype",
+    "color_blue": "Blauw",
+    "color_cyan": "Cyaan",
+    "color_gray": "Grijs",
+    "color_green": "Groen",
+    "color_orange": "Oranje",
+    "color_pink": "Roze",
+    "color_purple": "Paars",
+    "color_red": "Rood",
+    "color_slate": "Leisteen",
+    "color_teal": "Groenblauw",
+    "color_unknown": "Onbekende kleur",
+    "color_yellow": "Geel",
+    "failed_to_save_category": "Kan categorie niet opslaan",
+    "placeholder_name": "bijv. Kunst & Ambacht",
+    "color_fuchsia": "Fuchsia",
+    "color_indigo": "Indigo"
   }
 }

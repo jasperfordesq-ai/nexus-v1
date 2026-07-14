@@ -145,7 +145,7 @@ export default function FederationPeersAdminPage() {
         showToast(t('federation_peers_admin.toasts.status_updated', { status: t(`federation_peers_admin.status.${status}`) }), 'success');
         void fetchPeers();
       } else {
-        showToast(res.error || t('federation_peers_admin.toasts.status_failed'), 'error');
+        showToast(t('federation_peers_admin.toasts.status_failed'), 'error');
       }
     } catch (err) {
       logError('FederationPeersAdminPage.status', err);
@@ -195,7 +195,7 @@ export default function FederationPeersAdminPage() {
         showToast(t('federation_peers_admin.toasts.deleted'), 'success');
         void fetchPeers();
       } else {
-        showToast(res.error || t('federation_peers_admin.toasts.delete_failed'), 'error');
+        showToast(t('federation_peers_admin.toasts.delete_failed'), 'error');
       }
     } catch (err) {
       logError('FederationPeersAdminPage.delete', err);

@@ -166,10 +166,11 @@ class CaringCommunityAlertServiceTest extends TestCase
         foreach ($alerts as $alert) {
             $this->assertArrayHasKey('id', $alert);
             $this->assertArrayHasKey('severity', $alert);
-            $this->assertArrayHasKey('title', $alert);
-            $this->assertArrayHasKey('message', $alert);
+            $this->assertArrayHasKey('title_code', $alert);
+            $this->assertArrayHasKey('message_code', $alert);
+            $this->assertArrayHasKey('message_params', $alert);
             $this->assertArrayHasKey('count', $alert);
-            $this->assertArrayHasKey('action_label', $alert);
+            $this->assertArrayHasKey('action_code', $alert);
             $this->assertArrayHasKey('action_url', $alert);
         }
     }

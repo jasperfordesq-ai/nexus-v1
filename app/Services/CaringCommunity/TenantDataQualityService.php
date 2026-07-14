@@ -26,10 +26,11 @@ use Illuminate\Support\Facades\Schema;
  * Each check returns a structured row:
  *   [
  *     'key'           => 'duplicate_emails',
- *     'label'         => 'Duplicate email addresses',
+ *     'label_code'    => 'duplicate_emails',
  *     'severity'      => 'ok' | 'info' | 'warning' | 'danger',
  *     'count'         => int,
- *     'message'       => string,
+ *     'message_code'  => 'duplicate_emails.found',
+ *     'message_params'=> array<string, int|string>,
  *     'has_drilldown' => bool,
  *   ]
  */
@@ -97,7 +98,7 @@ class TenantDataQualityService
      * Return up to $limit affected rows for a single check, for the drill-down
      * modal in the admin UI. Always tenant-scoped.
      *
-     * @return array{rows: list<array<string,mixed>>, note?: string}
+     * @return array{rows: list<array<string,mixed>>, note_code?: string}
      */
     public function affectedRows(int $tenantId, string $checkKey, int $limit = 50): array
     {
@@ -119,7 +120,7 @@ class TenantDataQualityService
             default:
                 return [
                     'rows' => [],
-                    'note' => 'drilldown not available for this check',
+                    'note_code' => 'drilldown_not_available',
                 ];
         }
     }
@@ -131,7 +132,7 @@ class TenantDataQualityService
     private function checkDuplicateEmails(int $tenantId): array
     {
         if (!Schema::hasTable('users') || !Schema::hasColumn('users', 'email')) {
-            return $this->okRow('duplicate_emails', 'Duplicate email addresses', 'users table not present', false);
+            return $this->checkRow('duplicate_emails', self::SEVERITY_OK, 0, 'duplicate_emails.schema_unavailable');
         }
 
         $count = (int) DB::table('users')
@@ -149,22 +150,19 @@ class TenantDataQualityService
             )', [$tenantId])
             ->count();
 
-        return [
-            'key'           => 'duplicate_emails',
-            'label'         => 'Duplicate email addresses',
-            'severity'      => $count > 0 ? self::SEVERITY_DANGER : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Multiple users share the same email — merge or delete duplicates before launch.'
-                : 'No duplicate emails detected.',
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'duplicate_emails',
+            $count > 0 ? self::SEVERITY_DANGER : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'duplicate_emails.found' : 'duplicate_emails.clear',
+            $count > 0,
+        );
     }
 
     private function checkDuplicatePhones(int $tenantId): array
     {
         if (!Schema::hasTable('users') || !Schema::hasColumn('users', 'phone')) {
-            return $this->okRow('duplicate_phones', 'Duplicate phone numbers', 'phone column not present', false);
+            return $this->checkRow('duplicate_phones', self::SEVERITY_OK, 0, 'duplicate_phones.schema_unavailable');
         }
 
         $count = (int) DB::table('users')
@@ -182,22 +180,19 @@ class TenantDataQualityService
             })
             ->count();
 
-        return [
-            'key'           => 'duplicate_phones',
-            'label'         => 'Duplicate phone numbers',
-            'severity'      => $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Several members share the same phone number — confirm whether they are different residents.'
-                : 'No duplicate phone numbers detected.',
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'duplicate_phones',
+            $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'duplicate_phones.found' : 'duplicate_phones.clear',
+            $count > 0,
+        );
     }
 
     private function checkMissingPreferredLanguage(int $tenantId): array
     {
         if (!Schema::hasTable('users') || !Schema::hasColumn('users', 'preferred_language')) {
-            return $this->okRow('missing_preferred_language', 'Members without preferred language', 'preferred_language column not present', false);
+            return $this->checkRow('missing_preferred_language', self::SEVERITY_OK, 0, 'missing_preferred_language.schema_unavailable');
         }
 
         $count = (int) DB::table('users')
@@ -207,16 +202,13 @@ class TenantDataQualityService
             })
             ->count();
 
-        return [
-            'key'           => 'missing_preferred_language',
-            'label'         => 'Members without preferred language',
-            'severity'      => $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? __('caring_community.data_quality.missing_language_positive')
-                : __('caring_community.data_quality.missing_language_ok'),
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'missing_preferred_language',
+            $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'missing_preferred_language.found' : 'missing_preferred_language.clear',
+            $count > 0,
+        );
     }
 
     private function checkMissingSubRegion(int $tenantId): array
@@ -225,18 +217,11 @@ class TenantDataQualityService
         // Only run a meaningful check when both prerequisites exist; otherwise
         // surface an OK row with a clear note.
         if (!Schema::hasTable('caring_sub_regions')) {
-            return $this->okRow('missing_sub_region', 'Members without sub-region', 'caring_sub_regions table not present on this tenant schema', false);
+            return $this->checkRow('missing_sub_region', self::SEVERITY_OK, 0, 'missing_sub_region.regions_unavailable');
         }
 
         if (!Schema::hasTable('users') || !Schema::hasColumn('users', 'sub_region_id')) {
-            return [
-                'key'           => 'missing_sub_region',
-                'label'         => 'Members without sub-region',
-                'severity'      => self::SEVERITY_OK,
-                'count'         => 0,
-                'message'       => __('caring_community.data_quality.no_sub_region_column'),
-                'has_drilldown' => false,
-            ];
+            return $this->checkRow('missing_sub_region', self::SEVERITY_OK, 0, 'missing_sub_region.column_unavailable');
         }
 
         $hasAnyRegion = DB::table('caring_sub_regions')
@@ -244,14 +229,7 @@ class TenantDataQualityService
             ->exists();
 
         if (!$hasAnyRegion) {
-            return [
-                'key'           => 'missing_sub_region',
-                'label'         => 'Members without sub-region',
-                'severity'      => self::SEVERITY_OK,
-                'count'         => 0,
-                'message'       => __('caring_community.data_quality.no_sub_regions'),
-                'has_drilldown' => false,
-            ];
+            return $this->checkRow('missing_sub_region', self::SEVERITY_OK, 0, 'missing_sub_region.no_regions');
         }
 
         $count = (int) DB::table('users')
@@ -259,22 +237,18 @@ class TenantDataQualityService
             ->whereNull('sub_region_id')
             ->count();
 
-        return [
-            'key'           => 'missing_sub_region',
-            'label'         => 'Members without sub-region',
-            'severity'      => $count > 0 ? self::SEVERITY_INFO : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Members without a sub-region will not appear in neighbourhood-scoped feeds.'
-                : 'All members are assigned to a sub-region.',
-            'has_drilldown' => false,
-        ];
+        return $this->checkRow(
+            'missing_sub_region',
+            $count > 0 ? self::SEVERITY_INFO : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'missing_sub_region.found' : 'missing_sub_region.clear',
+        );
     }
 
     private function checkMissingCoordinatorAssignment(int $tenantId): array
     {
         if (!Schema::hasTable('caring_support_relationships')) {
-            return $this->okRow('missing_coordinator_assignment', 'Caring relationships without coordinator', 'caring_support_relationships table not present', false);
+            return $this->checkRow('missing_coordinator_assignment', self::SEVERITY_OK, 0, 'missing_coordinator_assignment.table_unavailable');
         }
 
         // Schema on this tenant uses `coordinator_id`. If a future schema
@@ -288,14 +262,7 @@ class TenantDataQualityService
         }
 
         if ($col === null) {
-            return [
-                'key'           => 'missing_coordinator_assignment',
-                'label'         => 'Caring relationships without coordinator',
-                'severity'      => self::SEVERITY_OK,
-                'count'         => 0,
-                'message'       => __('caring_community.data_quality.no_coordinator_column'),
-                'has_drilldown' => false,
-            ];
+            return $this->checkRow('missing_coordinator_assignment', self::SEVERITY_OK, 0, 'missing_coordinator_assignment.column_unavailable');
         }
 
         $count = (int) DB::table('caring_support_relationships')
@@ -303,22 +270,18 @@ class TenantDataQualityService
             ->whereNull($col)
             ->count();
 
-        return [
-            'key'           => 'missing_coordinator_assignment',
-            'label'         => 'Caring relationships without coordinator',
-            'severity'      => $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Assign a coordinator to each active caring relationship before going live.'
-                : 'All caring relationships have a coordinator assigned.',
-            'has_drilldown' => false,
-        ];
+        return $this->checkRow(
+            'missing_coordinator_assignment',
+            $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'missing_coordinator_assignment.found' : 'missing_coordinator_assignment.clear',
+        );
     }
 
     private function checkUnverifiedOrganisations(int $tenantId): array
     {
         if (!Schema::hasTable('vol_organizations')) {
-            return $this->okRow('unverified_organisations', 'Unverified organisations', 'vol_organizations table not present', false);
+            return $this->checkRow('unverified_organisations', self::SEVERITY_OK, 0, 'unverified_organisations.table_unavailable');
         }
 
         // Prefer verified_at if present (newer schema). Otherwise fall back to
@@ -336,7 +299,7 @@ class TenantDataQualityService
                 ->whereNotIn('status', ['approved', 'verified', 'active'])
                 ->count();
         } else {
-            return $this->okRow('unverified_organisations', 'Unverified organisations', 'no verification column on vol_organizations', false);
+            return $this->checkRow('unverified_organisations', self::SEVERITY_OK, 0, 'unverified_organisations.verification_unavailable');
         }
 
         $severity = self::SEVERITY_OK;
@@ -346,22 +309,19 @@ class TenantDataQualityService
             $severity = self::SEVERITY_INFO;
         }
 
-        return [
-            'key'           => 'unverified_organisations',
-            'label'         => 'Unverified organisations',
-            'severity'      => $severity,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Approve or reject each pending organisation so members trust the listings.'
-                : 'All organisations have been reviewed.',
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'unverified_organisations',
+            $severity,
+            $count,
+            $count > 0 ? 'unverified_organisations.found' : 'unverified_organisations.clear',
+            $count > 0,
+        );
     }
 
     private function checkSeedMarkerUsers(int $tenantId): array
     {
         if (!Schema::hasTable('users')) {
-            return $this->okRow('seed_marker_users', 'Demo / seed marker accounts', 'users table not present', false);
+            return $this->checkRow('seed_marker_users', self::SEVERITY_OK, 0, 'seed_marker_users.table_unavailable');
         }
 
         $hasName = Schema::hasColumn('users', 'name');
@@ -383,22 +343,19 @@ class TenantDataQualityService
 
         $count = (int) $query->count();
 
-        return [
-            'key'           => 'seed_marker_users',
-            'label'         => 'Demo / seed marker accounts',
-            'severity'      => $count > 0 ? self::SEVERITY_DANGER : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Demo or seed accounts are still present — they must be removed before onboarding real residents.'
-                : 'No demo / seed marker accounts detected.',
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'seed_marker_users',
+            $count > 0 ? self::SEVERITY_DANGER : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'seed_marker_users.found' : 'seed_marker_users.clear',
+            $count > 0,
+        );
     }
 
     private function checkUnansweredHelpRequests(int $tenantId): array
     {
         if (!Schema::hasTable('caring_help_requests')) {
-            return $this->okRow('unanswered_help_requests', 'Unanswered help requests (>30 days)', 'caring_help_requests table not present', false);
+            return $this->checkRow('unanswered_help_requests', self::SEVERITY_OK, 0, 'unanswered_help_requests.table_unavailable');
         }
 
         $thirtyDaysAgo = gmdate('Y-m-d H:i:s', time() - (30 * 86400));
@@ -416,22 +373,19 @@ class TenantDataQualityService
             $severity = self::SEVERITY_WARNING;
         }
 
-        return [
-            'key'           => 'unanswered_help_requests',
-            'label'         => 'Unanswered help requests (>30 days)',
-            'severity'      => $severity,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Old pending help requests damage trust — close, decline, or match each one.'
-                : 'No stale help requests.',
-            'has_drilldown' => $count > 0,
-        ];
+        return $this->checkRow(
+            'unanswered_help_requests',
+            $severity,
+            $count,
+            $count > 0 ? 'unanswered_help_requests.found' : 'unanswered_help_requests.clear',
+            $count > 0,
+        );
     }
 
     private function checkMembersWithoutRole(int $tenantId): array
     {
         if (!Schema::hasTable('users') || !Schema::hasColumn('users', 'role')) {
-            return $this->okRow('members_without_role', 'Members without role', 'role column not present', false);
+            return $this->checkRow('members_without_role', self::SEVERITY_OK, 0, 'members_without_role.schema_unavailable');
         }
 
         $count = (int) DB::table('users')
@@ -441,22 +395,18 @@ class TenantDataQualityService
             })
             ->count();
 
-        return [
-            'key'           => 'members_without_role',
-            'label'         => 'Members without role',
-            'severity'      => $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
-            'count'         => $count,
-            'message'       => $count > 0
-                ? 'Assign every member a role (member / coordinator / admin) so permissions resolve correctly.'
-                : 'Every member has a role assigned.',
-            'has_drilldown' => false,
-        ];
+        return $this->checkRow(
+            'members_without_role',
+            $count > 0 ? self::SEVERITY_WARNING : self::SEVERITY_OK,
+            $count,
+            $count > 0 ? 'members_without_role.found' : 'members_without_role.clear',
+        );
     }
 
     private function checkTenantSettingCompleteness(int $tenantId): array
     {
         if (!Schema::hasTable('tenant_settings')) {
-            return $this->okRow('tenant_setting_completeness', 'Tenant settings completeness', 'tenant_settings table not present', false);
+            return $this->checkRow('tenant_setting_completeness', self::SEVERITY_OK, 0, 'tenant_setting_completeness.table_unavailable');
         }
 
         $missing = 0;
@@ -474,16 +424,12 @@ class TenantDataQualityService
             }
         }
 
-        return [
-            'key'           => 'tenant_setting_completeness',
-            'label'         => 'Tenant settings completeness',
-            'severity'      => $missing > 0 ? self::SEVERITY_INFO : self::SEVERITY_OK,
-            'count'         => $missing,
-            'message'       => $missing > 0
-                ? 'One or more pre-launch settings are missing — review the AG80 disclosure pack and AG81 operating policy admin pages.'
-                : 'All pre-launch tenant settings are configured.',
-            'has_drilldown' => false,
-        ];
+        return $this->checkRow(
+            'tenant_setting_completeness',
+            $missing > 0 ? self::SEVERITY_INFO : self::SEVERITY_OK,
+            $missing,
+            $missing > 0 ? 'tenant_setting_completeness.found' : 'tenant_setting_completeness.clear',
+        );
     }
 
     // -------------------------------------------------------------------
@@ -669,7 +615,8 @@ class TenantDataQualityService
 
         return array_map(fn ($r) => [
             'id'         => (int) $r->id,
-            'identifier' => 'user #' . (int) ($r->user_id ?? 0),
+            'identifier_code' => 'user_id',
+            'identifier_params' => ['id' => (int) ($r->user_id ?? 0)],
             'status'     => (string) ($r->status ?? ''),
             'created_at' => $r->created_at !== null ? (string) $r->created_at : null,
         ], $rows->all());
@@ -679,15 +626,23 @@ class TenantDataQualityService
     // Internal helpers
     // -------------------------------------------------------------------
 
-    /** Build a uniformly shaped OK / no-op check row. */
-    private function okRow(string $key, string $label, string $message, bool $hasDrilldown): array
+    /** Build a uniformly shaped check row with frontend-owned copy. */
+    private function checkRow(
+        string $key,
+        string $severity,
+        int $count,
+        string $messageCode,
+        bool $hasDrilldown = false,
+        array $messageParams = [],
+    ): array
     {
         return [
             'key'           => $key,
-            'label'         => $label,
-            'severity'      => self::SEVERITY_OK,
-            'count'         => 0,
-            'message'       => $message,
+            'label_code'    => $key,
+            'severity'      => $severity,
+            'count'         => $count,
+            'message_code'  => $messageCode,
+            'message_params'=> $messageParams,
             'has_drilldown' => $hasDrilldown,
         ];
     }

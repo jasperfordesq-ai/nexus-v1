@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "analytics": {
     "category_demand_title": "Kategoria Zapotrzebowanie",
@@ -201,7 +201,8 @@
         "language_distribution": "Dystrybucja języka",
         "member_growth_12m": "Wzrost liczby członków w ciągu ostatnich 12 miesięcy",
         "total_with_data": "Członkowie {{total}} z danymi demograficznymi",
-        "total_active_members": "Aktywni członkowie {{total}}"
+        "total_active_members": "Aktywni członkowie {{total}}",
+        "unknown_language": "Nieznany język"
       },
       "volunteer": {
         "total_hours": "Łączna liczba godzin",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "Prośby o pomoc według kategorii",
-        "resolution_trend_6m": "Trend rozdzielczości, ostatnie 6 miesięcy"
+        "resolution_trend_6m": "Trend rozdzielczości, ostatnie 6 miesięcy",
+        "categories": {
+          "either": "Telefon lub wiadomość",
+          "message": "Wiadomość",
+          "phone": "Telefon",
+          "unknown": "Nieznana preferencja"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -238,10 +245,10 @@
       },
       "age_groups": {
         "under_25": "Poniżej 25. roku życia",
-        "25_34": "TOKEN NEXUSARM0",
-        "35_44": "TOKEN NEXUSARM0",
-        "45_54": "TOKEN NEXUSARM0",
-        "55_64": "TOKEN NEXUSARM0",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
         "65_plus": "65+",
         "unknown": "Nieznany"
       }
@@ -280,6 +287,17 @@
     "count_value_one": "{{count}}×",
     "count_value_other": "{{count}}×",
     "count_value_few": "{{count}}×",
-    "count_value_many": "{{count}}×"
+    "count_value_many": "{{count}}×",
+    "result_types": {
+      "blog": "Blog",
+      "events": "Wydarzenia",
+      "groups": "Grupy",
+      "jobs": "Oferty pracy",
+      "listings": "Ogłoszenia",
+      "marketplace": "Rynek",
+      "members": "Członkowie",
+      "resources": "Zasoby",
+      "volunteering": "Wolontariat"
+    }
   }
 }

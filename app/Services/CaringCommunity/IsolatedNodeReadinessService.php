@@ -44,68 +44,68 @@ class IsolatedNodeReadinessService
     /**
      * Schema for every item the gate tracks. Drives validation and the admin UI.
      *
-     * @return array<string, array{label: string, type: string, choices?: array<int, string>, help: string}>
+     * @return array<string, array{label_code: string, type: string, choices?: array<int, string>, help_code: string}>
      */
     public function schema(): array
     {
         return [
             'deployment_mode' => [
-                'label' => 'Deployment mode',
+                'label_code' => 'deployment_mode',
                 'type'  => 'enum',
                 'choices' => ['hosted_tenant', 'hosted_custom_domain', 'canton_isolated_node'],
-                'help'  => 'How this deployment is hosted: shared tenant, custom domain on the shared platform, or fully isolated canton-controlled node.',
+                'help_code'  => 'deployment_mode',
             ],
             'hosting_owner' => [
-                'label' => 'Hosting owner',
+                'label_code' => 'hosting_owner',
                 'type'  => 'text',
-                'help'  => 'Organisation that runs the infrastructure (server, domain, TLS) for the node.',
+                'help_code'  => 'hosting_owner',
             ],
             'smtp_owner' => [
-                'label' => 'SMTP / outbound email owner',
+                'label_code' => 'smtp_owner',
                 'type'  => 'text',
-                'help'  => 'Who operates outbound email delivery (e.g. own SMTP relay, Postmark account, Mailjet).',
+                'help_code'  => 'smtp_owner',
             ],
             'storage_owner' => [
-                'label' => 'Storage owner',
+                'label_code' => 'storage_owner',
                 'type'  => 'text',
-                'help'  => 'Who owns and operates file uploads, attachments, and persistent object storage.',
+                'help_code'  => 'storage_owner',
             ],
             'backup_owner' => [
-                'label' => 'Backup owner',
+                'label_code' => 'backup_owner',
                 'type'  => 'text',
-                'help'  => 'Who runs daily backups, retention windows, and has restore-tested the database.',
+                'help_code'  => 'backup_owner',
             ],
             'update_cadence' => [
-                'label' => 'Update cadence',
+                'label_code' => 'update_cadence',
                 'type'  => 'choice',
                 'choices' => ['weekly', 'monthly', 'quarterly', 'on_demand'],
-                'help'  => 'How often the node receives upstream NEXUS source updates.',
+                'help_code'  => 'update_cadence',
             ],
             'source_release_workflow' => [
-                'label' => 'Source release workflow',
+                'label_code' => 'source_release_workflow',
                 'type'  => 'text',
-                'help'  => 'How AGPL source updates flow into the isolated node (mirror repo, signed tags, manual review).',
+                'help_code'  => 'source_release_workflow',
             ],
             'telemetry_default' => [
-                'label' => 'Telemetry default',
+                'label_code' => 'telemetry_default',
                 'type'  => 'choice',
                 'choices' => ['enabled', 'disabled'],
-                'help'  => 'Default state for outbound telemetry / error reporting on this node.',
+                'help_code'  => 'telemetry_default',
             ],
             'federation_key_exchange' => [
-                'label' => 'Federation key exchange',
+                'label_code' => 'federation_key_exchange',
                 'type'  => 'text',
-                'help'  => 'Whether and how this node federates with other regional nodes (key custody, exchange protocol).',
+                'help_code'  => 'federation_key_exchange',
             ],
             'dpo_appointed' => [
-                'label' => 'Data-protection officer',
+                'label_code' => 'dpo_appointed',
                 'type'  => 'text',
-                'help'  => 'Named DPO with contact details (FADP requirement at scale for canton-level deployments).',
+                'help_code'  => 'dpo_appointed',
             ],
             'incident_runbook_url' => [
-                'label' => 'Incident runbook URL',
+                'label_code' => 'incident_runbook_url',
                 'type'  => 'url',
-                'help'  => 'Link to the operational runbook for incidents (downtime, breach, key compromise, restore drill).',
+                'help_code'  => 'incident_runbook_url',
             ],
         ];
     }
@@ -124,10 +124,10 @@ class IsolatedNodeReadinessService
             $envelope = $stored[$key] ?? [];
             $items[] = [
                 'key'     => $key,
-                'label'   => $meta['label'],
+                'label_code' => $meta['label_code'],
                 'type'    => $meta['type'],
                 'choices' => $meta['choices'] ?? null,
-                'help'    => $meta['help'],
+                'help_code' => $meta['help_code'],
                 'value'   => $envelope['value'] ?? null,
                 'owner'   => $envelope['owner'] ?? null,
                 'status'  => $envelope['status'] ?? self::STATUS_PENDING,

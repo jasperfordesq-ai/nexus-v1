@@ -75,6 +75,16 @@ export function ProvisioningRequestsPage() {
   usePageTitle(t('page_title'));
   const toast = useToast();
 
+  const statusLabel = (status: string) => t(`statuses.${status}`, {
+    defaultValue: t('statuses.unknown'),
+  });
+  const categoryLabel = (category: string) => t(`categories.${category}`, {
+    defaultValue: t('categories.unknown'),
+  });
+  const sizeLabel = (size: string | null) => size
+    ? t(`size_buckets.${size}`, { defaultValue: t('size_buckets.unknown') })
+    : t('empty_value');
+
   const [requests, setRequests] = useState<ProvisioningRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
@@ -117,7 +127,7 @@ export function ProvisioningRequestsPage() {
         detail.onClose();
         await load();
       } else {
-        toast.error(res.error || t('approve_failed'));
+        toast.error(t('approve_failed'));
       }
     } catch (err) {
       logError('approve failed', err);
@@ -143,7 +153,7 @@ export function ProvisioningRequestsPage() {
         detail.onClose();
         await load();
       } else {
-        toast.error(res.error || t('reject_failed'));
+        toast.error(t('reject_failed'));
       }
     } catch (err) {
       logError('reject failed', err);
@@ -163,7 +173,7 @@ export function ProvisioningRequestsPage() {
         detail.onClose();
         await load();
       } else {
-        toast.error(res.error || t('retry_failed'));
+        toast.error(t('retry_failed'));
       }
     } catch (err) {
       logError('retry failed', err);
@@ -239,7 +249,7 @@ export function ProvisioningRequestsPage() {
                       {req.country_code}{req.region_or_canton ? ` · ${req.region_or_canton}` : ''}
                     </p>
                   </div>
-                  <Chip size="sm" color={statusColor(req.status)} variant="soft">{req.status}</Chip>
+                  <Chip size="sm" color={statusColor(req.status)} variant="soft">{statusLabel(req.status)}</Chip>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
                   <Globe className="inline w-3 h-3 mr-1" aria-hidden="true" />/{req.requested_slug}
@@ -263,7 +273,7 @@ export function ProvisioningRequestsPage() {
                 <Building className="w-5 h-5 text-accent" aria-hidden="true" />
                 <ModalHeading>{selected.org_name}</ModalHeading>
                 <Chip size="sm" color={statusColor(selected.status)} variant="soft">
-                  {selected.status}
+                  {statusLabel(selected.status)}
                 </Chip>
               </ModalHeader>
               <ModalBody className="space-y-4 text-sm">
@@ -288,11 +298,11 @@ export function ProvisioningRequestsPage() {
                   </div>
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.category')}</p>
-                    <p>{selected.tenant_category}</p>
+                    <p>{categoryLabel(selected.tenant_category)}</p>
                   </div>
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.expected_size')}</p>
-                    <p>{selected.expected_member_count_bucket ?? '—'}</p>
+                    <p>{sizeLabel(selected.expected_member_count_bucket)}</p>
                   </div>
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.languages')}</p>

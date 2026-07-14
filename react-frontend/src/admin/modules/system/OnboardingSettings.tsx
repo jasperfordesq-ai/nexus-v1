@@ -172,7 +172,7 @@ export function OnboardingSettings() {
       if (res.success) {
         toast.success(t('system.onboarding.settings_saved'), t('system.onboarding.config_updated'));
       } else {
-        toast.error(t('system.onboarding.save_failed'), res.error || t('system.onboarding.please_try_again'));
+        toast.error(t('system.onboarding.save_failed'), t('system.onboarding.please_try_again'));
       }
     } catch (error) {
       logError('Failed to save onboarding config', error);
@@ -202,7 +202,7 @@ export function OnboardingSettings() {
         presetModal.onClose();
         fetchConfig();
       } else {
-        toast.error(t('system.onboarding.failed_to_apply_preset'), res.error || t('system.onboarding.please_try_again'));
+        toast.error(t('system.onboarding.failed_to_apply_preset'), t('system.onboarding.please_try_again'));
       }
     } catch (error) {
       logError('Failed to apply preset', error);

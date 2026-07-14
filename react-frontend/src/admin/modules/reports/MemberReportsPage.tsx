@@ -22,7 +22,7 @@ import Trophy from 'lucide-react/icons/trophy';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
-import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
@@ -157,6 +157,20 @@ async function exportCsv(reportType: string) {
 
 export function MemberReportsPage() {
   const { t } = useTranslation('admin_reports');
+  const formatPeriodLabel = (period: string): string => {
+    const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(period);
+    if (day) {
+      return new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])).toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    const month = /^(\d{4})-(\d{2})$/.exec(period);
+    if (month) {
+      return new Date(Number(month[1]), Number(month[2]) - 1, 1).toLocaleDateString(getFormattingLocale(), { month: 'short', year: 'numeric' });
+    }
+    const week = /^(\d{4})-W(\d{1,2})$/.exec(period);
+    return week
+      ? t('reports.week_period', { year: Number(week[1]), week: Number(week[2]) })
+      : t('reports.unknown_period');
+  };
   usePageTitle(t('reports.page_title'));
   const toast = useToast();
 
@@ -249,8 +263,8 @@ export function MemberReportsPage() {
                 <TableCell>
                   <Chip size="sm" variant="soft">{m.transaction_count}</Chip>
                 </TableCell>
-                <TableCell className="text-sm text-success font-medium">{m.hours_given?.toFixed(1) ?? '0.0'}</TableCell>
-                <TableCell className="text-sm text-warning font-medium">{m.hours_received?.toFixed(1) ?? '0.0'}</TableCell>
+                <TableCell className="text-sm text-success font-medium">{formatNumber(m.hours_given ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
+                <TableCell className="text-sm text-warning font-medium">{formatNumber(m.hours_received ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
                 <TableCell className="text-sm text-muted">
                   {m.joined_at ? new Date(m.joined_at).toLocaleDateString(getFormattingLocale()) : '---'}
                 </TableCell>
@@ -299,9 +313,9 @@ export function MemberReportsPage() {
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="period" tick={{ fontSize: 11 }} tickLine={false} />
-                <YAxis tick={{ fontSize: 12 }} tickLine={false} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="period" tick={{ fontSize: 11 }} tickLine={false} tickFormatter={formatPeriodLabel} />
+                <YAxis tick={{ fontSize: 12 }} tickLine={false} allowDecimals={false} tickFormatter={(value: number) => formatNumber(value)} />
+                <Tooltip contentStyle={tooltipStyle} labelFormatter={(value) => formatPeriodLabel(String(value))} formatter={(value) => formatNumber(Number(value))} />
                 <Legend />
                 <Bar dataKey="count" name={t('reports.new_registrations')} fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -347,8 +361,8 @@ export function MemberReportsPage() {
                   const color = pct >= 60 ? 'text-success' : pct >= 30 ? 'text-warning' : 'text-danger';
                   return (
                     <TableCell key={key} className={`text-center font-medium ${color}`}>
-                      {pct.toFixed(0)}%
-                      <span className="text-xs text-muted ml-1">({val})</span>
+                      {formatNumber(pct / 100, { style: 'percent', maximumFractionDigits: 0 })}
+                      <span className="text-xs text-muted ml-1">({formatNumber(val)})</span>
                     </TableCell>
                   );
                 };
@@ -379,27 +393,27 @@ export function MemberReportsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={t('reports.label_login_rate')}
-            value={metrics ? `${(Number(metrics.login_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? formatNumber(Number(metrics.login_rate ?? 0), { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
             icon={Users}
             loading={loading}
           />
           <StatCard
             label={t('reports.label_trading_rate')}
-            value={metrics ? `${(Number(metrics.trading_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? formatNumber(Number(metrics.trading_rate ?? 0), { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
             icon={TrendingUp}
             color="success"
             loading={loading}
           />
           <StatCard
             label={t('reports.label_listing_rate')}
-            value={metrics ? `${(Number(metrics.listing_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? formatNumber(Number(metrics.listing_rate ?? 0), { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
             icon={BarChart3}
             color="warning"
             loading={loading}
           />
           <StatCard
             label={t('reports.label_messaging_rate')}
-            value={metrics ? `${(Number(metrics.messaging_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? formatNumber(Number(metrics.messaging_rate ?? 0), { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '\u2014'}
             icon={Activity}
             color="default"
             loading={loading}
@@ -426,7 +440,7 @@ export function MemberReportsPage() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
-                  {metrics?.avg_sessions_per_user?.toFixed(1) ?? '0.0'}
+                  {formatNumber(metrics?.avg_sessions_per_user ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                 </p>
               )}
             </CardBody>
@@ -438,7 +452,7 @@ export function MemberReportsPage() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
-                  {metrics?.avg_transactions_per_user?.toFixed(1) ?? '0.0'}
+                  {formatNumber(metrics?.avg_transactions_per_user ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                 </p>
               )}
             </CardBody>
@@ -485,8 +499,8 @@ export function MemberReportsPage() {
                       <span className="font-medium text-foreground">{c.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right text-success font-medium">{c.hours_given?.toFixed(1)}</TableCell>
-                  <TableCell className="text-right text-warning font-medium">{c.hours_received?.toFixed(1)}</TableCell>
+                  <TableCell className="text-right text-success font-medium">{formatNumber(c.hours_given ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
+                  <TableCell className="text-right text-warning font-medium">{formatNumber(c.hours_received ?? 0, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</TableCell>
                   <TableCell className="text-right text-accent">{c.transaction_count}</TableCell>
                   <TableCell className="text-right text-muted">{c.listings_count}</TableCell>
                 </TableRow>

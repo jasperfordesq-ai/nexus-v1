@@ -23,7 +23,8 @@
     "escalated": "Escalado",
     "resolved_buyer": "Resolvido a favor do comprador",
     "resolved_seller": "Resolvido a favor do vendedor",
-    "closed": "Fechado"
+    "closed": "Fechado",
+    "unknown": "Outro status do caso"
   },
   "reason": {
     "counterfeit": "Artigo contrafeito",
@@ -37,7 +38,8 @@
     "payment_issue": "Problema de pagamento",
     "damaged": "Artigo danificado",
     "fraud": "Suspeita de fraude",
-    "other": "Outro"
+    "other": "Outro",
+    "unknown": "Outro motivo"
   },
   "action": {
     "none": "Sem medida de execução",

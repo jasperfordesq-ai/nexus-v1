@@ -3,7 +3,6 @@
   "subtitle": "Visão geral da plataforma e centro de comando em tempo real",
   "tour_btn": "Percorrer",
   "refresh": "Atualizar",
-  "loading": "Loading",
   "view_all_activity": "Ver todas as atividades",
   "tour": {
     "welcome_title": "Bem-vindo ao Controle da Missão!",
@@ -27,8 +26,8 @@
   },
   "trends": {
     "card_title": "Tendências de transações",
-    "hours_suffix": "hrs",
-    "no_data": "Não há dados de tendência disponíveis"
+    "no_data": "Não há dados de tendência disponíveis",
+    "hours_suffix": "hs"
   },
   "safeguarding_banner": {
     "title": "A etapa de proteção está DESATIVADA no assistente de integração",
@@ -80,7 +79,7 @@
     "seo_desc": "Otimização de pesquisa",
     "error_tracking": "Rastreamento de erros 404",
     "error_tracking_desc": "Monitore links quebrados",
-    "cron_jobs": "Cron Jobs",
+    "cron_jobs": "Tarefas cron",
     "cron_jobs_desc": "Tarefas agendadas"
   },
   "activity": {
@@ -118,8 +117,9 @@
     "card_title": "Status do sistema",
     "details": "Detalhes",
     "database": "Banco de dados",
-    "cache": "Cache",
-    "queue": "Cron Jobs",
-    "api": "API de e-mail"
-  }
+    "queue": "Tarefas cron",
+    "api": "API de e-mail",
+    "cache": "Cache"
+  },
+  "loading": "Carregando"
 }

@@ -10,6 +10,7 @@
  */
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 import { hasAdminPanelAccess } from '@/lib/access';
@@ -18,9 +19,10 @@ export function AdminRoute() {
   const { user, isAuthenticated, isLoading, status } = useAuth();
   const { tenantPath } = useTenant();
   const location = useLocation();
+  const { t } = useTranslation('admin_nav');
 
   if (isLoading || status === 'loading') {
-    return <LoadingScreen message={"Checking Permissions"} />;
+    return <LoadingScreen message={t('checking_permissions')} />;
   }
 
   if (!isAuthenticated) {

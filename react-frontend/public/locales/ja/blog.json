@@ -64,9 +64,13 @@
     "reaction_sad": "悲しい",
     "reaction_celebrate": "お祝い",
     "min_read_other": "{{count}}分で読めます",
-    "views_count_other": "{{count}}回表示"
+    "views_count_other": "{{count}}回表示",
+    "min_read_one": "{{count}} 分読",
+    "views_count_one": "{{count}} 回閲覧"
   },
   "page_description": "タイムバンクコミュニティからのストーリー、ガイド、最新情報 — 成功した交流、学んだ教訓、地域グループやパートナーからの最新ニュース。",
   "min_read_other": "{{count}}分で読めます",
-  "min_read_short_other": "{{count}}分"
+  "min_read_short_other": "{{count}}分",
+  "min_read_one": "{{count}} 分読",
+  "min_read_short_one": "{{count}}分"
 }

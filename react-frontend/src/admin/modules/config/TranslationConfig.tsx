@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { languageDisplayName } from '@/lib/languageDisplayName';
 import { PageHeader } from '../../components/PageHeader';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -40,24 +41,12 @@ type ConfigValue = string | number | boolean;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ENGINE_OPTIONS = [
-  { key: 'openai', label: 'OpenAI' },
-  { key: 'deepl', label: 'DeepL' },
-  { key: 'google', label: 'Google Translate' },
+  { key: 'openai', labelKey: 'config.translation_provider_openai' },
+  { key: 'deepl', labelKey: 'config.translation_provider_deepl' },
+  { key: 'google', labelKey: 'config.translation_provider_google' },
 ];
 
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Fran\u00e7ais' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'es', label: 'Espa\u00f1ol' },
-  { code: 'it', label: 'Italiano' },
-  { code: 'pt', label: 'Portugu\u00eas' },
-  { code: 'ga', label: 'Gaeilge' },
-  { code: 'nl', label: 'Nederlands' },
-  { code: 'pl', label: 'Polski' },
-  { code: 'ja', label: '\u65E5\u672C\u8A9E' },
-  { code: 'ar', label: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629' },
-];
+const LANGUAGES = ['en', 'fr', 'de', 'es', 'it', 'pt', 'ga', 'nl', 'pl', 'ja', 'ar'] as const;
 
 const CONFIG_KEYS: Record<string, { labelKey: string; descKey: string }> = {
   'translation.enabled': {
@@ -95,7 +84,7 @@ const CONFIG_KEYS: Record<string, { labelKey: string; descKey: string }> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function TranslationConfig() {
-  const { t } = useTranslation('admin_config');
+  const { t, i18n } = useTranslation('admin_config');
   usePageTitle(t('config.translation_settings_title'));
   const toast = useToast();
 
@@ -182,7 +171,7 @@ export function TranslationConfig() {
         setConfig((prev) => ({ ...prev, [key]: value }));
         toast.success(t('config.translation_setting_updated', { setting: meta(key).label }));
       } else {
-        toast.error(res.error || t('config.translation_setting_update_failed', { setting: meta(key).label }));
+        toast.error(t('config.translation_setting_update_failed', { setting: meta(key).label }));
       }
     } catch {
       toast.error(t('config.translation_setting_update_failed', { setting: meta(key).label }));
@@ -212,7 +201,7 @@ export function TranslationConfig() {
         setNewLang('');
         loadGlossary();
       } else {
-        toast.error(res.error || t('config.translation_glossary_add_failed'));
+        toast.error(t('config.translation_glossary_add_failed'));
       }
     } catch {
       toast.error(t('config.translation_glossary_add_failed'));
@@ -229,7 +218,7 @@ export function TranslationConfig() {
         setGlossary((prev) => prev.filter((e) => e.id !== id));
         toast.success(t('config.translation_glossary_entry_removed'));
       } else {
-        toast.error(res.error || t('config.translation_glossary_delete_failed'));
+        toast.error(t('config.translation_glossary_delete_failed'));
       }
     } catch {
       toast.error(t('config.translation_glossary_delete_failed'));
@@ -297,7 +286,7 @@ export function TranslationConfig() {
                 isDisabled={saving === 'translation.engine'}
               >
                 {ENGINE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
+                  <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
                 ))}
               </Select>
             </div>
@@ -430,8 +419,8 @@ export function TranslationConfig() {
                   className="min-w-[150px] flex-1"
                   size="sm"
                 >
-                  {LANGUAGES.map((lang) => (
-                    <SelectItem key={lang.code} id={lang.code}>{lang.label}</SelectItem>
+                  {LANGUAGES.map((code) => (
+                    <SelectItem key={code} id={code}>{languageDisplayName(code, i18n.resolvedLanguage)}</SelectItem>
                   ))}
                 </Select>
                 <Button
@@ -466,7 +455,7 @@ export function TranslationConfig() {
                   </TableHeader>
                   <TableBody>
                     {glossary.map((entry) => {
-                      const langLabel = LANGUAGES.find((l) => l.code === entry.target_language)?.label || entry.target_language;
+                      const langLabel = languageDisplayName(entry.target_language, i18n.resolvedLanguage);
                       return (
                         <TableRow key={entry.id}>
                           <TableCell>{entry.source_term}</TableCell>

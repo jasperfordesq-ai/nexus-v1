@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "performance": {
     "label_performance_metrics": "Prestatiestatistieken",
@@ -83,19 +83,20 @@
     "label_n_plus_one_warnings": "N Plus One-waarschuwingen",
     "label_slow_queries": "Langzame vragen",
     "label_total_requests": "Totaal aantal verzoeken",
-    "n_plus_one_body": "N Plus One Body",
     "n_plus_one_title": "N plus één",
     "no_memory_spikes": "Geen geheugenpieken gevonden",
     "no_slow_queries": "Geen langzame zoekopdrachten gevonden",
     "no_slow_requests": "Geen langzame verzoeken gevonden",
     "no_volume_data": "Geen volumegegevens gevonden",
-    "page_description": "Page.",
     "peak_memory": "Piekgeheugen",
     "query_count": "Aantal zoekopdrachten",
     "refresh": "Vernieuwen",
     "tab_memory_spikes": "Geheugenpieken",
     "tab_request_volume": "Vraagvolume aan",
     "tab_slow_queries": "Langzame vragen",
-    "tab_slow_requests": "Langzame verzoeken"
+    "tab_slow_requests": "Langzame verzoeken",
+    "warning_unknown": "Prestatie waarschuwing",
+    "n_plus_one_body": "Potentiële N+1 querypatronen zijn gedetecteerd. Bekijk het langzame verzoek en de querydetails voor herhaald relatiën laden.",
+    "page_description": "Database-, aanvraag- en geheugensprestatiemaatstaven voor de geselecteerde periode."
   }
 }

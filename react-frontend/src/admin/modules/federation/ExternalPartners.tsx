@@ -27,7 +27,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { BrokerEmptyState } from '@/broker/components';
@@ -285,7 +285,7 @@ export function ExternalPartners() {
         formModal.onClose();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.failed_to_save_partner');
+        const errorMsg = t('federation.failed_to_save_partner');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -324,22 +324,28 @@ export function ExternalPartners() {
         const data = res.data as { healthy?: boolean; response_time_ms?: number; error?: string };
         if (data?.healthy) {
           toast.success(
-            t('federation.health_check_success', {
+            t('federation.health_check_success_formatted', {
               name: partner.name,
-              time: data?.response_time_ms ?? '?',
-            }) || `${partner.name}: Healthy (${data?.response_time_ms ?? '?'}ms)`
+              time: data?.response_time_ms == null
+                ? t('federation.response_time_unknown')
+                : new Intl.NumberFormat(getFormattingLocale(), {
+                    style: 'unit',
+                    unit: 'millisecond',
+                    unitDisplay: 'short',
+                  }).format(data.response_time_ms),
+            })
           );
         } else {
           toast.error(
             t('federation.health_check_partner_error', {
               name: partner.name,
-              error: data?.error ?? t('federation.partner_unreachable'),
+              error: t('federation.partner_unreachable'),
             })
           );
         }
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.health_check_error');
+        const errorMsg = t('federation.health_check_error');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -450,7 +456,9 @@ export function ExternalPartners() {
               </TableCell>
               <TableCell>
                 <Chip size="sm" variant="soft">
-                  {t(`federation.auth_method_${partner.auth_method}`, partner.auth_method)}
+                  {t(`federation.auth_method_${partner.auth_method}`, {
+                    defaultValue: t('federation.auth_method_unknown'),
+                  })}
                 </Chip>
               </TableCell>
               <TableCell>
@@ -781,7 +789,13 @@ export function ExternalPartners() {
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-muted">
-                              {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
+                              {log.response_time_ms != null
+                                ? new Intl.NumberFormat(getFormattingLocale(), {
+                                    style: 'unit',
+                                    unit: 'millisecond',
+                                    unitDisplay: 'short',
+                                  }).format(log.response_time_ms)
+                                : t('federation.response_time_unknown')}
                             </span>
                           </TableCell>
                           <TableCell>

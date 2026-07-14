@@ -174,7 +174,7 @@ export function LegalDocVersionEditor() {
         setDirty(false);
         navigate(versionsPath);
       } else {
-        error(response.error || (isEdit ? t('enterprise.version_form.failed_to_update') : t('enterprise.version_form.failed_to_create')));
+        error((isEdit ? t('enterprise.version_form.failed_to_update') : t('enterprise.version_form.failed_to_create')));
       }
     } catch {
       error(isEdit ? t('enterprise.version_form.failed_to_update') : t('enterprise.version_form.failed_to_create'));

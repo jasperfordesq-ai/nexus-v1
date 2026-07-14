@@ -54,12 +54,12 @@ export function HealthCheck() {
     } catch {
       setResult({
         status: 'unhealthy',
-        checks: [{ name: t('enterprise.api'), status: 'fail' }],
+        checks: [{ code: 'api', status: 'fail' }],
       });
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);
@@ -97,7 +97,7 @@ export function HealthCheck() {
       case 'unhealthy':
         return t('enterprise.status_unhealthy');
       default:
-        return status;
+        return t('enterprise.status_unknown');
     }
   };
 
@@ -108,6 +108,12 @@ export function HealthCheck() {
   const getCheckStatusCodeLabel = (status: string) => (
     status === 'ok' ? t('enterprise.status_ok') : t('enterprise.status_fail')
   );
+
+  const getCheckName = (check: HealthCheckResult['checks'][number]) =>
+    t(`enterprise.health_check_name_${check.code}`, {
+      ...(check.params ?? {}),
+      defaultValue: t('enterprise.health_check_name_unknown'),
+    });
 
   return (
     <div>
@@ -152,7 +158,7 @@ export function HealthCheck() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {result.checks.map((check) => (
               <Card
-                key={check.name}
+                key={`${check.code}-${JSON.stringify(check.params ?? {})}`}
 
                 className={`border-l-4 ${statusBorderClass(check.status)}`}
               >
@@ -165,7 +171,7 @@ export function HealthCheck() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-base font-semibold text-foreground">{check.name}</p>
+                    <p className="text-base font-semibold text-foreground">{getCheckName(check)}</p>
                     <p className="text-sm text-muted">
                       {getCheckStatusLabel(check.status)}
                     </p>

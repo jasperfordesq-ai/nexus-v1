@@ -15,7 +15,7 @@
 import 'grapesjs/dist/css/grapes.min.css';
 import '@/styles/newsletter-builder.css';
 import { forwardRef, lazy, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import grapesjs, { type Editor } from 'grapesjs';
+import grapesjs, { type BlockProperties, type Editor } from 'grapesjs';
 import presetWebpage from 'grapesjs-preset-webpage';
 import blocksBasic from 'grapesjs-blocks-basic';
 import formsPlugin from 'grapesjs-plugin-forms';
@@ -40,6 +40,13 @@ import {
   sanitizePageBuilderCssForStorage,
   stripUnsafePageBuilderHtml,
 } from '@/lib/pageBuilderHtml';
+import {
+  escapeBuilderText,
+  getGrapesJsCoreMessages,
+  mergeGrapesJsMessages,
+  normalizeGrapesJsLocale,
+  type GrapesJsMessages,
+} from './grapesJsLocale';
 
 const AssetLibraryModal = lazy(() =>
   import('./AssetLibraryModal').then((module) => ({ default: module.AssetLibraryModal })),
@@ -58,6 +65,9 @@ export interface PageDesignBuilderHandle {
 
 type PluginFn = (editor: Editor, opts?: Record<string, unknown>) => void;
 type UndoLike = { hasUndo?: () => boolean; hasRedo?: () => boolean; undo?: () => void; redo?: () => void };
+type BuilderTranslate = (key: string) => string;
+type BuilderCategory = { id: string; label: string };
+type BuilderTrait = Record<string, unknown>;
 
 const AUTOSAVE_DEBOUNCE_MS = 800;
 
@@ -110,6 +120,373 @@ function resolvePlugin(plugin: unknown): PluginFn | null {
   return typeof def === 'function' ? (def as PluginFn) : null;
 }
 
+function pageEditorMessages(t: BuilderTranslate, language?: string): GrapesJsMessages {
+  const value = (key: string) => t(`page_builder.grapesjs.${key}`);
+
+  return mergeGrapesJsMessages(getGrapesJsCoreMessages(language, t), {
+    blockManager: {
+      categories: {
+        basic: value('categories.basic'),
+        forms: value('categories.forms'),
+        extra: value('categories.extra'),
+        nexus: t('page_builder.blocks.category_nexus'),
+      },
+      labels: {
+        column1: value('blocks.column_one'),
+        column2: value('blocks.column_two'),
+        column3: value('blocks.column_three'),
+        'column3-7': value('blocks.columns_three_seven'),
+        text: value('blocks.text'),
+        link: value('blocks.link'),
+        image: value('blocks.image'),
+        video: value('blocks.video'),
+        map: value('blocks.map'),
+        'link-block': value('blocks.link_block'),
+        quote: value('blocks.quote'),
+        'text-basic': value('blocks.text_section'),
+        form: value('blocks.form'),
+        input: value('blocks.input'),
+        textarea: value('blocks.textarea'),
+        select: value('blocks.select'),
+        button: value('blocks.button'),
+        label: value('blocks.label'),
+        checkbox: value('blocks.checkbox'),
+        radio: value('blocks.radio'),
+        tabs: value('blocks.tabs'),
+        tooltip: value('blocks.tooltip'),
+        'custom-code': value('blocks.custom_code'),
+        'nexus-hero': t('page_builder.blocks.hero_label'),
+        'nexus-feature-grid': t('page_builder.blocks.feature_grid_label'),
+        'nexus-story-band': t('page_builder.blocks.story_band_label'),
+      },
+    },
+    domComponents: {
+      names: {
+        Row: value('components.row'),
+        Cell: value('components.cell'),
+        form: value('components.form'),
+        input: value('components.input'),
+        textarea: value('components.textarea'),
+        select: value('components.select'),
+        option: value('components.option'),
+        checkbox: value('components.checkbox'),
+        radio: value('components.radio'),
+        button: value('components.button'),
+        label: value('components.label'),
+        tabs: value('components.tabs'),
+        'tab-container': value('components.tab_container'),
+        tab: value('components.tab'),
+        'tab-content': value('components.tab_content'),
+        'tab-contents': value('components.tab_contents'),
+        tooltip: value('components.tooltip'),
+        'custom-code': value('components.custom_code'),
+      },
+    },
+    traitManager: {
+      traits: {
+        labels: {
+          method: value('traits.method'),
+          action: value('traits.action'),
+          name: value('traits.name'),
+          placeholder: value('traits.placeholder'),
+          type: value('traits.type'),
+          required: value('traits.required'),
+          options: value('traits.options'),
+          id: value('traits.id'),
+          for: value('traits.for'),
+          value: value('traits.value'),
+          checked: value('traits.checked'),
+          text: value('traits.text'),
+          'data-tooltip': value('traits.tooltip_text'),
+          'data-tooltip-pos': value('traits.tooltip_position'),
+          'data-tooltip-length': value('traits.tooltip_length'),
+          'data-tooltip-visible': value('traits.tooltip_visible'),
+        },
+        options: {
+          type: {
+            text: value('options.text'),
+            email: value('options.email'),
+            password: value('options.password'),
+            number: value('options.number'),
+            submit: value('options.submit'),
+            reset: value('options.reset'),
+            button: value('options.button'),
+          },
+          'data-tooltip-pos': {
+            top: value('options.top'),
+            right: value('options.right'),
+            bottom: value('options.bottom'),
+            left: value('options.left'),
+          },
+          'data-tooltip-length': {
+            false: value('options.one_line'),
+            small: value('options.small'),
+            medium: value('options.medium'),
+            large: value('options.large'),
+            fit: value('options.fit'),
+          },
+        },
+      },
+    },
+  });
+}
+
+function pagePresetBlockOverrides(id: string, t: BuilderTranslate, category: BuilderCategory): Record<string, unknown> {
+  const content = (key: string) => escapeBuilderText(t(`page_builder.grapesjs.content.${key}`));
+  const labels: Record<string, string> = {
+    'link-block': t('page_builder.grapesjs.blocks.link_block'),
+    quote: t('page_builder.grapesjs.blocks.quote'),
+    'text-basic': t('page_builder.grapesjs.blocks.text_section'),
+  };
+  const common = { label: labels[id], category };
+
+  if (id === 'quote') {
+    return { ...common, content: `<blockquote class="quote">${content('quote')}</blockquote>` };
+  }
+  if (id === 'text-basic') {
+    return {
+      ...common,
+      content: `<section class="bdg-sect"><h1 class="heading">${content('text_heading')}</h1><p class="paragraph">${content('text_body')}</p></section>`,
+    };
+  }
+  return common;
+}
+
+function pageFormBlockOverrides(id: string, t: BuilderTranslate): Record<string, unknown> {
+  const content = (key: string) => escapeBuilderText(t(`page_builder.grapesjs.content.${key}`));
+  const labels: Record<string, string> = {
+    form: t('page_builder.grapesjs.blocks.form'),
+    input: t('page_builder.grapesjs.blocks.input'),
+    textarea: t('page_builder.grapesjs.blocks.textarea'),
+    select: t('page_builder.grapesjs.blocks.select'),
+    button: t('page_builder.grapesjs.blocks.button'),
+    label: t('page_builder.grapesjs.blocks.label'),
+    checkbox: t('page_builder.grapesjs.blocks.checkbox'),
+    radio: t('page_builder.grapesjs.blocks.radio'),
+  };
+
+  if (id === 'form') {
+    return {
+      label: labels[id],
+      content: {
+        type: 'form',
+        components: [
+          { components: [{ type: 'label', components: content('form_name') }, { type: 'input' }] },
+          { components: [{ type: 'label', components: content('form_email') }, { type: 'input', attributes: { type: 'email' } }] },
+          {
+            components: [
+              { type: 'label', components: content('form_gender') },
+              { type: 'checkbox', attributes: { value: 'M' } },
+              { type: 'label', components: content('form_male_short') },
+              { type: 'checkbox', attributes: { value: 'F' } },
+              { type: 'label', components: content('form_female_short') },
+            ],
+          },
+          { components: [{ type: 'label', components: content('form_message') }, { type: 'textarea' }] },
+          { components: [{ type: 'button', text: content('form_send'), components: content('form_send') }] },
+        ],
+      },
+    };
+  }
+
+  if (id === 'select') {
+    return {
+      label: labels[id],
+      content: {
+        type: 'select',
+        components: [
+          { type: 'option', content: content('option_one'), attributes: { value: 'opt1' } },
+          { type: 'option', content: content('option_two'), attributes: { value: 'opt2' } },
+        ],
+      },
+    };
+  }
+  if (id === 'button') {
+    return { label: labels[id], content: { type: 'button', text: content('form_send'), components: content('form_send') } };
+  }
+  if (id === 'label') {
+    return { label: labels[id], content: { type: 'label', components: content('label') } };
+  }
+  return { label: labels[id] };
+}
+
+function localizeTooltipTraits(traits: unknown, t: BuilderTranslate): unknown {
+  if (!Array.isArray(traits)) return traits;
+  const value = (key: string) => t(`page_builder.grapesjs.${key}`);
+
+  return traits.map((rawTrait) => {
+    const trait = rawTrait as BuilderTrait;
+    const name = trait.name;
+    if (name === 'data-tooltip') return { ...trait, label: value('traits.tooltip_text') };
+    if (name === 'data-tooltip-visible') return { ...trait, label: value('traits.tooltip_visible') };
+    if (name === 'style-tooltip') return { ...trait, labelButton: value('traits.style_tooltip') };
+    if (name === 'data-tooltip-pos') {
+      return {
+        ...trait,
+        label: value('traits.tooltip_position'),
+        options: [
+          { value: 'top', name: value('options.top') },
+          { value: 'right', name: value('options.right') },
+          { value: 'bottom', name: value('options.bottom') },
+          { value: 'left', name: value('options.left') },
+        ],
+      };
+    }
+    if (name === 'data-tooltip-length') {
+      return {
+        ...trait,
+        label: value('traits.tooltip_length'),
+        options: [
+          { value: '', name: value('options.one_line') },
+          { value: 'small', name: value('options.small') },
+          { value: 'medium', name: value('options.medium') },
+          { value: 'large', name: value('options.large') },
+          { value: 'fit', name: value('options.fit') },
+        ],
+      };
+    }
+    return trait;
+  });
+}
+
+function createLocalizedPagePlugins(t: BuilderTranslate): Array<(editor: Editor) => void> {
+  const basicCategory = { id: 'basic', label: t('page_builder.grapesjs.categories.basic') };
+  const formsCategory = { id: 'forms', label: t('page_builder.grapesjs.categories.forms') };
+  const extraCategory = { id: 'extra', label: t('page_builder.grapesjs.categories.extra') };
+  const value = (key: string) => t(`page_builder.grapesjs.${key}`);
+  const content = (key: string) => escapeBuilderText(value(`content.${key}`));
+
+  const definitions: Array<[unknown, Record<string, unknown>]> = [
+    [presetWebpage, {
+      block: (id: string) => pagePresetBlockOverrides(id, t, basicCategory),
+      modalImportTitle: value('dialogs.import_title'),
+      modalImportButton: value('dialogs.import_button'),
+      modalImportLabel: value('dialogs.import_help'),
+      textCleanCanvas: t('page_builder.reset_confirm'),
+    }],
+    [blocksBasic, {
+      flexGrid: true,
+      category: basicCategory,
+      labelColumn1: value('blocks.column_one'),
+      labelColumn2: value('blocks.column_two'),
+      labelColumn3: value('blocks.column_three'),
+      labelColumn37: value('blocks.columns_three_seven'),
+      labelText: value('blocks.text'),
+      labelLink: value('blocks.link'),
+      labelImage: value('blocks.image'),
+      labelVideo: value('blocks.video'),
+      labelMap: value('blocks.map'),
+    }],
+    [formsPlugin, {
+      category: formsCategory,
+      block: (id: string) => pageFormBlockOverrides(id, t),
+    }],
+    [tabsPlugin, {
+      tabsBlock: { label: value('blocks.tabs'), category: extraCategory },
+      tabsProps: {
+        name: 'tabs',
+        traits: [{
+          type: 'button',
+          label: false,
+          text: value('traits.add_tab'),
+          command: (tabEditor: Editor) => {
+            const selected = tabEditor.getSelected() as unknown as { addTab?: () => void } | undefined;
+            selected?.addTab?.();
+          },
+        }],
+      },
+      tabProps: {
+        name: 'tab',
+        traits: [{
+          type: 'button',
+          label: false,
+          text: value('traits.style_active_tab'),
+          command: (tabEditor: Editor) => {
+            tabEditor.Panels.getButton('views', 'open-sm')?.set('active', true);
+            const styleManager = tabEditor.StyleManager as unknown as {
+              setTarget: (target: string, options: Record<string, unknown>) => void;
+            };
+            styleManager.setTarget('.tab.tab-active', { targetIsClass: true });
+          },
+        }],
+      },
+      tabContainerProps: { name: 'tab-container' },
+      tabContentProps: { name: 'tab-content' },
+      tabContentsProps: { name: 'tab-contents' },
+      templateTab: () => `<span data-gjs-highlightable="false">${content('tab')}</span>`,
+      templateTabContent: () => `<div>${content('tab_content')}</div>`,
+    }],
+    [tooltipPlugin, {
+      labelTooltip: value('blocks.tooltip'),
+      blockTooltip: { label: value('blocks.tooltip'), category: extraCategory },
+      propsTooltip: {
+        name: 'tooltip',
+        attributes: { 'data-tooltip': value('content.tooltip') },
+      },
+      extendTraits: (traits: unknown) => localizeTooltipTraits(traits, t),
+    }],
+    [customCodePlugin, {
+      blockCustomCode: { label: value('blocks.custom_code'), category: extraCategory },
+      propsCustomCode: {
+        name: 'custom-code',
+        components: {
+          tagName: 'span',
+          components: { type: 'textnode', content: content('custom_code') },
+        },
+      },
+      toolbarBtnCustomCode: { attributes: { title: value('dialogs.open_custom_code') } },
+      placeholderScript: `<div style="pointer-events:none;padding:10px">${content('custom_code_script')}</div>`,
+      modalTitle: value('dialogs.custom_code_title'),
+      buttonLabel: value('dialogs.save'),
+    }],
+  ];
+
+  return definitions.flatMap(([source, options]) => {
+    const plugin = resolvePlugin(source);
+    return plugin ? [(editor: Editor) => plugin(editor, options)] : [];
+  });
+}
+
+function localizePagePluginBlocks(ed: Editor, t: BuilderTranslate): void {
+  const blockManager = ed.BlockManager;
+  const value = (key: string) => t(`page_builder.grapesjs.${key}`);
+  const content = (key: string) => escapeBuilderText(value(`content.${key}`));
+  const setBlock = (id: string, properties: Record<string, unknown>) => {
+    blockManager.get(id)?.set(properties);
+  };
+
+  const basicLabels: Record<string, string> = {
+    column1: value('blocks.column_one'),
+    column2: value('blocks.column_two'),
+    column3: value('blocks.column_three'),
+    'column3-7': value('blocks.columns_three_seven'),
+    text: value('blocks.text'),
+    link: value('blocks.link'),
+    image: value('blocks.image'),
+    video: value('blocks.video'),
+    map: value('blocks.map'),
+  };
+  Object.entries(basicLabels).forEach(([id, label]) => setBlock(id, { label }));
+  setBlock('text', {
+    content: { type: 'text', content: content('text'), style: { padding: '10px' } },
+  });
+  setBlock('link', {
+    content: { type: 'link', content: content('link'), style: { color: '#d983a6' } },
+  });
+
+  const basicCategory = { id: 'basic', label: value('categories.basic') };
+  ['link-block', 'quote', 'text-basic'].forEach((id) => {
+    const { category: _category, ...properties } = pagePresetBlockOverrides(id, t, basicCategory);
+    setBlock(id, properties);
+  });
+  ['form', 'input', 'textarea', 'select', 'button', 'label', 'checkbox', 'radio'].forEach((id) => {
+    setBlock(id, pageFormBlockOverrides(id, t));
+  });
+  setBlock('tabs', { label: value('blocks.tabs') });
+  setBlock('tooltip', { label: value('blocks.tooltip') });
+  setBlock('custom-code', { label: value('blocks.custom_code') });
+}
+
 function exportHtml(ed: Editor): string {
   const body = stripUnsafePageBuilderHtml(ed.getHtml() || '');
   const css = sanitizePageBuilderCssForStorage(ed.getCss() || '');
@@ -123,23 +500,36 @@ function exportProject(ed: Editor): { html: string; designJson: string } {
   };
 }
 
-function addNexusBlocks(ed: Editor, t: (key: string) => string, tenantRoot: string): void {
-  const bm = ed.BlockManager;
-  const category = t('page_builder.blocks.category_nexus');
-  bm.add('nexus-hero', {
-    label: t('page_builder.blocks.hero_label'),
-    category,
-    content: `<section class="nexus-page-section nexus-page-hero"><div class="nexus-page-container"><p class="nexus-page-kicker">${t('page_builder.blocks.hero_kicker')}</p><h1>${t('page_builder.blocks.hero_title')}</h1><p class="nexus-page-lede">${t('page_builder.blocks.hero_body')}</p><a class="nexus-page-button" href="${tenantRoot}">${t('page_builder.blocks.hero_cta')}</a></div></section>`,
-  });
-  bm.add('nexus-feature-grid', {
-    label: t('page_builder.blocks.feature_grid_label'),
-    category,
-    content: `<section class="nexus-page-section"><div class="nexus-page-container nexus-page-grid"><article class="nexus-page-card"><h2>${t('page_builder.blocks.feature_one_title')}</h2><p>${t('page_builder.blocks.feature_one_body')}</p></article><article class="nexus-page-card"><h2>${t('page_builder.blocks.feature_two_title')}</h2><p>${t('page_builder.blocks.feature_two_body')}</p></article></div></section>`,
-  });
-  bm.add('nexus-story-band', {
-    label: t('page_builder.blocks.story_band_label'),
-    category,
-    content: `<section class="nexus-page-section"><div class="nexus-page-container"><p class="nexus-page-kicker">${t('page_builder.blocks.story_kicker')}</p><h2>${t('page_builder.blocks.story_title')}</h2><p class="nexus-page-lede">${t('page_builder.blocks.story_body')}</p></div></section>`,
+function nexusBlockDefinitions(t: BuilderTranslate, tenantRoot: string): Array<[string, BlockProperties]> {
+  const text = (key: string) => escapeBuilderText(t(`page_builder.blocks.${key}`));
+  const category = { id: 'nexus', label: t('page_builder.blocks.category_nexus') };
+  return [
+    ['nexus-hero', {
+      label: t('page_builder.blocks.hero_label'),
+      category,
+      content: `<section class="nexus-page-section nexus-page-hero"><div class="nexus-page-container"><p class="nexus-page-kicker">${text('hero_kicker')}</p><h1>${text('hero_title')}</h1><p class="nexus-page-lede">${text('hero_body')}</p><a class="nexus-page-button" href="${tenantRoot}">${text('hero_cta')}</a></div></section>`,
+    }],
+    ['nexus-feature-grid', {
+      label: t('page_builder.blocks.feature_grid_label'),
+      category,
+      content: `<section class="nexus-page-section"><div class="nexus-page-container nexus-page-grid"><article class="nexus-page-card"><h2>${text('feature_one_title')}</h2><p>${text('feature_one_body')}</p></article><article class="nexus-page-card"><h2>${text('feature_two_title')}</h2><p>${text('feature_two_body')}</p></article></div></section>`,
+    }],
+    ['nexus-story-band', {
+      label: t('page_builder.blocks.story_band_label'),
+      category,
+      content: `<section class="nexus-page-section"><div class="nexus-page-container"><p class="nexus-page-kicker">${text('story_kicker')}</p><h2>${text('story_title')}</h2><p class="nexus-page-lede">${text('story_body')}</p></div></section>`,
+    }],
+  ];
+}
+
+function addNexusBlocks(ed: Editor, t: BuilderTranslate, tenantRoot: string): void {
+  nexusBlockDefinitions(t, tenantRoot).forEach(([id, properties]) => ed.BlockManager.add(id, properties));
+}
+
+function localizeNexusBlocks(ed: Editor, t: BuilderTranslate, tenantRoot: string): void {
+  nexusBlockDefinitions(t, tenantRoot).forEach(([id, properties]) => {
+    const { category: _category, ...localized } = properties;
+    ed.BlockManager.get(id)?.set(localized);
   });
 }
 
@@ -167,7 +557,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
   { html, designJson, readOnly, onChange },
   ref,
 ) {
-  const { t } = useTranslation('admin_editor');
+  const { t, i18n } = useTranslation('admin_editor');
   const { tenantPath } = useTenant();
   const tenantRoot = tenantPath('/');
   const toast = useToast();
@@ -185,7 +575,9 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
   const seedRef = useRef(designJson);
   const htmlSeedRef = useRef(html);
   const lastUploadRef = useRef<string | null>(null);
+  const translationRef = useRef(t);
   onChangeRef.current = onChange;
+  translationRef.current = t;
 
   const [editor, setEditor] = useState<Editor | null>(null);
   const [failed, setFailed] = useState(false);
@@ -231,11 +623,10 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       return undefined;
     }
 
-    const plugins = [presetWebpage, blocksBasic, formsPlugin, tabsPlugin, tooltipPlugin, customCodePlugin]
-      .map(resolvePlugin)
-      .filter((plugin): plugin is PluginFn => Boolean(plugin));
-
     try {
+      const initT = translationRef.current as BuilderTranslate;
+      const editorLocale = normalizeGrapesJsLocale(i18n.resolvedLanguage ?? i18n.language);
+      const englishT = i18n.getFixedT('en', 'admin_editor') as BuilderTranslate;
       const ed = grapesjs.init({
         container: canvasRef.current,
         height: '100%',
@@ -243,6 +634,15 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         fromElement: false,
         storageManager: { type: 'none' },
         undoManager: { trackSelection: false },
+        i18n: {
+          locale: editorLocale,
+          localeFallback: 'en',
+          detectLocale: false,
+          messages: {
+            en: pageEditorMessages(englishT, 'en'),
+            [editorLocale]: pageEditorMessages(initT, editorLocale),
+          },
+        },
         panels: { defaults: [] },
         blockManager: { appendTo: blocksRef.current },
         styleManager: { appendTo: stylesRef.current },
@@ -250,21 +650,16 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         layerManager: { appendTo: layersRef.current },
         deviceManager: {
           devices: [
-            { name: 'Desktop', width: '' },
-            { name: 'Tablet', width: '768px', widthMedia: '992px' },
-            { name: 'Mobile portrait', width: '375px', widthMedia: '480px' },
+            { id: 'Desktop', name: initT('devices.desktop'), width: '' },
+            { id: 'Tablet', name: initT('devices.tablet'), width: '768px', widthMedia: '992px' },
+            { id: 'Mobile portrait', name: initT('devices.mobile_portrait'), width: '375px', widthMedia: '480px' },
           ],
         },
         canvas: {
           styles: [],
           scripts: [],
         },
-        plugins: plugins.map((plugin) => (plugEd: Editor) => plugin(plugEd, {
-          blocksBasicOpts: { flexGrid: true },
-          navbarOpts: false,
-          countdownOpts: false,
-          formsOpts: {},
-        })),
+        plugins: createLocalizedPagePlugins(initT),
         assetManager: {
           uploadFile: async (ev: Event) => {
             const target = ev.target as HTMLInputElement | null;
@@ -274,20 +669,40 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
             try {
               const url = resolveUploadedUrl(await adminBuilderAssets.uploadImage(file));
               if (!url) {
-                toast.error(t('page_builder.image_upload_failed'));
+                toast.error(translationRef.current('page_builder.image_upload_failed'));
                 return;
               }
               applyServerImage(url);
             } catch (err) {
               logError('PageDesignBuilder: asset upload failed', err);
-              toast.error(t('page_builder.image_upload_failed'));
+              toast.error(translationRef.current('page_builder.image_upload_failed'));
             }
           },
         },
       });
 
       editorRef.current = ed;
-      addNexusBlocks(ed, t, tenantRoot);
+      addNexusBlocks(ed, initT, tenantRoot);
+      localizePagePluginBlocks(ed, initT);
+
+      const syncEditorLocale = (language: string) => {
+        const locale = normalizeGrapesJsLocale(language);
+        const fixedT = i18n.getFixedT(language, 'admin_editor') as BuilderTranslate;
+        ed.I18n.addMessages({ [locale]: pageEditorMessages(fixedT, locale) });
+        ed.I18n.setLocale(locale);
+        ed.Devices?.get('Desktop')?.set('name', fixedT('devices.desktop'));
+        ed.Devices?.get('Tablet')?.set('name', fixedT('devices.tablet'));
+        ed.Devices?.get('Mobile portrait')?.set('name', fixedT('devices.mobile_portrait'));
+        localizePagePluginBlocks(ed, fixedT);
+        localizeNexusBlocks(ed, fixedT, tenantRoot);
+        ed.BlockManager.render();
+        ed.StyleManager.render();
+        ed.TraitManager.render();
+        ed.LayerManager.render();
+      };
+      syncEditorLocale(i18n.resolvedLanguage ?? i18n.language);
+      i18n.on('languageChanged', syncEditorLocale);
+
       ed.Css.setRule('.nexus-page-section', {});
       ed.addStyle(DEFAULT_PAGE_CSS);
 
@@ -306,10 +721,10 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         const seed = htmlSeedRef.current.trim();
         if (seed) {
           const { bodyHtml, css } = sanitizePageBuilderDocument(seed);
-          ed.setComponents(bodyHtml || pageStarterHtml(t, tenantRoot));
+          ed.setComponents(bodyHtml || pageStarterHtml(initT, tenantRoot));
           ed.addStyle(css || DEFAULT_PAGE_CSS);
         } else {
-          ed.setComponents(pageStarterHtml(t, tenantRoot));
+          ed.setComponents(pageStarterHtml(initT, tenantRoot));
         }
       }
 
@@ -353,6 +768,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         ed.off('component:selected component:deselected', syncSelection);
         ed.off('change:device', syncDevice);
         ed.off('component:add', handleComponentAdd);
+        i18n.off('languageChanged', syncEditorLocale);
         if (debounceRef.current) clearTimeout(debounceRef.current);
         try {
           ed.destroy();
@@ -366,7 +782,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       setFailed(true);
       return undefined;
     }
-  }, [t, tenantRoot, toast]);
+  }, [i18n, tenantRoot, toast]);
 
   const handleUndo = () => {
     (editorRef.current?.UndoManager as unknown as UndoLike | undefined)?.undo?.();

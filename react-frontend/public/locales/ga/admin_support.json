@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,83 +67,81 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "Athbhreithnigh tuairiscí fabhtanna arna gcur isteach ag baill le diagnóisic leathanaigh, IDs teagmhais Sentry, agus nótaí triáise.",
     "loading": "Tuairiscí tacaíochta á lódáil...",
     "empty": "Ní mheaitseálann aon tuairiscí tacaíochta na scagairí seo.",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "Oscail leathanach",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "Cóipeáil diagnóisic",
       "copy_handoff": "Cóipeáil handoff innealtóireachta",
-      "close": "Close",
-      "save": "Sábháil triage"
+      "save": "Sábháil triage",
+      "refresh": "Athnuaigh",
+      "search": "Cuardaigh",
+      "clear": "Glan",
+      "review": "Athbhreithniú",
+      "open_sentry": "Sentry Oscailte",
+      "close": "Dún"
     },
     "stats": {
-      "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "open": "Oscailte",
+      "triaged": "Roghnaithe",
+      "blocked": "Blocáilte",
+      "unassigned": "Neamhrialaithe"
     },
     "filters": {
       "search": "Cuardaigh tagairt, bealach, tuairisceoir, nó achoimre",
-      "status": "Status",
-      "impact": "Impact"
+      "status": "Stádas",
+      "impact": "Tionchar"
     },
     "status": {
       "all": "Gach stádas",
-      "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "open": "Oscailte",
+      "triaged": "Roghnaithe",
+      "resolved": "Réitithe",
+      "closed": "Dúnta"
     },
     "impact": {
       "all": "Gach tionchar",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "Blocáilte",
+      "major": "Mór",
+      "minor": "Beag",
+      "cosmetic": "Smidireachta"
     },
     "table": {
       "aria": "Tuarascálacha tacaíochta",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
-      "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reference": "Tagairt",
+      "summary": "Achoimre",
+      "impact": "Tionchar",
+      "status": "Stádas",
+      "reporter": "Tuairisceoir",
+      "assignee": "Dúnta",
+      "created": "Cruthaíodh",
+      "actions": "Gníomhartha"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "Tuairisc á lódáil...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "Gníomhaire úsáideora",
       "sentry_event": "Imeacht sentry",
-      "diagnostics": "Diagnostics"
+      "summary": "Achoimre",
+      "description": "Cur síos",
+      "reporter": "Tuairisceoir",
+      "page": "Leathanach",
+      "created": "Cruthaíodh",
+      "diagnostics": "Ionstraimí Diagnóise",
+      "title": "Tuarascáil {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "URL na heisiúna seolta",
-      "triage_notes": "Nótaí triáise"
+      "triage_notes": "Nótaí triáise",
+      "status": "Stádas",
+      "assignee": "Dúnta"
     },
     "messages": {
       "saved": "Tuarascáil tacaíochta nuashonraithe.",
@@ -157,6 +154,37 @@
       "save": "Theip ar shábháil an tuairisc tacaíochta.",
       "copy": "Níorbh fhéidir diagnóisic a chóipeáil.",
       "copy_handoff": "Níorbh fhéidir an láimhsiú innealtóireachta a chóipeáil."
-    }
+    },
+    "handoff": {
+      "title": "Tuarascáil tacaíochta {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (úsáideoir {{id}})",
+      "reporter_without_email": "{{name}} (úsáideoir {{id}})",
+      "unknown_reporter": "Ionsaitheoir anaithnid",
+      "no_diagnostics": "Níor áiríodh aon dhiagnóis.",
+      "not_provided": "Níor tugadh",
+      "none_yet": "Níl aon cheann go fóill.",
+      "labels": {
+        "tenant": "Pobal",
+        "impact": "Tionchar",
+        "status": "Stádas",
+        "created": "Cruthaíodh",
+        "reporter": "Tuairisceoir",
+        "route": "Bealach",
+        "page_url": "URL na Leathanach",
+        "user_agent": "Gníomhaire úsáideora",
+        "sentry_event": "Imeacht Sentry",
+        "sentry_issue": "Fadhb Sentry"
+      },
+      "headings": {
+        "summary": "Achoimre:",
+        "user_description": "Cur síos an úsáideora:",
+        "triage_notes": "Nótaí Triage:",
+        "diagnostics": "Diagnóisic:"
+      }
+    },
+    "unassigned": "Neamhrialaithe",
+    "meta_title": "Tacaigh Tuarascálacha",
+    "title": "Tacaigh Tuarascálacha"
   }
 }

@@ -1,0 +1,1537 @@
+{
+  "articles": {
+    "caring": {
+      "title": "Comunità di cura — Centro Moduli",
+      "summary": "Il modulo Comunità Premurosa è il punto di accesso principale per tutte le funzionalità cooperative della Comunità Premurosa. Da qui puoi navigare in ogni sottosezione: livelli di fiducia dei membri, protezione, report ROI, preparazione al pilota e altro.",
+      "steps": {
+        "0": {
+          "label": "Esamina la salute del modulo a colpo d'occhio",
+          "detail": "Il centro mostra conteggi live dei membri attivi, richieste di aiuto aperte, report di protezione in sospeso e tasso di conformità SLA."
+        },
+        "1": {
+          "label": "Usa la griglia dei collegamenti rapidi",
+          "detail": "Ogni scheda collega direttamente alla sua area funzionale. Le schede con un badge rosso richiedono attenzione immediata (ad esempio SLA scaduto, rapporto di salvaguardia critico)."
+        },
+        "2": {
+          "label": "Controlla la barra degli annunci",
+          "detail": "Se il tuo partner cantonale o l'ufficio nazionale di Caring Community ha pubblicato un avviso, viene visualizzato fissato in cima al hub."
+        }
+      },
+      "tips": {
+        "0": "Segna questa pagina nei preferiti — è il modo più veloce per individuare i problemi che richiedono la tua attenzione senza navigare nei menu profondi.",
+        "1": "Il modulo appare nella barra laterale solo se il flag della funzione caring_community è abilitato per questo tenant."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Dashboard SLA"
+        },
+        "1": {
+          "label": "Tutela"
+        },
+        "2": {
+          "label": "Prontezza al lancio"
+        }
+      }
+    },
+    "caring_workflow": {
+      "title": "Dashboard del flusso di lavoro del coordinatore",
+      "summary": "Una bacheca in stile Kanban in tempo reale che mostra ogni scambio di assistenza in corso. Gli scambi passano attraverso gli stati: Richiesta → Abbinato → In corso → Completato → Revisionato. I coordinatori usano questa pagina per individuare colli di bottiglia, riassegnare gli scambi e segnalare richieste bloccate.",
+      "steps": {
+        "0": {
+          "label": "Filtra per stato o categoria",
+          "detail": "Usa la barra dei filtri in alto per restringere a uno stato specifico (ad esempio solo \"Abbinato\") o a una categoria di assistenza (ad esempio Trasporto, Compagnia)."
+        },
+        "1": {
+          "label": "Apri una scheda di scambio",
+          "detail": "Clicca su qualsiasi scheda per vedere il pannello dei dettagli completo: profili dei membri, orario concordato, eventuali note del coordinatore e cronologia delle verifiche."
+        },
+        "2": {
+          "label": "Riassegna o esegui l'escalation",
+          "detail": "Usa il menu a tre puntini su una scheda per riassegnarla a un altro coordinatore, aggiungere una nota o segnalarla come escalation per la revisione."
+        },
+        "3": {
+          "label": "Segna come completato",
+          "detail": "Una volta che entrambe le parti confermano, utilizza \"Segna come completato\" per attivare il trasferimento dei crediti orari e sbloccare la richiesta di recensione per entrambi i membri."
+        }
+      },
+      "tips": {
+        "0": "Gli scambi bloccati su \"Abbinato\" per più di 48 ore sono evidenziati in ambra — segui con entrambi i membri.",
+        "1": "Il toggle \"I miei scambi\" filtra solo gli scambi in cui sei il coordinatore assegnato.",
+        "2": "Le transazioni completate che non sono state revisionate dopo 7 giorni vengono contrassegnate — le revisioni sono importanti per i dati di riferimento KPI."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Trasferimenti di Ore"
+        },
+        "1": {
+          "label": "Dashboard SLA"
+        },
+        "2": {
+          "label": "Dati di Riferimento KPI"
+        }
+      }
+    },
+    "caring_projects": {
+      "title": "Progetti di Cura & Iniziative Comunitarie",
+      "summary": "I progetti sono iniziative comunitarie strutturate che raggruppano più scambi attorno a un obiettivo condiviso — per esempio, \"Supporto Invernale ai Vicini 2025\" o \"Rete di Mobilità per Anziani\". Ogni progetto ha un budget in ore, un coordinatore, date di inizio/fine e tappe di rendicontazione.",
+      "steps": {
+        "0": {
+          "label": "Crea un nuovo progetto",
+          "detail": "Clicca su \"Nuovo Progetto\", assegnagli un nome e una descrizione, imposta il budget in ore e assegna un coordinatore responsabile."
+        },
+        "1": {
+          "label": "Aggiungi membri partecipanti",
+          "detail": "Usa la ricerca dei membri per aggiungere aiutanti e destinatari. I membri possono anche auto-iscriversi se il progetto è contrassegnato come aperto."
+        },
+        "2": {
+          "label": "Collega gli scambi al progetto",
+          "detail": "Quando crei o modifichi uno scambio, usa il menu a tendina \"Progetto\" per associarlo. Tutti gli scambi collegati appariranno nel report di avanzamento del progetto."
+        },
+        "3": {
+          "label": "Rivedi le tappe del progresso",
+          "detail": "La pagina dei dettagli del progetto mostra le ore consegnate rispetto al budget, i membri attivi e una timeline degli scambi completati."
+        },
+        "4": {
+          "label": "Chiudi e segnala",
+          "detail": "Quando il progetto termina, usa \"Genera Rapporto\" per produrre un sommario PDF adatto agli stakeholder cantonali."
+        }
+      },
+      "tips": {
+        "0": "I progetti senza scambi dopo 14 giorni vengono contrassegnati come \"Bloccati\" — considera se l'obiettivo è ben compreso dai membri.",
+        "1": "Il budget orario è una guida, non un limite rigido. Puoi superarlo; il sistema lo segnalerà ma non impedirà gli scambi.",
+        "2": "Per i progetti finanziati tramite sovvenzioni, utilizza il campo \"Riferimento Esterno\" per memorizzare il codice progetto del finanziatore."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Flusso di lavoro del Coordinatore"
+        },
+        "1": {
+          "label": "ROI Municipale"
+        }
+      }
+    },
+    "caring_trust_tier": {
+      "title": "Livelli di Fiducia — Scala della Reputazione",
+      "summary": "Il sistema dei Livelli di Fiducia valuta l'affidabilità dei membri su una scala a cinque livelli: Nuovo (0) → Membro (1) → Fidato (2) → Verificato (3) → Coordinatore (4). Il livello determina cosa un membro può fare — per esempio, solo i membri Fidati+ possono esportare un Pass Calore o partecipare a scambi di cura intensivi.",
+      "steps": {
+        "0": {
+          "label": "Visualizza distribuzione dei livelli",
+          "detail": "Il grafico riepilogativo mostra quanti membri si trovano in ciascun livello. Una cooperativa sana ha la maggior parte dei membri ai Livelli 1–2."
+        },
+        "1": {
+          "label": "Rivedi le promozioni di livello in sospeso",
+          "detail": "I membri che hanno soddisfatto i criteri per il livello successivo appaiono nella lista \"Pronto per la promozione\". Rivedi la loro attività e approvala o rimandala."
+        },
+        "2": {
+          "label": "Regola manualmente un livello",
+          "detail": "Trova il membro, clicca sul suo badge del livello attuale e seleziona il nuovo livello. Scrivi una breve nota che spieghi l'aggiustamento — questo è soggetto a revisione."
+        },
+        "3": {
+          "label": "Configura le soglie dei livelli",
+          "detail": "Sotto \"Impostazioni Livello\", regola il numero di scambi completati e il punteggio medio delle recensioni richiesti per raggiungere ogni livello."
+        },
+        "4": {
+          "label": "Rivedi i candidati alla retrocessione",
+          "detail": "I membri segnalati per inattività prolungata o incidenti di sicurezza possono comparire per la revisione del livello. Controlla il contesto prima di declassare."
+        }
+      },
+      "tips": {
+        "0": "Le promozioni di livello non sono automatiche di default — un coordinatore deve approvare ogni promozione. Puoi abilitare la promozione automatica per il Livello 0→1 nelle Impostazioni del Livello.",
+        "1": "I membri non possono vedere il loro punteggio numerico di livello — vedono invece un badge con nome (ad es. \"Membro Fidato\").",
+        "2": "Il livello di Coordinatore (4) dovrebbe essere raro e assegnato solo a persone che gestiscono la salvaguardia o scambi di alto valore."
+      },
+      "caution": "La retrocessione di un membro Fidato (dal livello 2 al 1) invalida immediatamente il loro Pass del Calore in tutti i siti cooperativi della Comunità Premurosa. Notifica il membro prima della retrocessione.",
+      "related_paths": {
+        "0": {
+          "label": "Pass Caloroso"
+        },
+        "1": {
+          "label": "Tutela"
+        }
+      }
+    },
+    "caring_warmth_pass": {
+      "title": "Pass del Calore — Credenziale di Fiducia Portatile",
+      "summary": "Il Pass del Calore è una credenziale firmata criptograficamente che permette a un membro Trusted+ (livello 2+) di dimostrare la propria reputazione in qualsiasi cooperativa Caring Community affiliata, non solo nella propria comunità di origine. Viene rilasciato qui e può essere revocato in qualsiasi momento.",
+      "steps": {
+        "0": {
+          "label": "Rilascia un Pass del Calore",
+          "detail": "Trova il membro (deve essere Livello 2+), clicca su \"Rilascia Pass del Calore\". Il sistema genera un token QR firmato con scadenza di 12 mesi."
+        },
+        "1": {
+          "label": "Imposta il periodo di validità",
+          "detail": "Il valore predefinito è di 12 mesi. Puoi ridurlo a 3 o 6 mesi per i membri in promozione di prova."
+        },
+        "2": {
+          "label": "Revoca un pass",
+          "detail": "Clicca sul pass attivo, poi su \"Revoca\". La revoca si propaga a tutti i peer della federazione Caring Community entro pochi minuti tramite la sincronizzazione della federazione."
+        },
+        "3": {
+          "label": "Rivedi l'utilizzo del pass",
+          "detail": "Il registro delle verifiche mostra quando e in quale cooperativa è stato scansionato un pass. Pattern di localizzazione insoliti dovrebbero attivare una revisione da parte del coordinatore."
+        }
+      },
+      "tips": {
+        "0": "Un membro può detenere un solo Warmth Pass attivo alla volta. L'emissione di uno nuovo invalida il precedente.",
+        "1": "I pass emessi ai membri che successivamente vengono retrocessi sotto il Livello 2 vengono revocati automaticamente — non è necessario farlo manualmente.",
+        "2": "Il codice QR del pass è disponibile nel profilo del membro come PDF scaricabile."
+      },
+      "caution": "Non emettere pass ai membri con segnalazioni di tutela irrisolte, anche se il loro livello li qualifica tecnicamente.",
+      "related_paths": {
+        "0": {
+          "label": "Livelli di Fiducia"
+        },
+        "1": {
+          "label": "Cooperative Partner"
+        }
+      }
+    },
+    "caring_safeguarding": {
+      "title": "Tutela — Rapporti sugli Incidenti e SLA",
+      "summary": "Questa pagina gestisce tutti i rapporti sugli incidenti di salvaguardia sollevati all'interno della vostra cooperativa. I rapporti sono classificati per gravità: Critica (rispondere entro 1 ora), Alta (24 ore), Media (72 ore), Bassa (prossima riunione programmata). I coordinatori devono riconoscere e gestire ogni rapporto entro il periodo di SLA.",
+      "steps": {
+        "0": {
+          "label": "Rivedere la coda degli incidenti aperti",
+          "detail": "I rapporti sono ordinati per gravità e tempo trascorso. Le righe rosse stanno violando o hanno violato il loro SLA."
+        },
+        "1": {
+          "label": "Riconoscere un report",
+          "detail": "Clicca sul report, poi su \"Riconosci\" per fermare il conto SLA e segnalare che un coordinatore ha preso in carico."
+        },
+        "2": {
+          "label": "Registra le note della tua indagine",
+          "detail": "Usa il campo Note per documentare i passaggi eseguiti, le persone contattate e i risultati. Le note sono confidenziali e non visibili ai membri."
+        },
+        "3": {
+          "label": "Segnalare ad agenzie esterne",
+          "detail": "Per incidenti critici che comportano rischio di danno, utilizzare \"Segnalare Esternamente\" per registrare che avete contattato i servizi statutari (polizia, assistenza sociale, ecc.)."
+        },
+        "4": {
+          "label": "Chiudere la segnalazione",
+          "detail": "Una volta risolto, contrassegnare la segnalazione come Chiusa con un riepilogo della risoluzione. Le segnalazioni chiuse vengono archiviate ma mai cancellate."
+        }
+      },
+      "tips": {
+        "0": "Gli incidenti di gravità critica attivano anche una notifica push immediata a tutti i membri del livello Coordinatore.",
+        "1": "Se non sei sicuro della gravità, imposta per default Alta — è meglio reagire eccessivamente che perdere un vero problema di tutela.",
+        "2": "Tutti i dati sugli incidenti sono esclusi dal Rapporto di Impatto Pubblico — è riservato solo ai coordinatori."
+      },
+      "caution": "Non chiudere mai un rapporto di tutela senza un riepilogo scritto della risoluzione. Le chiusure vuote vengono segnalate nell'audit sulla qualità dei dati.",
+      "related_paths": {
+        "0": {
+          "label": "Dashboard SLA"
+        },
+        "1": {
+          "label": "Qualità dei Dati"
+        }
+      }
+    },
+    "caring_category_coefficients": {
+      "title": "Coefficienti di Sostituzione della Categoria",
+      "summary": "Ogni categoria di assistenza ha un coefficiente di sostituzione che converte le ore di scambio comunitario in equivalenti di assistenza formale. Un coefficiente di 1,0 significa che un'ora di assistenza comunitaria è considerata equivalente a un'ora di assistenza professionale (CHF 35/ora). L'assistenza personale intensiva può essere 2,0; un contatto sociale leggero può essere 0,5.",
+      "steps": {
+        "0": {
+          "label": "Revisionare i coefficienti esistenti",
+          "detail": "La tabella mostra ogni categoria di assistenza attiva con il suo coefficiente attuale e la data in cui è stata concordata l'ultima volta con il vostro partner cantonale."
+        },
+        "1": {
+          "label": "Modifica un coefficiente",
+          "detail": "Clicca sull'icona della matita accanto alla categoria, inserisci il nuovo valore, aggiungi una nota di giustificazione e salva. La modifica viene versionata."
+        },
+        "2": {
+          "label": "Aggiungi una nuova categoria",
+          "detail": "Usa \"Aggiungi Categoria\" per creare un nuovo tipo di assistenza (ad esempio \"Supporto Fisioterapia\") e assegnargli un coefficiente iniziale."
+        },
+        "3": {
+          "label": "Genera un rapporto sui coefficienti",
+          "detail": "Usa \"Esporta PDF\" per produrre un documento formattato per l'approvazione del tuo partner cantonale, elencando tutte le categorie e la loro base di evidenza."
+        }
+      },
+      "tips": {
+        "0": "I coefficienti superiori a 1,5 richiedono un accordo scritto dal vostro partner sanitario cantonale — documentate questo nel campo della giustificazione.",
+        "1": "Il rapporto ROI moltiplica le ore effettivamente erogate per ciascuna categoria per il coefficiente corrispondente per ottenere il costo totale delle cure formali evitate.",
+        "2": "Verificate tutti i coefficienti almeno una volta all'anno — gli standard della pratica assistenziale cambiano e la vostra base di prove dovrebbe rimanere aggiornata."
+      },
+      "caution": "Modificare un coefficiente influenza immediatamente tutti i calcoli futuri del ROI. I report storici non vengono aggiornati retroattivamente — annotare la data della modifica quando si presentano dati pluriennali.",
+      "related_paths": {
+        "0": {
+          "label": "Politica Operativa"
+        },
+        "1": {
+          "label": "ROI Municipale"
+        }
+      }
+    },
+    "caring_operating_policy": {
+      "title": "Politica Operativa — Parametri della Comunità Attenta",
+      "summary": "La Politica Operativa memorizza i parametri economici principali per il tuo dispiegamento cooperativo: la tariffa oraria per l'assistenza formale in CHF, il moltiplicatore di compensazione dei costi, i limiti massimi di durata dello scambio e altri vincoli globali. Questi valori influenzano tutti i calcoli del ROI e dell'impatto.",
+      "steps": {
+        "0": {
+          "label": "Imposta la tariffa oraria per l'assistenza formale",
+          "detail": "Inserisci la tariffa attuale per l'assistenza professionale in CHF (lo standard svizzero è CHF 35/ora). Adatta in base alla tua regione o al tipo di assistenza se il tuo accordo cantonale specifica diversamente."
+        },
+        "1": {
+          "label": "Imposta il moltiplicatore per la compensazione dei costi",
+          "detail": "Questo moltiplicatore regola le ore ponderate in base al coefficiente per tenere conto dell'amministrazione, del coordinamento dei volontari e delle spese generali. Il valore predefinito è 0,8."
+        },
+        "2": {
+          "label": "Configura i limiti di scambio",
+          "detail": "Imposta la durata massima di un singolo scambio (ad es. 8 ore) e quella minima (ad es. 15 minuti). Gli scambi fuori da questi limiti richiedono l'approvazione del coordinatore."
+        },
+        "3": {
+          "label": "Imposta la data di entrata in vigore della politica",
+          "detail": "Specifica quando questi parametri entrano in vigore. Le modifiche sono versionate in modo che i rapporti storici rimangano accurati."
+        },
+        "4": {
+          "label": "Pubblica e notifica",
+          "detail": "Usa \"Pubblica Politica\" per rendere effettivi i nuovi valori. Considera di notificare i coordinatori tramite il sistema di annunci."
+        }
+      },
+      "tips": {
+        "0": "Concorda tutte le modifiche ai parametri con il tuo partner cantonale prima di pubblicarle — modifiche unilaterali possono invalidare la rendicontazione della tua sovvenzione.",
+        "1": "La cronologia delle versioni della politica è completamente controllata — puoi sempre vedere quali parametri erano in vigore in una data specifica."
+      },
+      "caution": "Modificare la tariffa oraria dell'assistenza formale a metà del progetto pilota influenzerà tutti i futuri rapporti sul ROI. Concorda prima con il tuo partner cantonale e documenta il motivo della modifica.",
+      "related_paths": {
+        "0": {
+          "label": "Coefficienti di Categoria"
+        },
+        "1": {
+          "label": "ROI Municipale"
+        }
+      }
+    },
+    "caring_isolated_node": {
+      "title": "Nodo Isolato — Modalità Sovranità dei Dati",
+      "summary": "La modalità Nodo Isolato configura questa distribuzione per memorizzare tutti i dati personali all'interno di un confine geografico definito e disabilita la sincronizzazione dei dati di federazione con cooperative esterne della Comunità di Cura. Questo è richiesto per le distribuzioni che devono conformarsi alla FADP/nDSG della Svizzera (Legge federale sulla protezione dei dati).",
+      "steps": {
+        "0": {
+          "label": "Abilita la modalità Nodo Isolato",
+          "detail": "Attiva l'interruttore principale. Ti verrà chiesto di confermare il confine geografico (ad esempio \"Kanton Bern\") e la base legale della restrizione."
+        },
+        "1": {
+          "label": "Configura i flussi di dati consentiti",
+          "detail": "Alcuni flussi di dati (ad esempio statistiche aggregate anonimizzate per il cruscotto nazionale) possono essere inseriti nella whitelist. Esamina ogni flusso e approvalo o bloccalo."
+        },
+        "2": {
+          "label": "Disattiva la sincronizzazione della federazione",
+          "detail": "Quando il Nodo Isolato è attivo, la sincronizzazione della federazione Warmth Pass e le connessioni cooperative tra pari sono sospese. I membri vedranno un avviso che spiega questo."
+        },
+        "3": {
+          "label": "Genera un record di conformità FADP",
+          "detail": "Usa \"Genera Rapporto di Conformità\" per produrre un record dei confini dei dati, dei periodi di conservazione e delle basi giuridiche adatte a un audit FADP."
+        }
+      },
+      "tips": {
+        "0": "La modalità Nodo Isolato non influisce sulle operazioni locali: i membri possono comunque scambiare ore, guadagnare badge e utilizzare tutte le funzionalità all'interno della cooperativa.",
+        "1": "Se non sei sicuro se la tua implementazione richieda la modalità Nodo Isolato, consulta il team tecnico della Comunità Premurosa prima di abilitarla."
+      },
+      "caution": "Abilitare la modalità Nodo Isolato interrompe immediatamente la portabilità del Pass Calore per tutti i membri. Notifica i membri prima di attivarla.",
+      "related_paths": {
+        "0": {
+          "label": "Confine Commerciale"
+        },
+        "1": {
+          "label": "Pacchetto di Divulgazione"
+        },
+        "2": {
+          "label": "Cooperative Partner"
+        }
+      }
+    },
+    "caring_commercial_boundary": {
+      "title": "Confine Commerciale — Classificazione della Capacità AGPL",
+      "summary": "Questa pagina classifica ogni funzionalità della piattaforma secondo se è coperta dalla licenza open-source AGPL-3.0, se è configurabile per singolo tenant, se richiede un accordo di distribuzione privato o se è un componente aggiuntivo commerciale. Utilizzalo come riferimento quando discuti della licenza con municipi partner o cooperative.",
+      "steps": {
+        "0": {
+          "label": "Sfoglia il registro delle funzionalità",
+          "detail": "Ogni funzionalità è elencata con la sua classificazione AGPL (Pubblica / Configurazione Tenant / Distribuzione Privata / Commerciale) e una descrizione in linguaggio semplice."
+        },
+        "1": {
+          "label": "Filtra per classificazione",
+          "detail": "Usa le schede del filtro per visualizzare solo le funzionalità commerciali, o solo le funzionalità AGPL-pubbliche, a seconda di ciò che devi comunicare."
+        },
+        "2": {
+          "label": "Esporta per riferimento del partner",
+          "detail": "Usa \"Esporta PDF\" per produrre un documento formattato che puoi condividere con un comune o un finanziatore che ha bisogno di capire cosa è open-source e cosa è proprietario."
+        }
+      },
+      "tips": {
+        "0": "Le funzionalità pubbliche AGPL devono rimanere pubblicamente disponibili sotto AGPL-3.0 — non puoi limitarne l'accesso in nessuna distribuzione.",
+        "1": "Le funzionalità commerciali richiedono un accordo scritto separato con Caring Community o con l'operatore della piattaforma NEXUS."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nodo Isolato"
+        },
+        "1": {
+          "label": "Pacchetto di Divulgazione"
+        }
+      }
+    },
+    "caring_disclosure_pack": {
+      "title": "Pacchetto di Informativa sulla Protezione dei Dati FADP/nDSG",
+      "summary": "Il Pacchetto di Informativa raccoglie tutta la documentazione sulla protezione dei dati richiesta dalla FADP/nDSG svizzera: informative sulla privacy, contratti di trattamento dati, piani di conservazione, elenchi di sub-processori e modello di risposta al diritto di accesso. Generali e revisiona queste informazioni prima che la tua cooperativa inizi a trattare dati personali.",
+      "steps": {
+        "0": {
+          "label": "Rivedi i campi compilati automaticamente",
+          "detail": "Il sistema precompila il nome dell'organizzazione, i dettagli del responsabile del trattamento e i periodi di conservazione secondo la tua Politica Operativa. Controlla ogni campo per verificarne l'accuratezza."
+        },
+        "1": {
+          "label": "Aggiungi sottoprocessori",
+          "detail": "Elenca eventuali servizi di terze parti che elaborano i dati dei membri (ad esempio servizio e-mail, provider di hosting). Ogni sottoprocessore necessita di un nome, una sede e una base giuridica."
+        },
+        "2": {
+          "label": "Imposta i periodi di conservazione",
+          "detail": "Rivedi i periodi di conservazione predefiniti per ciascuna categoria di dati (ad es. registri di scambio: 7 anni per revisione finanziaria; rapporti di salvaguardia: 10 anni). Modifica se le tue regole cantonali differiscono."
+        },
+        "3": {
+          "label": "Genera il pacchetto completo",
+          "detail": "Clicca su \"Genera Pacchetto\" per produrre uno ZIP di documenti PDF. Condividilo con il tuo responsabile della protezione dei dati (o con l'autorità cantonale) per l'approvazione."
+        },
+        "4": {
+          "label": "Pubblica l'informativa sulla privacy rivolta ai membri",
+          "detail": "Una volta approvata, usa \"Pubblica l'Informativa sulla Privacy\" per rendere l'informativa disponibile nella pagina della Privacy Policy della tua cooperativa."
+        }
+      },
+      "tips": {
+        "0": "Rigenera il pacchetto ogni volta che aggiungi un nuovo sub-processore, modifichi i periodi di conservazione o abiliti la modalità Nodo Isolato.",
+        "1": "Il pacchetto include un modello di risposta per il diritto di accesso — usalo quando un membro richiede i propri dati ai sensi dell'Articolo 25 nDSG."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nodo Isolato"
+        },
+        "1": {
+          "label": "Confine Commerciale"
+        }
+      }
+    },
+    "caring_municipal_roi": {
+      "title": "Rapporto ROI Comunale/Cantonale",
+      "summary": "Genera un rapporto formale di evitamento dei costi per gli stakeholder cantonali mostrando quante ore di assistenza professionale sono state sostituite dagli scambi comunitari, espresso in CHF. Questo è il documento principale di prova finanziaria per il rinnovo dei contributi e gli accordi di partenariato comunale.",
+      "steps": {
+        "0": {
+          "label": "Seleziona il periodo di rendicontazione",
+          "detail": "Scegli le date di inizio e fine. I periodi tipici sono trimestrali o annuali, in linea con il tuo ciclo di rendicontazione dei finanziamenti."
+        },
+        "1": {
+          "label": "Scegli la modalità del pubblico",
+          "detail": "La modalità cantone mostra i dati sul risparmio dei costi cantonali. La modalità municipio si concentra sui risultati delle partnership locali. La modalità cooperativa mostra metriche di reciprocità e retention."
+        },
+        "2": {
+          "label": "Rivedi l'avviso sulla qualità dei dati",
+          "detail": "Se il punteggio di qualità dei dati è inferiore all'80%, appare un avviso. Rivedi la pagina Qualità dei Dati prima di generare un rapporto formale."
+        },
+        "3": {
+          "label": "Genera il rapporto",
+          "detail": "Clicca su \"Genera Rapporto\". Il sistema calcola: ore totali di scambio × coefficiente per categoria × tariffa oraria per cure formali (default CHF 35)."
+        },
+        "4": {
+          "label": "Esporta e distribuisci",
+          "detail": "Scarica come PDF (formattato per uso ufficiale) o CSV (per i team finanziari cantonali che necessitano dei dati grezzi)."
+        }
+      },
+      "tips": {
+        "0": "Blocca i parametri della politica operativa prima di generare un rapporto che presenterai ufficialmente — le modifiche successive rendono i dati incoerenti.",
+        "1": "Includere l'istantanea del KPI Baseline insieme al rapporto ROI per fornire contesto: come sono evoluti la partecipazione, la qualità della vita e l'evitamento dei costi nel tempo?",
+        "2": "Eseguire prima il controllo della qualità dei dati — un rapporto con lacune segnalate comprometterà la credibilità con i partner cantonali."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Coefficienti di Categoria"
+        },
+        "1": {
+          "label": "Politica Operativa"
+        },
+        "2": {
+          "label": "Dati di Riferimento KPI"
+        },
+        "3": {
+          "label": "Qualità dei Dati"
+        }
+      }
+    },
+    "caring_municipal_impact": {
+      "title": "Pacchetto di Prove dell'Impatto Municipale",
+      "summary": "Una dashboard interattiva delle evidenze per i partner municipali, con tre modalità di pubblico — Cantone (focus sull'evitamento dei costi), Municipio (focus sui partner locali) e Cooperativa (focus sulla reciprocità tra membri). Ogni modalità mostra metriche e visualizzazioni diverse adatte a quel pubblico.",
+      "steps": {
+        "0": {
+          "label": "Seleziona modalità del pubblico",
+          "detail": "Usa il selettore modalità in alto: Cantone per i dipartimenti cantonali di finanza/sanità, Municipio per i partner del consiglio locale, Cooperativa per il tuo consiglio di amministrazione."
+        },
+        "1": {
+          "label": "Rivedi le metriche principali",
+          "detail": "Ogni modalità evidenzia le sue cifre più rilevanti: il Cantone vede l'evitamento dei costi in CHF; il Comune vede i membri attivi e la frequenza di scambio; la Cooperativa vede i tassi di mantenimento e reciprocità."
+        },
+        "2": {
+          "label": "Analizza le visualizzazioni",
+          "detail": "I grafici sono interattivi — passa con il mouse per i suggerimenti, clicca per filtrare per periodo di tempo, categoria o sotto-regione."
+        },
+        "3": {
+          "label": "Esporta un pacchetto di stampa",
+          "detail": "Usa \"Esporta per presentazione\" per produrre un PDF pronto per le diapositive con i grafici principali e i numeri principali per la modalità pubblico."
+        }
+      },
+      "tips": {
+        "0": "La modalità pubblico Canton si collega direttamente ai dati del rapporto ROI municipale — dovrebbero essere coerenti.",
+        "1": "Per una presentazione al consiglio, passa alla modalità Municipio e concentrati sulla sezione \"Storie dei membri\", che presenta storie di successo anonime."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Municipale"
+        },
+        "1": {
+          "label": "Storie di successo"
+        },
+        "2": {
+          "label": "Dati di Riferimento KPI"
+        }
+      }
+    },
+    "caring_kpi_baselines": {
+      "title": "Valori di riferimento KPI — Misurazione dell'impatto prima/dopo",
+      "summary": "Le baseline dei KPI catturano un'istantanea degli indicatori chiave della salute della comunità in un momento definito nel tempo (tipicamente al lancio del pilota). Le istantanee successive vengono confrontate con la baseline per misurare i cambiamenti — per esempio, una riduzione del 15% della solitudine segnalata o un aumento del 20% delle connessioni sociali.",
+      "steps": {
+        "0": {
+          "label": "Crea la baseline di lancio",
+          "detail": "Prima che il tuo pilota diventi operativo, clicca su \"Crea Istanza di Riferimento\". Questo blocca i valori correnti per tutte le dimensioni KPI (indice di solitudine, membri attivi, scambi/settimana, ecc.)."
+        },
+        "1": {
+          "label": "Registra un'istantanea di confronto",
+          "detail": "Ad ogni traguardo di reporting (3 mesi, 6 mesi, 12 mesi), crea una nuova istantanea. Il sistema calcola automaticamente la variazione percentuale rispetto alla linea di base."
+        },
+        "2": {
+          "label": "Aggiungi metriche derivanti dai sondaggi",
+          "detail": "Per i KPI che provengono dai sondaggi dei membri (ad esempio il punteggio del benessere auto-riferito), usa i campi di inserimento manuale per inserire i risultati."
+        },
+        "3": {
+          "label": "Rivedi il cruscotto dei cambiamenti",
+          "detail": "La tabella di confronto affiancata mostra ogni KPI, il suo valore iniziale, il valore attuale e la tendenza direzionale (positiva/negativa)."
+        },
+        "4": {
+          "label": "Includi nei rapporti",
+          "detail": "Il Pacchetto di Evidenze d'Impatto e il Rapporto sul ROI Comunale possono entrambi incorporare il confronto di riferimento. Usa \"Collega al Pacchetto d'Impatto\" per includerlo."
+        }
+      },
+      "tips": {
+        "0": "Crea il riferimento di lancio prima di iscrivere qualsiasi membro — un riferimento preso dopo che i membri si sono uniti non è una vera misura pre-lancio.",
+        "1": "Per gli indicatori di solitudine e benessere, utilizzare una scala consolidata e validata (ad esempio UCLA Loneliness Scale, ONS Wellbeing) per garantire credibilità con partner accademici o sanitari."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Municipale"
+        },
+        "1": {
+          "label": "Cruscotto Pilota"
+        }
+      }
+    },
+    "caring_sla_dashboard": {
+      "title": "Cruscotto di Monitoraggio SLA delle Richieste di Aiuto",
+      "summary": "Traccia tutte le richieste di assistenza aperte rispetto al loro impegno SLA dalla Policy Operativa: Critico (1 ora), Alto (24 ore), Medio (72 ore), Basso (prossima riunione programmata). La codifica a colori a colpo d'occhio mostra la conformità in tempo reale.",
+      "steps": {
+        "0": {
+          "label": "Rivedi le schede riepilogative dello SLA",
+          "detail": "Le quattro schede nella parte superiore mostrano quante richieste ci sono in ciascun livello di gravità e quale percentuale è entro lo SLA. Rosso = superato; ambra = entro il 20% della scadenza."
+        },
+        "1": {
+          "label": "Filtra le richieste scadute",
+          "detail": "Clicca su \"Solo scadute\" per vedere solo le richieste che hanno già superato il loro SLA. Queste richiedono attenzione immediata."
+        },
+        "2": {
+          "label": "Assegna o riassegna",
+          "detail": "Clicca su qualsiasi richiesta per aprire il pannello dei dettagli. Usa \"Assegna al Coordinatore\" per allocare la responsabilità. Il destinatario riceve una notifica in-app."
+        },
+        "3": {
+          "label": "Sospendi con giustificazione",
+          "detail": "Se una richiesta non può essere eseguita ancora (ad esempio in attesa di informazioni esterne), usa \"Sospendi\" e scrivi un motivo. Le richieste sospese mettono in pausa temporaneamente l'orologio SLA."
+        },
+        "4": {
+          "label": "Esporta rapporto di conformità",
+          "detail": "Genera un CSV settimanale di conformità SLA per i tuoi record di gestione della qualità."
+        }
+      },
+      "tips": {
+        "0": "La dashboard SLA si aggiorna ogni 60 secondi — non è necessario ricaricare manualmente.",
+        "1": "I periodi di alto volume (inverno, eventi) spesso causano pressione sugli SLA. Usa Smart Nudges per attivare preventivamente gli assistenti prima che le richieste si accumulino."
+      },
+      "caution": "Le richieste posticipate appaiono comunque nel report di conformità. Il frequente posticipo delle richieste Critiche sarà segnalato nell'audit sulla qualità dei dati.",
+      "related_paths": {
+        "0": {
+          "label": "Tutela"
+        },
+        "1": {
+          "label": "Nudge intelligenti"
+        },
+        "2": {
+          "label": "Politica Operativa"
+        }
+      }
+    },
+    "caring_data_quality": {
+      "title": "Controlli di Qualità dei Dati",
+      "summary": "Esegue controlli automatici sui dati della tua cooperativa e segnala i problemi per gravità: Critico (blocca la reportistica), Alto (degrada l'accuratezza del report), Medio (consigliato), Basso (cosmetico). Risolvi i problemi Critici e Alti prima di generare qualsiasi report per soggetti esterni.",
+      "steps": {
+        "0": {
+          "label": "Esegui un controllo di qualità completo",
+          "detail": "Clicca su \"Esegui Controllo Ora\". La scansione di solito richiede 30–60 secondi. I risultati vengono memorizzati nella cache per 6 ore — esegui di nuovo se hai apportato modifiche significative ai dati."
+        },
+        "1": {
+          "label": "Rivedi prima le questioni critiche",
+          "detail": "Le questioni critiche (rosse) devono essere risolte prima di generare i rapporti comunali. Clicca su ogni problema per una descrizione del problema e un link diretto per risolverlo."
+        },
+        "2": {
+          "label": "Lavora sulle questioni Alte e Medie",
+          "detail": "I problemi gravi (arancione) influenzano la precisione dei calcoli del ROI. I problemi medi (giallo) sono consulenze — risolvili quando conveniente."
+        },
+        "3": {
+          "label": "Segna i falsi positivi",
+          "detail": "Se un problema segnalato non è effettivamente un problema (ad esempio un membro non ha legittimamente un indirizzo email), usa \"Segna come Riconosciuto\" con una motivazione. Questo silenzia il segnale."
+        },
+        "4": {
+          "label": "Monitora il punteggio di qualità nel tempo",
+          "detail": "Il grafico delle tendenze del punteggio di qualità (0–100) ti aiuta a identificare se la qualità dei dati sta migliorando dopo aver affrontato i problemi."
+        }
+      },
+      "tips": {
+        "0": "Esegui il controllo della qualità come parte della tua routine mensile da coordinatore, non solo prima di generare i report.",
+        "1": "I riassunti delle risoluzioni di tutela mancanti sono sempre segnalati come Critici — consulta la pagina Tutela per aggiungerli."
+      },
+      "related_paths": {
+        "0": {
+          "label": "ROI Municipale"
+        },
+        "1": {
+          "label": "Tutela"
+        }
+      }
+    },
+    "caring_launch_readiness": {
+      "title": "Gate di Prontezza al Lancio Pilota",
+      "summary": "Un elenco di criteri a cancelli che devono tutti essere superati prima che il tuo pilota sia considerato pronto per essere attivato. La prontezza viene valutata in quattro aree di segnale: allineamento al valore municipale, partecipazione della comunità, rete di partner e capacità di scambio locale. Tutti devono essere verdi prima del lancio.",
+      "steps": {
+        "0": {
+          "label": "Rivedi i quattro segnali di prontezza",
+          "detail": "Valore Municipale, Partecipazione, Rete di Partner e Scambio Locale sono ciascuno valutati da 0 a 100. Tutti e quattro devono raggiungere la soglia configurata (70 di default) prima che il cancello si apra."
+        },
+        "1": {
+          "label": "Analizza i segnali che non superano la soglia",
+          "detail": "Clicca su qualsiasi scheda di segnale arancione o rosso per vedere i sotto-criteri specifici che non sono ancora stati soddisfatti, con indicazioni pratiche su come affrontare ciascuno."
+        },
+        "2": {
+          "label": "Carica le prove di supporto",
+          "detail": "Alcuni criteri richiedono il caricamento di prove (ad esempio, una lettera di partenariato comunale firmata o un sondaggio di base completato). Utilizza il pulsante di caricamento sul criterio rilevante."
+        },
+        "3": {
+          "label": "Richiedi una revisione del coordinatore",
+          "detail": "Una volta che ritieni che tutti i criteri siano soddisfatti, utilizza \"Richiedi Revisione\" per notificare un coordinatore senior o un rappresentante nazionale di Caring Community per convalidare il gate di prontezza."
+        },
+        "4": {
+          "label": "Sblocca il deployment live",
+          "detail": "Quando la revisione approva tutti i criteri, il pulsante \"Vai Live\" diventa disponibile. Questo abilita il modulo Caring Community per i membri."
+        }
+      },
+      "tips": {
+        "0": "Puoi lavorare sui criteri in qualsiasi ordine — non esiste una sequenza obbligatoria.",
+        "1": "I documenti di prova sono archiviati in modo sicuro e sono accessibili al Caring Community nazionale per i loro registri.",
+        "2": "La soglia di prontezza può essere rivalutata in qualsiasi momento — se le circostanze cambiano (ad es. un partner municipale si ritira), lo stato della soglia viene aggiornato automaticamente."
+      },
+      "caution": "Non tentare di bypassare manualmente la soglia di prontezza. Lanciare senza superare tutti i criteri comporta il rischio di una scarsa esperienza per i membri e compromette la responsabilità del finanziamento.",
+      "related_paths": {
+        "0": {
+          "label": "Cruscotto Pilota"
+        },
+        "1": {
+          "label": "Dati di Riferimento KPI"
+        },
+        "2": {
+          "label": "Politica Operativa"
+        }
+      }
+    },
+    "caring_pilot_scoreboard": {
+      "title": "Punteggio del Progetto Pilota Comunità Prontezza",
+      "summary": "Il tabellone dei punteggi in tempo reale per il tuo progetto pilota Comunità Premurosa, che monitora i progressi rispetto ai metriche della metodologia della Comunità Premurosa. Le metriche includono il volume degli scambi, la fidelizzazione dei membri, il rapporto di reciprocità (aiutanti che sono anche beneficiari), il tempo di risposta del coordinatore e il tasso di conformità alla salvaguardia.",
+      "steps": {
+        "0": {
+          "label": "Rivedi il punteggio principale",
+          "detail": "Il punteggio complessivo del pilota (0-100) è un composito di tutte le metriche della metodologia. Mira a 75+ per qualificarti per il riconoscimento \"Cooperativa Stabilita\" della Comunità Premurosa."
+        },
+        "1": {
+          "label": "Comprendere i punteggi delle singole metriche",
+          "detail": "Ogni metrica ha un intervallo target definito nella Politica Operativa. Verde = nel target; ambra = entro il 10% del target; rosso = sotto la soglia."
+        },
+        "2": {
+          "label": "Confrontare con il benchmark della Comunità Premurosa",
+          "detail": "Attiva \"Mostra Benchmark della Comunità Premurosa\" per sovrapporre i punteggi mediani anonimizzati di tutte le cooperative della Comunità Premurosa. Questo mostra come ti confronti con i pari."
+        },
+        "3": {
+          "label": "Scarica il rapporto sulla metodologia",
+          "detail": "Genera un rapporto sulla metodologia formattato per la Comunità Premurosa da presentare alla Comunità Premurosa durante la tua revisione trimestrale."
+        }
+      },
+      "tips": {
+        "0": "Il rapporto di reciprocità (la proporzione di membri che danno E ricevono) è l'unico indicatore più importante per l'accreditamento della Comunità Attenta — puntare al 60% o più.",
+        "1": "Un punteggio basso del tempo di risposta del coordinatore riflette quasi sempre violazioni SLA — controllare il Cruscotto SLA per la causa principale."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Dati di Riferimento KPI"
+        },
+        "1": {
+          "label": "Dashboard SLA"
+        },
+        "2": {
+          "label": "Prontezza al lancio"
+        }
+      }
+    },
+    "caring_nudges": {
+      "title": "Smart Nudges — Coinvolgimento Automatizzato",
+      "summary": "Gli Smart Nudges sono messaggi automatizzati e personalizzati inviati ai membri inattivi o a rischio per coinvolgerli nuovamente. Le regole sono definite dalla soglia di inattività, dal livello di fiducia del membro e dalla categoria di assistenza. Tutti i nudges vengono visualizzati in anteprima prima di essere pubblicati.",
+      "steps": {
+        "0": {
+          "label": "Crea una regola per il nudge",
+          "detail": "Clicca su \"Nuovo Nudge\". Imposta il trigger (ad es. \"il membro non ha effettuato il login negli ultimi 14 giorni\"), il segmento di destinazione (ad es. membri Tier 1+ nella categoria Trasporti) e il canale (email / in-app)."
+        },
+        "1": {
+          "label": "Scrivi il messaggio di spinta",
+          "detail": "Utilizza l'assistente Communication Copilot per redigere un messaggio caldo e personalizzato. Il nome del membro viene sempre inserito automaticamente."
+        },
+        "2": {
+          "label": "Imposta il programma di invio",
+          "detail": "Scegli quando possono essere inviati i messaggi di spinta (ad esempio solo nei giorni feriali dalle 9:00 alle 18:00) e la frequenza massima (ad esempio non più di una volta a settimana per membro)."
+        },
+        "3": {
+          "label": "Anteprima e attiva",
+          "detail": "Rivedi l'elenco di anteprima dei membri che attualmente riceverebbero il promemoria. Se il conteggio è sensato, cambia lo stato della regola su Attivo."
+        },
+        "4": {
+          "label": "Rivedi le prestazioni del promemoria",
+          "detail": "Il pannello di analisi mostra il tasso di apertura, il tasso di clic e il tasso di riattivazione (membri che hanno completato uno scambio entro 7 giorni dal promemoria)."
+        }
+      },
+      "tips": {
+        "0": "Inizia con una frequenza bassa — una spinta ogni quindici giorni di solito è sufficiente. Troppe spinte portano alla disiscrizione.",
+        "1": "Le spinte sono più efficaci per i membri del Tier 0–1 che non hanno ancora completato il loro primo scambio.",
+        "2": "Non usare mai le spinte per il follow-up sulla protezione — usa il modulo Protezione per quello."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Copilota della Comunicazione"
+        },
+        "1": {
+          "label": "Dashboard SLA"
+        }
+      }
+    },
+    "caring_emergency_alerts": {
+      "title": "Allarmi di Emergenza — Trasmissione a Tutti i Membri",
+      "summary": "Invia allerte immediate e ad alta priorità a tutti i membri della tua cooperativa. Usalo solo per emergenze reali: condizioni meteorologiche severe che influenzano i viaggi verso gli scambi, tutela degli avvisi pubblici o consigli urgenti sulla salute della comunità. Tutte le allerte sono registrate e contrassegnate con data e ora.",
+      "steps": {
+        "0": {
+          "label": "Scegli il tipo di allerta",
+          "detail": "Seleziona tra: Avviso di Sicurezza, Allerta Meteo, Interruzione del Servizio o Emergenza Generale. Il tipo imposta lo stile visivo e l'urgenza della notifica push."
+        },
+        "1": {
+          "label": "Scrivi il messaggio di avviso",
+          "detail": "Mantienilo breve (meno di 160 caratteri per la compatibilità con SMS). Indica qual è la situazione, cosa devono fare i membri e quando fornirai un aggiornamento."
+        },
+        "2": {
+          "label": "Seleziona i canali di distribuzione",
+          "detail": "Scegli: Banner In-App, Email, Notifica Push o Tutti i Canali. La Push è istantanea; l'email può richiedere fino a 5 minuti."
+        },
+        "3": {
+          "label": "Imposta un orario di scadenza",
+          "detail": "Gli avvisi scadono automaticamente dopo il tempo impostato (default 24 ore). Gli avvisi scaduti vengono rimossi automaticamente dagli schermi dei membri."
+        },
+        "4": {
+          "label": "Invia e monitora",
+          "detail": "Clicca su \"Invia Avviso\". Il cruscotto di consegna mostra i tassi di invio/lettura in tempo reale. Invia un messaggio \"Tutto Chiaro\" come seguito quando la situazione è risolta."
+        }
+      },
+      "tips": {
+        "0": "Testa il sistema di allerta mensilmente con un avviso in \"Modalità Test\" (visibile solo ai membri del livello Coordinatore) per verificare che tutti i canali funzionino.",
+        "1": "Se l'avviso riguarda solo parte della tua comunità, usa le Sotto-Region per filtrare i destinatari invece di trasmettere a tutti."
+      },
+      "caution": "Non utilizzare gli Avvisi di Emergenza per comunicazioni di routine. La saturazione da avvisi porterà i membri a ignorare i futuri avvisi genuini.",
+      "related_paths": {
+        "0": {
+          "label": "Sotto-regioni"
+        },
+        "1": {
+          "label": "Copilota della Comunicazione"
+        }
+      }
+    },
+    "caring_surveys": {
+      "title": "Sondaggi Comunali",
+      "summary": "Crea e distribuisci sondaggi ai tuoi contatti comunali — funzionari del consiglio, personale del dipartimento sanitario e enti finanziatori. I sondaggi possono essere utilizzati per raccogliere valutazioni dei bisogni, feedback sulla soddisfazione o prove per la rendicontazione dei finanziamenti.",
+      "steps": {
+        "0": {
+          "label": "Crea un nuovo sondaggio",
+          "detail": "Clicca su \"Nuovo sondaggio\". Scegli tra i tipi di domanda: scelta multipla, scala di valutazione (1–5 o 1–10), testo libero e sì/no."
+        },
+        "1": {
+          "label": "Aggiungi destinatari dalla tua lista contatti comunale",
+          "detail": "Il selettore destinatari attinge dalla tua lista contatti Lead Nurture. Filtra per ruolo (ad es. \"Responsabile sanitario cantonale\") o organizzazione."
+        },
+        "2": {
+          "label": "Programma o invia immediatamente",
+          "detail": "I sondaggi possono essere inviati subito o programmati per una data specifica (ad esempio, prima di una riunione di revisione trimestrale)."
+        },
+        "3": {
+          "label": "Analizza le risposte",
+          "detail": "Il cruscotto dei risultati mostra le percentuali di risposta, i punteggi aggregati e le risposte testuali aperte. Filtra per ruolo del rispondente o organizzazione."
+        },
+        "4": {
+          "label": "Esporta per report",
+          "detail": "Usa \"Esporta CSV\" per i dati grezzi o \"Esporta PDF Riepilogo\" per un riepilogo formattato adatto all'inclusione nella tua documentazione sull'impatto."
+        }
+      },
+      "tips": {
+        "0": "Mantieni i sondaggi brevi (5 domande o meno). I contatti comunali sono occupati — i sondaggi brevi ottengono tassi di completamento significativamente più alti.",
+        "1": "Segui i non rispondenti una volta dopo 7 giorni con un promemoria automatico. Non inviare più di un promemoria."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Coltivazione dei contatti"
+        },
+        "1": {
+          "label": "Impatto comunale"
+        }
+      }
+    },
+    "caring_copilot": {
+      "title": "Copilota della comunicazione — Redazione assistita dall'IA",
+      "summary": "Un assistente alla scrittura AI addestrato sugli standard di comunicazione della comunità Caring Community. Incolla un'idea approssimativa e il Copilot restituisce una bozza rifinita in un tono caldo e inclusivo, adatto alle comunità di timebanking. Tu rivedi e modifichi prima di inviare.",
+      "steps": {
+        "0": {
+          "label": "Scegli il tipo di comunicazione",
+          "detail": "Seleziona tra: Annuncio ai membri, Email di benvenuto, Riepilogo del rapporto d'impatto, Aggiornamento partner municipale o Bozza libera."
+        },
+        "1": {
+          "label": "Descrivi ciò che vuoi dire",
+          "detail": "Scrivi da 1 a 3 frasi descrivendo i punti chiave. Per esempio: \"Abbiamo tenuto 120 scambi a marzo. I punteggi di solitudine sono migliorati del 12%. Ringraziamo i membri per il loro contributo.\""
+        },
+        "2": {
+          "label": "Genera e rivedi la bozza",
+          "detail": "Clicca su \"Genera bozza\". Leggi attentamente il risultato — le bozze dell'IA possono contenere inesattezze. Correggi eventuali cifre o nomi prima dell'uso."
+        },
+        "3": {
+          "label": "Regola tono e lunghezza",
+          "detail": "Usa i cursori per regolare la formalità (informale ↔ formale) e la lunghezza (breve ↔ dettagliata). Rigenera finché non sei soddisfatto."
+        },
+        "4": {
+          "label": "Copia nel tuo strumento di invio",
+          "detail": "Usa \"Copia negli appunti\" e incolla nel tuo client di posta, nel compositore di annunci o nell'editor della newsletter."
+        }
+      },
+      "tips": {
+        "0": "Il Copilot funziona meglio con input specifici: prompt vaghi producono bozze generiche. Fornisci numeri reali e risultati nominativi.",
+        "1": "Verifica sempre i fatti del testo generato dall'IA. Il Copilot non può accedere a dati in tempo reale: scrive basandosi su ciò che gli dici."
+      },
+      "caution": "Non inviare mai una bozza del Copilot a stakeholder esterni (cantone, media, finanziatori) senza una revisione umana. L'IA può riportare cifre in modo errato o utilizzare frasi inadeguate per contesti formali.",
+      "related_paths": {
+        "0": {
+          "label": "Nudge intelligenti"
+        },
+        "1": {
+          "label": "Avvisi di Emergenza"
+        },
+        "2": {
+          "label": "Digest Civico"
+        }
+      }
+    },
+    "caring_civic_digest": {
+      "title": "Digest Civico — Impostazioni Personalizzate del Digest per i Membri",
+      "summary": "Il Digest Civico è un'email riassuntiva personalizzata inviata a ciascun membro in base ai suoi interessi, attività e ruolo nella comunità. Questa pagina controlla le impostazioni globali del digest: opzioni di frequenza, moduli di contenuto da includere e quali segmenti di membri ricevono quale tipo di digest.",
+      "steps": {
+        "0": {
+          "label": "Imposta le frequenze del digest disponibili",
+          "detail": "Scegli a quali frequenze i membri possono iscriversi: Giornaliero, Settimanale, Bisettimanale, Mensile o Mai. Il predefinito per i nuovi membri è Settimanale."
+        },
+        "1": {
+          "label": "Configura i moduli dei contenuti del digest",
+          "detail": "Attiva o disattiva quali blocchi di contenuto appariranno: Eventi Futuri, Richieste di Aiuto Aperte, Nuovi Membri da Accogliere, Riepilogo del Mio Scambio, punti salienti della Classifica Piloti, ecc."
+        },
+        "2": {
+          "label": "Imposta regole specifiche per segmento",
+          "detail": "I coordinatori possono ricevere un digest arricchito con lo stato SLA e avvisi sulla qualità dei dati. Imposta questo sotto \"Componenti aggiuntivi del digest del coordinatore\"."
+        },
+        "3": {
+          "label": "Anteprima del digest",
+          "detail": "Clicca su \"Anteprima\" per vedere un digest di esempio visualizzato per un profilo membro di prova. Controlla layout, link e ordine dei contenuti."
+        },
+        "4": {
+          "label": "Invia un digest occasionale",
+          "detail": "Usa \"Invia ora\" per inviare un digest al di fuori della programmazione normale — utile per lanciare una campagna o condividere un risultato importante."
+        }
+      },
+      "tips": {
+        "0": "I membri che hanno selezionato \"Mai\" ricevono comunque gli Avvisi di Emergenza — la preferenza del digest non influisce sulle comunicazioni critiche.",
+        "1": "I digest settimanali inviati il martedì o il mercoledì mattina tendono a ottenere i tassi di apertura più alti sulle piattaforme comunitarie."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Nudge intelligenti"
+        },
+        "1": {
+          "label": "Copilota della Comunicazione"
+        }
+      }
+    },
+    "caring_lead_nurture": {
+      "title": "Lead Nurture — CRM dei contatti municipali",
+      "summary": "Un sistema leggero di gestione dei contatti per tracciare le conversazioni con potenziali contatti pilota municipali — consiglieri locali, funzionari del dipartimento sanitario, personale cantonale e fondazioni comunitarie. Tracciare lo stato della richiesta, la data dell'ultimo contatto e la prossima azione per ogni lead.",
+      "steps": {
+        "0": {
+          "label": "Aggiungi un contatto",
+          "detail": "Clicca su \"Nuovo contatto\". Inserisci nome, ruolo, organizzazione, email e il cantone o comune che rappresentano."
+        },
+        "1": {
+          "label": "Imposta la fase di richiesta",
+          "detail": "Scegli la fase del flusso: Prospect → Primo contatto → Interessato → Proposta inviata → Pilota concordato → Inserito → Rifiutato. Sposta la fase man mano che le conversazioni avanzano."
+        },
+        "2": {
+          "label": "Registra una nota di contatto",
+          "detail": "Dopo ogni interazione (email, chiamata, riunione), aggiungi una nota con la data, ciò che è stato discusso e l'azione successiva concordata. Le note sono private per i coordinatori."
+        },
+        "3": {
+          "label": "Imposta un promemoria di follow-up",
+          "detail": "Usa \"Imposta promemoria\" per creare un compito che apparirà nella tua dashboard del coordinatore in una data scelta."
+        },
+        "4": {
+          "label": "Collega a un inquilino",
+          "detail": "Una volta che un comune accetta di partecipare al progetto pilota, utilizzare \"Collega a un inquilino\" per associare il contatto al nuovo inquilino NEXUS creato per loro."
+        }
+      },
+      "tips": {
+        "0": "Mantieni le note brevi ma specifiche — \"Chiamata a Maria, esaminerà la proposta entro venerdì 14 feb\" è più utile di \"Contatto chiamato\".",
+        "1": "I contatti che sono stati nello stesso stadio del pipeline per più di 60 giorni sono evidenziati — considera se hanno bisogno di un approccio diverso o se dovrebbero essere spostati a Rifiutati."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Sondaggi Comunali"
+        },
+        "1": {
+          "label": "Richieste Pilota"
+        }
+      }
+    },
+    "caring_success_stories": {
+      "title": "Storie di Successo — Schede di Prova dell'Impatto",
+      "summary": "Raccogliere e gestire brevi storie anonime dei membri sul cambiamento che gli scambi premurosi hanno portato nelle loro vite. Le storie vengono utilizzate in rapporti di impatto, presentazioni comunali e nel Pacchetto di Prove di Impatto destinato al pubblico.",
+      "steps": {
+        "0": {
+          "label": "Raccogliere una storia",
+          "detail": "Clicca su \"Nuova Storia\". Inserisci il pseudonimo del membro (mai il loro nome reale nei materiali pubblici), il tipo di scambio, il risultato e una citazione diretta (con il consenso annotato)."
+        },
+        "1": {
+          "label": "Etichetta per categoria di impatto",
+          "detail": "Etichetta ogni storia con i temi di impatto rilevanti: Riduzione della Solitudine, Miglioramento della Mobilità, Supporto Pratico, Connessione Intergenerazionale, ecc. Questi guidano il filtraggio nei rapporti."
+        },
+        "2": {
+          "label": "Segna lo stato del consenso",
+          "detail": "Ogni storia deve avere un record di consenso prima di poter essere pubblicata. Seleziona \"Consenso Verbale Ottenuto\" oppure carica un modulo di consenso scritto."
+        },
+        "3": {
+          "label": "Revisiona e pubblica",
+          "detail": "Usa \"Pubblica su Impact Pack\" per rendere la storia disponibile nella dashboard Municipal Impact e nelle esportazioni del Pacchetto di Evidenze."
+        },
+        "4": {
+          "label": "Archivia le storie obsolete",
+          "detail": "Le storie vecchie di più di 2 anni dovrebbero essere revisionate per verificarne la pertinenza attuale. Archivia quelle che non riflettono più le operazioni correnti."
+        }
+      },
+      "tips": {
+        "0": "Le storie più convincenti sono specifiche: \"Maria, 78 anni, è riuscita a rimanere indipendente per altri 6 mesi perché...\" è più efficace di affermazioni generiche sul benessere.",
+        "1": "Punta ad almeno 3 storie per categoria di assistenza: i rapporti d'impatto sono più credibili con una gamma di prove."
+      },
+      "caution": "Non pubblicare mai una storia senza un consenso registrato. Pubblicare senza consenso costituisce una violazione del FADP/nDSG.",
+      "related_paths": {
+        "0": {
+          "label": "Impatto comunale"
+        },
+        "1": {
+          "label": "Pacchetto di Divulgazione"
+        }
+      }
+    },
+    "caring_feedback": {
+      "title": "Casella di Posta dei Feedback — Smistamento dei Feedback del Comune",
+      "summary": "Centralizza i feedback inviati dai partner e dai soggetti interessati del comune — preoccupazioni, domande, suggerimenti e reclami. Ogni elemento viene smistato in base alla gravità, assegnato a un coordinatore e monitorato fino alla risoluzione.",
+      "steps": {
+        "0": {
+          "label": "Rivedi i nuovi elementi di feedback",
+          "detail": "I nuovi elementi appaiono in cima alla casella di posta. Leggi ciascuno e valuta la sua gravità: Critico (interruzione del servizio / reclamo formale), Alta (preoccupazione significativa), Media (domanda), Bassa (suggerimento)."
+        },
+        "1": {
+          "label": "Assegna a un coordinatore",
+          "detail": "Usa \"Assegna\" per destinare l'elemento al coordinatore più adatto a rispondere. Riceveranno una notifica nell'app."
+        },
+        "2": {
+          "label": "Redigi una risposta",
+          "detail": "Usa il pannello \"Rispondi\" per elaborare la tua risposta. Per gli elementi Critici, usa il Copilota di Comunicazione per assicurarti che il tono sia appropriato."
+        },
+        "3": {
+          "label": "Invia e registra",
+          "detail": "L'invio della risposta registra l'intera conversazione nella cronologia dell'elemento. Il contatto municipale riceve la tua risposta via email."
+        },
+        "4": {
+          "label": "Chiudi o escalera",
+          "detail": "Segna come Risolto una volta che la questione è conclusa, oppure usa \"Escalare alla Comunità Nazionale di Supporto\" se il problema è al di là dell'autorità del tuo cooperativa di affrontarlo."
+        }
+      },
+      "tips": {
+        "0": "Punta a riconoscere il feedback Critico entro 4 ore anche se una soluzione completa richiede più tempo. Il solo riconoscimento previene l'escalation.",
+        "1": "Riconoscimento dei modelli: se tre o più elementi di feedback toccano lo stesso tema (ad esempio \"risposta lenta del coordinatore\"), segnala un problema sistemico da indagare."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Copilota della Comunicazione"
+        },
+        "1": {
+          "label": "Dashboard SLA"
+        }
+      }
+    },
+    "caring_verification": {
+      "title": "Verifica Comunale — Badge DNS/Attestazione",
+      "summary": "I partner comunali verificati ricevono un badge digitale visualizzato sul loro profilo della comunità e nei rapporti di impatto. La verifica richiede la conferma del record DNS (per dimostrare il controllo del dominio ufficiale del comune) e una lettera di attestazione firmata.",
+      "steps": {
+        "0": {
+          "label": "Avviare la verifica per un comune",
+          "detail": "Trova il contatto municipale in Lead Nurture, clicca su \"Avvia Verifica\". Il sistema genera un valore unico del record DNS TXT da aggiungere al loro dominio."
+        },
+        "1": {
+          "label": "Istruisci il team IT del comune",
+          "detail": "Condividi la guida alle istruzioni DNS (PDF scaricabile) con l'amministratore web del comune. Loro aggiungono il record TXT al loro DNS."
+        },
+        "2": {
+          "label": "Avvia il controllo DNS",
+          "detail": "Una volta confermato che il record è stato aggiunto, clicca su \"Controlla DNS\". Il sistema interroga automaticamente il dominio. La verifica è immediata se il record viene trovato."
+        },
+        "3": {
+          "label": "Carica la lettera di attestazione",
+          "detail": "Carica la lettera di attestazione firmata (su carta intestata ufficiale, firmata da un responsabile). Questa viene archiviata come parte del record di conformità."
+        },
+        "4": {
+          "label": "Emetti il badge",
+          "detail": "Una volta confermati sia il DNS che l'attestazione, clicca su \"Rilascia Badge Verificato\". Il badge appare immediatamente sul profilo del partner del comune."
+        }
+      },
+      "tips": {
+        "0": "La propagazione del DNS può richiedere fino a 48 ore. Lascia abbastanza tempo prima di effettuare il controllo — non riprovare più di una volta all'ora.",
+        "1": "Il badge viene revocato automaticamente se successivamente il record DNS viene rimosso. I partner verificati dovrebbero essere consigliati di mantenere il record permanentemente."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Coltivazione dei contatti"
+        },
+        "1": {
+          "label": "Impatto comunale"
+        }
+      }
+    },
+    "caring_hour_transfers": {
+      "title": "Trasferimenti Manuali di Crediti Orari",
+      "summary": "Consente ai coordinatori di trasferire manualmente i crediti orari tra conti dei membri al di fuori di uno scambio completato. Utilizzare questo per correzioni, concessioni di crediti comunitari o aggiustamenti amministrativi. Tutti i trasferimenti sono permanentemente verificati.",
+      "steps": {
+        "0": {
+          "label": "Seleziona il membro sorgente",
+          "detail": "Cerca il membro a cui verranno detratti gli ore. Conferma il loro saldo attuale prima di procedere."
+        },
+        "1": {
+          "label": "Seleziona il membro di destinazione",
+          "detail": "Cerca il membro ricevente. Il sistema avverte se il membro di destinazione appartiene a un tenant diverso."
+        },
+        "2": {
+          "label": "Inserisci l'importo e il motivo",
+          "detail": "Inserisci il numero di ore (sono consentiti i decimali, ad esempio 0,5 per 30 minuti). Scrivi una ragione chiara — questo apparirà nella cronologia delle transazioni di entrambi i membri."
+        },
+        "3": {
+          "label": "Conferma ed esegui",
+          "detail": "Rivedi il riepilogo e clicca su \"Conferma trasferimento\". La modifica ha effetto immediato."
+        },
+        "4": {
+          "label": "Verifica il registro di controllo",
+          "detail": "Controlla la voce del registro di audit per confermare che entrambi i saldi siano stati aggiornati correttamente."
+        }
+      },
+      "tips": {
+        "0": "Non puoi andare in rosso sul conto di un membro fino a un saldo negativo senza un flag di override — contatta un super-amministratore se è davvero necessario un saldo negativo.",
+        "1": "Per le correzioni di massa (ad esempio dopo un errore di sistema), usa l'importazione CSV per i trasferimenti batch invece di farli uno alla volta."
+      },
+      "caution": "I trasferimenti manuali non possono essere annullati automaticamente. Controlla attentamente gli importi prima di confermare — le correzioni richiedono un secondo trasferimento manuale nella direzione opposta.",
+      "related_paths": {
+        "0": {
+          "label": "Flusso di lavoro del Coordinatore"
+        },
+        "1": {
+          "label": "Fidelizzazione"
+        }
+      }
+    },
+    "caring_loyalty": {
+      "title": "Programma di Fidelizzazione — Premi per i Membri",
+      "summary": "Configura il programma di premi fedeltà: badge, ricompense per traguardi, bonus per le serie consecutive e riconoscimenti speciali per i membri di lunga data e i migliori contributori. Le meccaniche di fedeltà aumentano l'impegno senza sostituire il valore intrinseco dell'aiuto reciproco.",
+      "steps": {
+        "0": {
+          "label": "Rivedi le regole dei premi attivi",
+          "detail": "La tabella delle regole mostra ogni attivatore di fedeltà attivo: traguardi degli scambi (1°, 5°, 25° scambio), bonus per raccomandazioni, crediti di compleanno, ecc."
+        },
+        "1": {
+          "label": "Modifica o aggiungi una regola",
+          "detail": "Clicca su \"Nuova Regola\". Imposta il tipo di trigger (numero di scambi, punteggio della recensione, giorni consecutivi, evento personalizzato), l'importo della ricompensa in ore e se si tratta di una ricompensa unica o ricorrente."
+        },
+        "2": {
+          "label": "Configura i badge di traguardo",
+          "detail": "Collega un badge (creato nell'amministrazione dei Badge) a un traguardo di fedeltà in modo che i membri ricevano sia una ricompensa in ore sia un riconoscimento visibile."
+        },
+        "3": {
+          "label": "Consultare la classifica",
+          "detail": "Controlla la classifica della fedeltà per i principali contributori di questo mese. Considera di inviare loro un ringraziamento personale tramite il Copilota di Comunicazione."
+        },
+        "4": {
+          "label": "Revisionare le erogazioni dei premi",
+          "detail": "Il registro delle erogazioni mostra ogni premio emesso, a chi e perché. Usalo per individuare anomalie."
+        }
+      },
+      "tips": {
+        "0": "I bonus di reciprocità (per i membri che sia danno che ricevono nello stesso mese) sono molto efficaci per migliorare il rapporto di reciprocità sul Pilot Scoreboard.",
+        "1": "Mantieni il programma semplice — troppe regole creano confusione. Da tre a cinque ricompense ben comprese superano una matrice di punti complessa."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Punti regionali"
+        },
+        "1": {
+          "label": "Cruscotto Pilota"
+        }
+      }
+    },
+    "caring_regional_points": {
+      "title": "Punti regionali — Libro mastro della terza valuta",
+      "summary": "I Punti Regionali sono una valuta complementare che coesiste con i crediti orari. Sono emessi da enti sub-regionali (consigli di quartiere, gruppi di vicinato) e possono essere riscattati per beni o servizi locali non coperti dagli scambi di ore. Questa pagina gestisce il registro dei punti regionali.",
+      "steps": {
+        "0": {
+          "label": "Rivedi il bilancio dei punti regionali",
+          "detail": "Il registro mostra il totale dei punti in circolazione, quelli emessi in questo mese, quelli riscattati in questo mese e la passività residua."
+        },
+        "1": {
+          "label": "Emettere un lotto di punti",
+          "detail": "Usa \"Emetti Punti\" per accreditare punti a un membro o a un gruppo di membri. Inserisci l'importo, la sotto-regione e il motivo (ad es. \"Partecipazione alla pulizia del quartiere\")."
+        },
+        "2": {
+          "label": "Configura le opzioni di riscossione",
+          "detail": "Sotto \"Catalogo Riscatti\", aggiungi articoli per i quali i membri possono riscattare i punti (ad es. \"Voucher pasticceria locale — 50 punti\"). Ogni articolo necessita di un conteggio dello stock o di un interruttore per quantità illimitata."
+        },
+        "3": {
+          "label": "Revisiona le richieste di riscatto",
+          "detail": "Le richieste di riscatto in sospeso appaiono in coda. Approva o rifiuta ciascuna, indicando un motivo per i rifiuti."
+        },
+        "4": {
+          "label": "Esporta il registro",
+          "detail": "Genera un report periodico del registro per il tuo partner sub-regionale mostrando i punti emessi e riscattati."
+        }
+      },
+      "tips": {
+        "0": "I Punti Regionali dovrebbero completare, non competere con, i crediti orari. Evitare di creare articoli riscattabili che potrebbero anche essere scambiati come servizi a credito orario.",
+        "1": "Mantenere la responsabilità (punti non riscattati) visibile ai vostri partner sub-regionali — rappresenta un impegno reale."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Sotto-regioni"
+        },
+        "1": {
+          "label": "Fidelizzazione"
+        }
+      }
+    },
+    "caring_sub_regions": {
+      "title": "Sub-Region — Gestione delle Suddivisioni Geografiche",
+      "summary": "Le sotto-regioni suddividono l'area geografica della vostra cooperativa in unità amministrative più piccole come Quartier (quartiere), Ortsteil (quartiere distretto) o villaggio. I membri possono essere assegnati alle sotto-regioni per comunicazioni mirate, rapporti locali e gestione dei Punti Regionali.",
+      "steps": {
+        "0": {
+          "label": "Creare una sotto-regione",
+          "detail": "Cliccare su \"Nuova Sotto-Regione\". Inserire il nome (es. \"Länggasse-Felsenau\"), il tipo (Quartier / Ortsteil / Villaggio / Personalizzato) e una descrizione facoltativa dei confini."
+        },
+        "1": {
+          "label": "Assegna membri",
+          "detail": "Usa lo strumento di assegnazione in blocco per assegnare membri in base al loro CAP/indirizzo, oppure assegna manualmente membri individuali."
+        },
+        "2": {
+          "label": "Imposta un coordinatore di sotto-regione",
+          "detail": "Assegna un membro di livello Coordinatore come contatto responsabile per questa sotto-regione. Riceveranno notifiche SLA specifiche per la sotto-regione e digest."
+        },
+        "3": {
+          "label": "Uso nelle comunicazioni",
+          "detail": "Quando invii Avvisi di Emergenza, Promemoria Intelligenti o Digest Civici, filtra i destinatari per sotto-regione per raggiungere solo i membri rilevanti."
+        },
+        "4": {
+          "label": "Rivedi le analisi della sotto-regione",
+          "detail": "La scheda delle analisi mostra la densità degli scambi, il tasso di membri attivi e la conformità SLA suddivisi per sotto-regione."
+        }
+      },
+      "tips": {
+        "0": "Le sotto-regioni funzionano meglio quando corrispondono a vere identità comunitarie riconosciute dai membri — usa nomi che le persone usano realmente per il loro quartiere.",
+        "1": "Evita di creare troppe sotto-regioni (più di 10 di solito è troppo dettagliato per una cooperativa pilota)."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Punti regionali"
+        },
+        "1": {
+          "label": "Avvisi di Emergenza"
+        }
+      }
+    },
+    "partner_timebanks_caring_peers": {
+      "title": "Cooperative partner - Federazione Comunità Premurosa",
+      "summary": "Gestisci le connessioni del timebank dei partner tra la tua cooperativa e altre cooperative della Caring Community. Questa pagina è destinata ai collegamenti fidati da cooperativa a cooperativa, non ai client API generici o alle integrazioni di terze parti.",
+      "steps": {
+        "0": {
+          "label": "Visualizza le cooperative partner attive",
+          "detail": "La tabella mostra ogni cooperativa della Caring Community connessa, il suo URL di istanza, lo stato e l'ultima stretta di mano verificata."
+        },
+        "1": {
+          "label": "Invita una nuova cooperativa",
+          "detail": "Clicca su \"Invita Cooperativa Partner\". Inserisci l'URL della loro istanza NEXUS. Riceveranno un invito da accettare e firmare l'accordo di fiducia bilaterale."
+        },
+        "2": {
+          "label": "Accetta un invito in arrivo",
+          "detail": "Gli inviti in sospeso appaiono nella scheda \"In arrivo\". Controlla il profilo della cooperativa richiedente prima di accettare."
+        },
+        "3": {
+          "label": "Configura le regole di condivisione dei dati",
+          "detail": "Per ogni peer, scegli quali dati condividere: solo la validazione Warmth Pass, oppure anche le statistiche aggregate di scambio per il cruscotto nazionale della Comunità Premurosa."
+        },
+        "4": {
+          "label": "Sospendi una connessione con un peer",
+          "detail": "Se una cooperativa non è più attiva o ha avuto un problema di tutela, usa \"Sospendi\" per mettere in pausa il collegamento alla federazione senza rimuoverlo permanentemente."
+        }
+      },
+      "tips": {
+        "0": "Connettiti solo con cooperative che hai verificato di persona o tramite la rete nazionale Caring Community — possono verificarsi inviti automatizzati di spam.",
+        "1": "Quando la modalità Nodo Isolato è attiva, tutta la sincronizzazione dei dati dei peer della federazione è automaticamente sospesa. Riattivala singolarmente dopo aver esaminato la conformità FADP."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Pass Caloroso"
+        },
+        "1": {
+          "label": "Nodo Isolato"
+        }
+      }
+    },
+    "caring_providers": {
+      "title": "Elenco dei fornitori di assistenza",
+      "summary": "Una directory curata di fornitori di assistenza professionale e semi-professionale affiliati alla tua cooperativa. I fornitori sono distinti dai volontari membri: sono organizzazioni o individui che offrono servizi di assistenza specializzata che completano gli scambi comunitari (ad esempio fisioterapia professionale, lavoro sociale medico).",
+      "steps": {
+        "0": {
+          "label": "Aggiungi un fornitore",
+          "detail": "Clicca su \"Nuovo Fornitore\". Inserisci il nome dell'organizzazione, i dettagli di contatto, le specializzazioni assistenziali, la copertura geografica e se accettano referenze NEXUS."
+        },
+        "1": {
+          "label": "Verifica il fornitore",
+          "detail": "Carica le prove della registrazione o accreditamento del fornitore (ad es. registrazione KESB, iscrizione a un ente professionale). Contrassegnalo come Verificato una volta confermata la documentazione."
+        },
+        "2": {
+          "label": "Collegamento alle categorie di assistenza",
+          "detail": "Associa il fornitore alle categorie di assistenza che copre. Questo permette al motore di abbinamento di suggerirlo quando una richiesta di aiuto supera la capacità dei volontari."
+        },
+        "3": {
+          "label": "Rivedi la capacità del fornitore",
+          "detail": "I fornitori possono aggiornare la loro capacità disponibile (ad es. \"accettando nuovi casi\", \"a piena capacità\"). Verifica questo prima di fare segnalazioni."
+        },
+        "4": {
+          "label": "Registra i risultati delle segnalazioni",
+          "detail": "Dopo aver indirizzato un membro, registra l'esito del referral nel registro degli scambi del membro — questo alimenta i dati KPI."
+        }
+      },
+      "tips": {
+        "0": "I fornitori non hanno bisogno di account NEXUS — la directory è gestita dal coordinatore. I membri vedono una versione semplificata della directory nel loro profilo.",
+        "1": "Rivedi la directory dei fornitori almeno due volte l'anno per rimuovere le organizzazioni che hanno chiuso o modificato i loro servizi."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Cerchio del destinatario di cure"
+        },
+        "1": {
+          "label": "Flusso di lavoro del Coordinatore"
+        }
+      }
+    },
+    "caring_recipient_circle": {
+      "title": "Cerchi dei destinatari di cure e gestione dei beneficiari",
+      "summary": "Un cerchio del destinatario di cure raggruppa la rete di supporto attorno a un membro specifico della comunità che necessita di cure regolari — per esempio, una persona anziana che riceve aiuto da tre vicini, un coordinatore e un infermiere professionista. Questa pagina crea e gestisce tali cerchi.",
+      "steps": {
+        "0": {
+          "label": "Crea un cerchio per un destinatario",
+          "detail": "Clicca su \"Nuovo Circolo\". Seleziona il destinatario delle cure (deve essere un membro). Dai al circolo un nome descrittivo (ad esempio \"Hans S. — Gruppo di Supporto del Martedì Mattina\")."
+        },
+        "1": {
+          "label": "Aggiungi i membri del circolo",
+          "detail": "Aggiungi volontari assistenti, il coordinatore assegnato e qualsiasi fornitore professionale. Ogni membro ha un ruolo (Assistente / Coordinatore Principale / Fornitore Professionale)."
+        },
+        "2": {
+          "label": "Imposta un piano di cura",
+          "detail": "Usa il campo del Piano di Assistenza per documentare le attività di supporto concordate, la frequenza e eventuali note sulla salute o sulla sicurezza rilevanti per gli assistenti."
+        },
+        "3": {
+          "label": "Collega gli scambi al cerchio",
+          "detail": "Gli scambi per il destinatario dell'assistenza possono essere contrassegnati con il cerchio. Questo offre una vista consolidata di tutto il supporto ricevuto da quella persona."
+        },
+        "4": {
+          "label": "Rivedi l'attività del cerchio",
+          "detail": "La timeline delle attività mostra scambi recenti, note e qualsiasi segnalazione di tutela relativa a questo destinatario."
+        }
+      },
+      "tips": {
+        "0": "Il contenuto del piano di assistenza è confidenziale — solo i membri del cerchio e i coordinatori possono vederlo.",
+        "1": "Quando un membro del cerchio se ne va (ad esempio un volontario si trasferisce), archiviarlo dal cerchio invece di cancellare il ruolo — questo preserva la storia dell'assistenza."
+      },
+      "caution": "I piani di cura possono contenere informazioni sanitarie sensibili. Trattali come documenti riservati ai sensi della FADP/nDSG.",
+      "related_paths": {
+        "0": {
+          "label": "Fornitori"
+        },
+        "1": {
+          "label": "Tutela"
+        }
+      }
+    },
+    "caring_research": {
+      "title": "Partnership di ricerca — Collaborazione accademica",
+      "summary": "Gestire partnership di ricerca formali con università, istituti di sanità pubblica e organizzazioni di ricerca sociale. Ai partner può essere concesso l'accesso in sola lettura ai dati aggregati anonimizzati per studi accademici, soggetto a un accordo sui dati firmato.",
+      "steps": {
+        "0": {
+          "label": "Creare un record di partnership di ricerca",
+          "detail": "Fare clic su \"Nuova Partnership\". Inserire il nome dell'istituzione, il ricercatore principale, la domanda di ricerca, il riferimento all'approvazione etica e l'ambito dei dati concordato."
+        },
+        "1": {
+          "label": "Carica l'accordo sui dati",
+          "detail": "Carica l'accordo di trattamento dei dati firmato. Le partnership non possono essere attivate finché non è presente un accordo firmato."
+        },
+        "2": {
+          "label": "Configura l'accesso ai dati",
+          "detail": "Usa il selettore di ambito dei dati per specificare a quali set di dati anonimizzati il partner può accedere: aggregati di scambio, tendenze KPI, risultati dei sondaggi, suddivisioni demografiche."
+        },
+        "3": {
+          "label": "Rilasciare le credenziali di accesso del ricercatore",
+          "detail": "Una volta attivato, utilizzare \"Rilascia Accesso\" per inviare al ricercatore una chiave API di sola lettura o un programma di esportazione dei dati."
+        },
+        "4": {
+          "label": "Revisionare e rinnovare",
+          "detail": "Le partnership scadono dopo il termine concordato (tipicamente un anno accademico). Utilizzare il flusso di lavoro di rinnovo per estendere con il consenso aggiornato."
+        }
+      },
+      "tips": {
+        "0": "Non concedere mai l'accesso a dati dei membri non anonimizzati. La piattaforma anonimizza automaticamente i dati per l'endpoint di esportazione della ricerca, ma verifica questo con il tuo responsabile della protezione dei dati.",
+        "1": "Conserva il numero di riferimento etico — le verifiche esterne potrebbero richiedere prove della supervisione etica."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Dati di Riferimento KPI"
+        },
+        "1": {
+          "label": "Pacchetto di Divulgazione"
+        }
+      }
+    },
+    "caring_external_integrations": {
+      "title": "Tracker di integrazione dei partner - Dipendenze esterne",
+      "summary": "Traccia le integrazioni dipendenti dai partner che necessitano di un proprietario esterno, un accordo di condivisione dei dati, un sandbox o una specifica dell'interfaccia prima di poter essere attive. Questa pagina è un tracker di prontezza, non la pagina di configurazione della federazione Partner Timebanks.",
+      "steps": {
+        "0": {
+          "label": "Verifica lo stato delle dipendenze",
+          "detail": "L'elenco mostra ogni proprietario dell'integrazione, categoria, stato operativo, stato del DSA, stato del sandbox e URL della specifica dell'interfaccia."
+        },
+        "1": {
+          "label": "Aggiungi una dipendenza tracciata",
+          "detail": "Clicca su \"Aggiungi\" quando una nuova parte esterna deve fornire un'API, un sandbox, un accordo sui dati o un contatto operativo prima che la consegna possa procedere."
+        },
+        "2": {
+          "label": "Separare la prontezza dalle credenziali",
+          "detail": "Usa questa pagina per monitorare se un partner è pronto. Usa Partner API in Entrata, Partner di Protocollo Esterni o Webhook quando devono essere configurate credenziali o endpoint."
+        },
+        "3": {
+          "label": "Mantieni aggiornate le note",
+          "detail": "Registra blocchi, prossime azioni e aggiornamenti dei responsabili in modo che le parti interessate possano vedere se il ritardo è tecnico, legale o esterno."
+        },
+        "4": {
+          "label": "Chiudi le voci obsolete",
+          "detail": "Rimuovi o archivia le dipendenze che non fanno più parte del piano di consegna della Comunità Solidale."
+        }
+      },
+      "tips": {
+        "0": "Non incollare segreti o token OAuth nelle note. Conserva le credenziali solo nella pagina delle credenziali appropriata.",
+        "1": "Un sandbox verde non significa che l'integrazione sia approvata. Controlla lo stato DSA e del proprietario prima di considerarla pronta."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Riferimento Integrazione Sviluppatore"
+        },
+        "1": {
+          "label": "Pacchetto di Divulgazione"
+        }
+      }
+    },
+    "caring_integration_showcase": {
+      "title": "Riferimento Integrazione Sviluppatore",
+      "summary": "Una pagina di riferimento rivolta agli sviluppatori per gli endpoint API disponibili di Caring Community, gli schemi degli eventi webhook, la configurazione OAuth e i payload di esempio. Usala per spiegare i dettagli di implementazione dopo che il tipo di integrazione corretto è stato scelto.",
+      "steps": {
+        "0": {
+          "label": "Esplora gli endpoint disponibili",
+          "detail": "Usa il browser degli endpoint per esplorare i percorsi API REST disponibili raggruppati per dominio (Membri, Scambi, Portafoglio, Eventi, ecc.). Ogni voce mostra il metodo, il percorso, i parametri e lo schema di risposta."
+        },
+        "1": {
+          "label": "Copia esempi di payload",
+          "detail": "Clicca su \"Copia Esempio\" accanto a qualsiasi evento webhook per ottenere un esempio realistico di payload JSON da utilizzare nel tuo codice di integrazione o nei test."
+        },
+        "2": {
+          "label": "Rivedi gli ambiti OAuth",
+          "detail": "La tabella degli ambiti OAuth mostra tutti gli ambiti di autorizzazione disponibili, quali dati consentono di accedere e il livello minimo di fiducia richiesto per autorizzarli."
+        },
+        "3": {
+          "label": "Scarica la specifica OpenAPI",
+          "detail": "Usa \"Scarica specifica OpenAPI 3.1\" per ottenere la definizione completa dell'API leggibile dalla macchina, compatibile con Postman, Insomnia e strumenti di generazione di codice."
+        },
+        "4": {
+          "label": "Testa con il sandbox dell'API",
+          "detail": "Il sandbox integrato ti permette di effettuare chiamate di test autenticate contro i dati di staging della tua cooperativa senza influenzare i record live."
+        }
+      },
+      "tips": {
+        "0": "Condividi la specifica OpenAPI con gli sviluppatori di terze parti invece di scrivere una documentazione API manuale: si aggiorna automaticamente.",
+        "1": "La sandbox utilizza un set separato di credenziali di test rispetto alle tue chiavi API live: non confonderle."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Tracciatore di Integrazione dei Partner"
+        }
+      }
+    },
+    "super_admin_national_kiss": {
+      "title": "Comunità Premurosa — Cruscotto Nazionale Cooperativo Cross",
+      "summary": "Un cruscotto aggregato a livello nazionale visibile solo al personale nazionale di Caring Community e ai super-amministratori. Aggrega le metriche chiave di tutte le cooperative attive di Caring Community: ore totali di scambio, risparmio combinato dei costi in CHF, utilizzo del Warmth Pass tra cooperative e stato di salute della federazione.",
+      "steps": {
+        "0": {
+          "label": "Rivedi le schede di riepilogo nazionali",
+          "detail": "La riga superiore mostra: cooperative totali attive, ore totali di scambio (mese/anno), risparmio combinato in CHF e numero totale di membri unici in tutte le cooperative."
+        },
+        "1": {
+          "label": "Analizza una cooperativa specifica",
+          "detail": "Clicca sulla riga di qualsiasi cooperativa nella tabella per aprire il loro dashboard dettagliato. Hai accesso in sola lettura ai loro dati."
+        },
+        "2": {
+          "label": "Esamina la salute della federazione",
+          "detail": "La mappa della salute della federazione mostra quali cooperative sono connesse tramite la federazione Warmth Pass e quali hanno recentemente avuto un errore di sincronizzazione."
+        },
+        "3": {
+          "label": "Esporta il rapporto nazionale",
+          "detail": "Usa \"Esporta Rapporto Nazionale\" per produrre un PDF aggregato per le riunioni del consiglio della Comunità di Cura o per le comunicazioni alle autorità sanitarie federali."
+        },
+        "4": {
+          "label": "Lancia un allarme nazionale",
+          "detail": "Usa l'\"Annuncio Nazionale\" per inviare un messaggio a tutti i coordinatori delle cooperative contemporaneamente — ad esempio, un aggiornamento della metodologia o un avviso di manutenzione del sistema."
+        }
+      },
+      "tips": {
+        "0": "Il cruscotto nazionale non contiene alcun dato di membri identificabili individualmente — solo aggregati a livello di cooperativa.",
+        "1": "Usa la \"Vista di Benchmark\" per mostrare il punteggio del pilota Community Caring di ogni cooperativa insieme alla mediana nazionale."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Agenti KI"
+        },
+        "1": {
+          "label": "Richieste Pilota"
+        }
+      }
+    },
+    "admin_ki_agents": {
+      "title": "KI-Agenten — Framework di Agenti Autonomi",
+      "summary": "Il framework KI-Agenten (Agente AI) permette a NEXUS di proporre azioni automatizzate basate sui modelli di dati — ad esempio, suggerire una campagna Smart Nudge, segnalare un membro a rischio di abbandono o raccomandare una regolazione di coefficiente. Tutte le proposte richiedono l'approvazione umana prima di entrare in vigore. Gli agenti non agiscono mai unilateralmente a meno che non innalzi esplicitamente la soglia di applicazione automatica.",
+      "steps": {
+        "0": {
+          "label": "Rivedi le proposte in sospeso",
+          "detail": "La coda delle proposte mostra la raccomandazione di ciascun agente, le prove dei dati a supporto, e l'azione proposta. Leggi attentamente le prove prima di approvare."
+        },
+        "1": {
+          "label": "Approva o rifiuta una proposta",
+          "detail": "Clicca \"Approva\" per eseguire immediatamente l'azione, \"Rifiuta\" per scartarla, o \"Rimanda\" per ripensarci in un secondo momento. Aggiungi una nota che spieghi la tua decisione."
+        },
+        "2": {
+          "label": "Configura la soglia di applicazione automatica",
+          "detail": "Nelle Impostazioni Agente, puoi impostare una soglia di fiducia al di sopra della quale le proposte a basso rischio vengono applicate automaticamente (predefinito: disabilitato). Abilita questa opzione solo per tipi specifici di azioni a basso rischio."
+        },
+        "3": {
+          "label": "Rivedi le prestazioni dell'agente",
+          "detail": "La scheda di analisi degli agenti mostra quante proposte sono state fatte, approvate, rifiutate e rinviate, oltre ai risultati delle azioni approvate (hanno raggiunto l'effetto desiderato?)."
+        },
+        "4": {
+          "label": "Aggiungi o disabilita tipi di agenti",
+          "detail": "Usa il Registro Agenti per abilitare o disabilitare tipi specifici di agenti. Inizia con un piccolo insieme ed espandilo man mano che acquisisci fiducia nelle loro raccomandazioni."
+        }
+      },
+      "tips": {
+        "0": "Il modello proponi-then-approve è un meccanismo di sicurezza deliberato — non disabilitarlo per azioni consequenziali (ad esempio, escalation di sicurezza, grandi trasferimenti di credito).",
+        "1": "Gli agenti imparano dalle tue decisioni di approvare/rifiutare nel tempo. Rifiuti coerenti di un tipo specifico di agente sono un segnale per rivedere la sua configurazione."
+      },
+      "caution": "Non aumentare mai la soglia di applicazione automatica per gli agenti che possono avviare trasferimenti finanziari, gestire escalation o modifiche del livello dei membri. Questi devono sempre richiedere la revisione umana.",
+      "related_paths": {
+        "0": {
+          "label": "Nudge intelligenti"
+        },
+        "1": {
+          "label": "Cruscotto della Comunità Nazionale di Cura"
+        }
+      }
+    },
+    "admin_pilot_inquiries": {
+      "title": "Richieste Pilota — Pipeline di Onboarding del Comune",
+      "summary": "Gestisce l'intero processo per i comuni (Gemeinde) che esprimono interesse a testare NEXUS/Community di Cura. Ogni richiesta viene tracciata dal contatto iniziale fino all'accordo pilota e al lancio cooperativo. Questo è il punto di partenza per l'inserimento di tutte le nuove cooperative.",
+      "steps": {
+        "0": {
+          "label": "Rivedi le nuove richieste",
+          "detail": "Nuove richieste arrivano dal modulo di contatto pubblico, dalle segnalazioni nazionali Caring Community o dall'inserimento manuale. Ognuna mostra il nome del comune, il cantone, la persona di contatto e le note iniziali sulla richiesta."
+        },
+        "1": {
+          "label": "Qualificare la richiesta",
+          "detail": "Usare la checklist di qualificazione per valutare la prontezza: c'è un coordinatore designato? C'è il supporto del consiglio comunale? Esiste una rete comunitaria esistente adatta? Valutare ogni fattore."
+        },
+        "2": {
+          "label": "Muoviti attraverso il pipeline",
+          "detail": "Trascina o avanza l'inchiesta attraverso le fasi: Nuovo → Qualificazione → Proposta Inviata → Accordo Pilota → Onboarding → Attivo. Ogni fase ha azioni richieste documentate."
+        },
+        "3": {
+          "label": "Genera una proposta pilota",
+          "detail": "Alla fase di Invia Proposta, utilizzare \"Genera Proposta\" per produrre una proposta PDF personalizzata utilizzando i dettagli del comune, la tariffa di cura del loro cantone e i termini standard della metodologia Comunità Attenta."
+        },
+        "4": {
+          "label": "Attivare la creazione del tenant",
+          "detail": "Una volta che un accordo pilota è stato firmato e caricato, utilizzare \"Crea Tenant Cooperativo\" per fornire un nuovo tenant NEXUS per loro. Questo collega la richiesta alla fase di Prontezza per il Lancio Live."
+        }
+      },
+      "tips": {
+        "0": "Le richieste che restano bloccate a \"Qualifying\" per più di 30 giorni di solito mancano di un promotore interno municipale — concentra le attività di contatto per trovare un sponsor senior.",
+        "1": "La pipeline ha una vista corrispondente nella pagina Lead Nurture — usa la vista che meglio si adatta al tuo flusso di lavoro, condividono gli stessi dati."
+      },
+      "related_paths": {
+        "0": {
+          "label": "Coltivazione dei contatti"
+        },
+        "1": {
+          "label": "Prontezza al lancio"
+        },
+        "2": {
+          "label": "Cruscotto della Comunità Nazionale di Cura"
+        }
+      }
+    }
+  }
+}

@@ -163,7 +163,8 @@
       "missing_artwork": "Add show artwork for podcast directory readiness.",
       "episode_missing_audio_url": "An episode is missing a valid HTTP audio URL.",
       "episode_missing_audio_length": "An episode is missing the audio file size.",
-      "episode_missing_audio_mime": "An episode is missing the audio MIME type."
+      "episode_missing_audio_mime": "An episode is missing the audio MIME type.",
+      "unknown": "The feed has an unrecognised issue."
     },
     "columns": {
       "title": "Title",
@@ -188,7 +189,8 @@
       "safety": "Safety or harm",
       "spam": "Spam or misleading content",
       "rights": "Copyright or rights concern",
-      "other": "Other"
+      "other": "Other",
+      "unknown": "Unrecognised reason"
     },
     "stats": {
       "total_shows": "Shows",

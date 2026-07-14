@@ -37,14 +37,14 @@
     "loading": "Cargando",
     "next": "Siguiente",
     "no": "No",
-    "ok": "OK",
     "pending": "Pendiente",
     "previous": "Anterior",
     "retry": "Reintentar",
     "save": "Guardar",
     "select_all": "Seleccionar todo",
     "select_item": "Seleccionar artículo",
-    "yes": "si"
+    "yes": "si",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Acciones del corredor",
@@ -57,7 +57,6 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -68,9 +67,10 @@
     "refresh": "Refrescar",
     "search": "Buscar...",
     "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Select row {{id}}",
     "data_table": "Datos",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Cargando",
+    "select_row": "Seleccionar fila {{id}}"
   },
   "safeguarding": {
     "active": "Activo",
@@ -329,12 +329,11 @@
     "pending": "Pendiente",
     "placeholder_description_help": "Descripción Ayuda...",
     "placeholder_display_label": "p.ej. Es posible que necesite apoyo adicional durante los intercambios.",
-    "placeholder_guardian_email": "guardián@ejemplo.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "por ej. necesita_apoyo_adicional",
     "placeholder_review_notes": "Revisar notas...",
     "placeholder_search_messages": "Buscar mensajes...",
-    "placeholder_ward_email": "barrio@ejemplo.com",
+    "placeholder_ward_email": "ward@example.com",
     "reason": "Razón",
     "refresh": "Actualizar",
     "required": "Requerido",
@@ -368,7 +367,6 @@
     "ward": "barrio",
     "aria_deactivate_option": "Desactivar opción",
     "aria_edit_option": "Editar opción",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "Acceso a investigación Ni",
     "vetting_dbs_basic": "Verificación de Dbs Básico",
     "vetting_dbs_enhanced": "Investigación de Dbs mejorada",
@@ -377,6 +375,11 @@
     "vetting_international": "Investigación internacional",
     "vetting_other": "Investigación de otros",
     "vetting_pvg_scotland": "Investigación de investigación de Pvg Escocia",
-    "tabs_aria": "Secciones de salvaguardia"
+    "tabs_aria": "Secciones de salvaguardia",
+    "status_active": "Activo",
+    "status_revoked": "Revocado",
+    "status_expired": "Expirado",
+    "deactivate_confirm_question": "Desactivar",
+    "placeholder_option_key": "p. ej. needs_additional_support"
   }
 }

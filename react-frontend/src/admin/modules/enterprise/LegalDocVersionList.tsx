@@ -65,7 +65,7 @@ export default function LegalDocVersionList() {
       if (response.success && response.data) {
         setVersions(response.data);
       } else {
-        error(response.error || t('enterprise.failed_to_load_versions'));
+        error(t('enterprise.failed_to_load_versions'));
       }
     } catch {
       error(t('enterprise.failed_to_load_versions'));
@@ -92,7 +92,7 @@ export default function LegalDocVersionList() {
         setSelectedVersion(null);
         loadVersions();
       } else {
-        error(response.error || t('enterprise.failed_to_publish_version'));
+        error(t('enterprise.failed_to_publish_version'));
       }
     } catch {
       error(t('enterprise.failed_to_publish_version'));
@@ -114,7 +114,7 @@ export default function LegalDocVersionList() {
         setDeleteTarget(null);
         loadVersions();
       } else {
-        error(response.error || t('enterprise.failed_to_delete_version'));
+        error(t('enterprise.failed_to_delete_version'));
       }
     } catch {
       error(t('enterprise.failed_to_delete_version'));
@@ -135,7 +135,7 @@ export default function LegalDocVersionList() {
         setShowNotifyModal(false);
         setSelectedVersion(null);
       } else {
-        error(response.error || t('enterprise.failed_to_send_notifications'));
+        error(t('enterprise.failed_to_send_notifications'));
       }
     } catch {
       error(t('enterprise.failed_to_send_notifications'));

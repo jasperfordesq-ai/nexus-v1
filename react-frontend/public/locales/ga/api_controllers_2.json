@@ -179,5 +179,259 @@
     "provider_subject": "Project NEXUS — Tástáil Soláthraí Ríomhphoist",
     "provider_heading": "Tástáil Soláthraí Ríomhphoist",
     "body_tenant_ok": "Tá do sholáthraí ríomhphoist tionónta cumraithe agus ag obair i gceart."
+  },
+  "help": {
+    "feedback_recorded": "Aiseolas taifeadta",
+    "missing_article_slug": "article_slug ar iarraidh",
+    "article_not_found": "Níor aimsíodh an t-alt"
+  },
+  "job_vacancies": {
+    "job_not_found": "Níor aimsíodh an post",
+    "only_poster_can_rank": "Ní féidir ach an t-léiritheoir phoist rangú a thabhairt ar iarrthóirí",
+    "ai_not_configured": "Níl AI cumraithe",
+    "no_active_applications": "Níl aon iarratais ghníomhacha le rangú",
+    "ai_parse_error": "Theip ar fhreagra rangú AI a pharsáil",
+    "ai_ranking_failed": "Theip ar rangú AI",
+    "template_name_required": "Tá ainm an teimpléid riachtanach",
+    "template_not_found": "Ní bhfuarthas an teimpléad",
+    "employer_id_required": "is riachtanach aitheantas an fostóra (employer_id)",
+    "rating_must_be_1_5": "Ní mór an rátáil a bheith idir 1 agus 5",
+    "only_review_after_completing": "Ní féidir leat ach fostóirí a fhéachaint tar éis post a chríochnú leo",
+    "already_reviewed_employer": "Tá tú tar éis an fhostóir seo a léirmhíniú cheana",
+    "interview_not_found": "Níor aimsíodh an agallamh",
+    "access_denied": "Diúltaithe rochtain",
+    "message_required": "Tá teachtaireacht riachtanach",
+    "ai_chat_failed": "Theip ar chomhrá AI"
+  },
+  "knowledge_base": {
+    "feedback_submitted": "Léirigh aiseolas go rathúil",
+    "article_not_found": "Níor aimsíodh an t-alt",
+    "attachment_not_found": "Níor aimsíodh an ceangaltán",
+    "file_not_found_on_disk": "Níor aimsíodh an comhad ar dhiosca"
+  },
+  "legal": {
+    "all_accepted": "Ghlacfar na doiciméid dlí uile",
+    "acceptance_recorded": "Taifeadadh glacadh"
+  },
+  "listings": {
+    "cannot_report_own": "Ní féidir leat do liosta féin a thuairisciú.",
+    "valid_reason_required": "Teastaíonn cúis bhailí.",
+    "details_max_500": "Níor cheart go sáródh sonraí 500 carachtar.",
+    "already_reported": "Tá tú tar éis an liosta seo a thuairisciú cheana féin.",
+    "report_thank_you": "Go raibh maith agat as do thuairisc. Déanfar ár bhfoireann é a athbhreithniú.",
+    "no_images_uploaded": "Níor uaslódáladh aon íomhánna.",
+    "image_not_found": "Íomhá gan fáil.",
+    "image_ids_non_empty": "caithfidh go mbeadh image_ids ina eagar nach bhfuil folamh."
+  },
+  "marketplace_ai": {
+    "feature_disabled": "Níor ceadaíodh gné an mhargaidh don phobal seo.",
+    "auth_required": "Teastaíonn fíordheimhniú.",
+    "listing_not_found": "Níor aimsíodh liostáil.",
+    "only_owner_auto_reply": "Is cuma an t-úinéir liostála amháin is féidir freagraí uathoibríocha a ghiniúint."
+  },
+  "marketplace_delivery": {
+    "feature_disabled": "Níor ceadaíodh gné an mhargaidh don phobal seo.",
+    "auth_required": "Teastaíonn fíordheimhniú.",
+    "offer_accepted": "Tá tairiscint seachadta glacaithe",
+    "delivery_confirmed": "Seachadadh dearbhaithe, creidmheasa ama bronntha"
+  },
+  "marketplace_listing": {
+    "feature_disabled": "Níor ceadaíodh gné an mhargaidh don phobal seo.",
+    "no_permission_modify": "Níl cead agat an liostú seo a mhodhnú.",
+    "not_found": "Níor aimsíodh liostú an mhargaidh.",
+    "create_failed": "Theip ar chruthú liostú. Déan iarracht arís le do thoil.",
+    "update_failed": "Theip ar an liostú a nuashonrú. Déan iarracht arís, le do thoil.",
+    "no_image_files": "Níor chuirtear aon comhaid íomhá ar fáil.",
+    "no_valid_images": "Níorbh fhéidir íomhánna bailí a uaslódáil. Ceadaithe: JPEG, PNG, GIF, WebP (uasmhéid 10 MB).",
+    "image_not_found": "Níor aimsíodh íomhá don liostú seo.",
+    "no_video_file": "Níor chuirtear aon chomhad físeáin ar fáil.",
+    "invalid_video_type": "Cineál físe neamhbhailí. Ceadaithe: MP4, WebM, MOV.",
+    "video_too_large": "Tá méid comhaid físe os cionn an teorainn 50 MB.",
+    "ai_description_failed": "Níorbh fhéidir cur síos a ghiniúint. Déan iarracht arís nó scríobh ceann de láimh.",
+    "lat_lng_required": "Tá fáilte le leithead agus fadfhad a sholáthar.",
+    "invalid_coordinates": "Comhordanáidí neamhbhailí.",
+    "csv_read_failed": "Níorbh fhéidir an comhad CSV a léamh.",
+    "csv_header_required": "Caithfidh go mbeadh sraith teidil ag comhad CSV agus ar a laghad sraith sonraí amháin.",
+    "max_images_reached": "Tá an méid uasta :max íomhánna in aghaidh liosta bainte amach.",
+    "csv_missing_column": "Caithfidh colún ':col' a bheith sa chomhad CSV.",
+    "imported_as_drafts": ":count liostú(a) allmhairíodh mar dréachtaí."
+  },
+  "marketplace_offer": {
+    "feature_disabled": "Níor ceadaíodh gné an mhargaidh don phobal seo.",
+    "not_own_listing": "Níl úinéir tú ar an liostú seo.",
+    "only_seller_accept": "Ní féidir leis an díoltóir amháin an tairiscint seo a ghlacadh.",
+    "only_seller_decline": "Ní féidir leis an díoltóir amháin an tairiscint seo a dhiúltú.",
+    "only_seller_counter": "Ní féidir leis an díoltóir amháin freagra ar an tairiscint seo a thabhairt.",
+    "only_buyer_accept_counter": "Ní féidir leis an gceannaitheoir amháin glacadh le freagra ar thairiscint.",
+    "only_buyer_withdraw": "Ní féidir ach leis an gceannaí a thairiscint a tharraingt siar.",
+    "withdrawn": "Tarraingíodh an tairiscint siar go rathúil."
+  },
+  "marketplace_report": {
+    "feature_disabled": "Níor ceadaíodh gné an mhargaidh don phobal seo.",
+    "report_submitted": "Tá do thuairisc curtha isteach. Déanfaimid é a athbhreithniú laistigh de 24 uair an chloig de réir mar a éilíonn an tAcht um Sheirbhísí Digití."
+  },
+  "member_availability": {
+    "slot_deleted": "Scriosadh an sliotán"
+  },
+  "menu": {
+    "cache_cleared": "Sonraí talún an roghchláir glanadh go rathúil"
+  },
+  "newsletter": {
+    "already_unsubscribed": "Tá tú cheana féin as síntiús."
+  },
+  "notifications": {
+    "deleted": "Fógra scriosta"
+  },
+  "onboarding": {
+    "already_completed": "Onboarding críochnaithe cheana féin",
+    "safeguarding_saved": "Roghanna slándála sábháilte"
+  },
+  "openapi": {
+    "spec_not_found": "Níor aimsíodh sonraíocht OpenAPI"
+  },
+  "identity": {
+    "dob_locked": "Tá d’ainm agus do dháta breithe gloine tar éis fíorú aitheantais.",
+    "dob_required": "Teastaíonn dáta breithe.",
+    "dob_invalid": "Iontráil dáta breithe bailí le do thoil.",
+    "dob_must_be_past": "Caithfidh an dáta breithe a bheith san am atá thart.",
+    "must_be_16": "Ní mór duit a bheith ar a laghad 16 bliana d’aois.",
+    "no_fee_required": "Ní gá aon táille.",
+    "payment_failed": "Ní féidir íocaíocht a phróiseáil. Déan iarracht arís le do thoil.",
+    "user_not_found": "Níor aimsíodh úsáideoir.",
+    "provide_dob_first": "Tabhair do dháta breithe le do thoil ar dtús.",
+    "complete_payment_first": "Líon an íocaíocht ar dtús le do thoil.",
+    "not_available": "Ní bhíonn fíorú féiniúlachta ar fáil faoi láthair.",
+    "start_failed": "Ní féidir an fíorú a thosú."
+  },
+  "password_reset": {
+    "link_sent": "Má tá cuntas ann leis an seoladh ríomhphoist sin, tá nasc athshocraithe pasfhocal curtha chugat.",
+    "updated": "Pasfhocal nuashonraithe go rathúil. Logáil isteach le do phasfhocal nua, le do thoil.",
+    "changed_bell": "Athraíodh do phasfhocal. Mura ndearna tú é seo, déan teagmháil leis an tacaíocht láithreach."
+  },
+  "peer_endorsement": {
+    "recorded": "Taifeadadh moladh comhghleacaithe"
+  },
+  "push": {
+    "unsubscribed": "Sínigh ar shiúl go rathúil",
+    "no_subscribers": "Níor aimsíodh síntiúsóirí",
+    "token_pending": "Fáiscín faighte - bainfear é a bhaineann le logáil isteach",
+    "device_registered": "Trealamh cláraithe le haghaidh fógraí brú"
+  },
+  "registration": {
+    "email_verified": "Ríomhphost fíoraithe go rathúil",
+    "verification_sent": "Ríomhphost fíoraithe seolta má tá cuntas ann"
+  },
+  "resource_category": {
+    "reordered": "Acmhainní athordaithe go rathúil"
+  },
+  "skill_taxonomy": {
+    "category_deleted": "Catagóir scriosta",
+    "skill_removed": "Scil bainte"
+  },
+  "sub_account": {
+    "relationship_revoked": "Caidreamh cealaithe"
+  },
+  "two_factor": {
+    "disabled": "Tá fíordheimhniú dhá-nóimhirdhúnadh bainte",
+    "enabled_notification": "Tá fíordheimhniú dhá-nóimhirdhúnadh cumasaithe ar do chuntas.",
+    "disabled_notification": "Tá fíordheimhniú dhá fhachtóir díghníomhachtaithe ar do chuntas. Mura ndearna tú é seo, slánábháil do chuntas láithreach.",
+    "disabled_email_title": "Fíordheimhniú Dá Fhachtóir Díghníomhachtaithe",
+    "disabled_email_preview": "Tá 2FA díghníomhachtaithe ar do chuntas.",
+    "disabled_email_body": "Tá fíordheimhniú dhá fhachtóir díghníomhachtaithe ar do chuntas. Mura ndearna tú an t-athrú seo, le do thoil slánábháil do chuntas láithreach trí d’fhocal-faire a athrú agus 2FA a ghníomhachtú arís.",
+    "disabled_email_subject": "Rabhadh Slándála: 2FA Dímhéadrach — {{tenant}}"
+  },
+  "users": {
+    "theme_updated": "Nuashonraíodh rogha téama",
+    "password_updated": "Nuashonraíodh pasfhocal go rathúil",
+    "account_deleted": "Scriosadh cuntas go rathúil",
+    "prefs_updated": "Nuashonraíodh roghanna fógra",
+    "notification_settings_update_failed": "Theip ar nuashonrú socruithe fógra",
+    "invalid_context_type": "Cineál comhthéacs neamhbhailí",
+    "invalid_frequency": "Minicíocht neamhbhailí",
+    "context_id_required": "ID comhthéacs riachtanach",
+    "invalid_group_id": "ID ghrúpa neamhbhailí",
+    "invalid_thread_id": "ID snáithe neamhbhailí"
+  },
+  "volunteer_checkin": {
+    "checked_out": "Seiceáil amach go rathúil"
+  },
+  "volunteer_community": {
+    "joined_waitlist": "D'éirigh leis an liosta feitheamh a bhaint",
+    "claimed_spot": "D'éirigh leis an spás athraithe a éileamh",
+    "swap_request_sent": "Iarratas malartaithe seolta",
+    "swap_admin_pending": "Glacadh le malartú ach teastaíonn cead ón riarthóir",
+    "reserved_slots": "Áirithinte: :slots spásanna",
+    "member_added_reservation": "Cuir fearannach chuig an áirithint ghrúpa",
+    "recurring_deactivated": "Pátrún athfhillteach díghníomhachtaithe",
+    "guardian_consent_granted": "Tá cead na gcaomhnóirí faighte go rathúil."
+  },
+  "volunteer": {
+    "access_denied": "Diúltaithe rochtain",
+    "amount_gt_zero": "Caithfidh an méid a bheith níos mó ná 0",
+    "no_fields_to_update": "Níl aon réimsí le nuashonrú",
+    "signed_up_for_shift": "Cláraithe go rathúil don athrú ama",
+    "hours_logged_pending": "Tá na huaireanta logáilte go rathúil, ag fanacht le fíorú",
+    "review_submitted": "Léirmheas curtha isteach go rathúil"
+  },
+  "volunteer_wellbeing": {
+    "emergency_alert_sent": "Fógra éigeandála seolta"
+  },
+  "wallet": {
+    "donation_successful": "Bronntanas rathúil. Go raibh maith agat!",
+    "category_deleted": "Catagóir scriosta",
+    "name_required": "Tá ainm riachtanach",
+    "create_category_failed": "Theip ar chruthú catagóire",
+    "update_category_failed": "Theip ar nuashonrú catagóire",
+    "cannot_delete_category": "Ní féidir an chatagóir seo a scriosadh (d’fhéadfadh gur chatagóir chórais é)",
+    "rating_required": "Tá rátáil riachtanach (1-5)",
+    "amount_required": "Tá méid riachtanach",
+    "starting_balance_failed": "Theip ar nuashonrú ar an bhfíor-bheachtú tosaigh",
+    "starting_balance_updated": "Nuashonraíodh an fíor-bheachtú tosaigh",
+    "statement_exported": "Onnmhairíodh an ráiteas"
+  },
+  "webauthn": {
+    "passkey_registered": "Cláraitheadh eochair-chomhrá go rathúil",
+    "auth_successful": "D'éirigh leis an fhíordheimhniú",
+    "credentials_removed": "Cuireadh credential(s) as",
+    "all_removed": "Baintear :count eochair(chomhrá). Is féidir leat athchlárú ar aon ghléas anois.",
+    "passkey_removed_bell": "Bainadh eochair-chomhrá as do chuntas. Mura ndearna tú é seo, sábháil do chuntas láithreach.",
+    "all_passkeys_removed_bell": "Bíodh na heochracha go léir ({{count}}) bainte as do chuntas. Mura ndearna tú é seo, daingnigh do chuntas láithreach."
+  },
+  "maintenance": {
+    "under_maintenance": "Tá an t-ardán faoi chothabháil faoi láthair. Seiceáil arís go luath le do thoil."
+  },
+  "block_user": {
+    "cannot_block_self": "Ní féidir leat tú féin a bhac."
+  },
+  "group_conversation": {
+    "body_required": "Tá gá le comhlacht na teachtaireachta.",
+    "message_too_long": "Tá an teachtaireacht ró-fhada"
+  },
+  "marketplace_group": {
+    "auth_required": "Teastaíonn fíordheimhniú."
+  },
+  "connections": {
+    "accepted_connection": "Glactha le nasc",
+    "connection_accepted": "Nasc glactha"
+  },
+  "admin_crm": {
+    "invalid_type": "Paraiméadar cineál neamhbhailí"
+  },
+  "endorsement": {
+    "cannot_endorse_self": "Ní féidir leat tú féin a mholadh",
+    "member_not_found": "Baill gan aimsiú",
+    "already_endorsed": "Tá an scil seo curtha leat cheana féin"
+  },
+  "feed": {
+    "content_or_image_required": "Ní mór don phost ábhar nó íomhá a bheith ann",
+    "quoted_post_not_found": "Níor aimsíodh an post luaithe",
+    "post_not_found_or_not_owned": "Níor aimsíodh an post nó ní híse féin é",
+    "must_be_group_member": "Ní mór duit a bheith i do bhall den ghrúpa chun postáil",
+    "create_post_failed": "Theip ar an bpóstáil a chruthú"
+  },
+  "verification_badge": {
+    "user_not_found": "Níor aimsíodh an t-úsáideoir",
+    "badge_already_active": "Tá naisc gníomhach cheana",
+    "invalid_badge_type": "Cineál badge neamhbhailí: :type"
   }
 }

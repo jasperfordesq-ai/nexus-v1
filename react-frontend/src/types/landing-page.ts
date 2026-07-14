@@ -162,29 +162,46 @@ export interface LandingPageConfig {
 // Defaults
 // ───────────────────────────────────────────────────���─────────────────────────
 
-export const DEFAULT_AUDIENCE_CARDS: AudienceCard[] = [
+const DEFAULT_AUDIENCE_CARD_BLUEPRINTS = [
   {
     icon: 'user-plus',
-    title: 'New here?',
-    description: 'Learn how our community works and how to get involved.',
-    cta_label: 'Get started',
+    titleKey: 'home.audience_cards.defaults.new_here.title',
+    descriptionKey: 'home.audience_cards.defaults.new_here.description',
+    ctaKey: 'home.audience_cards.defaults.new_here.cta',
     target_url: '/about',
   },
   {
     icon: 'handshake',
-    title: 'Offer or find help',
-    description: 'Browse what people are offering, or post your own request.',
-    cta_label: 'Browse listings',
+    titleKey: 'home.audience_cards.defaults.exchange.title',
+    descriptionKey: 'home.audience_cards.defaults.exchange.description',
+    ctaKey: 'home.audience_cards.defaults.exchange.cta',
     target_url: '/listings',
   },
   {
     icon: 'shield',
-    title: 'Partner or refer',
-    description: 'For organisations, funders, and professionals supporting our members.',
-    cta_label: 'Learn more',
+    titleKey: 'home.audience_cards.defaults.partner.title',
+    descriptionKey: 'home.audience_cards.defaults.partner.description',
+    ctaKey: 'home.audience_cards.defaults.partner.cta',
     target_url: '/contact',
   },
+] as const;
+
+type DefaultAudienceCardKey = (typeof DEFAULT_AUDIENCE_CARD_BLUEPRINTS)[number][
+  'titleKey' | 'descriptionKey' | 'ctaKey'
 ];
+
+/** Build locale-aware fallback content without freezing copy at module load. */
+export function createDefaultAudienceCards(
+  translate: (key: DefaultAudienceCardKey) => string,
+): AudienceCard[] {
+  return DEFAULT_AUDIENCE_CARD_BLUEPRINTS.map((card) => ({
+    icon: card.icon,
+    title: translate(card.titleKey),
+    description: translate(card.descriptionKey),
+    cta_label: translate(card.ctaKey),
+    target_url: card.target_url,
+  }));
+}
 
 export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
   sections: [
@@ -199,7 +216,8 @@ export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
       type: 'audience_cards',
       enabled: true,
       order: 1,
-      content: { cards: DEFAULT_AUDIENCE_CARDS },
+      // Empty means "use locale-aware defaults" in the renderer/editor.
+      content: { cards: [] },
     },
     {
       id: 'feature_pills',

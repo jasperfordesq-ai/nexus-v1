@@ -109,7 +109,8 @@
       "candidates": "代替候補をロードできませんでした",
       "assign": "代替者が一致しませんでした"
     },
-    "skill_matches_other": "{{count}}マッチングスキル"
+    "skill_matches_other": "{{count}}マッチングスキル",
+    "skill_matches_one": "{{count}} 照合スキル"
   },
   "providers": {
     "title": "介護提供者ディレクトリ",
@@ -684,7 +685,8 @@
         "answer_count_other": "{{count}}の回答",
         "no_open_text": "公開文による回答はまだありません。",
         "modal_title": "分析 -{{title}}",
-        "empty": "利用可能な分析データはまだありません。"
+        "empty": "利用可能な分析データはまだありません。",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "はい",

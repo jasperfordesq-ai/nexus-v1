@@ -46,7 +46,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
 
         $sub = DB::table('regional_analytics_subscriptions')->where('id', $id)->first();
         if (! $sub) {
-            return $this->respondNotFound('Subscription not found.', 'SUBSCRIPTION_NOT_FOUND');
+            return $this->respondNotFound(__('api.regional_analytics_subscription_not_found'), 'SUBSCRIPTION_NOT_FOUND');
         }
 
         $reports = DB::table('regional_analytics_reports')
@@ -71,7 +71,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
         $contactEmail = trim((string) $request->input('contact_email', ''));
 
         if ($tenantId <= 0 || $partnerName === '' || $contactEmail === '') {
-            return $this->respondWithError('invalid_request', 'tenant_id, partner_name and contact_email are required.', null, 422);
+            return $this->respondWithError('invalid_request', __('api.regional_analytics_required_fields'), null, 422);
         }
 
         $partnerType = in_array($request->input('partner_type'), ['municipality', 'sme_partner'], true)
@@ -143,7 +143,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
 
         $sub = DB::table('regional_analytics_subscriptions')->where('id', $id)->first();
         if (! $sub) {
-            return $this->respondNotFound('Subscription not found.', 'SUBSCRIPTION_NOT_FOUND');
+            return $this->respondNotFound(__('api.regional_analytics_subscription_not_found'), 'SUBSCRIPTION_NOT_FOUND');
         }
 
         $update = ['updated_at' => now()];
@@ -172,7 +172,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
 
         $sub = DB::table('regional_analytics_subscriptions')->where('id', $id)->first();
         if (! $sub) {
-            return $this->respondNotFound('Subscription not found.', 'SUBSCRIPTION_NOT_FOUND');
+            return $this->respondNotFound(__('api.regional_analytics_subscription_not_found'), 'SUBSCRIPTION_NOT_FOUND');
         }
 
         if (! empty($sub->stripe_subscription_id)) {
@@ -193,7 +193,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
 
         $sub = DB::table('regional_analytics_subscriptions')->where('id', $id)->first();
         if (! $sub) {
-            return $this->respondNotFound('Subscription not found.', 'SUBSCRIPTION_NOT_FOUND');
+            return $this->respondNotFound(__('api.regional_analytics_subscription_not_found'), 'SUBSCRIPTION_NOT_FOUND');
         }
 
         Artisan::call('regional-analytics:generate-monthly', ['--subscription' => $id]);

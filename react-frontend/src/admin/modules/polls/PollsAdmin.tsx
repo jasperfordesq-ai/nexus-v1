@@ -132,7 +132,7 @@ export function PollsAdmin() {
         toast.success(t('polls.poll_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || t('polls.failed_to_delete_poll'));
+        toast.error(t('polls.failed_to_delete_poll'));
       }
     } catch {
       toast.error(t('polls.an_unexpected_error_occurred'));

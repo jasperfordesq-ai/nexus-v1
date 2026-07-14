@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "users": {
     "action_approve": "Cheadaigh",
@@ -156,7 +156,6 @@
     "label_reason": "Cúis",
     "label_role": "Ról",
     "label_status": "Stádas",
-    "label_tagline": "Tagline",
     "never_logged_in": "Ná logáilte isteach riamh",
     "onboarding_incomplete": "Onboarding Neamhiomlán",
     "pending": "Ar feitheamh",
@@ -168,7 +167,7 @@
     "placeholder_a_short_biography_for_this_user": "Beathaisnéis ghearr don Úsáideoir Seo...",
     "placeholder_eg_community_centre": "m.sh. Ionad Pobail...",
     "placeholder_eg_community_volunteer": "m.sh. Oibrí Deonach Pobail...",
-    "placeholder_email": "ríomhphost@example.com",
+    "placeholder_email": "email@example.com",
     "placeholder_first_name": "Céad ainm...",
     "placeholder_enter_first_name": "Iontráil Céad Ainm...",
     "placeholder_enter_last_name": "Iontráil Sloinne...",
@@ -220,7 +219,10 @@
     "permissions_editor_unavailable_title": "Tá na ceadanna inléite amháin anseo",
     "permissions_editor_unavailable_desc": "Taispeánann an leathanach seo ról an úsáideora agus na ceadanna a deonaíodh, ach ní féidir iad a athrú anseo. Bainistigh rochtain trí ról an úsáideora a athrú ar an leathanach eagarthóireachta.",
     "role_unknown": "Ról anaithnid",
-    "role_tenant_super_admin": "Sár-riarthóir tionónta"
+    "role_tenant_super_admin": "Sár-riarthóir tionónta",
+    "role_super_admin_short": "Super Fheidhmeannach",
+    "reset_2fa_reason": "Athshocraithe ag riarthóir",
+    "label_tagline": "Slogán"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "Toiliú tugtha",
       "not_consented": "Gan Toiliú",
       "not_given": "Ní thugtar toiliú",
-      "withdrawn_on": "Tarraingthe siar ar"
+      "withdrawn_on": "Tarraingthe siar ar",
+      "type_unknown": "Cineál ceadúnais anaithnid"
     },
     "descriptions": {
       "balance_amount": "Úsáid luachanna diúltacha chun creidmheasanna ama a asbhaint ón mball seo",
@@ -296,8 +299,8 @@
       "reason": "Cúis",
       "role": "Ról",
       "status": "Stádas",
-      "tagline": "Tagline",
-      "tenant_super_admin": "Sár-Riarachán Tionónta"
+      "tenant_super_admin": "Sár-Riarachán Tionónta",
+      "tagline": "Slogán"
     },
     "loading": {
       "compliance": "Comhlíonadh á Luchtú",
@@ -326,7 +329,7 @@
       "balance_amount": "e.g. 2 nó -1.5",
       "balance_reason": "Cén fáth a bhfuil an t-iarmhéid seo á choigeartú agat?",
       "bio": "Beathaisnéis ghearr don Úsáideoir Seo...",
-      "email": "úsáideoir@sampla.com",
+      "email": "user@example.com",
       "first_name": "Iontráil Céad Ainm...",
       "last_name": "Iontráil Sloinne...",
       "location": "e.g. Nua Eabhrac, SAM",
@@ -433,12 +436,28 @@
       "decision_confirmed": "Fianaise deimhnithe",
       "decision_revoked": "Fianú cúlghairthe",
       "decision_not_confirmed": "Ní dheimhnítear an fianú"
+    },
+    "insurance": {
+      "status_none": "Uile",
+      "status_pending": "Ar feitheamh",
+      "status_submitted": "Cuirte isteach",
+      "status_verified": "Fíoraíodh",
+      "status_expired": "Éagtha",
+      "status_rejected": "Dhiúltódh",
+      "status_revoked": "Díghníomhaithe",
+      "status_unknown": "Stádas anaithnid",
+      "type_public_liability": "Freagracht phoiblí",
+      "type_professional_indemnity": "Indeimhneacht ghairmiúil",
+      "type_employers_liability": "Freagracht fostóirí",
+      "type_product_liability": "Dlíteanas táirge",
+      "type_personal_accident": "Tinneas pearsanta",
+      "type_other": "Eile",
+      "type_unknown": "Cineál árachais anaithnid"
     }
   },
   "aria": {
     "breadcrumbs": "Brioscáin aráin"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "Fíoruithe Cónaithe",
     "page_desc": "Déan athbhreithniú ar dhearbhuithe cónaithe a chuir baill isteach agus bronn an suaitheantas cónaithe fíoraithe.",
@@ -483,5 +502,6 @@
     "intelligence": "Intleacht",
     "engagement": "Rannpháirtíocht",
     "system": "Córas"
-  }
+  },
+  "loading": "Luchtú"
 }

@@ -43,7 +43,7 @@ export default function LegalDocVersionComparison({
       if (response.success && response.data) {
         setComparison(response.data);
       } else {
-        error(response.error || t('enterprise.comparison.failed_to_load'));
+        error(t('enterprise.comparison.failed_to_load'));
       }
     } catch {
       error(t('enterprise.comparison.failed_to_load'));

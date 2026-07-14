@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "advertising": {
     "status": {
@@ -107,11 +107,11 @@
         "create_campaign": "Kampagne erstellen",
         "details": "Details",
         "new_campaign": "Neue Kampagne",
-        "pause": "Pause",
         "reject": "Ablehnen",
         "reject_campaign": "Kampagne ablehnen",
         "submit_for_review": "Zur Überprüfung einreichen",
-        "view_details": "Details anzeigen"
+        "view_details": "Details anzeigen",
+        "pause": "Pause"
       },
       "columns": {
         "actions": "Aktionen",
@@ -162,11 +162,13 @@
         "all": "Alle Platzierungen",
         "discovery": "Entdeckung",
         "feed": "Füttern",
-        "market": "Markt"
+        "market": "Markt",
+        "markt": "Markt"
       },
       "placeholders": {
         "budget": "z.B. 5000 = EUR 50,00",
-        "campaign_name": "Sommerschlussverkauf - Cafe Helvetia"
+        "campaign_name": "Sommerschlussverkauf - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"Gartenarbeit\"]}"
       },
       "stats": {
         "active_campaigns": "Aktive Kampagnen",
@@ -240,7 +242,8 @@
       "placeholders": {
         "body": "Maximal 400 Zeichen",
         "campaign_name": "z.B. Frühlingsaktion – Cafe Seeblick",
-        "title": "Maximal 100 Zeichen"
+        "title": "Maximal 100 Zeichen",
+        "cta_url": "https://... oder nexus://..."
       },
       "stats": {
         "needs_attention": "Braucht Aufmerksamkeit",
@@ -260,7 +263,8 @@
         "rejected": "Kampagne „{{name}}“ abgelehnt.",
         "reject_failed": "Kampagne konnte nicht abgelehnt werden.",
         "required_fields": "Name, Titel und Körper sind erforderlich."
-      }
+      },
+      "cost_per_send": "{{cost}} pro Versand"
     },
     "tabs_aria": "Statusfilter für Werbekampagnen"
   }

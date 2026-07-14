@@ -3,10 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatDateTime, getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import Bug from 'lucide-react/icons/bug';
 import Copy from 'lucide-react/icons/copy';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -63,38 +64,55 @@ interface DraftState {
   sentryIssueUrl: string;
 }
 
-export function buildSupportReportHandoff(report: AdminSupportReport): string {
+export function buildSupportReportHandoff(report: AdminSupportReport, t: TFunction<'admin_support'>): string {
   const reporter = report.reporter
-    ? `${report.reporter.name}${report.reporter.email ? ` <${report.reporter.email}>` : ''} (user ${report.reporter.id})`
-    : 'Unknown reporter';
+    ? report.reporter.email
+      ? t('support_reports.handoff.reporter_with_email', {
+          name: report.reporter.name,
+          email: report.reporter.email,
+          id: report.reporter.id,
+        })
+      : t('support_reports.handoff.reporter_without_email', {
+          name: report.reporter.name,
+          id: report.reporter.id,
+        })
+    : t('support_reports.handoff.unknown_reporter');
   const diagnostics = report.diagnostics
     ? JSON.stringify(report.diagnostics, null, 2)
-    : 'No diagnostics were included.';
+    : t('support_reports.handoff.no_diagnostics');
+  const field = (label: string, value: string | number) => t('support_reports.handoff.field', { label, value });
+  const notProvided = t('support_reports.handoff.not_provided');
+  const impact = t(`support_reports.impact.${report.impact}`, {
+    defaultValue: t('common.unknown'),
+  });
+  const status = t(`support_reports.status.${report.status}`, {
+    defaultValue: t('common.unknown'),
+  });
 
   return [
-    `Support report ${report.reference}`,
+    t('support_reports.handoff.title', { reference: report.reference }),
     '',
-    `Tenant: ${report.tenant_name ?? report.tenant_id}`,
-    `Impact: ${report.impact}`,
-    `Status: ${report.status}`,
-    `Created: ${report.created_at}`,
-    `Reporter: ${reporter}`,
-    `Route: ${report.route ?? 'Not provided'}`,
-    `Page URL: ${report.page_url ?? 'Not provided'}`,
-    `User agent: ${report.user_agent ?? 'Not provided'}`,
-    `Sentry event: ${report.sentry_event_id ?? 'Not provided'}`,
-    `Sentry issue: ${report.sentry_issue_url ?? 'Not provided'}`,
+    field(t('support_reports.handoff.labels.tenant'), report.tenant_name ?? report.tenant_id),
+    field(t('support_reports.handoff.labels.impact'), impact),
+    field(t('support_reports.handoff.labels.status'), status),
+    field(t('support_reports.handoff.labels.created'), formatDateTime(report.created_at)),
+    field(t('support_reports.handoff.labels.reporter'), reporter),
+    field(t('support_reports.handoff.labels.route'), report.route ?? notProvided),
+    field(t('support_reports.handoff.labels.page_url'), report.page_url ?? notProvided),
+    field(t('support_reports.handoff.labels.user_agent'), report.user_agent ?? notProvided),
+    field(t('support_reports.handoff.labels.sentry_event'), report.sentry_event_id ?? notProvided),
+    field(t('support_reports.handoff.labels.sentry_issue'), report.sentry_issue_url ?? notProvided),
     '',
-    'Summary:',
+    t('support_reports.handoff.headings.summary'),
     report.summary,
     '',
-    'User description:',
+    t('support_reports.handoff.headings.user_description'),
     report.description,
     '',
-    'Triage notes:',
-    report.triage_notes ?? 'None yet.',
+    t('support_reports.handoff.headings.triage_notes'),
+    report.triage_notes ?? t('support_reports.handoff.none_yet'),
     '',
-    'Diagnostics:',
+    t('support_reports.handoff.headings.diagnostics'),
     diagnostics,
   ].join('\n');
 }
@@ -152,7 +170,7 @@ export default function SupportReportsPage() {
     setIsLoading(false);
 
     if (!response.success || !response.data) {
-      toast.error(response.error || t('support_reports.errors.load'));
+      toast.error(t('support_reports.errors.load'));
       return;
     }
 
@@ -175,7 +193,7 @@ export default function SupportReportsPage() {
     setIsDetailLoading(false);
 
     if (!response.success || !response.data) {
-      toast.error(response.error || t('support_reports.errors.load_detail'));
+      toast.error(t('support_reports.errors.load_detail'));
       return;
     }
 
@@ -235,7 +253,7 @@ export default function SupportReportsPage() {
     setIsSaving(false);
 
     if (!response.success || !response.data) {
-      toast.error(response.error || t('support_reports.errors.save'));
+      toast.error(t('support_reports.errors.save'));
       return;
     }
 
@@ -263,7 +281,7 @@ export default function SupportReportsPage() {
     }
 
     try {
-      await navigator.clipboard.writeText(buildSupportReportHandoff(selectedReport));
+      await navigator.clipboard.writeText(buildSupportReportHandoff(selectedReport, t));
       toast.success(t('support_reports.messages.handoff_copied'));
     } catch {
       toast.error(t('support_reports.errors.copy_handoff'));

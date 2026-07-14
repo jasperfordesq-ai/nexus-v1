@@ -13,6 +13,7 @@ import { Navigate } from 'react-router-dom';
 import { adminCron, adminSystem } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { CronJob, CronJobSettings, GlobalCronSettings } from '../../api/types';
+import { getCronJobName } from './cronJobTranslations';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -121,7 +122,7 @@ export function CronJobSettingsPage() {
       if (res.success) {
         toast.success(t('system.job_settings_saved_successfully'));
       } else {
-        toast.error(res.error || t('system.failed_to_save_job_settings'));
+        toast.error(t('system.failed_to_save_job_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_job_settings'));
@@ -137,7 +138,7 @@ export function CronJobSettingsPage() {
       if (res.success) {
         toast.success(t('system.global_settings_saved_successfully'));
       } else {
-        toast.error(res.error || t('system.failed_to_save_global_settings'));
+        toast.error(t('system.failed_to_save_global_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_global_settings'));
@@ -190,7 +191,7 @@ export function CronJobSettingsPage() {
                 >
                   {jobs.map((job) => (
                     <SelectItem key={job.slug} id={job.slug}>
-                      {job.name}
+                      {getCronJobName(t, job)}
                     </SelectItem>
                   ))}
                 </Select>

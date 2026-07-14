@@ -457,7 +457,24 @@
     },
     "scroll_down": "Desplázate hacia abajo",
     "audience_cards": {
-      "title": "¿Por dónde te gustaría empezar?"
+      "title": "¿Por dónde te gustaría empezar?",
+      "defaults": {
+        "new_here": {
+          "title": "¿Nuevo aquí?",
+          "description": "Aprende cómo funciona nuestra comunidad y cómo involucrarte.",
+          "cta": "Comenzar"
+        },
+        "exchange": {
+          "title": "Ofrecer o encontrar ayuda",
+          "description": "Explora lo que las personas están ofreciendo, o publica tu propia solicitud.",
+          "cta": "Explorar anuncios"
+        },
+        "partner": {
+          "title": "Asociarse o referir",
+          "description": "Para organizaciones, financiadores y profesionales que apoyan a nuestros miembros.",
+          "cta": "Aprende más"
+        }
+      }
     },
     "how_it_works": {
       "title": "Cómo Funciona",
@@ -595,7 +612,7 @@
       "name_label": "Nombre",
       "name_placeholder": "Tu nombre",
       "email_label": "Correo",
-      "email_placeholder": "tu@ejemplo.com",
+      "email_placeholder": "you@example.com",
       "subject_label": "Asunto",
       "subject_placeholder": "¿De qué se trata?",
       "subjects": {

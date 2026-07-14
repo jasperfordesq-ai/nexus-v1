@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,12 +67,12 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "Ładowanie stanu algorytmu...",
     "404_entry_dismissed": "Wpis 404 został usunięty",
     "a_i_settings_saved_successfully": "Ustawienia AI zostały pomyślnie zapisane",
@@ -276,13 +275,12 @@
     "placeholder_gocspx": "GOCSPPX-xxxxx",
     "placeholder_my_timebank": "Mój bank czasu...",
     "placeholder_noreply_example": "noreply@example.com",
-    "placeholder_robots_txt": "Klient użytkownika: *\nNie zezwalaj: /admin/",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxx...",
     "placeholder_search_users_by_name_or_email": "Wyszukaj użytkowników według nazwy lub adresu e-mail...",
-    "placeholder_smtpexamplecom": "Smtpexamplecom...",
     "placeholder_smtp_port": "587",
     "placeholder_test_example": "test@example.com",
-    "placeholder_user_example": "użytkownik@example.com",
+    "placeholder_user_example": "user@example.com",
     "placeholder_welcome_to_our_community": "Witamy w naszej społeczności...",
     "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
     "placeholder_your_timebank_name": "Twoja nazwa w banku czasu...",
@@ -410,7 +408,6 @@
     "label_ollama_host_url": "Adres URL hosta Ollama",
     "last_run_label": "Ostatni bieg",
     "meta_description_count": "{{count}}/160 znaków metaopisu",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "Podgląd obrazu OG",
     "param_activity_weight": "Waga aktywności",
     "param_activity_weight_desc": "Jak bardzo ostatnia aktywność podnosi ranking",
@@ -505,7 +502,6 @@
       "workflows": {
         "title": "Co próbujesz zrobić?",
         "description": "Zacznij od zwykłego zadania, a następnie skorzystaj z karty, którą ono otwiera. Dzięki temu rutynowa praca jest z dala od ryzykownych kontroli.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "Odśwież jednego najemcę",
           "body": "Użyj, gdy zawartość publiczna uległa zmianie w przypadku pojedynczej społeczności. Wprowadź informację o dzierżawie przed rozpoczęciem pracy w kolejce."
@@ -525,21 +521,22 @@
         "check_tenant_safety": {
           "title": "Sprawdź, czy jeden z najemców jest bezpieczny",
           "body": "Sprawdź dokładnie, co powinien mieć ten najemca, co zostało zapisane i czy jakiekolwiek migawki powinny znajdować się gdzie indziej."
-        }
+        },
+        "open": "Otwarte"
       },
       "analytics": {
         "actions": {
           "reload": "Przeładować"
         },
         "columns": {
-          "crawler": "ŻETON NEXUSARM20",
-          "hits": "ŻETON NEXUSARM21",
-          "host": "ŻETON NEXUSARM22",
-          "ip": "ŻETON NEXUSARM14",
-          "status": "ŻETON NEXUSARM23",
-          "time": "TOKEN NEXUSARM24",
-          "uri": "ŻETON NEXUSARM12",
-          "url": "TOKEN NEXUSARM11"
+          "ip": "IP",
+          "uri": "URI",
+          "url": "URL",
+          "crawler": "Crawler",
+          "hits": "Wyszukiwania",
+          "host": "Host",
+          "status": "Status",
+          "time": "Czas"
         },
         "empty": "Brak dostępnych analiz. Dziennik dostępu bota może być pusty.",
         "empty_bot_traffic": "Nie ma jeszcze ruchu botów",
@@ -574,7 +571,7 @@
           "hits_by_crawler": "Trafienia przez robota",
           "hits_by_status": "Trafienia według statusu HTTP",
           "recent_activity": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
-          "top_uris": "Najpopularniejsze tokeny NEXUSTERM12 (50 najlepszych według liczby trafień)",
+          "top_uris": "Najpopularniejsze URI (50 według liczby trafień)",
           "recent_activity_few": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
           "recent_activity_many": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
           "recent_activity_one": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
@@ -582,7 +579,7 @@
         },
         "tables": {
           "recent_hits_aria": "Ostatnie trafienia botów",
-          "top_uris_aria": "Najlepsze tokeny NEXUSRM12"
+          "top_uris_aria": "Najpopularniejsze URI"
         },
         "windows": {
           "1": "Ostatnie 24 godziny",
@@ -601,13 +598,13 @@
           "refresh_all_stale_other": "Odśwież wszystkie nieaktualne ({{count}})"
         },
         "columns": {
-          "actions": "ŻETON NEXUSARM25",
-          "asset": "ASSET",
-          "coverage": "ŻETON NEXUSARM27",
-          "host": "ŻETON NEXUSARM22",
-          "missing": "ŻETON NEXUSARM28",
-          "stale": "ŻETON NEXUSARM29",
-          "tenant": "ŻETON NEXUSARM30"
+          "actions": "Działania",
+          "asset": "Zasób",
+          "coverage": "Zakres",
+          "host": "Host",
+          "missing": "Brak",
+          "stale": "Przestarzałe",
+          "tenant": "Najemca"
         },
         "confirm": {
           "queue_recache": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
@@ -739,10 +736,18 @@
           "last_failed_pass": "Ostatni nieudany bieg",
           "sched_prerender-detect-drift": "Bicie serca czujnika dryfu",
           "sched_prerender-auto-recache": "Automatyczne ponowne buforowanie pulsu",
-          "sched_prerender-reap-stale": "Bicie serca czyszczenia nieaktualnych zadań"
+          "sched_prerender-reap-stale": "Bicie serca czyszczenia nieaktualnych zadań",
+          "unknown": "Nieznana kontrola"
         },
         "issue_count_few": "Problemy z {{count}}",
-        "issue_count_many": "Problemy z {{count}}"
+        "issue_count_many": "Problemy z {{count}}",
+        "remediation": "Akcja: {{detail}}",
+        "statuses": {
+          "green": "Zdrowy",
+          "yellow": "Ostrzeżenie",
+          "red": "Krytyczny",
+          "unknown": "Nieznany status"
+        }
       },
       "inventory": {
         "truncated": "Spis osiągnął bezpieczny limit liczby migawek: {{count}}. Zawęź filtr tenantów przed wykonaniem operacji zbiorczej.",
@@ -766,7 +771,7 @@
           "actions": "Działania",
           "age": "Wiek",
           "host": "Gospodarz",
-          "http": "ŻETON NEXUSARM15",
+          "http": "HTTP",
           "route": "Trasa",
           "size": "Rozmiar",
           "status": "Stan"
@@ -826,7 +831,6 @@
           "modified": "Zmodyfikowany",
           "must_fix": "Należy naprawić ({{count}})",
           "no_structured_data": "Brak danych strukturalnych",
-          "no_type": "(brak @typu)",
           "none": "(nic)",
           "old": "{{age}} stary",
           "open_graph": "Otwórz wykres",
@@ -850,7 +854,8 @@
           "dead_assets_few": "{{count}} nie żyje",
           "dead_assets_many": "{{count}} nie żyje",
           "dead_assets_one": "{{count}} nie żyje",
-          "dead_assets_other": "{{count}} nie żyje"
+          "dead_assets_other": "{{count}} nie żyje",
+          "no_type": "(brak @type)"
         },
         "selected": "Wybrano {{count}}",
         "status": {
@@ -1009,7 +1014,6 @@
       "audit": {
         "actions": {
           "reset_all": "Zresetuj i przebuduj wszystko",
-          "auto_recache": "Auto-recache",
           "cancel": "Anuluj zadanie",
           "detect_drift": "Wykryj dryf",
           "enqueue": "Odświeżenie kolejki",
@@ -1017,7 +1021,9 @@
           "purge": "Usuń migawki",
           "purge_unexpected": "Wyczyść nieoczekiwane migawki",
           "reset_breaker": "Zresetuj wyłącznik bezpieczeństwa",
-          "reset_queue": "Napraw zablokowaną kolejkę"
+          "reset_queue": "Napraw zablokowaną kolejkę",
+          "unknown": "Nieznana akcja",
+          "auto_recache": "Automatyczne ponowne buforowanie"
         },
         "buttons": {
           "export_csv": "Eksportuj CSV",
@@ -1047,9 +1053,10 @@
         },
         "table_aria": "Historia audytu",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "Nieznany wynik",
+          "denied": "Odmowa",
+          "failed": "Niepowodzenie",
+          "ok": "Zakończone"
         },
         "details_empty": "Żadnych dodatkowych szczegółów"
       },
@@ -1094,7 +1101,6 @@
           "unexpected": "Zapisane migawki spoza bieżących planów tras tenantów",
           "active_jobs": "{{count}} aktywny",
           "aging": "{{count}} starzenie się (>7 dni)",
-          "asset_broken": "Referencje martwe /aktywa/*",
           "backoff_window": "W 6-godzinnym oknie wycofania",
           "cache_age": "Najstarszy {{oldest}} / najnowszy {{newest}}",
           "content_stale": "Treść źródłowa nowsza niż migawka",
@@ -1109,7 +1115,8 @@
           "active_jobs_few": "{{count}} aktywny",
           "active_jobs_many": "{{count}} aktywny",
           "active_jobs_one": "{{count}} aktywny",
-          "active_jobs_other": "{{count}} aktywny"
+          "active_jobs_other": "{{count}} aktywny",
+          "asset_broken": "Odnosi się do nieaktywnego /assets/*"
         },
         "kpi": {
           "age_stale": "Wiek nieaktualny (>14d)",
@@ -1145,7 +1152,6 @@
           "continue_to_delete": "Kontynuuj usuwanie na żywo"
         },
         "description_middle": "dla jednego segmentu ścieżki,",
-        "description_prefix": "Usuń migawki pasujące do wzorca globu. Używać",
         "description_suffix": "dla każdego potomka. Przykłady:",
         "all_tenants_warning": {
           "body": "Pozostawienie pustej informacji o dzierżawie spowoduje usunięcie pasujących migawek w każdej dzierżawie. Dotyczy to wyłącznie czyszczenia całej platformy po przejrzeniu dokładnych plików.",
@@ -1177,8 +1183,8 @@
           "purged_other": "Usunięto migawki {{count}}{{job}}"
         },
         "placeholders": {
-          "pattern": "/blog/* lub /listy/**",
-          "tenant_slug": "opcjonalne - pozostaw puste dla wszystkich"
+          "tenant_slug": "opcjonalne - pozostaw puste dla wszystkich",
+          "pattern": "/blog/* lub /listings/**"
         },
         "result": {
           "deleted": "Usunięto migawki {{count}}",
@@ -1201,7 +1207,8 @@
           "ready_many": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
           "ready_one": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
           "ready_other": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie."
-        }
+        },
+        "description_prefix": "Usuń zapisane migawki HTML, które pasują do wzorca ścieżki. Dodaj identyfikator najemcy, gdy trasa należy do jednego najemcy. Użyj"
       },
       "ttl_inspector": {
         "actions": {
@@ -1215,13 +1222,18 @@
         },
         "path_only": "Tylko ścieżka — bez schematu i hosta",
         "placeholders": {
-          "route": "/blog/mój-post"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "dopasowanie: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (specyficzność {{specificity}})",
           "other_patterns": "Inne wzorce pasujące do tej trasy:",
-          "ttl": "TTL:{{ttl}}({{seconds}}s)"
+          "ttl": "TTL:{{ttl}}({{seconds}}s)",
+          "sources": {
+            "default": "Reguła domyślna",
+            "pattern": "Dopasowujący wzorzec",
+            "unknown": "Nieznane źródło"
+          }
         },
         "title": "Inspektor TTL",
         "units": {
@@ -1327,14 +1339,14 @@
           "needs_attention_other": "Element {{count}} wymaga uwagi"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "Oczekiwano",
+          "missing": "Brak",
+          "unexpected": "Nieoczekiwane",
+          "stale": "Przestarzałe",
+          "static": "Statyczne",
+          "sitemap": "Mapa strony",
+          "snapshots": "Zapisano",
+          "asset_invalid": "Aktywa"
         },
         "sections": {
           "attention_limited": "Wyświetlono {{shown}} z {{total}} zapisanych migawek wymagających uwagi.",
@@ -1344,10 +1356,10 @@
         "empty": "Wprowadź informację o najemcy, aby sprawdzić jej plan trasy i zapisane migawki.",
         "empty_attention": "Ten dzierżawca nie ma brakujących, przestarzałych, uszkodzonych lub nieoczekiwanych migawek.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
-          "status": "Status",
-          "why": "Dlaczego to jest tutaj"
+          "why": "Dlaczego to jest tutaj",
+          "route": "Trasa",
+          "source": "Źródło",
+          "status": "Status"
         },
         "tables": {
           "attention_aria": "Elementy migawki najemcy wymagające uwagi"
@@ -1355,12 +1367,12 @@
         "sources": {
           "static": "Trasa statyczna",
           "sitemap": "Trasa mapy witryny",
-          "unexpected": "Unexpected"
+          "unexpected": "Nieoczekiwane"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "Problem z aktywami",
-          "content": "Treść nieaktualna"
+          "content": "Treść nieaktualna",
+          "unexpected": "Nieoczekiwane"
         },
         "reasons": {
           "sitemap": "Opublikowana przez tę mapę witryny najemcy jako treść publiczna.",
@@ -1383,9 +1395,9 @@
           "body": "Nieoczekiwane migawki można zwykle usunąć za pomocą narzędzia do czyszczenia w Przeglądzie. Najpierw wyświetl podgląd, a następnie zastosuj tylko wtedy, gdy lista najemców jest prawidłowa."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "Świeży",
+          "stale": "Przestarzałe",
+          "warn": "Starzenie się"
         }
       }
     },
@@ -1419,13 +1431,12 @@
     "next_public": {
       "title": "Gotowość publicznego frontendu Next.js",
       "description": "Stan trybu cienia tylko do odczytu dla publicznego interfejsu użytkownika Next.js. Ta strona nie umożliwia publicznego routingu ani nie zmienia zachowania wstępnego renderowania.",
-      "refresh": "Refresh",
       "loading": "Ładowanie gotowości publicznego frontendu Next.js",
       "error": "Nie można załadować gotowości Next.js.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "Trasowanie produkcji",
-        "prerender": "Renderowanie zastępcze"
+        "prerender": "Renderowanie zastępcze",
+        "mode": "Tryb"
       },
       "values": {
         "shadow_mode": "Tryb cienia",
@@ -1463,8 +1474,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "Publiczna trasa GET Laravela",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "Trasa Laravel nie jest zarejestrowana",
+        "auth": "Trasa Laravel wymaga uwierzytelnienia"
       },
       "edge_canary": {
         "title": "Podgląd kanarków krawędziowych",
@@ -1479,7 +1490,6 @@
         "included_by_deploy": "Uwzględnione przez wdrożenie",
         "not_included_by_deploy": "Nieuwzględnione podczas wdrażania",
         "route_audit_title": "Audyt trasy szablonu",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "Tylko drogi publiczne",
         "not_public_only": "Nie tylko drogi publiczne",
         "no_private_collisions": "Żadnych kolizji na trasie prywatnej",
@@ -1493,7 +1503,8 @@
         "preview_only": "Tylko podgląd",
         "not_preview_only": "Tryb podglądu nie został potwierdzony",
         "reviewed_config_required": "Wymagana sprawdzona konfiguracja",
-        "explicit_instruction_required": "Wymagana osobna instrukcja przełączenia"
+        "explicit_instruction_required": "Wymagana osobna instrukcja przełączenia",
+        "exact_path_count": "{{count}} dokładne ścieżki"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1504,9 +1515,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "Wymagana jest wyraźna instrukcja przełączenia",
         "next_shadow_checks_required": "Wymagane są kolejne kontrole cieni",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Rezerwowe renderowanie wstępne musi pozostać"
+        "prerender_fallback_must_remain": "Rezerwowe renderowanie wstępne musi pozostać",
+        "apache_configtest_required": "Wymagany test konfiguracji Apache",
+        "react_private_regression_required": "Wymagany regres testu prywatnej trasy w React"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Nie edytuj bezpośrednio vhostów Plesk",
@@ -1516,21 +1527,21 @@
       },
       "route_batches": {
         "title": "Gotowość partii trasy",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} trasy"
       },
       "remaining_route_work": {
         "title": "Pozostałe prace na drogach publicznych",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} Trasa obsługiwana przez API",
         "api_backed_routes_plural": "{{count}} trasy obsługiwane przez API",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Dostępne są elementy sterujące aktywacją",
-        "activation_unavailable": "Brak kontroli aktywacji"
+        "activation_unavailable": "Brak kontroli aktywacji",
+        "route_count": "{{count}} trasy",
+        "public_routes": "{{count}} publiczna trasa",
+        "public_routes_plural": "{{count}} publiczne trasy",
+        "remaining_routes": "{{count}} pozostała trasa",
+        "remaining_routes_plural": "{{count}} pozostałe trasy",
+        "unclassified_routes": "{{count}} nieklasyfikowana trasa",
+        "unclassified_routes_plural": "{{count}} nieklasyfikowane trasy"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "Trasy statyczne/ręczne z przeglądem",
@@ -1589,13 +1600,13 @@
       },
       "artifacts": {
         "title": "Inwentarz artefaktów przesunięcia",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "Wymagane polecenia",
         "required_before_cutover": "Wymagane przed przesiadką",
         "activation_available": "Dostępne są elementy sterujące aktywacją",
-        "no_activation_control": "Brak kontroli aktywacji"
+        "no_activation_control": "Brak kontroli aktywacji",
+        "path": "Ścieżka",
+        "present": "Obecny",
+        "missing": "Brak"
       },
       "artifact_items": {
         "route_ownership_manifest": "Dokument własności trasy",
@@ -1606,11 +1617,11 @@
         "prerender_fallback": "Renderowanie zastępcze"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "Konfiguracja krawędzi",
-        "runtime": "Runtime",
-        "guard": "Guard",
-        "fallback": "Fallback"
+        "runtime": "Czas działania",
+        "guard": "Strażnik",
+        "fallback": "Opcja awaryjna",
+        "manifest": "Manifest"
       },
       "production_effects": {
         "none": "Brak efektu produkcyjnego"
@@ -1619,13 +1630,13 @@
         "title": "Kwalifikacja do przeniesienia",
         "eligible": "Kwalifikuje się do przeniesienia",
         "blocked": "Nie kwalifikuje się do przeniesienia",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} trasy publiczne wspierane przez API",
         "remaining_public_routes": "{{count}} pozostałe trasy publiczne",
         "activation_available": "Dostępne elementy sterujące aktywacją",
         "activation_unavailable": "Brak kontroli aktywacji",
-        "blockers": "Blockers",
-        "required_actions": "Wymagane działania"
+        "required_actions": "Wymagane działania",
+        "blockers": "Blokady",
+        "public_routes": "{{count}} publiczne trasy"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "Weryfikacja manifestu jest zablokowana",
@@ -1660,15 +1671,15 @@
         "prerender_retained": "Bieżące zastępcze renderowanie wstępne pozostaje zachowane",
         "vite_private_routes_retained": "Prywatna własność trasy Vite pozostaje zachowana",
         "public_edge_not_configured": "Dla Next.js nie skonfigurowano żadnej trasy brzegowej produkcji",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Przed jakimkolwiek przełączeniem nadal wymagane są testy parzystości"
+        "parity_tests_required_before_cutover": "Przed jakimkolwiek przełączeniem nadal wymagane są testy parzystości",
+        "apache_canary_template_not_included": "Szablon Apache canary nie jest uwzględniany podczas wdrażania"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
-        "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "pass": "Zalicz",
+        "blocker": "Blokada",
+        "info": "Informacja",
+        "fail": "Nie zaliczono",
+        "blocked": "Zablokowane"
       },
       "runtime": {
         "title": "Środowisko wykonawcze w tle",
@@ -1690,9 +1701,9 @@
         "monitor_and_keep_prerender_fallback": "Monitoruj odpowiedzi i udostępniaj renderowanie wstępne jako rezerwowe do czasu sprawdzenia parzystości."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} prywatna edycja/tworzenie wzorców"
+        "private_patterns": "{{count}} prywatna edycja/tworzenie wzorców",
+        "public_routes": "{{count}} publiczne trasy",
+        "private_prefixes": "{{count}} prywatne prefiksy"
       },
       "validation": {
         "title": "Oczywista weryfikacja",
@@ -1758,7 +1769,8 @@
         "public_routes_only": "Tylko drogi publiczne",
         "do_not_remove_prerender": "Nie usuwaj rezerwowego renderowania wstępnego.",
         "rollback_path_required": "Wymagana ścieżka wycofania"
-      }
+      },
+      "refresh": "Odśwież"
     },
     "health_meta_description_length_few": "Znaki{{count}}(idealnie: 150–160)",
     "health_meta_description_length_many": "Znaki{{count}}(idealnie: 150–160)",
@@ -1808,7 +1820,93 @@
     "total_count_many": "Razem: {{count}}",
     "total_count_one": "Razem: {{count}}",
     "total_count_other": "Razem: {{count}}",
-    "score_out_of": "z {{maximum}}"
+    "score_out_of": "z {{maximum}}",
+    "component_match_score_aria": "{{component}} wynik: {{score}}%",
+    "placeholder_default_title_suffix": "| Mój Bank Czasu",
+    "placeholder_meta_keywords": "bankowanie czasu, społeczność, wymiana",
+    "sitemap_content_type_unknown": "Inne treści",
+    "sitemap_content_type_blog_posts": "Posty na blogu",
+    "sitemap_content_type_events": "Wydarzenia",
+    "sitemap_content_type_groups": "Grupy",
+    "sitemap_content_type_jobs": "Oferty pracy",
+    "sitemap_content_type_listings": "Ogłoszenia",
+    "sitemap_content_type_members": "Członkowie",
+    "sitemap_content_type_pages": "Strony",
+    "sitemap_content_type_podcasts": "Podcasty",
+    "sitemap_content_type_resources": "Zasoby",
+    "sitemap_content_type_volunteering": "Wolontariat",
+    "seo_audit_check_blog_meta_description_one": "Sprawdza {{count}} opublikowany wpis na blogu pod kątem tytułów meta i opisów",
+    "seo_audit_check_blog_meta_description_other": "Sprawdza {{count}} opublikowane wpisy na blogu pod kątem tytułów meta i opisów",
+    "seo_audit_check_blog_meta_name": "Metadane wpisu na blogu",
+    "seo_audit_check_canonical_urls_description": "Sprawdza konfigurację kanonicznego URL i niestandardowe nadpisania",
+    "seo_audit_check_canonical_urls_name": "Kanoniczne URL",
+    "seo_audit_check_content_quality_description": "Sprawdza cienką treść, brakujące tytuły i inne problemy z jakością treści",
+    "seo_audit_check_content_quality_name": "Sygnalizatory jakości treści",
+    "seo_audit_check_duplicate_titles_description": "Sprawdza zduplikowane meta tytuły w opublikowanej treści",
+    "seo_audit_check_duplicate_titles_name": "Unikalne meta tytuły",
+    "seo_audit_check_kb_meta_description_one": "Sprawdza {{count}} opublikowany artykuł w bazie wiedzy pod kątem prawidłowego tytułu",
+    "seo_audit_check_kb_meta_description_other": "Sprawdza opublikowane artykuły w bazie wiedzy {{count}} pod kątem poprawnych tytułów",
+    "seo_audit_check_kb_meta_name": "Metadane artykułu bazy wiedzy",
+    "seo_audit_check_open_graph_description": "Sprawdza konfigurację Open Graph i Twitter Card",
+    "seo_audit_check_open_graph_name": "Metadane udostępniania społecznościowego",
+    "seo_audit_check_page_meta_description_one": "Sprawdza opublikowaną stronę CMS {{count}} pod kątem metadanych",
+    "seo_audit_check_page_meta_description_other": "Sprawdza {{count}} opublikowane strony CMS pod kątem metadanych",
+    "seo_audit_check_page_meta_name": "Metadane strony CMS",
+    "seo_audit_check_redirect_health_description_one": "Sprawdza {{count}} skonfigurowane przekierowania pod kątem łańcuchów, pętli i samoprzekierowań",
+    "seo_audit_check_redirect_health_description_other": "Sprawdza {{count}} skonfigurowane przekierowania pod kątem łańcuchów, pętli i samoprzekierowań",
+    "seo_audit_check_redirect_health_name": "Stan przekierowań",
+    "seo_audit_check_seo_settings_description": "Sprawdza, czy włączone są kanoniczne adresy URL, tagi Open Graph i karty Twitter",
+    "seo_audit_check_seo_settings_name": "Konfiguracja SEO",
+    "seo_audit_check_sitemap_coverage_description_one": "Sprawdza pokrycie mapy witryny dla adresu URL {{count}}",
+    "seo_audit_check_sitemap_coverage_description_other": "Sprawdza pokrycie mapy witryny dla adresów URL {{count}}",
+    "seo_audit_check_sitemap_coverage_name": "Pokrycie mapy witryny",
+    "seo_audit_check_tenant_metadata_description": "Sprawdza meta tytuł, meta opis i nagłówek H1 strony głównej najemcy",
+    "seo_audit_check_tenant_metadata_name": "Metadane strony głównej",
+    "seo_audit_check_unknown_description": "To sprawdzenie audytu nie jest obsługiwane przez tę wersję panelu administracyjnego",
+    "seo_audit_check_unknown_name": "Nieznane sprawdzenie audytu",
+    "seo_audit_issue_additional_results_truncated": "Mogą istnieć inne problemy; pokazywane są tylko pierwsze {{limit}}.",
+    "seo_audit_issue_blog_post_meta_missing": "Post na blogu „{{title}}” ({{path}}) nie ma tytułu meta ani opisu.",
+    "seo_audit_issue_canonical_generation_disabled": "Generowanie kanonicznego URL jest wyłączone, co stwarza ryzyko duplikacji treści.",
+    "seo_audit_issue_canonical_urls_not_enabled": "Kanoniczne URL nie są włączone.",
+    "seo_audit_issue_cms_page_meta_title_missing": "Strona CMS „{{title}}” ({{path}}) nie ma tytułu meta.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} strona ma niestandardowy kanoniczny URL; potwierdź, że nadal jest ważny.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} strony mają niestandardowe kanoniczne URL; potwierdź, że nadal są ważne.",
+    "seo_audit_issue_duplicate_meta_title_one": "Tytuł meta „{{title}}” jest używany {{count}} raz.",
+    "seo_audit_issue_duplicate_meta_title_other": "Tytuł meta „{{title}}” jest używany {{count}} razy.",
+    "seo_audit_issue_homepage_meta_title_too_long": "Meta tytuł strony głównej ma {{length}} znaków; maksymalnie {{max}}.",
+    "seo_audit_issue_kb_article_titles_missing_one": "Opublikowany artykuł w bazie wiedzy {{count}} ma pusty tytuł.",
+    "seo_audit_issue_kb_article_titles_missing_other": "Opublikowane artykuły w bazie wiedzy {{count}} mają puste tytuły.",
+    "seo_audit_issue_legacy_result_requires_rerun": "Ten zapisany problem używa starszego formatu. Uruchom audyt ponownie, aby uzyskać pełne szczegóły.",
+    "seo_audit_issue_meta_description_too_long": "Opis meta strony głównej ma długość {{length}} znaków; maksymalnie {{max}}.",
+    "seo_audit_issue_meta_description_too_short": "Opis meta strony głównej ma długość {{length}} znaków; minimalnie {{min}}.",
+    "seo_audit_issue_missing_homepage_h1": "Strona główna nie ma nagłówka H1.",
+    "seo_audit_issue_missing_homepage_meta_title": "Strona główna nie ma domyślnego tytułu meta.",
+    "seo_audit_issue_missing_meta_description": "Strona główna nie ma domyślnego opisu meta.",
+    "seo_audit_issue_open_graph_default_image_missing": "Nie skonfigurowano domyślnego obrazu Open Graph, więc udostępnienia w mediach społecznościowych nie będą zawierały obrazu.",
+    "seo_audit_issue_open_graph_not_enabled": "Tagi Open Graph nie są włączone.",
+    "seo_audit_issue_open_graph_sharing_disabled": "Tagi Open Graph są wyłączone, więc udostępnienia w mediach społecznościowych będą korzystać z ogólnych podglądów.",
+    "seo_audit_issue_redirect_chain": "Łańcuch przekierowań: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "Pętla przekierowań: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "Samoprzekierowanie: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "Mapa witryny nie zawiera żadnych adresów URL, więc żadne treści nie są z niej indeksowane.",
+    "seo_audit_issue_sitemap_low_coverage_one": "Mapa witryny zawiera tylko {{count}} adres URL, co wskazuje na bardzo niskie pokrycie.",
+    "seo_audit_issue_sitemap_low_coverage_other": "Mapa witryny zawiera tylko {{count}} adresy URL, co wskazuje na bardzo niskie pokrycie.",
+    "seo_audit_issue_sitemap_profiles_missing": "Mapa witryny nie zawiera profili członków, chociaż niektóre są spodziewane.",
+    "seo_audit_issue_sitemap_static_pages_missing": "Mapa witryny nie zawiera statycznych stron, chociaż niektóre są spodziewane.",
+    "seo_audit_issue_thin_blog_content_one": "Opublikowany wpis na blogu {{count}} ma mniej niż {{minimum}} znaków; cienka treść może negatywnie wpłynąć na SEO.",
+    "seo_audit_issue_thin_blog_content_other": "Opublikowane wpisy na blogu {{count}} mają mniej niż {{minimum}} znaków; cienka treść może negatywnie wpłynąć na SEO.",
+    "seo_audit_issue_title_suffix_missing": "Nie skonfigurowano sufiksu tytułu, takiego jak „ | Nazwa Społeczności”.",
+    "seo_audit_issue_twitter_cards_disabled": "Karty Twittera są wyłączone.",
+    "seo_audit_issue_twitter_cards_not_enabled": "Karty Twittera nie są włączone.",
+    "seo_audit_issue_unknown": "Ten problem z audytem nie jest obsługiwany przez tę wersję panelu administracyjnego.",
+    "seo_audit_issue_untitled_published_pages_one": "Opublikowana strona {{count}} nie ma tytułu.",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} opublikowane strony nie mają tytułu.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "Ładowanie",
+    "no_audit_results_prompt": "Brak wyników audytu",
+    "placeholder_smtpexamplecom": "Smtpexamplecom..."
   },
   "email_deliverability": {
     "title": "Dostarczalność e-maili",
@@ -2190,7 +2288,7 @@
       },
       "email_dispatch_missing_explicit_tenant": {
         "title": "W e-mailu dyspozytora brakuje wyraźnego dzierżawcy",
-        "body": "Witryny połączeń dyspozytorów poczty e-mail {{count}} nadal opierają się na wywnioskowanym kontekście dzierżawy. Przekazuj identyfikator_dzierżawcy lub identyfikator_dzierżawcy jawnie, aby można było kontrolować każde wysyłanie w kolejce, cron, webhook i między dzierżawcami."
+        "body": "{{count}} miejsca wywołań dyspozytora e-mail wciąż polegają na wywnioskowanym kontekście najemcy. Przekaż tenant_id lub tenantId jawnie, aby każda kolejka, cron, webhook i wysyłka między najemcami była możliwa do audytu."
       },
       "email_trigger_audit_failed": {
         "title": "Kontrola wyzwalacza poczty e-mail nie powiodła się",
@@ -2221,6 +2319,27 @@
     "trigger_coverage_few": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
     "trigger_coverage_many": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
     "trigger_coverage_one": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
-    "trigger_coverage_other": "Problemy z {{issues}} w monitorowanych przepływach {{count}}"
+    "trigger_coverage_other": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
+    "categories": {
+      "billing": "Fakturowanie",
+      "civic_digest": "Skrót obywatelski",
+      "donation_receipt": "Potwierdzenie darowizny",
+      "event_reminder": "Przypomnienie o wydarzeniu",
+      "federation_connection": "Połączenie federacyjne",
+      "federation_message": "Wiadomość federacyjna",
+      "federation_review": "Recenzja federacyjna",
+      "federation_transaction": "Transakcja federacyjna",
+      "goal_reminder": "Przypomnienie o celu",
+      "job_interview": "Rozmowa kwalifikacyjna",
+      "listing_expiry": "Wygaśnięcie oferty",
+      "marketplace_dispute": "Spór na rynku",
+      "marketplace_rating": "Ocena w serwisie",
+      "newsletter": "Biuletyn",
+      "safeguarding": "Ochrona",
+      "safeguarding_review": "Przegląd bezpieczeństwa",
+      "volunteer_reminder": "Przypomnienie dla wolontariusza",
+      "not_available": "Niedostępne",
+      "unknown": "Inna kategoria e-mail"
+    }
   }
 }

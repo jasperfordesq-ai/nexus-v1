@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "購読者",
       "user_fallback": "ユーザー番号{{id}}",
       "columns": {
-        "member": "メンバー",
-        "email": "EMAIL",
-        "tier": "ティア",
+        "member": "会員",
+        "email": "メール",
+        "tier": "ランク",
         "interval": "間隔",
-        "status": "状態",
-        "next_billing": "次回の請求",
-        "started": "開始しました"
+        "status": "ステータス",
+        "next_billing": "次の請求",
+        "started": "開始"
       },
       "status": {
         "active": "アクティブ",
@@ -125,7 +125,8 @@
         "yearly": "毎年",
         "annual": "年間"
       },
-      "total_other": "{{count}} 合計"
+      "total_other": "{{count}} 合計",
+      "total_one": "{{count}} 合計"
     },
     "table": {
       "aria": "プレミアム層",
@@ -182,31 +183,31 @@
       "settings_save_failed": "寄付ルーティング設定を保存できませんでした。",
       "onboarding_failed": "Stripe オンボーディングを開始できませんでした。",
       "finance_load_failed": "寄付金融操作をロードできませんでした。",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "年次領収書のエクスポートをダウンロードできませんでした。"
+      "annual_receipts_export_failed": "年次領収書のエクスポートをダウンロードできませんでした。",
+      "gift_aid_export_failed": "ギフトエイドのエクスポートをダウンロードできませんでした。"
     },
     "settings": {
-      "title": "ストライプルーティング",
       "description": "テナント メタデータを持つプラットフォーム Stripe アカウントを使用するには、これを空白のままにします。テナントの Stripe アカウントを接続して、将来の 1 回限りの寄付および定期的な寄付をそのテナント アカウントに送信します。",
       "stripe_connect_account_id": "テナント Stripe Connect アカウント ID",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "これを変更すると、今後の寄付のチェックアウトに影響します。テナント アカウントを追加した後、サポート レベルを再同期して、その Stripe アカウントに定期的な価格が存在するようにします。",
       "route_platform_default": "プラットフォームのフォールバック",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Stripe オンボーディングを開始する",
       "continue_onboarding": "Stripe のオンボーディングを継続する",
       "requirements_due": "注意が必要な Stripe アカウント要件: {{count}}。",
       "save": "ルーティングの保存",
       "status": {
         "not_connected": "接続されていません",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "必要なアクション",
-        "unknown": "ステータス不明"
+        "unknown": "ステータス不明",
+        "pending": "保留中",
+        "ready": "準備完了"
       },
       "connect_fallback_active": "Stripe Connect アカウントは構成されていますが、まだライブ寄付を行う準備ができていません。オンボーディングが完了するまで、支払いにはプラットフォームのフォールバックが使用されます。",
       "requirements_due_one": "注意が必要な Stripe アカウント要件: {{count}}。",
-      "requirements_due_other": "注意が必要な Stripe アカウント要件: {{count}}。"
+      "requirements_due_other": "注意が必要な Stripe アカウント要件: {{count}}。",
+      "route_tenant_connect": "テナント接続",
+      "title": "Stripe ルーティング"
     },
     "finance": {
       "title": "財務業務",
@@ -214,19 +215,22 @@
       "completed_volume": "完結巻",
       "platform_fallback_volume": "プラットフォームのフォールバック ボリューム",
       "tenant_connect_volume": "テナントコネクトボリューム",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "オープンな紛争",
       "active_recurring": "アクティブな定期的",
       "failed_receipts": "失敗した受信",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "年間領収書をエクスポートする",
       "empty": "財務活動はまだ記録されていません。",
-      "past_due_count_other": "{{count}} 期限を過ぎました"
+      "past_due_count_other": "{{count}} 期限を過ぎました",
+      "donation_count_one": "{{count}} 寄付",
+      "declaration_count_one": "{{count}} 宣言",
+      "past_due_count_one": "{{count}} 支払期日過ぎ",
+      "gift_aid_ready": "寄付金控除準備完了",
+      "export_gift_aid": "寄付金控除をエクスポート",
+      "donation_count": "{{count}} 寄付",
+      "donation_count_other": "{{count}} 寄付",
+      "declaration_count": "{{count}} 宣言",
+      "declaration_count_other": "{{count}} 宣言",
+      "past_due_count": "{{count}} 支払期日過ぎ"
     }
   }
 }

@@ -457,7 +457,24 @@
     },
     "scroll_down": "Nach unten scrollen",
     "audience_cards": {
-      "title": "Wo möchten Sie beginnen?"
+      "title": "Wo möchten Sie beginnen?",
+      "defaults": {
+        "new_here": {
+          "title": "Neu hier?",
+          "description": "Erfahren Sie, wie unsere Gemeinschaft funktioniert und wie Sie sich einbringen können.",
+          "cta": "Loslegen"
+        },
+        "exchange": {
+          "title": "Hilfe anbieten oder finden",
+          "description": "Durchsuchen Sie, was Menschen anbieten, oder posten Sie Ihre eigene Anfrage.",
+          "cta": "Angebote durchsuchen"
+        },
+        "partner": {
+          "title": "Partner werden oder weiterempfehlen",
+          "description": "Für Organisationen, Geldgeber und Fachleute, die unsere Mitglieder unterstützen.",
+          "cta": "Mehr erfahren"
+        }
+      }
     },
     "how_it_works": {
       "title": "So funktioniert es",
@@ -595,7 +612,7 @@
       "name_label": "Name",
       "name_placeholder": "Ihr Name",
       "email_label": "E-Mail",
-      "email_placeholder": "sie@beispiel.ch",
+      "email_placeholder": "you@example.com",
       "subject_label": "Betreff",
       "subject_placeholder": "Worum geht es?",
       "subjects": {

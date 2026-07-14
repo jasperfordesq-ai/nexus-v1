@@ -39,17 +39,17 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 const HEALTHY_RESULT = {
   status: 'healthy',
   checks: [
-    { name: 'Database', status: 'ok' },
-    { name: 'Redis', status: 'ok' },
-    { name: 'Storage', status: 'ok', free: '10 GB', total: '50 GB' },
+    { code: 'database', name: 'SERVER COPY MUST NOT RENDER', status: 'ok' },
+    { code: 'redis', status: 'ok' },
+    { code: 'disk', status: 'ok', free: '10 GB', total: '50 GB' },
   ],
 };
 
 const DEGRADED_RESULT = {
   status: 'degraded',
   checks: [
-    { name: 'Database', status: 'ok' },
-    { name: 'Redis', status: 'fail' },
+    { code: 'database', status: 'ok' },
+    { code: 'redis', status: 'fail' },
   ],
 };
 
@@ -113,8 +113,9 @@ describe('HealthCheck', () => {
     await waitFor(() => {
       expect(screen.getByText('Database')).toBeInTheDocument();
       expect(screen.getByText('Redis')).toBeInTheDocument();
-      expect(screen.getByText('Storage')).toBeInTheDocument();
+      expect(screen.getByText('Disk storage')).toBeInTheDocument();
     });
+    expect(screen.queryByText('SERVER COPY MUST NOT RENDER')).not.toBeInTheDocument();
   });
 
   it('shows "Operational" for ok checks and "Failed" for fail checks', async () => {

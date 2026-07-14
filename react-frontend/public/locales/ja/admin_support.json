@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,83 +67,81 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "ページ診断、Sentry イベント ID、トリアージ メモを含むメンバーが送信したバグ レポートを確認します。",
     "loading": "サポート レポートを読み込んでいます...",
     "empty": "これらのフィルターに一致するサポート レポートはありません。",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "ページを開く",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "コピー診断",
       "copy_handoff": "コピーエンジニアリングの引き継ぎ",
-      "close": "Close",
-      "save": "トリアージを保存する"
+      "save": "トリアージを保存する",
+      "refresh": "更新",
+      "search": "検索",
+      "clear": "クリア",
+      "review": "レビュー",
+      "open_sentry": "セントリーを開く",
+      "close": "閉じる"
     },
     "stats": {
-      "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "open": "未処理",
+      "triaged": "トリアージ済み",
+      "blocked": "ブロック",
+      "unassigned": "未割り当て"
     },
     "filters": {
       "search": "リファレンス、ルート、レポーター、または概要を検索します",
-      "status": "Status",
-      "impact": "Impact"
+      "status": "ステータス",
+      "impact": "影響"
     },
     "status": {
       "all": "すべてのステータス",
-      "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "open": "未処理",
+      "triaged": "トリアージ済み",
+      "resolved": "解決済み",
+      "closed": "完了"
     },
     "impact": {
       "all": "すべての影響",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "ブロック",
+      "major": "重大",
+      "minor": "軽微",
+      "cosmetic": "化粧品"
     },
     "table": {
       "aria": "サポートレポート",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
-      "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reference": "参照",
+      "summary": "概要",
+      "impact": "影響",
+      "status": "ステータス",
+      "reporter": "報告者",
+      "assignee": "担当者",
+      "created": "作成済み",
+      "actions": "操作"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "レポートを読み込んでいます...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "ユーザーエージェント",
       "sentry_event": "セントリーイベント",
-      "diagnostics": "Diagnostics"
+      "summary": "概要",
+      "description": "説明",
+      "reporter": "報告者",
+      "page": "ページ",
+      "created": "作成済み",
+      "diagnostics": "診断",
+      "title": "レポート {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "セントリー問題の URL",
-      "triage_notes": "トリアージメモ"
+      "triage_notes": "トリアージメモ",
+      "status": "ステータス",
+      "assignee": "担当者"
     },
     "messages": {
       "saved": "サポートレポートが更新されました。",
@@ -157,6 +154,37 @@
       "save": "サポートレポートの保存に失敗しました。",
       "copy": "診断をコピーできませんでした。",
       "copy_handoff": "エンジニアリングハンドオフをコピーできませんでした。"
-    }
+    },
+    "handoff": {
+      "title": "サポートレポート {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}>（ユーザー {{id}}）",
+      "reporter_without_email": "{{name}}（ユーザー {{id}}）",
+      "unknown_reporter": "不明な報告者",
+      "no_diagnostics": "診断情報は含まれていません。",
+      "not_provided": "提供されていません",
+      "none_yet": "まだありません。",
+      "labels": {
+        "tenant": "コミュニティ",
+        "impact": "影響",
+        "status": "ステータス",
+        "created": "作成済み",
+        "reporter": "報告者",
+        "route": "ルート",
+        "page_url": "ページ URL",
+        "user_agent": "ユーザーエージェント",
+        "sentry_event": "Sentry イベント",
+        "sentry_issue": "Sentry 問題"
+      },
+      "headings": {
+        "summary": "概要:",
+        "user_description": "ユーザーの説明:",
+        "triage_notes": "トリアージノート:",
+        "diagnostics": "診断:"
+      }
+    },
+    "unassigned": "未割り当て",
+    "meta_title": "サポートレポート",
+    "title": "サポートレポート"
   }
 }

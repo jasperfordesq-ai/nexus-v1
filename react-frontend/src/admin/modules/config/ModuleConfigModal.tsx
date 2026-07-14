@@ -43,29 +43,20 @@ function optionToken(optionKey: string): string {
   return optionKey.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 }
 
-function translateRegistryText(t: AdminTranslator, key: string, fallback: string): string {
-  const translated = t(key);
-  return translated === key ? fallback : translated;
-}
-
 function getOptionLabel(t: AdminTranslator, option: ConfigOption): string {
-  return translateRegistryText(t, `config.option_${optionToken(option.key)}_label`, option.label);
+  return t(`config.option_${optionToken(option.key)}_label`);
 }
 
 function getOptionDescription(t: AdminTranslator, option: ConfigOption): string {
-  return translateRegistryText(t, `config.option_${optionToken(option.key)}_desc`, option.description);
+  return t(`config.option_${optionToken(option.key)}_desc`);
 }
 
 function getCategoryLabel(t: AdminTranslator, category: string): string {
-  return translateRegistryText(t, `config.option_category_${slugConfigText(category)}`, category);
+  return t(`config.option_category_${category}`);
 }
 
-function getChoiceLabel(t: AdminTranslator, option: ConfigOption, choiceValue: string, fallback: string): string {
-  return translateRegistryText(
-    t,
-    `config.option_choice_${optionToken(option.key)}_${slugConfigText(choiceValue)}`,
-    fallback
-  );
+function getChoiceLabel(t: AdminTranslator, option: ConfigOption, choiceValue: string): string {
+  return t(`config.option_choice_${optionToken(option.key)}_${slugConfigText(choiceValue)}`);
 }
 
 interface ModuleConfigModalProps {
@@ -81,10 +72,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
   const nameKey = module ? `config.module_name_${module.id}` : '';
   const descKey = module ? `config.module_desc_${module.id}` : '';
-  const translatedName = module ? t(nameKey) : '';
-  const translatedDesc = module ? t(descKey) : '';
-  const moduleName = module ? (translatedName === nameKey ? module.name : translatedName) : '';
-  const moduleDesc = module ? (translatedDesc === descKey ? module.description : translatedDesc) : '';
+  const moduleName = module ? t(nameKey) : '';
+  const moduleDesc = module ? t(descKey) : '';
   const { tenantPath, refreshTenant } = useTenant();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -225,7 +214,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       } else {
         setAuthenticationConfig(null);
         setAuthenticationLoadError(true);
-        toast.error(res.error || t('config.modal_authentication_load_failed'));
+        toast.error(t('config.modal_authentication_load_failed'));
       }
     } catch {
       setAuthenticationConfig(null);
@@ -784,7 +773,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             aria-label={label}
           >
             {option.choices.map(c => (
-              <SelectItem key={c.value} id={c.value}>{getChoiceLabel(t, option, c.value, c.label)}</SelectItem>
+              <SelectItem key={c.value} id={c.value}>{getChoiceLabel(t, option, c.value)}</SelectItem>
             ))}
           </Select>
         )}

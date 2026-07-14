@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Textarea, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
@@ -60,7 +60,7 @@ function statusLabel(status: string, t: StatusLabelTranslator): string {
     case 'incomplete':
       return t('billing.status_incomplete');
     default:
-      return status;
+      return t('billing.status_unknown');
   }
 }
 
@@ -189,7 +189,7 @@ export function BillingPage() {
                       max: maxUsers,
                     })}
                   </span>
-                  <span className="text-muted">{usagePct}%</span>
+                  <span className="text-muted">{formatPercentValue(usagePct)}</span>
                 </div>
                 <Progress
                   value={usagePct}
@@ -282,7 +282,9 @@ export function BillingPage() {
                       <p className="text-sm text-muted">
                         {t('billing.billing_interval')}
                       </p>
-                      <p className="font-medium capitalize">{subscription.billing_interval}</p>
+                      <p className="font-medium">
+                        {t(`billing.interval_${subscription.billing_interval}`, { defaultValue: t('billing.interval_unknown') })}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted">

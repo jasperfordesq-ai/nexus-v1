@@ -67,7 +67,7 @@ export default function GroupTypes() {
         setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
         loadTypes();
       } else {
-        error(res.error || t('groups.failed_to_create_group_type'));
+        error(t('groups.failed_to_create_group_type'));
       }
     } catch {
       error(t('groups.failed_to_create_group_type'));
@@ -89,7 +89,7 @@ export default function GroupTypes() {
         setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
         loadTypes();
       } else {
-        error(res.error || t('groups.failed_to_update_group_type'));
+        error(t('groups.failed_to_update_group_type'));
       }
     } catch {
       error(t('groups.failed_to_update_group_type'));
@@ -105,7 +105,7 @@ export default function GroupTypes() {
         success(t('groups.group_type_deleted'));
         loadTypes();
       } else {
-        error(res.error || t('groups.failed_to_delete_group_type'));
+        error(t('groups.failed_to_delete_group_type'));
       }
     } catch {
       error(t('groups.failed_to_delete_group_type'));
@@ -223,7 +223,7 @@ export default function GroupTypes() {
               />
               <Input
                 label={t('groups.label_icon_class')}
-                placeholder="e.g. fa-layer-group"
+                placeholder={t('groups.placeholder_icon_class')}
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />
@@ -266,7 +266,7 @@ export default function GroupTypes() {
               />
               <Input
                 label={t('groups.label_icon_class')}
-                placeholder="e.g. fa-layer-group"
+                placeholder={t('groups.placeholder_icon_class')}
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />

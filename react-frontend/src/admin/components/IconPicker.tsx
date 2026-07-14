@@ -28,8 +28,10 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
   const filteredIcons = useMemo(() => {
     if (!search.trim()) return ICON_NAMES;
     const q = search.toLowerCase();
-    return ICON_NAMES.filter((name) => name.toLowerCase().includes(q));
-  }, [search]);
+    return ICON_NAMES.filter((name) =>
+      name.toLowerCase().includes(q) || t(`icon_picker.icons.${name}`).toLowerCase().includes(q)
+    );
+  }, [search, t]);
 
   const handleSelect = (iconName: string) => {
     onChange(iconName);
@@ -53,7 +55,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
           {value ? (
             <>
               <DynamicIcon name={value} className="w-4 h-4 text-theme-primary" />
-              <span className="text-sm text-theme-primary">{value}</span>
+              <span className="text-sm text-theme-primary">{t(`icon_picker.icons.${value}`)}</span>
             </>
           ) : (
             <span className="text-sm text-theme-subtle">{t('icon_picker.search_for_icon')}</span>
@@ -100,6 +102,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
                   const Icon = ICON_MAP[name];
                   if (!Icon) return null;
                   const isSelected = value === name;
+                  const iconLabel = t(`icon_picker.icons.${name}`);
                   return (
                     <Button
                       key={name}
@@ -110,10 +113,10 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
                           ? 'bg-accent/10 ring-2 ring-accent text-accent dark:text-accent'
                           : 'text-theme-muted'
                       }`}
-                      title={name}
+                      title={iconLabel}
                     >
                       <Icon className="w-5 h-5" />
-                      <span className="text-[10px] leading-tight truncate w-full">{name}</span>
+                      <span className="text-[10px] leading-tight truncate w-full">{iconLabel}</span>
                     </Button>
                   );
                 })}

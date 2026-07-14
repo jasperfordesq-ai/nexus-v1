@@ -261,5 +261,6 @@ function inferTextValue(node: ReactNode): string | undefined {
 }
 
 function normalizePlacement(placement: LegacyPlacement | undefined): HeroDropdownPopoverProps['placement'] {
+  // admin-i18n-ignore: converts a legacy placement token to HeroUI's protocol value; never rendered
   return placement?.replace('-', ' ') as HeroDropdownPopoverProps['placement'] | undefined;
 }

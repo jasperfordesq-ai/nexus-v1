@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,12 +67,12 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "Actieve leden",
     "already_notified": "Al op de hoogte gebracht",
     "at_risk": "In gevaar",
@@ -88,7 +87,6 @@
     "clear_selection": "Selectie wissen",
     "col_actions": "Acties",
     "col_author": "Auteur",
-    "col_cohort": "Cohort",
     "col_content": "Inhoud",
     "col_days_inactive": "Dagen inactief",
     "col_flag_type": "Vlagtype",
@@ -143,11 +141,7 @@
     "group_by_monthly": "Groepeer op maandelijks",
     "group_by_weekly": "Groeperen op wekelijks",
     "hours": "Uur",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "{{value}}-uren",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "Actieve leden",
     "label_approve": "Goedkeuren",
     "label_approved": "Goedgekeurd",
@@ -198,14 +192,10 @@
     "label_unique_categories": "Unieke categorieën",
     "label_unique_givers": "Unieke gevers",
     "mark_as_notified": "Markeer als aangemeld",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "Leden gemarkeerd als op de hoogte gebracht",
     "members_selected": "Leden geselecteerd",
     "members_selected_count": "{{count}}geselecteerd",
     "moderation_pending": "In behandeling",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "Moderatie-instellingen",
     "moderation_settings_updated": "Moderatie-instellingen bijgewerkt",
     "never": "Nooit",
@@ -280,7 +270,19 @@
     "members_selected_count_one": "{{count}}geselecteerd",
     "members_selected_count_other": "{{count}}geselecteerd",
     "days_count_one": "{{count}} dagen",
-    "days_count_other": "{{count}} dagen"
+    "days_count_other": "{{count}} dagen",
+    "unknown_period": "Onbekende periode",
+    "active_30d_total": "Actief binnen 30 dagen",
+    "hours_reports_page_desc": "Analyseer het volume van het tijdkredietuitwisselingen, de saldi van leden en categorietrends.",
+    "hours_reports_page_title": "Uurverslagen",
+    "inactive_members_page_desc": "Identificeer leden die risico lopen zich terug te trekken en beheer opvolgingsmeldingen.",
+    "inactive_members_page_title": "Inactieve leden",
+    "member_reports_page_desc": "Volg de activiteit, retentie, betrokkenheid en bijdragemethoden van leden.",
+    "member_reports_page_title": "Ledenrapporten",
+    "moderation_queue_page_desc": "Bekijk inhoud die in afwachting is of gemarkeerd is voordat deze in de gemeenschap verschijnt.",
+    "moderation_queue_page_title": "Moderatiewachtrij",
+    "col_cohort": "Cohort",
+    "week_period": "Week {{week}}, {{year}}"
   },
   "municipal_reports": {
     "meta": {
@@ -298,13 +300,13 @@
       "body_1_before_kiss": "Het Gemeentelijk Impactrapport is het bewijspakket dat u deelt met gemeentelijke partners, kantons en financiers om de waarde van het programma aan te tonen. Het toont geverifieerde opvanguren, actieve leden, partnerorganisaties en, met behulp van de",
       "body_1_after_kiss": " methodologie, een geschatte kostencompensatie voor formele zorgdiensten (",
       "body_1_after_chf": "waarde van uren x preventiemultiplier).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Gebruik de",
       "body_2_after_audience": "schakel om de verhaalkader te wijzigen:",
       "body_2_after_canton": "verzamelt meerdere gemeenten en toont kostenvermijding op kantonnale schaal;",
       "body_2_after_municipality": "richt zich op bereikte buurtbewoners en partnerorganisaties;",
-      "body_2_after_cooperative": "toont het ledenbehoud, het wederkerigheidspercentage en de werklast van de coördinator. Exporteer als PDF om naar partners te sturen of als CSV voor verdere analyse. Sla rapportsjablonen op om dezelfde configuratie in toekomstige perioden snel opnieuw te genereren."
+      "body_2_after_cooperative": "toont het ledenbehoud, het wederkerigheidspercentage en de werklast van de coördinator. Exporteer als PDF om naar partners te sturen of als CSV voor verdere analyse. Sla rapportsjablonen op om dezelfde configuratie in toekomstige perioden snel opnieuw te genereren.",
+      "kiss_abbr": "Zorgzame Gemeenschap"
     },
     "actions": {
       "analytics": "Community-analyses",
@@ -395,7 +397,8 @@
       "hours_one": "{{count}}u",
       "hours_other": "{{count}}u",
       "activities_one": "{{count}} activiteiten",
-      "activities_other": "{{count}} activiteiten"
+      "activities_other": "{{count}} activiteiten",
+      "formatted_hours": "{{value}}u"
     },
     "toast": {
       "load_failed": "Kan gemeentelijke impactgegevens niet laden.",
@@ -548,7 +551,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}% op jaarbasis"
+      "yoy_value": "{{value}} op jaarbasis"
     }
   }
 }

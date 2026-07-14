@@ -50,6 +50,7 @@ import { adminKb } from '../../api/adminApi';
 import { api, API_BASE } from '@/lib/api';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
+import { formatNumber } from '@/lib/helpers';
 
 interface KBAttachment {
   id: number;
@@ -86,9 +87,13 @@ interface ParentArticleOption {
 }
 
 function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024) {
+    return formatNumber(bytes, { style: 'unit', unit: 'byte', unitDisplay: 'short', maximumFractionDigits: 0 });
+  }
+  if (bytes < 1024 * 1024) {
+    return formatNumber(bytes / 1024, { style: 'unit', unit: 'kilobyte', unitDisplay: 'short', maximumFractionDigits: 0 });
+  }
+  return formatNumber(bytes / (1024 * 1024), { style: 'unit', unit: 'megabyte', unitDisplay: 'short', maximumFractionDigits: 1 });
 }
 
 const ACCEPTED_FILE_TYPES = '.md,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx';
@@ -259,6 +264,7 @@ export function KBArticleForm() {
           setTitle(headingMatch[1].trim());
         } else if (!title) {
           // Fallback: use filename
+          // admin-i18n-ignore: derives editable user content from the user's own filename, not interface copy.
           setTitle(file.name.replace(/\.md$/, '').replace(/[_-]+/g, ' '));
         }
 
@@ -276,12 +282,14 @@ export function KBArticleForm() {
       setPendingFile(file);
       setContentType('html');
       if (!title) {
+        // admin-i18n-ignore: derives editable user content from the user's own filename, not interface copy.
         setTitle(file.name.replace(/\.pdf$/, '').replace(/[_-]+/g, ' '));
       }
     } else {
       // Other file types — store as attachment
       setPendingFile(file);
       if (!title) {
+        // admin-i18n-ignore: derives editable user content from the user's own filename, not interface copy.
         setTitle(file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '));
       }
     }
@@ -310,7 +318,7 @@ export function KBArticleForm() {
         setAttachments((prev) => [...prev, res.data as KBAttachment]);
         toast.success(t('resources.attachment_uploaded'));
       } else {
-        toast.error(res.error || t('resources.attachment_upload_failed'));
+        toast.error(t('resources.attachment_upload_failed'));
       }
     } catch {
       toast.error(t('resources.attachment_upload_failed'));
@@ -385,7 +393,7 @@ export function KBArticleForm() {
         );
         navigate(tenantPath('/admin/resources'));
       } else {
-        toast.error(res.error || t('resources.an_unexpected_error_occurred'));
+        toast.error(t('resources.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('resources.an_unexpected_error_occurred'));

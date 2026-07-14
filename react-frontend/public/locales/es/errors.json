@@ -49,5 +49,23 @@
   "extend_session": "Ampliar sesión",
   "dismiss": "Cerrar",
   "idle_logout_title": "Sesión cerrada por inactividad",
-  "idle_logout_message": "Su sesión se cerró automáticamente tras un período de inactividad. Inicie sesión de nuevo para continuar."
+  "idle_logout_message": "Su sesión se cerró automáticamente tras un período de inactividad. Inicie sesión de nuevo para continuar.",
+  "api": {
+    "request_failed_title": "La solicitud falló",
+    "request_failed": "No se pudo completar la solicitud.",
+    "service_unavailable": "El servicio no está disponible temporalmente. Por favor, inténtelo de nuevo más tarde.",
+    "invalid_response": "El servidor devolvió una respuesta no válida.",
+    "request_timeout": "La solicitud agotó el tiempo de espera. Por favor, inténtelo de nuevo.",
+    "network_error": "No se puede conectar. Por favor, compruebe su conexión a Internet e inténtelo de nuevo.",
+    "invalid_request": "La solicitud no es válida. Por favor, revise su entrada.",
+    "permission_denied": "No tiene permiso para realizar esta acción.",
+    "resource_not_found": "El recurso solicitado no fue encontrado.",
+    "too_many_requests": "Demasiadas solicitudes. Por favor, espere un momento y vuelva a intentarlo.",
+    "server_error": "Ocurrió un error inesperado en el servidor. Por favor, inténtelo de nuevo más tarde.",
+    "download_failed_status": "Descarga fallida (HTTP {{status}}).",
+    "upload_failed": "Subida fallida.",
+    "upload_failed_retry": "Subida fallida. Por favor, inténtelo de nuevo.",
+    "upload_cancelled": "Subida cancelada.",
+    "upload_timeout": "La subida ha caducado. Por favor, inténtelo de nuevo."
+  }
 }

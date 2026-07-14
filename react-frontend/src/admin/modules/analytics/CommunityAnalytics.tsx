@@ -19,6 +19,7 @@ import {
   AreaChart,
 } from 'recharts';
 import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
+import { formatPercentRatio, formatPercentValue } from '@/lib/helpers';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';
@@ -245,7 +246,7 @@ export function CommunityAnalytics() {
           label={t('analytics.label_engagement_rate')}
           value={
             data
-              ? `${(data.engagement_rate * 100).toFixed(1)}%`
+              ? formatPercentRatio(data.engagement_rate)
               : t('analytics.empty_value')
           }
           icon={Activity}
@@ -446,7 +447,7 @@ export function CommunityAnalytics() {
                     innerRadius={50}
                     paddingAngle={2}
                     label={({ name, percent }) =>
-                      `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
+                      `${name} (${formatPercentRatio(percent ?? 0, { maximumFractionDigits: 0 })})`
                     }
                     labelLine={{ strokeWidth: 1 }}
                   >
@@ -569,7 +570,7 @@ export function CommunityAnalytics() {
                   />
                   <StatCard
                     label={t('analytics.label_location_coverage')}
-                    value={`${geoData.coverage_percentage}%`}
+                    value={formatPercentValue(geoData.coverage_percentage)}
                     icon={Globe}
                     color={geoData.coverage_percentage > 50 ? 'success' : 'warning'}
                   />

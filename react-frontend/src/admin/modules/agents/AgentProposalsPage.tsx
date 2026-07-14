@@ -90,7 +90,7 @@ export default function AgentProposalsPage() {
         toast.success(t('agents.proposals.toasts.approved'));
         await fetchItems();
       } else {
-        toast.error(res.error || t('agents.proposals.toasts.approve_failed'));
+        toast.error(t('agents.proposals.toasts.approve_failed'));
       }
     } catch {
       toast.error(t('agents.proposals.toasts.approve_failed'));
@@ -110,7 +110,7 @@ export default function AgentProposalsPage() {
         setRejectNote('');
         await fetchItems();
       } else {
-        toast.error(res.error || t('agents.proposals.toasts.reject_failed'));
+        toast.error(t('agents.proposals.toasts.reject_failed'));
       }
     } catch {
       toast.error(t('agents.proposals.toasts.reject_failed'));
@@ -143,7 +143,7 @@ export default function AgentProposalsPage() {
         setEditing(null);
         await fetchItems();
       } else {
-        toast.error(res.error || t('agents.proposals.toasts.edit_approve_failed'));
+        toast.error(t('agents.proposals.toasts.edit_approve_failed'));
       }
     } catch {
       toast.error(t('agents.proposals.toasts.edit_approve_failed'));
@@ -193,7 +193,9 @@ export default function AgentProposalsPage() {
           <Card key={p.id} className="border border-border">
             <CardHeader className="flex flex-wrap gap-2 justify-between items-start">
               <div className="flex flex-wrap gap-2 items-center">
-                <Chip size="sm" variant="soft">{p.proposal_type}</Chip>
+                <Chip size="sm" variant="soft">
+                  {t(`agents.proposal_type.${p.proposal_type}`, { defaultValue: t('common.unknown') })}
+                </Chip>
                 <Chip size="sm" variant="soft" color={confidenceColor(p.confidence_score)}>
                   {t('agents.proposals.confidence', {
                     score: (typeof p.confidence_score === 'string'
@@ -211,7 +213,7 @@ export default function AgentProposalsPage() {
                 <Chip size="sm" variant="soft" color={
                   p.status === 'approved' ? 'success' :
                   p.status === 'rejected' ? 'danger' : 'warning'
-                }>{t(`agents.proposal_status.${p.status}`, p.status)}</Chip>
+                }>{t(`agents.proposal_status.${p.status}`, { defaultValue: t('common.unknown') })}</Chip>
               </div>
               <span className="text-xs text-muted">
                 {new Date(p.created_at).toLocaleString(getFormattingLocale())}

@@ -86,7 +86,7 @@ class AgentAdminController extends BaseApiController
             ->first();
 
         if (!$row) {
-            return $this->respondNotFound('Agent definition not found.');
+            return $this->respondNotFound(__('api.agent_definition_not_found'));
         }
 
         DB::table('agent_definitions')
@@ -116,7 +116,7 @@ class AgentAdminController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$row) {
-            return $this->respondNotFound('Agent definition not found.');
+            return $this->respondNotFound(__('api.agent_definition_not_found'));
         }
 
         $update = ['updated_at' => now()];
@@ -134,7 +134,7 @@ class AgentAdminController extends BaseApiController
             if (is_string($cfg)) {
                 $decoded = json_decode($cfg, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    return $this->respondWithError('INVALID_CONFIG', 'config must be valid JSON.', 'config', 422);
+                    return $this->respondWithError('INVALID_CONFIG', __('api.invalid_json'), 'config', 422);
                 }
                 $cfg = $decoded;
             }
@@ -165,7 +165,7 @@ class AgentAdminController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$row) {
-            return $this->respondNotFound('Agent definition not found.');
+            return $this->respondNotFound(__('api.agent_definition_not_found'));
         }
 
         $result = AgentRunner::run($id, 'manual', $userId);
@@ -279,7 +279,7 @@ class AgentAdminController extends BaseApiController
                 'proposal_id' => $proposalId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('APPROVE_FAILED', 'Could not approve the proposal. See the server logs for details.', null, 400);
+            return $this->respondWithError('APPROVE_FAILED', __('api.agent_proposal_approve_failed'), null, 400);
         }
 
         return $this->respondWithData($updated);
@@ -303,7 +303,7 @@ class AgentAdminController extends BaseApiController
                 'proposal_id' => $proposalId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('REJECT_FAILED', 'Could not reject the proposal. See the server logs for details.', null, 400);
+            return $this->respondWithError('REJECT_FAILED', __('api.agent_proposal_reject_failed'), null, 400);
         }
 
         return $this->respondWithData(['rejected' => true]);
@@ -317,7 +317,12 @@ class AgentAdminController extends BaseApiController
 
         $payload = $request->input('edited_payload');
         if (!is_array($payload)) {
-            return $this->respondWithError('INVALID_PAYLOAD', 'edited_payload must be an object.', 'edited_payload', 422);
+            return $this->respondWithError(
+                'INVALID_PAYLOAD',
+                __('api.field_object_required', ['field' => 'edited_payload']),
+                'edited_payload',
+                422,
+            );
         }
 
         try {
@@ -335,7 +340,7 @@ class AgentAdminController extends BaseApiController
                 'proposal_id' => $proposalId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('EDIT_APPROVE_FAILED', 'Could not approve the edited proposal. See the server logs for details.', null, 400);
+            return $this->respondWithError('EDIT_APPROVE_FAILED', __('api.agent_proposal_edit_approve_failed'), null, 400);
         }
 
         return $this->respondWithData($updated);

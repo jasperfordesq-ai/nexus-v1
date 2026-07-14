@@ -104,6 +104,21 @@ export default function VolunteerGivingDays() {
   usePageTitle(t('volunteering.giving_days_title'));
   const toast = useToast();
 
+  const formatTrendPeriod = (period: string): string => {
+    const dayMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(period);
+    if (dayMatch) {
+      const date = new Date(Number(dayMatch[1]), Number(dayMatch[2]) - 1, Number(dayMatch[3]));
+      return date.toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric' });
+    }
+
+    const weekMatch = /^(\d{4})-W(\d{1,2})$/.exec(period);
+    if (weekMatch) {
+      return t('volunteering.week_period', { year: Number(weekMatch[1]), week: Number(weekMatch[2]) });
+    }
+
+    return t('volunteering.chart_period_unknown');
+  };
+
   const [givingDays, setGivingDays] = useState<GivingDay[]>([]);
   const [donationStats, setDonationStats] = useState<DonationStats>({ total_donations: 0, total_amount: 0 });
   const [loading, setLoading] = useState(true);
@@ -194,7 +209,7 @@ export default function VolunteerGivingDays() {
         onClose();
         loadData();
       } else {
-        toast.error(res.error || t('volunteering.failed_to_save'));
+        toast.error(t('volunteering.failed_to_save'));
       }
     } catch {
       toast.error(t('volunteering.failed_to_save'));
@@ -214,7 +229,7 @@ export default function VolunteerGivingDays() {
         setDeactivateTarget(null);
         loadData();
       } else {
-        toast.error(res.error || t('volunteering.failed_to_update_status'));
+        toast.error(t('volunteering.failed_to_update_status'));
       }
     } catch {
       toast.error(t('volunteering.failed_to_update_status'));
@@ -614,9 +629,12 @@ export default function VolunteerGivingDays() {
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={trends} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                        <XAxis dataKey="period" fontSize={11} />
-                        <YAxis fontSize={11} />
-                        <Tooltip />
+                        <XAxis dataKey="period" fontSize={11} tickFormatter={formatTrendPeriod} />
+                        <YAxis fontSize={11} tickFormatter={(value: number) => formatNumber(value)} />
+                        <Tooltip
+                          labelFormatter={(value) => formatTrendPeriod(String(value))}
+                          formatter={(value) => formatNumber(Number(value))}
+                        />
                         <Area
                           type="monotone"
                           dataKey="cumulative"

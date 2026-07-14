@@ -49,5 +49,23 @@
   "extend_session": "Estendi la sessione",
   "dismiss": "Chiudi",
   "idle_logout_title": "Disconnessione per inattività",
-  "idle_logout_message": "È stato disconnesso automaticamente dopo un periodo di inattività. Acceda di nuovo per continuare."
+  "idle_logout_message": "È stato disconnesso automaticamente dopo un periodo di inattività. Acceda di nuovo per continuare.",
+  "api": {
+    "request_failed_title": "Richiesta fallita",
+    "request_failed": "La richiesta non può essere completata.",
+    "service_unavailable": "Il servizio non è disponibile al momento. Per favore riprova più tardi.",
+    "invalid_response": "Il server ha restituito una risposta non valida.",
+    "request_timeout": "La richiesta è scaduta. Per favore riprova.",
+    "network_error": "Impossibile connettersi. Controlla la tua connessione a internet e riprova.",
+    "invalid_request": "La richiesta non è valida. Controlla i tuoi dati di input.",
+    "permission_denied": "Non hai il permesso di eseguire questa azione.",
+    "resource_not_found": "La risorsa richiesta non è stata trovata.",
+    "too_many_requests": "Troppe richieste. Attendi un momento e riprova.",
+    "server_error": "Si è verificato un errore imprevisto del server. Riprova più tardi.",
+    "download_failed_status": "Download non riuscito (HTTP {{status}}).",
+    "upload_failed": "Caricamento fallito.",
+    "upload_failed_retry": "Caricamento fallito. Per favore riprova.",
+    "upload_cancelled": "Caricamento annullato.",
+    "upload_timeout": "Il caricamento è scaduto. Per favore riprova."
+  }
 }

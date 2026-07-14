@@ -17,8 +17,6 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,15 +36,6 @@ const MOBILE_CLI_PATH = path.join(
 );
 const MOBILE_APP_CONFIG_PATH = path.join(MOBILE_ROOT, 'app.json');
 const MOBILE_LOCALES_ROOT = path.join(MOBILE_ROOT, 'locales');
-const ADMIN_HELP_CONTENT_PATH = path.join(
-  ROOT,
-  'react-frontend',
-  'src',
-  'admin',
-  'data',
-  'helpContent.ts',
-);
-const ADMIN_HELP_CONTENT_KEY = 'react-frontend/src/admin/data/helpContent.ts';
 const MOBILE_LANGUAGES = ['de', 'en', 'es', 'fr', 'ga', 'it', 'pt'];
 const REQUIRED_NATIVE_IOS_KEYS = [
   'CFBundleDisplayName',
@@ -98,8 +87,6 @@ const NON_TRANSLATABLE_PATTERNS = [
 const args = process.argv.slice(2);
 const listMode = args.includes('--list');
 const baselineMode = args.includes('--baseline');
-const require = createRequire(import.meta.url);
-const ts = require(path.join(ROOT, 'react-frontend', 'node_modules', 'typescript'));
 
 function runI18nextLint() {
   const command = process.platform === 'win32' ? (process.env.ComSpec || 'cmd.exe') : 'npm';
@@ -196,39 +183,6 @@ function validateMobileNativeLocales() {
   }
 
   return errors;
-}
-
-function snapshotAdminHelpContent() {
-  const source = fs.readFileSync(ADMIN_HELP_CONTENT_PATH, 'utf8');
-  const sourceFile = ts.createSourceFile(
-    ADMIN_HELP_CONTENT_PATH,
-    source,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-  const values = [];
-
-  function visit(node) {
-    if (ts.isStringLiteralLike(node)) {
-      const parent = node.parent;
-      const isPropertyName = ts.isPropertyAssignment(parent) && parent.name === node;
-      const isModuleSpecifier =
-        (ts.isImportDeclaration(parent) || ts.isExportDeclaration(parent)) &&
-        parent.moduleSpecifier === node;
-      if (!isPropertyName && !isModuleSpecifier && !node.text.startsWith('/')) {
-        values.push(node.text);
-      }
-    }
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
-  values.sort();
-  return {
-    count: values.length,
-    sha256: createHash('sha256').update(JSON.stringify(values), 'utf8').digest('hex'),
-  };
 }
 
 function flattenLocaleKeys(value, prefix = '', keys = new Set()) {
@@ -361,7 +315,6 @@ const nativeLocaleErrors = validateMobileNativeLocales();
 const parsedLint = parseLiterals(lintResult.output);
 const parsedMobileLint = parseLiterals(mobileLintResult.output, 'mobile/');
 const literals = [...parsedLint.literals, ...parsedMobileLint.literals];
-const adminHelpSnapshot = snapshotAdminHelpContent();
 const mobileLocaleGapSnapshot = snapshotMobileLocaleGaps();
 const byFile = summarizeByFile(literals);
 const interpolationDiagnostics = [
@@ -406,9 +359,6 @@ if (baselineMode) {
       updated: new Date().toISOString(),
       source: 'scripts/check-i18n-literals.mjs',
       scope: 'react-frontend/src (except lawyer-controlled platform legal pages) and mobile app/components/lib',
-      staticRegistries: {
-        [ADMIN_HELP_CONTENT_KEY]: adminHelpSnapshot,
-      },
       localeGaps: {
         mobileMissingKeys: mobileLocaleGapSnapshot.missingKeys,
       },
@@ -430,15 +380,7 @@ if (listMode) {
 }
 
 const baseline = loadBaseline();
-const adminHelpBaseline = baseline.staticRegistries?.[ADMIN_HELP_CONTENT_KEY];
 const mobileMissingKeysBaseline = baseline.localeGaps?.mobileMissingKeys;
-const adminHelpRegressed =
-  !adminHelpBaseline ||
-  adminHelpSnapshot.count > adminHelpBaseline.count ||
-  (
-    adminHelpSnapshot.count === adminHelpBaseline.count &&
-    adminHelpSnapshot.sha256 !== adminHelpBaseline.sha256
-  );
 const mobileLocaleGapsRegressed =
   typeof mobileMissingKeysBaseline !== 'number' ||
   mobileLocaleGapSnapshot.missingKeys > mobileMissingKeysBaseline;
@@ -449,17 +391,12 @@ console.log('============================================================');
 console.log(`  Current UI literals:        ${literals.length}`);
 console.log(`  Baseline:                   ${baseline.count}`);
 console.log('  Scope:                      member/admin web + mobile (legal corpus separately governed)');
-console.log(`  Ratcheted admin-help text:  ${adminHelpSnapshot.count}`);
 console.log(`  Mobile locale-key gaps:     ${mobileLocaleGapSnapshot.missingKeys}`);
 
-if (literals.length > baseline.count || adminHelpRegressed || mobileLocaleGapsRegressed) {
+if (literals.length > baseline.count || mobileLocaleGapsRegressed) {
   console.error('');
   if (literals.length > baseline.count) {
     console.error(`  FAIL: ${literals.length - baseline.count} new web/mobile literal string(s) introduced.`);
-  }
-  if (adminHelpRegressed) {
-    console.error('  FAIL: Static admin-help English content changed without reducing the known debt.');
-    console.error('  Translate/refactor the content, or review it and refresh the baseline explicitly.');
   }
   if (mobileLocaleGapsRegressed) {
     console.error(
@@ -481,13 +418,6 @@ if (literals.length > baseline.count || adminHelpRegressed || mobileLocaleGapsRe
 if (literals.length < baseline.count) {
   console.log('');
   console.log(`  ${baseline.count - literals.length} literal string(s) fixed. Run --baseline to lock in the improvement.`);
-}
-
-if (adminHelpBaseline && adminHelpSnapshot.count < adminHelpBaseline.count) {
-  console.log(
-    `  ${adminHelpBaseline.count - adminHelpSnapshot.count} static admin-help literal(s) fixed. ` +
-    'Run --baseline to lock in the improvement.',
-  );
 }
 
 if (

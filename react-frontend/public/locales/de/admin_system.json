@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,21 +67,20 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "admin_settings": {
     "logo_uploaded": "Partnerlogo hochgeladen",
     "upload_failed": "Der Upload ist fehlgeschlagen",
-    "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "Wird im linken Bereich der Fußzeile angezeigt. PNG, JPEG, WebP oder SVG – maximal 2 MB.",
     "replace_image": "Bild ersetzen",
     "upload_image": "Bild hochladen",
     "remove_light_image": "Lichtmodus-Bild entfernen",
     "remove_dark_image": "Entfernen Sie das Bild im Dunkelmodus",
     "remove_partner_logo": "Partnerlogo entfernen",
-    "header_logo_section": "Header Logo",
     "header_colors_section": "Barrierefreie Kopfzeilenfarbe",
     "header_colors_desc": "Wählen Sie die Farbe des barrierefreien Site-Headers (GOV.UK-Stil). Lassen Sie die Option deaktiviert, um die standardmäßige schwarze Kopfzeile mit der blauen Linie beizubehalten.",
     "header_bg_color_label": "Hintergrundfarbe der Kopfzeile",
@@ -90,7 +88,6 @@
     "header_accent_color_label": "Akzentlinienfarbe",
     "header_accent_color_hint": "Die dünne Linie unter der Kopfzeile. Lassen Sie das Feld leer, um es an den Hintergrund anzupassen (keine sichtbare Linie), oder wählen Sie eine Kontrastfarbe wie Weiß.",
     "header_colors_reset": "Auf Standard zurücksetzen",
-    "header_colors_preview": "Preview",
     "header_logo_desc": "Laden Sie ein benutzerdefiniertes Logo hoch, das im Site-Header anstelle der Initialen Ihrer Community angezeigt wird. Lassen Sie das Feld leer, um die Standardeinstellung zu verwenden.",
     "header_logo_light_label": "Header-Logo (Lichtmodus)",
     "header_logo_dark_label": "Header-Logo (dunkler Modus)",
@@ -99,29 +96,32 @@
     "header_logo_uploaded": "Header-Logo aktualisiert",
     "header_logo_removed": "Header-Logo entfernt",
     "remove_header_logo": "Header-Logo entfernen",
-    "remove_header_logo_dark": "Entfernen Sie das Header-Logo für den dunklen Modus"
+    "remove_header_logo_dark": "Entfernen Sie das Header-Logo für den dunklen Modus",
+    "partner_logo_label": "Partner-Logo",
+    "header_logo_section": "Header-Logo",
+    "header_colors_preview": "Vorschau"
   },
   "operations": {
-    "title": "Operations",
     "description": "Cache-Statistiken und Hintergrundjobkontrollen.",
-    "refresh": "Refresh",
-    "cache_heading": "Cache",
-    "bg_jobs_heading": "Background Jobs",
     "redis_label": "Redis",
-    "redis_connected": "Connected",
-    "redis_disconnected": "Disconnected",
     "memory_used": "Verwendeter Speicher",
-    "keys": "Keys",
     "clear_cache": "Leeren Sie den Mandanten-Cache",
     "cache_cleared": "Cache erfolgreich geleert",
     "cache_clear_failed": "Cache konnte nicht geleert werden",
     "job_triggered": "Job erfolgreich ausgelöst",
     "job_trigger_failed": "Job konnte nicht ausgelöst werden",
-    "run_job_label": "Run {{name}}",
-    "last_run": "Last run: {{date}}",
     "never_run": "Laufen Sie niemals",
     "no_jobs": "Keine Hintergrundjobs konfiguriert",
-    "loading": "Loading"
+    "refresh": "Aktualisieren",
+    "keys": "Schlüssel",
+    "loading": "Lädt",
+    "title": "Operationen",
+    "bg_jobs_heading": "Hintergrundaufgaben",
+    "redis_connected": "Verbunden",
+    "redis_disconnected": "Getrennt",
+    "run_job_label": "Ausführen {{name}}",
+    "last_run": "Letzte Ausführung: {{date}}",
+    "cache_heading": "Cache"
   },
   "retention": {
     "page_title": "Datenaufbewahrung",
@@ -160,7 +160,9 @@
     "type_vol_safeguarding_incidents": "Schutzvorfälle",
     "type_vol_safeguarding_incidents_desc": "Schutzfall-Akten. Nur gelöste oder geschlossene Fälle werden gelöscht; prüfen Sie gesetzliche Aufbewahrungspflichten vor der Aktivierung.",
     "type_vol_guardian_consents": "Einwilligungen von Erziehungsberechtigten",
-    "type_vol_guardian_consents_desc": "Einwilligungen für Minderjährige, gelöscht so viele Tage nach Ablauf der Einwilligung."
+    "type_vol_guardian_consents_desc": "Einwilligungen für Minderjährige, gelöscht so viele Tage nach Ablauf der Einwilligung.",
+    "status_unknown": "Unbekannter Status",
+    "type_unknown": "Unbekannter Datentyp"
   },
   "seed_generator": {
     "count_aria_label": "Anzahl {{label}}",
@@ -183,62 +185,63 @@
     "option_messages_desc": "Generieren Sie Beispielnachrichten für Mitglieder",
     "option_badges_label": "Abzeichen",
     "option_badges_desc": "Generieren Sie Muster-Abzeichen-Auszeichnungen",
-    "warning_body": "Warning Body"
+    "warning_body": "Seed-Generierung nur in Entwicklungs- oder Testumgebungen ausführen. Sie erstellt Beispieldatensätze und kann Berichte beeinflussen."
   },
   "sso": {
-    "page_title": "Single Sign-On",
     "page_subtitle": "Konfigurieren Sie OpenID Connect-Identitätsanbieter für diese Community",
     "loading": "SSO-Anbieter werden geladen",
     "load_failed": "SSO-Anbieter konnten nicht geladen werden",
-    "refresh": "Refresh",
     "add_provider": "Anbieter hinzufügen",
     "intro": "Mitglieder melden sich über den Identitätsanbieter Ihrer Organisation mit OpenID Connect an. Auf den Anmelde- und Registrierungsseiten erscheint für jeden aktivierten Anbieter eine Schaltfläche.",
     "no_providers": "Es sind noch keine SSO-Anbieter konfiguriert.",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "updated_at": "Updated {{date}}",
-    "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
     "preset_entra_hint": "Für Microsoft Entra ID lautet die Aussteller-URL https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "Testverbindung",
     "testing": "Testen…",
-    "test_ok": "Connection OK",
     "test_error": "Verbindung fehlgeschlagen",
     "test_failed": "Test fehlgeschlagen. Bitte versuchen Sie es erneut.",
-    "edit": "Edit",
-    "edit_provider_title": "Edit {{name}}",
-    "delete": "Delete",
     "delete_title": "SSO-Anbieter löschen",
     "delete_body": "„{{name}}“ löschen? Mitglieder können sich bei diesem Anbieter nicht mehr anmelden.",
-    "delete_confirm": "Delete",
     "deleted": "Anbieter gelöscht",
     "delete_failed": "Anbieter konnte nicht gelöscht werden",
     "saved": "Anbieter gespeichert",
-    "save": "Save",
     "saving": "Sparen…",
     "save_failed": "Anbieter konnte nicht gespeichert werden",
-    "cancel": "Cancel",
     "key_invalid": "Der Anbieterschlüssel muss aus 2–20 Zeichen bestehen: Kleinbuchstaben, Zahlen, Bindestriche oder Unterstriche, beginnend mit einem Buchstaben oder einer Zahl.",
     "field_key": "Anbieterschlüssel",
     "field_key_desc": "Kurze eindeutige Kennung, die in URLs verwendet wird (z. B. Coventry). Kann nachträglich nicht geändert werden.",
     "field_display_name": "Anzeigename",
     "field_display_name_desc": "Wird auf der Anmeldeschaltfläche angezeigt, z. B. „Melden Sie sich beim Stadtrat von Coventry an“.",
-    "field_preset": "Preset",
-    "field_issuer_url": "Issuer URL",
     "field_issuer_url_desc": "Der OIDC-Emittent; Discovery wird gegen {issuer}/.well-known/openid-configuration ausgeführt.",
-    "field_client_id": "Client ID",
     "field_client_secret": "Kundengeheimnis",
     "secret_keep_placeholder": "Lassen Sie das Feld leer, um das aktuelle Geheimnis zu wahren",
     "secret_keep_desc": "Ein Geheimnis wird gespeichert. Geben Sie einen neuen Wert ein, um ihn zu ersetzen, oder lassen Sie das Feld leer, um ihn beizubehalten.",
-    "field_scopes": "Scopes",
     "field_scopes_desc": "Durch Leerzeichen getrennte OIDC-Bereiche. Standard: openid-Profil-E-Mail",
     "field_domains": "Zulässige E-Mail-Domänen",
     "field_domains_desc": "Durch Kommas getrennt, z.B. coventry.gov.uk, example.org. Lassen Sie das Feld leer, um jede beliebige Domäne zuzulassen.",
     "field_auto_provision": "Konten automatisch bereitstellen",
     "field_auto_provision_desc": "Erstellen Sie bei der ersten Anmeldung automatisch ein Mitgliedskonto. Wenn diese Option deaktiviert ist, können sich nur bestehende Mitglieder mit SSO anmelden.",
-    "field_enabled": "Enabled",
-    "field_enabled_desc": "Zeigen Sie diesen Anbieter auf den Anmelde- und Registrierungsseiten an."
+    "field_enabled_desc": "Zeigen Sie diesen Anbieter auf den Anmelde- und Registrierungsseiten an.",
+    "preset_unknown": "Unbekanntes Preset",
+    "refresh": "Aktualisieren",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "updated_at": "Aktualisiert {{date}}",
+    "preset_generic": "Generisches OIDC",
+    "test_ok": "Verbindung OK",
+    "edit_provider_title": "Bearbeiten {{name}}",
+    "delete_confirm": "Löschen",
+    "field_preset": "Voreinstellung",
+    "field_issuer_url": "Issuer-URL",
+    "field_client_id": "Client-ID",
+    "field_scopes": "Bereiche",
+    "field_enabled": "Aktiviert",
+    "page_title": "Single Sign-On"
   },
   "system": {
     "active": "Aktiv",
@@ -299,7 +302,7 @@
     "cron_cpanel_step_2_desc_prefix": "Stellen Sie den Zeitplan auf ein",
     "cron_cpanel_step_2_desc_suffix": "mit dem Befehl:",
     "cron_cpanel_step_2_title": "Schritt 2: Fügen Sie einen neuen Cron-Job hinzu",
-    "cron_docker_step_1_desc": "Bearbeiten Sie die Host-Crontab mit „sudo crontab -e“ und fügen Sie diese einzelne Zeile hinzu:",
+    "cron_docker_step_1_desc": "Bearbeiten Sie die Host-Crontab mit `sudo crontab -e` und fügen Sie diese einzelne Zeile hinzu:",
     "cron_docker_step_1_title": "Schritt 1: Fügen Sie einen Cron-Eintrag auf dem Host hinzu",
     "cron_gcp_step_1_title": "Schritt 1: SSH in Ihre Instanz",
     "cron_gcp_step_2_title": "Schritt 2: Fügen Sie einen Host-Crontab-Eintrag hinzu",
@@ -315,7 +318,6 @@
     "cron_success_title": "Das ist es!",
     "currency_aud": "AUD – Australischer Dollar",
     "currency_cad": "CAD – Kanadischer Dollar",
-    "currency_eur": "EUR - Euro",
     "currency_gbp": "GBP – Britisches Pfund",
     "currency_jpy": "JPY – Japanischer Yen",
     "currency_usd": "USD – US-Dollar",
@@ -324,9 +326,6 @@
     "only_word": "nur.",
     "platform_azure_vm": "Azure-VM",
     "platform_cpanel": "cPanel",
-    "platform_docker": "Docker",
-    "platform_gcp": "GCP",
-    "platform_linux_vps": "Linux / VPS",
     "recommended": "Empfohlen",
     "replace": "Ersetzen",
     "test_connection": "Testverbindung",
@@ -393,7 +392,6 @@
     "label_app_name": "App-Name",
     "label_app_version": "App-Version",
     "label_auto_resize": "Automatische Größenänderung",
-    "label_auto_web_p": "Auto WebP",
     "label_contact_phone": "Kontakttelefon",
     "label_copy_c_u_r_l_command": "cURL-Befehl kopieren",
     "label_copy_code": "Code kopieren",
@@ -444,7 +442,6 @@
     "loading_cron_jobs": "Cron-Jobs werden geladen...",
     "native_app_desc": "Konfigurieren Sie native Einstellungen für mobile Apps, einschließlich FCM- und APN-Anmeldeinformationen",
     "native_app_settings_saved_successfully": "Native App-Einstellungen erfolgreich gespeichert",
-    "native_app_title": "Native App",
     "native_app": {
       "android_identity": "Android-Identität",
       "android_play_store_id": "Android Play Store-ID",
@@ -455,7 +452,6 @@
       "apns_key_id": "APNs-Schlüssel-ID",
       "apns_team_id": "APNs-Team-ID",
       "background_color": "Hintergrundfarbe",
-      "browser": "Browser",
       "build_manifest_export_failed": "Build-Manifest konnte nicht exportiert werden",
       "build_manifest_exported": "Build-Manifest exportiert",
       "build_profile": "Profil erstellen",
@@ -504,14 +500,15 @@
       "service_worker_desc": "Aktivieren Sie Offline-Shell- und App-Caching.",
       "shared_app": "Geteilte NEXUS-App",
       "short_name": "Kurzname",
-      "standalone": "Standalone",
       "store_metadata": "Store-Metadaten mit Mietermarke",
       "store_mode": "Store-Modus",
       "support_url": "Support-URL",
       "tenant_branded_app": "App mit Mieterlogo",
       "tenant_branded_ready": "Fertig mit Mieterlogo",
       "tenant_channel_prefix": "Präfix des Mandantenkanals",
-      "theme_color": "Themenfarbe"
+      "theme_color": "Themenfarbe",
+      "browser": "Browser",
+      "standalone": "Eigenständig"
     },
     "never": "Niemals",
     "next_run": "Nächster Lauf",
@@ -576,12 +573,8 @@
       "preset_applied": "Voreinstellung angewendet",
       "preset_confirm": "Sind Sie sicher, dass Sie diese Voreinstellung anwenden möchten? Die aktuellen Einstellungen werden überschrieben.",
       "preset_created_options": "Voreinstellung angewendet und Optionen erstellt",
-      "preset_custom": "Custom",
       "preset_england_wales": "England und Wales",
-      "preset_ireland": "Ireland",
-      "preset_northern_ireland": "Northern Ireland",
       "preset_note": "Durch das Anwenden einer Voreinstellung werden Ihre aktuellen Registrierungsrichtlinieneinstellungen überschrieben",
-      "preset_scotland": "Scotland",
       "profile_requirements": "Profilanforderungen",
       "profile_requirements_desc": "Legen Sie die Mindestprofilanforderungen fest, die Mitglieder erfüllen müssen",
       "require_avatar_visibility": "Avatar-Sichtbarkeit erforderlich",
@@ -626,7 +619,11 @@
       "your_community": "Deine Community",
       "n_active_one": "{{count}}aktiv",
       "n_active_other": "{{count}}aktiv",
-      "preset_united_kingdom": "Vereinigtes K?nigreich"
+      "preset_united_kingdom": "Vereinigtes K?nigreich",
+      "preset_custom": "Benutzerdefiniert",
+      "preset_ireland": "Irland",
+      "preset_northern_ireland": "Nordirland",
+      "preset_scotland": "Schottland"
     },
     "overdue_jobs": "Überfällige Aufträge",
     "page_title": "System",
@@ -646,7 +643,6 @@
       "cancel": "Stornieren",
       "codes_generated": "Codes generiert",
       "col_actions": "Aktionen",
-      "col_code": "Code",
       "col_expires": "Läuft ab",
       "col_note": "Hinweis",
       "col_status": "Status",
@@ -737,7 +733,6 @@
       "post_activate_desc": "Was passiert mit dem Konto eines Mitglieds unmittelbar nach seiner Aktivierung?",
       "post_admin_approval": "Nach Genehmigung durch den Administrator",
       "post_admin_approval_desc": "Was passiert mit dem Konto eines Mitglieds nach der Genehmigung durch den Administrator?",
-      "post_limited": "Post Limited",
       "post_limited_desc": "Der Mitgliederzugriff ist bis zum Abschluss der weiteren Überprüfung begrenzt",
       "post_reject": "Post-Ablehnung",
       "post_reject_desc": "Was passiert mit dem Konto eines Mitglieds, wenn sein Antrag abgelehnt wird?",
@@ -756,14 +751,12 @@
       "require_email_desc": "Fordern Sie Mitglieder auf, ihre E-Mail-Adresse zu bestätigen, bevor sie auf die Plattform zugreifen",
       "require_email_tooltip": "Nur Plattform-Superadministratoren dürfen diese Einstellung ändern",
       "save_credentials": "Anmeldeinformationen speichern",
-      "save_policy": "Save Policy",
       "show_api_key": "API-Schlüssel anzeigen",
       "show_webhook": "Webhook anzeigen",
       "tip_change_modes": "Bei Neuanmeldungen wird die Änderung des Anmeldemodus sofort wirksam",
       "total_codes": "Gesamtcodes",
       "total_codes_count": "Gesamtcodes: {{count}}",
       "unavailable": "Nicht verfügbar",
-      "understanding_modes": "Understanding Modes",
       "verification_settings": "Verifizierungseinstellungen",
       "verification_settings_desc": "Konfigurieren Sie Anforderungen zur Identitätsüberprüfung für die Registrierung neuer Mitglieder",
       "waitlist_info": "Mitglieder auf der Warteliste werden manuell von einem Administrator genehmigt",
@@ -775,10 +768,13 @@
       "n_available_one": "{{count}}verfügbar",
       "n_available_other": "{{count}}verfügbar",
       "total_codes_count_one": "Gesamtcodes: {{count}}",
-      "total_codes_count_other": "Gesamtcodes: {{count}}"
+      "total_codes_count_other": "Gesamtcodes: {{count}}",
+      "save_policy": "Registrierungsrichtlinie speichern",
+      "understanding_modes": "Verständnis der Registrierungsmodi",
+      "col_code": "Code",
+      "post_limited": "Beitrag Begrenzung"
     },
     "registration_policy_saved_successfully": "Registrierungsrichtlinie erfolgreich gespeichert",
-    "registration_policy_settings_title": "Registration Policy Settings",
     "run_now": "Jetzt ausführen",
     "running": "Laufen",
     "schedule": "Zeitplan",
@@ -808,16 +804,13 @@
     "label_default_currency": "Standardwährung",
     "desc_default_currency": "Wird für Abonnement- und Marktplatzpreise verwendet",
     "section_branding_legal": "Branding und Recht",
-    "powered_by_branding_section": "Powered By Branding",
     "powered_by_branding_desc": "Konfigurieren Sie den rechten „Powered By“-Slot der Fußzeile. Änderungen werden sofort wirksam. Nur Gott.",
     "god_only_chip": "Nur Gott",
     "label_partner_logo_label": "Partner-Logo-Etikett",
-    "placeholder_partner_logo_label": "Community Partner",
     "desc_partner_logo_label": "Kurzes Label, das über dem Partnerlogo angezeigt wird (leer lassen, um den Standardtext „Community-Partner“ zu verwenden)",
     "label_powered_by_label": "Beschriftungstext",
     "placeholder_powered_by_label": "Angetrieben von",
     "desc_powered_by_label": "Über dem Bild wird eine kurze Beschriftung angezeigt (leer lassen, um den Standardtext „Unterstützt von“ zu verwenden)",
-    "label_powered_by_url": "Link URL",
     "placeholder_powered_by_url": "https://example.com",
     "desc_powered_by_url": "Macht das Bild anklickbar. Für keinen Link leer lassen.",
     "label_powered_by_image_light": "Bild im Lichtmodus",
@@ -879,9 +872,7 @@
     "advanced_custom_settings": "Erweiterte benutzerdefinierte Einstellungen",
     "app_configuration_heading": "App-Konfiguration",
     "auto_convert_webp": "WebP automatisch konvertieren",
-    "auto_convert_webp_desc": "Auto Convert WebP.",
     "auto_resize": "Automatische Größenänderung",
-    "auto_resize_desc": "Auto Resize.",
     "avg_completion_minutes": "Durchschnittliche Fertigstellungsminuten",
     "avg_completion_seconds": "Durchschnittliche Abschlusssekunden",
     "blog_restore_warning": "Blog-Wiederherstellungswarnung",
@@ -897,9 +888,6 @@
     "col_provider": "Anbieter",
     "col_time": "Zeit",
     "conversion_failed": "Die Konvertierung ist fehlgeschlagen",
-    "desc_comma_separated_emails": "Comma Separated Emails.",
-    "desc_job_will_run_when_enabled": "Job Will Run When Enabled.",
-    "desc_notify_on_failure": "Notify on Failure.",
     "enable_push_notifications": "Aktivieren Sie Push-Benachrichtigungen",
     "enable_push_notifications_desc": "Aktivieren Sie Push-Benachrichtigungen.",
     "failed_to_action_verification": "Aktionsüberprüfung fehlgeschlagen",
@@ -907,7 +895,6 @@
     "failed_to_load_provider_health": "Der Zustand des Anbieters konnte nicht geladen werden",
     "failed_count": "{{count}}ist fehlgeschlagen",
     "generate_thumbnails": "Miniaturansichten generieren",
-    "generate_thumbnails_desc": "Generate Thumbnails.",
     "generated_data_for": "Daten für {{count}} ausgewählte Datentypen generiert",
     "health_check_complete": "Gesundheitscheck abgeschlossen",
     "health_check_failed": "Gesundheitsprüfung ist fehlgeschlagen",
@@ -938,7 +925,6 @@
     "n_hours_ago": "Vor N Stunden",
     "n_minutes_ago": "Vor N Minuten",
     "n_sessions": "N Sitzungen",
-    "no_backups_available": "No backups available found",
     "no_failed_sessions": "Keine fehlgeschlagenen Sitzungen gefunden",
     "no_identity_providers": "Keine Identitätsanbieter gefunden",
     "not_available_short": "N / A",
@@ -990,7 +976,6 @@
     "stat_pending": "Statistik ausstehend",
     "stat_total": "Statistische Gesamtsumme",
     "strip_exif": "Exif entfernen",
-    "strip_exif_desc": "Strip Exif.",
     "success_rate_label": "Erfolgsquote",
     "system_requirements_desc": "Systemanforderungen.",
     "system_requirements_title": "Systemanforderungen",
@@ -1022,8 +1007,6 @@
     "not_writable_status": "Nicht beschreibbar",
     "search_extensions_placeholder": "Sucherweiterungen...",
     "some_warnings_detected": "Einige Warnungen wurden erkannt",
-    "status_fail": "FAIL",
-    "status_ok": "OK",
     "writable_status": "Beschreibbar",
     "action": {
       "admin_approve_group_member": "Gruppenmitglied genehmigen",
@@ -1113,9 +1096,9 @@
       "vetting_record_rejected": "Überprüfungsprotokoll abgelehnt",
       "vetting_record_updated": "Überprüfungsprotokoll aktualisiert",
       "vetting_record_verified": "Überprüfungsprotokoll überprüft",
-      "welcome_credits_issued": "Willkommens-Credits ausgestellt"
+      "welcome_credits_issued": "Willkommens-Credits ausgestellt",
+      "unknown": "Unbekannte Aktion"
     },
-    "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optionaler Website-Link für das Partnerlogo im Footer.",
     "label_inactivity_timeout": "Inaktivitäts-Timeout (Minuten)",
     "desc_inactivity_timeout": "Mitglieder nach so vielen Minuten ohne Aktivität automatisch abmelden. 0 deaktiviert das Timeout; zulässiger Bereich ist 5–480 Minuten. Empfohlen: 120.",
@@ -1147,8 +1130,254 @@
       "api_unavailable": "API für Zustandsprüfung nicht verfügbar",
       "run_all": "Alle Tests ausführen",
       "suites": "Testsammlungen",
-      "unknown_test": "Diagnose: {{name}}"
-    }
+      "unknown_test": "Diagnose: {{name}}",
+      "tests": {
+        "api_health": "API-Zustandsprüfung",
+        "database": "Datenbankverbindung",
+        "redis": "Redis-Verbindung",
+        "auth_token": "Erstellung des Authentifizierungstokens",
+        "tenant_bootstrap": "Mandanteninitialisierung",
+        "file_upload": "Datei-Upload (S3 oder lokal)",
+        "email_service": "E-Mail-Dienst",
+        "pusher": "Pusher-WebSocket"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "Blogbeitrag Nr. {{id}} erstellt: {{title}}",
+      "blog_post_updated": "Blogbeitrag Nr. {{id}} aktualisiert: {{title}}",
+      "blog_post_deleted": "Blogbeitrag Nr. {{id}} gelöscht: {{title}}",
+      "blog_post_status_changed": "Status von Blogbeitrag Nr. {{id}} von {{old_status}} in {{new_status}} geändert.",
+      "blog_posts_bulk_deleted": "In großer Menge gelöschte Blogbeiträge: {{count}}",
+      "blog_posts_bulk_published": "In großer Menge veröffentlichte Blogbeiträge: {{count}}",
+      "unknown": "Aktivitätsdetail: {{code}}"
+    },
+    "activity_status": {
+      "draft": "Entwurf",
+      "published": "veröffentlicht",
+      "unknown": "Unbekannter Status"
+    },
+    "alert_status_healthy": "Gesund",
+    "alert_status_warning": "Warnung",
+    "alert_status_critical": "Kritisch",
+    "verification_level_none": "Keine",
+    "verification_level_document_only": "Nur Dokument",
+    "verification_level_document_selfie": "Dokument und Selfie",
+    "verification_level_reusable_digital_id": "Wiederverwendbare digitale ID",
+    "verification_level_manual_review": "Manuelle Überprüfung",
+    "verification_level_unknown": "Unbekanntes Verifizierungsniveau",
+    "job_category_notifications": "Benachrichtigungen",
+    "job_category_newsletters": "Newsletter",
+    "job_category_geocoding": "Geokodierung",
+    "job_category_maintenance": "Wartung",
+    "job_category_groups": "Gruppen",
+    "job_category_security": "Sicherheit",
+    "job_category_other": "Andere",
+    "job_category_unknown": "Unbekannte Kategorie",
+    "cron_job_name_unknown": "Geplanter Task",
+    "cron_job_description_unknown": "Führt eine geplante Hintergrundaufgabe aus.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "Master-Cron-Runner",
+        "description": "Führt die für die aktuelle Zeit vorgesehenen geplanten Aufgaben aus. Alle anderen Aufgaben laufen über diesen Scheduler-Eintrag."
+      },
+      "process_queue": {
+        "name": "Sofort-Benachrichtigungswarteschlange",
+        "description": "Verarbeitet ausstehende Sofortbenachrichtigungen für die sofortige Zustellung."
+      },
+      "daily_digest": {
+        "name": "Tägliche Zusammenfassung",
+        "description": "Sendet tägliche Benachrichtigungszusammenfassungs-E-Mails an Mitglieder, die die tägliche Zustellung ausgewählt haben."
+      },
+      "weekly_digest": {
+        "name": "Monatlicher Überblick",
+        "description": "Sendet den monatlichen Benachrichtigungsüberblick am ersten Tag jedes Monats."
+      },
+      "process_newsletters": {
+        "name": "Geplante Newsletter verarbeiten",
+        "description": "Findet Newsletter, die zur Zustellung fällig sind, und startet den Versandprozess."
+      },
+      "process_recurring": {
+        "name": "Wiederkehrende Newsletter verarbeiten",
+        "description": "Verarbeitet wiederkehrende und automatisierte Newsletter."
+      },
+      "process_newsletter_queue": {
+        "name": "Newsletter-Warteschlangenprozessor",
+        "description": "Verarbeitet in Warteschlangen befindliche Newsletter-Zustellungen in Stapeln."
+      },
+      "notify_hot_matches": {
+        "name": "Benachrichtigungen über heiße Matches",
+        "description": "Benachrichtigt Mitglieder über neue Punktespitzen-Matches."
+      },
+      "match_digest_daily": {
+        "name": "Tägliche Match-Zusammenfassung",
+        "description": "Sendet tägliche Spielempfehlungen an Mitglieder."
+      },
+      "match_digest_weekly": {
+        "name": "Wöchentlicher Spielbericht",
+        "description": "Sendet eine wöchentliche Zusammenfassung der Spielempfehlungen."
+      },
+      "gamification_daily": {
+        "name": "Tägliche Gamification-Aufgaben",
+        "description": "Verarbeitet Serienrücksetzungen, Tagesboni und Abzeichenprüfungen."
+      },
+      "gamification_campaigns": {
+        "name": "Verarbeitet Erfolgskampagnen",
+        "description": "Verarbeitet wiederkehrende Erfolgsaktionen."
+      },
+      "gamification_leaderboard": {
+        "name": "Ranglisten-Schnappschuss",
+        "description": "Erstellt tägliche Ranglisten-Schnappschüsse und schließt Saisons ab."
+      },
+      "gamification_challenges": {
+        "name": "Überprüft das Ablaufdatum von Herausforderungen",
+        "description": "Läuft abgeschlossene Herausforderungen ab und aktualisiert deren Status."
+      },
+      "gamification_weekly_digest": {
+        "name": "Monatlicher Gamification-Newsletter",
+        "description": "Sendet monatliche Fortschritts-Newsletter an Mitglieder."
+      },
+      "gamification_streaks": {
+        "name": "Gamification-Streak-Meilensteine",
+        "description": "Überprüft und vergibt Mitglieder-Streak-Meilensteine."
+      },
+      "gamification_cleanup": {
+        "name": "Gamification-Bereinigung",
+        "description": "Entfernt alte Erfahrungsbenachrichtigungen, Kampagnenbelohnungen und Analysedaten."
+      },
+      "update_featured_groups": {
+        "name": "Ausgewählte Gruppen aktualisieren",
+        "description": "Aktualisiert ausgewählte Gruppen unter Verwendung der Ranglistenregeln."
+      },
+      "group_weekly_digest": {
+        "name": "Monatliche Gruppenzusammenfassungen",
+        "description": "Sendet monatliche Analysedigest-E-Mails an Gruppenbesitzer."
+      },
+      "abuse_detection": {
+        "name": "Missbrauchserkennung",
+        "description": "Scannt Transaktionen nach möglichen Missbrauchsmustern."
+      },
+      "abuse_daily_report": {
+        "name": "Täglicher Missbrauchsbericht",
+        "description": "Sendet den täglichen Missbrauchserkennungsbericht an Administratoren."
+      },
+      "abuse_cleanup": {
+        "name": "Bereinigung von Missbrauchsalarmen",
+        "description": "Archiviert alte Warnungen und verwirft automatisch Elemente mit niedriger Priorität."
+      },
+      "verification_reminders": {
+        "name": "Erinnerungen zur Überprüfung",
+        "description": "Erinnert Mitglieder an unvollständige Identitätsüberprüfungen."
+      },
+      "expire_verifications": {
+        "name": "Abgebrochene Überprüfungen verfallen lassen",
+        "description": "Lässt Überprüfungssitzungen verfallen, die länger als 72 Stunden abgebrochen wurden."
+      },
+      "purge_verification_sessions": {
+        "name": "Alte Verifizierungsdaten löschen",
+        "description": "Löscht abgeschlossene und abgelaufene Verifizierungssitzungen nach 180 Tagen."
+      },
+      "volunteer_pre_shift": {
+        "name": "Erinnerungen vor dem Einsatz von Freiwilligen",
+        "description": "Sendet Erinnerungen vor den Schichten der Freiwilligen."
+      },
+      "volunteer_post_shift": {
+        "name": "Feedback nach der Freiwilligen-Schicht",
+        "description": "Fordert nach abgeschlossenen Freiwilligen-Schichten Feedback an."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "Hinweis an inaktive Freiwillige",
+        "description": "Erinnert Freiwillige, die in letzter Zeit nicht aktiv waren."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "Ablauf von Freiwilligennachweisen",
+        "description": "Warnt Freiwillige vor Nachweisen und Schulungen, die bald ablaufen."
+      },
+      "recurring_shifts": {
+        "name": "Wiederkehrende Schichten erzeugen",
+        "description": "Erzeugt bevorstehende Freiwilligenschichten aus wiederkehrenden Vorlagen."
+      },
+      "volunteer_expire_consents": {
+        "name": "Verfall von Erziehungsberechtigten-Zustimmungen",
+        "description": "Löscht Erziehungsberechtigten-Zustimmungsaufzeichnungen nach ihrem Ablaufdatum."
+      },
+      "cleanup": {
+        "name": "Systembereinigung",
+        "description": "Entfernt abgelaufene Tokens, alte Warteschlangeneinträge, API-Tokens und Tracking-Daten."
+      },
+      "geocode_batch": {
+        "name": "Batch-Geokodierung",
+        "description": "Geokodiert Mitglieder und Einträge, die Koordinaten fehlen."
+      },
+      "event_reminders": {
+        "name": "Veranstaltungserinnerungen",
+        "description": "Sendet Erinnerungen vor bevorstehenden Veranstaltungen."
+      },
+      "inactive_members": {
+        "name": "Erkennung inaktiver Mitglieder",
+        "description": "Findet inaktive Mitglieder und markiert sie zur Nachverfolgung."
+      },
+      "listing_expiry": {
+        "name": "Bearbeitung des Ablaufs von Einträgen",
+        "description": "Löscht Einträge nach ihrem Ablaufdatum."
+      },
+      "listing_expiry_reminders": {
+        "name": "Erinnerungen an den Ablauf von Einträgen",
+        "description": "Warnt die Eigentümer von Einträgen, bevor ein Eintrag abläuft."
+      },
+      "job_expiry": {
+        "name": "Ablauf von Stellenangeboten",
+        "description": "Lässt Stellenangebote nach ihrem Schließdatum ablaufen."
+      },
+      "federation_weekly_digest": {
+        "name": "Monatlicher Föderationsbericht",
+        "description": "Sendet einen Aktivitätsbericht der Föderation an teilnehmende Communities."
+      },
+      "balance_alerts": {
+        "name": "Kontostandswarnungen",
+        "description": "Überprüft die Wallet-Guthaben der Organisation und sendet Benachrichtigungen bei niedrigem Guthaben."
+      },
+      "goal_reminders": {
+        "name": "Zielerinnerungen",
+        "description": "Sendet Erinnerungen für Ziele, die fällig oder im Verzug sind."
+      },
+      "retry_failed_webhooks": {
+        "name": "Fehlgeschlagene Webhooks erneut versuchen",
+        "description": "Versucht die Zustellung von Webhooks erneut, die zuvor fehlgeschlagen sind."
+      },
+      "digest_emails": {
+        "name": "E-Mail-Übersicht-Absender"
+      },
+      "badge_checker": {
+        "name": "Abzeichen-Auszeichnungsprüfer"
+      },
+      "streak_updater": {
+        "name": "Anmeldeherausforderungsaktualisierer"
+      }
+    },
+    "partner_logo_link_url": "Partner-Logo-Link-URL",
+    "registration_policy_settings_title": "Registrierung & Identitätsprüfung",
+    "auto_convert_webp_desc": "WebP-Versionen unterstützter Uploads für kleinere Bilddownloads erstellen.",
+    "auto_resize_desc": "Bilder, die die konfigurierten Höchstmaße überschreiten, skalieren.",
+    "desc_comma_separated_emails": "Geben Sie eine oder mehrere E-Mail-Adressen ein, getrennt durch Kommas.",
+    "desc_job_will_run_when_enabled": "Dieser Auftrag wird nach dem konfigurierten Zeitplan ausgeführt, wenn er aktiviert ist.",
+    "desc_notify_on_failure": "Senden Sie eine E-Mail-Benachrichtigung, wenn dieser Auftrag fehlschlägt.",
+    "generate_thumbnails_desc": "Erstellen Sie kleinere Thumbnail-Varianten für Einträge, Profile und Karten.",
+    "no_backups_available": "Keine Sicherungen verfügbar",
+    "strip_exif_desc": "Entfernen Sie EXIF-Metadaten von hochgeladenen Bildern vor der Speicherung.",
+    "status_fail": "SCHEITERN",
+    "status_ok": "OK",
+    "placeholder_partner_logo_label": "Gemeinschaftspartner",
+    "label_powered_by_url": "Link-URL",
+    "platform_gcp": "GCP",
+    "currency_eur": "EUR - Euro",
+    "platform_docker": "Docker",
+    "platform_linux_vps": "Linux / VPS",
+    "label_auto_web_p": "Auto WebP",
+    "native_app_title": "Native App",
+    "job_category_matching": "Abgleich",
+    "job_category_master": "Meister",
+    "job_category_gamification": "Gamifizierung",
+    "powered_by_branding_section": "Mit Powered-by-Branding"
   },
   "verification": {
     "approve": "Genehmigen",
@@ -1216,7 +1445,20 @@
     "n_pending_one": "{{count}} ausstehend",
     "n_pending_other": "{{count}} ausstehend",
     "total_events_one": "{{count}}-Ereignisse",
-    "total_events_other": "{{count}}-Ereignisse"
+    "total_events_other": "{{count}}-Ereignisse",
+    "provider_mock": "Scheinanbieter",
+    "provider_idenfy": "iDenfy",
+    "provider_unknown": "Unbekannter Anbieter",
+    "actor_type_system": "System",
+    "actor_type_user": "Benutzer",
+    "actor_type_admin": "Administrator",
+    "actor_type_webhook": "Webhook",
+    "actor_type_unknown": "Unbekannter Akteur",
+    "status_unknown": "Unbekannter Status",
+    "provider_stripe_identity": "Stripe Identität",
+    "provider_veriff": "Veriff",
+    "provider_jumio": "Jumio",
+    "provider_onfido": "Onfido"
   },
   "cancel": "Abbrechen"
 }

@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentRatio, getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -129,13 +129,13 @@ function fmtDate(s: string | null, empty: string): string {
 function durationMs(run: AgentRun, empty: string): string {
   if (!run.started_at || !run.completed_at) return empty;
   const ms = new Date(run.completed_at).getTime() - new Date(run.started_at).getTime();
-  if (ms < 1000) return `${ms}ms`;
-  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
-  return `${Math.round(ms / 60000)}m`;
-}
-
-function identifierLabel(value: string): string {
-  return value.replace(/_/g, ' ');
+  if (ms < 1000) {
+    return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'millisecond', unitDisplay: 'short' }).format(ms);
+  }
+  if (ms < 60000) {
+    return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'second', unitDisplay: 'short', maximumFractionDigits: 1 }).format(ms / 1000);
+  }
+  return new Intl.NumberFormat(getFormattingLocale(), { style: 'unit', unit: 'minute', unitDisplay: 'short' }).format(Math.round(ms / 60000));
 }
 
 const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''] as const;
@@ -293,7 +293,7 @@ export default function KiAgentAdminPage() {
         toast.success(t('ai.ki_agents.toasts.proposal_approved'));
         void fetchProposals();
       } else {
-        toast.error(res.error || t('ai.ki_agents.toasts.proposal_approve_failed'));
+        toast.error(t('ai.ki_agents.toasts.proposal_approve_failed'));
       }
     } catch {
       toast.error(t('ai.ki_agents.toasts.proposal_approve_failed'));
@@ -307,7 +307,7 @@ export default function KiAgentAdminPage() {
         toast.success(t('ai.ki_agents.toasts.proposal_rejected'));
         void fetchProposals();
       } else {
-        toast.error(res.error || t('ai.ki_agents.toasts.proposal_reject_failed'));
+        toast.error(t('ai.ki_agents.toasts.proposal_reject_failed'));
       }
     } catch {
       toast.error(t('ai.ki_agents.toasts.proposal_reject_failed'));
@@ -341,13 +341,14 @@ export default function KiAgentAdminPage() {
 
   const pendingCount = proposals.filter((p) => p.status === 'pending_review').length;
   const empty = t('ai.common.empty_dash');
-  const translatedIdentifier = (key: string, value: string) => {
+  const translatedIdentifier = (key: string) => {
     const label = t(key);
-    return label === key ? identifierLabel(value) : label;
+    return label === key ? t('ai.ki_agents.unknown_identifier') : label;
   };
-  const agentTypeText = (value: string) => translatedIdentifier(`ai.ki_agents.agent_types.${value}`, value);
-  const statusText = (value: string) => translatedIdentifier(`ai.ki_agents.status.${value}`, value);
-  const triggeredByText = (value: string) => translatedIdentifier(`ai.ki_agents.triggered_by.${value}`, value);
+  const agentTypeText = (value: string) => translatedIdentifier(`ai.ki_agents.agent_types.${value}`);
+  const statusText = (value: string) => translatedIdentifier(`ai.ki_agents.status.${value}`);
+  const triggeredByText = (value: string) => translatedIdentifier(`ai.ki_agents.triggered_by.${value}`);
+  const proposalTypeText = (value: string) => translatedIdentifier(`ai.ki_agents.proposal_types.${value}`);
 
   return (
     <div className="space-y-6 p-6">
@@ -460,7 +461,7 @@ export default function KiAgentAdminPage() {
                 <div>
                   <p className="text-sm mb-2">
                     {t('ai.ki_agents.config.auto_apply_threshold')}{' '}
-                    <strong>{(mergedConfig.auto_apply_threshold * 100).toFixed(0)}%</strong>
+                    <strong>{formatPercentRatio(mergedConfig.auto_apply_threshold, { maximumFractionDigits: 0 })}</strong>
                   </p>
                   <Slider
                     minValue={0}
@@ -612,14 +613,14 @@ export default function KiAgentAdminPage() {
                 {proposals.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <span className="font-mono text-xs">{p.proposal_type}</span>
+                      <span className="text-xs">{proposalTypeText(p.proposal_type)}</span>
                     </TableCell>
                     <TableCell>{p.subject_user_id ?? empty}</TableCell>
                     <TableCell>{p.target_user_id ?? empty}</TableCell>
                     <TableCell>
                       {p.confidence_score !== null ? (
                         <Chip size="sm" color={confidenceColor(p.confidence_score)}>
-                          {(p.confidence_score * 100).toFixed(0)}%
+                          {formatPercentRatio(p.confidence_score, { maximumFractionDigits: 0 })}
                         </Chip>
                       ) : (
                         empty
@@ -847,13 +848,13 @@ export default function KiAgentAdminPage() {
                             {selectedRun.proposals.map((p) => (
                               <TableRow key={p.id}>
                                 <TableCell>
-                                  <span className="font-mono text-xs">{p.proposal_type}</span>
+                                  <span className="text-xs">{proposalTypeText(p.proposal_type)}</span>
                                 </TableCell>
                                 <TableCell>{p.subject_user_id ?? empty}</TableCell>
                                 <TableCell>
                                   {p.confidence_score !== null ? (
                                     <Chip size="sm" color={confidenceColor(p.confidence_score)}>
-                                      {(p.confidence_score * 100).toFixed(0)}%
+                                      {formatPercentRatio(p.confidence_score, { maximumFractionDigits: 0 })}
                                     </Chip>
                                   ) : (
                                     empty

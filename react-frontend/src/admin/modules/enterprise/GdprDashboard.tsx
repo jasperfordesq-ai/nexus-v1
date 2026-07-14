@@ -23,6 +23,7 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTenant } from '@/contexts';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
+import { formatPercentValue } from '@/lib/helpers';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { StatCard } from '../../components/StatCard';
@@ -62,7 +63,7 @@ function ComplianceScoreRing({ score, size = 120, scoreLabel }: { score: number;
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-2xl font-bold ${color}`}>{score}%</span>
+        <span className={`text-2xl font-bold ${color}`}>{formatPercentValue(score)}</span>
         <span className="text-xs text-muted">{scoreLabel}</span>
       </div>
     </div>
@@ -209,7 +210,7 @@ export function GdprDashboard() {
           />
           <StatCard
             label={t('enterprise.gdpr_consent_coverage')}
-            value={`${consentCoverage.toFixed(0)}%`}
+            value={formatPercentValue(consentCoverage, { maximumFractionDigits: 0 })}
             icon={UserCheck}
             loading={loading}
           />
@@ -251,8 +252,8 @@ export function GdprDashboard() {
               <p className="text-sm font-semibold text-foreground mb-3">{t('enterprise.gdpr_requests_by_type')}</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(statistics.requests_by_type || {}).map(([type, count]) => (
-                  <Chip key={type} size="sm" variant="soft" className="capitalize">
-                    {type}: {count}
+                  <Chip key={type} size="sm" variant="soft">
+                    {t(`enterprise.gdpr_type_${type}`, { defaultValue: t('enterprise.gdpr_type_unknown') })}: {count}
                   </Chip>
                 ))}
                 {Object.keys(statistics.requests_by_type || {}).length === 0 && (

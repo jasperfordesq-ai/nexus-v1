@@ -23,6 +23,11 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import type { Column } from '../../components/DataTable';
 import type { Role } from '../../api/types';
 import { Button, Chip } from '@/components/ui';
+import {
+  caringRolePresetDescription,
+  caringRolePresetKey,
+  caringRolePresetName,
+} from './caringRolePresetTranslations';
 
 export function RoleList() {
   const { t } = useTranslation('admin_enterprise');
@@ -67,7 +72,7 @@ export function RoleList() {
         setDeleteTarget(null);
         loadRoles();
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.failed_to_delete_role');
+        const error = t('enterprise.failed_to_delete_role');
         toast.error(error);
       }
     } catch {
@@ -85,12 +90,23 @@ export function RoleList() {
       render: (role) => (
         <div className="flex items-center gap-2">
           <Shield size={16} className="text-accent" />
-          <span className="font-medium">{role.name}</span>
+          <span className="font-medium">
+            {caringRolePresetKey(role.name)
+              ? caringRolePresetName(t, caringRolePresetKey(role.name)!)
+              : role.name}
+          </span>
         </div>
       ),
     },
     { key: 'slug', label: t('enterprise.col_slug'), sortable: true },
-    { key: 'description', label: t('enterprise.col_description') },
+    {
+      key: 'description',
+      label: t('enterprise.col_description'),
+      render: (role) => {
+        const presetKey = caringRolePresetKey(role.name);
+        return presetKey ? caringRolePresetDescription(t, presetKey) : role.description;
+      },
+    },
     {
       key: 'permissions',
       label: t('enterprise.col_permissions'),

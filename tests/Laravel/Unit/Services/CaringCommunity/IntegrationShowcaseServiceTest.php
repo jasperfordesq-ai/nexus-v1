@@ -76,16 +76,15 @@ class IntegrationShowcaseServiceTest extends TestCase
         }
     }
 
-    public function test_all_sections_have_id_title_and_icon(): void
+    public function test_all_sections_have_language_neutral_id_and_icon(): void
     {
         $sections = $this->service()->showcase()['sections'];
 
         foreach ($sections as $section) {
             $this->assertArrayHasKey('id', $section, "Section missing 'id'");
-            $this->assertArrayHasKey('title', $section, "Section '{$section['id']}' missing 'title'");
             $this->assertArrayHasKey('icon', $section, "Section '{$section['id']}' missing 'icon'");
-            $this->assertNotEmpty($section['title']);
             $this->assertNotEmpty($section['icon']);
+            $this->assertArrayNotHasKey('title', $section);
         }
     }
 
@@ -105,9 +104,8 @@ class IntegrationShowcaseServiceTest extends TestCase
         $methods = array_column($openapi['items'], 'method');
         $this->assertSame(['GET', 'GET'], $methods);
 
-        $labels = array_column($openapi['items'], 'label');
-        $this->assertContains('JSON', $labels);
-        $this->assertContains('YAML', $labels);
+        $codes = array_column($openapi['items'], 'code');
+        $this->assertSame(['openapi_json', 'openapi_yaml'], $codes);
     }
 
     public function test_openapi_section_has_docs_link(): void
@@ -184,13 +182,12 @@ class IntegrationShowcaseServiceTest extends TestCase
         $this->assertContains('DELETE', $methods);
     }
 
-    public function test_webhooks_section_has_verification_note_mentioning_hmac(): void
+    public function test_webhooks_section_has_semantic_verification_note_code(): void
     {
         $sections = $this->service()->showcase()['sections'];
         $webhooks = $this->findSection($sections, 'webhooks');
 
-        $this->assertArrayHasKey('verification_note', $webhooks);
-        $this->assertStringContainsString('HMAC', $webhooks['verification_note']);
+        $this->assertSame('webhook_signature', $webhooks['verification_note_code']);
     }
 
     // -------------------------------------------------------------------------
@@ -243,8 +240,8 @@ class IntegrationShowcaseServiceTest extends TestCase
         $checklist = $this->findSection($sections, 'partner_checklist');
 
         $this->assertNotNull($checklist, 'partner_checklist section not found');
-        $this->assertArrayHasKey('checklist', $checklist);
-        $this->assertGreaterThanOrEqual(5, count($checklist['checklist']));
+        $this->assertArrayHasKey('checklist_codes', $checklist);
+        $this->assertGreaterThanOrEqual(5, count($checklist['checklist_codes']));
     }
 
     public function test_checklist_items_are_non_empty_strings(): void
@@ -252,7 +249,7 @@ class IntegrationShowcaseServiceTest extends TestCase
         $sections  = $this->service()->showcase()['sections'];
         $checklist = $this->findSection($sections, 'partner_checklist');
 
-        foreach ($checklist['checklist'] as $i => $item) {
+        foreach ($checklist['checklist_codes'] as $i => $item) {
             $this->assertIsString($item, "Checklist item {$i} is not a string.");
             $this->assertNotEmpty($item, "Checklist item {$i} is empty.");
         }

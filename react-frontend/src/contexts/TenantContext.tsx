@@ -447,7 +447,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         setState({
           tenant: null,
           isLoading: false,
-          error: response.error ?? 'TENANT_NOT_FOUND',
+          error: response.code ?? 'TENANT_NOT_FOUND',
           notFoundSlug: effectiveTenantSlug,
         });
       } else {
@@ -459,18 +459,18 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
             !effectiveTenantSlug || prev.tenant.slug === effectiveTenantSlug
           ) ? prev.tenant : null,
           isLoading: false,
-          error: response.error ?? response.code ?? 'TENANT_BOOTSTRAP_FAILED',
+          error: response.code ?? 'TENANT_BOOTSTRAP_FAILED',
           notFoundSlug: null,
         }));
       }
-    } catch (err) {
+    } catch {
       setTelemetryTenant(null);
       setState((prev) => ({
         tenant: prev.tenant && (
           !effectiveTenantSlug || prev.tenant.slug === effectiveTenantSlug
         ) ? prev.tenant : null,
         isLoading: false,
-        error: err instanceof Error ? err.message : 'TENANT_BOOTSTRAP_FAILED',
+        error: 'TENANT_BOOTSTRAP_FAILED', // admin-i18n-ignore: stable control-flow error code, localized by the consuming screen
         notFoundSlug: null,
         }));
     }

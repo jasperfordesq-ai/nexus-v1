@@ -286,7 +286,6 @@
     "reviews_intro": "Enregistrez les décisions contrôlées sans notes en texte libre, coordonnées ou enregistrements d'incidents.",
     "review_member": "Participant à l'événement",
     "review_member_choose": "Choisissez un participant",
-    "member_fallback": "Numéro de membre : id",
     "review_decision": "Décision",
     "decisions": {
       "deny": "Refuser la participation",
@@ -319,6 +318,7 @@
     },
     "reviewed_by": "Révisé par",
     "withdraw_review": "Retirer la décision",
-    "ledger_empty": "Aucun avis de participation n'a été enregistré pour cet événement."
+    "ledger_empty": "Aucun avis de participation n'a été enregistré pour cet événement.",
+    "member_fallback": "Membre #:id"
   }
 }

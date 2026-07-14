@@ -88,7 +88,7 @@ export function Redirects() {
         onAddClose();
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || t('failed_to_create_redirect');
+        const error = t('failed_to_create_redirect');
         toast.error(error);
       }
     } catch {
@@ -109,7 +109,7 @@ export function Redirects() {
         setDeleteTarget(null);
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || t('failed_to_delete_redirect');
+        const error = t('failed_to_delete_redirect');
         toast.error(error);
       }
     } catch {

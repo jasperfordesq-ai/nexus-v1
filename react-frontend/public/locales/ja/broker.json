@@ -170,7 +170,10 @@
     "time_days_ago": "{{count}}日前",
     "time_minutes_ago_other": "{{count}}分前",
     "time_hours_ago_other": "{{count}}時間前",
-    "time_days_ago_other": "{{count}}日前"
+    "time_days_ago_other": "{{count}}日前",
+    "time_minutes_ago_one": "{{count}} 分前",
+    "time_hours_ago_one": "{{count}}前",
+    "time_days_ago_one": "{{count}}日前"
   },
   "members": {
     "title": "メンバー",
@@ -277,7 +280,11 @@
     "time_minutes_ago_other": "{{count}}分前",
     "time_hours_ago_other": "{{count}}時間前",
     "time_days_ago_other": "{{count}}日前",
-    "bulk_selected_other": "{{count}}件選択中"
+    "bulk_selected_other": "{{count}}件選択中",
+    "time_minutes_ago_one": "{{count}} 分前",
+    "time_hours_ago_one": "{{count}}前",
+    "time_days_ago_one": "{{count}}日前",
+    "bulk_selected_one": "{{count}} 選択済み"
   },
   "onboarding": {
     "title": "オンボーディング",
@@ -306,7 +313,10 @@
     "members_error_title": "保留中のメンバーを読み込めませんでした",
     "members_error_hint": "承認キューの読み込みに失敗しました。再試行して取得し直してください。",
     "retry": "再試行",
-    "empty_pending_title": "すべて対応済み"
+    "empty_pending_title": "すべて対応済み",
+    "stage_first_listing": "初めての出品",
+    "stage_repeat_user": "リピートユーザー",
+    "stage_unknown": "不明なステージ"
   },
   "safeguarding": {
     "title": "セーフガーディング",
@@ -740,7 +750,8 @@
     "detail_not_found_hint": "メッセージコピーがアーカイブまたは削除されたか、リンクが間違っている可能性があります。",
     "detail_flag_banner_title": "レビュー用にフラグ付き",
     "detail_decision_prompt": "このメッセージコピーのレビュー決定を記録してください。",
-    "detail_message_count_other": "{{count}}件のメッセージ"
+    "detail_message_count_other": "{{count}}件のメッセージ",
+    "detail_message_count_one": "{{count}} メッセージ"
   },
   "monitoring": {
     "title": "ユーザー監視",
@@ -1070,7 +1081,8 @@
     "frozen_note": "この記録はレビュー時のまま正確に保存されており、変更できません。",
     "record_id": "記録 #{{id}}",
     "record_unavailable": "記録は利用できません",
-    "messages_count_other": "{{count}}件のメッセージ"
+    "messages_count_other": "{{count}}件のメッセージ",
+    "messages_count_one": "{{count}} メッセージ"
   },
   "configuration": {
     "title": "ブローカー設定",
@@ -1108,7 +1120,7 @@
     "field_show_broker_name_help": "割り当てられたブローカーの名前をメンバーに表示します。",
     "field_broker_contact_email_label": "ブローカーの連絡先メール",
     "field_broker_contact_email_help": "ブローカーへの問い合わせ用の公開連絡先メールアドレス。",
-    "field_broker_contact_email_placeholder": "ブローカー@example.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "ブローカーの連絡先メール",
     "field_broker_approval_required_label": "ブローカー承認が必要",
     "field_broker_approval_required_help": "交換を進める前にブローカーの承認を要求します。",
@@ -1270,7 +1282,8 @@
     "pending_confirmation": "確認待ち",
     "confirmed": "確認済み",
     "review_requested": "レビューが要求されました",
-    "not_confirmed": "未確認"
+    "not_confirmed": "未確認",
+    "unknown": "不明"
   },
   "common": {
     "loading": "読み込み中…",

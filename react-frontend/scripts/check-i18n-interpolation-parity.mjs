@@ -12,6 +12,7 @@
 
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const frontendRoot = resolve(import.meta.dirname, '..');
 const localesRoot = resolve(frontendRoot, 'public/locales');
@@ -29,11 +30,26 @@ function flattenStrings(object, prefix = '', result = new Map()) {
   return result;
 }
 
-function interpolationSignature(value) {
-  return [...value.matchAll(/\{\{\s*([\w.-]+)(?:,[^}]*)?\s*\}\}/gu)]
-    .map((match) => match[1])
-    .sort()
-    .join('|');
+const i18nextInterpolationPattern = /\{\{\s*([\w.-]+)(?:,[^}]*)?\s*\}\}/gu;
+
+// Laravel placeholders start at a token boundary and use an ASCII identifier.
+// Requiring the colon not to follow a letter, number, underscore, or another
+// colon excludes URL schemes (https://, mailto:name), compact prose labels
+// (Status:active), and scope-resolution syntax. Requiring an identifier as the
+// first character excludes clock times such as 09:30.
+const laravelInterpolationPattern = /(?<![\p{L}\p{N}_:]):([A-Za-z_][A-Za-z0-9_]*)(?![A-Za-z0-9_])/gu;
+
+export function interpolationTokens(value) {
+  const i18nextTokens = [...value.matchAll(i18nextInterpolationPattern)]
+    .map((match) => `{{${match[1]}}}`);
+  const laravelTokens = [...value.matchAll(laravelInterpolationPattern)]
+    .map((match) => `:${match[1]}`);
+
+  return [...i18nextTokens, ...laravelTokens].sort();
+}
+
+export function interpolationSignature(value) {
+  return interpolationTokens(value).join('|');
 }
 
 function describePluralKey(key) {
@@ -55,75 +71,83 @@ function familySignatures(strings, descriptor) {
   return signatures;
 }
 
-const locales = (await readdir(localesRoot, { withFileTypes: true }))
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
-const namespaces = (await readdir(resolve(localesRoot, 'en')))
-  .filter((file) => file.endsWith('.json'))
-  .sort();
+async function checkInterpolationParity() {
+  const locales = (await readdir(localesRoot, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  const namespaces = (await readdir(resolve(localesRoot, 'en')))
+    .filter((file) => file.endsWith('.json'))
+    .sort();
 
-const resources = new Map();
-let filesParsed = 0;
-for (const locale of locales) {
-  const localeResources = new Map();
-  for (const namespaceFile of namespaces) {
-    const path = resolve(localesRoot, locale, namespaceFile);
-    const raw = await readFile(path, 'utf8');
-    const parsed = JSON.parse(raw);
-    localeResources.set(namespaceFile.slice(0, -'.json'.length), flattenStrings(parsed));
-    filesParsed += 1;
+  const resources = new Map();
+  let filesParsed = 0;
+  for (const locale of locales) {
+    const localeResources = new Map();
+    for (const namespaceFile of namespaces) {
+      const path = resolve(localesRoot, locale, namespaceFile);
+      const raw = await readFile(path, 'utf8');
+      const parsed = JSON.parse(raw);
+      localeResources.set(namespaceFile.slice(0, -'.json'.length), flattenStrings(parsed));
+      filesParsed += 1;
+    }
+    resources.set(locale, localeResources);
   }
-  resources.set(locale, localeResources);
-}
 
-const mismatches = [];
-let exactValuesChecked = 0;
-let localePluralValuesChecked = 0;
-const englishResources = resources.get('en');
+  const mismatches = [];
+  let exactValuesChecked = 0;
+  let localePluralValuesChecked = 0;
+  const englishResources = resources.get('en');
 
-for (const locale of locales.filter((value) => value !== 'en')) {
-  for (const [namespace, englishStrings] of englishResources) {
-    const targetStrings = resources.get(locale).get(namespace);
-    for (const [key, targetValue] of targetStrings) {
-      const targetSignature = interpolationSignature(targetValue);
-      const englishValue = englishStrings.get(key);
-      if (englishValue !== undefined) {
-        exactValuesChecked += 1;
-        const englishSignature = interpolationSignature(englishValue);
-        if (targetSignature !== englishSignature) {
-          mismatches.push({ locale, namespace, key, expected: englishSignature, actual: targetSignature });
+  for (const locale of locales.filter((value) => value !== 'en')) {
+    for (const [namespace, englishStrings] of englishResources) {
+      const targetStrings = resources.get(locale).get(namespace);
+      for (const [key, targetValue] of targetStrings) {
+        const targetSignature = interpolationSignature(targetValue);
+        const englishValue = englishStrings.get(key);
+        if (englishValue !== undefined) {
+          exactValuesChecked += 1;
+          const englishSignature = interpolationSignature(englishValue);
+          if (targetSignature !== englishSignature) {
+            mismatches.push({ locale, namespace, key, expected: englishSignature, actual: targetSignature });
+          }
+          continue;
         }
-        continue;
-      }
 
-      const descriptor = describePluralKey(key);
-      if (!descriptor) continue;
-      const expectedSignatures = familySignatures(englishStrings, descriptor);
-      if (expectedSignatures.size === 0) continue;
-      localePluralValuesChecked += 1;
-      if (!expectedSignatures.has(targetSignature)) {
-        mismatches.push({
-          locale,
-          namespace,
-          key,
-          expected: [...expectedSignatures].sort().join(' OR '),
-          actual: targetSignature,
-        });
+        const descriptor = describePluralKey(key);
+        if (!descriptor) continue;
+        const expectedSignatures = familySignatures(englishStrings, descriptor);
+        if (expectedSignatures.size === 0) continue;
+        localePluralValuesChecked += 1;
+        if (!expectedSignatures.has(targetSignature)) {
+          mismatches.push({
+            locale,
+            namespace,
+            key,
+            expected: [...expectedSignatures].sort().join(' OR '),
+            actual: targetSignature,
+          });
+        }
       }
     }
   }
+
+  console.log(`Parsed ${filesParsed} locale JSON files.`);
+  console.log(`Checked ${exactValuesChecked} exact translated values and ${localePluralValuesChecked} locale-specific plural values.`);
+  if (mismatches.length > 0) {
+    console.error(`Found ${mismatches.length} interpolation mismatch(es):`);
+    for (const mismatch of mismatches) {
+      console.error(
+        `  ${mismatch.locale}/${mismatch.namespace}:${mismatch.key} expected [${mismatch.expected || '(none)'}] but found [${mismatch.actual || '(none)'}]`,
+      );
+    }
+    process.exitCode = 1;
+    return;
+  }
+  console.log('Interpolation parity passed.');
 }
 
-console.log(`Parsed ${filesParsed} locale JSON files.`);
-console.log(`Checked ${exactValuesChecked} exact translated values and ${localePluralValuesChecked} locale-specific plural values.`);
-if (mismatches.length > 0) {
-  console.error(`Found ${mismatches.length} interpolation mismatch(es):`);
-  for (const mismatch of mismatches) {
-    console.error(
-      `  ${mismatch.locale}/${mismatch.namespace}:${mismatch.key} expected {${mismatch.expected}} but found {${mismatch.actual}}`,
-    );
-  }
-  process.exit(1);
+const invokedPath = process.argv[1] ? resolve(process.argv[1]) : null;
+if (invokedPath === fileURLToPath(import.meta.url)) {
+  await checkInterpolationParity();
 }
-console.log('Interpolation parity passed.');

@@ -92,7 +92,8 @@
     "sort_label": "アイデアを並べ替え",
     "loading": "アイデアを読み込んでいます...",
     "your_ideas_other": "あなたのアイデア: {{count}}/{{max}}",
-    "comments_other": "{{count}} コメント"
+    "comments_other": "{{count}} コメント",
+    "your_ideas_one": "あなたのアイデア: {{count}}/{{max}}"
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",

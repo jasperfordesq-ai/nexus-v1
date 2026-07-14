@@ -58,7 +58,9 @@ vi.mock('../../components', () => ({
 // ─── fixtures ─────────────────────────────────────────────────────────────────
 const makeJob = (overrides = {}) => ({
   id: 1,
-  name: 'Send Notifications',
+  slug: 'daily-digest',
+  translation_key: 'daily_digest',
+  name: 'SERVER COPY MUST NOT RENDER',
   command: 'php artisan notifications:send',
   schedule: '*/5 * * * *',
   status: 'active',
@@ -66,7 +68,7 @@ const makeJob = (overrides = {}) => ({
   last_run_at: new Date(Date.now() - 60000).toISOString(),
   next_run_at: new Date(Date.now() + 240000).toISOString(),
   category: 'notifications',
-  description: 'Dispatches pending notifications',
+  description: 'SERVER DESCRIPTION MUST NOT RENDER',
   ...overrides,
 });
 
@@ -105,7 +107,7 @@ describe('CronJobs', () => {
       expect(spinners.find((el) => el.getAttribute('aria-busy') === 'true')).toBeUndefined();
     });
     // page still renders (no crash); empty state text is i18n key
-    expect(screen.queryByText('Send Notifications')).not.toBeInTheDocument();
+    expect(screen.queryByText('Daily digest')).not.toBeInTheDocument();
   });
 
   it('renders job name and schedule when jobs are present', async () => {
@@ -113,7 +115,7 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
     await waitFor(() => {
-      expect(screen.getByText('Send Notifications')).toBeInTheDocument();
+      expect(screen.getByText('Daily digest')).toBeInTheDocument();
     });
     expect(screen.getByText('*/5 * * * *')).toBeInTheDocument();
   });
@@ -132,8 +134,10 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
     await waitFor(() => {
-      expect(screen.getByText('Dispatches pending notifications')).toBeInTheDocument();
+      expect(screen.getByText('Sends daily notification digest emails to members who selected daily delivery.')).toBeInTheDocument();
     });
+    expect(screen.queryByText('SERVER COPY MUST NOT RENDER')).not.toBeInTheDocument();
+    expect(screen.queryByText('SERVER DESCRIPTION MUST NOT RENDER')).not.toBeInTheDocument();
   });
 
   it('renders health score from health metrics', async () => {
@@ -196,7 +200,7 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
 
-    await waitFor(() => expect(screen.getByText('Send Notifications')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Daily digest')).toBeInTheDocument());
 
     const runBtn = screen.queryAllByRole('button').find(
       (b) => b.textContent?.toLowerCase().includes('run'),
@@ -215,7 +219,7 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
 
-    await waitFor(() => expect(screen.getByText('Send Notifications')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Daily digest')).toBeInTheDocument());
 
     const runBtn = screen.queryAllByRole('button').find(
       (b) => b.textContent?.toLowerCase().includes('run'),
@@ -233,7 +237,7 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
 
-    await waitFor(() => expect(screen.getByText('Send Notifications')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Daily digest')).toBeInTheDocument());
 
     const runBtn = screen.queryAllByRole('button').find(
       (b) => b.textContent?.toLowerCase().includes('run'),
@@ -250,7 +254,7 @@ describe('CronJobs', () => {
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
 
-    await waitFor(() => expect(screen.getByText('Send Notifications')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Daily digest')).toBeInTheDocument());
 
     const runBtn = screen.queryAllByRole('button').find(
       (b) => b.textContent?.toLowerCase().includes('run'),
@@ -268,18 +272,18 @@ describe('CronJobs', () => {
     mockAdminSystem.getCronJobs.mockResolvedValue({
       success: true,
       data: [
-        makeJob({ id: 1, category: 'notifications', name: 'Job A' }),
-        makeJob({ id: 2, category: 'matching', name: 'Job B' }),
+        makeJob({ id: 1, slug: 'daily-digest', translation_key: 'daily_digest', category: 'notifications' }),
+        makeJob({ id: 2, slug: 'notify-hot-matches', translation_key: 'notify_hot_matches', category: 'matching' }),
       ],
     });
     const { CronJobs } = await import('./CronJobs');
     render(<CronJobs />);
     await waitFor(() => {
-      expect(screen.getByText('Job A')).toBeInTheDocument();
-      expect(screen.getByText('Job B')).toBeInTheDocument();
+      expect(screen.getByText('Daily digest')).toBeInTheDocument();
+      expect(screen.getByText('Hot match notifications')).toBeInTheDocument();
     });
     // Category chips appear
-    expect(screen.getByText('notifications')).toBeInTheDocument();
-    expect(screen.getByText('matching')).toBeInTheDocument();
+    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Matching')).toBeInTheDocument();
   });
 });

@@ -118,6 +118,8 @@
     "question_placeholder": "e.g. How do I earn time credits?",
     "answer_placeholder": "Write the answer members will see...",
     "category_placeholder": "General",
+    "category_value": "{{category}}",
+    "default_category": "General",
     "publish_toggle_aria": "Toggle publish state for \"{{question}}\"",
     "save": "Save changes",
     "create": "Create FAQ"

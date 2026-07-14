@@ -49,5 +49,23 @@
   "extend_session": "Prolonger la session",
   "dismiss": "Fermer",
   "idle_logout_title": "Déconnecté pour cause d'inactivité",
-  "idle_logout_message": "Vous avez été déconnecté automatiquement après une période d'inactivité. Veuillez vous reconnecter pour continuer."
+  "idle_logout_message": "Vous avez été déconnecté automatiquement après une période d'inactivité. Veuillez vous reconnecter pour continuer.",
+  "api": {
+    "request_failed_title": "La requête a échoué",
+    "request_failed": "La demande n'a pas pu être complétée.",
+    "service_unavailable": "Le service est temporairement indisponible. Veuillez réessayer plus tard.",
+    "invalid_response": "Le serveur a renvoyé une réponse invalide.",
+    "request_timeout": "Le délai de la demande est dépassé. Veuillez réessayer.",
+    "network_error": "Impossible de se connecter. Veuillez vérifier votre connexion Internet et réessayer.",
+    "invalid_request": "La requête était invalide. Veuillez vérifier votre saisie.",
+    "permission_denied": "Vous n'avez pas la permission d'effectuer cette action.",
+    "resource_not_found": "La ressource demandée est introuvable.",
+    "too_many_requests": "Trop de requêtes. Veuillez patienter un moment et réessayer.",
+    "server_error": "Une erreur serveur inattendue est survenue. Veuillez réessayer plus tard.",
+    "download_failed_status": "Échec du téléchargement (HTTP {{status}}).",
+    "upload_failed": "Échec de l'envoi.",
+    "upload_failed_retry": "Échec de l'envoi. Veuillez réessayer.",
+    "upload_cancelled": "Envoi annulé.",
+    "upload_timeout": "Le délai d'envoi a été dépassé. Veuillez réessayer."
+  }
 }

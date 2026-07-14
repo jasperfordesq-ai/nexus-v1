@@ -24,6 +24,14 @@ import type { SuperAuditEntry } from '../../api/types';
 
 const PAGE_SIZE = 25;
 
+const auditDisplayKeys: Record<string, string> = {
+  bulk_users_move_target: 'super.audit_display.bulk_users_move_target',
+  bulk_users_moved: 'super.audit_display.bulk_users_moved',
+  bulk_users_moved_with_super_admin: 'super.audit_display.bulk_users_moved_with_super_admin',
+  bulk_tenants_update_target: 'super.audit_display.bulk_tenants_update_target',
+  bulk_tenants_updated: 'super.audit_display.bulk_tenants_updated',
+};
+
 export default function SuperAuditLog() {
   const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
@@ -88,6 +96,47 @@ export default function SuperAuditLog() {
   };
 
   const hasFilters = !!(search || actionType || targetType || dateFrom || dateTo);
+  const actionLabel = (action: string) => t(`super.audit_action_${action}`, {
+    defaultValue: t('super.audit_action_unknown'),
+  });
+  const targetTypeLabel = (target: string) => t(`super.target_type_${target}`, {
+    defaultValue: t('super.target_type_unknown'),
+  });
+  const localizeAuditParams = (params?: Record<string, string | number>) => {
+    const localized = { ...(params ?? {}) };
+    if (typeof localized.action === 'string') {
+      localized.action = t(`super.audit_bulk_action.${localized.action}`, {
+        defaultValue: t('super.audit_bulk_action.unknown'),
+      });
+    }
+    return localized;
+  };
+  const auditDisplay = (
+    code: string | null | undefined,
+    params: Record<string, string | number> | undefined,
+    legacy: string | null,
+  ): string => {
+    if (code) {
+      const key = auditDisplayKeys[code];
+      return key
+        ? t(key, localizeAuditParams(params))
+        : t('super.audit_display.unknown', { code });
+    }
+
+    // Historical rows stored localized/free-form prose. New rows always carry
+    // a stable display code and never use this compatibility fallback.
+    return legacy || '—';
+  };
+  const targetLabel = (entry: SuperAuditEntry) => auditDisplay(
+    entry.target_label_code,
+    entry.target_label_params,
+    entry.target_label,
+  );
+  const description = (entry: SuperAuditEntry) => auditDisplay(
+    entry.description_code,
+    entry.description_params,
+    entry.description,
+  );
 
   const exportCsv = () => {
     if (logs.length === 0) return;
@@ -102,11 +151,11 @@ export default function SuperAuditLog() {
     ];
     const rows = logs.map((entry) => [
       entry.id,
-      entry.action_type,
-      entry.target_type,
-      entry.target_label,
+      actionLabel(entry.action_type),
+      targetTypeLabel(entry.target_type),
+      targetLabel(entry),
       entry.actor_name || t('super.user_with_id', { id: entry.actor_id }),
-      `"${(entry.description || '').replace(/"/g, '""')}"`,
+      `"${description(entry).replace(/"/g, '""')}"`,
       entry.created_at,
     ]);
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
@@ -136,12 +185,12 @@ export default function SuperAuditLog() {
           <div>
             {targetLink ? (
               <Link to={targetLink} className="font-medium text-foreground hover:text-accent">
-                {entry.target_label}
+                {targetLabel(entry)}
               </Link>
             ) : (
-              <span className="font-medium">{entry.target_label}</span>
+              <span className="font-medium">{targetLabel(entry)}</span>
             )}
-            <span className="text-xs text-muted ml-2">({entry.target_type})</span>
+            <span className="text-xs text-muted ml-2">({targetTypeLabel(entry.target_type)})</span>
           </div>
         );
       },
@@ -158,7 +207,7 @@ export default function SuperAuditLog() {
     },
     {
       key: 'description', label: t('super.col_description'),
-      render: (entry) => <span className="text-sm text-muted">{entry.description}</span>,
+      render: (entry) => <span className="text-sm text-muted">{description(entry)}</span>,
     },
     {
       key: 'created_at', label: t('super.col_date'), sortable: true,

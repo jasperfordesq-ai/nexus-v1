@@ -23,22 +23,22 @@ class AchievementCampaignService
      * Campaign types.
      */
     public const TYPES = [
-        'one_time' => 'One Time - Award once to qualifying users',
-        'recurring' => 'Recurring - Award on schedule (daily/weekly/monthly)',
-        'triggered' => 'Triggered - Award when user meets conditions',
+        'one_time' => 'one_time',
+        'recurring' => 'recurring',
+        'triggered' => 'triggered',
     ];
 
     /**
      * Target audience options.
      */
     public const AUDIENCES = [
-        'all_users' => 'All Active Users',
-        'new_users' => 'New Users (joined in last 30 days)',
-        'active_users' => 'Active Users (logged in this week)',
-        'inactive_users' => 'Inactive Users (no login in 30+ days)',
-        'level_range' => 'Users at specific level range',
-        'badge_holders' => 'Users with specific badge',
-        'custom' => 'Custom filter (SQL)',
+        'all_users' => 'all_users',
+        'new_users' => 'new_users',
+        'active_users' => 'active_users',
+        'inactive_users' => 'inactive_users',
+        'level_range' => 'level_range',
+        'badge_holders' => 'badge_holders',
+        'custom' => 'custom',
     ];
 
     private static array $typeToDbMap = [

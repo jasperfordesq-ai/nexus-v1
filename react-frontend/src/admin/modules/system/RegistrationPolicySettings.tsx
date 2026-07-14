@@ -240,7 +240,7 @@ export function RegistrationPolicySettings() {
         setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
         fetchData();
       } else {
-        toast.error(res.error || t('system.failed_to_save_credentials_please_check'));
+        toast.error(t('system.failed_to_save_credentials_please_check'));
       }
     } catch {
       toast.error(t('system.failed_to_save_credentials_please_check'));
@@ -262,7 +262,7 @@ export function RegistrationPolicySettings() {
         toast.success(t('system.reg.credentials_removed'));
         fetchData();
       } else {
-        toast.error(res.error || t('system.failed_to_remove_credentials'));
+        toast.error(t('system.failed_to_remove_credentials'));
       }
     } catch {
       toast.error(t('system.failed_to_remove_credentials'));
@@ -297,7 +297,7 @@ export function RegistrationPolicySettings() {
         toast.success(t('system.invite_code_deactivated'));
         fetchInviteCodes();
       } else {
-        toast.error(res.error || t('system.failed_to_deactivate_invite_code'));
+        toast.error(t('system.failed_to_deactivate_invite_code'));
       }
     } catch {
       toast.error(t('system.failed_to_deactivate_invite_code'));

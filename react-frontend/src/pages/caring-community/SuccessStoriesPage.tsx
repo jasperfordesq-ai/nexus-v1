@@ -13,6 +13,7 @@ import Award from 'lucide-react/icons/award';
 import Info from 'lucide-react/icons/info';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { CardBody, Card } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -30,6 +31,7 @@ type MetricSource = 'pilot_scoreboard' | 'municipal_roi' | 'manual';
 
 interface SuccessStory {
   id: string;
+  copy_code?: string | null;
   title: string;
   narrative: string;
   metric_source: MetricSource;
@@ -59,6 +61,18 @@ function formatValue(v: number | null, unit: string): string {
   if (v === null) return '—';
   const formatted = v.toLocaleString(getFormattingLocale());
   return unit ? `${formatted} ${unit}` : formatted;
+}
+
+function storyCopy(
+  story: SuccessStory,
+  field: 'title' | 'narrative' | 'method_caveat' | 'evidence_source',
+  t: TFunction,
+): string {
+  if (!story.copy_code) return story[field];
+
+  return t(`demo_stories.${story.copy_code}.${field}`, {
+    defaultValue: story[field],
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -156,7 +170,7 @@ export function SuccessStoriesPage() {
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <h2 className="text-lg font-semibold leading-tight text-theme-primary">
-                        {story.title}
+                        {storyCopy(story, 'title', t)}
                       </h2>
                       {story.is_demo && (
                         <Chip size="sm" color="warning" variant="flat">
@@ -194,7 +208,7 @@ export function SuccessStoriesPage() {
 
                   {/* Narrative */}
                   <p className="text-sm leading-relaxed text-theme-muted">
-                    {story.narrative}
+                    {storyCopy(story, 'narrative', t)}
                   </p>
 
                   {/* Audience */}
@@ -204,14 +218,14 @@ export function SuccessStoriesPage() {
                         {t('audience_label')}
                       </span>
                       <Chip size="sm" variant="flat" color="primary">
-                        {story.audience}
+                        {t(`audiences.${story.audience}`, { defaultValue: story.audience })}
                       </Chip>
                     </div>
                   )}
 
                   {/* Caveat + evidence */}
                   <div className="space-y-2 border-t border-[var(--color-border)] pt-3">
-                    {story.method_caveat && (
+                    {storyCopy(story, 'method_caveat', t) && (
                       <div className="flex items-start gap-2">
                         <Info
                           className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted"
@@ -221,14 +235,14 @@ export function SuccessStoriesPage() {
                           <span className="font-medium not-italic">
                             {t('caveat_label')}:{' '}
                           </span>
-                          {story.method_caveat}
+                          {storyCopy(story, 'method_caveat', t)}
                         </p>
                       </div>
                     )}
-                    {story.evidence_source && (
+                    {storyCopy(story, 'evidence_source', t) && (
                       <p className="text-[11px] text-muted">
                         <span className="font-medium">{t('evidence_label')}: </span>
-                        {story.evidence_source}
+                        {storyCopy(story, 'evidence_source', t)}
                       </p>
                     )}
                   </div>

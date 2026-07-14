@@ -457,7 +457,24 @@
     },
     "scroll_down": "Défiler vers le bas",
     "audience_cards": {
-      "title": "Par où aimeriez-vous commencer ?"
+      "title": "Par où aimeriez-vous commencer ?",
+      "defaults": {
+        "new_here": {
+          "title": "Nouveau ici ?",
+          "description": "Découvrez comment fonctionne notre communauté et comment vous impliquer.",
+          "cta": "Commencer"
+        },
+        "exchange": {
+          "title": "Offrir ou trouver de l'aide",
+          "description": "Parcourez ce que les gens proposent, ou publiez votre propre demande.",
+          "cta": "Parcourir les annonces"
+        },
+        "partner": {
+          "title": "Devenir partenaire ou recommander",
+          "description": "Pour les organisations, bailleurs de fonds et professionnels soutenant nos membres.",
+          "cta": "En savoir plus"
+        }
+      }
     },
     "how_it_works": {
       "title": "Comment ça marche",
@@ -595,7 +612,7 @@
       "name_label": "Nom",
       "name_placeholder": "Votre nom",
       "email_label": "E-mail",
-      "email_placeholder": "vous@exemple.ch",
+      "email_placeholder": "you@example.com",
       "subject_label": "Sujet",
       "subject_placeholder": "De quoi s'agit-il ?",
       "subjects": {

@@ -73,7 +73,7 @@ export default function AgentsAdminPage() {
         }));
         await fetchItems();
       } else {
-        toast.error(res.error || t('agents.definitions.toasts.toggle_failed'));
+        toast.error(t('agents.definitions.toasts.toggle_failed'));
       }
     } catch {
       toast.error(t('agents.definitions.toasts.toggle_failed'));
@@ -91,7 +91,7 @@ export default function AgentsAdminPage() {
       );
       const data = res.data;
       if (data?.error) {
-        toast.error(t('agents.definitions.toasts.run_failed_with_error', { error: data.error }));
+        toast.error(t('agents.definitions.toasts.run_failed'));
       } else {
         toast.success(t('agents.definitions.toasts.run_created', {
           runId: data?.run_id ?? t('agents.common.empty_dash'),
@@ -131,7 +131,7 @@ export default function AgentsAdminPage() {
         setEditing(null);
         await fetchItems();
       } else {
-        toast.error(res.error || t('agents.definitions.toasts.update_failed'));
+        toast.error(t('agents.definitions.toasts.update_failed'));
       }
     } catch {
       toast.error(t('agents.definitions.toasts.update_failed'));
@@ -188,7 +188,9 @@ export default function AgentsAdminPage() {
                 <Chip size="sm" variant="soft" color={def.is_enabled ? 'success' : 'default'}>
                   {t(def.is_enabled ? 'agents.status.enabled' : 'agents.status.disabled')}
                 </Chip>
-                <Chip size="sm" variant="soft">{def.agent_type}</Chip>
+                <Chip size="sm" variant="soft">
+                  {t(`agents.agent_type.${def.agent_type}`, { defaultValue: t('common.unknown') })}
+                </Chip>
                 {def.last_run_at && (
                   <Chip size="sm" variant="soft">
                     {t('agents.definitions.last_run', {

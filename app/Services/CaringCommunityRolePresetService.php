@@ -18,25 +18,23 @@ use Illuminate\Support\Facades\Schema;
 class CaringCommunityRolePresetService
 {
     private const PERMISSIONS = [
-        'caring.view' => ['View caring community workspace', 'Open caring-community dashboards and operating views.', 'caring'],
-        'caring.configure' => ['Configure caring community module', 'Manage caring-community settings and module controls.', 'caring'],
-        'caring.workflow.review' => ['Review caring workflow', 'Review caring-community queue items and workflow evidence.', 'caring'],
-        'caring.workflow.assign' => ['Assign caring workflow', 'Assign caring-community coordination work to trusted users.', 'caring'],
-        'caring.reports.view' => ['View caring reports', 'View municipal and Caring Community reports.', 'caring'],
-        'caring.reports.export' => ['Export caring reports', 'Export municipal and Caring Community evidence packs.', 'caring'],
-        'national.kiss_dashboard.view' => ['View National Caring Community dashboard', 'View the cross-cooperative national foundation dashboard (super-admin tool).', 'caring'],
-        'volunteering.hours.review' => ['Review volunteering hours', 'Approve or decline volunteer hour logs.', 'volunteering'],
-        'volunteering.organisations.manage' => ['Manage volunteering organisations', 'Manage trusted volunteering partner organisations.', 'volunteering'],
-        'volunteering.opportunities.manage' => ['Manage volunteering opportunities', 'Manage volunteering programs, opportunities, and rosters.', 'volunteering'],
-        'members.assisted_onboarding' => ['Assist member onboarding', 'Help members complete onboarding and coordinator-supported setup.', 'users'],
-        'safeguarding.view' => ['View safeguarding signals', 'View safeguarding and sensitive-care coordination signals.', 'safeguarding'],
-        'federation.nodes.view' => ['View federation nodes', 'View connected regional, canton, or cooperative nodes.', 'federation'],
+        'caring.view' => 'caring',
+        'caring.configure' => 'caring',
+        'caring.workflow.review' => 'caring',
+        'caring.workflow.assign' => 'caring',
+        'caring.reports.view' => 'caring',
+        'caring.reports.export' => 'caring',
+        'national.kiss_dashboard.view' => 'caring',
+        'volunteering.hours.review' => 'volunteering',
+        'volunteering.organisations.manage' => 'volunteering',
+        'volunteering.opportunities.manage' => 'volunteering',
+        'members.assisted_onboarding' => 'users',
+        'safeguarding.view' => 'safeguarding',
+        'federation.nodes.view' => 'federation',
     ];
 
     private const PRESETS = [
         'national_admin' => [
-            'display_name' => 'KISS National Foundation Admin',
-            'description' => 'Cross-program oversight, reporting standards, federation view, and network governance.',
             'level' => 90,
             'permissions' => [
                 'caring.view',
@@ -54,8 +52,6 @@ class CaringCommunityRolePresetService
             ],
         ],
         'canton_admin' => [
-            'display_name' => 'KISS Canton Admin',
-            'description' => 'Regional operating view, municipal coordination, reporting, and trusted partner oversight.',
             'level' => 80,
             'permissions' => [
                 'caring.view',
@@ -70,8 +66,6 @@ class CaringCommunityRolePresetService
             ],
         ],
         'municipality_admin' => [
-            'display_name' => 'KISS Municipality Admin',
-            'description' => 'Local participation, requests, organisations, and public-sector reporting.',
             'level' => 70,
             'permissions' => [
                 'caring.view',
@@ -84,8 +78,6 @@ class CaringCommunityRolePresetService
             ],
         ],
         'cooperative_coordinator' => [
-            'display_name' => 'KISS Cooperative Coordinator',
-            'description' => 'Member onboarding, matching, hour review, and sensitive support escalation.',
             'level' => 60,
             'permissions' => [
                 'caring.view',
@@ -97,8 +89,6 @@ class CaringCommunityRolePresetService
             ],
         ],
         'organisation_coordinator' => [
-            'display_name' => 'KISS Organisation Coordinator',
-            'description' => 'Opportunity management, volunteer rosters, logged hours, and partner activity.',
             'level' => 50,
             'permissions' => [
                 'caring.view',
@@ -108,8 +98,6 @@ class CaringCommunityRolePresetService
             ],
         ],
         'trusted_reviewer' => [
-            'display_name' => 'KISS Trusted Volunteer Reviewer',
-            'description' => 'Limited review authority for approved hour logs and community trust signals.',
             'level' => 40,
             'permissions' => [
                 'caring.view',
@@ -202,10 +190,14 @@ class CaringCommunityRolePresetService
 
     private function ensurePermissions(): array
     {
-        foreach (self::PERMISSIONS as $name => [$displayName, $description, $category]) {
+        foreach (self::PERMISSIONS as $name => $category) {
             DB::insert(
                 'INSERT IGNORE INTO permissions (name, display_name, description, category, tenant_id) VALUES (?, ?, ?, ?, NULL)',
-                [$name, $displayName, $description, $category]
+                [$name, $name, null, $category]
+            );
+            DB::update(
+                'UPDATE permissions SET display_name = ?, description = NULL, category = ? WHERE name = ? AND tenant_id IS NULL',
+                [$name, $category, $name]
             );
         }
 
@@ -227,11 +219,11 @@ class CaringCommunityRolePresetService
         $roleName = $this->roleName($tenantId, $key);
         DB::insert(
             'INSERT IGNORE INTO roles (name, display_name, description, level, is_system, tenant_id) VALUES (?, ?, ?, ?, 0, ?)',
-            [$roleName, $preset['display_name'], $preset['description'], $preset['level'], $tenantId]
+            [$roleName, $roleName, null, $preset['level'], $tenantId]
         );
         DB::update(
             'UPDATE roles SET display_name = ?, description = ?, level = ?, tenant_id = ? WHERE name = ?',
-            [$preset['display_name'], $preset['description'], $preset['level'], $tenantId, $roleName]
+            [$roleName, null, $preset['level'], $tenantId, $roleName]
         );
 
         return (int) DB::selectOne('SELECT id FROM roles WHERE name = ? LIMIT 1', [$roleName])->id;

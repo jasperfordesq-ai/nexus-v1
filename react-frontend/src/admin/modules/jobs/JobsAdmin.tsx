@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -265,7 +265,7 @@ export function JobsAdmin() {
     try {
       const res = await api.get<Application[]>(`/v2/admin/jobs/${job.id}/applications`);
       if (res.success) { setApplications(Array.isArray(res.data) ? res.data : []); }
-      else { setAppsError((res as { error?: string }).error ?? t('jobs.failed_load_applications')); }
+      else { setAppsError(t('jobs.failed_load_applications')); }
     } catch { setAppsError(t('jobs.failed_load_applications')); }
     finally { setAppsLoading(false); }
   }, [t]);
@@ -279,7 +279,7 @@ export function JobsAdmin() {
         toast.success(t('jobs.application_updated'));
         setApplications((prev) => prev.map((appl) => appl.id === appId ? { ...appl, status: newStatus, reviewer_notes: notes } : appl));
         loadJobs();
-      } else { toast.error((res as { error?: string }).error ?? t('jobs.failed_update_application')); }
+      } else { toast.error(t('jobs.failed_update_application')); }
     } catch { toast.error(t('jobs.unexpected_error')); }
   }, [toast, loadJobs, t]);
 
@@ -290,7 +290,7 @@ export function JobsAdmin() {
       if (res && res.success) {
         toast.success(job.is_featured ? t('jobs.removed_featured', { title: job.title }) : t('jobs.now_featured', { title: job.title }));
         loadJobs();
-      } else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_update_featured')); }
+      } else { toast.error(t('jobs.failed_update_featured')); }
     } catch { toast.error(t('jobs.unexpected_error')); }
   };
 
@@ -300,7 +300,7 @@ export function JobsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/jobs/${confirmDelete.id}`);
       if (res && res.success) { toast.success(t('jobs.job_deleted')); loadJobs(); }
-      else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_delete_job')); }
+      else { toast.error(t('jobs.failed_delete_job')); }
     } catch { toast.error(t('jobs.unexpected_error')); }
     finally { setActionLoading(false); setConfirmDelete(null); }
   };
@@ -351,7 +351,7 @@ export function JobsAdmin() {
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
         <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='secondary' loading={statsLoading} />
         <StatCard label={t('jobs.stat_applications')} value={stats?.total_applications ?? 0} icon={Users} color='success' loading={statsLoading} />
-        <StatCard label={t('jobs.stat_conversion')} value={`${stats?.conversion_rate ?? 0}%`} icon={TrendingUp} color='warning' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_conversion')} value={formatPercentValue(stats?.conversion_rate ?? 0)} icon={TrendingUp} color='warning' loading={statsLoading} />
         <StatCard label={t('jobs.stat_interviews')} value={stats?.active_interviews ?? 0} icon={Calendar} color='secondary' loading={statsLoading} description={stats?.pending_offers ? t('jobs.stat_pending_offers', { count: stats.pending_offers }) : undefined} />
       </div>
       <div className='mb-6'>

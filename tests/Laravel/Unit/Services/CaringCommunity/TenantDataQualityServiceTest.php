@@ -114,10 +114,11 @@ class TenantDataQualityServiceTest extends TestCase
 
         foreach ($report['checks'] as $check) {
             $this->assertArrayHasKey('key',           $check);
-            $this->assertArrayHasKey('label',         $check);
+            $this->assertArrayHasKey('label_code',    $check);
             $this->assertArrayHasKey('severity',      $check);
             $this->assertArrayHasKey('count',         $check);
-            $this->assertArrayHasKey('message',       $check);
+            $this->assertArrayHasKey('message_code',  $check);
+            $this->assertArrayHasKey('message_params', $check);
             $this->assertArrayHasKey('has_drilldown', $check);
             $this->assertContains(
                 $check['severity'],
@@ -537,7 +538,7 @@ class TenantDataQualityServiceTest extends TestCase
         $this->assertArrayHasKey('rows', $result);
         $this->assertIsArray($result['rows']);
         // No 'note' key expected — duplicate_emails IS a supported drilldown key
-        $this->assertArrayNotHasKey('note', $result);
+        $this->assertArrayNotHasKey('note_code', $result);
     }
 
     public function test_affected_rows_returns_seed_marker_rows_for_drilldown(): void
@@ -557,8 +558,7 @@ class TenantDataQualityServiceTest extends TestCase
 
         $this->assertArrayHasKey('rows', $result);
         $this->assertSame([], $result['rows']);
-        $this->assertArrayHasKey('note', $result);
-        $this->assertStringContainsString('drilldown not available', $result['note']);
+        $this->assertSame('drilldown_not_available', $result['note_code']);
     }
 
     public function test_affected_rows_limit_is_respected(): void

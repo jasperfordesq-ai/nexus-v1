@@ -23,7 +23,8 @@
     "escalated": "Escalated",
     "resolved_buyer": "Resolved for buyer",
     "resolved_seller": "Resolved for seller",
-    "closed": "Closed"
+    "closed": "Closed",
+    "unknown": "Other case status"
   },
   "reason": {
     "counterfeit": "Counterfeit item",
@@ -37,7 +38,8 @@
     "payment_issue": "Payment issue",
     "damaged": "Item damaged",
     "fraud": "Suspected fraud",
-    "other": "Other"
+    "other": "Other",
+    "unknown": "Other reason"
   },
   "action": {
     "none": "No enforcement action",

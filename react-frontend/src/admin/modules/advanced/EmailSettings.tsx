@@ -43,7 +43,7 @@ interface EmailSettingsForm {
   smtp_encryption: string;
   smtp_from_email: string;
   smtp_from_name: string;
-  platform_default: { provider: string };
+  platform_default: { provider: string; description_code?: string };
   // Track which secrets are saved on the server
   _sendgrid_api_key_set: boolean;
   _gmail_client_secret_set: boolean;
@@ -69,7 +69,7 @@ const INITIAL_FORM: EmailSettingsForm = {
   smtp_encryption: 'tls',
   smtp_from_email: '',
   smtp_from_name: '',
-  platform_default: { provider: 'unknown' },
+  platform_default: { provider: 'unknown', description_code: 'platform_environment_configuration' },
   _sendgrid_api_key_set: false,
   _gmail_client_secret_set: false,
   _gmail_refresh_token_set: false,
@@ -82,6 +82,10 @@ const PROVIDERS = [
   { key: 'gmail_api', labelKey: 'provider_gmail_api' },
   { key: 'smtp', labelKey: 'provider_smtp' },
 ];
+
+const PLATFORM_DEFAULT_DESCRIPTION_KEYS: Record<string, string> = {
+  platform_environment_configuration: 'platform_default_desc',
+};
 
 export function EmailSettings() {
   const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced' });
@@ -107,7 +111,10 @@ export function EmailSettings() {
             ...INITIAL_FORM,
             provider: String(data.provider ?? 'platform_default'),
             webhook_url: String(data.webhook_url ?? ''),
-            platform_default: (data.platform_default as { provider: string }) ?? { provider: 'unknown' },
+            platform_default: (data.platform_default as EmailSettingsForm['platform_default']) ?? {
+              provider: 'unknown',
+              description_code: 'platform_environment_configuration',
+            },
             // SendGrid
             sendgrid_api_key: sg?.api_key_set ? '********' : '',
             sendgrid_from_email: String(sg?.from_email ?? ''),
@@ -170,7 +177,7 @@ export function EmailSettings() {
       if (res.data?.success) {
         toast.success(t('email_settings_saved_successfully'));
       } else {
-        toast.error(res.error || t('save_failed'));
+        toast.error(t('save_failed'));
       }
     } catch {
       toast.error(t('failed_to_save_email_settings'));
@@ -192,7 +199,7 @@ export function EmailSettings() {
         const providerName = res.data.provider ? String(res.data.provider).toUpperCase() : '';
         toast.success(providerName ? t('test_email_sent_via_provider', { provider: providerName }) : t('test_email_sent'));
       } else {
-        toast.error(res.error || t('save_failed'));
+        toast.error(t('save_failed'));
       }
     } catch {
       toast.error(t('failed_to_send_test_email'));
@@ -456,7 +463,7 @@ export function EmailSettings() {
             </CardHeader>
             <CardBody>
               <p className="text-sm text-muted">
-                {t('platform_default_desc')}{' '}
+                {t(PLATFORM_DEFAULT_DESCRIPTION_KEYS[formData.platform_default.description_code ?? ''] ?? 'platform_default_desc')}{' '}
                 <Chip size="sm" variant="soft" color="accent">
                   {formData.platform_default.provider || t('not_configured')}
                 </Chip>

@@ -317,7 +317,7 @@ export function EventsAdmin() {
         }));
         await loadItems();
       } else {
-        toast.error(res?.error || t('events.action_failed', {
+        toast.error(t('events.action_failed', {
           action: t(`events.action_${actionModal.action}`),
         }));
       }

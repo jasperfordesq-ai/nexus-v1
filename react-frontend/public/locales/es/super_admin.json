@@ -15,67 +15,66 @@
     "federation_audit": "Auditoría de Federación",
     "platform_admin": "Administrador de plataforma",
     "back_to_platform_admin": "Volver al administrador de la plataforma",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Consultas de Piloto",
+    "provisioning_queue": "Cola de Aprovisionamiento",
+    "billing_control": "Control de Facturación",
+    "revenue_dashboard": "Panel de Ingresos",
+    "regional_analytics": "Analítica Regional",
+    "national_dashboard": "Panel Nacional"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Cargando superadministrador",
+    "skip_to_main": "Saltar al contenido principal",
+    "close_navigation": "Cerrar navegación de superadministrador",
+    "navigation": "Navegación de super administrador"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Volver al administrador",
+    "toggle_sidebar": "Alternar barra lateral",
+    "notifications": "Notificaciones",
+    "my_profile": "Mi Perfil",
+    "sign_out": "Cerrar sesión",
+    "user_fallback": "Súper Administrador",
+    "user_menu": "Menú de super administrador"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Resumen",
+    "section_tenants": "Inquilinos",
+    "section_federation": "Federación",
+    "section_commercial": "Comercial",
+    "expand": "Expandir barra lateral",
+    "collapse": "Colapsar barra lateral",
+    "nav_label": "Navegación de super administrador"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Súper Administrador",
+    "tenants": "Inquilinos",
+    "create": "Crear",
+    "edit": "Editar",
+    "hierarchy": "Jerarquía",
+    "users": "Usuarios",
+    "federation": "Federación",
+    "whitelist": "Lista blanca",
+    "partnerships": "Alianzas",
+    "tenant": "Inquilino",
+    "features": "Funciones",
+    "billing": "Facturación",
+    "revenue": "Ingresos",
+    "platform": "Plataforma",
+    "pilot_inquiries": "Consultas de Piloto",
+    "provisioning_requests": "Solicitudes de aprovisionamiento",
+    "national": "Nacional",
+    "regional_analytics": "Analítica Regional",
+    "subscriptions": "Suscripciones",
+    "aria_label": "Migas de pan",
+    "bulk": "Operaciones masivas",
+    "audit": "Registro de Auditoría"
   },
   "dashboard": {
     "title": "Panel de infraestructura",
     "subtitle_global": "Descripción general global de todos los inquilinos y la infraestructura",
-    "subtitle_scoped": "Descripción general de:tenant_name y subinquilinos",
     "create_tenant_btn": "Crear inquilino",
     "stat_total_tenants": "Inquilinos totales",
     "stat_active_tenants": "Inquilinos activos",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Acciones rápidas",
     "create_new_tenant": "Crear nuevo inquilino",
     "view_super_admins": "Ver superadministradores",
-    "back_to_platform_admin": "Volver al administrador de la plataforma"
+    "back_to_platform_admin": "Volver al administrador de la plataforma",
+    "subtitle_scoped": "Resumen de :tenant_name y subarrendatarios"
   },
   "common": {
     "active": "Activo",
@@ -188,7 +188,6 @@
       "actions_card_title": "Acciones",
       "view_tenant_btn": "Ver inquilino",
       "god_card_title": "Superadministrador global (solo Dios)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Los superadministradores globales pueden acceder a TODOS los inquilinos de la plataforma.",
       "god_has_access": "El usuario tiene acceso GLOBAL de superadministrador",
       "god_revoke_btn": "Revocar superadministrador global",
@@ -206,12 +205,12 @@
       "stat_user_id": "ID de usuario",
       "stat_tenant_id": "ID de inquilino",
       "stat_status": "Estado",
-      "stat_approved": "Aprobado"
+      "stat_approved": "Aprobado",
+      "god_warning": "Advertencia:"
     },
     "create": {
       "breadcrumb_create": "crear",
       "title": "Crear nuevo usuario",
-      "subtitle_selected": "Creando usuario para:tenant_name",
       "subtitle_default": "Seleccione un inquilino para crear un nuevo usuario",
       "card_title": "Detalles del usuario",
       "tenant_label": "inquilino",
@@ -229,7 +228,8 @@
       "super_admin_label": "Otorgar privilegios de superadministrador",
       "super_admin_help": "Los superadministradores pueden acceder al Panel de superadministrador y administrar los subinquilinos de sus inquilinos. Solo disponible para inquilinos de Hub (inquilinos con capacidad de subinquilino).",
       "submit_btn": "Crear usuario",
-      "cancel_btn": "Cancelar"
+      "cancel_btn": "Cancelar",
+      "subtitle_selected": "Creando usuario para :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Editar",
@@ -254,7 +254,6 @@
       "assign_what_happens": "Qué pasa:",
       "assign_step1": "El usuario se mueve al inquilino de Hub seleccionado",
       "assign_step2": "Se concede al usuario is_tenant_super_admin = 1",
-      "assign_step3": "El rol del usuario está establecido en teniente_admin.",
       "assign_step4": "El usuario ahora puede acceder a /super-admin con vista de ámbito",
       "hub_tenant_label": "Seleccione el inquilino del concentrador para asignar",
       "hub_tenant_placeholder": "-- Seleccione un inquilino del centro --",
@@ -272,23 +271,23 @@
       "stat_active": "Activo",
       "stat_pending": "Pendiente",
       "super_admin_card_title": "Estado de superadministrador",
-      "super_admin_toggle_desc": "Alternar superadministrador para:tenant_name",
       "revoke_btn": "Revocar superadministrador",
       "revoke_confirm": "¿Revocar privilegios de superadministrador?",
       "grant_btn": "Otorgar superadministrador",
       "grant_confirm": "¿Conceder privilegios de superadministrador?",
-      "no_hub_text": "No se puede otorgar superadministrador porque:tenant_name no es un inquilino de Hub.",
       "no_hub_move_text": "Utilice la función \"Mover y otorgar superadministrador\" para asignar este usuario a un inquilino de Hub.",
       "quick_links_card_title": "Enlaces rápidos",
       "view_profile_btn": "Ver perfil",
       "view_tenant_btn": "Ver inquilino",
-      "tenant_users_btn": "Usuarios inquilinos"
+      "tenant_users_btn": "Usuarios inquilinos",
+      "assign_step3": "El rol del usuario está configurado como tenant_admin",
+      "super_admin_toggle_desc": "Alternar Super Administrador para :tenant_name",
+      "no_hub_text": "No se puede otorgar Super Administrador porque :tenant_name no es un inquilino de Hub."
     }
   },
   "tenants": {
     "index": {
       "title": "Administrar inquilinos",
-      "subtitle": ":cuenta inquilino(s) en tu alcance",
       "create_btn": "Crear inquilino",
       "filter_search_placeholder": "Buscar inquilinos...",
       "filter_hub_label": "Solo inquilinos del centro",
@@ -304,9 +303,10 @@
       "col_status": "Estado",
       "col_actions": "Acciones",
       "parent_root": "raíz",
-      "level_label": "Nivel: profundidad",
       "you_badge": "tu",
-      "no_tenants": "No se encontraron inquilinos"
+      "no_tenants": "No se encontraron inquilinos",
+      "subtitle": "Inquilino(s) :count en su alcance",
+      "level_label": "Nivel :depth"
     },
     "show": {
       "breadcrumb_tenants": "inquilinos",
@@ -319,11 +319,9 @@
       "field_slug": "babosa",
       "field_domain": "Dominio",
       "field_hierarchy_level": "Nivel de jerarquía",
-      "field_level": "Nivel: profundidad",
       "field_parent": "Padre",
       "field_total_users": "Usuarios totales",
       "field_sub_tenants": "Subinquilinos",
-      "field_sub_tenants_direct": ":cuenta directa",
       "field_description": "Descripción",
       "not_configured": "No configurado",
       "root_tenant": "Inquilino raíz",
@@ -355,18 +353,18 @@
       "reactivate_card_title": "Reactivar inquilino",
       "reactivate_desc": "Este inquilino está actualmente inactivo. La reactivación restaurará el acceso del usuario.",
       "reactivate_btn": "Reactivar inquilino",
-      "tenant_id_label": "ID de inquilino::id | Ruta::ruta"
+      "field_level": "Nivel :depth",
+      "field_sub_tenants_direct": ":count directo",
+      "tenant_id_label": "ID del inquilino: :id | Ruta: :path"
     },
     "create": {
       "breadcrumb_create": "crear",
       "title": "Crear nuevo inquilino",
-      "subtitle_selected": "Creando subinquilino en: parent_name",
       "subtitle_default": "Seleccione un inquilino principal para crear un nuevo subinquilino",
       "card_title": "Detalles del inquilino",
       "parent_label": "Padre Inquilino",
       "parent_placeholder": "-- Seleccione el inquilino principal --",
       "parent_help": "Solo se muestran los inquilinos con capacidad de subarrendatario. El nuevo inquilino se creará como hijo del padre seleccionado.",
-      "depth_label": "(Profundidad::profundidad)",
       "name_label": "Nombre del inquilino",
       "slug_label": "babosa",
       "slug_help": "Sólo letras minúsculas, números y guiones",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Ilimitado",
       "max_depth_help": "Limite la cantidad de niveles de subinquilinos que se pueden crear debajo de este inquilino (solo se aplica si Hub está habilitado)",
       "submit_btn": "Crear inquilino",
-      "cancel_btn": "Cancelar"
+      "cancel_btn": "Cancelar",
+      "subtitle_selected": "Creando sub-inquilino bajo :parent_name",
+      "depth_label": "(Profundidad: :depth)"
     },
     "edit": {
       "breadcrumb_edit": "Editar",
       "title": "Editar inquilino",
-      "subtitle": "Modificando::nombre (Nivel:profundidad)",
       "back_btn": "Volver a Detalles",
       "details_card_title": "Detalles del inquilino",
       "name_label": "Nombre del inquilino",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "Inquilino estándar",
       "max_depth_label": "Profundidad máxima del subinquilino",
       "max_depth_unlimited": "Ilimitado",
-      "max_depth_levels": ": niveles de recuento",
       "disable_hub_btn": "Deshabilitar concentrador",
       "disable_hub_confirm": "Esto evitará que se creen nuevos subinquilinos. Los subarrendatarios existentes permanecerán.",
       "enable_hub_btn": "Habilitar concentrador",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "¿Está seguro de que desea desactivar este inquilino? Los usuarios perderán el acceso.",
       "reactivate_card_title": "Reactivar inquilino",
       "reactivate_desc": "Este inquilino está actualmente inactivo. La reactivación restaurará el acceso del usuario.",
-      "reactivate_btn": "Reactivar inquilino"
+      "reactivate_btn": "Reactivar inquilino",
+      "subtitle": "Modificando: :name (Nivel :depth)",
+      "max_depth_levels": ":count niveles"
     },
     "hierarchy": {
       "breadcrumb_tenants": "inquilinos",
@@ -577,7 +577,6 @@
     "source_tenant_all": "Todos los inquilinos",
     "user_selection_label": "Seleccionar usuarios",
     "user_select_hint": "Seleccione un inquilino de origen para cargar usuarios",
-    "users_selected": ":contar usuarios seleccionados",
     "target_tenant_label": "Inquilino objetivo",
     "target_tenant_placeholder": "-- Seleccionar destino --",
     "grant_super_admin_label": "Otorgar superadministrador a todos los usuarios movidos",
@@ -586,7 +585,6 @@
     "bulk_tenants_card_title": "Operaciones de inquilinos a granel",
     "bulk_tenants_desc": "Habilite/deshabilite varios inquilinos o alterne la capacidad del Hub de forma masiva.",
     "select_tenants_label": "Seleccionar inquilinos",
-    "tenants_selected": ":contar inquilino(s) seleccionado(s)",
     "select_all": "Seleccionar todo",
     "deselect_all": "Deseleccionar todo",
     "action_label": "acción",
@@ -595,7 +593,9 @@
     "action_enable_hub": "Habilitar concentrador",
     "action_disable_hub": "Deshabilitar concentrador",
     "apply_btn": "Aplicar a los seleccionados",
-    "apply_confirm": "¿Aplicar esta acción a todos los inquilinos seleccionados?"
+    "apply_confirm": "¿Aplicar esta acción a todos los inquilinos seleccionados?",
+    "users_selected": ":count usuario(s) seleccionado(s)",
+    "tenants_selected": ":count inquilino(s) seleccionado(s)"
   },
   "federation": {
     "index": {
@@ -631,7 +631,6 @@
       "recent_activity_title": "Actividad reciente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Aún no hay actividad de la federación",
-      "by_label": "by",
       "activity_title": "Actividad de la Federación (30 días)",
       "stat_total_actions": "Acciones totales",
       "stat_messages": "Mensajes",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Eventos críticos",
       "most_active_partnerships": "Asociaciones más activas",
       "quick_nav_title": "Navegación rápida",
-      "tenant_whitelist_btn": "Lista blanca de inquilinos"
+      "tenant_whitelist_btn": "Lista blanca de inquilinos",
+      "by_label": "por"
     },
     "system_controls": {
       "title": "Controles del sistema de federación",

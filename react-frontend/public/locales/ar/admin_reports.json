@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,12 +67,12 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "reports": {
-    "active_30d_total": "Active (30 days)",
     "active_members": "الأعضاء النشطين",
     "already_notified": "تم إخطارها بالفعل",
     "at_risk": "في خطر",
@@ -143,11 +142,7 @@
     "group_by_monthly": "المجموعة حسب الشهري",
     "group_by_weekly": "المجموعة حسب الأسبوعية",
     "hours": "ساعات",
-    "hours_reports_page_desc": "View detailed reports on time credit exchanges and hours traded",
-    "hours_reports_page_title": "Hours Reports Page",
     "hours_value": "ساعات{{value}}",
-    "inactive_members_page_desc": "Identify and manage members who have not been active recently",
-    "inactive_members_page_title": "Inactive Members Page",
     "label_active_members": "الأعضاء النشطين",
     "label_approve": "يعتمد",
     "label_approved": "موافقة",
@@ -198,14 +193,10 @@
     "label_unique_categories": "الفئات الفريدة",
     "label_unique_givers": "المانحون الفريدون",
     "mark_as_notified": "وضع علامة كمُخطر",
-    "member_reports_page_desc": "View engagement statistics and activity reports for members",
-    "member_reports_page_title": "Member Reports Page",
     "members_marked_notified": "تم وضع علامة على الأعضاء كما تم إخطارهم",
     "members_selected": "تم اختيار الأعضاء",
     "members_selected_count": "تم تحديد{{count}}",
     "moderation_pending": "قيد الانتظار",
-    "moderation_queue_page_desc": "Review content pending moderation approval",
-    "moderation_queue_page_title": "Moderation Queue Page",
     "moderation_settings": "إعدادات الاعتدال",
     "moderation_settings_updated": "تم تحديث إعدادات الإشراف",
     "never": "أبداً",
@@ -288,7 +279,18 @@
     "days_count_one": "{{count}} يومًا",
     "days_count_other": "{{count}} يومًا",
     "days_count_two": "{{count}} يومًا",
-    "days_count_zero": "{{count}} يومًا"
+    "days_count_zero": "{{count}} يومًا",
+    "unknown_period": "الفترة غير المعروفة",
+    "week_period": "أسبوع {{week}}، {{year}}",
+    "active_30d_total": "نشط خلال 30 يومًا",
+    "hours_reports_page_desc": "تحليل حجم تبادل ساعات الائتمان، أرصدة الأعضاء، واتجاهات الفئات.",
+    "hours_reports_page_title": "تقارير الساعات",
+    "inactive_members_page_desc": "تحديد الأعضاء المعرضين لخطر الانسحاب وإدارة الإشعارات اللاحقة.",
+    "inactive_members_page_title": "الأعضاء غير النشطين",
+    "member_reports_page_desc": "تتبع نشاط الأعضاء والاحتفاظ بهم والمشاركة وأنماط المساهمة.",
+    "member_reports_page_title": "تقارير الأعضاء",
+    "moderation_queue_page_desc": "مراجعة المحتوى المعلق والمعلّم قبل ظهوره في المجتمع.",
+    "moderation_queue_page_title": "قائمة الانتظار للإشراف"
   },
   "municipal_reports": {
     "meta": {
@@ -306,13 +308,13 @@
       "body_1_before_kiss": "تقرير الأثر البلدي هو حزمة الأدلة التي تشاركها مع شركاء البلديات والكانتونات والممولين لإثبات قيمة البرنامج. يُظهر ساعات الرعاية التي تم التحقق منها، والأعضاء النشطين، والمنظمات الشريكة، وباستخدام",
       "body_1_after_kiss": " المنهجية، التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (",
       "body_1_after_chf": "قيمة الساعات × مضاعف المنع).",
-      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "استخدم",
       "body_2_after_audience": "تبديل لتبديل تأطير السرد:",
       "body_2_after_canton": "يجمع بلديات متعددة ويظهر تجنب التكاليف على مستوى الكانتونات؛",
       "body_2_after_municipality": "يركز على السكان المحليين الذين تم الوصول إليهم والمنظمات الشريكة؛",
-      "body_2_after_cooperative": "يُظهر الاحتفاظ بالأعضاء، ومعدل المعاملة بالمثل، وعبء عمل المنسق. قم بالتصدير كـ PDF لإرساله إلى الشركاء أو كـ CSV لمزيد من التحليل. احفظ قوالب التقارير لإعادة إنشاء نفس التكوين بسرعة في الفترات المستقبلية."
+      "body_2_after_cooperative": "يُظهر الاحتفاظ بالأعضاء، ومعدل المعاملة بالمثل، وعبء عمل المنسق. قم بالتصدير كـ PDF لإرساله إلى الشركاء أو كـ CSV لمزيد من التحليل. احفظ قوالب التقارير لإعادة إنشاء نفس التكوين بسرعة في الفترات المستقبلية.",
+      "kiss_abbr": "مجتمع مهتم"
     },
     "actions": {
       "analytics": "تحليلات المجتمع",
@@ -411,7 +413,8 @@
       "activities_one": "أنشطة {{count}}",
       "activities_other": "أنشطة {{count}}",
       "activities_two": "أنشطة {{count}}",
-      "activities_zero": "أنشطة {{count}}"
+      "activities_zero": "أنشطة {{count}}",
+      "formatted_hours": "{{value}}س"
     },
     "toast": {
       "load_failed": "فشل تحميل بيانات التأثير البلدي.",
@@ -584,7 +587,7 @@
   },
   "municipal_impact": {
     "portfolio": {
-      "yoy_value": "{{sign}}{{value}}٪ على أساس سنوي"
+      "yoy_value": "{{value}} على أساس سنوي"
     }
   }
 }

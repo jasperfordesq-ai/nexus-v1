@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -116,6 +116,10 @@ function rateColor(rate: number, benchmark: number): 'success' | 'warning' | 'da
   return 'danger';
 }
 
+function formatRate(rate: number, maximumFractionDigits = 2): string {
+  return formatNumber(rate / 100, { style: 'percent', maximumFractionDigits });
+}
+
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Component                                                                */
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -217,14 +221,14 @@ export function NewsletterAnalytics() {
         />
         <StatCard
           label={t('newsletters.label_avg_open_rate')}
-          value={`${avgOpenRate}%`}
+          value={formatRate(avgOpenRate)}
           icon={Eye}
           color="warning"
           loading={loading}
         />
         <StatCard
           label={t('newsletters.label_avg_click_rate')}
-          value={`${avgClickRate}%`}
+          value={formatRate(avgClickRate)}
           icon={MousePointer}
           color="default"
           loading={loading}
@@ -307,7 +311,12 @@ export function NewsletterAnalytics() {
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                 <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} unit="%" />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => formatRate(Number(value), 0)}
+                />
                 <Tooltip
                   contentStyle={{
                     borderRadius: 12,
@@ -317,7 +326,7 @@ export function NewsletterAnalytics() {
                   formatter={(value, name) => {
                     const v = value as number;
                     const n = name as string;
-                    if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? t('newsletters.chart_open_rate') : t('newsletters.chart_click_rate')];
+                    if (n === 'openRate' || n === 'clickRate') return [formatRate(v), n === 'openRate' ? t('newsletters.chart_open_rate') : t('newsletters.chart_click_rate')];
                     return [v.toLocaleString(getFormattingLocale()), n === 'sent' ? t('newsletters.chart_emails_sent') : n === 'opens' ? t('newsletters.chart_opens') : t('newsletters.chart_clicks')];
                   }}
                   labelFormatter={(label) => String(label)}
@@ -377,7 +386,7 @@ export function NewsletterAnalytics() {
                           variant="soft"
                           color={rateColor(row.openRate, BENCHMARK_OPEN_RATE)}
                         >
-                          {row.openRate}%
+                          {formatRate(row.openRate)}
                         </Chip>
                       </TableCell>
                       <TableCell className="text-center">
@@ -386,7 +395,7 @@ export function NewsletterAnalytics() {
                           variant="soft"
                           color={rateColor(row.clickRate, BENCHMARK_CLICK_RATE)}
                         >
-                          {row.clickRate}%
+                          {formatRate(row.clickRate)}
                         </Chip>
                       </TableCell>
                     </TableRow>
@@ -448,7 +457,7 @@ export function NewsletterAnalytics() {
                         variant="soft"
                         color={rateColor(nl.open_rate, BENCHMARK_OPEN_RATE)}
                       >
-                        {nl.open_rate}%
+                        {formatRate(nl.open_rate)}
                       </Chip>
                     </TableCell>
                     <TableCell className="text-center">
@@ -457,7 +466,7 @@ export function NewsletterAnalytics() {
                         variant="soft"
                         color={rateColor(nl.click_rate, BENCHMARK_CLICK_RATE)}
                       >
-                        {nl.click_rate}%
+                        {formatRate(nl.click_rate)}
                       </Chip>
                     </TableCell>
                     <TableCell className="text-end text-sm text-muted">
@@ -582,11 +591,11 @@ function BenchmarkCard({
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-xs text-muted">{tLocal('newsletters.your_average')}</p>
-          <p className="text-2xl font-bold text-foreground">{yours}%</p>
+          <p className="text-2xl font-bold text-foreground">{formatRate(yours)}</p>
         </div>
         <div className="text-right">
           <p className="text-xs text-muted">{tLocal('newsletters.industry_avg')}</p>
-          <p className="text-2xl font-bold text-muted">{benchmark}%</p>
+          <p className="text-2xl font-bold text-muted">{formatRate(benchmark)}</p>
         </div>
       </div>
       <Separator className="my-3" />
@@ -600,10 +609,8 @@ function BenchmarkCard({
           }
         >
           {tLocal('newsletters.benchmark_difference', {
-            percentSign: isAbove ? '+' : '',
-            percentValue: diffPct,
-            pointSign: isAbove ? '+' : '',
-            pointValue: diff.toFixed(1),
+            percentValue: formatNumber(diffPct / 100, { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' }),
+            pointValue: formatNumber(diff, { maximumFractionDigits: 1, signDisplay: 'exceptZero' }),
           })}
         </Chip>
         <span className="text-xs text-muted">

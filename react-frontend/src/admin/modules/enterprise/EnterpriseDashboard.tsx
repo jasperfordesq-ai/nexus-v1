@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -29,6 +29,10 @@ import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
+function translationToken(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
+
 export function EnterpriseDashboard() {
   const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.enterprise_dashboard_title'));
@@ -56,6 +60,9 @@ export function EnterpriseDashboard() {
   }, [loadData]);
 
   const healthColor = stats?.health_status === 'healthy' ? 'success' : stats?.health_status === 'degraded' ? 'warning' : 'danger';
+  const healthStatusLabel = stats
+    ? t(`enterprise.status_${stats.health_status}`, { defaultValue: t('enterprise.status_unknown') })
+    : '---';
 
   const quickLinks = [
     { label: t('enterprise.link_roles_permissions'), href: tenantPath('/admin/enterprise/roles'), icon: Shield },
@@ -105,7 +112,7 @@ export function EnterpriseDashboard() {
         />
         <StatCard
           label={t('enterprise.label_system_health')}
-          value={stats?.health_status ?? '---'}
+          value={healthStatusLabel}
           icon={HeartPulse}
           color={healthColor}
           loading={loading}
@@ -125,10 +132,10 @@ export function EnterpriseDashboard() {
                 {t('enterprise.redis')} {stats.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
               </Chip>
               <Chip color={stats.memory_percent > 90 ? 'danger' : stats.memory_percent > 70 ? 'warning' : 'success'} variant="tertiary" size="sm">
-                {t('enterprise.memory')} {stats.memory_percent}%
+                {t('enterprise.memory')} {formatPercentValue(stats.memory_percent)}
               </Chip>
               <Chip color={stats.disk_percent > 90 ? 'danger' : stats.disk_percent > 70 ? 'warning' : 'success'} variant="tertiary" size="sm">
-                {t('enterprise.disk')} {stats.disk_percent}%
+                {t('enterprise.disk')} {formatPercentValue(stats.disk_percent)}
               </Chip>
             </div>
           </CardBody>
@@ -172,8 +179,12 @@ export function EnterpriseDashboard() {
               {stats.recent_gdpr_activity.map((entry) => (
                 <div key={entry.id} className="flex items-center justify-between text-sm border-b border-divider pb-2 last:border-0">
                   <div className="flex items-center gap-2">
-                    <Chip size="sm" variant="soft">{entry.action}</Chip>
-                    <span className="text-muted">{entry.entity_type}</span>
+                    <Chip size="sm" variant="soft">
+                      {t(`enterprise.gdpr_audit_action_${translationToken(entry.action)}`, { defaultValue: t('enterprise.gdpr_audit_action_unknown') })}
+                    </Chip>
+                    <span className="text-muted">
+                      {t(`enterprise.gdpr_entity_type_${translationToken(entry.entity_type)}`, { defaultValue: t('enterprise.gdpr_entity_type_unknown') })}
+                    </span>
                     {entry.user_name && (
                       <span className="text-muted">
                         {t('enterprise.activity_by_user', { name: entry.user_name })}

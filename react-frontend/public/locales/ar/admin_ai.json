@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "ai": {
     "common": {
@@ -135,7 +135,8 @@
       },
       "triggered_by": {
         "manual": "يدوي",
-        "scheduled": "المقرر"
+        "scheduled": "المقرر",
+        "schedule": "الجدول"
       },
       "config": {
         "enable_title": "تمكين KI-Agenten",
@@ -254,6 +255,13 @@
         "run_triggered_other": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
         "run_triggered_two": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
         "run_triggered_zero": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}."
+      },
+      "unknown_identifier": "مجهول",
+      "proposal_types": {
+        "create_tandem": "إنشاء توأم",
+        "route_help_request": "توجيه طلب المساعدة",
+        "send_activity_summary": "إرسال ملخص النشاط",
+        "send_nudge": "إرسال تذكير"
       }
     },
     "module_docs": {
@@ -327,6 +335,122 @@
         "seeded_other": "المستند (المستندات) الافتراضي {{count}} المصنف.",
         "seeded_two": "المستند (المستندات) الافتراضي {{count}} المصنف.",
         "seeded_zero": "المستند (المستندات) الافتراضي {{count}} المصنف."
+      },
+      "defaults": {
+        "overview": {
+          "title": "نظرة عامة على المنصة — ما هذا"
+        },
+        "timebanking": {
+          "title": "أساسيات وفلسفة تبادل الوقت"
+        },
+        "getting_started": {
+          "title": "البدء — أسبوعك الأول"
+        },
+        "safety": {
+          "title": "السلامة والثقة وإرشادات المجتمع"
+        },
+        "listings": {
+          "title": "القوائم — العروض والطلبات"
+        },
+        "wallet": {
+          "title": "المحفظة ورصيد وقتك"
+        },
+        "messages": {
+          "title": "الرسائل — المحادثات الخاصة"
+        },
+        "feed": {
+          "title": "التغذية — تدفق نشاط المجتمع"
+        },
+        "dashboard": {
+          "title": "لوحة التحكم — نقطة البداية الخاصة بك"
+        },
+        "profile": {
+          "title": "الملف الشخصي ودليل الأعضاء"
+        },
+        "notifications": {
+          "title": "الإشعارات"
+        },
+        "settings": {
+          "title": "الإعدادات — إدارة حسابك"
+        },
+        "events": {
+          "title": "الفعاليات — تجمعات المجتمع"
+        },
+        "groups": {
+          "title": "المجموعات — المجتمعات الفرعية"
+        },
+        "volunteering": {
+          "title": "التطوع — الفرص والفترات الزمنية"
+        },
+        "jobs": {
+          "title": "الوظائف الشاغرة"
+        },
+        "marketplace": {
+          "title": "السوق — العناصر، ليست الخدمات"
+        },
+        "blog": {
+          "title": "المدونة — قصص وأخبار المجتمع"
+        },
+        "resources": {
+          "title": "الموارد — قاعدة المعرفة والملفات"
+        },
+        "polls": {
+          "title": "الاستطلاعات — قرارات المجتمع"
+        },
+        "ideation": {
+          "title": "تحديات الأفكار — حل المشكلات بشكل تعاوني"
+        },
+        "organisations": {
+          "title": "المنظمات — ملفات الشركاء"
+        },
+        "group_exchanges": {
+          "title": "تبادلات المجموعات — مشاريع زمنية متعددة إلى متعددة"
+        },
+        "federation": {
+          "title": "الاتحاد — ربط المجتمعات"
+        },
+        "gamification": {
+          "title": "اللعب الجذابي — الشارات، نقاط الخبرة، والاعتراف"
+        },
+        "goals": {
+          "title": "الأهداف — الأهداف الشخصية والمجتمعية"
+        },
+        "connections": {
+          "title": "الاتصالات — شبكتك"
+        },
+        "reviews": {
+          "title": "المراجعات والتقييمات"
+        },
+        "ai_chat": {
+          "title": "المساعد الذكي — زر الدردشة"
+        },
+        "search": {
+          "title": "البحث — العثور على أي شيء"
+        },
+        "caring_community": {
+          "title": "المجتمع الرعوي — دعم للأعضاء الضعفاء"
+        },
+        "newsletter": {
+          "title": "النشرة الإخبارية وملخصات البريد الإلكتروني"
+        },
+        "account_security": {
+          "title": "أمان الحساب — كلمات المرور، المصادقة الثنائية، مفاتيح المرور"
+        },
+        "privacy_data": {
+          "title": "الخصوصية وحقوق البيانات (لائحة GDPR)"
+        },
+        "accessibility": {
+          "title": "سهولة الوصول — القوالب، اللغات، التقنيات المساعدة"
+        },
+        "mobile_pwa": {
+          "title": "تطبيق الهاتف المحمول وPWA"
+        },
+        "troubleshooting": {
+          "title": "استكشاف المشكلات الشائعة"
+        },
+        "admin_overview": {
+          "title": "للمسؤولين عن المجتمع"
+        }
       }
     },
     "trace_metrics": {

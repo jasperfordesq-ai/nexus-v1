@@ -302,7 +302,9 @@ export function MarketplaceAdmin() {
                         color={statusColors[listing.status] || 'default'}
                         className="capitalize"
                       >
-                        {listing.status}
+                        {t(`marketplace.status.${listing.status}`, {
+                          defaultValue: t('marketplace.status.unknown'),
+                        })}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -312,7 +314,9 @@ export function MarketplaceAdmin() {
                         color={moderationColors[listing.moderation_status] || 'default'}
                         className="capitalize"
                       >
-                        {listing.moderation_status}
+                        {t(`marketplace.moderation_status.${listing.moderation_status}`, {
+                          defaultValue: t('marketplace.moderation_status.unknown'),
+                        })}
                       </Chip>
                     </TableCell>
                     <TableCell className="text-muted">

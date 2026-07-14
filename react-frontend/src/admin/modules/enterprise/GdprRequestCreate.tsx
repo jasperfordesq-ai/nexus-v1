@@ -137,7 +137,7 @@ export function GdprRequestCreate() {
         toast.success(t('enterprise.gdpr_request_created'));
         navigate(tenantPath('/admin/enterprise/gdpr/requests'));
       } else {
-        const error = (res as { error?: string }).error || t('enterprise.gdpr_failed_create_request');
+        const error = t('enterprise.gdpr_failed_create_request');
         toast.error(error);
       }
     } catch {

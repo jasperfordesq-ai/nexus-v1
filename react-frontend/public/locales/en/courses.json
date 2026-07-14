@@ -188,6 +188,7 @@
     "course": "Course",
     "author": "Author",
     "status": "Status",
+    "status_unknown": "Unknown status",
     "actions": "Actions",
     "approve": "Approve",
     "reject": "Reject",

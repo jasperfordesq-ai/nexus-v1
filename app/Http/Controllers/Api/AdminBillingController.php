@@ -53,7 +53,10 @@ class AdminBillingController extends BaseApiController
         if (!in_array($billingInterval, ['monthly', 'yearly'], true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'billing_interval must be "monthly" or "yearly"',
+                __('api.billing_interval_invalid', [
+                    'monthly' => 'monthly',
+                    'yearly' => 'yearly',
+                ]),
                 'billing_interval',
                 422
             );
@@ -81,7 +84,7 @@ class AdminBillingController extends BaseApiController
             if ($currentSub && (int) $currentSub->tier_level > 0) {
                 return $this->respondWithError(
                     'DOWNGRADE_NOT_ALLOWED',
-                    'Downgrading to a free plan is not allowed through self-service. Please contact support.',
+                    __('api.billing_free_downgrade_support_required'),
                     'plan_id',
                     422
                 );
@@ -99,7 +102,7 @@ class AdminBillingController extends BaseApiController
             ]);
             return $this->respondWithError(
                 'STRIPE_ERROR',
-                'Failed to create checkout session. Please try again.',
+                __('api.billing_checkout_session_failed'),
                 null,
                 500
             );
@@ -121,7 +124,7 @@ class AdminBillingController extends BaseApiController
         if (!$tenant || empty($tenant->stripe_customer_id)) {
             return $this->respondWithError(
                 'NO_SUBSCRIPTION',
-                'No active subscription. Subscribe to a plan first to manage payment methods.',
+                __('api.billing_subscription_required_for_portal'),
                 null,
                 400
             );
@@ -137,7 +140,7 @@ class AdminBillingController extends BaseApiController
             ]);
             return $this->respondWithError(
                 'STRIPE_ERROR',
-                'Failed to create billing portal session. Please try again.',
+                __('api.billing_portal_session_failed'),
                 null,
                 500
             );

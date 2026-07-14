@@ -285,7 +285,7 @@ export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: Saf
           prev.map((a) => a.id === assignmentId ? { ...a, status: 'revoked' as const } : a)
         );
       } else {
-        toast.error(res.error || t('safeguarding.failed_to_revoke_assignment'));
+        toast.error(t('safeguarding.failed_to_revoke_assignment'));
       }
     } catch (err) {
       logError('SafeguardingDashboard.revoke', err);
@@ -538,7 +538,7 @@ export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: Saf
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={SEVERITY_COLORS[flag.severity] || 'default'} variant="soft">
-                        {flag.severity}
+                        {t(`common.${flag.severity}`, { defaultValue: t('common.unknown') })}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -626,7 +626,7 @@ export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: Saf
                         variant="soft"
                         color={assignment.status === 'active' ? 'success' : assignment.status === 'revoked' ? 'danger' : 'default'}
                       >
-                        {assignment.status}
+                        {t(`safeguarding.status_${assignment.status}`, { defaultValue: t('common.unknown') })}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -775,7 +775,7 @@ export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: Saf
                       <div>
                         <span className="text-sm text-muted">{t('safeguarding.severity')}:</span>{' '}
                         <Chip size="sm" color={SEVERITY_COLORS[reviewTarget.severity]} variant="soft">
-                          {reviewTarget.severity}
+                          {t(`common.${reviewTarget.severity}`, { defaultValue: t('common.unknown') })}
                         </Chip>
                       </div>
                       <div>

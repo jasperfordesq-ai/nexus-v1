@@ -2856,7 +2856,7 @@
     "type_external_label": "Link zewnętrzny",
     "type_external_desc": "Link do zewnętrznej strony internetowej",
     "type_dropdown_label": "Lista rozwijana",
-    "type_dropdown_desc": "Menu rozwijane zawierające elementy podrz��dne",
+    "type_dropdown_desc": "Menu rozwijane zawierające elementy podrzędne",
     "type_page_label": "Strona niestandardowa",
     "type_page_desc": "Link do niestandardowej strony na tej platformie",
     "type_route_label": "Nazwana trasa",
@@ -3098,10 +3098,10 @@
       },
       "age_groups": {
         "under_25": "Poniżej 25. roku życia",
-        "25_34": "TOKEN NEXUSARM0",
-        "35_44": "TOKEN NEXUSARM0",
-        "45_54": "TOKEN NEXUSARM0",
-        "55_64": "TOKEN NEXUSARM0",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
         "65_plus": "65+",
         "unknown": "Nieznany"
       },

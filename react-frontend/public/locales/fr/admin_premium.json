@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Abonnés",
       "user_fallback": "Utilisateur #{{id}}",
       "columns": {
-        "member": "MEMBRE",
-        "email": "EMAIL",
-        "tier": "ÉTAGE",
-        "interval": "INTERVALLE",
-        "status": "STATUT",
-        "next_billing": "PROCHAINE FACTURATION",
-        "started": "COMMENCÉ"
+        "member": "Membre",
+        "email": "Email",
+        "tier": "Niveau",
+        "interval": "Intervalle",
+        "status": "Statut",
+        "next_billing": "Prochaine facturation",
+        "started": "Commencé"
       },
       "status": {
         "active": "Actif",
@@ -184,32 +184,32 @@
       "settings_save_failed": "Les paramètres d'acheminement des dons n'ont pas pu être enregistrés.",
       "onboarding_failed": "L'intégration de Stripe n'a pas pu démarrer.",
       "finance_load_failed": "Les opérations de financement de dons n'ont pas pu être chargées.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "L'exportation des reçus annuels n'a pas pu être téléchargée."
+      "annual_receipts_export_failed": "L'exportation des reçus annuels n'a pas pu être téléchargée.",
+      "gift_aid_export_failed": "L'export du Gift Aid n'a pas pu être téléchargé."
     },
     "settings": {
-      "title": "Routage par bandes",
       "description": "Laissez ce champ vide pour utiliser le compte Stripe de la plateforme avec les métadonnées du locataire. Connectez un compte Stripe locataire pour envoyer de futurs dons ponctuels et réguliers à ce compte locataire.",
       "stripe_connect_account_id": "ID de compte du locataire Stripe Connect",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Changer cela affecte les futurs paiements de dons. Resynchronisez les niveaux de support après avoir ajouté un compte locataire afin que des prix récurrents existent dans ce compte Stripe.",
       "route_platform_default": "Plateforme de secours",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Commencer l'intégration de Stripe",
       "continue_onboarding": "Continuer l'intégration de Stripe",
       "requirements_due": "Conditions requises pour le compte Stripe nécessitant une attention : {{count}}.",
       "save": "Enregistrer le routage",
       "status": {
         "not_connected": "Non connecté",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Action nécessaire",
-        "unknown": "Statut inconnu"
+        "unknown": "Statut inconnu",
+        "pending": "En attente",
+        "ready": "Prêt"
       },
       "connect_fallback_active": "Un compte Stripe Connect est configuré, mais il n'est pas encore prêt pour les dons en direct. Les paiements utiliseront la solution de secours de la plateforme jusqu'à ce que l'intégration soit terminée.",
       "requirements_due_one": "Conditions requises pour le compte Stripe nécessitant une attention : {{count}}.",
       "requirements_due_other": "Conditions requises pour le compte Stripe nécessitant une attention : {{count}}.",
-      "requirements_due_many": "Stripe account requirements needing attention: {{count}}."
+      "requirements_due_many": "Stripe account requirements needing attention: {{count}}.",
+      "route_tenant_connect": "Connexion du locataire",
+      "title": "Stripe routage"
     },
     "finance": {
       "title": "Opérations financières",
@@ -217,16 +217,9 @@
       "completed_volume": "Tome terminé",
       "platform_fallback_volume": "Volume de secours de la plateforme",
       "tenant_connect_volume": "Volume de connexion du locataire",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Litiges ouverts",
       "active_recurring": "Actif récurrent",
       "failed_receipts": "Reçus échoués",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Recettes annuelles d’exportation",
       "empty": "Aucune activité financière n’a encore été enregistrée.",
       "donation_count_one": "Don {{count}}",
@@ -235,7 +228,14 @@
       "past_due_count_other": "{{count}} en souffrance",
       "donation_count_many": "{{count}} donation",
       "declaration_count_many": "{{count}} declaration",
-      "past_due_count_many": "{{count}} past due"
+      "past_due_count_many": "{{count}} past due",
+      "gift_aid_ready": "Aide aux dons prête",
+      "export_gift_aid": "Exporter l'Aide aux dons",
+      "donation_count": "Don {{count}}",
+      "donation_count_other": "Dons {{count}}",
+      "declaration_count": "{{count}} déclaration",
+      "declaration_count_other": "{{count}} déclarations",
+      "past_due_count": "{{count}} en retard"
     }
   }
 }

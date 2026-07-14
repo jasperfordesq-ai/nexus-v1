@@ -121,7 +121,7 @@ export default function GroupOrganization() {
       if (res.success) {
         setTags(res.data || []);
       } else {
-        error(res.error || t('group_organization.load_failed'));
+        error(t('group_organization.load_failed'));
       }
     } catch {
       error(t('group_organization.load_failed'));
@@ -137,7 +137,7 @@ export default function GroupOrganization() {
       if (res.success) {
         setCollections(res.data || []);
       } else {
-        error(res.error || t('group_organization.load_failed'));
+        error(t('group_organization.load_failed'));
       }
     } catch {
       error(t('group_organization.load_failed'));
@@ -153,7 +153,7 @@ export default function GroupOrganization() {
       if (res.success) {
         setRules(res.data || []);
       } else {
-        error(res.error || t('group_organization.load_failed'));
+        error(t('group_organization.load_failed'));
       }
     } catch {
       error(t('group_organization.load_failed'));
@@ -200,7 +200,7 @@ export default function GroupOrganization() {
         setTagForm({ name: '', color: '#6366f1' });
         loadTags();
       } else {
-        error(res.error || t('group_organization.tag_create_failed'));
+        error(t('group_organization.tag_create_failed'));
       }
     } catch {
       error(t('group_organization.tag_create_failed'));
@@ -219,7 +219,7 @@ export default function GroupOrganization() {
         setDeleteTagTarget(null);
         loadTags();
       } else {
-        error(res.error || t('group_organization.tag_delete_failed'));
+        error(t('group_organization.tag_delete_failed'));
         setDeleteTagTarget(null);
       }
     } catch {
@@ -273,8 +273,7 @@ export default function GroupOrganization() {
         loadCollections();
       } else {
         error(
-          res.error ||
-            (editingCollection
+          (editingCollection
               ? t('group_organization.collection_update_failed')
               : t('group_organization.collection_create_failed'))
         );
@@ -300,7 +299,7 @@ export default function GroupOrganization() {
         setDeleteCollectionTarget(null);
         loadCollections();
       } else {
-        error(res.error || t('group_organization.collection_delete_failed'));
+        error(t('group_organization.collection_delete_failed'));
         setDeleteCollectionTarget(null);
       }
     } catch {
@@ -335,7 +334,7 @@ export default function GroupOrganization() {
         setGroupsTarget(null);
         loadCollections();
       } else {
-        error(res.error || t('group_organization.groups_save_failed'));
+        error(t('group_organization.groups_save_failed'));
       }
     } catch {
       error(t('group_organization.groups_save_failed'));
@@ -363,7 +362,7 @@ export default function GroupOrganization() {
         setRuleForm({ group_id: '', rule_type: 'location', rule_value: '' });
         loadRules();
       } else {
-        error(res.error || t('group_organization.rule_create_failed'));
+        error(t('group_organization.rule_create_failed'));
       }
     } catch {
       error(t('group_organization.rule_create_failed'));
@@ -382,7 +381,7 @@ export default function GroupOrganization() {
         setDeleteRuleTarget(null);
         loadRules();
       } else {
-        error(res.error || t('group_organization.rule_delete_failed'));
+        error(t('group_organization.rule_delete_failed'));
         setDeleteRuleTarget(null);
       }
     } catch {
@@ -404,7 +403,7 @@ export default function GroupOrganization() {
         )));
         success(t('group_organization.rule_updated'));
       } else {
-        error(res.error || t('group_organization.rule_update_failed'));
+        error(t('group_organization.rule_update_failed'));
       }
     } catch {
       error(t('group_organization.rule_update_failed'));

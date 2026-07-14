@@ -323,7 +323,7 @@ export function JobModerationQueue() {
                     <div className="flex items-center gap-3 mb-2">
                       <Avatar
                         src={resolveAvatarUrl(job.poster_avatar) || undefined}
-                        name={job.poster_name ?? 'Unknown'}
+                        name={job.poster_name ?? tAdmin('common.unknown')}
                         size="sm"
                         className="shrink-0"
                       />
@@ -356,12 +356,14 @@ export function JobModerationQueue() {
                     <div className="flex flex-wrap gap-2">
                       {job.type && (
                         <Chip size="sm" variant="soft" color="accent" className="capitalize">
-                          {job.type}
+                          {t(`jobs.type_${job.type}`, {
+                            defaultValue: t('jobs.type_unknown'),
+                          })}
                         </Chip>
                       )}
                       {job.category && (
                         <Chip size="sm" variant="soft" color="default">
-                          {job.category}
+                          {t('jobs.category_value', { category: job.category })}
                         </Chip>
                       )}
                       {job.location && (

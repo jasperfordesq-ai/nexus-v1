@@ -25,6 +25,7 @@ import Eye from 'lucide-react/icons/eye';
 import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { feedIssueKey } from '@/lib/podcasts/feedIssues';
+import { languageDisplayName } from '@/lib/languageDisplayName';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { podcastsApi, type PodcastEpisode, type PodcastModerationStatus, type PodcastShow, type PodcastStatus } from '@/lib/api/podcasts';
@@ -301,7 +302,7 @@ export default function PodcastsAdmin() {
         toast.success(t(`podcasts_admin.toasts.${type}_${action}`));
         load();
       } else {
-        toast.error(res.error || t('podcasts_admin.action_failed'));
+        toast.error(t('podcasts_admin.action_failed'));
       }
     } catch {
       toast.error(t('podcasts_admin.action_failed'));
@@ -333,7 +334,7 @@ export default function PodcastsAdmin() {
         toast.success(t(`podcasts_admin.toasts.report_${status}`));
         load();
       } else {
-        toast.error(res.error || t('podcasts_admin.action_failed'));
+        toast.error(t('podcasts_admin.action_failed'));
       }
     } catch {
       toast.error(t('podcasts_admin.action_failed'));
@@ -417,7 +418,7 @@ export default function PodcastsAdmin() {
           toast.error(t('podcasts_admin.toasts.feed_invalid', { count: res.data.errors.length }));
         }
       } else {
-        toast.error(res.error || t('podcasts_admin.action_failed'));
+        toast.error(t('podcasts_admin.action_failed'));
       }
     } catch {
       toast.error(t('podcasts_admin.action_failed'));
@@ -697,7 +698,7 @@ export default function PodcastsAdmin() {
                     <p className="text-sm font-medium text-foreground">{t('podcasts_admin.feed_validation.errors')}</p>
                     <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
                       {feedValidation.errors.map((issue) => (
-                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: t('podcasts_admin.feed_issues.unknown') })}</li>
                       ))}
                     </ul>
                   </div>
@@ -707,7 +708,7 @@ export default function PodcastsAdmin() {
                     <p className="text-sm font-medium text-foreground">{t('podcasts_admin.feed_validation.warnings')}</p>
                     <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
                       {feedValidation.warnings.map((issue) => (
-                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: t('podcasts_admin.feed_issues.unknown') })}</li>
                       ))}
                     </ul>
                   </div>
@@ -835,7 +836,7 @@ export default function PodcastsAdmin() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</TableCell>
+                      <TableCell>{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: t('podcasts_admin.report_reasons.unknown') })}</TableCell>
                       <TableCell className="max-w-md whitespace-normal text-sm text-muted">{report.details || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell className="text-right">{reportButtons(report.id)}</TableCell>
@@ -937,7 +938,7 @@ export default function PodcastsAdmin() {
                     <dl className="grid gap-2 text-sm sm:grid-cols-2">
                       <div><dt className="font-medium">{t('podcasts_admin.columns.owner')}</dt><dd className="text-muted">{reviewItem.item.owner?.name ?? t('podcasts_admin.empty_value')}</dd></div>
                       <div><dt className="font-medium">{t('podcasts_admin.review.visibility')}</dt><dd className="text-muted">{reviewState('visibility', reviewItem.item.visibility)}</dd></div>
-                      <div><dt className="font-medium">{t('podcasts_admin.review.language')}</dt><dd className="text-muted">{reviewItem.item.language}</dd></div>
+                      <div><dt className="font-medium">{t('podcasts_admin.review.language')}</dt><dd className="text-muted">{languageDisplayName(reviewItem.item.language, getFormattingLocale())}</dd></div>
                       <div><dt className="font-medium">{t('podcasts_admin.review.category')}</dt><dd className="text-muted">{reviewItem.item.category || t('podcasts_admin.empty_value')}</dd></div>
                     </dl>
                   ) : (
@@ -983,7 +984,7 @@ export default function PodcastsAdmin() {
                             {reviewItem.item.report_history.map((report) => (
                               <li key={report.id} className="border-b border-border pb-2 last:border-0 last:pb-0">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <span className="font-medium">{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</span>
+                                  <span className="font-medium">{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: t('podcasts_admin.report_reasons.unknown') })}</span>
                                   <Chip size="sm" variant="soft">{reviewState('report_status', report.status)}</Chip>
                                 </div>
                                 {report.reporter_name && <p className="text-xs text-muted">{t('podcasts_admin.reporter', { name: report.reporter_name })}</p>}

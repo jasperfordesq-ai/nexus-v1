@@ -15,62 +15,62 @@
     "federation_audit": "フェデレーション監査",
     "platform_admin": "プラットフォーム管理者",
     "back_to_platform_admin": "プラットフォーム管理者に戻る",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "パイロット問い合わせ",
+    "provisioning_queue": "プロビジョニングキュー",
+    "billing_control": "請求管理",
+    "revenue_dashboard": "収益ダッシュボード",
+    "regional_analytics": "地域別分析",
+    "national_dashboard": "全国ダッシュボード"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "スーパ管理者を読み込み中",
+    "skip_to_main": "メインコンテンツにスキップ",
+    "close_navigation": "スーパ管理者ナビゲーションを閉じる",
+    "navigation": "スーパ管理者ナビゲーション"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "管理者に戻る",
+    "toggle_sidebar": "サイドバー切り替え",
+    "notifications": "通知",
+    "my_profile": "マイプロフィール",
+    "sign_out": "サインアウト",
+    "user_fallback": "スーパー管理者",
+    "user_menu": "スーパ管理者メニュー"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "概要",
+    "section_tenants": "テナント",
+    "section_federation": "連邦",
+    "section_commercial": "商業",
+    "expand": "サイドバーを展開",
+    "collapse": "サイドバーを折りたたむ",
+    "nav_label": "スーパ管理者ナビゲーション"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "スーパー管理者",
+    "tenants": "テナント",
+    "create": "作成",
+    "edit": "編集",
+    "hierarchy": "階層",
+    "users": "ユーザー",
+    "federation": "連邦",
+    "whitelist": "ホワイトリスト",
+    "partnerships": "パートナーシップ",
+    "tenant": "テナント",
+    "features": "機能",
+    "billing": "請求",
+    "revenue": "収益",
+    "platform": "プラットフォーム",
+    "pilot_inquiries": "パイロット問い合わせ",
+    "provisioning_requests": "プロビジョニングリクエスト",
+    "national": "国内",
+    "regional_analytics": "地域別分析",
+    "subscriptions": "サブスクリプション",
+    "aria_label": "パンくずリスト",
+    "bulk": "一括操作",
+    "audit": "監査ログ"
   },
   "dashboard": {
     "title": "インフラストラクチャダッシュボード",
@@ -188,7 +188,6 @@
       "actions_card_title": "アクション",
       "view_tenant_btn": "テナントを見る",
       "god_card_title": "グローバルスーパー管理者（神のみ）",
-      "god_warning": "WARNING:",
       "god_warning_text": "グローバル スーパー管理者は、プラットフォーム上のすべてのテナントにアクセスできます。",
       "god_has_access": "ユーザーはグローバルスーパー管理者アクセス権を持っています",
       "god_revoke_btn": "グローバルスーパー管理者の取り消し",
@@ -206,7 +205,8 @@
       "stat_user_id": "ユーザーID",
       "stat_tenant_id": "テナントID",
       "stat_status": "ステータス",
-      "stat_approved": "承認済み"
+      "stat_approved": "承認済み",
+      "god_warning": "警告："
     },
     "create": {
       "breadcrumb_create": "作成",
@@ -288,7 +288,6 @@
   "tenants": {
     "index": {
       "title": "テナントの管理",
-      "subtitle": ":スコープ内のテナントをカウントします",
       "create_btn": "テナントの作成",
       "filter_search_placeholder": "テナントを検索...",
       "filter_hub_label": "ハブテナントのみ",
@@ -304,9 +303,10 @@
       "col_status": "ステータス",
       "col_actions": "アクション",
       "parent_root": "ルート",
-      "level_label": "レベル:深さ",
       "you_badge": "あなた",
-      "no_tenants": "テナントが見つかりませんでした"
+      "no_tenants": "テナントが見つかりませんでした",
+      "subtitle": ":count あなたのスコープ内のテナント",
+      "level_label": "レベル :depth"
     },
     "show": {
       "breadcrumb_tenants": "テナント",
@@ -319,11 +319,9 @@
       "field_slug": "ナメクジ",
       "field_domain": "ドメイン",
       "field_hierarchy_level": "階層レベル",
-      "field_level": "レベル:深さ",
       "field_parent": "親",
       "field_total_users": "総ユーザー数",
       "field_sub_tenants": "サブテナント",
-      "field_sub_tenants_direct": ":直接カウント",
       "field_description": "説明",
       "not_configured": "未設定",
       "root_tenant": "ルートテナント",
@@ -355,7 +353,9 @@
       "reactivate_card_title": "テナントを再アクティブ化する",
       "reactivate_desc": "このテナントは現在非アクティブです。再アクティブ化すると、ユーザー アクセスが復元されます。",
       "reactivate_btn": "テナントを再アクティブ化する",
-      "tenant_id_label": "テナント ID::id |パス::パス"
+      "field_level": "レベル :depth",
+      "field_sub_tenants_direct": ":count 直接",
+      "tenant_id_label": "テナント ID: :id | パス: :path"
     },
     "create": {
       "breadcrumb_create": "作成",
@@ -366,7 +366,6 @@
       "parent_label": "親テナント",
       "parent_placeholder": "-- 親テナントの選択 --",
       "parent_help": "サブテナント機能を持つテナントのみが表示されます。新しいテナントは、選択した親の子として作成されます。",
-      "depth_label": "(深さ::深さ)",
       "name_label": "テナント名",
       "slug_label": "ナメクジ",
       "slug_help": "小文字、数字、ハイフンのみ",
@@ -383,12 +382,12 @@
       "max_depth_unlimited": "無制限",
       "max_depth_help": "このテナントの下に作成できるサブテナントのレベル数を制限します (ハブが有効な場合にのみ適用されます)",
       "submit_btn": "テナントの作成",
-      "cancel_btn": "キャンセル"
+      "cancel_btn": "キャンセル",
+      "depth_label": "(深さ: :depth)"
     },
     "edit": {
       "breadcrumb_edit": "編集",
       "title": "テナントの編集",
-      "subtitle": "変更::name (レベル:深さ)",
       "back_btn": "詳細に戻る",
       "details_card_title": "テナント詳細",
       "name_label": "テナント名",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "標準テナント",
       "max_depth_label": "サブテナントの最大深さ",
       "max_depth_unlimited": "無制限",
-      "max_depth_levels": ":カウントレベル",
       "disable_hub_btn": "ハブを無効にする",
       "disable_hub_confirm": "これにより、新しいサブテナントが作成されなくなります。既存のサブテナントはそのまま残ります。",
       "enable_hub_btn": "ハブを有効にする",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "このテナントを非アクティブ化してもよろしいですか?ユーザーはアクセスできなくなります。",
       "reactivate_card_title": "テナントを再アクティブ化する",
       "reactivate_desc": "このテナントは現在非アクティブです。再アクティブ化すると、ユーザー アクセスが復元されます。",
-      "reactivate_btn": "テナントを再アクティブ化する"
+      "reactivate_btn": "テナントを再アクティブ化する",
+      "subtitle": "変更中: :name (レベル :depth)",
+      "max_depth_levels": ":count レベル"
     },
     "hierarchy": {
       "breadcrumb_tenants": "テナント",
@@ -631,7 +631,6 @@
       "recent_activity_title": "最近の活動",
       "full_log_btn": "完全なログ",
       "no_federation_activity": "連盟の活動はまだありません",
-      "by_label": "by",
       "activity_title": "連盟活動（30日間）",
       "stat_total_actions": "合計アクション数",
       "stat_messages": "メッセージ",
@@ -640,7 +639,8 @@
       "stat_critical_events": "重大なイベント",
       "most_active_partnerships": "最も活発なパートナーシップ",
       "quick_nav_title": "クイックナビゲーション",
-      "tenant_whitelist_btn": "テナントのホワイトリスト"
+      "tenant_whitelist_btn": "テナントのホワイトリスト",
+      "by_label": "作成者"
     },
     "system_controls": {
       "title": "フェデレーション システムの制御",

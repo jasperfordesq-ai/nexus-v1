@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "provisioning_requests": {
     "page_title": "Bereitstellungswarteschlange",
@@ -102,23 +102,43 @@
       "approved": "Genehmigt",
       "provisioned": "Bereitgestellt",
       "rejected": "Abgelehnt",
-      "failed": "Fehlgeschlagen"
+      "failed": "Fehlgeschlagen",
+      "unknown": "Unbekannter Status"
     },
     "fields": {
       "applicant": "Antragsteller",
       "country_region": "Land / Region",
       "slug": "Schnecke",
-      "subdomain": "Subdomain",
       "category": "Kategorie",
       "expected_size": "Erwartete Größe",
       "languages": "Sprachen",
       "provisioned_tenant": "Bereitgestellter Mieter",
       "intended_use": "Verwendungszweck",
       "rejection_reason": "Ablehnungsgrund",
-      "provisioning_log": "Bereitstellungsprotokoll"
+      "provisioning_log": "Bereitstellungsprotokoll",
+      "subdomain": "Subdomain"
     },
-    "loading": "Bereitstellungsanfragen werden geladen…"
+    "loading": "Bereitstellungsanfragen werden geladen…",
+    "categories": {
+      "community": "Gemeinschaft",
+      "timebank": "Zeitbank",
+      "kiss_cooperative": "Caring Community Genossenschaft",
+      "caring_community": "Fürsorgliche Gemeinschaft",
+      "agoris_node": "Agoris-Knoten",
+      "foundation": "Stiftung",
+      "platform": "Plattform",
+      "unknown": "Andere Gemeindetyp"
+    },
+    "size_buckets": {
+      "under_50": "Unter 50 Mitglieder",
+      "50_250": "50–250 Mitglieder",
+      "250_1000": "250–1.000 Mitglieder",
+      "1000_5000": "1.000–5.000 Mitglieder",
+      "5000_plus": "Mehr als 5.000 Mitglieder",
+      "50-200": "50–200 Mitglieder",
+      "unknown": "Größe nicht angegeben"
+    }
   },
-  "loading": "Loading",
-  "refresh": "Aktualisieren"
+  "refresh": "Aktualisieren",
+  "loading": "Lädt"
 }

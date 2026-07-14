@@ -189,9 +189,9 @@ const PERIOD_OPTIONS = [
 ];
 
 const CURRENCY_OPTIONS = [
-  { key: 'GBP', label: 'GBP (£)' },
-  { key: 'EUR', label: 'EUR (€)' },
-  { key: 'USD', label: 'USD ($)' },
+  { key: 'GBP', labelKey: 'impact.currency_gbp' },
+  { key: 'EUR', labelKey: 'impact.currency_eur' },
+  { key: 'USD', labelKey: 'impact.currency_usd' },
 ];
 
 const REPORTING_PERIOD_OPTIONS = [
@@ -199,12 +199,6 @@ const REPORTING_PERIOD_OPTIONS = [
   { key: 'quarterly', labelKey: 'impact.reporting_quarterly' },
   { key: 'annually', labelKey: 'impact.reporting_annually' },
 ];
-
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  GBP: '£',
-  EUR: '€',
-  USD: '$',
-};
 
 const tooltipStyle = {
   borderRadius: '8px',
@@ -219,12 +213,39 @@ const tooltipStyle = {
 
 function formatCurrency(value: number | null | undefined, currency: string): string {
   if (value == null) return '—';
-  const symbol = CURRENCY_SYMBOLS[currency] || currency;
-  return `${symbol}${value.toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  try {
+    return new Intl.NumberFormat(getFormattingLocale(), {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return new Intl.NumberFormat(getFormattingLocale(), {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
 }
 
 function formatPercent(rate: number): string {
-  return `${(rate * 100).toFixed(1)}%`;
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(rate);
+}
+
+function getCurrencySymbol(currency: string): string {
+  try {
+    return new Intl.NumberFormat(getFormattingLocale(), {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+    }).formatToParts(0).find((part) => part.type === 'currency')?.value ?? currency;
+  } catch {
+    return currency;
+  }
 }
 
 function formatMonth(monthStr: string): string {
@@ -1105,7 +1126,7 @@ export function ImpactReport() {
                 variant="secondary"
               >
                 {CURRENCY_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
+                  <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -1119,7 +1140,7 @@ export function ImpactReport() {
                 variant="secondary"
                 startContent={
                   <span className="text-muted text-sm">
-                    {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                    {getCurrencySymbol(configCurrency)}
                   </span>
                 }
                 description={t('impact.desc_hour_value')}
@@ -1166,7 +1187,7 @@ export function ImpactReport() {
                 variant="secondary"
                 startContent={
                   <span className="text-muted text-sm">
-                    {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                    {getCurrencySymbol(configCurrency)}
                   </span>
                 }
                 description={t('impact.desc_investment')}
@@ -1315,7 +1336,7 @@ export function ImpactReport() {
                       className="w-full sm:w-32"
                       startContent={
                         <span className="text-muted text-xs">
-                          {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                          {getCurrencySymbol(configCurrency)}
                         </span>
                       }
                     />
@@ -1337,14 +1358,14 @@ export function ImpactReport() {
             <div className="text-xs text-muted space-y-1">
               <p>
                 <strong>{t('impact.label_sroi_formula')}:</strong> {t('impact.formula_detailed', {
-                  currency: CURRENCY_SYMBOLS[configCurrency] || configCurrency,
+                  currency: getCurrencySymbol(configCurrency),
                   hourValue: configHourValue,
                   multiplier: configMultiplier,
                 })}
               </p>
               <p>
                 <strong>{t('impact.label_value_multiplier')}:</strong> {t('impact.formula_ratio', {
-                  currency: CURRENCY_SYMBOLS[configCurrency] || configCurrency,
+                  currency: getCurrencySymbol(configCurrency),
                   multiplier: configMultiplier,
                 })}
               </p>

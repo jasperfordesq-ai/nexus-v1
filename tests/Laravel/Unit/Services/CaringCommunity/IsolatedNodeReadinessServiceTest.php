@@ -89,10 +89,11 @@ class IsolatedNodeReadinessServiceTest extends TestCase
     public function test_schema_items_have_required_shape(): void
     {
         foreach ($this->svc->schema() as $key => $meta) {
-            $this->assertArrayHasKey('label', $meta, "Schema item '{$key}' missing 'label'");
+            $this->assertArrayHasKey('label_code', $meta, "Schema item '{$key}' missing 'label_code'");
             $this->assertArrayHasKey('type', $meta, "Schema item '{$key}' missing 'type'");
-            $this->assertArrayHasKey('help', $meta, "Schema item '{$key}' missing 'help'");
-            $this->assertIsString($meta['label']);
+            $this->assertArrayHasKey('help_code', $meta, "Schema item '{$key}' missing 'help_code'");
+            $this->assertSame($key, $meta['label_code']);
+            $this->assertSame($key, $meta['help_code']);
             $this->assertContains($meta['type'], ['text', 'enum', 'choice', 'url']);
         }
     }
@@ -148,9 +149,9 @@ class IsolatedNodeReadinessServiceTest extends TestCase
 
         foreach ($result['items'] as $item) {
             $this->assertArrayHasKey('key', $item);
-            $this->assertArrayHasKey('label', $item);
+            $this->assertArrayHasKey('label_code', $item);
             $this->assertArrayHasKey('type', $item);
-            $this->assertArrayHasKey('help', $item);
+            $this->assertArrayHasKey('help_code', $item);
             $this->assertArrayHasKey('value', $item);
             $this->assertArrayHasKey('owner', $item);
             $this->assertArrayHasKey('status', $item);

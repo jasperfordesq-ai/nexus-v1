@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "regional_analytics_admin": {
     "meta": {
@@ -95,8 +95,8 @@
       "status": "Status",
       "period_end": "Einde periode",
       "price_per_month": "Prijs / ma",
-      "modules": "Modules",
-      "actions": "Acties"
+      "actions": "Acties",
+      "modules": "Modules"
     },
     "partner_types": {
       "municipality": "Gemeente",
@@ -104,8 +104,8 @@
     },
     "plan_tiers": {
       "basic": "Basis",
-      "pro": "Pro",
-      "enterprise": "Onderneming"
+      "enterprise": "Onderneming",
+      "pro": "Pro"
     },
     "statuses": {
       "trialing": "Proeven",
@@ -114,10 +114,10 @@
       "cancelled": "Geannuleerd"
     },
     "modules": {
-      "trends": "Trends",
       "demand_supply": "Vraag en aanbod",
       "demographics": "Demografie",
-      "footfall": "Voetstappen"
+      "footfall": "Voetstappen",
+      "trends": "Trends"
     },
     "empty": {
       "subscriptions": "Nog geen abonnementen. Zorg voor één om regionale analyses te gaan verkopen.",

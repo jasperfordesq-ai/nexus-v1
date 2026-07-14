@@ -165,7 +165,7 @@
     "form_description_required": "Opis jest wymagany",
     "form_description_min_length": "Opis musi mieć co najmniej 20 znaków",
     "form_email_label": "Kontakt e-mail",
-    "form_email_placeholder": "kontakt@twojaorganizacja.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "Adres e-mail kontaktowy jest wymagany",
     "form_email_invalid": "Proszę podać prawidłowy adres e-mail",
     "form_website_label": "Strona internetowa (opcjonalnie)",
@@ -281,7 +281,7 @@
     "add_member_heading": "Dodaj członka grupy",
     "add_member_desc": "Wpisz adres e-mail osoby, którą chcesz dodać do tej rezerwacji grupowej. Otrzymają zaproszenie do przyłączenia się.",
     "email_label": "Adres e-mail",
-    "email_placeholder": "członek@przykład.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Anulować",
     "add_member_failed": "Nie udało się dodać członka. Być może są już w grupie lub adres e-mail jest nieprawidłowy.",
     "add_member_error": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie."

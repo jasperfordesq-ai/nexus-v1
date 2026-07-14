@@ -45,7 +45,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
-import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { formatPercentRatio, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
@@ -295,7 +295,10 @@ type TandemSuggestion = {
     availability_overlap?: number;
     interest_overlap?: number;
   };
-  reason: string;
+  reasons: Array<{
+    code: string;
+    params: Record<string, string | number>;
+  }>;
 };
 
 type TandemSuggestionsResponse = {
@@ -317,10 +320,11 @@ type ForecastSeries = {
 type ForecastAlert = {
   id: string;
   severity: 'info' | 'warning' | 'critical';
-  title: string;
-  message: string;
+  title_code: string;
+  message_code: string;
+  message_params: Record<string, string | number>;
   count: number;
-  action_label: string | null;
+  action_code: string | null;
   action_url: string | null;
 };
 
@@ -537,7 +541,8 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
         </ResponsiveContainer>
       </div>
       <div className="mt-1 text-[11px] text-muted">
-        {t('caring_workflow.predictive.confidence')}: <span className="capitalize">{series.confidence}</span>
+        {t('caring_workflow.predictive.confidence')}:{' '}
+        <span>{t(`caring_workflow.predictive.confidence_levels.${series.confidence}`)}</span>
       </div>
     </div>
   );
@@ -553,6 +558,36 @@ function alertSeverityLabel(severity: ForecastAlert['severity'], t: AdminT): str
   if (severity === 'critical') return t('caring_workflow.predictive.severity.critical');
   if (severity === 'warning') return t('caring_workflow.predictive.severity.warning');
   return t('caring_workflow.predictive.severity.info');
+}
+
+function alertMessageParams(alert: ForecastAlert): Record<string, string | number> {
+  return Object.fromEntries(
+    Object.entries(alert.message_params).map(([key, value]) => [
+      key,
+      typeof value === 'number' ? value.toLocaleString(getFormattingLocale()) : value,
+    ]),
+  );
+}
+
+function tandemReason(suggestion: TandemSuggestion, t: AdminT): string {
+  const reasons = suggestion.reasons.map(({ code, params }) => {
+    const localizedParams = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [
+        key,
+        typeof value === 'number'
+          ? value.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 })
+          : value,
+      ]),
+    );
+    return t(`caring_workflow.tandem.reasons.${code}`, localizedParams);
+  });
+
+  return reasons.reduce(
+    (combined, reason) => combined
+      ? t('caring_workflow.tandem.reason_join', { previous: combined, next: reason })
+      : reason,
+    '',
+  );
 }
 
 function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: PredictiveInsightsCardProps): ReactNode {
@@ -642,7 +677,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         <TableCell>{r.name}</TableCell>
                         <TableCell className="text-right tabular-nums">{r.requested_90d.toFixed(1)}</TableCell>
                         <TableCell className="text-right tabular-nums">{r.fulfilled_90d.toFixed(1)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</TableCell>
+                        <TableCell className="text-right tabular-nums">{formatPercentRatio(r.coverage_ratio_90d, { maximumFractionDigits: 0 })}</TableCell>
                         <TableCell>
                           <Chip size="sm" variant="soft" color={r.flagged ? 'warning' : 'default'}>
                             {r.flagged ? t('caring_workflow.predictive.status.under_supplied') : t('caring_workflow.predictive.status.ok')}
@@ -692,7 +727,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                           <TableCell>{c.category_name}</TableCell>
                           <TableCell className="text-right tabular-nums">{c.prior_active}</TableCell>
                           <TableCell className="text-right tabular-nums">{c.lapsed}</TableCell>
-                          <TableCell className="text-right tabular-nums">{(c.churn_rate * 100).toFixed(0)}%</TableCell>
+                          <TableCell className="text-right tabular-nums">{formatPercentRatio(c.churn_rate, { maximumFractionDigits: 0 })}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -737,7 +772,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         <TableCell className="text-right tabular-nums">{c.observed_session_hours.toFixed(2)}</TableCell>
                         <TableCell className="text-right tabular-nums">
                           <Chip size="sm" variant="soft" color={c.flagged ? 'warning' : 'default'}>
-                            {(c.drift * 100).toFixed(0)}%
+                            {formatPercentRatio(c.drift, { maximumFractionDigits: 0 })}
                           </Chip>
                         </TableCell>
                         <TableCell className="text-right tabular-nums">{c.sample_size}</TableCell>
@@ -761,21 +796,28 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         <Chip size="sm" variant="soft" color={alertSeverityChipColor(alert.severity)}>
                           {alertSeverityLabel(alert.severity, t)}
                         </Chip>
-                        <span className="text-sm font-semibold text-foreground">{alert.title}</span>
+                        <span className="text-sm font-semibold text-foreground">
+                          {t(`caring_workflow.predictive.alerts.${alert.title_code}.title`)}
+                        </span>
                         <Chip size="sm" variant="soft" color="default">
                           {alert.count.toLocaleString(getFormattingLocale())}
                         </Chip>
                       </div>
-                      <p className="mt-1 text-xs text-muted">{alert.message}</p>
+                      <p className="mt-1 text-xs text-muted">
+                        {t(
+                          `caring_workflow.predictive.alerts.${alert.message_code}.message`,
+                          alertMessageParams(alert),
+                        )}
+                      </p>
                     </div>
-                    {alert.action_url && alert.action_label && (
+                    {alert.action_url && alert.action_code && (
                       <Button
                         as={Link}
                         size="sm"
                         variant={alert.severity === 'critical' ? 'danger' : 'secondary'}
                         to={alert.action_url}
                       >
-                        {alert.action_label}
+                        {t(`caring_workflow.predictive.alert_actions.${alert.action_code}`)}
                       </Button>
                     )}
                   </div>
@@ -933,14 +975,14 @@ export default function CaringCommunityWorkflowPage() {
         setForecast(res.data);
       } else {
         setForecast(null);
-        setForecastError('Could not load predictive insights.');
+        setForecastError(t('caring_workflow.predictive.load_failed'));
       }
     } catch {
-      setForecastError('Could not load predictive insights.');
+      setForecastError(t('caring_workflow.predictive.load_failed'));
     } finally {
       setLoadingForecast(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadForecast();
@@ -1313,7 +1355,7 @@ export default function CaringCommunityWorkflowPage() {
         loadSupportRelationships();
         loadWorkflow();
       } else {
-        toast.error(res.error || t('caring_workflow.relationships.log_failed'));
+        toast.error(t('caring_workflow.relationships.log_failed'));
       }
     } catch {
       toast.error(t('caring_workflow.relationships.log_failed'));
@@ -1909,7 +1951,11 @@ export default function CaringCommunityWorkflowPage() {
                                     {t(`caring_workflow.safeguarding.severity.${r.severity}`)}
                                   </Chip>
                                 </TableCell>
-                                <TableCell>{r.category}</TableCell>
+                                <TableCell>
+                                  {t(`caring_workflow.safeguarding.categories.${r.category}`, {
+                                    defaultValue: t('caring_workflow.safeguarding.categories.unknown'),
+                                  })}
+                                </TableCell>
                                 <TableCell>
                                   {r.subject_user_name ?? (r.subject_organisation_id ? t('caring_workflow.safeguarding.org_subject', { id: r.subject_organisation_id }) : t('caring_workflow.empty.value'))}
                                 </TableCell>
@@ -2057,8 +2103,8 @@ export default function CaringCommunityWorkflowPage() {
                           ))}
                         </div>
                       )}
-                      {suggestion.reason && (
-                        <p className="mt-2 text-xs text-muted">{suggestion.reason}</p>
+                      {suggestion.reasons.length > 0 && (
+                        <p className="mt-2 text-xs text-muted">{tandemReason(suggestion, t)}</p>
                       )}
                       <div className="mt-3 flex flex-wrap justify-end gap-2">
                         <Button
@@ -2328,7 +2374,9 @@ export default function CaringCommunityWorkflowPage() {
                   <p className="mt-1 text-sm text-foreground line-clamp-2">{f.description}</p>
                   {f.category && (
                     <span className="mt-1 inline-block rounded bg-surface-secondary px-1.5 py-0.5 text-xs text-foreground">
-                      {f.category}
+                      {t(`caring_workflow.favours.categories.${f.category}`, {
+                        defaultValue: t('caring_workflow.favours.categories.unknown'),
+                      })}
                     </span>
                   )}
                 </div>

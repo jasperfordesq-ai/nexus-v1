@@ -321,7 +321,10 @@
     "members_error_title": "No se pudieron cargar los miembros pendientes",
     "members_error_hint": "La cola de aprobación no se pudo cargar. Reintenta para obtenerla de nuevo.",
     "retry": "Reintentar",
-    "empty_pending_title": "Todo al día"
+    "empty_pending_title": "Todo al día",
+    "stage_first_listing": "Primera Publicación",
+    "stage_repeat_user": "Usuario Recurrente",
+    "stage_unknown": "Etapa desconocida"
   },
   "safeguarding": {
     "title": "Protección",
@@ -1128,7 +1131,7 @@
     "field_show_broker_name_help": "Mostrar a los miembros el nombre del bróker asignado.",
     "field_broker_contact_email_label": "Correo electrónico de contacto del bróker",
     "field_broker_contact_email_help": "Correo electrónico público de contacto para consultas al bróker.",
-    "field_broker_contact_email_placeholder": "corredor@ejemplo.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "Correo electrónico de contacto del bróker",
     "field_broker_approval_required_label": "Aprobación del bróker requerida",
     "field_broker_approval_required_help": "Requerir la aprobación del bróker antes de que los intercambios puedan continuar.",
@@ -1290,7 +1293,8 @@
     "pending_confirmation": "Pendiente de confirmación",
     "confirmed": "Confirmado",
     "review_requested": "Revisión solicitada",
-    "not_confirmed": "No confirmado"
+    "not_confirmed": "No confirmado",
+    "unknown": "Desconocido"
   },
   "common": {
     "loading": "Cargando...",

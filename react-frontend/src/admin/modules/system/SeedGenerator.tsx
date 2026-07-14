@@ -69,7 +69,7 @@ export function SeedGenerator() {
           t('system.generated_data_for', { count: selected.length })
         );
       } else {
-        toast.error(t('system.seed_generation_failed'), res.error || t('system.seed_generation_error'));
+        toast.error(t('system.seed_generation_failed'), t('system.seed_generation_error'));
       }
     } catch {
       toast.error(t('system.seed_generation_failed'), t('system.seed_generation_error'));

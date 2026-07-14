@@ -72,6 +72,15 @@ interface SellerSettings {
   loyalty_max_discount_pct: number;
 }
 
+function formatChf(amount: number): string {
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'CHF',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,7 +118,7 @@ export default function LoyaltyAdminPage() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        toast.error(res.error || t('admin.loyalty.errors.load_redemptions'));
+        toast.error(t('admin.loyalty.errors.load_redemptions'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: load redemptions failed', err);
@@ -134,7 +143,7 @@ export default function LoyaltyAdminPage() {
         if (res.success && res.data) {
           setSettings(res.data);
         } else {
-          toast.error(res.error || t('admin.loyalty.errors.load_settings'));
+          toast.error(t('admin.loyalty.errors.load_settings'));
         }
       } catch (err) {
         logError('LoyaltyAdminPage: load settings failed', err);
@@ -181,7 +190,7 @@ export default function LoyaltyAdminPage() {
         setSettings(res.data);
         toast.success(t('admin.loyalty.messages.settings_saved'));
       } else {
-        toast.error(res.error || t('admin.loyalty.errors.save_settings'));
+        toast.error(t('admin.loyalty.errors.save_settings'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: save settings failed', err);
@@ -221,7 +230,7 @@ export default function LoyaltyAdminPage() {
         setReverseReason('');
         await loadRedemptions();
       } else {
-        toast.error(res.error || t('admin.loyalty.errors.reverse'));
+        toast.error(t('admin.loyalty.errors.reverse'));
       }
     } catch (err) {
       logError('LoyaltyAdminPage: reverse failed', err);
@@ -296,7 +305,7 @@ export default function LoyaltyAdminPage() {
         <StatCard
           icon={Store}
           label={t('admin.loyalty.stats.total_chf_discount')}
-          value={`CHF ${stats.total_discount_chf.toFixed(2)}`}
+          value={formatChf(stats.total_discount_chf)}
           color="success"
         />
       </div>
@@ -452,7 +461,7 @@ export default function LoyaltyAdminPage() {
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums">
                     <Chip variant="soft" color="success" size="sm">
-                      CHF {row.discount_chf.toFixed(2)}
+                      {formatChf(row.discount_chf)}
                     </Chip>
                   </TableCell>
                   <TableCell className="text-sm">

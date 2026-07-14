@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ComponentProps, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Autocomplete as HeroAutocomplete } from '@heroui/react/autocomplete';
 import { Description } from '@heroui/react/description';
 import { FieldError } from '@heroui/react/field-error';
@@ -64,6 +65,7 @@ export function Autocomplete<T extends object = object>({
   variant,
   ...props
 }: AutocompleteProps<T>) {
+  const { t } = useTranslation('common');
   const { contains } = useFilter({ sensitivity: 'base' });
   const filterFn = filter ?? contains;
 
@@ -84,7 +86,7 @@ export function Autocomplete<T extends object = object>({
       {description != null && <Description>{description}</Description>}
       <HeroAutocomplete.Popover className={classNames?.popover}>
         <HeroAutocomplete.Filter filter={filterFn}>
-          <SearchField aria-label={searchPlaceholder ?? 'Search'}>
+          <SearchField aria-label={searchPlaceholder ?? t('accessibility.search')}>
             <SearchField.Group>
               <SearchField.SearchIcon />
               <SearchField.Input className={classNames?.searchInput} placeholder={searchPlaceholder} />

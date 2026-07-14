@@ -67,8 +67,8 @@ import { adminSystem, adminCron } from '../../api/adminApi';
 import { CronJobSettingsPage } from './CronJobSettings';
 
 const MOCK_JOBS = [
-  { slug: 'daily-digest', name: 'Daily Digest', schedule: '0 9 * * *', is_enabled: true },
-  { slug: 'weekly-report', name: 'Weekly Report', schedule: '0 8 * * 1', is_enabled: false },
+  { id: 1, slug: 'daily-digest', translation_key: 'daily_digest', schedule: '0 9 * * *', status: 'active' },
+  { id: 2, slug: 'weekly-digest', translation_key: 'weekly_digest', schedule: '0 8 * * 1', status: 'disabled' },
 ];
 
 const MOCK_JOB_SETTINGS = {

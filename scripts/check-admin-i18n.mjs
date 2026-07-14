@@ -6,23 +6,25 @@
 /**
  * check-admin-i18n.mjs — Verify that admin React translation keys exist.
  *
- * Scans react-frontend/src/admin for useTranslation(...) usage and validates
- * string-literal t(...) keys against the matching English locale namespace.
- * Also expands a small set of high-risk dynamic admin key families that have
- * regressed repeatedly (tenant features/modules and module registry labels).
+ * Scope-aware parsing covers both admin source trees, useTranslation key
+ * prefixes, namespace overrides, literal calls, and high-risk dynamic or
+ * registry-backed keys that ordinary JSX lint cannot resolve.
  *
  * Exit code 0 = no missing admin keys detected.
  * Exit code 1 = one or more required admin keys are missing.
  *
- * This script intentionally uses only built-in Node modules so it can run in CI
- * without installing dependencies.
+ * The parser uses the TypeScript dependency installed by react-frontend.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
+import { createRequire } from 'node:module';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join, relative, resolve } from 'path';
 
 const PROJECT_ROOT = process.cwd();
+const require = createRequire(import.meta.url);
+const ts = require(join(PROJECT_ROOT, 'react-frontend', 'node_modules', 'typescript'));
 const ADMIN_SRC_DIR = join(PROJECT_ROOT, 'react-frontend', 'src', 'admin');
+const SUPER_ADMIN_SRC_DIR = join(PROJECT_ROOT, 'react-frontend', 'src', 'super-admin');
 const LOCALES_DIR = join(PROJECT_ROOT, 'react-frontend', 'public', 'locales', 'en');
 const MODULE_REGISTRY_FILE = join(
   PROJECT_ROOT,
@@ -36,7 +38,10 @@ const MODULE_REGISTRY_FILE = join(
 
 const MODULE_IDS = readModuleIds(MODULE_REGISTRY_FILE);
 const LOCALE_KEYSETS = loadLocaleKeysets(LOCALES_DIR);
-const SOURCE_FILES = walkFiles(ADMIN_SRC_DIR, /\.(ts|tsx)$/);
+const SOURCE_FILES = [ADMIN_SRC_DIR, SUPER_ADMIN_SRC_DIR]
+  .filter(existsSync)
+  .flatMap((directory) => walkFiles(directory, /\.(ts|tsx)$/));
+const INDIRECT_REQUIREMENTS = readIndirectTranslationRequirements();
 
 let missingCount = 0;
 let warningCount = 0;
@@ -48,18 +53,14 @@ console.log(`  Source files: ${SOURCE_FILES.length}`);
 console.log(`  Locale namespaces: ${[...LOCALE_KEYSETS.keys()].sort().join(', ')}`);
 console.log('');
 
+for (const requirement of INDIRECT_REQUIREMENTS) {
+  reportMissingIfNeeded(requirement.namespace, requirement.key, requirement.file, requirement.line);
+}
+
 for (const filePath of SOURCE_FILES) {
   const relPath = normalizeSlashes(relative(PROJECT_ROOT, filePath));
   const source = readFileSync(filePath, 'utf8');
-  const aliasNamespaces = extractTranslationAliases(source);
-  if (aliasNamespaces.size === 0) {
-    continue;
-  }
-
-  const callsites = [];
-  for (const [alias, namespace] of aliasNamespaces.entries()) {
-    callsites.push(...extractTranslationCalls(source, alias, namespace));
-  }
+  const callsites = extractTranslationCallsites(source, filePath);
 
   for (const call of callsites) {
     const targetNamespace = call.overrideNamespace ?? call.namespace;
@@ -68,22 +69,26 @@ for (const filePath of SOURCE_FILES) {
     }
 
     if (call.kind === 'literal') {
-      if (!shouldAuditKey(relPath, targetNamespace, call.key)) {
-        continue;
-      }
-      reportMissingIfNeeded(targetNamespace, call.key, relPath, call.line);
+      const resolvedKey = call.keyPrefix && !call.key.includes(':')
+        ? `${call.keyPrefix}.${call.key}`
+        : call.key;
+      const qualified = splitQualifiedKey(resolvedKey, targetNamespace);
+      reportMissingIfNeeded(qualified.namespace, qualified.key, relPath, call.line);
       continue;
     }
 
-    if (!shouldAuditKey(relPath, targetNamespace, call.rawTemplate.split('${')[0])) {
+    const rawTemplate = call.keyPrefix
+      ? `${call.keyPrefix}.${call.rawTemplate}`
+      : call.rawTemplate;
+    if (!shouldAuditKey(relPath, targetNamespace, rawTemplate.split('${')[0])) {
       continue;
     }
 
-    const expandedKeys = expandDynamicKey(call.rawTemplate, relPath, source);
+    const expandedKeys = expandDynamicKey(rawTemplate, relPath, source);
     if (expandedKeys === null) {
       warningCount++;
       console.log(
-        `[WARN] ${relPath}:${call.line} — unsupported dynamic key pattern in namespace "${targetNamespace}": ${call.rawTemplate}`,
+        `[WARN] ${relPath}:${call.line} — unsupported dynamic key pattern in namespace "${targetNamespace}": ${rawTemplate}`,
       );
       continue;
     }
@@ -121,7 +126,15 @@ process.exit(0);
 
 function reportMissingIfNeeded(namespace, key, relPath, line) {
   const keyset = LOCALE_KEYSETS.get(namespace);
-  if (!keyset || keyset.has(key)) {
+  const hasPluralVariant = keyset && [
+    'zero',
+    'one',
+    'two',
+    'few',
+    'many',
+    'other',
+  ].some((suffix) => keyset.has(`${key}_${suffix}`));
+  if (!keyset || keyset.has(key) || hasPluralVariant) {
     return;
   }
   missingCount++;
@@ -251,6 +264,105 @@ function readModuleIds(filePath) {
   return [...ids].sort();
 }
 
+function splitQualifiedKey(key, fallbackNamespace) {
+  const separator = key.indexOf(':');
+  if (separator <= 0) {
+    return { namespace: fallbackNamespace, key };
+  }
+  const namespace = key.slice(0, separator);
+  if (!LOCALE_KEYSETS.has(namespace)) {
+    return { namespace: fallbackNamespace, key };
+  }
+  return { namespace, key: key.slice(separator + 1) };
+}
+
+function readIndirectTranslationRequirements() {
+  const requirements = [];
+  const add = (namespace, key, file, line = 1) => {
+    requirements.push({ namespace, key, file, line });
+  };
+
+  const registrySource = readFileSync(MODULE_REGISTRY_FILE, 'utf8');
+  const registryFile = normalizeSlashes(relative(PROJECT_ROOT, MODULE_REGISTRY_FILE));
+  for (const id of MODULE_IDS) {
+    add('admin_config', `config.module_name_${id}`, registryFile);
+    add('admin_config', `config.module_desc_${id}`, registryFile);
+  }
+  for (const [index, line] of registrySource.split(/\r?\n/).entries()) {
+    const option = /\{\s*key:\s*'([^']+)'/.exec(line)?.[1];
+    const category = /\bcategory:\s*'([^']+)'/.exec(line)?.[1];
+    if (!option || !category) continue;
+    const optionToken = slugTranslationToken(option, false);
+    add('admin_config', `config.option_${optionToken}_label`, registryFile, index + 1);
+    add('admin_config', `config.option_${optionToken}_desc`, registryFile, index + 1);
+    add('admin_config', `config.option_category_${category}`, registryFile, index + 1);
+    const choices = /\bchoices:\s*\[([^\]]*)\]/.exec(line)?.[1] ?? '';
+    for (const match of choices.matchAll(/\bvalue:\s*'([^']+)'/g)) {
+      add(
+        'admin_config',
+        `config.option_choice_${optionToken}_${slugTranslationToken(match[1], true)}`,
+        registryFile,
+        index + 1,
+      );
+    }
+  }
+
+  const prefixedRegistries = [
+    {
+      file: join(ADMIN_SRC_DIR, 'data', 'helpContent.ts'),
+      namespace: 'admin_help',
+      prefix: 'articles.',
+    },
+    {
+      file: join(ADMIN_SRC_DIR, 'components', 'Abbr.tsx'),
+      namespace: 'admin_glossary',
+      prefix: 'terms.',
+    },
+    {
+      file: join(ADMIN_SRC_DIR, 'modules', 'federation', 'ApiDocumentation.tsx'),
+      namespace: 'admin_federation',
+      prefix: 'federation.api_doc_',
+    },
+  ];
+  for (const registry of prefixedRegistries) {
+    if (!existsSync(registry.file)) continue;
+    const source = readFileSync(registry.file, 'utf8');
+    const relativeFile = normalizeSlashes(relative(PROJECT_ROOT, registry.file));
+    const pattern = new RegExp(`(['\"])(` + escapeRegExp(registry.prefix) + `[^'\"]+)\\1`, 'g');
+    for (const match of source.matchAll(pattern)) {
+      const line = 1 + countNewlines(source.slice(0, match.index));
+      add(registry.namespace, match[2], relativeFile, line);
+    }
+  }
+
+  const iconSourcePath = join(PROJECT_ROOT, 'react-frontend', 'src', 'components', 'ui', 'DynamicIcon.tsx');
+  if (existsSync(iconSourcePath)) {
+    const source = readFileSync(iconSourcePath, 'utf8');
+    const map = /export const ICON_MAP[^=]*=\s*\{([\s\S]*?)\n\};/.exec(source)?.[1] ?? '';
+    const relativeFile = normalizeSlashes(relative(PROJECT_ROOT, iconSourcePath));
+    for (const match of map.matchAll(/^\s*([A-Za-z_$][\w$]*),\s*$/gm)) {
+      add('admin_nav', `icon_picker.icons.${match[1]}`, relativeFile, 1 + countNewlines(map.slice(0, match.index)));
+    }
+  }
+
+  const uniqueRequirements = new Map();
+  for (const requirement of requirements) {
+    uniqueRequirements.set(`${requirement.namespace}:${requirement.key}`, requirement);
+  }
+  return [...uniqueRequirements.values()];
+}
+
+function slugTranslationToken(value, lowerCase) {
+  const normalized = (lowerCase ? value.toLowerCase() : value)
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return normalized || 'value';
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function loadLocaleKeysets(localeDir) {
   if (!existsSync(localeDir)) {
     throw new Error(`Locale directory not found: ${localeDir}`);
@@ -307,99 +419,139 @@ function walkFiles(dir, pattern) {
   return files;
 }
 
-function extractTranslationAliases(source) {
-  const aliases = new Map();
-  const regex =
-    /const\s*\{\s*t(?:\s*:\s*([A-Za-z_$][\w$]*))?\s*\}\s*=\s*useTranslation\(\s*(['"`])([^'"`]+)\2\s*\)/g;
-  let match;
-  while ((match = regex.exec(source)) !== null) {
-    const alias = match[1] || 't';
-    const namespace = match[3];
-    aliases.set(alias, namespace);
+function extractTranslationCallsites(source, filePath) {
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    filePath.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const bindings = [];
+  const calls = [];
+
+  function visit(node) {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === 'useTranslation' &&
+      ts.isVariableDeclaration(node.parent) &&
+      ts.isObjectBindingPattern(node.parent.name)
+    ) {
+      const bindingElement = node.parent.name.elements.find((element) => {
+        const exportedName = element.propertyName && ts.isIdentifier(element.propertyName)
+          ? element.propertyName.text
+          : ts.isIdentifier(element.name)
+            ? element.name.text
+            : '';
+        return exportedName === 't';
+      });
+      const namespace = readTranslationNamespace(node.arguments[0]);
+      if (bindingElement && ts.isIdentifier(bindingElement.name) && namespace) {
+        bindings.push({
+          alias: bindingElement.name.text,
+          namespace,
+          keyPrefix: readStringProperty(node.arguments[1], 'keyPrefix') ?? '',
+          declarationStart: node.parent.getStart(sourceFile),
+          scope: nearestTranslationScope(node.parent),
+        });
+      }
+    }
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.arguments.length > 0) {
+      calls.push(node);
+    }
+    ts.forEachChild(node, visit);
   }
-  return aliases;
+
+  function nearestTranslationScope(node) {
+    let current = node.parent;
+    while (current && !ts.isSourceFile(current)) {
+      if (ts.isFunctionLike(current)) return current;
+      current = current.parent;
+    }
+    return sourceFile;
+  }
+
+  visit(sourceFile);
+
+  const callsites = [];
+  for (const call of calls) {
+    const alias = call.expression.text;
+    const binding = bindings
+      .filter((candidate) =>
+        candidate.alias === alias &&
+        candidate.declarationStart <= call.getStart(sourceFile) &&
+        call.pos >= candidate.scope.pos &&
+        call.end <= candidate.scope.end,
+      )
+      .sort((left, right) =>
+        (left.scope.end - left.scope.pos) - (right.scope.end - right.scope.pos) ||
+        right.declarationStart - left.declarationStart,
+      )[0];
+    if (!binding) continue;
+
+    const parsed = parseTranslationArgument(call.arguments[0], sourceFile);
+    if (!parsed) continue;
+    const location = sourceFile.getLineAndCharacterOfPosition(call.getStart(sourceFile));
+    callsites.push({
+      namespace: binding.namespace,
+      keyPrefix: binding.keyPrefix,
+      overrideNamespace: readStringProperty(call.arguments[1], 'ns'),
+      line: location.line + 1,
+      ...parsed,
+    });
+  }
+
+  return dedupeCallsites(callsites);
 }
 
-function extractTranslationCalls(source, alias, namespace) {
-  const calls = [];
-  const needle = `${alias}(`;
-
-  let index = 0;
-  while (index < source.length) {
-    const foundAt = source.indexOf(needle, index);
-    if (foundAt === -1) break;
-
-    const prevChar = foundAt > 0 ? source[foundAt - 1] : '';
-    if (/[A-Za-z0-9_$\.]/.test(prevChar)) {
-      index = foundAt + needle.length;
-      continue;
-    }
-
-    const openParen = foundAt + alias.length;
-    const closeParen = findMatchingBracket(source, openParen, '(', ')');
-    if (closeParen === -1) break;
-
-    const inner = source.slice(openParen + 1, closeParen);
-    const args = splitTopLevelArgs(inner);
-    const firstArg = args[0]?.trim();
-    if (!firstArg) {
-      index = closeParen + 1;
-      continue;
-    }
-
-    const line = 1 + countNewlines(source.slice(0, foundAt));
-    const overrideNamespace = extractNamespaceOverride(args[1] ?? '');
-    const parsed = parseFirstArg(firstArg);
-    if (parsed) {
-      calls.push({ namespace, overrideNamespace, line, ...parsed });
-    }
-
-    index = closeParen + 1;
+function readTranslationNamespace(node) {
+  if (ts.isStringLiteralLike(node)) return node.text;
+  if (ts.isArrayLiteralExpression(node)) {
+    const first = node.elements.find((element) => ts.isStringLiteralLike(element));
+    return first?.text ?? null;
   }
+  return null;
+}
 
-  return dedupeCallsites(calls);
+function readStringProperty(node, propertyName) {
+  if (!node || !ts.isObjectLiteralExpression(node)) return null;
+  const property = node.properties.find((candidate) =>
+    ts.isPropertyAssignment(candidate) && getTsPropertyName(candidate.name) === propertyName,
+  );
+  return property && ts.isPropertyAssignment(property) && ts.isStringLiteralLike(property.initializer)
+    ? property.initializer.text
+    : null;
+}
+
+function getTsPropertyName(node) {
+  return ts.isIdentifier(node) || ts.isStringLiteralLike(node) ? node.text : '';
+}
+
+function parseTranslationArgument(node, sourceFile) {
+  if (ts.isStringLiteralLike(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
+    return { kind: 'literal', key: node.text };
+  }
+  if (ts.isTemplateExpression(node)) {
+    let rawTemplate = node.head.text;
+    for (const span of node.templateSpans) {
+      rawTemplate += `\${${span.expression.getText(sourceFile)}}${span.literal.text}`;
+    }
+    return { kind: 'template', rawTemplate };
+  }
+  return null;
 }
 
 function dedupeCallsites(calls) {
   const seen = new Set();
   return calls.filter((call) => {
     const id =
-      `${call.namespace}|${call.overrideNamespace || ''}|${call.line}|` +
+      `${call.namespace}|${call.keyPrefix || ''}|${call.overrideNamespace || ''}|${call.line}|` +
       (call.kind === 'literal' ? call.key : call.rawTemplate);
     if (seen.has(id)) return false;
     seen.add(id);
     return true;
   });
-}
-
-function parseFirstArg(arg) {
-  if (
-    (arg.startsWith("'") && arg.endsWith("'")) ||
-    (arg.startsWith('"') && arg.endsWith('"'))
-  ) {
-    return { kind: 'literal', key: unquote(arg) };
-  }
-
-  if (arg.startsWith('`') && arg.endsWith('`')) {
-    const rawTemplate = arg.slice(1, -1);
-    if (!rawTemplate.includes('${')) {
-      return { kind: 'literal', key: rawTemplate };
-    }
-    return { kind: 'template', rawTemplate };
-  }
-
-  return null;
-}
-
-function unquote(value) {
-  const quote = value[0];
-  const inner = value.slice(1, -1);
-  return inner.replaceAll(`\\${quote}`, quote);
-}
-
-function extractNamespaceOverride(arg) {
-  const match = /\bns\s*:\s*(['"`])([^'"`]+)\1/.exec(arg);
-  return match ? match[2] : null;
 }
 
 function expandDynamicKey(rawTemplate, relPath, source) {
@@ -571,73 +723,6 @@ function extractConstInitializer(source, constName) {
   }
 
   return null;
-}
-
-function splitTopLevelArgs(text) {
-  const args = [];
-  let current = '';
-  let depthParen = 0;
-  let depthBracket = 0;
-  let depthBrace = 0;
-  let quote = null;
-  let templateDepth = 0;
-  let escaped = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const next = text[i + 1];
-    current += char;
-
-    if (quote) {
-      if (escaped) {
-        escaped = false;
-        continue;
-      }
-      if (char === '\\') {
-        escaped = true;
-        continue;
-      }
-      if (quote === '`' && char === '$' && next === '{') {
-        templateDepth++;
-        current += next;
-        i++;
-        continue;
-      }
-      if (quote === '`' && char === '}' && templateDepth > 0) {
-        templateDepth--;
-        continue;
-      }
-      if (char === quote && templateDepth === 0) {
-        quote = null;
-      }
-      continue;
-    }
-
-    if (char === "'" || char === '"' || char === '`') {
-      quote = char;
-      continue;
-    }
-    if (char === '(') depthParen++;
-    else if (char === ')') depthParen--;
-    else if (char === '[') depthBracket++;
-    else if (char === ']') depthBracket--;
-    else if (char === '{') depthBrace++;
-    else if (char === '}') depthBrace--;
-    else if (
-      char === ',' &&
-      depthParen === 0 &&
-      depthBracket === 0 &&
-      depthBrace === 0
-    ) {
-      args.push(current.slice(0, -1));
-      current = '';
-    }
-  }
-
-  if (current.trim()) {
-    args.push(current);
-  }
-  return args;
 }
 
 function findMatchingBracket(text, openIndex, opener, closer) {

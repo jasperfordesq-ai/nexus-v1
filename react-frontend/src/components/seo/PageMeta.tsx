@@ -179,6 +179,7 @@ export function PageMeta({
       {enableCanonical && canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
       {/* Robots */}
+      {/* admin-i18n-ignore: standards-defined robots directive, not rendered copy */}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph / Facebook (respects admin toggle) */}

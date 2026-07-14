@@ -64,9 +64,10 @@ vi.mock('../../components', () => ({
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 const makeSection = (overrides = {}) => ({
   key: 'commercial_boundary',
-  label: 'Commercial Boundary',
+  label_code: 'commercial_boundary',
   status: 'ready' as const,
-  summary: 'All checks passed',
+  summary_code: 'commercial_boundary.ready_default',
+  summary_params: {},
   admin_path: '/admin/commercial',
   last_updated_at: '2025-01-01T00:00:00Z',
   missing: [],
@@ -79,7 +80,8 @@ const makeReadinessReport = (overrides = {}) => ({
     status: 'ready' as const,
     ready_section_count: 3,
     total_section_count: 3,
-    summary: 'All sections are ready',
+    summary_code: 'ready',
+    summary_params: {},
   },
   sections: [makeSection()],
   isolated_node_required: false,
@@ -112,7 +114,7 @@ describe('PilotLaunchReadinessAdminPage', () => {
     render(<PilotLaunchReadinessAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Commercial Boundary')).toBeInTheDocument();
+      expect(screen.getByText('AG82 — Commercial boundary map')).toBeInTheDocument();
     });
   });
 
@@ -154,7 +156,7 @@ describe('PilotLaunchReadinessAdminPage', () => {
     const PilotLaunchReadinessAdminPage = (await import('./PilotLaunchReadinessAdminPage')).default;
     render(<PilotLaunchReadinessAdminPage />);
 
-    await waitFor(() => screen.getByText('Commercial Boundary'));
+    await waitFor(() => screen.getByText('AG82 — Commercial boundary map'));
 
     // i18n resolves to "Launch pilot"
     const launchBtn = screen.getAllByRole('button').find((b) =>
@@ -169,7 +171,7 @@ describe('PilotLaunchReadinessAdminPage', () => {
     const PilotLaunchReadinessAdminPage = (await import('./PilotLaunchReadinessAdminPage')).default;
     render(<PilotLaunchReadinessAdminPage />);
 
-    await waitFor(() => screen.getByText('Commercial Boundary'));
+    await waitFor(() => screen.getByText('AG82 — Commercial boundary map'));
 
     const launchBtn = screen.getAllByRole('button').find((b) =>
       b.textContent?.includes('Launch pilot')
@@ -191,7 +193,7 @@ describe('PilotLaunchReadinessAdminPage', () => {
     const PilotLaunchReadinessAdminPage = (await import('./PilotLaunchReadinessAdminPage')).default;
     render(<PilotLaunchReadinessAdminPage />);
 
-    await waitFor(() => screen.getByText('Commercial Boundary'));
+    await waitFor(() => screen.getByText('AG82 — Commercial boundary map'));
 
     // Open modal — "Launch pilot" button
     const launchBtn = screen.getAllByRole('button').find((b) =>
@@ -229,7 +231,7 @@ describe('PilotLaunchReadinessAdminPage', () => {
     const PilotLaunchReadinessAdminPage = (await import('./PilotLaunchReadinessAdminPage')).default;
     render(<PilotLaunchReadinessAdminPage />);
 
-    await waitFor(() => screen.getByText('Commercial Boundary'));
+    await waitFor(() => screen.getByText('AG82 — Commercial boundary map'));
 
     const launchBtn = screen.getAllByRole('button').find((b) =>
       b.textContent?.includes('Launch pilot')
@@ -243,12 +245,13 @@ describe('PilotLaunchReadinessAdminPage', () => {
       success: true,
       data: makeReadinessReport({
         can_launch: false,
-        blockers: [{ key: 'safeguarding', label: 'Safeguarding', status: 'blocked' }],
+        blockers: [{ key: 'safeguarding', status: 'blocked' }],
         overall: {
           status: 'blocked',
           ready_section_count: 1,
           total_section_count: 3,
-          summary: 'There are blockers',
+          summary_code: 'blocked',
+          summary_params: {},
         },
         sections: [makeSection({ status: 'blocked', missing: ['safeguarding_escalation_user_id'] })],
       }),
@@ -272,7 +275,8 @@ describe('PilotLaunchReadinessAdminPage', () => {
           status: 'needs_review',
           ready_section_count: 0,
           total_section_count: 1,
-          summary: 'Needs review',
+          summary_code: 'needs_review',
+          summary_params: { ready: 0, total: 1 },
         },
       }),
     });

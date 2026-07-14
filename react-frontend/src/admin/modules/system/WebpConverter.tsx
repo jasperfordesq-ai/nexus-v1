@@ -59,7 +59,7 @@ export function WebpConverter() {
         toast.success(t('system.webp_conversion_complete'), t('system.webp_all_converted'));
         await fetchStats();
       } else {
-        toast.error(t('system.conversion_failed'), res.error || t('system.webp_conversion_error'));
+        toast.error(t('system.conversion_failed'), t('system.webp_conversion_error'));
       }
     } catch {
       toast.error(t('system.conversion_failed'), t('system.webp_conversion_error'));

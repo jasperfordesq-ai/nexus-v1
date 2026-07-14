@@ -8,5 +8,33 @@
   "after_label": "Ina dhiaidh",
   "caveat_label": "Modh",
   "evidence_label": "Fianaise",
-  "error_loading": "Níorbh fhéidir linn na scéalta ratha a luchtú faoi láthair. Déan iarracht arís ar ball."
+  "error_loading": "Níorbh fhéidir linn na scéalta ratha a luchtú faoi láthair. Déan iarracht arís ar ball.",
+  "audiences": {
+    "all_residents": "Gach cónaitheoir",
+    "municipality": "Bardas",
+    "kanton": "Ceantar",
+    "verein_members": "Baill an Chumainn",
+    "volunteers": "Deonaithe",
+    "recipients": "Faighteoirí cúraim"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% níos lú iarracht maidir le scaipeadh faisnéise",
+      "narrative": "Caitheann comhordaitheoirí thart ar thríú cuid níos lú ama ag scaipeadh nuashonruithe tar éis athrú go NEXUS. Tá fógraí, díriú ar shéimeanna baill, agus rianú dearbhaithe comhtháite in áit amháin.",
+      "method_caveat": "Sampla léiritheach bunaithe ar éileamh ó chomhphobal comhghaolta; níor tomhas é seo don tionónta seo.",
+      "evidence_source": "Leathanach bhaile fearainn chomhghleacaí (léiritheach)"
+    },
+    "volunteer_engagement": {
+      "title": "25% níos mó rannpháirtíochta deonaithe",
+      "narrative": "Tuairiscíonn pobail tástála ráth níos mó rannpháirtíochta deonaithe gníomhach tar éis NEXUS a ghlacadh, tacaíocht a fhaightear ó mheaitseáil níos soiléire, clárú éasca, agus aitheantas infheicthe an Pas Teasa.",
+      "method_caveat": "Sampla léiritheach bunaithe ar éileamh ó chomhphobal comhghaolta; níor tomhas é seo don tionónta seo.",
+      "evidence_source": "Leathanach bhaile fearainn chomhghleacaí (léiritheach)"
+    },
+    "formal_care_offset": {
+      "title": "12,250 CHF i gcostais cúraim fhoirmiúla a chur ar ais",
+      "narrative": "Taispeántar uair an chloig dheonach a chomhordú trí NEXUS mar aisbhunú de 12,250 CHF in aghaidh chostais chúraim bhaile fhoirmiúla le linn na tréimhse píolóta, luachmhar ag ráta cúnamh cúraim fhoirmiúil na hEilvéise.",
+      "method_caveat": "Measúnú ag úsáid 35 CHF in aghaidh na huaire ar feadh 350 uair; tá an comparáid i gcoinne líne bhunúsach gan pháilót amháin amháin.",
+      "evidence_source": "Sampla múnla ROI bhaile AG76 (taispeántach)"
+    }
+  }
 }

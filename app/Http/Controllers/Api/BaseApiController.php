@@ -146,24 +146,24 @@ abstract class BaseApiController extends Controller
      * status numbers. Each helper sets a consistent default error code for the
      * failure class while still allowing caller customization.
      */
-    protected function respondUnauthorized(string $message = 'Authentication required', string $code = 'AUTH_REQUIRED'): JsonResponse
+    protected function respondUnauthorized(?string $message = null, string $code = 'AUTH_REQUIRED'): JsonResponse
     {
-        return $this->respondWithError($code, $message, null, 401);
+        return $this->respondWithError($code, $message ?? __('api.auth_required'), null, 401);
     }
 
-    protected function respondForbidden(string $message = 'Access denied', string $code = 'FORBIDDEN'): JsonResponse
+    protected function respondForbidden(?string $message = null, string $code = 'FORBIDDEN'): JsonResponse
     {
-        return $this->respondWithError($code, $message, null, 403);
+        return $this->respondWithError($code, $message ?? __('api.access_denied'), null, 403);
     }
 
-    protected function respondNotFound(string $message = 'Resource not found', string $code = 'NOT_FOUND'): JsonResponse
+    protected function respondNotFound(?string $message = null, string $code = 'NOT_FOUND'): JsonResponse
     {
-        return $this->respondWithError($code, $message, null, 404);
+        return $this->respondWithError($code, $message ?? __('api.resource_not_found'), null, 404);
     }
 
-    protected function respondServerError(string $message = 'Internal server error', string $code = 'SERVER_ERROR'): JsonResponse
+    protected function respondServerError(?string $message = null, string $code = 'SERVER_ERROR'): JsonResponse
     {
-        return $this->respondWithError($code, $message, null, 500);
+        return $this->respondWithError($code, $message ?? __('api.server_error'), null, 500);
     }
 
     /**

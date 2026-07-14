@@ -683,6 +683,7 @@
         "total_responses": "Total responses",
         "answer_count_one": "{{count}} answer",
         "answer_count_other": "{{count}} answers",
+        "option_percentage_aria": "{{option}}: {{percentage}}",
         "no_open_text": "No open-text responses yet.",
         "modal_title": "Analytics - {{title}}",
         "empty": "No analytics data available yet."

@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "fadp": {
     "meta": {
@@ -154,9 +154,7 @@
     },
     "residency": {
       "article_16": "A divulgação transfronteiriça de dados pessoais é permitida se o país de destino garantir proteção de dados adequada reconhecida pelo Conselho Federal. Os estados membros Switzerland, EU/EEA e uma pequena lista de outros países se qualificam.",
-      "article_16_label": "FADP Art. 16",
       "article_17": "Se o destino não se qualificar, deverão ser implementadas salvaguardas adequadas, como cláusulas padrão de proteção de dados aprovadas pelo FDPIC, regras corporativas vinculativas ou consentimento dos membros.",
-      "article_17_label": "FADP Art. 17",
       "description": "Onde os dados dos membros inquilinos são armazenados e processados.",
       "dpa_contact": "Contato DPA",
       "title": "Residência de dados declarada",
@@ -166,7 +164,9 @@
         "EU": "Os dados são armazenados em EU/EEA. Switzerland reconhece a proteção de dados EU como adequada, portanto, nenhuma salvaguarda adicional FADP é necessária para essas transferências.",
         "International": "Os dados são armazenados fora do Switzerland e do EU. Art. 16-17 São necessárias salvaguardas do nDSG, como cláusulas contratuais padrão ou consentimento explícito dos membros para cada transferência.",
         "Switzerland": "Os dados são armazenados inteiramente em Switzerland. Disposições de transferência transfronteiriça não são exigidas para esta declaração."
-      }
+      },
+      "article_16_label": "FADP Art. 16",
+      "article_17_label": "FADP Art. 17"
     },
     "summary": {
       "automated_profiling": "Perfil automatizado",

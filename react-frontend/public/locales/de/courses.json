@@ -199,7 +199,8 @@
     "moderated": "Kurs aktualisiert",
     "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
     "no_courses": "Noch keine Kurse.",
-    "no_instructors": "Noch keine Lehrkräfte vergeben."
+    "no_instructors": "Noch keine Lehrkräfte vergeben.",
+    "status_unknown": "Unbekannter Status"
   },
   "builder": {
     "add_section": "Abschnitt hinzufügen",

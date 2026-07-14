@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,9 +67,10 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "ai": {
     "common": {
@@ -132,7 +132,8 @@
       },
       "triggered_by": {
         "manual": "Manuale",
-        "scheduled": "Programmato"
+        "scheduled": "Programmato",
+        "schedule": "Programma"
       },
       "config": {
         "enable_title": "Abilita KI-Agenten",
@@ -150,7 +151,7 @@
         "max_proposals": "Numero massimo di proposte per esecuzione",
         "schedule_hour": "Orario di pianificazione (0-23, ora locale del server)",
         "notification_email": "E-mail di notifica",
-        "notification_email_placeholder": "admin@esempio.org"
+        "notification_email_placeholder": "admin@example.org"
       },
       "actions": {
         "approve": "Approvare",
@@ -245,6 +246,13 @@
         "run_triggered_many": "Esecuzione attivata: proposte {{count}} generate.",
         "run_triggered_one": "Esecuzione attivata: proposte {{count}} generate.",
         "run_triggered_other": "Esecuzione attivata: proposte {{count}} generate."
+      },
+      "unknown_identifier": "Sconosciuto",
+      "proposal_types": {
+        "create_tandem": "Crea tandem",
+        "route_help_request": "Instrada richiesta di aiuto",
+        "send_activity_summary": "Invia riepilogo attività",
+        "send_nudge": "Invia sollecito"
       }
     },
     "module_docs": {
@@ -315,6 +323,122 @@
         "seeded_many": "Documenti predefiniti {{count}} seminati.",
         "seeded_one": "Documenti predefiniti {{count}} seminati.",
         "seeded_other": "Documenti predefiniti {{count}} seminati."
+      },
+      "defaults": {
+        "overview": {
+          "title": "Panoramica della piattaforma — cos'è"
+        },
+        "timebanking": {
+          "title": "Nozioni di base sul timebanking e filosofia"
+        },
+        "getting_started": {
+          "title": "Primi passi — la tua prima settimana"
+        },
+        "safety": {
+          "title": "Sicurezza, fiducia e linee guida della comunità"
+        },
+        "listings": {
+          "title": "Annunci — offerte e richieste"
+        },
+        "wallet": {
+          "title": "Portafoglio e saldo crediti di tempo"
+        },
+        "messages": {
+          "title": "Messaggi — conversazioni private"
+        },
+        "feed": {
+          "title": "Feed — flusso di attività della comunità"
+        },
+        "dashboard": {
+          "title": "Dashboard — il tuo punto di partenza"
+        },
+        "profile": {
+          "title": "Profilo & directory dei membri"
+        },
+        "notifications": {
+          "title": "Notifiche"
+        },
+        "settings": {
+          "title": "Impostazioni — gestisci il tuo account"
+        },
+        "events": {
+          "title": "Eventi — incontri della comunità"
+        },
+        "groups": {
+          "title": "Gruppi — sotto-comunità"
+        },
+        "volunteering": {
+          "title": "Volontariato — opportunità e turni"
+        },
+        "jobs": {
+          "title": "Offerte di lavoro"
+        },
+        "marketplace": {
+          "title": "Mercato — articoli, non servizi"
+        },
+        "blog": {
+          "title": "Blog — storie e notizie della comunità"
+        },
+        "resources": {
+          "title": "Risorse — base di conoscenza e file"
+        },
+        "polls": {
+          "title": "Sondaggi — decisioni della comunità"
+        },
+        "ideation": {
+          "title": "Sfide di ideazione — risoluzione collaborativa dei problemi"
+        },
+        "organisations": {
+          "title": "Organizzazioni — profili dei partner"
+        },
+        "group_exchanges": {
+          "title": "Scambi di gruppo — progetti temporali molti-a-molti"
+        },
+        "federation": {
+          "title": "Federazione — collegamento delle comunità"
+        },
+        "gamification": {
+          "title": "Gamification — distintivi, XP e riconoscimento"
+        },
+        "goals": {
+          "title": "Obiettivi — traguardi personali e della comunità"
+        },
+        "connections": {
+          "title": "Connessioni — la tua rete"
+        },
+        "reviews": {
+          "title": "Recensioni e valutazioni"
+        },
+        "ai_chat": {
+          "title": "Assistente AI — il pulsante della chat"
+        },
+        "search": {
+          "title": "Ricerca — trovare qualsiasi cosa"
+        },
+        "caring_community": {
+          "title": "Comunità premurosa — supporto per i membri vulnerabili"
+        },
+        "newsletter": {
+          "title": "Newsletter e digest via email"
+        },
+        "account_security": {
+          "title": "Sicurezza dell'account — password, 2FA, chiavi di accesso"
+        },
+        "privacy_data": {
+          "title": "Privacy e diritti sui dati (GDPR)"
+        },
+        "accessibility": {
+          "title": "Accessibilità — temi, lingue, tecnologia assistiva"
+        },
+        "mobile_pwa": {
+          "title": "App mobile e PWA"
+        },
+        "troubleshooting": {
+          "title": "Risoluzione dei problemi comuni"
+        },
+        "admin_overview": {
+          "title": "Per gli amministratori della community"
+        }
       }
     },
     "trace_metrics": {

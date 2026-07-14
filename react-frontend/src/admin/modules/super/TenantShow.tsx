@@ -35,6 +35,7 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminTenantDetail, TenantPurgePreview } from '../../api/types';
+import { languageDisplayName } from '@/lib/languageDisplayName';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -68,20 +69,6 @@ const FEATURE_LABEL_KEYS: Record<string, string> = {
   messages: 'super.feature_messages',
   dashboard: 'super.feature_dashboard',
   feed: 'super.feature_feed',
-};
-
-const LANGUAGE_LABELS: Record<string, string> = {
-  en: 'English',
-  ga: 'Gaeilge',
-  de: 'Deutsch',
-  fr: 'Français',
-  it: 'Italiano',
-  pt: 'Português',
-  es: 'Español',
-  nl: 'Nederlands',
-  pl: 'Polski',
-  ja: '日本語',
-  ar: 'العربية',
 };
 
 export function TenantShow() {
@@ -148,7 +135,7 @@ export function TenantShow() {
         moveModal.onClose();
         loadTenant();
       } else {
-        toast.error(res.error || t('super.failed_to_move_tenant'));
+        toast.error(t('super.failed_to_move_tenant'));
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setActionLoading(false);
@@ -169,7 +156,7 @@ export function TenantShow() {
         toast.success(newActive ? t('super.tenant_reactivated') : t('super.tenant_deactivated'));
         setTenant((prev) => prev ? { ...prev, is_active: newActive } : prev);
       } else {
-        toast.error(res.error || t('super.operation_failed'));
+        toast.error(t('super.operation_failed'));
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setActionLoading(false);
@@ -186,7 +173,7 @@ export function TenantShow() {
       if (res.success && res.data) {
         setPurgePreview(res.data);
       } else {
-        toast.error(res.error || t('super.purge_preview_failed'));
+        toast.error(t('super.purge_preview_failed'));
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setPurgePreviewLoading(false);
@@ -202,7 +189,7 @@ export function TenantShow() {
         purgeModal.onClose();
         navigate(tenantPath('/super-admin/tenants'));
       } else {
-        toast.error(res.error || t('super.purge_failed'));
+        toast.error(t('super.purge_failed'));
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setPurging(false);
@@ -220,7 +207,7 @@ export function TenantShow() {
         // Optimistic update — avoids refetch which re-triggers Switch onValueChange
         setTenant((prev) => prev ? { ...prev, allows_subtenants: newValue } : prev);
       } else {
-        toast.error(res.error || t('super.failed_to_toggle_hub'));
+        toast.error(t('super.failed_to_toggle_hub'));
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setActionLoading(false);
@@ -236,10 +223,10 @@ export function TenantShow() {
       if (res.success && res.data) {
         setTenant(res.data as SuperAdminTenantDetail);
       } else {
-        toast.error(res.error || t('super.failed_to_load_tenant'));
+        toast.error(t('super.failed_to_load_tenant'));
       }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('super.an_error_occurred'));
+    } catch {
+      toast.error(t('super.an_error_occurred'));
     }
     setLoading(false);
   }, [id, toast, t])
@@ -267,11 +254,10 @@ export function TenantShow() {
         setAdminForm({ first_name: '', last_name: '', email: '', password: '', role: 'admin' });
         loadTenant(); // Refresh to show new admin
       } else {
-        toast.error(res.error || t('super.failed_to_add_administrator'));
+        toast.error(t('super.failed_to_add_administrator'));
       }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t('super.failed_to_add_administrator');
-      toast.error(message);
+    } catch {
+      toast.error(t('super.failed_to_add_administrator'));
     }
     setAddingAdmin(false);
   };
@@ -284,7 +270,7 @@ export function TenantShow() {
         toast.success(t('super.admin_demoted'));
         loadTenant();
       } else {
-        toast.error(res.error || t('super.failed_to_remove_admin'));
+        toast.error(t('super.failed_to_remove_admin'));
       }
     } catch {
       toast.error(t('super.an_error_occurred'));
@@ -399,7 +385,7 @@ export function TenantShow() {
                         to={tenantPath(`/super-admin/tenants/${tenant.parent_id}`)}
                         className="text-accent hover:underline"
                       >
-                        {tenant.parent_name || `Tenant #${tenant.parent_id}`}
+                        {tenant.parent_name || t('super.tenant_with_id', { id: tenant.parent_id })}
                       </Link>
                     ) : (
                       <span className="text-muted">{t('super.none_top_level')}</span>
@@ -550,7 +536,8 @@ export function TenantShow() {
                   value={
                     (() => {
                       const code = (tenant.configuration as Record<string, unknown>)?.default_language as string | undefined;
-                      return code ? `${LANGUAGE_LABELS[code] || code} (${code.toUpperCase()})` : `${LANGUAGE_LABELS.en} (EN)`;
+                      const languageCode = code ?? 'en';
+                      return `${languageDisplayName(languageCode, getFormattingLocale())} (${languageCode.toUpperCase()})`;
                     })()
                   }
                 />
@@ -562,7 +549,7 @@ export function TenantShow() {
                       const codes = langs ?? ['en'];
                       return codes.map((code) => (
                         <Chip key={code} size="sm" variant="soft" color="accent">
-                          {LANGUAGE_LABELS[code] || code}
+                          {languageDisplayName(code, getFormattingLocale())}
                         </Chip>
                       ));
                     })()}
@@ -816,7 +803,7 @@ export function TenantShow() {
                             <p className="text-xs text-muted truncate">{admin.email}</p>
                           </div>
                           <Chip variant="soft" size="sm" className="capitalize">
-                            {admin.role}
+                            {t(`super.role_${admin.role}`, { defaultValue: t('super.role_unknown') })}
                           </Chip>
                         </Link>
                         <Button

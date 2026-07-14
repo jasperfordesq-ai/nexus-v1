@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { getIcon } from './iconMap';
 import type { AudienceCardsContent } from '@/types';
-import { DEFAULT_AUDIENCE_CARDS } from '@/types/landing-page';
+import { createDefaultAudienceCards } from '@/types/landing-page';
 
 interface AudienceCardsSectionProps {
   content?: AudienceCardsContent;
@@ -27,7 +27,7 @@ export function AudienceCardsSection({ content }: AudienceCardsSectionProps) {
 
   const cards = content?.cards && content.cards.length > 0
     ? content.cards
-    : DEFAULT_AUDIENCE_CARDS;
+    : createDefaultAudienceCards((key) => t(key));
 
   if (cards.length === 0) return null;
 

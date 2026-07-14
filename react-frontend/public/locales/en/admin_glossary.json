@@ -1,0 +1,17 @@
+{
+  "terms": {
+    "chf": "Swiss franc — the currency used for formal-care cost-offset calculations in Caring Community deployments",
+    "fadp": "Federal Act on Data Protection — revised Swiss data protection law (in force since September 2023)",
+    "ndsg": "Neues Datenschutzgesetz — the revised Swiss Federal Data Protection Act (synonym for FADP)",
+    "dsg": "Datenschutzgesetz — see nDSG / FADP",
+    "gdpr": "General Data Protection Regulation — EU data protection law; Swiss deployments use FADP/nDSG instead",
+    "sla": "Service-level agreement — the maximum committed response or resolution time for each priority tier",
+    "agpl": "GNU Affero General Public License v3 — the open-source licence under which NEXUS is publicly released",
+    "kpi": "Key performance indicator — a measurable metric used to evaluate progress toward a defined goal",
+    "roi": "Return on investment — here: formal-care cost avoided per hour of informal support exchanged",
+    "nexus": "Project NEXUS — the multi-tenant timebanking and community-care platform",
+    "agm": "Annual general meeting",
+    "xp": "Experience points — gamification points awarded for completing exchanges and reaching milestones",
+    "isco": "International Standard Classification of Occupations — used to categorise care-service types"
+  }
+}

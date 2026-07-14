@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,12 +67,12 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "advanced": {
-    "loading": "Loading",
     "health_loading": "Zustand des Algorithmus wird geladen...",
     "404_entry_dismissed": "404-Eintrag abgewiesen",
     "a_i_settings_saved_successfully": "AI-Einstellungen erfolgreich gespeichert",
@@ -111,7 +110,6 @@
     "col_from_url": "Von URL",
     "col_hits": "Treffer",
     "col_last_seen": "Zuletzt gesehen",
-    "col_referrer": "Referrer",
     "col_status_code": "Statuscode",
     "col_to_url": "Zur URL",
     "col_url": "URL",
@@ -276,10 +274,9 @@
     "placeholder_gocspx": "GOCSPX-xxxxx",
     "placeholder_my_timebank": "Meine Zeitbank...",
     "placeholder_noreply_example": "noreply@example.com",
-    "placeholder_robots_txt": "Benutzeragent: *\nNicht zulassen: /admin/",
+    "placeholder_robots_txt": "User-agent: *\nDisallow: /admin/",
     "placeholder_s_gxxxxx": "S Gxxxxx...",
     "placeholder_search_users_by_name_or_email": "Benutzer nach Name oder E-Mail suchen...",
-    "placeholder_smtpexamplecom": "Smtpexamplecom...",
     "placeholder_smtp_port": "587",
     "placeholder_test_example": "test@example.com",
     "placeholder_user_example": "user@example.com",
@@ -351,7 +348,6 @@
     "chip_active": "Aktiv",
     "chip_fail": "Scheitern",
     "chip_key_configured": "Schlüssel konfiguriert",
-    "chip_pass": "Pass",
     "chip_warning": "Warnung",
     "desc_api_key_new": "API-Schlüssel Neu.",
     "desc_api_key_replace": "API-Schlüssel ersetzen.",
@@ -410,7 +406,6 @@
     "label_ollama_host_url": "Ollama-Host-URL",
     "last_run_label": "Letzter Lauf",
     "meta_description_count": "{{count}}/160 Meta-Beschreibungszeichen",
-    "no_audit_results_prompt": "No audit results prompt found",
     "og_image_preview": "OG-Bildvorschau",
     "param_activity_weight": "Aktivitätsgewicht",
     "param_activity_weight_desc": "Wie stark die jüngste Aktivität das Ranking steigert",
@@ -460,7 +455,6 @@
     "placeholder_current_key": "Geben Sie den aktuellen Wert ein:{{masked}}",
     "provider_configuration_heading": "Anbieterkonfiguration",
     "provider_anthropic": "Anthropisch (Claude)",
-    "provider_gemini": "Google Gemini",
     "provider_gmail_api": "Gmail-API",
     "provider_ollama": "Ollama (selbst gehostet)",
     "provider_openai": "OpenAI",
@@ -505,7 +499,6 @@
       "workflows": {
         "title": "Was versuchst du zu tun?",
         "description": "Beginnen Sie mit der einfachen Aufgabe und verwenden Sie dann die Registerkarte, die geöffnet wird. Dies hält Routinearbeiten von den riskanten Kontrollen fern.",
-        "open": "Open",
         "refresh_one_tenant": {
           "title": "Aktualisieren Sie einen Mandanten",
           "body": "Wird verwendet, wenn öffentliche Inhalte für eine einzelne Community geändert wurden. Geben Sie den Mandanten-Slug ein, bevor Sie die Arbeit in die Warteschlange stellen."
@@ -525,21 +518,22 @@
         "check_tenant_safety": {
           "title": "Überprüfen Sie, ob ein Mieter sicher ist",
           "body": "Überprüfen Sie genau, was dieser Mandant haben sollte, was gespeichert wird und ob Snapshots woanders hingehören."
-        }
+        },
+        "open": "Offen"
       },
       "analytics": {
         "actions": {
           "reload": "Neu laden"
         },
         "columns": {
-          "crawler": "CRAWLER",
-          "hits": "HITS",
-          "host": "HOST",
           "ip": "IP",
-          "status": "STATUS",
-          "time": "TIME",
           "uri": "URI",
-          "url": "URL"
+          "url": "URL",
+          "crawler": "Crawler",
+          "hits": "Hits",
+          "host": "Host",
+          "status": "Status",
+          "time": "Zeit"
         },
         "empty": "Keine Analyse verfügbar. Das Bot-Zugriffsprotokoll ist möglicherweise leer.",
         "empty_bot_traffic": "Noch kein Bot-Traffic",
@@ -595,13 +589,13 @@
           "refresh_all_stale_other": "Alle veralteten Dateien aktualisieren ({{count}})"
         },
         "columns": {
-          "actions": "ACTIONS",
-          "asset": "ASSET",
-          "coverage": "COVERAGE",
-          "host": "HOST",
-          "missing": "MISSING",
-          "stale": "STALE",
-          "tenant": "TENANT"
+          "actions": "Aktionen",
+          "asset": "Asset",
+          "coverage": "Abdeckung",
+          "host": "Host",
+          "missing": "Fehlt",
+          "stale": "Veraltet",
+          "tenant": "Mandant"
         },
         "confirm": {
           "queue_recache": "Warteschlangen-Recache für {{count}}-Mandanten?",
@@ -717,8 +711,16 @@
           "last_failed_pass": "Letzter fehlgeschlagener Lauf",
           "sched_prerender-detect-drift": "Herzschlag des Driftdetektors",
           "sched_prerender-auto-recache": "Automatischer Recache-Herzschlag",
-          "sched_prerender-reap-stale": "Herzschlag bei der Bereinigung veralteter Jobs"
-        }
+          "sched_prerender-reap-stale": "Herzschlag bei der Bereinigung veralteter Jobs",
+          "unknown": "Unbekannte Prüfung"
+        },
+        "statuses": {
+          "green": "Gesund",
+          "yellow": "Warnung",
+          "red": "Kritisch",
+          "unknown": "Unbekannter Status"
+        },
+        "remediation": "Aktion: {{detail}}"
       },
       "inventory": {
         "truncated": "Das Inventar hat das Sicherheitslimit von {{count}} Snapshots erreicht. Grenzen Sie den Mandantenfilter ein, bevor Sie eine Massenaktion ausführen.",
@@ -741,9 +743,9 @@
           "age": "Alter",
           "host": "Gastgeber",
           "http": "HTTP",
-          "route": "Route",
           "size": "Größe",
-          "status": "Status"
+          "status": "Status",
+          "route": "Route"
         },
         "empty": "Keine Snapshots entsprechen den Filtern",
         "errors": {
@@ -765,8 +767,8 @@
           "status": "Status",
           "status_200": "Nur 200",
           "status_non_200": "Nicht-200",
-          "tenant_placeholder": "optional",
-          "tenant_slug": "Mieterschnecke"
+          "tenant_slug": "Mieterschnecke",
+          "tenant_placeholder": "optional"
         },
         "messages": {
           "bulk_recache": "Ungültige {{count}}-Snapshots und Recache in der Warteschlange",
@@ -892,8 +894,8 @@
         "priority": {
           "high": "Hoch",
           "low": "Niedrig",
-          "normal": "Normal",
-          "tooltip": "priorität={{priority}} (geringere Gewinne)"
+          "tooltip": "priorität={{priority}} (geringere Gewinne)",
+          "normal": "Normal"
         },
         "result": {
           "invalid": "{{count}} ungültig",
@@ -967,7 +969,6 @@
       "audit": {
         "actions": {
           "reset_all": "Alle zurücksetzen und neu erstellen",
-          "auto_recache": "Auto-recache",
           "cancel": "Auftrag abbrechen",
           "detect_drift": "Drift erkennen",
           "enqueue": "Warteschlangenaktualisierung",
@@ -975,7 +976,9 @@
           "purge": "Snapshots löschen",
           "purge_unexpected": "Bereinigen Sie unerwartete Schnappschüsse",
           "reset_breaker": "Sicherheitsschalter zurücksetzen",
-          "reset_queue": "Reparieren Sie feststeckende Warteschlangen"
+          "reset_queue": "Reparieren Sie feststeckende Warteschlangen",
+          "unknown": "Unbekannte Aktion",
+          "auto_recache": "Automatisches Zwischenspeichern"
         },
         "buttons": {
           "export_csv": "CSV exportieren",
@@ -1005,9 +1008,10 @@
         },
         "table_aria": "Audit-Historie",
         "outcomes": {
-          "ok": "Completed",
-          "denied": "Denied",
-          "failed": "Failed"
+          "unknown": "Unbekanntes Ergebnis",
+          "denied": "Abgelehnt",
+          "failed": "Fehlgeschlagen",
+          "ok": "Abgeschlossen"
         },
         "details_empty": "Keine zusätzlichen Details"
       },
@@ -1095,7 +1099,6 @@
           "continue_to_delete": "Fahren Sie mit dem Live-Löschen fort"
         },
         "description_middle": "für ein Wegsegment,",
-        "description_prefix": "Snapshots löschen, die einem Glob-Muster entsprechen. Verwenden",
         "description_suffix": "für jeden Nachkommen. Beispiele:",
         "all_tenants_warning": {
           "body": "Wenn Sie den Mieter-Slug leer lassen, werden übereinstimmende Snapshots für jeden Mieter gelöscht. Dies dient nur der plattformweiten Bereinigung, nachdem Sie eine Vorschau der genauen Dateien angezeigt haben.",
@@ -1141,7 +1144,8 @@
           "ready": "Passende Vorschau gefunden. Das Live-Löschen ist auf die in der Vorschau angezeigten {{count}} passenden Snapshots beschränkt.",
           "ready_one": "Passende Vorschau gefunden. Das Live-Löschen ist auf die in der Vorschau angezeigten {{count}} passenden Snapshots beschränkt.",
           "ready_other": "Passende Vorschau gefunden. Das Live-Löschen ist auf die in der Vorschau angezeigten {{count}} passenden Snapshots beschränkt."
-        }
+        },
+        "description_prefix": "Löschen Sie gespeicherte HTML-Snapshots, die einem Pfadmuster entsprechen. Fügen Sie einen Mandanten-Slug hinzu, wenn die Route zu einem Mandanten gehört. Verwenden Sie"
       },
       "ttl_inspector": {
         "actions": {
@@ -1155,13 +1159,18 @@
         },
         "path_only": "Nur Pfad – kein Schema oder Host",
         "placeholders": {
-          "route": "/blog/mein-beitrag"
+          "route": "/blog/my-post"
         },
         "result": {
           "match": "Übereinstimmung: {{pattern}}",
           "other_pattern_item": "{{pattern}} -> {{ttl}} (Spezifität {{specificity}})",
           "other_patterns": "Andere Muster, die zu dieser Route passen:",
-          "ttl": "TTL:{{ttl}}({{seconds}}s)"
+          "ttl": "TTL:{{ttl}}({{seconds}}s)",
+          "sources": {
+            "default": "Standardregel",
+            "pattern": "Übereinstimmendes Muster",
+            "unknown": "Unbekannte Quelle"
+          }
         },
         "title": "TTL-Inspektor",
         "units": {
@@ -1220,9 +1229,9 @@
         "failures": "Misserfolge",
         "history": "Geschichte",
         "inventory": "Inventar",
-        "jobs": "Jobs",
         "overview": "Überblick",
-        "tenant_safety": "Mietersicherheit"
+        "tenant_safety": "Mietersicherheit",
+        "jobs": "Jobs"
       },
       "tabs_aria": "Registerkarten für das Vorrendern",
       "title": "Prerender-Engine",
@@ -1253,14 +1262,14 @@
           "needs_attention_other": "{{count}}-Element erfordert Aufmerksamkeit"
         },
         "counts": {
-          "expected": "Expected",
-          "snapshots": "Saved",
-          "missing": "Missing",
-          "unexpected": "Unexpected",
-          "stale": "Stale",
-          "asset_invalid": "Assets",
-          "static": "Static",
-          "sitemap": "Sitemap"
+          "expected": "Erwartet",
+          "missing": "Fehlt",
+          "unexpected": "Unerwartet",
+          "stale": "Veraltet",
+          "static": "Statisch",
+          "sitemap": "Seitenübersicht",
+          "snapshots": "Gespeichert",
+          "asset_invalid": "Vermögenswerte"
         },
         "sections": {
           "attention_limited": "Angezeigt werden {{shown}} von {{total}} gespeicherten Snapshots mit Handlungsbedarf.",
@@ -1270,10 +1279,10 @@
         "empty": "Betreten Sie einen Mieter-Slug, um dessen Routenplan und gespeicherte Snapshots zu überprüfen.",
         "empty_attention": "Dieser Mandant verfügt über keine fehlenden, veralteten, beschädigten oder unerwarteten Snapshots.",
         "columns": {
-          "route": "Route",
-          "source": "Source",
+          "why": "Warum es hier ist",
+          "source": "Quelle",
           "status": "Status",
-          "why": "Warum es hier ist"
+          "route": "Route"
         },
         "tables": {
           "attention_aria": "Mieter-Snapshot-Elemente, die Aufmerksamkeit erfordern"
@@ -1281,12 +1290,12 @@
         "sources": {
           "static": "Statische Route",
           "sitemap": "Sitemap-Route",
-          "unexpected": "Unexpected"
+          "unexpected": "Unerwartet"
         },
         "badges": {
-          "unexpected": "Unexpected",
           "assets": "Vermögensproblem",
-          "content": "Inhalt veraltet"
+          "content": "Inhalt veraltet",
+          "unexpected": "Unerwartet"
         },
         "reasons": {
           "sitemap": "Von dieser Mieter-Sitemap als öffentlicher Inhalt veröffentlicht.",
@@ -1309,9 +1318,9 @@
           "body": "Unerwartete Schnappschüsse können normalerweise mit dem Bereinigungstool in der Übersicht entfernt werden. Zuerst Vorschau anzeigen, dann nur anwenden, wenn die Mieterliste korrekt ist."
         },
         "staleness": {
-          "fresh": "Fresh",
-          "warn": "Aging",
-          "stale": "Stale"
+          "fresh": "Frisch",
+          "stale": "Veraltet",
+          "warn": "Alterung"
         }
       }
     },
@@ -1324,7 +1333,6 @@
     "seo_health_check_heading": "SEO-Gesundheitscheck",
     "server_seo_audit_heading": "Server-SEO-Audit",
     "sitemap_cache_cleared": "Sitemap-Cache geleert",
-    "sitemap_heading": "Sitemap",
     "sitemap_total_urls": "Gesamt-URLs",
     "sitemap_url_label": "Sitemap-URL",
     "sitemap_urls_by_type": "URLs nach Typ",
@@ -1345,13 +1353,12 @@
     "next_public": {
       "title": "Bereitschaft des öffentlichen Frontends von Next.js",
       "description": "Schreibgeschützter Schattenmodusstatus für das öffentliche Next.js-Frontend. Auf dieser Seite ist weder das öffentliche Routing noch die Änderung des Prerender-Verhaltens möglich.",
-      "refresh": "Refresh",
-      "loading": "Die Bereitschaft des öffentlichen Frontends von Next.j wird geladen",
+      "loading": "Die Bereitschaft des öffentlichen Frontends von Next.js wird geladen",
       "error": "Next.js-Bereitschaft konnte nicht geladen werden.",
       "cards": {
-        "mode": "Mode",
         "production_routing": "Produktionsrouting",
-        "prerender": "Fallback vor dem Rendern"
+        "prerender": "Fallback vor dem Rendern",
+        "mode": "Modus"
       },
       "values": {
         "shadow_mode": "Schattenmodus",
@@ -1389,8 +1396,8 @@
       },
       "tenant_resolution_route_statuses": {
         "public": "Öffentliche Laravel-GET-Route",
-        "missing": "Laravel route is not registered",
-        "auth": "Laravel route requires authentication"
+        "missing": "Laravel-Route ist nicht registriert",
+        "auth": "Laravel-Route erfordert Authentifizierung"
       },
       "edge_canary": {
         "title": "Edge Canary-Vorschau",
@@ -1405,7 +1412,6 @@
         "included_by_deploy": "In der Bereitstellung enthalten",
         "not_included_by_deploy": "Nicht im Deploy enthalten",
         "route_audit_title": "Vorlagenroutenprüfung",
-        "exact_path_count": "{{count}} exact paths",
         "public_only": "Nur öffentliche Strecken",
         "not_public_only": "Nicht nur öffentliche Strecken",
         "no_private_collisions": "Keine Kollisionen auf Privatrouten",
@@ -1419,7 +1425,8 @@
         "preview_only": "Nur Vorschau",
         "not_preview_only": "Der Vorschaumodus wird nicht bestätigt",
         "reviewed_config_required": "Überprüfte Konfiguration erforderlich",
-        "explicit_instruction_required": "Separate Umstellungsanweisung erforderlich"
+        "explicit_instruction_required": "Separate Umstellungsanweisung erforderlich",
+        "exact_path_count": "{{count}} exakte Pfade"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
@@ -1430,9 +1437,9 @@
       "edge_canary_review_steps": {
         "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich",
         "next_shadow_checks_required": "Nächste Schattenprüfungen erforderlich",
-        "react_private_regression_required": "React private-route regression required",
-        "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Der Prerender-Fallback muss bestehen bleiben"
+        "prerender_fallback_must_remain": "Der Prerender-Fallback muss bestehen bleiben",
+        "apache_configtest_required": "Apache-Konfigurationstest erforderlich",
+        "react_private_regression_required": "React private-Route-Regression erforderlich"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Bearbeiten Sie Plesk-Vhosts nicht direkt",
@@ -1442,21 +1449,21 @@
       },
       "route_batches": {
         "title": "Batch-Bereitschaft weiterleiten",
-        "route_count": "{{count}} routes"
+        "route_count": "{{count}} Routen"
       },
       "remaining_route_work": {
         "title": "Verbleibende Arbeiten an der öffentlichen Strecke",
-        "route_count": "{{count}} routes",
-        "public_routes": "{{count}} public route",
-        "public_routes_plural": "{{count}} public routes",
         "api_backed_routes": "{{count}} API-gestützte Route",
         "api_backed_routes_plural": "{{count}} API-gestützte Routen",
-        "remaining_routes": "{{count}} route remaining",
-        "remaining_routes_plural": "{{count}} routes remaining",
-        "unclassified_routes": "{{count}} unclassified route",
-        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Aktivierungskontrollen sind verfügbar",
-        "activation_unavailable": "Keine Aktivierungskontrollen"
+        "activation_unavailable": "Keine Aktivierungskontrollen",
+        "route_count": "{{count}} Routen",
+        "public_routes": "{{count}} öffentliche Route",
+        "public_routes_plural": "{{count}} öffentliche Routen",
+        "remaining_routes": "{{count}} verbleibende Route",
+        "remaining_routes_plural": "{{count}} verbleibende Routen",
+        "unclassified_routes": "{{count}} unklassifizierte Route",
+        "unclassified_routes_plural": "{{count}} unklassifizierte Routen"
       },
       "remaining_route_work_groups": {
         "static_manual_review": "Statische/manuelle Überprüfungsrouten",
@@ -1515,13 +1522,13 @@
       },
       "artifacts": {
         "title": "Umstellung des Artefaktinventars",
-        "path": "Path",
-        "present": "Present",
-        "missing": "Missing",
         "required_commands": "Erforderliche Befehle",
         "required_before_cutover": "Vor der Umstellung erforderlich",
         "activation_available": "Aktivierungskontrollen sind verfügbar",
-        "no_activation_control": "Keine Aktivierungskontrollen"
+        "no_activation_control": "Keine Aktivierungskontrollen",
+        "path": "Pfad",
+        "present": "Präsent",
+        "missing": "Fehlt"
       },
       "artifact_items": {
         "route_ownership_manifest": "Routeneigentumsmanifest",
@@ -1532,10 +1539,10 @@
         "prerender_fallback": "Fallback vor dem Rendern"
       },
       "artifact_categories": {
-        "manifest": "Manifest",
         "edge_config": "Edge-Konfiguration",
-        "runtime": "Runtime",
-        "guard": "Guard",
+        "runtime": "Laufzeit",
+        "guard": "Wächter",
+        "manifest": "Manifest",
         "fallback": "Fallback"
       },
       "production_effects": {
@@ -1545,13 +1552,13 @@
         "title": "Cutover-Berechtigung",
         "eligible": "Für eine Umstellung geeignet",
         "blocked": "Nicht für eine Umstellung geeignet",
-        "public_routes": "{{count}} public routes",
         "api_backed_public_routes": "{{count}} API-gestützte öffentliche Routen",
         "remaining_public_routes": "{{count}} verbleibende öffentliche Routen",
         "activation_available": "Aktivierungskontrollen verfügbar",
         "activation_unavailable": "Keine Aktivierungskontrollen",
-        "blockers": "Blockers",
-        "required_actions": "Erforderliche Aktionen"
+        "required_actions": "Erforderliche Aktionen",
+        "blockers": "Blockaden",
+        "public_routes": "{{count}} öffentliche Routen"
       },
       "cutover_eligibility_blockers": {
         "manifest_validation_blocked": "Die Manifestvalidierung ist blockiert",
@@ -1586,15 +1593,15 @@
         "prerender_retained": "Der aktuelle Fallback vor dem Rendern bleibt erhalten",
         "vite_private_routes_retained": "Das Eigentum an der privaten Vite-Strecke bleibt erhalten",
         "public_edge_not_configured": "Für Next.js ist keine Produktions-Edge-Route konfiguriert",
-        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Vor jeder Umstellung sind weiterhin Paritätstests erforderlich"
+        "parity_tests_required_before_cutover": "Vor jeder Umstellung sind weiterhin Paritätstests erforderlich",
+        "apache_canary_template_not_included": "Die Apache-Canary-Vorlage wird durch Bereitstellung nicht eingeschlossen"
       },
       "statuses": {
-        "pass": "Pass",
-        "blocker": "Blocker",
+        "pass": "Bestehen",
         "info": "Info",
-        "fail": "Fail",
-        "blocked": "Blocked"
+        "fail": "Fehler",
+        "blocked": "Gesperrt",
+        "blocker": "Blocker"
       },
       "runtime": {
         "title": "Schattenlaufzeit",
@@ -1616,9 +1623,9 @@
         "monitor_and_keep_prerender_fallback": "Überwachen Sie die Antworten und halten Sie den Prerender als Ersatz bereit, bis die Parität nachgewiesen ist."
       },
       "counts": {
-        "public_routes": "{{count}} public routes",
-        "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} private Muster bearbeiten/erstellen"
+        "private_patterns": "{{count}} private Muster bearbeiten/erstellen",
+        "public_routes": "{{count}} öffentliche Routen",
+        "private_prefixes": "{{count}} private Präfixe"
       },
       "validation": {
         "title": "Manifest-Validierung",
@@ -1684,7 +1691,8 @@
         "public_routes_only": "Nur öffentliche Strecken",
         "do_not_remove_prerender": "Prerender-Fallback nicht entfernen.",
         "rollback_path_required": "Rollback-Pfad erforderlich"
-      }
+      },
+      "refresh": "Aktualisieren"
     },
     "health_meta_description_length_one": "{{count}}Zeichen (ideal: 150–160)",
     "health_meta_description_length_other": "{{count}}Zeichen (ideal: 150–160)",
@@ -1708,7 +1716,97 @@
     "failed_count_with_value_other": "{{count}}ist fehlgeschlagen",
     "total_count_one": "Insgesamt: {{count}}",
     "total_count_other": "Insgesamt: {{count}}",
-    "score_out_of": "von {{maximum}}"
+    "score_out_of": "von {{maximum}}",
+    "component_match_score_aria": "{{component}} Punktzahl: {{score}} %",
+    "placeholder_default_title_suffix": "| Meine Zeitbank",
+    "placeholder_meta_keywords": "Timebanking, Community, Austausch",
+    "sitemap_content_type_unknown": "Andere Inhalte",
+    "sitemap_content_type_blog_posts": "Blogbeiträge",
+    "sitemap_content_type_events": "Ereignisse",
+    "sitemap_content_type_groups": "Gruppen",
+    "sitemap_content_type_listings": "Einträge",
+    "sitemap_content_type_members": "Mitglieder",
+    "sitemap_content_type_pages": "Seiten",
+    "sitemap_content_type_podcasts": "Podcasts",
+    "sitemap_content_type_resources": "Ressourcen",
+    "sitemap_content_type_volunteering": "Freiwilligenarbeit",
+    "seo_audit_check_blog_meta_description_one": "Überprüft den veröffentlichten Blogbeitrag {{count}} auf Meta-Titel und Beschreibungen",
+    "seo_audit_check_blog_meta_description_other": "Überprüft veröffentlichte Blogbeiträge {{count}} auf Meta-Titel und Beschreibungen",
+    "seo_audit_check_blog_meta_name": "Blogbeitrag-Metadaten",
+    "seo_audit_check_canonical_urls_description": "Überprüft die Konfiguration der kanonischen URL und benutzerdefinierte Überschreibungen",
+    "seo_audit_check_canonical_urls_name": "Kanonische URLs",
+    "seo_audit_check_content_quality_description": "Überprüft auf dünne Inhalte, fehlende Titel und andere Inhaltsqualitätsprobleme",
+    "seo_audit_check_content_quality_name": "Signale für Inhaltsqualität",
+    "seo_audit_check_duplicate_titles_description": "Überprüft, ob Meta-Titel in veröffentlichten Inhalten dupliziert sind",
+    "seo_audit_check_duplicate_titles_name": "Einzigartige Meta-Titel",
+    "seo_audit_check_kb_meta_description_one": "Überprüft {{count}} veröffentlichten Wissensdatenbankartikel auf einen gültigen Titel",
+    "seo_audit_check_kb_meta_description_other": "Überprüft {{count}} veröffentlichte Wissensdatenbank-Artikel auf gültige Titel",
+    "seo_audit_check_kb_meta_name": "Wissensdatenbank-Artikel-Metadaten",
+    "seo_audit_check_open_graph_description": "Überprüft Open Graph- und Twitter Card-Konfiguration",
+    "seo_audit_check_open_graph_name": "Social Sharing-Metadaten",
+    "seo_audit_check_page_meta_description_one": "Überprüft {{count}} veröffentlichte CMS-Seite auf Metadaten",
+    "seo_audit_check_page_meta_description_other": "Überprüft {{count}} veröffentlichte CMS-Seiten auf Metadaten",
+    "seo_audit_check_page_meta_name": "CMS-Seiten-Metadaten",
+    "seo_audit_check_redirect_health_description_one": "Überprüft {{count}} konfigurierte Weiterleitungen auf Ketten, Schleifen und Selbstweiterleitungen",
+    "seo_audit_check_redirect_health_description_other": "Überprüft {{count}} konfigurierte Weiterleitungen auf Ketten, Schleifen und Selbstweiterleitungen",
+    "seo_audit_check_redirect_health_name": "Weiterleitungs-Gesundheit",
+    "seo_audit_check_seo_settings_description": "Überprüft, ob kanonische URLs, Open Graph-Tags und Twitter Cards aktiviert sind",
+    "seo_audit_check_seo_settings_name": "SEO-Konfiguration",
+    "seo_audit_check_sitemap_coverage_description_one": "Überprüft die Sitemap-Abdeckung für {{count}} URL",
+    "seo_audit_check_sitemap_coverage_description_other": "Überprüft die Sitemap-Abdeckung für {{count}} URLs",
+    "seo_audit_check_sitemap_coverage_name": "Sitemap-Abdeckung",
+    "seo_audit_check_tenant_metadata_description": "Überprüft den Meta-Titel, die Meta-Beschreibung und die H1-Überschrift der Startseite des Mieters",
+    "seo_audit_check_tenant_metadata_name": "Startseiten-Metadaten",
+    "seo_audit_check_unknown_description": "Diese Audit-Prüfung wird von dieser Version des Admin-Panels nicht unterstützt",
+    "seo_audit_check_unknown_name": "Unbekannte Audit-Prüfung",
+    "seo_audit_issue_additional_results_truncated": "Es können weitere Probleme bestehen; es werden nur die ersten {{limit}} angezeigt.",
+    "seo_audit_issue_blog_post_meta_missing": "Blogpost „{{title}}“ ({{path}}) fehlt ein Meta-Titel oder eine Beschreibung.",
+    "seo_audit_issue_canonical_generation_disabled": "Die Generierung von kanonischen URLs ist deaktiviert, was ein Risiko für doppelte Inhalte schafft.",
+    "seo_audit_issue_canonical_urls_not_enabled": "Kanonische URLs sind nicht aktiviert.",
+    "seo_audit_issue_cms_page_meta_title_missing": "CMS-Seite „{{title}}“ ({{path}}) fehlt ein Meta-Titel.",
+    "seo_audit_issue_custom_canonical_urls_high_one": "{{count}} Seite hat eine benutzerdefinierte kanonische URL; bestätigen Sie, dass sie noch gültig ist.",
+    "seo_audit_issue_custom_canonical_urls_high_other": "{{count}} Seiten haben benutzerdefinierte kanonische URLs; bestätigen Sie, dass sie noch gültig sind.",
+    "seo_audit_issue_duplicate_meta_title_one": "Der Meta-Titel „{{title}}“ wird {{count}} Mal verwendet.",
+    "seo_audit_issue_duplicate_meta_title_other": "Der Meta-Titel „{{title}}“ wird {{count}} Mal verwendet.",
+    "seo_audit_issue_homepage_meta_title_too_long": "Der Meta-Titel der Startseite ist {{length}} Zeichen lang; das Maximum ist {{max}}.",
+    "seo_audit_issue_kb_article_titles_missing_one": "{{count}} veröffentlichter Knowledge-Base-Artikel hat einen leeren Titel.",
+    "seo_audit_issue_kb_article_titles_missing_other": "{{count}} veröffentlichte Knowledge-Base-Artikel haben leere Titel.",
+    "seo_audit_issue_legacy_result_requires_rerun": "Dieses gespeicherte Problem verwendet ein älteres Format. Führen Sie die Prüfung noch einmal durch, um vollständige Details zu erhalten.",
+    "seo_audit_issue_meta_description_too_long": "Die Meta-Beschreibung der Startseite ist {{length}} Zeichen lang; das Maximum beträgt {{max}}.",
+    "seo_audit_issue_meta_description_too_short": "Die Meta-Beschreibung der Startseite ist {{length}} Zeichen lang; das Minimum beträgt {{min}}.",
+    "seo_audit_issue_missing_homepage_h1": "Der Startseite fehlt die H1-Überschrift.",
+    "seo_audit_issue_missing_homepage_meta_title": "Der Startseite fehlt der Standard-Meta-Titel.",
+    "seo_audit_issue_missing_meta_description": "Die Startseite hat keine Standard-Meta-Beschreibung.",
+    "seo_audit_issue_open_graph_default_image_missing": "Es ist kein Standard-Open-Graph-Bild konfiguriert, daher werden bei Social Shares keine Bilder angezeigt.",
+    "seo_audit_issue_open_graph_not_enabled": "Open-Graph-Tags sind nicht aktiviert.",
+    "seo_audit_issue_open_graph_sharing_disabled": "Open-Graph-Tags sind deaktiviert, daher verwenden Social Shares generische Vorschauen.",
+    "seo_audit_issue_redirect_chain": "Weiterleitungskette: {{from}} → {{via}} → {{destination}}",
+    "seo_audit_issue_redirect_loop": "Weiterleitungsschleife: {{from}} ↔ {{to}}",
+    "seo_audit_issue_self_redirect": "Selbstweiterleitung: {{from}} → {{to}}",
+    "seo_audit_issue_sitemap_empty": "Die Sitemap enthält keine URLs, daher wird kein Inhalt daraus indexiert.",
+    "seo_audit_issue_sitemap_low_coverage_one": "Die Sitemap enthält nur {{count}} URL, was auf eine sehr geringe Abdeckung hinweist.",
+    "seo_audit_issue_sitemap_low_coverage_other": "Die Sitemap enthält nur {{count}} URLs, was auf eine sehr geringe Abdeckung hinweist.",
+    "seo_audit_issue_sitemap_profiles_missing": "Die Sitemap enthält keine Mitgliederprofile, obwohl einige erwartet werden.",
+    "seo_audit_issue_sitemap_static_pages_missing": "Die Sitemap enthält keine statischen Seiten, obwohl einige erwartet werden.",
+    "seo_audit_issue_thin_blog_content_one": "Der veröffentlichte Blogbeitrag {{count}} hat weniger als {{minimum}} Zeichen; dünner Inhalt kann das SEO beeinträchtigen.",
+    "seo_audit_issue_thin_blog_content_other": "Die veröffentlichten Blogbeiträge {{count}} haben weniger als {{minimum}} Zeichen; dünner Inhalt kann das SEO beeinträchtigen.",
+    "seo_audit_issue_title_suffix_missing": "Es ist kein Titelsuffix konfiguriert, wie z. B. „ | Community-Name“.",
+    "seo_audit_issue_twitter_cards_disabled": "Twitter Cards sind deaktiviert.",
+    "seo_audit_issue_twitter_cards_not_enabled": "Twitter Cards sind nicht aktiviert.",
+    "seo_audit_issue_unknown": "Dieses Prüfungsproblem wird von dieser Version des Admin-Panels nicht unterstützt.",
+    "seo_audit_issue_untitled_published_pages_one": "{{count}} veröffentlichte Seite hat keinen Titel.",
+    "seo_audit_issue_untitled_published_pages_other": "{{count}} veröffentlichte Seiten haben keinen Titel.",
+    "match_category": {
+      "value": "{{category}}"
+    },
+    "loading": "Lädt",
+    "no_audit_results_prompt": "Noch keine Prüfergebnisse",
+    "col_referrer": "Referrer",
+    "placeholder_smtpexamplecom": "Smtpexamplecom...",
+    "sitemap_content_type_jobs": "Jobs",
+    "chip_pass": "Pass",
+    "provider_gemini": "Google Gemini",
+    "sitemap_heading": "Sitemap"
   },
   "email_deliverability": {
     "title": "E-Mail-Zustellbarkeit",
@@ -1822,7 +1920,6 @@
         "marketplace_report_notifications": "Marktplatzbericht",
         "marketplace_seller_ratings": "Bewertung des Marktplatzverkäufers",
         "member_subscription_events": "Abrechnung von Mitgliederabonnements",
-        "newsletter_queue": "Newsletter",
         "notification_queue": "Benachrichtigung",
         "notifications": "Benachrichtigungsbeweis",
         "reviews": "Verbundrezension",
@@ -1830,7 +1927,8 @@
         "user_safeguarding_preferences": "Sicherstellende Überprüfung",
         "vol_donations": "Spendenquittung",
         "vol_reminder_delivery_claims": "Ehrenamtlicher Erinnerungsanspruch",
-        "vol_reminders_sent": "Erinnerung an Freiwillige"
+        "vol_reminders_sent": "Erinnerung an Freiwillige",
+        "newsletter_queue": "Newsletter"
       }
     },
     "logs": {
@@ -2086,7 +2184,7 @@
       },
       "email_dispatch_missing_explicit_tenant": {
         "title": "Der Dispatcher-E-Mail fehlt ein expliziter Mandant",
-        "body": "{{count}}-E-Mail-Dispatcher-Anrufseiten stützen sich immer noch auf den abgeleiteten Mandantenkontext. Übergeben Sie „tenant_id“ oder „mieterId“ explizit, damit jeder in der Warteschlange befindliche, Cron-, Webhook- und mandantenübergreifende Versand überprüfbar ist."
+        "body": "{{count}} E-Mail-Dispatcher-Aufrufstellen verlassen sich immer noch auf den erschlossenen Mandantenkontext. Übergeben Sie tenant_id oder tenantId explizit, damit jeder geplante, Cron-, Webhook- und Mandanten-übergreifende Versand prüfbar ist."
       },
       "email_trigger_audit_failed": {
         "title": "Die Prüfung des E-Mail-Triggers ist fehlgeschlagen",
@@ -2105,16 +2203,37 @@
       "title": "Push-Benachrichtigungen",
       "subtitle": "Web- und Mobil-Push-Zustellung im gewählten Zeitraum",
       "unavailable": "Die Protokollierung der Push-Zustellung ist noch nicht verfügbar.",
-      "total": "Pushes",
       "delivered": "Zugestellt",
       "partial": "Teilweise",
       "failed": "Fehlgeschlagen",
       "success_rate": "Erfolgsrate",
       "fcm": "Mobil gesendet/fehlgeschlagen",
       "web": "Web zugestellt",
-      "recent_failures": "Letzte Fehler"
+      "recent_failures": "Letzte Fehler",
+      "total": "Stöße"
     },
     "trigger_coverage_one": "{{issues}}-Probleme in allen von {{count}} überwachten Flüssen",
-    "trigger_coverage_other": "{{issues}}-Probleme in allen von {{count}} überwachten Flüssen"
+    "trigger_coverage_other": "{{issues}}-Probleme in allen von {{count}} überwachten Flüssen",
+    "categories": {
+      "billing": "Abrechnung",
+      "civic_digest": "Städtischer Überblick",
+      "donation_receipt": "Spendenquittung",
+      "event_reminder": "Erinnerung an Veranstaltung",
+      "federation_connection": "Verbindungsaufbau zur Föderation",
+      "federation_message": "Föderationsnachricht",
+      "federation_review": "Föderationsbewertung",
+      "federation_transaction": "Föderationstransaktion",
+      "goal_reminder": "Zielerinnerung",
+      "job_interview": "Vorstellungsgespräch",
+      "listing_expiry": "Ablauf der Auflistung",
+      "marketplace_dispute": "Marktplatzstreit",
+      "marketplace_rating": "Marktplatzbewertung",
+      "safeguarding": "Schutzmaßnahmen",
+      "safeguarding_review": "Überprüfung der Schutzmaßnahmen",
+      "volunteer_reminder": "Freiwilligenerinnerung",
+      "not_available": "Nicht verfügbar",
+      "unknown": "Andere E-Mail-Kategorie",
+      "newsletter": "Newsletter"
+    }
   }
 }

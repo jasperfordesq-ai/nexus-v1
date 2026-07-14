@@ -26,10 +26,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 // ── Mock ConfirmModal ─────────────────────────────────────────────────────
-vi.mock('@/admin/components', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/admin/components')>();
-  return {
-    ...actual,
+vi.mock('../../components/ConfirmModal', () => ({
     ConfirmModal: ({
       isOpen,
       onConfirm,
@@ -51,8 +48,7 @@ vi.mock('@/admin/components', async (importOriginal) => {
           <button onClick={onClose}>Close</button>
         </div>
       ) : null,
-  };
-});
+}));
 
 // ── Mock contexts ─────────────────────────────────────────────────────────
 vi.mock('@/contexts', () =>
@@ -148,6 +144,20 @@ describe('AiModuleDocsAdminPage — populated state', () => {
       expect(screen.getByText('Wallet Module')).toBeInTheDocument();
     });
     expect(screen.getByText('Events Module')).toBeInTheDocument();
+  });
+
+  it('localizes an unchanged seeded title from its stable code', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [{ ...DOC_1, default_title_code: 'wallet' }],
+    });
+
+    render(<AiModuleDocsAdminPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Wallet & time credit balance')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Wallet Module')).not.toBeInTheDocument();
   });
 
   it('renders module slugs', async () => {

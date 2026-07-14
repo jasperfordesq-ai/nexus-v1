@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "diagnostics": {
     "avg_match_score": "Durchschnittlicher Match-Score",
@@ -99,7 +99,6 @@
     "matching_diagnostic_title": "Passende Diagnose",
     "matches_today": "Spiele heute",
     "nexus_score_analytics_desc": "Sehen Sie sich Analysen für NEXUS-Ergebnisse in Ihrer gesamten Mitgliederbasis an",
-    "nexus_score_analytics_title": "NEXUS Score Analytics",
     "no_diagnostic_data_found_for_this_listin": "Für diesen Eintrag wurden keine Diagnosedaten gefunden",
     "no_diagnostic_data_found_for_this_user": "Für diesen Benutzer wurden keine Diagnosedaten gefunden",
     "page_title": "Diagnose",
@@ -108,8 +107,11 @@
     "score_distribution": "Punkteverteilung",
     "score_distribution_empty": "Keine Punkteverteilung gefunden",
     "score_factors": "Bewertungsfaktoren",
-    "score_factors_desc": "Score Factors.",
-    "user_prompt": "Geben Sie eine Benutzer-ID ein und klicken Sie auf „Diagnose“, um die Übereinstimmungsanalyse anzuzeigen."
+    "user_prompt": "Geben Sie eine Benutzer-ID ein und klicken Sie auf „Diagnose“, um die Übereinstimmungsanalyse anzuzeigen.",
+    "listing_id_placeholder": "z. B., 105",
+    "user_id_placeholder": "z.B., 42",
+    "score_factors_desc": "Bewertungsfaktoren sind gewichtete Signale, die zur Berechnung des Mitgliederengagements verwendet werden.",
+    "nexus_score_analytics_title": "NEXUS Punkteanalyse"
   },
   "diagnostics_matching": {
     "avg_match_score": "Durchschnittlicher Match-Score",

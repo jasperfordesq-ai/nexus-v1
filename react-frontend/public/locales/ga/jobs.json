@@ -711,7 +711,7 @@
     "time_credits_label": "Creidmheasanna Ama á dTairiscint",
     "time_credits_placeholder": "m.sh. 5.00",
     "contact_email_label": "Ríomhphost Teagmhála",
-    "contact_email_placeholder": "teagmhail@sampla.ie",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Fón Teagmhála",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Spriocdháta Iarratais",
@@ -1141,7 +1141,9 @@
     }
   },
   "jobs": {
-    "view_details": "Féach ar shonraí an phoist"
+    "view_details": "Féach ar shonraí an phoist",
+    "type_unknown": "Cineál anaithnid",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Radharc poist",
   "deadline_countdown_few": "Ag dúnadh i gceann {{count}} lá",

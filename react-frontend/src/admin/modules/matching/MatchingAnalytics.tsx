@@ -89,6 +89,13 @@ const PILLAR_LABEL_KEYS: Record<string, string> = {
   trust: 'matching.pillar_trust',
 };
 
+function formatPercentage(value: number): string {
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'percent',
+    maximumFractionDigits: 1,
+  }).format(value / 100);
+}
+
 export function MatchingAnalytics() {
   const { t } = useTranslation('admin_matching');
   usePageTitle(t('matching.page_title'));
@@ -186,7 +193,7 @@ export function MatchingAnalytics() {
             />
             <StatCard
               label={t('matching.label_approval_rate')}
-              value={`${stats?.approval_rate ?? 0}%`}
+              value={formatPercentage(stats?.approval_rate ?? 0)}
               icon={CheckCircle}
               color="success"
               loading={loading}
@@ -194,7 +201,7 @@ export function MatchingAnalytics() {
             <StatCard
               label={t('matching.label_average_score')}
               value={overview?.avg_match_score !== undefined
-                ? `${overview.avg_match_score}%`
+                ? formatPercentage(overview.avg_match_score)
                 : '---'}
               icon={TrendingUp}
               loading={loading}
@@ -230,10 +237,10 @@ export function MatchingAnalytics() {
                         <div key={range}>
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-sm text-muted">
-                              {SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : range}
+                              {SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : t('matching.score_range_unknown')}
                             </span>
                             <span className="text-sm font-medium tabular-nums">
-                              {count} ({pct}%)
+                              {count} ({formatPercentage(pct)})
                             </span>
                           </div>
                           <Progress
@@ -241,7 +248,7 @@ export function MatchingAnalytics() {
                             color={SCORE_COLORS[range] ?? 'primary'}
                             size="sm"
                             aria-label={t('matching.distribution_aria', {
-                              label: SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : range,
+                              label: SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : t('matching.score_range_unknown'),
                               count,
                               percent: pct,
                             })}
@@ -278,10 +285,10 @@ export function MatchingAnalytics() {
                           <div key={band}>
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm text-muted">
-                                {DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : band}
+                                {DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : t('matching.distance_unknown')}
                               </span>
                               <span className="text-sm font-medium tabular-nums">
-                                {count} ({pct}%)
+                                {count} ({formatPercentage(pct)})
                               </span>
                             </div>
                             <Progress
@@ -289,7 +296,7 @@ export function MatchingAnalytics() {
                               color={DIST_COLORS[band] ?? 'primary'}
                               size="sm"
                               aria-label={t('matching.distribution_aria', {
-                                label: DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : band,
+                                label: DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : t('matching.distance_unknown'),
                                 count,
                                 percent: pct,
                               })}
@@ -389,7 +396,7 @@ export function MatchingAnalytics() {
                     <div className="flex items-center justify-between py-1">
                       <span className="text-sm text-muted">{t('matching.label_approval_rate')}</span>
                       <span className="text-sm font-bold text-success">
-                        {stats.approval_rate}%
+                        {formatPercentage(stats.approval_rate)}
                       </span>
                     </div>
                     <Progress
@@ -474,13 +481,13 @@ export function MatchingAnalytics() {
                           0
                         );
                         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                        const label = REASON_LABEL_KEYS[reason] ? t(REASON_LABEL_KEYS[reason]) : reason;
+                        const label = REASON_LABEL_KEYS[reason] ? t(REASON_LABEL_KEYS[reason]) : t('matching.reason_unknown');
                         return (
                           <div key={reason}>
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm text-muted">{label}</span>
                               <span className="text-sm font-medium tabular-nums">
-                                {count} ({pct}%)
+                                {count} ({formatPercentage(pct)})
                               </span>
                             </div>
                             <Progress
@@ -516,12 +523,14 @@ export function MatchingAnalytics() {
                       const value = stats.pillar_averages?.pillars?.[pillar];
                       if (value === undefined) return null;
                       const pct = Math.round(value * 100);
-                      const label = t(PILLAR_LABEL_KEYS[pillar] ?? pillar);
+                      const label = PILLAR_LABEL_KEYS[pillar]
+                        ? t(PILLAR_LABEL_KEYS[pillar])
+                        : t('matching.pillar_unknown');
                       return (
                         <div key={pillar}>
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-sm text-muted">{label}</span>
-                            <span className="text-sm font-medium tabular-nums">{pct}%</span>
+                            <span className="text-sm font-medium tabular-nums">{formatPercentage(pct)}</span>
                           </div>
                           <Progress
                             value={pct}

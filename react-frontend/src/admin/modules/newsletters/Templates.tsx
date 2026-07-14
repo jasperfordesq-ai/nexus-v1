@@ -112,7 +112,7 @@ export function Templates() {
         toast.success(t('newsletter_templates.template_duplicated'));
         loadData();
       } else {
-        toast.error(res.error || t('newsletter_templates.failed_to_duplicate_template'));
+        toast.error(t('newsletter_templates.failed_to_duplicate_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -129,7 +129,7 @@ export function Templates() {
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(res.error || t('newsletter_templates.failed_to_delete_template'));
+        toast.error(t('newsletter_templates.failed_to_delete_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -210,7 +210,7 @@ export function Templates() {
           variant="soft"
           color={CATEGORY_COLORS[item.category] || 'default'}
         >
-          {CATEGORY_LABELS[item.category] || item.category}
+          {CATEGORY_LABELS[item.category] || t('newsletter_templates.category_unknown')}
         </Chip>
       ),
     },
@@ -324,7 +324,10 @@ export function Templates() {
         >
           <Tab key="all" title={t('newsletters.tab_all')} />
           {Object.entries(categoryCounts).map(([cat, count]) => (
-            <Tab key={cat} title={`${CATEGORY_LABELS[cat] || cat} (${count})`} />
+            <Tab key={cat} title={t('newsletter_templates.category_count', {
+              category: CATEGORY_LABELS[cat] || t('newsletter_templates.category_unknown'),
+              count,
+            })} />
           ))}
         </Tabs>
       </div>

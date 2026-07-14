@@ -37,14 +37,14 @@
     "loading": "Ładowanie",
     "next": "Następny",
     "no": "Nie",
-    "ok": "OK",
     "pending": "Oczekujące",
     "previous": "Poprzedni",
     "retry": "Spróbuj ponownie",
     "save": "Zapisz",
     "select_all": "Wybierz wszystko",
     "select_item": "Wybierz element",
-    "yes": "Tak"
+    "yes": "Tak",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Działania brokera",
@@ -57,7 +57,6 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
-    "loading": "Loading",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -68,9 +67,10 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
-    "select_row": "Select row {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}"
+    "total_count": "Łącznie{{count}}",
+    "loading": "Ładowanie",
+    "select_row": "Wybierz wiersz {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Abonenci",
       "user_fallback": "Użytkownik #{{id}}",
       "columns": {
-        "member": "CZŁONEK",
-        "email": "EMAIL",
-        "tier": "SZCZEBEL",
-        "interval": "INTERWAŁ",
-        "status": "STATUS",
-        "next_billing": "NASTĘPNE ROZLICZENIE",
-        "started": "ROZPOCZĘTO"
+        "member": "Członek",
+        "email": "Email",
+        "tier": "Poziom",
+        "interval": "Okres",
+        "status": "Status",
+        "next_billing": "Następna faktura",
+        "started": "Rozpoczęto"
       },
       "status": {
         "active": "Aktywny",
@@ -185,33 +185,33 @@
       "settings_save_failed": "Nie można zapisać ustawień przekazywania darowizn.",
       "onboarding_failed": "Nie można rozpocząć wdrażania Stripe.",
       "finance_load_failed": "Nie można wczytać operacji finansowania darowizn.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Nie można pobrać eksportu rocznego rachunku."
+      "annual_receipts_export_failed": "Nie można pobrać eksportu rocznego rachunku.",
+      "gift_aid_export_failed": "Nie udało się pobrać eksportu Gift Aid."
     },
     "settings": {
-      "title": "Prowadzenie pasków",
       "description": "Pozostaw to pole puste, aby używać konta Stripe platformy z metadanymi dzierżawy. Połącz konto Stripe najemcy, aby wysyłać przyszłe jednorazowe i regularne darowizny na to konto najemcy.",
       "stripe_connect_account_id": "Identyfikator konta Tenant Stripe Connect",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Zmiana tego ustawienia będzie miała wpływ na przyszłe transakcje dotyczące darowizn. Po dodaniu konta najemcy ponownie zsynchronizuj poziomy wsparcia, aby na tym koncie Stripe istniały powtarzające się ceny.",
       "route_platform_default": "Awaryjna platforma",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Rozpocznij wdrażanie Stripe",
       "continue_onboarding": "Kontynuuj wdrażanie Stripe",
       "requirements_due": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
       "save": "Zapisz routing",
       "status": {
         "not_connected": "Nie podłączony",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Potrzebne działanie",
-        "unknown": "Stan nieznany"
+        "unknown": "Stan nieznany",
+        "pending": "Oczekujące",
+        "ready": "Gotowe"
       },
       "connect_fallback_active": "Konto Stripe Connect jest skonfigurowane, ale nie jest jeszcze gotowe do przyjmowania darowizn na żywo. Do momentu zakończenia wdrożenia płatności będą korzystać z platformy zastępczej.",
       "requirements_due_few": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
       "requirements_due_many": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
       "requirements_due_one": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
-      "requirements_due_other": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}."
+      "requirements_due_other": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
+      "title": "Stripe trasowanie",
+      "route_tenant_connect": "Połączenie Najemcy"
     },
     "finance": {
       "title": "Operacje finansowe",
@@ -219,16 +219,9 @@
       "completed_volume": "Ukończony tom",
       "platform_fallback_volume": "Wolumen rezerwowy platformy",
       "tenant_connect_volume": "Wolumen Tenant Connect",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Otwarte spory",
       "active_recurring": "Aktywne, powtarzające się",
       "failed_receipts": "Nieudane wpływy",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Eksportuj roczne wpływy",
       "empty": "Nie zarejestrowano jeszcze żadnej działalności finansowej.",
       "donation_count_few": "{{count}} donation",
@@ -240,7 +233,14 @@
       "past_due_count_few": "{{count}} past due",
       "past_due_count_many": "{{count}} past due",
       "past_due_count_one": "{{count}} przeterminowany",
-      "past_due_count_other": "{{count}} przeterminowany"
+      "past_due_count_other": "{{count}} przeterminowany",
+      "gift_aid_ready": "Gift Aid gotowy",
+      "export_gift_aid": "Eksportuj Gift Aid",
+      "donation_count": "{{count}} darowizna",
+      "donation_count_other": "{{count}} darowizny",
+      "declaration_count": "{{count}} deklaracja",
+      "declaration_count_other": "{{count}} deklaracje",
+      "past_due_count": "{{count}} zaległe"
     }
   }
 }

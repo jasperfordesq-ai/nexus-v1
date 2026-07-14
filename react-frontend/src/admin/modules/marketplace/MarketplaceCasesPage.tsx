@@ -121,7 +121,7 @@ export function MarketplaceCasesPage() {
     try {
       const response = await api.get<unknown>(`/v2/admin/marketplace/reports?page=${reportPage}&per_page=20`);
       if (!response.success) {
-        toast.error(response.error || t('admin.load_reports_error'));
+        toast.error(t('admin.load_reports_error'));
         return;
       }
       const page = normalizeMarketplaceCasePage<MarketplaceReportCase>(response.data);
@@ -139,7 +139,7 @@ export function MarketplaceCasesPage() {
     try {
       const response = await api.get<unknown>(`/v2/admin/marketplace/disputes?page=${disputePage}&per_page=20`);
       if (!response.success) {
-        toast.error(response.error || t('admin.load_disputes_error'));
+        toast.error(t('admin.load_disputes_error'));
         return;
       }
       const page = normalizeMarketplaceCasePage<MarketplaceDisputeCase>(response.data);
@@ -160,7 +160,7 @@ export function MarketplaceCasesPage() {
     try {
       const response = await api.post(`/v2/admin/marketplace/reports/${report.id}/acknowledge`);
       if (!response.success) {
-        toast.error(response.error || t('admin.acknowledge_error'));
+        toast.error(t('admin.acknowledge_error'));
         return;
       }
       toast.success(t('admin.acknowledged'));
@@ -190,7 +190,7 @@ export function MarketplaceCasesPage() {
         resolution_reason: resolutionNotes.trim(),
       });
       if (!response.success) {
-        toast.error(response.error || t('admin.resolve_error'));
+        toast.error(t('admin.resolve_error'));
         return;
       }
       toast.success(t('admin.resolve_success'));
@@ -224,7 +224,7 @@ export function MarketplaceCasesPage() {
         ...(parsedRefund === undefined ? {} : { refund_amount: parsedRefund }),
       });
       if (!response.success) {
-        toast.error(response.error || t('admin.resolve_error'));
+        toast.error(t('admin.resolve_error'));
         return;
       }
       toast.success(t('admin.resolve_success'));
@@ -258,14 +258,14 @@ export function MarketplaceCasesPage() {
     {
       key: 'reason',
       label: t('admin.columns.reason'),
-      render: (report) => <span className="text-sm text-muted">{t(`reason.${report.reason}`, { defaultValue: report.reason })}</span>,
+      render: (report) => <span className="text-sm text-muted">{t(`reason.${report.reason}`, { defaultValue: t('reason.unknown') })}</span>,
     },
     {
       key: 'status',
       label: t('admin.columns.status'),
       render: (report) => (
         <Chip size="sm" color={STATUS_COLORS[report.status] || 'default'} variant="soft">
-          {t(`status.${report.status}`, { defaultValue: report.status })}
+          {t(`status.${report.status}`, { defaultValue: t('status.unknown') })}
         </Chip>
       ),
     },
@@ -315,14 +315,14 @@ export function MarketplaceCasesPage() {
     {
       key: 'reason',
       label: t('admin.columns.reason'),
-      render: (dispute) => <span className="text-sm text-muted">{t(`reason.${dispute.reason}`, { defaultValue: dispute.reason })}</span>,
+      render: (dispute) => <span className="text-sm text-muted">{t(`reason.${dispute.reason}`, { defaultValue: t('reason.unknown') })}</span>,
     },
     {
       key: 'status',
       label: t('admin.columns.status'),
       render: (dispute) => (
         <Chip size="sm" color={STATUS_COLORS[dispute.status] || 'default'} variant="soft">
-          {t(`status.${dispute.status}`, { defaultValue: dispute.status })}
+          {t(`status.${dispute.status}`, { defaultValue: t('status.unknown') })}
         </Chip>
       ),
     },
@@ -401,7 +401,7 @@ export function MarketplaceCasesPage() {
             {reportTarget && (
               <div className="space-y-3 rounded-lg border border-divider bg-surface-secondary p-4 text-sm">
                 <div><span className="font-semibold">{t('common.listing')}:</span> {reportTarget.listing?.title || `#${reportTarget.marketplace_listing_id}`}</div>
-                <div><span className="font-semibold">{t('common.reason')}:</span> {t(`reason.${reportTarget.reason}`, { defaultValue: reportTarget.reason })}</div>
+                <div><span className="font-semibold">{t('common.reason')}:</span> {t(`reason.${reportTarget.reason}`, { defaultValue: t('reason.unknown') })}</div>
                 <div>
                   <p className="font-semibold">{t('admin.case_description')}</p>
                   <p className="whitespace-pre-wrap text-muted">{reportTarget.description || t('common.not_available')}</p>

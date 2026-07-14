@@ -8,5 +8,33 @@
   "after_label": "Na",
   "caveat_label": "Methode",
   "evidence_label": "Bewijs",
-  "error_loading": "We konden de succesverhalen nu niet laden. Probeer het over een ogenblik opnieuw."
+  "error_loading": "We konden de succesverhalen nu niet laden. Probeer het over een ogenblik opnieuw.",
+  "audiences": {
+    "all_residents": "Alle bewoners",
+    "municipality": "Gemeente",
+    "kanton": "Kanton",
+    "verein_members": "Leden van de vereniging",
+    "volunteers": "Vrijwilligers",
+    "recipients": "Zorgontvangers"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30% lagere inspanning voor informatieverspreiding",
+      "narrative": "Coördinatoren besteden ongeveer een derde minder tijd aan het verspreiden van updates na de overstap naar NEXUS. Aankondigingen, doelgroepgerichte segmentatie van leden en opvolging van bevestigingen worden op één plek samengebracht.",
+      "method_caveat": "Illustratief voorbeeld gebaseerd op een claim van de peer-gemeenschap; het is niet gemeten voor deze huurder.",
+      "evidence_source": "Peer-gemeente pagina (illustratief)"
+    },
+    "volunteer_engagement": {
+      "title": "25% meer vrijwilligersbetrokkenheid",
+      "narrative": "Pilotgemeenschappen rapporteren een kwart meer actieve vrijwillige deelname na het aannemen van NEXUS, ondersteund door duidelijkere matching, probleemloze aanmelding en zichtbare Warmth Pass-erkenning.",
+      "method_caveat": "Illustratief voorbeeld gebaseerd op een claim van de peer-gemeenschap; het is niet gemeten voor deze huurder.",
+      "evidence_source": "Peer-gemeente pagina (illustratief)"
+    },
+    "formal_care_offset": {
+      "title": "CHF 12.250 aan formele zorgkosten gecompenseerd",
+      "narrative": "Vrijwilligersuren gecoördineerd via NEXUS vertegenwoordigen een compensatie van CHF 12.250 tegen formele thuiszorgkosten tijdens het pilotprogramma, gewaardeerd tegen het Zwitserse tarief voor formele zorgassistenten.",
+      "method_caveat": "Schatting met CHF 35 per uur over 350 uur; de vergelijking is alleen ten opzichte van de pre-pilot basislijn.",
+      "evidence_source": "AG76 gemeentelijk ROI-model (ter illustratie)"
+    }
+  }
 }

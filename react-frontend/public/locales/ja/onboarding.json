@@ -138,5 +138,7 @@
   "skills_to_offer_count_one": "{{count}} が提供するスキル",
   "skills_to_offer_count_other": "{{count}} のスキルを提供",
   "skills_needed_count_one": "{{count}} 必要なスキル",
-  "skills_needed_count_other": "{{count}} のスキルが必要"
+  "skills_needed_count_other": "{{count}} のスキルが必要",
+  "bio_char_count_one": "{{count}} 文字",
+  "count_selected_one": "{{count}} 選択済み"
 }

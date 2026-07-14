@@ -77,7 +77,9 @@ function StatusChip({ status, t }: StatusChipProps) {
   }
   return (
     <Chip color="default" variant="soft" size="sm" startContent={<ShieldAlert className="w-3.5 h-3.5" />}>
-      {status}
+      {t(`municipal_verification.status.${status}`, {
+        defaultValue: t('municipal_verification.status.unknown'),
+      })}
     </Chip>
   );
 }
@@ -112,7 +114,7 @@ export default function MunicipalVerificationAdminPage() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        toast.error(res.error || t('municipal_verification.toasts.load_failed'));
+        toast.error(t('municipal_verification.toasts.load_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: load failed', err);
@@ -143,7 +145,7 @@ export default function MunicipalVerificationAdminPage() {
         setDnsDomain('');
         void load();
       } else {
-        toast.error(res.error || t('municipal_verification.toasts.dns_failed'));
+        toast.error(t('municipal_verification.toasts.dns_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: start DNS failed', err);
@@ -170,7 +172,7 @@ export default function MunicipalVerificationAdminPage() {
         setAttestNote('');
         void load();
       } else {
-        toast.error(res.error || t('municipal_verification.toasts.attest_failed'));
+        toast.error(t('municipal_verification.toasts.attest_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: attest failed', err);
@@ -194,7 +196,7 @@ export default function MunicipalVerificationAdminPage() {
         setRevokeTarget(null);
         void load();
       } else {
-        toast.error(res.error || t('municipal_verification.toasts.revoke_failed'));
+        toast.error(t('municipal_verification.toasts.revoke_failed'));
       }
     } catch (err) {
       logError('MunicipalVerificationAdminPage: revoke failed', err);

@@ -8,5 +8,33 @@
   "after_label": "Nachher",
   "caveat_label": "Methodik",
   "evidence_label": "Beleg",
-  "error_loading": "Die Erfolgsgeschichten konnten momentan nicht geladen werden. Bitte versuchen Sie es in einem Moment erneut."
+  "error_loading": "Die Erfolgsgeschichten konnten momentan nicht geladen werden. Bitte versuchen Sie es in einem Moment erneut.",
+  "audiences": {
+    "all_residents": "Alle Einwohner",
+    "municipality": "Gemeinde",
+    "kanton": "Kanton",
+    "verein_members": "Vereinsmitglieder",
+    "volunteers": "Freiwillige",
+    "recipients": "Pflegeempfänger"
+  },
+  "demo_stories": {
+    "information_distribution": {
+      "title": "30 % geringerer Aufwand für die Informationsverteilung",
+      "narrative": "Koordinatoren benötigen ungefähr ein Drittel weniger Zeit für die Verteilung von Updates, nachdem sie zu NEXUS gewechselt haben. Ankündigungen, Zielgruppensegmentierung von Mitgliedern und Bestätigungsverfolgung sind an einem Ort gebündelt.",
+      "method_caveat": "Illustratives Beispiel basierend auf einer Behauptung der Peer-Community; es wurde für diesen Mandanten nicht gemessen.",
+      "evidence_source": "Seite der Peer-Gemeinde (illustrativ)"
+    },
+    "volunteer_engagement": {
+      "title": "25 % mehr Engagement von Freiwilligen",
+      "narrative": "Pilotgemeinschaften berichten von einem Viertel mehr aktiver Freiwilligenbeteiligung nach der Einführung von NEXUS, unterstützt durch klarere Zuordnung, unkomplizierte Anmeldung und sichtbare Anerkennung durch den Warmth-Pass.",
+      "method_caveat": "Illustratives Beispiel basierend auf einer Behauptung der Peer-Community; es wurde für diesen Mandanten nicht gemessen.",
+      "evidence_source": "Seite der Peer-Gemeinde (illustrativ)"
+    },
+    "formal_care_offset": {
+      "title": "CHF 12.250 an formellen Pflegekosten ausgeglichen",
+      "narrative": "Freiwilligenstunden, die über NEXUS koordiniert werden, entsprechen während des Pilotzeitraums einer Entlastung von CHF 12.250 bei den formellen Hauspflegekosten, bewertet zum Schweizer Tarif für formelle Pflegeassistenten.",
+      "method_caveat": "Schätzung unter Verwendung von 35 CHF pro Stunde über 350 Stunden; der Vergleich erfolgt nur gegenüber dem Vor-Pilot-Baseline.",
+      "evidence_source": "AG76 kommunales ROI-Modell (illustrativ)"
+    }
+  }
 }

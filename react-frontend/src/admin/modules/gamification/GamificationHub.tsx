@@ -19,6 +19,7 @@ import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import type { GamificationStats, BadgeConfigEntry } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { badgeDisplayName } from './badgeDisplay';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -104,7 +105,7 @@ export function GamificationHub() {
       setSelectedBadge('');
       setUserIdsText('');
     } else {
-      toast.error(res.error || t('gamification.bulk_award_failed'));
+      toast.error(t('gamification.bulk_award_failed'));
     }
   };
 
@@ -112,11 +113,10 @@ export function GamificationHub() {
     setRechecking(true);
     const res = await adminGamification.recheckAll();
     if (res.success) {
-      const data = res.data as { users_checked?: number; message?: string } | undefined;
-      toast.success(data?.message || t('gamification.badge_recheck_completed'));
+      toast.success(t('gamification.badge_recheck_completed'));
       loadStats();
     } else {
-      toast.error(res.error || t('gamification.badge_recheck_failed'));
+      toast.error(t('gamification.badge_recheck_failed'));
     }
     setRechecking(false);
   };
@@ -199,8 +199,8 @@ export function GamificationHub() {
               <div className="space-y-3">
                 {stats.badge_distribution.map((badge) => (
                   <div key={badge.badge_name} className="flex items-center gap-3">
-                    <span className="w-36 truncate text-sm text-foreground font-medium" title={badge.badge_name}>
-                      {badge.badge_name}
+                    <span className="w-36 truncate text-sm text-foreground font-medium" title={badgeDisplayName(t, { name: badge.badge_name, name_code: badge.name_code })}>
+                      {badgeDisplayName(t, { name: badge.badge_name, name_code: badge.name_code })}
                     </span>
                     <div className="flex-1 h-6 rounded-lg bg-surface-secondary overflow-hidden">
                       <div
@@ -310,7 +310,7 @@ export function GamificationHub() {
                 onSelectionChange={(keys) => setSelectedBadge(Array.from(keys)[0] as string ?? '')}
               >
                 {badges.map((b) => (
-                  <SelectItem key={b.key} id={b.key}>{b.name}</SelectItem>
+                  <SelectItem key={b.key} id={b.key}>{badgeDisplayName(t, b)}</SelectItem>
                 ))}
               </Select>
             )}

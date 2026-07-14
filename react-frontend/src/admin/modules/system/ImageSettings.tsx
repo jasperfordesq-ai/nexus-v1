@@ -55,7 +55,7 @@ export function ImageSettings() {
       if (res.success) {
         toast.success(t('system.image_settings_saved_successfully'));
       } else {
-        toast.error(res.error || t('system.failed_to_save_image_settings'));
+        toast.error(t('system.failed_to_save_image_settings'));
       }
     } catch {
       toast.error(t('system.failed_to_save_image_settings'));

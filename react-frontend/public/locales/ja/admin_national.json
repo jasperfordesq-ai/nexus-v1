@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,15 +67,15 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "national": {
     "trend_chart_aria": "コミュニティ活動の長期的な傾向を示すグラフ"
   },
   "national_kiss_dashboard": {
-    "loading": "Loading",
     "meta": {
       "page_title": "Caring Community - 全国ダッシュボード",
       "title": "Caring Community - 全国ダッシュボード",
@@ -141,7 +140,8 @@
       "hours_axis": "営業時間",
       "cooperatives_axis": "協同組合",
       "active_cooperatives": "活発な協同組合",
-      "total_hours_all": "合計時間（すべての協同組合）"
+      "total_hours_all": "合計時間（すべての協同組合）",
+      "unknown_period": "不明な期間"
     },
     "comparative": {
       "title": "比較指標",
@@ -181,6 +181,7 @@
     },
     "toasts": {
       "load_failed": "ダッシュボードの読み込みに失敗しました"
-    }
+    },
+    "loading": "読み込み中"
   }
 }

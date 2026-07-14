@@ -19,18 +19,17 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type Plan, type SubscriptionDetails } from '../../api/billingApi';
 import { PageHeader } from '../../components/PageHeader';
+import { getFormattingLocale } from '@/lib/helpers';
 
 const isFreePlan = (plan: Plan) =>
   plan.price_monthly === 0 && plan.price_yearly === 0;
 
-const priceFormatter = new Intl.NumberFormat(undefined, {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 2,
-});
-
 const formatPrice = (amount: number) => {
-  return priceFormatter.format(amount);
+  return new Intl.NumberFormat(getFormattingLocale(), {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
 };
 
 export function PlanSelector() {

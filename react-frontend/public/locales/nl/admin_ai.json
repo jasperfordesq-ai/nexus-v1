@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "ai": {
     "common": {
@@ -131,7 +131,8 @@
       },
       "triggered_by": {
         "manual": "Handmatig",
-        "scheduled": "Gepland"
+        "scheduled": "Gepland",
+        "schedule": "Schema"
       },
       "config": {
         "enable_title": "Schakel KI-Agenten in",
@@ -149,7 +150,7 @@
         "max_proposals": "Max. aantal voorstellen per run",
         "schedule_hour": "Schema-uur (0-23, lokale servertijd)",
         "notification_email": "E-mailmelding",
-        "notification_email_placeholder": "beheerder@voorbeeld.org"
+        "notification_email_placeholder": "admin@example.org"
       },
       "actions": {
         "approve": "Goedkeuren",
@@ -242,6 +243,13 @@
         "runs_load_failed": "Kan runs niet laden.",
         "run_triggered_one": "Run geactiveerd: {{count}}-voorstellen gegenereerd.",
         "run_triggered_other": "Run geactiveerd: {{count}}-voorstellen gegenereerd."
+      },
+      "unknown_identifier": "Onbekend",
+      "proposal_types": {
+        "create_tandem": "Maak tandem",
+        "route_help_request": "Verzoek om hulp doorsturen",
+        "send_activity_summary": "Activiteitsoverzicht verzenden",
+        "send_nudge": "Stuur aansporing"
       }
     },
     "module_docs": {
@@ -258,8 +266,8 @@
       },
       "about": {
         "body": "Wanneer het chatbericht van een lid een van de trefwoorden van een document bevat, wordt de hoofdtekst van dat document als canonieke basis toegevoegd aan de systeemprompt van de AI. Er worden per beurt maximaal vier documenten geïnjecteerd, gerangschikt op basis van de overeenkomststerkte van de zoekwoorden. Schrijf in duidelijke taal: wat de functie doet, hoe u deze kunt gebruiken en wat niet mogelijk is. Voeg de specifieke terminologie, het beleid en de veelgestelde vragen van uw community toe.",
-        "tip_label": "Tip:",
-        "tip_body": "Nieuwe huurders worden automatisch voorzien van een uitgebreid startpakket van 38 documenten dat het platformoverzicht, de tijdbankfilosofie, elke module/functie, accountbeveiliging, privacy, toegankelijkheid, mobiel en probleemoplossing omvat. Klik op 'Seed-standaardinstellingen' om ontbrekende documenten aan te vullen. Uw aangepaste bewerkingen worden nooit overschreven."
+        "tip_body": "Nieuwe huurders worden automatisch voorzien van een uitgebreid startpakket van 38 documenten dat het platformoverzicht, de tijdbankfilosofie, elke module/functie, accountbeveiliging, privacy, toegankelijkheid, mobiel en probleemoplossing omvat. Klik op 'Seed-standaardinstellingen' om ontbrekende documenten aan te vullen. Uw aangepaste bewerkingen worden nooit overschreven.",
+        "tip_label": "Tip:"
       },
       "columns": {
         "actions": "Acties",
@@ -311,6 +319,122 @@
         "updated": "Document bijgewerkt.",
         "seeded_one": "{{count}} standaarddocument(en) geplaatst.",
         "seeded_other": "{{count}} standaarddocument(en) geplaatst."
+      },
+      "defaults": {
+        "overview": {
+          "title": "Platformoverzicht — wat dit is"
+        },
+        "timebanking": {
+          "title": "Basisprincipes en filosofie van timebanking"
+        },
+        "getting_started": {
+          "title": "Aan de slag — je eerste week"
+        },
+        "safety": {
+          "title": "Veiligheid, vertrouwen en gemeenschapsrichtlijnen"
+        },
+        "listings": {
+          "title": "Vermeldingen — aanbiedingen en verzoeken"
+        },
+        "wallet": {
+          "title": "Portemonnee & tijdkredietsaldo"
+        },
+        "messages": {
+          "title": "Berichten — privégesprekken"
+        },
+        "feed": {
+          "title": "Feed — activiteitenschema van de gemeenschap"
+        },
+        "dashboard": {
+          "title": "Dashboard — je startpunt"
+        },
+        "profile": {
+          "title": "Profiel & ledenlijst"
+        },
+        "notifications": {
+          "title": "Meldingen"
+        },
+        "settings": {
+          "title": "Instellingen — beheer je account"
+        },
+        "events": {
+          "title": "Evenementen — bijeenkomsten van de gemeenschap"
+        },
+        "groups": {
+          "title": "Groepen — subgemeenschappen"
+        },
+        "volunteering": {
+          "title": "Vrijwilligerswerk — mogelijkheden & diensten"
+        },
+        "jobs": {
+          "title": "Vacatures"
+        },
+        "marketplace": {
+          "title": "Marktplaats — artikelen, geen diensten"
+        },
+        "blog": {
+          "title": "Blog — gemeenschapsverhalen & nieuws"
+        },
+        "resources": {
+          "title": "Bronnen — kennisbank & bestanden"
+        },
+        "polls": {
+          "title": "Peilingen — gemeenschapsbeslissingen"
+        },
+        "ideation": {
+          "title": "Ideeënuitdagingen — gezamenlijk problemen oplossen"
+        },
+        "organisations": {
+          "title": "Organisaties — partnerprofielen"
+        },
+        "group_exchanges": {
+          "title": "Groepsuitwisselingen — veel-tot-veel tijdprojecten"
+        },
+        "federation": {
+          "title": "Federatie — gemeenschappen verbinden"
+        },
+        "gamification": {
+          "title": "Gamification — badges, XP en erkenning"
+        },
+        "goals": {
+          "title": "Doelen — persoonlijke en gemeenschapsdoelen"
+        },
+        "connections": {
+          "title": "Connecties — je netwerk"
+        },
+        "reviews": {
+          "title": "Beoordelingen & waarderingen"
+        },
+        "ai_chat": {
+          "title": "AI-assistent — de chatknop"
+        },
+        "search": {
+          "title": "Zoeken — alles vinden"
+        },
+        "caring_community": {
+          "title": "Zorgzame gemeenschap — ondersteuning voor kwetsbare leden"
+        },
+        "newsletter": {
+          "title": "Nieuwsbrief & e-mailoverzichten"
+        },
+        "account_security": {
+          "title": "Accountbeveiliging — wachtwoorden, 2FA, toegangssleutels"
+        },
+        "privacy_data": {
+          "title": "Privacy & gegevensrechten (AVG)"
+        },
+        "accessibility": {
+          "title": "Toegankelijkheid — thema's, talen, ondersteunende technologie"
+        },
+        "mobile_pwa": {
+          "title": "Mobiele app & PWA"
+        },
+        "troubleshooting": {
+          "title": "Problemen oplossen van veelvoorkomende problemen"
+        },
+        "admin_overview": {
+          "title": "Voor communitybeheerders"
+        }
       }
     },
     "trace_metrics": {

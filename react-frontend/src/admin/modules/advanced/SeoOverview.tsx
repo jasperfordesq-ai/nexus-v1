@@ -20,6 +20,12 @@ import { useToast } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components/PageHeader';
 import { adminSettings, adminTools } from '../../api/adminApi';
+import type { SeoAuditResult } from '../../api/types';
+import {
+  getSeoAuditCheckDescriptionKey,
+  getSeoAuditCheckNameKey,
+  getSeoAuditIssueKey,
+} from './seoAuditTranslations';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -63,11 +69,6 @@ interface SeoCheckResult {
   detail: string;
 }
 
-interface ServerAuditResult {
-  checks: Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>;
-  last_run_at: string | null;
-}
-
 export function SeoOverview() {
   const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
@@ -79,7 +80,7 @@ export function SeoOverview() {
   const [sitemapStats, setSitemapStats] = useState<SitemapStats | null>(null);
   const [sitemapLoading, setSitemapLoading] = useState(false);
   const [clearingCache, setClearingCache] = useState(false);
-  const [serverAudit, setServerAudit] = useState<ServerAuditResult | null>(null);
+  const [serverAudit, setServerAudit] = useState<SeoAuditResult | null>(null);
   const [auditRunning, setAuditRunning] = useState(false);
   const [formData, setFormData] = useState<Record<string, unknown>>({
     seo_title_suffix: '',
@@ -134,8 +135,7 @@ export function SeoOverview() {
     adminTools.getSeoAudit()
       .then(res => {
         if (res.data) {
-          const raw = res.data as unknown as ServerAuditResult;
-          if (raw?.checks) setServerAudit(raw);
+          setServerAudit(res.data);
         }
       })
       .catch(() => { /* silently fail — audit is optional */ });
@@ -146,11 +146,7 @@ export function SeoOverview() {
     try {
       const res = await adminTools.runSeoAudit();
       if (res.data) {
-        // The run endpoint returns results directly; re-fetch to get full structure
-        const freshRes = await adminTools.getSeoAudit();
-        if (freshRes.data) {
-          setServerAudit(freshRes.data as unknown as ServerAuditResult);
-        }
+        setServerAudit(res.data);
         toast.success(t('seo_audit_completed'));
       }
     } catch {
@@ -186,7 +182,7 @@ export function SeoOverview() {
       if (res.success) {
         toast.success(t('s_e_o_settings_saved_successfully'));
       } else {
-        const error = (res as { error?: string }).error || t('save_failed');
+        const error = t('save_failed');
         toast.error(error);
       }
     } catch {
@@ -426,7 +422,7 @@ export function SeoOverview() {
           <CardBody className="gap-4">
             <Input
               label={t('label_default_title_suffix')}
-              placeholder=" | My Timebank"
+              placeholder={t('placeholder_default_title_suffix')}
               variant="secondary"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
@@ -442,7 +438,7 @@ export function SeoOverview() {
             />
             <Input
               label={t('label_meta_keywords')}
-              placeholder="timebanking, community, exchange"
+              placeholder={t('placeholder_meta_keywords')}
               variant="secondary"
               value={String(formData.seo_meta_keywords || '')}
               onValueChange={(v) => updateField('seo_meta_keywords', v)}
@@ -584,7 +580,7 @@ export function SeoOverview() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(sitemapStats.content_types).map(([type, count]) => (
                       <div key={type} className="flex items-center justify-between rounded-lg bg-surface-secondary px-3 py-2">
-                        <span className="text-xs capitalize">{type.replace(/_/g, ' ')}</span>
+                        <span className="text-xs">{t(`sitemap_content_type_${type}`, { defaultValue: t('sitemap_content_type_unknown') })}</span>
                         <Chip size="sm" variant="soft">{count}</Chip>
                       </div>
                     ))}
@@ -605,9 +601,9 @@ export function SeoOverview() {
               {t('server_seo_audit_heading')}
             </h3>
             <div className="flex items-center gap-2">
-              {serverAudit?.last_run_at && (
+              {serverAudit?.run_at && (
                 <span className="text-xs text-muted">
-                  {t('last_run')}: {new Date(serverAudit.last_run_at).toLocaleDateString(getFormattingLocale())}
+                  {t('last_run')}: {new Date(serverAudit.run_at).toLocaleDateString(getFormattingLocale())}
                 </span>
               )}
               <Button
@@ -624,14 +620,24 @@ export function SeoOverview() {
             {serverAudit?.checks && serverAudit.checks.length > 0 ? (
               <div className="space-y-2">
                 {serverAudit.checks.map((check) => (
-                  <div key={check.name} className="flex items-start gap-3 py-1">
+                  <div key={check.code} className="flex items-start gap-3 py-1">
                     {check.status === 'pass' && <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />}
                     {check.status === 'warning' && <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />}
                     {check.status === 'fail' && <XCircle size={18} className="text-danger mt-0.5 shrink-0" />}
                     <div className="min-w-0">
-                      <p className="font-medium text-sm">{check.name}</p>
-                      <p className="text-xs text-muted">{check.description}</p>
-                      {check.details && <p className="mt-0.5 text-xs text-muted">{check.details}</p>}
+                      <p className="font-medium text-sm">{t(getSeoAuditCheckNameKey(check.code), check.params)}</p>
+                      <p className="text-xs text-muted">
+                        {t(getSeoAuditCheckDescriptionKey(check.code), check.params)}
+                      </p>
+                      {check.issues.length > 0 && (
+                        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-muted">
+                          {check.issues.map((issue, index) => (
+                            <li key={`${issue.code}-${index}`}>
+                              {t(getSeoAuditIssueKey(issue.code), issue.params)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   </div>
                 ))}

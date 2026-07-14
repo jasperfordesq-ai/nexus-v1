@@ -150,6 +150,7 @@ import type {
   TagSummary,
   CrmAdmin,
   TimelineEntry,
+  SeoAuditResult,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1953,7 +1954,10 @@ export const adminTools = {
     ),
   delete404Error: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/tools/404-errors/${id}`),
 
-  runHealthCheck: () => api.post<Array<{ name: string; status: string; duration_ms: number; error?: string }>>('/v2/admin/tools/health-check'),
+  runHealthCheck: () => api.post<{
+    tests: Array<{ code: string; status: string; duration_ms: number; error?: string }>;
+    summary: { total: number; passed: number; failed: number; overall: string };
+  }>('/v2/admin/tools/health-check'),
 
   getWebpStats: () => api.get<{ total_images: number; webp_images: number; pending_conversion: number }>('/v2/admin/tools/webp-stats'),
   runWebpConversion: () => api.post<{ converted: number }>('/v2/admin/tools/webp-convert'),
@@ -1967,10 +1971,10 @@ export const adminTools = {
     api.post<{ restored_count: number }>(`/v2/admin/tools/blog-backups/${backupId}/restore`),
 
   runSeoAudit: () =>
-    api.post<Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>>('/v2/admin/tools/seo-audit'),
+    api.post<SeoAuditResult>('/v2/admin/tools/seo-audit'),
 
   getSeoAudit: () =>
-    api.get<{ checks: Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>; last_run_at: string | null }>('/v2/admin/tools/seo-audit'),
+    api.get<SeoAuditResult | null>('/v2/admin/tools/seo-audit'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

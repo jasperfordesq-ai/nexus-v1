@@ -40,7 +40,7 @@ import type {
   CoreValue,
   CtaContent,
 } from '@/types/landing-page';
-import { DEFAULT_LANDING_PAGE_CONFIG, DEFAULT_AUDIENCE_CARDS } from '@/types/landing-page';
+import { DEFAULT_LANDING_PAGE_CONFIG, createDefaultAudienceCards } from '@/types/landing-page';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -324,6 +324,7 @@ function AudienceCardsEditor({
   onChange: (c: AudienceCardsContent) => void;
 }) {
   const { t } = useTranslation('admin_content');
+  const { t: tPublic } = useTranslation('public');
   const cards = content.cards || [];
 
   const updateCard = (index: number, field: keyof AudienceCard, value: string) => {
@@ -366,7 +367,7 @@ function AudienceCardsEditor({
   };
 
   const resetToDefaults = () => {
-    onChange({ ...content, cards: JSON.parse(JSON.stringify(DEFAULT_AUDIENCE_CARDS)) });
+    onChange({ ...content, cards: createDefaultAudienceCards((key) => tPublic(key)) });
   };
 
   return (

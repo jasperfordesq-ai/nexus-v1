@@ -141,7 +141,8 @@
       "hours_axis": "Hours",
       "cooperatives_axis": "Cooperatives",
       "active_cooperatives": "Active cooperatives",
-      "total_hours_all": "Total hours (all cooperatives)"
+      "total_hours_all": "Total hours (all cooperatives)",
+      "unknown_period": "Unknown period"
     },
     "comparative": {
       "title": "Comparative metrics",

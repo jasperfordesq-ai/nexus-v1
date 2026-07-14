@@ -1102,17 +1102,17 @@ class AdminSuperController extends BaseApiController
             $user = User::findById($uid, false);
 
             if (!$user) {
-                $errors[] = "User ID {$uid} not found";
+                $errors[] = ['code' => 'USER_NOT_FOUND', 'params' => ['user_id' => $uid]];
                 continue;
             }
 
             if ((int) $user['tenant_id'] === $targetTenantId) {
-                $errors[] = "User ID {$uid} is already in the target tenant";
+                $errors[] = ['code' => 'USER_ALREADY_IN_TARGET_TENANT', 'params' => ['user_id' => $uid]];
                 continue;
             }
 
             if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-                $errors[] = "No access to user ID {$uid}'s tenant";
+                $errors[] = ['code' => 'USER_TENANT_ACCESS_DENIED', 'params' => ['user_id' => $uid]];
                 continue;
             }
 
@@ -1136,15 +1136,17 @@ class AdminSuperController extends BaseApiController
                 $moveResult = User::moveTenant($uid, $targetTenantId);
                 if (!$moveResult['success']) {
                     if (self::moveRequiresPasskeyRecovery($moveResult)) {
-                        $message = __('api.super_move_user_passkey_recovery_required');
-                        $errors[] = $message;
+                        $issue = [
+                            'code' => ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED,
+                            'params' => ['user_id' => $uid],
+                        ];
+                        $errors[] = $issue;
                         $failures[] = [
                             'user_id' => $uid,
-                            'code' => ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED,
-                            'message' => $message,
+                            ...$issue,
                         ];
                     } else {
-                        $errors[] = "Failed to move user ID {$uid}";
+                        $errors[] = ['code' => 'USER_MOVE_FAILED', 'params' => ['user_id' => $uid]];
                     }
                     continue;
                 }
@@ -1160,7 +1162,7 @@ class AdminSuperController extends BaseApiController
 
                 $movedCount++;
             } catch (\Exception $e) {
-                $errors[] = "Failed to move user ID {$uid}";
+                $errors[] = ['code' => 'USER_MOVE_FAILED', 'params' => ['user_id' => $uid]];
             }
         }
 
@@ -1168,10 +1170,13 @@ class AdminSuperController extends BaseApiController
             'bulk_users_moved',
             'bulk',
             null,
-            "Bulk move to {$targetTenant['name']}",
+            $this->structuredAuditDisplay('bulk_users_move_target', ['tenant' => $targetTenant['name']]),
             ['user_count' => count($userIds)],
             ['target_tenant_id' => $targetTenantId, 'moved_count' => $movedCount, 'grant_super_admin' => $grantSuperAdmin],
-            "Moved {$movedCount} users to '{$targetTenant['name']}'" . ($grantSuperAdmin ? ' with Super Admin privileges' : '')
+            $this->structuredAuditDisplay(
+                $grantSuperAdmin ? 'bulk_users_moved_with_super_admin' : 'bulk_users_moved',
+                ['count' => $movedCount, 'tenant' => $targetTenant['name']],
+            )
         );
 
         return $this->respondWithData([
@@ -1207,18 +1212,18 @@ class AdminSuperController extends BaseApiController
             $tid = (int) $tid;
 
             if ($tid === 1) {
-                $errors[] = 'Cannot modify Master tenant';
+                $errors[] = ['code' => 'MASTER_TENANT_IMMUTABLE', 'params' => ['tenant_id' => $tid]];
                 continue;
             }
 
             $tenant = Tenant::find($tid);
             if (!$tenant) {
-                $errors[] = "Tenant ID {$tid} not found";
+                $errors[] = ['code' => 'TENANT_NOT_FOUND', 'params' => ['tenant_id' => $tid]];
                 continue;
             }
 
             if (!SuperPanelAccess::canAccessTenant($tid)) {
-                $errors[] = "No access to tenant ID {$tid}";
+                $errors[] = ['code' => 'TENANT_ACCESS_DENIED', 'params' => ['tenant_id' => $tid]];
                 continue;
             }
 
@@ -1239,25 +1244,21 @@ class AdminSuperController extends BaseApiController
                 }
                 $updatedCount++;
             } catch (\Exception $e) {
-                $errors[] = "Failed to update tenant ID {$tid}";
+                $errors[] = ['code' => 'TENANT_UPDATE_FAILED', 'params' => ['tenant_id' => $tid]];
             }
         }
-
-        $actionLabels = [
-            'activate' => 'Activated',
-            'deactivate' => 'Deactivated',
-            'enable_hub' => 'Hub Enabled',
-            'disable_hub' => 'Hub Disabled',
-        ];
 
         $this->superAdminAuditService->log(
             'bulk_tenants_updated',
             'bulk',
             null,
-            "Bulk {$action}",
+            $this->structuredAuditDisplay('bulk_tenants_update_target', ['action' => $action]),
             ['tenant_count' => count($tenantIds)],
             ['action' => $action, 'updated_count' => $updatedCount],
-            "{$actionLabels[$action]} {$updatedCount} tenant(s)"
+            $this->structuredAuditDisplay('bulk_tenants_updated', [
+                'action' => $action,
+                'count' => $updatedCount,
+            ])
         );
 
         return $this->respondWithData([
@@ -1271,6 +1272,36 @@ class AdminSuperController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
     // Audit
     // ─────────────────────────────────────────────────────────────────────────
+
+    /** @param array<string, bool|int|string> $params */
+    private function structuredAuditDisplay(string $code, array $params): string
+    {
+        return json_encode(
+            ['code' => $code, 'params' => $params],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        );
+    }
+
+    /**
+     * @return array{code: ?string, params: array<string, mixed>, legacy: ?string}
+     */
+    private function decodeAuditDisplay(?string $value): array
+    {
+        if ($value === null || !str_starts_with(trim($value), '{')) {
+            return ['code' => null, 'params' => [], 'legacy' => $value];
+        }
+
+        $decoded = json_decode($value, true);
+        if (!is_array($decoded) || !is_string($decoded['code'] ?? null)) {
+            return ['code' => null, 'params' => [], 'legacy' => $value];
+        }
+
+        return [
+            'code' => $decoded['code'],
+            'params' => is_array($decoded['params'] ?? null) ? $decoded['params'] : [],
+            'legacy' => null,
+        ];
+    }
 
     /** GET /api/v2/super-admin/audit */
     public function audit(): JsonResponse
@@ -1294,18 +1325,25 @@ class AdminSuperController extends BaseApiController
 
         // Map DB columns to frontend field names
         $mapped = array_map(function ($row) {
+            $targetDisplay = $this->decodeAuditDisplay($row['target_name'] ?? null);
+            $descriptionDisplay = $this->decodeAuditDisplay($row['description'] ?? null);
+
             return [
                 'id' => $row['id'] ?? null,
                 'action_type' => $row['action_type'] ?? '',
                 'target_type' => $row['target_type'] ?? '',
                 'target_id' => $row['target_id'] ?? null,
-                'target_label' => $row['target_name'] ?? '',
+                'target_label' => $targetDisplay['legacy'],
+                'target_label_code' => $targetDisplay['code'],
+                'target_label_params' => $targetDisplay['params'],
                 'actor_id' => $row['actor_user_id'] ?? null,
                 'actor_name' => $row['actor_name'] ?? null,
                 'actor_email' => $row['actor_email'] ?? null,
                 'old_value' => $row['old_values'] ?? null,
                 'new_value' => $row['new_values'] ?? null,
-                'description' => $row['description'] ?? '',
+                'description' => $descriptionDisplay['legacy'],
+                'description_code' => $descriptionDisplay['code'],
+                'description_params' => $descriptionDisplay['params'],
                 'created_at' => $row['created_at'] ?? '',
             ];
         }, $logs);
@@ -1691,10 +1729,10 @@ class AdminSuperController extends BaseApiController
         $feeCents = (int) ($input['fee_cents'] ?? -1);
 
         if ($tenantId <= 0) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'tenant_id is required.', 'tenant_id', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.tenant_id_is_required'), 'tenant_id', 422);
         }
         if ($feeCents < 0) {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'fee_cents must be 0 or greater.', 'fee_cents', 422);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api.fee_cents_non_negative'), 'fee_cents', 422);
         }
 
         $this->tenantSettingsService->set($tenantId, 'identity_verification_fee_cents', (string) $feeCents, 'integer');

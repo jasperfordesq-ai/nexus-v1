@@ -106,6 +106,28 @@ const makeSitemapStats = () => ({
   success: true,
 });
 
+const makeAuditResult = () => ({
+  data: {
+    checks: [{
+      code: 'redirect_health',
+      params: { count: 2 },
+      status: 'warning',
+      issues: [{
+        code: 'redirect_chain',
+        params: { from: '/old', via: '/middle', destination: '/new' },
+      }],
+      issue_count: 1,
+      points: 5,
+      max_points: 10,
+    }],
+    score: 5,
+    max_score: 10,
+    grade: 'F',
+    run_at: '2026-01-01T00:00:00Z',
+  },
+  success: true,
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 describe('SeoOverview', () => {
   beforeEach(() => {
@@ -115,7 +137,7 @@ describe('SeoOverview', () => {
     mockAdminSettings.getSitemapStats.mockResolvedValue(makeSitemapStats());
     mockAdminSettings.clearSitemapCache.mockResolvedValue({ success: true });
     mockAdminTools.getSeoAudit.mockResolvedValue({ data: null, success: false });
-    mockAdminTools.runSeoAudit.mockResolvedValue({ data: {}, success: true });
+    mockAdminTools.runSeoAudit.mockResolvedValue(makeAuditResult());
   });
 
   it('shows loading spinner initially then renders content', async () => {
@@ -231,13 +253,7 @@ describe('SeoOverview', () => {
   });
 
   it('shows run audit button and calls audit endpoints', async () => {
-    mockAdminTools.getSeoAudit.mockResolvedValue({
-      data: {
-        checks: [{ name: 'Robots.txt', description: 'OK', status: 'pass' }],
-        last_run_at: '2026-01-01T00:00:00Z',
-      },
-      success: true,
-    });
+    mockAdminTools.getSeoAudit.mockResolvedValue(makeAuditResult());
 
     const { SeoOverview } = await import('./SeoOverview');
     render(<SeoOverview />);
@@ -257,6 +273,9 @@ describe('SeoOverview', () => {
     await waitFor(() => {
       expect(mockAdminTools.runSeoAudit).toHaveBeenCalled();
     });
+
+    expect(screen.getByText('Redirect Health')).toBeInTheDocument();
+    expect(screen.getByText('Redirect chain: /old → /middle → /new')).toBeInTheDocument();
   });
 
   it('renders sitemap content_types as Chips', async () => {
@@ -264,9 +283,9 @@ describe('SeoOverview', () => {
     render(<SeoOverview />);
 
     await waitFor(() => {
-      expect(screen.getByText('listings')).toBeInTheDocument();
-      expect(screen.getByText('events')).toBeInTheDocument();
-      expect(screen.getByText('members')).toBeInTheDocument();
+      expect(screen.getByText('Listings')).toBeInTheDocument();
+      expect(screen.getByText('Events')).toBeInTheDocument();
+      expect(screen.getByText('Members')).toBeInTheDocument();
     });
   });
 

@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "admin": {
     "providers": {
@@ -396,12 +396,12 @@
       },
       "messages": {
         "recomputed": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
-        "saved": "Trust tier settings saved.",
         "recomputed_one": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
         "recomputed_other": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
         "recomputed_few": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
         "recomputed_many": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
-        "recomputed_two": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball."
+        "recomputed_two": "Ríomhadh na sraitheanna muiníne arís do {{count}} ball.",
+        "saved": "Cumraíocht leibhéal iontaobhais sábháilte. Beartais athróidh ar an gcuntas eile."
       },
       "recompute_confirm": "An ríomhtar na sraitheanna iontaobhais do gach ball? Seans go dtógfaidh sé seo cúpla nóiméad."
     },
@@ -693,8 +693,8 @@
   "caring_workflow": {
     "meta": {
       "page_title": "Sreabhadh Oibre Pobail Cúramach",
-      "title": "Caring Community Workflow Console",
-      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+      "title": "Sreabhadh Oibre Pobail Cúramach",
+      "description": "Seo do dheaschláir oibríochtaí laethúil. Úsáid é chun athbhreithniú a dhéanamh ar cheaduithe uair atá ar feitheamh, monatóireacht a dhéanamh ar earraí atá ró-amhrasta, bainistíocht a dhéanamh ar shannadh comhordaitheoirí, ráitis bhall a ghiniúint, agus polasaí sreafa oibre a chumrú. Tá na nithe atá ar feitheamh agus atá tar éis a SLA le feiceáil béimnithe i n-amhairc."
     },
     "actions": {
       "refresh": "Athnuaigh",
@@ -710,7 +710,7 @@
       "workflow": "Sreabhadh oibre pobail cúraim á lódáil..."
     },
     "toast": {
-      "load_failed": "Failed to load Caring Community workflow data."
+      "load_failed": "Níor éirigh le sreabhadh oibre pobail chúramach a luchtú."
     },
     "empty": {
       "value": "-",
@@ -719,8 +719,8 @@
     "stats": {
       "pending_reviews": "Léirmheasanna ar feitheamh",
       "pending_hours": "Uaireanta ar feitheamh",
-      "approved_30d": "Approved in 30 days",
-      "coordinators": "Comhordaitheoirí"
+      "coordinators": "Comhordaitheoirí",
+      "approved_30d": "Ceadaithe (30 lá)"
     },
     "pending": {
       "title": "Léirmheasanna ar Feitheamh",
@@ -769,30 +769,30 @@
       "age_days_two": "{{count}} lá d'aois"
     },
     "paper_onboarding": {
-      "title": "Paper Form Intake",
-      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
-      "file_label": "Scanned form",
-      "name_label": "Extracted full name",
-      "name_placeholder": "Name on the paper form",
       "dob_label": "Dáta breithe",
-      "email_label": "Extracted email",
-      "email_placeholder": "ball@sampla.com",
-      "phone_label": "Extracted phone",
-      "phone_placeholder": "+41 79 123 45 67",
-      "address_label": "Extracted address",
-      "address_placeholder": "Street, postcode, municipality",
-      "note_label": "Review note",
-      "note_placeholder": "What did the coordinator verify before creating the account?",
-      "upload_cta": "Upload For Review",
-      "confirm_cta": "Confirm And Create Account",
+      "email_placeholder": "member@example.com",
+      "phone_placeholder": "+1 555 123 4567",
       "review_cta": "Léirmheas",
-      "no_email": "No email captured",
-      "file_required": "Choose a scanned form first.",
       "load_failed": "Níorbh fhéidir iontógálacha bordála páipéir a lódáil.",
       "upload_success": "Iontógáil páipéir a uaslódáil.",
-      "upload_failed": "Could not upload the paper form.",
       "confirm_success": "Deimhníodh an ball agus cruthaíodh cuntas.",
-      "confirm_failed": "Could not confirm this paper onboarding intake."
+      "title": "Iontráil páipéir (OCR)",
+      "description": "Uaslódáil foirm scanraithe nó grianghraf. Cuirfimid na réimsí i dtaisce agus ligfimid duit athbhreithniú a dhéanamh roimh chruthú an chuntais.",
+      "file_label": "Foirm scanraithe nó grianghraf",
+      "name_label": "Ainm iomlán",
+      "name_placeholder": "Mar a scríobhadh ar an bhfoirm",
+      "email_label": "R-phost",
+      "phone_label": "Fón",
+      "address_label": "Seoladh",
+      "address_placeholder": "Sráid, cathair, cód poist",
+      "note_label": "Nóta comhordaitheoir",
+      "note_placeholder": "Comhthéacs roghnach don ionchur seo",
+      "upload_cta": "Uaslódáil & a bhaint",
+      "confirm_cta": "Dearbhaigh & cruthaigh cuntas",
+      "no_email": "Gan ríomhphost",
+      "file_required": "Roghnaigh comhad le uaslódáil ar dtús.",
+      "upload_failed": "Níorbh fhéidir an t-ionchur páipéir a uaslódáil.",
+      "confirm_failed": "Níorbh fhéidir glacadh páipéir a dhaingniú."
     },
     "tandem": {
       "title": "Tandem Moltaí",
@@ -809,7 +809,17 @@
       "shared_interests": "Leasanna roinnte",
       "score": "Scór {{value}}%",
       "dismiss": "Díbhe",
-      "create": "Cruthaigh Tandem"
+      "create": "Cruthaigh Tandem",
+      "reason_join": "{{previous}}; {{next}}",
+      "reasons": {
+        "distance": "Cósta {{distance_km}} km ar shiúl",
+        "shared_language": "Roinntear teanga",
+        "complementary_skills": "Tá scileanna comhthreomhar aige/iscé",
+        "availability_overlap": "Tá infhaighteacht chomhoiriúnach aige",
+        "shared_interests": "Roinnt suimeanna",
+        "intergenerational": "Tairgeann péireáil idirghlúine",
+        "overall_fit": "Taispeánann sé oiriúnacht iomlán réasúnta"
+      }
     },
     "safeguarding": {
       "title": "Tuarascálacha Coimirce",
@@ -853,7 +863,27 @@
       "age_hours_two": "{{count}}h",
       "age_days_few": "{{count}}D",
       "age_days_many": "{{count}}D",
-      "age_days_two": "{{count}}D"
+      "age_days_two": "{{count}}D",
+      "categories": {
+        "exploitation": "Éirim",
+        "financial_concern": "Imní airgeadais",
+        "inappropriate_behavior": "Iompar míchuí",
+        "medical_concern": "Imní leighis",
+        "neglect": "Neamhaird",
+        "other": "Eile",
+        "unknown": "Catagóir anaithnid"
+      },
+      "history_actions": {
+        "assigned": "D'ionadaíodh",
+        "created": "Cruthaíodh",
+        "dismissed": "Brúite",
+        "escalated": "Ardaíodh",
+        "note_added": "Nóta curtha leis",
+        "resolved": "Réitithe",
+        "status_changed": "Dhá athrú stádas",
+        "triaged": "Roghnaithe",
+        "unknown": "Gníomh anaithnid"
+      }
     },
     "role_pack": {
       "title": "Réamhshocruithe róil",
@@ -901,62 +931,62 @@
     },
     "policy": {
       "title": "Beartas sreabhadh oibre",
-      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
       "save": "Sábháil polasaí",
-      "review_sla_days": "Review SLA days",
       "review_sla_days_description": "Cuirfear in iúl go bhfuil na huaireanta nach ndéantar athbhreithniú orthu laistigh den iliomad laethanta seo thar téarma sa scuaine.",
-      "escalation_sla_days": "Escalation SLA days",
       "escalation_sla_days_description": "Déanfar míreanna thar téarma nár gníomhaíodh laistigh den iliomad laethanta breise seo a ardú go huathoibríoch.",
-      "monthly_statement_day": "Statement day",
       "monthly_statement_day_description": "Lá den mhí ar a ngintear ráitis na mball (m.sh. 1 = 1ú de gach mí).",
-      "default_hour_value_chf": "Hour value CHF",
       "default_hour_value_chf_description": "Úsáidtear é chun luach sóisialta measta ar ráitis agus tuarascálacha cathrach a ríomh.",
       "municipal_report_default_period": "Tréimhse tuairiscithe réamhshocraithe",
-      "approval_required": "Require hour approval",
-      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
       "auto_approve_trusted_reviewers": "Auto-cheadú léirmheastóirí iontaofa",
-      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
-      "allow_member_self_log": "Allow member self logging",
-      "allow_member_self_log_description": "Members can record their own support activity before review.",
-      "require_organisation_for_partner_hours": "Require partner organisation",
-      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
       "include_social_value_estimate": "Cuir meastachán ar luach sóisialta san áireamh",
-      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
       "save_success": "Beartas sreabhadh oibre sábháilte.",
-      "save_failed": "Failed to save workflow policy.",
       "periods": {
         "last_30_days": "30 lá anuas",
         "last_90_days": "90 lá seo caite",
         "year_to_date": "Bliain go dtí seo",
         "previous_quarter": "ráithe roimhe sin"
-      }
+      },
+      "review_sla_days": "Athbhreithniú SLA (laethanta)",
+      "escalation_sla_days": "SLA Escalation (laethanta)",
+      "description": "Cumraigh SLAanna, rialacha ceadaithe, agus réamhshocruithe tuairisciúcháin. Beidh tionchar láithreach ag na hathruithe ar sábháil agus beidh siad infheidhmithe ar gach tuairisciú uair nua ó sin ar aghaidh.",
+      "monthly_statement_day": "Lá ráite míosúil",
+      "default_hour_value_chf": "Luach uair réamhshocraithe (CHF)",
+      "approval_required": "Riachtanach cead",
+      "approval_required_description": "Éilíonn ceadú an chomhordaitheora sula gcuirtear uaireanta leis na sparáin.",
+      "auto_approve_trusted_reviewers_description": "Sleamhnaigh an chuardach do na huaireanta a logáladh ag athbhreithnithe a bhfuil muinín acu.",
+      "allow_member_self_log": "Ceadaigh logáil fhéin-mhíreála ó bhall.",
+      "allow_member_self_log_description": "Lig do bhaill a gcuid uaireanta tacaíochta féin a logáil gan iontráil an chomhordaitheora.",
+      "require_organisation_for_partner_hours": "Éilíonn eagraíocht do huaireanta comhpháirtí",
+      "require_organisation_for_partner_hours_description": "Caithfidh an tréimhse ama a thugtar ar son comhpháirtithe a bheith nasctha le heagraíocht.",
+      "include_social_value_estimate_description": "Taispeáin luach sóisialta measta (CHF) ar ráitis agus ar tuarascálacha.",
+      "save_failed": "Níorbh fhéidir an beartas sruthobair a shábháil."
     },
     "member_statement": {
-      "title": "Member statements",
-      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
       "member_id": "Aitheantas Ball",
-      "start_date": "From",
-      "end_date": "To",
       "preview": "Réamhamharc",
       "export_csv": "Easpórtáil CSV",
       "approved_support_hours": "Uaireanta tacaíochta ceadaithe",
       "pending_support_hours": "Uaireanta tacaíochta ar feitheamh",
       "wallet_hours_earned": "Uaireanta tuillte sparán",
       "wallet_hours_spent": "Sparán uaireanta caite",
-      "empty": "Enter a member ID to generate a statement.",
       "chf_value": "Luach sóisialta measta: CHF{{value}}",
       "invalid_member": "Cuir isteach ID ball bailí.",
-      "load_failed": "Failed to load the member statement.",
-      "export_success": "Member statement CSV prepared.",
-      "export_failed": "Failed to export the member statement."
+      "title": "Ráitis Bhall",
+      "description": "Gineann ráiteas ama agus tionchair do bhall amháin. Úsáid é seo chun taifead foirmiúil a roinnt de na huaireanta tacaíochta atá acu, cothrom le dála, agus luach sóisialta measta - úsáideach do iarratais duais, athbhreithnithe, nó fiosrúcháin bhall. Iontráil Aitheantas Ball agus ré raon dáta roghnach, ansin déan réamhamharc nó onnmhairigh CSV.",
+      "start_date": "Dáta Tosaigh",
+      "end_date": "Dáta Deiridh",
+      "empty": "Iontráil Aitheantas Ball agus brúigh Réamhamharc chun a ráiteas a fheiceáil.",
+      "load_failed": "Níorbh fhéidir ráiteas an bhaill a luchtú.",
+      "export_success": "Ráiteas easpórtáilte.",
+      "export_failed": "Níorbh fhéidir ráiteas a easpórtáil."
     },
     "signals": {
       "title": "Comhordaitheoir comharthaí",
-      "description": "Quick operating indicators for matching, oversight, and partner activity.",
-      "active_requests": "Active requests",
-      "active_offers": "Active offers",
       "trusted_organisations": "Eagraíochtaí iontaofa",
-      "declined_30d": "Declined in 30 days"
+      "active_requests": "Iarratais tacaíochta gníomhacha",
+      "active_offers": "Tacaíocht ghníomhach ar fáil",
+      "description": "Grianghraf beo den ghníomhaíocht a d’fhéadfadh aird comhordaitheora a dhéanamh - iarratais oscailte, tairiscintí ar fáil, eagraíochtaí iontaofa, agus diúltuithe le déanaí.",
+      "declined_30d": "Diúltaithe (30 l)"
     },
     "favours": {
       "title": "Fabhar Neamhfhoirmiúil",
@@ -970,27 +1000,36 @@
       "total_recorded_other": "Iomlán {{count}} taifeadta",
       "total_recorded_few": "Iomlán {{count}} taifeadta",
       "total_recorded_many": "Iomlán {{count}} taifeadta",
-      "total_recorded_two": "Iomlán {{count}} taifeadta"
+      "total_recorded_two": "Iomlán {{count}} taifeadta",
+      "categories": {
+        "transport": "Iompar",
+        "shopping": "Siopadóireacht",
+        "companionship": "Comhluadar",
+        "household": "Cúnamh tí",
+        "technology": "Cabhair teicneolaíochta",
+        "other": "Eile",
+        "unknown": "Gan chatagóiriú"
+      }
     },
     "assisted_onboarding": {
-      "title": "Assisted Onboarding",
-      "description": "Create a member account on behalf of a participant who cannot self-register.",
       "name_label": "Ainm iomlán",
-      "name_placeholder": "e.g. Marie Curie",
-      "email_label": "Email address",
-      "email_placeholder": "ball@sampla.com",
+      "email_placeholder": "member@example.com",
       "phone_label": "Fón (roghnach)",
-      "phone_placeholder": "+41 79 123 45 67",
+      "phone_placeholder": "+1 555 123 4567",
       "note_label": "Nóta comhordaitheora (roghnach)",
-      "note_placeholder": "e.g. Met at Tuesday drop-in",
-      "create_cta": "Create Member Account",
       "required": "Tá ainm agus ríomhphost ag teastáil.",
-      "created": "Member account created successfully.",
-      "create_failed": "Could not create member account. Please check the email is not already registered.",
-      "created_for": "Account created for {{name}} ({{email}})",
-      "password_note": "The member should change this password on first login.",
       "copy": "Cóip",
-      "copied": "Cóipeáladh!"
+      "copied": "Cóipeáladh!",
+      "title": "Tacaíocht le clárú",
+      "description": "Cruthaigh cuntas thar ceann ball nach féidir leis/leis cláru féin, ansin roinn a bhfocal faire sealadach.",
+      "name_placeholder": "Ainm iomlán an bhaill",
+      "email_label": "R-phost",
+      "note_placeholder": "Rud ar bith ba chóir don choimisiúnóir a choinneáil i gcuimhne",
+      "create_cta": "Cruthaigh cuntas an bhaill",
+      "created": "Cruthaíodh cuntas ball.",
+      "create_failed": "Níorbh fhéidir cuntas ball a chruthú.",
+      "created_for": "Cruthaíodh cuntas do {{name}} ({{email}}).",
+      "password_note": "Roinn an focal faire sealadach seo leis an mball. Beidh orthu é a athrú ar an gcéad logáil isteach."
     },
     "invite_codes": {
       "title": "Cóid Cuireadh",
@@ -1024,28 +1063,28 @@
       }
     },
     "stages": {
-      "title": "Caring Community operating model",
-      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
       "intake": {
         "title": "Iontógáil",
-        "description": "A member, family, organisation, or coordinator records a need or offer."
+        "description": "Fáilte a chur roimh bhaill nua agus riachtanais tacaíochta a ghabháil."
       },
       "match": {
         "title": "Meaitseáil",
-        "description": "Coordinators connect people, organisations, or trusted volunteers."
+        "description": "Cúpla tacaíochtóirí agus iarrthóirí bunaithe ar scileanna agus ar infhaighteacht."
       },
       "log": {
-        "title": "Log hours",
-        "description": "Support time is recorded against the member, organisation, or activity."
+        "title": "Loga uaireanta",
+        "description": "Gabh uaireanta tacaíochta mar a tharlaíonn siad."
       },
       "verify": {
         "title": "Fíoraigh",
-        "description": "A trusted coordinator approves or declines the logged hours."
+        "description": "Athbhreithníonn agus ceadaíonn comhordaitheoirí na huaireanta logáilte."
       },
       "statement": {
         "title": "Ráiteas",
-        "description": "Accepted hours feed member statements and municipal evidence packs."
-      }
+        "description": "Eisigh ráitis mhíosúla agus tuarascálacha tionchair."
+      },
+      "title": "Céimeanna sreafa oibre",
+      "description": "Píblíne pobail cúraim cúig chéim ar an gcéad amharc."
     },
     "predictive": {
       "title": "Léargais Thuarthacha",
@@ -1097,6 +1136,51 @@
         "critical": "Criticiúil",
         "warning": "Rabhadh",
         "info": "Eolas"
+      },
+      "load_failed": "Níorbh fhéidir léargas réamh-mheasta a luchtú.",
+      "confidence_levels": {
+        "high": "Ard",
+        "medium": "Meán",
+        "low": "Íseal"
+      },
+      "alert_actions": {
+        "see_suggestions": "Féach moltaí",
+        "view_members": "Féach baill",
+        "review_now": "Athbhreithnigh anois",
+        "reassign_reviews": "Athshanntar athbhreithnithe",
+        "open_reports": "Tosaigh tuairiscí",
+        "view_tandems": "Féach tandemaí",
+        "view_listings": "Amharc ar liostaí"
+      },
+      "alerts": {
+        "recipients_without_tandem": {
+          "title": "Faighteoirí gan tacaí rialta",
+          "message": "Fuair na baill seo cabhair sna sé mhí caite ach níl aon tandem athfhillteach gníomhach acu. Páirliú iad le tacaí seasta chun lántéacsacht a neartú."
+        },
+        "inactive_members": {
+          "title": "Tá baill a bhí gníomhach roimhe seo imithe ciúin",
+          "message": "Chuir na baill seo fáilte isteach sna sé mhí caite ach ní sna 30 lá anuas. D’fhéadfadh seiceáil chairdiúil cabhrú leo dul i mbun gnímh arís."
+        },
+        "overdue_reviews": {
+          "title": "Tá athbhreithnithe uaireanta tar éis an leibhéal seirbhíse a sháraigh",
+          "message": "Tá na logálacha uaire pending seo níos sine ná {{sla}} lá. Ceadaigh nó cuir ar aghaidh iad ionas go bhfaighidh na baill a gcreidmheas."
+        },
+        "coordinators_overloaded": {
+          "title": "Tá ró-uafás ar na comhordaitheoirí",
+          "message": "Tá một nó níos mó comhordaitheoirí le níos mó ná 10 athbhreithniú pending. Athshluaigh an obair sula bhforbraíonn bottleneck."
+        },
+        "retention_dropping": {
+          "title": "Tá laghdú ar pháirtíocht gníomhach na mball",
+          "message": "Tá líon na mball gníomhacha i mí seo chugainn ({{current}}) faoi bhun {{threshold_percent}}% den mheán reatha de {{months}} míonna ({{average}}). Smaoinigh ar bhrú spriocdhírithe."
+        },
+        "overdue_check_ins": {
+          "title": "Tá seiceálacha Tandem thar am",
+          "message": "Tá na caidrimh athfhillteach ghníomhacha seo tar éis a seiceála sceidealta a sháraigh. Déan teagmháil leis an mbeirt rannpháirtí chun a dhearbhú go bhfuil siad go maith."
+        },
+        "low_supply": {
+          "title": "Tá éileamh neamhshásaithe sna catagóirí",
+          "message": "Tá éileamh gníomhach níos mó ná tairiscintí ar fáil sna catagóirí seo. Taispeáin iad do lucht tacaíochta féideartha."
+        }
       }
     },
     "relationships": {
@@ -1150,10 +1234,10 @@
       }
     },
     "invite_card": {
-      "brand": "Community Caring",
       "subtitle": "Cuireadh ó chomharsa go comharsa",
       "instructions": "Cuir isteach an cód seo nó tabhair cuairt ar an nasc thíos chun páirt a ghlacadh.",
-      "valid_until": "Bailí go dtí {{date}}"
+      "valid_until": "Bailí go dtí {{date}}",
+      "brand": "Cúram Pobail"
     }
   },
   "category_coefficients": {
@@ -1274,7 +1358,174 @@
     "overrides_count_other": "{{count}} shárú",
     "overrides_count_few": "{{count}} shárú",
     "overrides_count_many": "{{count}} shárú",
-    "overrides_count_two": "{{count}} shárú"
+    "overrides_count_two": "{{count}} shárú",
+    "capabilities": {
+      "caring_help_requests": {
+        "notes": "",
+        "label": "Iarratais chabhrach",
+        "description": "An sreabhadh oibre iarratais chabhrach cúraim, lena n-áirítear iarratais chúraim déanta thar ceann duine eile, meaitseáil, agus glacadh."
+      },
+      "caring_support_relationships": {
+        "notes": "",
+        "label": "Caidrimh thacaíochta",
+        "description": "Caidrimh chúraim fhada idir faighteoir agus tacaí amháin nó níos mó, le seiceálacha athfhillteacha."
+      },
+      "caring_caregiver_links": {
+        "notes": "",
+        "label": "Naisc chúramóirí",
+        "description": "Nasc fíoraithe idir cúramóir neamhfhoirmiúil agus an duine a dtugann siad tacaíocht dó/dóibh, ag ceadú iarratais a dhéanamh thar ceann an duine sin."
+      },
+      "caring_substitute_cover": {
+        "notes": "",
+        "label": "Áireoidh agus scéimeáil chlúdach",
+        "description": "Faigh cúramóirí malartacha nuair nach bhfuil an t-údarás tacaíochta príomhúil ar fáil, le braite comhréire agus dearbhú."
+      },
+      "caring_warmth_pass": {
+        "notes": "",
+        "label": "Pas Teasa",
+        "description": "Ciseal dínite rialaithe ag an faighteoir a riallaíonn cé a fheiceann a gcuid riachtanas agus a thacaíonn le hiontrálacha bunaithe ar thoiliú."
+      },
+      "caring_emergency_alerts": {
+        "notes": "",
+        "label": "Fógraí éigeandála",
+        "description": "Craoltaí éigeandála ó fhaighteoir nó cúramóir chuig raon a bhfuil muinín agam astu de chomharsana"
+      },
+      "caring_sub_regions": {
+        "notes": "",
+        "label": "Réigiúin chúraim",
+        "description": "Cillí réigiúnacha laistigh de thábhacht amháin, ar nós ceantar nó comharsanachtaí, lena chomhordaitheoir féin agus comhlánú KPI."
+      },
+      "caring_research_consent": {
+        "notes": "",
+        "label": "Bratach ceadúnas taighde",
+        "description": "Ball a roghnaíonn dul isteach le bheith san áireamh i mbunachar sonraí taighde gan ainm a roinneann le comhoibrithe acadúla nó cathrach."
+      },
+      "caring_municipal_roi": {
+        "notes": "",
+        "label": "Tuairisc ar ais-infheistíocht chathrach",
+        "description": "Tuarascáil ar fhritháireamh costais chúraim fhoirmiúil agus luach coisctheach do phlé soláthair na hearnála poiblí."
+      },
+      "caring_pilot_scoreboard": {
+        "notes": "",
+        "label": "Scórchlár píolótach",
+        "description": "Pacáiste KPI beo le haghaidh seasamh píolótach agus athbhreithnithe ar dhul chun cinn atá os comhair maoinitheoirí."
+      },
+      "caring_disclosure_pack": {
+        "notes": "",
+        "label": "Pacáiste nochta FADP/nDSG",
+        "description": "Pacáiste nochtaithe sonraí na hEilvéise inrochtana le haghaidh athbhreithnithe dlíthiúla sula ndéanfar cónaitheach a chur ar bord."
+      },
+      "caring_operating_policy": {
+        "notes": "",
+        "label": "Ceardlann beartais oibriúcháin",
+        "description": "Beartas tiomnaithe do scéama a chlúdaíonn údarás ceadaithe, leibhéil seirbhíse, socrú uaireanta oidhreachta, rátaí, agus minicíocht athbhreithnithe."
+      },
+      "safeguarding_reports": {
+        "notes": "",
+        "label": "Tuarascálacha coimeádta",
+        "description": "Obairshruth imní sábháilteachta ó bhall go comhordaitheoir le sleas audit agus bealach ardaithe."
+      },
+      "trust_tier_system": {
+        "notes": "",
+        "label": "Córas céimeanna muiníne",
+        "description": "Dul chun cinn muiníne ball a riallaíonn na gníomhartha cúraim a d’fhéadfadh ball nua, muiníneach, nó a bhfuil cruthúnas faofa air a dhéanamh."
+      },
+      "municipal_verification": {
+        "notes": "",
+        "label": "Bonn fíoraithe cathrach",
+        "description": "Marcóir faicsin bhaile roghnach ar phróifíl ball, bunaithe ar chónaitheacht nó seiceálacha cúlra."
+      },
+      "xp_badges_journeys": {
+        "notes": "",
+        "label": "XP, bratacha, agus turais",
+        "description": "Ciseal rannpháirtíochta le XP, bratacha, turais, agus dúshláin a aithníonn rannpháirtíocht chúramach."
+      },
+      "appreciation_messages": {
+        "notes": "",
+        "label": "Teachtaireachtaí buíochais",
+        "description": "Sruth buíochais éadrom a ligeann do thuilleadóirí tacaitheoirí a aithint go poiblí."
+      },
+      "premium_member_tier": {
+        "notes": "",
+        "label": "Céim bhall préimhe",
+        "description": "Céim síntiúis roghnach íoctha le sochair bhreise, faoi oibriú ag tosaíocht an tionónta."
+      },
+      "merchant_loyalty_coupons": {
+        "notes": "",
+        "label": "Dílseacht agus cuisíní an mhiondíoltóra",
+        "description": "Cártaí dílseachta miondíoltóra áitiúla agus aistarraingt caisíní nasctha le cistí creidmheasa ama."
+      },
+      "smart_matching_engine": {
+        "notes": "",
+        "label": "Inneall meaitseála cliste",
+        "description": "Meaitseálaí heuraisticiúil a chuireann iarratais cúnabh le tacaíochtí dóchúla ag úsáid scileanna, fad agus stair."
+      },
+      "caring_community_module": {
+        "label": "Modúl Pobail Cauine",
+        "description": "An ghné leathanbhanda a ghníomhachtaíonn an sreabhadh oibre iomlán Pobail Chauine do thánaiste.",
+        "notes": "Is é seo an príomh-doras do na gnéithe cúraim eile."
+      },
+      "local_advertising_campaigns": {
+        "label": "Féilte fógraíochta áitiúla",
+        "description": "Suiteálacha san aip díolta do mhiondíoltóirí áitiúla. Tá an cód le ceadúnas AGPL, rialú le rannpháirtíocht an tionóilí, agus fanann an ioncam leis an gcurthóir.",
+        "notes": "Roghnaigh in aghaidh an tionóilí; ní ghlacann an cód poiblí le cuid den ioncam leis an oibreoir ardán."
+      },
+      "paid_push_campaigns": {
+        "label": "Feachtais brú íocaite",
+        "description": "Feachtais fógraí brú dírithe ar féidir le trádálaithe a cheannach chun baill a bhfuil gné acu a bhaint amach.",
+        "notes": "Ní mór don tionóntóir an ghné a chumasú agus glacadh le freagracht as costais seachadta brú."
+      },
+      "verein_dues_collection": {
+        "label": "Táillí Cumann",
+        "description": "Bailiúchán dues ballraíochta athfhillteach trí Stripe, le ráitis bhall agus athmhuintearas.",
+        "notes": "Is bonneagar oibriúcháin é cuntas Stripe; fanann cód an iarratais ceadúnaithe AGPL."
+      },
+      "ki_agenten_framework": {
+        "label": "Creataeigh KI-Aghent",
+        "description": "Runtime a ghabhann le gach tionónta a ligeann do chomhordaitheoirí cúntóirí struchtúrtha a shainmhíniú do shruthanna oibre inathnuaite.",
+        "notes": "Tá an cód ceadúnaithe faoi AGPL; soláthraíonn gach tionónta a chreidmheasanna API samhail teanga féin agus íocann sé leis an soláthraí go díreach."
+      },
+      "ai_chat_assistant": {
+        "label": "Cúntóir comhrá AI",
+        "description": "Cúntóir do bhaill a bhfuil bonn eolais tionónta aige chun cabhrú agus le hiontráil.",
+        "notes": "Soláthraíonn gach tionónt a gcuid creidiúnaithe API OpenAI féin."
+      },
+      "embedding_recommendations": {
+        "label": "Moltaí bunaithe ar ionsú",
+        "description": "Bíonn samhlacha ionsú mar chumhacht do leideanna liostaí, ball agus grúpa ar fud na hardáin.",
+        "notes": "Tá freagracht ar gach tionscadal as a chostais úsáide soláthraithe tiontaithe."
+      },
+      "tenant_branded_native_app": {
+        "label": "Aip dhúchais branda na tionscadail",
+        "description": "Aip Capacitor iOS agus Android a foilsíodh faoin mbranda tionscadail. Tá an foinse faoi cheadúnas AGPL; is úinéireacht na tionscadail í an bonneagar scaoilte.",
+        "notes": "Tá cuntais forbróra Apple agus Google, eochracha sínithe, píblíní tógála, agus sreafaí athbhreithnithe stór mar fhreagrachtaí oibríochta lasmuigh den phacáiste."
+      },
+      "paid_regional_analytics": {
+        "label": "Anailís réigiúnach íoctha",
+        "description": "Anailís iomlán tras-léasán do tharraingt réigiúnach agus bhardasacha, ar fáil go neamhspleách do cheannaitheoirí sa tseirbhís phoiblí.",
+        "notes": "Tá sé seo ina tháirge neamhspleách don tseirbhís phoiblí a éilíonn comhaontú tráchtála leis an oibrí ardáin."
+      },
+      "partner_api_access": {
+        "label": "Rochtain API comhpháirtí",
+        "description": "API teoranta rátáil le haghaidh taighde, rialtais, agus comhpháirtithe comhtháthaithe a d’fhéadfadh fiosrúcháin shonracha tras-úsáideoirí a áireamh.",
+        "notes": "Éilítear comhaontú tráchtála; níl an rochtain seo ar fáil d’úsáideoirí AGPL de réir réamhshocraithe."
+      }
+    },
+    "classification_descriptions": {
+      "agpl_public": "Cód foinse faoi cheadúnas AGPL sa stór poiblí. Is féidir le haon duine é a chur i bhfeidhm faoin téarmaí ceadúnais.",
+      "tenant_config": "Feidhmíocht faoi cheadúnas AGPL atá faoi smacht cumraíocht tionóil nó lasc ghné.",
+      "private_deployment": "Ciseal díospóireachta oibríochta mar inneallra, cuntais tógála, nó úinéireacht eochair-síniú; níl sé seo ina teorainn ceadúnaithe cód.",
+      "commercial": "Seirbhís a fhaigheann conradh ar leith nach bhfuil san áireamh sa phacáiste poiblí AGPL."
+    },
+    "categories": {
+      "core_caring": "Pobal cúraim lárnach",
+      "community_governance": "Rialachas pobail",
+      "gamification_engagement": "Gamú agus rannpháirtíocht",
+      "commercial_layer": "Sraith thráchtála",
+      "advanced_ai": "AI chun cinn",
+      "mobile_native": "Aipeanna soghluaiste dúchasacha",
+      "regional_intelligence": "Eolas réigiúnach"
+    }
   },
   "data_quality": {
     "meta": {
@@ -1337,6 +1588,88 @@
     "toasts": {
       "load_failed": "Theip ar an tuairisc ar cháilíocht sonraí a lódáil",
       "rows_failed": "Theip ar lódáil na sraitheanna lena mbaineann"
+    },
+    "checks": {
+      "duplicate_emails": {
+        "label": "Seoltaí ríomhphoist dúblacha",
+        "schema_unavailable": "Níl an tábla úsáideoirí ná colún ríomhphoist ar fáil sa scéim tionóil seo.",
+        "found": "Roinntear an seoladh ríomhphoist céanna ag úsáideoirí iomadúla. Comhcheangail nó bain cuntais dhúblacha roimh sheoladh.",
+        "clear": "Níor aithníodh aon seoltaí ríomhphoist dhúblacha."
+      },
+      "duplicate_phones": {
+        "label": "Uimhreacha fóin dhúblacha",
+        "schema_unavailable": "Níl an tábla úsáideoirí nó colún fóin ar fáil sa scéim tionóil seo.",
+        "found": "Roinn roinnt ball an uimhir ghutháin chéanna. Dearbhaigh an bhfuil siad ina gcónaí éagsúla.",
+        "clear": "Níor aimsíodh uimhreacha fóin dhúblacha."
+      },
+      "missing_preferred_language": {
+        "label": "Baill gan teanga roghnaithe",
+        "schema_unavailable": "Níl an réimse teanga roghnaithe ar fáil sa scéim téannta seo.",
+        "found": "Níor roghnaigh roinnt ball teanga roghnaithe. Socraigh ceann sula seoltar cumarsáidí chuig na cónaitheoirí.",
+        "clear": "Tá teanga roghnaithe ag gach ball."
+      },
+      "missing_sub_region": {
+        "label": "Baill gan fo-réigiún",
+        "regions_unavailable": "Níl fo-chórais réigiúnacha ar fáil sa scéim tionónta seo, mar sin ní bhaineann an seiceáil seo le húsáid.",
+        "column_unavailable": "Níl ceapacháin fo-chórais réigiúnacha do bhall ar fáil sa scéim tionónta seo, mar sin ní bhaineann an seiceáil seo le húsáid.",
+        "no_regions": "Níor cumadh aon fho-chórais réigiúnacha, mar sin ní bhaineann an seiceáil seo le húsáid.",
+        "found": "Ní bheidh baill gan fho-chóras réigiúnach le feiceáil sna soláthairtí scóptha chomharsanachta.",
+        "clear": "Tugtar gach ball do fho- Réigiún."
+      },
+      "missing_coordinator_assignment": {
+        "label": "Caidreamh cúraim gan comhordaitheoir",
+        "table_unavailable": "Níl caidreamh tacaíochta cúraim ar fáil sa scéim tionóil seo.",
+        "column_unavailable": "Níl socruithe comhordaitheora ar fáil sa scéim tionóil seo.",
+        "found": "Déan comhordaitheoir a shannadh do gach caidreamh cúraim gníomhach roimh sheoladh.",
+        "clear": "Tá comhordaitheoir ag gach caidreamh cúraim."
+      },
+      "unverified_organisations": {
+        "label": "Eagraíochtaí neamhiomlán nó neamhfhiúntacha",
+        "table_unavailable": "Níl eagraíochtaí dheonacha ar fáil sa scéim tionóil seo.",
+        "verification_unavailable": "Níl réimsí fíoraithe eagraíochta ar fáil sa scéim tionóil seo.",
+        "found": "Ceadaigh nó diúltaigh gach eagraíocht atá ag fanacht ionas gur féidir le baill muinín a bheith acu ina liostaí.",
+        "clear": "Athbhreithníodh gach eagraíocht."
+      },
+      "seed_marker_users": {
+        "label": "Cuntais taispeántais nó síolta",
+        "table_unavailable": "Níl baill ar fáil sa scéim tionóil seo.",
+        "found": "Tá cuntais taispeántais nó síolta fós i láthair. Bain iad sula gcuireann tú cónaitheoirí fíor ar bord.",
+        "clear": "Níor aimsíodh cuntais taispeántais ná síolta."
+      },
+      "unanswered_help_requests": {
+        "label": "Iarratais chabhrach gan freagra atá níos sine ná 30 lá",
+        "table_unavailable": "Níl iarratais chabhrach cúramacha ar fáil sa scéim tionóil seo.",
+        "found": "Cailleann sean-iarratais chabhrach atá fós le freagra muinín. Dún, diúltaigh, nó meaitseáil le gach ceann.",
+        "clear": "Níl aon iarratais chabhrach seanaimseartha."
+      },
+      "members_without_role": {
+        "label": "Baill gan ról",
+        "schema_unavailable": "Níl rólanna ball ar fáil sa scéim tionóil seo.",
+        "found": "Sonaigh ról do gach ball ionas go réiteofar a gceadanna i gceart.",
+        "clear": "Tá ról ag gach ball."
+      },
+      "tenant_setting_completeness": {
+        "label": "Iomlánacht socruithe tionóil",
+        "table_unavailable": "Níl socruithe tionóil ar fáil sa scéim tionóil seo.",
+        "found": "Tá ceann amháin nó níos mó socruithe réamh-tosaigh ar iarraidh. Athbhreithnigh pacáiste nochtaithe AG80 agus polasaí oibríochta AG81.",
+        "clear": "Tá gach socrú tionóil réamh-tosaigh riachtanach cumraithe."
+      }
+    },
+    "notes": {
+      "drilldown_not_available": "Níl imirt dhomhain ar leibhéal sraithe ar fáil don seiceáil seo."
+    },
+    "identifiers": {
+      "user_id": "Úsáideoir #{{id}}"
+    },
+    "row_status": {
+      "active": "Gníomhach",
+      "approved": "Ceadaithe",
+      "completed": "Críochnaithe",
+      "inactive": "Neamhghníomhach",
+      "pending": "Ar feitheamh",
+      "rejected": "Dhiúltódh",
+      "unknown": "Stádas anaithnid",
+      "verified": "Fíoraíodh"
     }
   },
   "disclosure_pack": {
@@ -1430,6 +1763,84 @@
       "export_empty": "Easpórtáil ar ais folamh",
       "exported": "Easpórtáil an pacáiste nochta",
       "export_failed": "Theip ar easpórtáil an phacáiste nochta"
+    },
+    "export": {
+      "filename": "disclosure-pack.md"
+    },
+    "default_copy": {
+      "subprocessor_azure": "Microsoft Azure (óstáil, AE)",
+      "subprocessor_cloudflare": "Cloudflare (CDN / WAF)",
+      "subprocessor_stripe": "Stripe (íocaíochtaí agus fíordheimhniú aitheantais)",
+      "subprocessor_openai": "OpenAI (meaitseáil roghnach agus achoimrí)",
+      "subprocessor_firebase": "Google Firebase Cloud Messaging (fógraí brú)",
+      "isolated_node_description": "Foirgneamh faoi rialú cantúin lena sheachadadh ríomhphoist féin, stóráil, agus cúltacaí. Is féidir an t-aontas a mhúchadh go hiomlán.",
+      "fadp_authority": "Coimisinéir Cosanta Sonraí agus Faisnéise Aontais (FDPIC / EDÖB)",
+      "destination_eu_azure": "An tAontas Eorpach (Microsoft Azure)",
+      "destination_us_services": "Stáit Aontaithe Mheiriceá (Cloudflare, Stripe, agus OpenAI)",
+      "safeguard_scc": "Clásail Chonartha Chaighdeánacha (SCCs)",
+      "safeguard_swiss_us_framework": "Framworks Príobháideachta Sonraí Eilvéiseach–SAM, áit is infheidhme"
+    },
+    "structured": {
+      "fields": {
+        "identity": "Aitheantas",
+        "profile": "Próifíl",
+        "caring": "Gníomhaíocht cúraim",
+        "time_credits": "Creidmheasanna ama",
+        "communications": "Cumarsáid",
+        "safeguarding": "Cosaint",
+        "research_consent": "Ceada le haghaidh taighde",
+        "active_account_data": "Sonraí cuntais ghníomhacha",
+        "inactive_account_data": "Sonraí cuntais neamhghníomhacha",
+        "transactions": "Gnóthaí",
+        "help_requests": "Iarratais chabhrach",
+        "safeguarding_reports": "Tuarascálacha coimeádta",
+        "research_datasets": "Suirbhéanna taighde",
+        "access": "Rochtain",
+        "export": "Easpórtáil",
+        "rectify": "Ceartú",
+        "erase": "Scriosadh",
+        "restrict": "Srianta",
+        "object": "Aighneacht",
+        "portability": "Inaistritheacht",
+        "export_format": "Formáid onnmhairithe"
+      },
+      "values": {
+        "name": "ainm",
+        "email": "seoladh ríomhphoist",
+        "phone": "-uimhir theileafóin",
+        "date_of_birth": "-dáta breithe",
+        "biography": "béaloideas",
+        "photo": "grianghraf",
+        "skills": "scileanna",
+        "preferred_language": "teanga roghnaithe",
+        "help_requests": "iarrata ar chabhair",
+        "support_relationships": "caidrimh tacaíochta",
+        "caregiver_links": "naisc chúramóirí",
+        "transactions": "idirbhearta",
+        "volunteer_logs": "loganna toilteanach",
+        "wallet_balance": "balans sparán",
+        "messages": "teachtaireachtaí",
+        "notifications": "fógraí",
+        "announcements": "fógraí oifigiúla",
+        "reports": "tuairiscí",
+        "flags": "bráid",
+        "verification_status": "stádas fíoraithe",
+        "flag": "brat comhaontaithe",
+        "aggregate_dataset_inclusion": "ábharthacht sonraí chomhghnóthaithe",
+        "contract": "Conradh",
+        "consent": "Toiliú",
+        "legitimate_interest": "Leas dleathach",
+        "lifetime_of_membership": "Fad bhallraíochta",
+        "24_months_then_anonymise": "24 mí, ansin déan anaithnid",
+        "10_years_after_completion": "10 mbliana tar éis críochnaithe",
+        "24_months_after_closure": "24 mí tar éis dúnta",
+        "7_years_after_resolution": "7 mbliana tar éis réitigh",
+        "24_months": "24 mí",
+        "duration_of_research_partnership": "Fad na comhpháirtíochta taighde",
+        "json+csv": "JSON agus CSV",
+        "no_personal_data_shared_outside_tenant": "Ní roinntear sonraí pearsanta lasmuigh den tionóntán",
+        "monthly": "Míosúil"
+      }
     }
   },
   "external_integrations": {
@@ -1511,7 +1922,7 @@
       "owner_name": "Ainm úinéara",
       "owner_name_placeholder": "Ainm iomlán teagmhálaí seachtracha",
       "owner_email": "Ríomhphost úinéara",
-      "owner_email_placeholder": "contact@partner.sampla",
+      "owner_email_placeholder": "contact@partner.example",
       "interface_spec_url": "Sonraíocht an chomhéadain URL",
       "interface_spec_placeholder": "https://docs.partner.example/spec",
       "dsa_status": "Comhaontú comhroinnte sonraí",
@@ -1536,6 +1947,32 @@
       "create_failed": "Theip ar chruthú",
       "removed": "Baineadh an comhtháthú",
       "delete_failed": "Theip ar an scriosadh"
+    },
+    "default_items": {
+      "ahv_submission_gateway": {
+        "name": "Geataigh chur isteach AHV",
+        "notes": "Bealach oifigiúil le tuarascálacha uair-deonach a bhaineann le AHV a sheoladh. Caithfidh an comhéadan cur isteach canónach a bheith fós dearbhaithe."
+      },
+      "spitex_handoff": {
+        "name": "Aistriú comhordaithe cúraim Spitex",
+        "notes": "Aistriú lámh dhá-threoir le soláthraithe Spitex cantúin do chiorcail faighteoirí cúraim. Teastaíonn comhaontú roinnte sonraí agus sonraíocht comhéadan ó gach soláthraí."
+      },
+      "cantonal_master_data": {
+        "name": "Sreang sonraí máistir cantúin",
+        "notes": "Seoladh síntiúsaithe agus sonraí tí ón gclár cantúin chun próifílí na bhfaighteoirí cúraim a chothabháil suas chun dáta."
+      },
+      "postfinance_payment": {
+        "name": "Comhtháthú íocaíochta PostFinance",
+        "notes": "Comhpháirtí baincéireachta na hEilvéise don airgead tirim agus oibríochtaí treasaireachta. Teastaíonn comhaontú trádóra."
+      },
+      "twint_payment": {
+        "name": "Íocaíocht Twint",
+        "notes": "Glacadóir Twint le híocaíochtaí ballraíochta agus deonacha. Teastaíonn clárú trádóra trí bhanc comhpháirtí."
+      },
+      "postal_address_verification": {
+        "name": "Fíorú seoladh poist",
+        "notes": "Gnóthú agus fíorú seoltaí i gcoinne eolaire Swiss Post."
+      }
     }
   },
   "federation_peers_admin": {
@@ -1594,12 +2031,12 @@
       "display_name": "Ainm Taispeána",
       "display_name_placeholder": "Comharchumann Caring Community Bern",
       "base_url": "Bonn URL",
-      "base_url_description": "HTTPS URL den chianda NEXUS API. Cuirtear an cosán /v2/cónaidhm/aistriú uair an chloig/isteach i gceangal leis go huathoibríoch.",
       "base_url_placeholder": "https://api.bern-cooperative.ch",
       "notes": "Nótaí",
       "notes_placeholder": "Nótaí inmheánacha - teagmháil comhpháirtíochta, tagairt comhaontaithe...",
       "status_hint_prefix": "Tosaíonn stádas mar",
-      "status_hint_middle": "Tar éis don taobh iargúlta an rún comhroinnte céanna a chlárú, socraigh an dá thaobh"
+      "status_hint_middle": "Tar éis don taobh iargúlta an rún comhroinnte céanna a chlárú, socraigh an dá thaobh",
+      "base_url_description": "URL HTTPS den NEXUS API i bhfad i gcéin. Tá an /v2/federation/hour-transfer/inbound cosán curtha leis go huathoibríoch."
     },
     "secret_modal": {
       "title": "Rún Roinnte Aonuaire",
@@ -1745,6 +2182,12 @@
     },
     "toasts": {
       "load_failed": "Theip ar lódáil an deais SLA"
+    },
+    "status": {
+      "closed": "Dúnta",
+      "matched": "Meaitseáilte",
+      "pending": "Ar feitheamh",
+      "unknown": "Stádas anaithnid"
     }
   },
   "integration_showcase": {
@@ -1771,6 +2214,74 @@
     },
     "toasts": {
       "load_failed": "Theip ar an taispeántas comhtháthaithe a lódáil"
+    },
+    "manifest": {
+      "sections": {
+        "openapi": {
+          "title": "Sonraíocht OpenAPI",
+          "body": "Sonraíocht inléite meaisín do gach dromchla API poiblí, ginte ó na rialaitheoirí a sheoltar leis an ardán seo."
+        },
+        "partner_api": {
+          "title": "Comhpháirtí API v1",
+          "body": "API a chosnaíodh le OAuth do chomhtháthaithe tríú páirtí, ag clúdach baill, liostaí, creidmheas sparán, suimeanna pobail, agus síntiúis webhook."
+        },
+        "oauth": {
+          "title": "Cáilíochtaí cliant OAuth",
+          "body": "Sreabhadh caighdeánach OAuth 2.0 le haghaidh cáilíochtaí cliant do fhreastalaithe comhpháirtí muiníneach, lena n-áirítear cealú ticéad."
+        },
+        "webhooks": {
+          "title": "Sínitheanna Webhook",
+          "body": "Síníonn comhpháirtithe le hábhair imeachta. Tá gach payload sínithe le HMAC-SHA256 thar an gcomhlacht iomlán ag úsáid rúndacht an síntiús sin."
+        },
+        "federation": {
+          "title": "Meascthaíocht na Cumann",
+          "body": "Tugann gach tiontóir deireadhphointe meastacháin léitheoireach sínithe. Cuimsíonn na payloads comhairimh, lúibíní, príomhchatagóirí, agus áiteanna, ach riamh ní sonraí pearsanta amh."
+        },
+        "sample_payloads": {
+          "title": "Samplaí paiste",
+          "body": "Paisteanna ionadaíocha do pháirtí comhtháthaithe. Tá na samplaí seo léiritheach agus níl sonraí tiarna maireachtála iontu."
+        },
+        "partner_checklist": {
+          "title": "Cad a fhaigheann páirtí comhtháthaithe",
+          "body": "Roinn an seicliosta seo le páirtí comhtháthaithe ionchasach sular thosaíonn an cur i bhfeidhm."
+        }
+      },
+      "endpoints": {
+        "openapi_json": "Sainrú JSON",
+        "openapi_yaml": "Sainspéacsáil YAML",
+        "list_users": "Líon na n-úsáideoirí",
+        "show_user": "Taispeáin úsáideoir",
+        "list_listings": "Líon na liostaí",
+        "wallet_balance": "Léigh cúlchiste sparán",
+        "credit_wallet": "Creidmheas sparán",
+        "community_aggregates": "Léigh comhdhúile an phobail",
+        "list_subscriptions": "Liostaigh síntiúis webhook",
+        "create_subscription": "Cruthaigh síntiús webhook",
+        "token_endpoint": "Eisigh token rochtana",
+        "revoke_endpoint": "Ceartaigh token rochtana",
+        "update_subscription": "Nuashonraigh síntiús webhook",
+        "delete_subscription": "Scrios síntiús webhook",
+        "tenant_aggregate": "Léigh meascán tionóil"
+      },
+      "verification_notes": {
+        "webhook_signature": "Déan fíorú ar cheannlíne X-NEXUS-Signature trí HMAC-SHA256 a ríomh thar chorp iomlán an iarratais leis an rúndacht síntiúis, ansin déan comparáid ar na sínithe in am seasta. Diúltaigh do phlandaí a bhfuil leagan réamhshocraithe imirce orthu, atá cúig nóiméad go dtí seo."
+      },
+      "samples": {
+        "federation_aggregate": "Meascán comhdháil — sampla JSON sínithe",
+        "webhook_event": "Imeacht webhook — sampla sínithe HMAC",
+        "partner_aggregates": "Pobal API pháirtí a chomhcheanglaíonn — sampla"
+      },
+      "checklist": {
+        "oauth_credentials": "Aitheantas cliant OAuth agus rúndacht chliant atá tiomnaithe don pháirtí seo",
+        "allowed_scopes": "Na scóip ceadaithe, mar shampla read:users, read:listings, agus write:wallet",
+        "webhook_subscription": "Sínitheach webhook, rúndacht HMAC, agus liosta ceadaithe URL críochphointe",
+        "openapi_spec": "URL sonraíocht OpenAPI i bhformáid JSON nó YAML",
+        "sandbox_tenant": "Slug tionóil ghinearálta le haghaidh tástáil chomhtháthaithe",
+        "federation_public_key": "Eochair phoiblí sínithe d'ionadaíocht na feidearais, nuair a ghlacann an pháirtí páirt sa fheidearachas",
+        "rate_limit_headers": "Doiciméadas maidir le ceannteidil X-RateLimit-Limit agus X-RateLimit-Remaining",
+        "data_sharing_agreement": "Dréacht-threoir chomhaontaithe roinnte sonraí agus teagmhála faoi chosaint sonraí ainmniúil",
+        "incident_runbook": "An URL le haghaidh an leabhair rith freagartha eachtra ón bpacáiste nochtaithe AG80"
+      }
     }
   },
   "isolated_node": {
@@ -1866,6 +2377,63 @@
       "load_failed": "Theip ar lódáil sonraí geata cinntí",
       "item_updated": "Mír chinnidh nuashonraithe",
       "save_failed": "Theip ar shábháil an mhír chinnidh"
+    },
+    "items": {
+      "deployment_mode": {
+        "label": "Mód dífhostaithe",
+        "help": "Roghnaigh an bhfuil sé seo ina tionónta óstáilte roinnte, tionónta óstáilte le fearann saincheaptha, nó nóid iomlán ina aonar faoi rialú an údarás réigiúnach."
+      },
+      "hosting_owner": {
+        "label": "Úinéir óstála",
+        "help": "Ainmnigh an eagraíocht atá freagrach as freastalaithe, fearann, agus cumraíocht TLS an nóid."
+      },
+      "smtp_owner": {
+        "label": "Úinéir SMTP agus ríomhphoist amach",
+        "help": "Ainmnigh an eagraíocht atá freagrach as seachadadh ríomhphoist amach agus a cuntas soláthraí ríomhphoist."
+      },
+      "storage_owner": {
+        "label": "Úinéir stórála",
+        "help": "Ainmnigh an eagraíocht atá freagrach as uaslódálacha comhad, ceangaltáin, agus stóráil rudaí buan."
+      },
+      "backup_owner": {
+        "label": "Úinéir cúltaca",
+        "help": "Ainmnigh an eagraíocht atá freagrach as cúltacaí laethúla, coimeádta, agus athshlánuithe bunachar sonraí tástáilte."
+      },
+      "update_cadence": {
+        "label": "Minicíocht nuashonraithe",
+        "help": "Roghnaigh cé chomh minic a fhaigheann an nod nuashonruithe foinsí NEXUS ó bhun."
+      },
+      "source_release_workflow": {
+        "label": "Sreabhadh oibre le haghaidh scaoileadh foinsí",
+        "help": "Déan cur síos ar conas a shroicheann nuashonruithe foinsí AGPL an nóid ina bhfuil sé scoite, lena n-áirítear scáthanna stóras, clibeanna sínithe, agus athbhreithniú láimhe."
+      },
+      "telemetry_default": {
+        "label": "Réamhshocrú teileametry",
+        "help": "Roghnaigh an staid réamhshocraithe do theileametry amach agus le haghaidh tuairisciú earráide ar an nóid seo."
+      },
+      "federation_key_exchange": {
+        "label": "Malartú eochair féidearthachta",
+        "help": "Déan cur síos ar an mbealach a n-éascaíonn nó nach n-éascaíonn an nod seo le comhghleacaithe réigiúnacha, lena n-áirítear príomh-protacal coimeád agus malartaithe."
+      },
+      "dpo_appointed": {
+        "label": "Oifigeach cosanta sonraí",
+        "help": "Taifead an t-oifigeach cosanta sonraí a ainmníodh agus a shonraí teagmhála don chur i bhfeidhm aonair."
+      },
+      "incident_runbook_url": {
+        "label": "URL leabhar rith eachtra",
+        "help": "Nasc chuig leabhar oibre oibríochta do shéasamh síos, sáruithe, comhrac eochracha, agus cleachtaí athchóirithe."
+      }
+    },
+    "choices": {
+      "hosted_tenant": "Tónaí óstáilte",
+      "hosted_custom_domain": "Tónaí óstáilte le fearann saincheaptha",
+      "canton_isolated_node": "Nód aonair faoi rialú réigiúin",
+      "weekly": "Gach seachtain",
+      "monthly": "Míosúil",
+      "quarterly": "Gach ráithe",
+      "on_demand": "Ar éileamh",
+      "enabled": "Cumasaíodh",
+      "disabled": "Díghníomhachtaithe"
     }
   },
   "kpi_baselines": {
@@ -2245,7 +2813,9 @@
     "status": {
       "verified": "Fíoraithe",
       "pending_dns": "Ar feitheamh DNS",
-      "revoked": "Cúlghairthe"
+      "revoked": "Cúlghairthe",
+      "unverified": "Neamh-fhíorthaithe",
+      "unknown": "Stádas anaithnid"
     },
     "current": {
       "title": "Stádas reatha",
@@ -2338,7 +2908,12 @@
       "acknowledgement": "Admháil an chomhordaitheora",
       "pre_pilot_baseline": "Bunlíne scórchlár réamh-phíolótach",
       "danger_checks": "Saincheisteanna cáilíochta sonraí",
-      "backlog_empty": "Riaráiste comhtháthú folamh"
+      "backlog_empty": "Riaráiste comhtháthú folamh",
+      "warning_checks": "Rabhadh cáilíochta sonraí",
+      "quarterly_review": "Athbhreithniú scórchláir ráithiúil",
+      "blocked_integrations": "Comhtháthuithe blocáilte",
+      "undecided_items": "Míreanna nod núíosach neamhchinnte",
+      "unknown": "Riachtanas anaithnid"
     },
     "states": {
       "launched_title": "Seoladh píolótach",
@@ -2408,7 +2983,74 @@
     "more_count_other": "+ {{count}} níos mó",
     "more_count_few": "+ {{count}} níos mó",
     "more_count_many": "+ {{count}} níos mó",
-    "more_count_two": "+ {{count}} níos mó"
+    "more_count_two": "+ {{count}} níos mó",
+    "section_labels": {
+      "disclosure_pack": "AG80 — Pacáiste nochtaithe FADP/nDSG",
+      "operating_policy": "AG81 — Polasaí oibríochta KISS",
+      "commercial_boundary": "AG82 — Léarscáil teorann trádála",
+      "pilot_scoreboard": "AG83 — Bonnscór píolótaí",
+      "data_quality": "AG84 — Cáilíocht sonraí tionóil",
+      "isolated_node": "AG85 — Geata cinntí nod aolchóirithe",
+      "external_integrations": "AG87 — Cúlchiste comhtháthú seachtrach"
+    },
+    "section_summaries": {
+      "disclosure_pack": {
+        "not_started": "Tá na pack fós ag úsáid réamhshocruithe na hardáin agus níl rialtóir ainmnithe ann.",
+        "needs_review": "Tá an rialtóir, oifigeach cosanta sonraí, nó teagmháil eachtra neamh-iomlán.",
+        "ready": "Tá an rialtóir, oifigeach cosanta sonraí, agus teagmháil eachtra taifeadta."
+      },
+      "operating_policy": {
+        "not_started": "Tá an polasaí fós ag úsáid réamhshocruithe na hardáin. Sceideal an ceardlann pholasaí.",
+        "needs_review": "Tá an ceardlann críochnaithe, ach tá an URL iarscríbe nó úinéir na cosanta ar iarraidh.",
+        "ready": "Tá an ceardlann beartais críochnaithe, tá an breiseán nasctha, agus tá úinéir cosanta ceaptha."
+      },
+      "commercial_boundary": {
+        "needs_review": "Tá aicmíochtaí réamhshocraithe i bhfeidhm, ach níor admhaigh comhordaitheoir an meicníocht.",
+        "ready_with_overrides": "Tá fáil réidh {{count}} curtha i bhfeidhm agus tá an meicníocht athbhreithnithe.",
+        "ready_with_overrides_one": "Tá fáil réidh {{count}} curtha i bhfeidhm agus tá an meicníocht athbhreithnithe.",
+        "ready_with_overrides_other": "Tá fáil réidh {{count}} curtha i bhfeidhm agus tá an meicníocht athbhreithnithe.",
+        "ready_default": "Tá an maitrís réamhshocraithe faighte ar aitheantas."
+      },
+      "pilot_scoreboard": {
+        "not_started": "Níor glacadh bunlíne roimh-thriantán, mar sin níl comparáid sula agus tar éis indéanta go fóill.",
+        "needs_review": "Tá bunlíne roimh-thriantán faighte, ach tá an athbhreithniú ráithiúil thar a spriocdháta.",
+        "ready": "Tá bunlíne roimh-thriantán faighte agus tá cúrsa athbhreithnithe ráithiúil ar an mbealach ceart."
+      },
+      "data_quality": {
+        "blocked": "{{count}} fadhb bhlocála fós ag fanacht. Tá cuntais dhúbailte nó úsáideoirí síolta fós i láthair.",
+        "blocked_one": "{{count}} fadhb bhlocála fós ag fanacht. Tá cuntais dhúbailte nó úsáideoirí síolta fós i láthair.",
+        "blocked_other": "{{count}} fadhbanna blocála fós ag fanacht. Tá cuntais dhúbailte nó úsáideoirí síolta fós i láthair.",
+        "needs_review": "{{count}} éileamh rabhaidh le haghaidh athbhreithnithe roimh sheoladh.",
+        "needs_review_one": "{{count}} éileamh rabhaidh le haghaidh athbhreithnithe roimh sheoladh.",
+        "needs_review_other": "{{count}} éilimh rabhaidh le haghaidh athbhreithnithe roimh sheoladh.",
+        "ready": "Ritheann gach seiceáil. Tá na sonraí réidh do chónaitheoirí fíor."
+      },
+      "isolated_node": {
+        "hosted_closed": "Tá an geata dúnta. Fanann sé faisnéiseach toisc go bhfuil an t-úsáid seo á óstáil.",
+        "hosted_informational": "Ní gá an geata do úsáidí óstáilte agus fanann sé faisnéiseach.",
+        "blocked": "Cuireann cinneadh blocáilte {{count}} cosc ar an úsáid aonair ó thosaíocht.",
+        "blocked_one": "Cuireann cinneadh blocáilte {{count}} cosc ar an úsáid aonair ó thosaíocht.",
+        "blocked_other": "Coscann cinntí {{count}} ar an imscaradh inaonaithe ó thosú.",
+        "needs_review": "Tá {{decided}} de {{total}} cinntí taifeadta. Éilíonn imscaradh inaonaithe gach cinneadh a bheith críochnaithe.",
+        "ready": "Tá gach cinneadh geata taifeadta. Tá an imscaradh inaonaithe réidh."
+      },
+      "external_integrations": {
+        "not_started": "Tá an bharraistín folamh. Síligh na réamhshocruithe nó dearbhaigh nach bhfuil comhtháthú páirteach de dhíth.",
+        "blocked": "Tá comhtháthú {{count}} blocáilte, mar sin ní féidir gnéithe atá ag brath ar pháirtí a lainseáil.",
+        "blocked_one": "Tá comhtháthú {{count}} blocáilte, mar sin ní féidir gnéithe atá ag brath ar pháirtí a lainseáil.",
+        "blocked_other": "Tá comhtháthú {{count}} blocáilte, mar sin ní féidir gnéithe atá ag brath ar pháirtí a lainseáil.",
+        "ready": "Tá mír chomhtháthaithe {{count}} á rianú agus níl aon cheann blocáilte.",
+        "ready_one": "Tá mír chomhtháthaithe {{count}} á rianú agus níl aon cheann blocáilte.",
+        "ready_other": "Tá míreanna comhtháthaithe {{count}} á rianú agus níl aon cheann blocáilte."
+      }
+    },
+    "overall_summaries": {
+      "blocked": "Tá ceann amháin nó níos mó earnálacha blocáilte, mar sin níl sé sábháilte an t-eitilt thurgnamhach a sheoladh.",
+      "ready": "Tá gach earnáil réidh agus is féidir an t-eitilt thurgnamhach a sheoladh.",
+      "needs_review": "Tá {{ready}} de {{total}} earnálacha réidh. Teastaíonn athbhreithniú comhordaitheora roimh sheoladh.",
+      "not_started": "Tá {{ready}} de {{total}} earnálacha réidh. Níor críochnaíodh an measúnú eitilte thurgnamhach ó cheann go ceann.",
+      "fallback": "Tá {{ready}} de {{total}} rannáin réidh."
+    }
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2427,10 +3069,10 @@
       "title": "Maidir leis an leathanach seo",
       "body": "Úsáideann gach méadracht fuinneog rollta 90-lá. Gabh bunlíne réamh-phíolótach sula dtéann tú ar bord fíor-chónaitheoirí, ansin reáchtáil pictiúr athbhreithnithe ráithiúil gach 3 mhí. Léiríonn an tábla comparáide conas a bhog gach méadrach i gcoibhneas leis an mbunlíne sin.",
       "methodology_prefix": "Ríomhtar fritháireamh costais ag baint úsáide as an",
-      "age_stiftung": "Caring Community",
       "age_stiftung_title": "Stiftung für das Alter",
       "methodology_middle": "modheolaíocht: uaireanta an chúraim neamhfhoirmiúil x",
-      "methodology_suffix": "35/uair (ráta cúntóir cúraim fhoirmiúil na hEilvéise) x 2 (iolraitheoir coiscthe a léiríonn costais chúraim fhoirmiúla seachanta). Aithníonn seirbhísí sóisialta cantonal na hEilvéise an mhodheolaíocht seo le haghaidh tuairisciú píolótach."
+      "methodology_suffix": "35/uair (ráta cúntóir cúraim fhoirmiúil na hEilvéise) x 2 (iolraitheoir coiscthe a léiríonn costais chúraim fhoirmiúla seachanta). Aithníonn seirbhísí sóisialta cantonal na hEilvéise an mhodheolaíocht seo le haghaidh tuairisciú píolótach.",
+      "age_stiftung": "Pobal Cúramach"
     },
     "quarterly": {
       "next_review": "Léirmheas ráithiúil eile:",
@@ -2446,8 +3088,8 @@
       "metric": "méadrach",
       "pre_pilot": "Réamhphíolótach",
       "current": "Reatha",
-      "delta": "Delta",
-      "change": "Athrú"
+      "change": "Athrú",
+      "delta": "Delta"
     },
     "metrics": {
       "active_members": "Baill ghníomhacha (90d)",
@@ -2482,9 +3124,9 @@
     "quarterly_modal": {
       "title": "Gabháil athbhreithniú ráithiúil",
       "body": "Rith gach 3 mhí tar éis seoladh píolótach. Tá an lipéad seat réamhshocraithe go dtí an ráithe reatha (m.sh. Q2_2026) ach is féidir leat é a shaincheapadh. Cuir nótaí leis chun an méid a d’athraigh ón athbhreithniú deireanach a thaifeadadh – garspriocanna a baineadh amach, athruithe polasaí, aiseolas ó chónaitheoirí. Clúdaíonn Snapshot an fhuinneog 90 lá is déanaí ón lá inniu.",
-      "label_placeholder": "ráithiúil_2026_07",
-      "label_description": "Úsáid lipéad inaitheanta ar nós Q2_2026 nó 2026_Q3. Réamhshocrú go ráithiúil_YYYY_MM.",
-      "notes_placeholder": "Rud a d’athraigh an ráithe seo, tá garspriocanna bainte amach..."
+      "notes_placeholder": "Rud a d’athraigh an ráithe seo, tá garspriocanna bainte amach...",
+      "label_placeholder": "quarterly_2026_07",
+      "label_description": "Úsáid lipéad inchreidte cosúil le Q2_2026 nó 2026_Q3. An réamhshocrú go quarterly_YYYY_MM."
     },
     "empty": {
       "value": "-"
@@ -2561,7 +3203,21 @@
       "rendered_markdown_two": "Rindreáilte Markdown ({{count}} charachtair)",
       "missing_placeholder_count_few": "{{count}} áitshealbhóirí in easnamh",
       "missing_placeholder_count_many": "{{count}} áitshealbhóirí in easnamh",
-      "missing_placeholder_count_two": "{{count}} áitshealbhóirí in easnamh"
+      "missing_placeholder_count_two": "{{count}} áitshealbhóirí in easnamh",
+      "placeholders": {
+        "partner_name": "Ainm comhpháirtí taighde",
+        "partner_institution": "Institiúid chomhpháirtí taighde",
+        "tenant_name": "Ainm pobail",
+        "dpo_name": "Ainm oifigeach cosanta sonraí",
+        "dpo_email": "Ríomhphost oifige cosanta sonraí",
+        "period_start": "Tús tréimhse tuairisce",
+        "period_end": "Deireadh tréimhse tuairisce",
+        "jurisdiction": "Dúiche rialaitheach",
+        "cohort_window_years": "Fuinneog cohort i mblianta",
+        "pilot_region": "Réigiún trialach",
+        "study_title": "Teideal staidéir",
+        "unknown": "Luach teimpléid"
+      }
     },
     "exports": {
       "title": "Stair Easpórtála tacair Sonraí",
@@ -2693,7 +3349,8 @@
     },
     "status": {
       "sent": "Seolta",
-      "converted": "tiontaithe"
+      "converted": "tiontaithe",
+      "unknown": "Stádas anaithnid"
     },
     "dispatch_modal": {
       "title": "Nudges seolta anois?",
@@ -2758,8 +3415,8 @@
       "quartier": "Ceathrú (comharsanacht)",
       "ortsteil": "Ortsteil (ceantar)",
       "municipality": "Bardas (Gemeinde)",
-      "canton": "Canton",
-      "other": "Eile"
+      "other": "Eile",
+      "canton": "Cantún"
     },
     "status": {
       "active": "Gníomhach",
@@ -2854,10 +3511,10 @@
     "audience": {
       "all_residents": "Gach cónaitheoir",
       "municipality": "Bardas",
-      "kanton": "Kanton",
       "verein_members": "Baill Verein",
       "volunteers": "Oibrithe Deonacha",
-      "recipients": "Faighteoirí cúraim"
+      "recipients": "Faighteoirí cúraim",
+      "kanton": "Kanton"
     },
     "editor": {
       "new_title": "Scéal ratha nua",
@@ -2869,7 +3526,6 @@
       "metric_source": "Foinse méadrach",
       "metric_source_description": "pilot_scoreboard: tarraingíonn uathoibríoch ó AG83; municipal_roi: auto-tarraingt ó AG76; lámhleabhar: cuireann tú luachanna isteach de láimh.",
       "metric_key": "Eochair méadrach",
-      "metric_key_placeholder": "e.g. ceadaithe_uaireanta, formal_care_offset_chf",
       "metric_key_description": "Ag teastáil le haghaidh foinsí neamhláimhe",
       "before_value": "Roimh luach",
       "after_value": "Tar éis luach",
@@ -2887,7 +3543,8 @@
       "demo_label": "Taispeántas/léiritheach",
       "demo_description": "Tá an cárta lipéadaithe mar thaispeántas sa ghailearaí",
       "published_label": "Foilsithe",
-      "published_description": "Le feiceáil ar an gailearaí os comhair na mball"
+      "published_description": "Le feiceáil ar an gailearaí os comhair na mball",
+      "metric_key_placeholder": "m.sh. approved_hours, formal_care_offset_chf"
     },
     "delete_modal": {
       "title": "Bain scéal ratha",
@@ -2907,6 +3564,38 @@
       "delete_failed": "Theip ar an scriosadh",
       "metric_refreshed": "Athnuachan méadrach beo",
       "refresh_failed": "Theip ar an athnuachan"
+    },
+    "demo_stories": {
+      "information_distribution": {
+        "title": "30% níos lú iarracht maidir le scaipeadh faisnéise",
+        "narrative": "Caitheann comhordaitheoirí thart ar thríú cuid níos lú ama ag scaipeadh nuashonruithe tar éis athrú go NEXUS. Tá fógraí, díriú ar shéimeanna baill, agus rianú dearbhaithe comhtháite in áit amháin.",
+        "method_caveat": "Sampla léiritheach bunaithe ar éileamh ó chomhphobal comhghaolta; níor tomhas é seo don tionónta seo.",
+        "evidence_source": "Leathanach bhaile fearainn chomhghleacaí (léiritheach)"
+      },
+      "volunteer_engagement": {
+        "title": "25% níos mó rannpháirtíochta deonaithe",
+        "narrative": "Tuairiscíonn pobail tástála ráth níos mó rannpháirtíochta deonaithe gníomhach tar éis NEXUS a ghlacadh, tacaíocht a fhaightear ó mheaitseáil níos soiléire, clárú éasca, agus aitheantas infheicthe an Pas Teasa.",
+        "method_caveat": "Sampla léiritheach bunaithe ar éileamh ó chomhphobal comhghaolta; níor tomhas é seo don tionónta seo.",
+        "evidence_source": "Leathanach bhaile fearainn chomhghleacaí (léiritheach)"
+      },
+      "formal_care_offset": {
+        "title": "12,250 CHF i gcostais cúraim fhoirmiúla a chur ar ais",
+        "narrative": "Taispeántar uair an chloig dheonach a chomhordú trí NEXUS mar aisbhunú de 12,250 CHF in aghaidh chostais chúraim bhaile fhoirmiúla le linn na tréimhse píolóta, luachmhar ag ráta cúnamh cúraim fhoirmiúil na hEilvéise.",
+        "method_caveat": "Measúnú ag úsáid 35 CHF in aghaidh na huaire ar feadh 350 uair; tá an comparáid i gcoinne líne bhunúsach gan pháilót amháin amháin.",
+        "evidence_source": "Sampla múnla ROI bhaile AG76 (taispeántach)"
+      }
+    }
+  },
+  "regional_points": {
+    "ledger_types": {
+      "admin_adjustment": "Coigeartú riarthóra",
+      "admin_issue": "Ceist riarthóra",
+      "earned_for_hours": "Brabhsáilte as uaireanta ceadaithe",
+      "redemption": "Aisíocaíocht",
+      "reversal": "Aisghairm",
+      "transfer_in": "Aistriú faighte",
+      "transfer_out": "Aistriú seolta",
+      "unknown": "Gnóthas anaithnid"
     }
   }
 }

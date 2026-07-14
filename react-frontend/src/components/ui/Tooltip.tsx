@@ -56,6 +56,7 @@ function mapColor(color?: TooltipProps['color']): string | undefined {
 }
 
 function normalizePlacement(placement?: LegacyPlacement): HeroUITooltipContentProps['placement'] | undefined {
+  // admin-i18n-ignore: converts a legacy placement token to HeroUI's protocol value; never rendered
   return placement?.replace('-', ' ') as HeroUITooltipContentProps['placement'] | undefined;
 }
 

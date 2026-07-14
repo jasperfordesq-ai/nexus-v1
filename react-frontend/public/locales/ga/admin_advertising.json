@@ -37,14 +37,14 @@
     "loading": "Ag lódáil",
     "next": "Ar aghaidh",
     "no": "Níl",
-    "ok": "OK",
     "pending": "Ar feitheamh",
     "previous": "Roimhe Seo",
     "retry": "Bain triail eile as",
     "save": "Sábháil",
     "select_all": "Roghnaigh Uile",
     "select_item": "Roghnaigh Mír",
-    "yes": "Tá"
+    "yes": "Tá",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Gníomhartha Bróicéara",
@@ -57,7 +57,6 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -68,9 +67,10 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
-    "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "loading": "Luchtú",
+    "select_row": "Roghnaigh sraith {{id}}"
   },
   "advertising": {
     "status": {
@@ -161,12 +161,14 @@
       "placement": {
         "all": "Gach socrúchán",
         "discovery": "Fionnachtain",
-        "feed": "Feed",
-        "market": "Margadh"
+        "market": "Margadh",
+        "markt": "Margadh",
+        "feed": "Soláthar"
       },
       "placeholders": {
         "budget": "e.g. 5000 = EUR 50.00",
-        "campaign_name": "Díolachán Samhraidh - Cafe Helvetia"
+        "campaign_name": "Díolachán Samhraidh - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"gairdín\"]}"
       },
       "stats": {
         "active_campaigns": "Feachtais ghníomhacha",
@@ -243,7 +245,8 @@
       "placeholders": {
         "body": "400 carachtar ar a mhéad",
         "campaign_name": "e.g. Cur Chun Cinn an Earraigh - Cafe Seeblick",
-        "title": "100 carachtar ar a mhéad"
+        "title": "100 carachtar ar a mhéad",
+        "cta_url": "https://... nó nexus://..."
       },
       "stats": {
         "needs_attention": "Teastaíonn aird",
@@ -263,7 +266,8 @@
         "rejected": "Diúltaíodh don fheachtas \"{{name}}\".",
         "reject_failed": "Theip ar an bhfeachtas a dhiúltú.",
         "required_fields": "Tá ainm, teideal agus corp ag teastáil."
-      }
+      },
+      "cost_per_send": "{{cost}} in aghaidh seolta"
     },
     "tabs_aria": "Scagaire stádais feachtas fógraíochta"
   }

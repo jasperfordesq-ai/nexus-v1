@@ -430,10 +430,10 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'POST',
     path: '/api/v1/federation/oauth/token',
     permission: 'none',
-    description: 'Exchange API credentials for a JWT bearer token. Uses OAuth2 client_credentials grant. Authenticate with HTTP Basic auth where client_id is the API key prefix and client_secret is the full API key.',
+    description: "federation.api_doc_endpoint_post_oauth_token_description",
     params: [
-      { name: 'grant_type', type: 'string', required: true, description: 'Must be "client_credentials"' },
-      { name: 'scope', type: 'string', required: false, description: 'Space-separated list of requested scopes (e.g. "members:read listings:read")' },
+      { name: 'grant_type', type: 'string', required: true, description: "federation.api_doc_endpoint_post_oauth_token_param_grant_type" },
+      { name: 'scope', type: 'string', required: false, description: "federation.api_doc_endpoint_post_oauth_token_param_scope" },
     ],
     response: `{
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
@@ -445,7 +445,7 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation',
     permission: 'none',
-    description: 'Returns API version info and a list of available endpoints. Useful as a health check.',
+    description: "federation.api_doc_endpoint_get_root_description",
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
@@ -463,7 +463,7 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/timebanks',
     permission: 'timebanks:read',
-    description: 'List all partner timebanks with active partnerships. Returns name, location, member count, and partnership status.',
+    description: "federation.api_doc_endpoint_get_timebanks_description",
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
@@ -485,14 +485,14 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/members',
     permission: 'members:read',
-    description: 'Search federated members across partner timebanks. Supports full-text search, filtering by skills, location, and timebank.',
+    description: "federation.api_doc_endpoint_get_members_description",
     params: [
-      { name: 'q', type: 'string', required: false, description: 'Search query (name, username, skills)' },
-      { name: 'timebank_id', type: 'integer', required: false, description: 'Filter by specific timebank ID' },
-      { name: 'skills', type: 'string', required: false, description: 'Comma-separated skill filters' },
-      { name: 'location', type: 'string', required: false, description: 'Location filter (partial match)' },
-      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
-      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+      { name: 'q', type: 'string', required: false, description: "federation.api_doc_endpoint_get_members_param_q" },
+      { name: 'timebank_id', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_members_param_timebank_id" },
+      { name: 'skills', type: 'string', required: false, description: "federation.api_doc_endpoint_get_members_param_skills" },
+      { name: 'location', type: 'string', required: false, description: "federation.api_doc_endpoint_get_members_param_location" },
+      { name: 'page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_members_param_page" },
+      { name: 'per_page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_members_param_per_page" },
     ],
     response: `{
   "success": true,
@@ -517,9 +517,9 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/members/{id}',
     permission: 'members:read',
-    description: 'Get detailed profile for a single federated member, including messaging and transaction preferences.',
+    description: "federation.api_doc_endpoint_get_members_id_description",
     params: [
-      { name: 'id', type: 'integer', required: true, description: 'Member ID (URL parameter)' },
+      { name: 'id', type: 'integer', required: true, description: "federation.api_doc_endpoint_get_members_id_param_id" },
     ],
     response: `{
   "success": true,
@@ -544,14 +544,14 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/listings',
     permission: 'listings:read',
-    description: 'Search federated listings (offers and requests) across partner timebanks.',
+    description: "federation.api_doc_endpoint_get_listings_description",
     params: [
-      { name: 'q', type: 'string', required: false, description: 'Search query (title, description)' },
-      { name: 'type', type: 'string', required: false, description: '"offer" or "request"' },
-      { name: 'timebank_id', type: 'integer', required: false, description: 'Filter by specific timebank ID' },
-      { name: 'category', type: 'integer', required: false, description: 'Category ID (integer)' },
-      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
-      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+      { name: 'q', type: 'string', required: false, description: "federation.api_doc_endpoint_get_listings_param_q" },
+      { name: 'type', type: 'string', required: false, description: "federation.api_doc_endpoint_get_listings_param_type" },
+      { name: 'timebank_id', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_listings_param_timebank_id" },
+      { name: 'category', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_listings_param_category" },
+      { name: 'page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_listings_param_page" },
+      { name: 'per_page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_listings_param_per_page" },
     ],
     response: `{
   "success": true,
@@ -575,9 +575,9 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/listings/{id}',
     permission: 'listings:read',
-    description: 'Get detailed information for a single federated listing.',
+    description: "federation.api_doc_endpoint_get_listings_id_description",
     params: [
-      { name: 'id', type: 'integer', required: true, description: 'Listing ID (URL parameter)' },
+      { name: 'id', type: 'integer', required: true, description: "federation.api_doc_endpoint_get_listings_id_param_id" },
     ],
     response: `{
   "success": true,
@@ -605,12 +605,12 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'POST',
     path: '/api/v1/federation/messages',
     permission: 'messages:write',
-    description: 'Send a federated message to a member in a partner timebank. The sender must belong to your tenant.',
+    description: "federation.api_doc_endpoint_post_messages_description",
     params: [
-      { name: 'sender_id', type: 'integer', required: true, description: 'Sender user ID (must belong to your tenant)' },
-      { name: 'recipient_id', type: 'integer', required: true, description: 'Recipient user ID' },
-      { name: 'subject', type: 'string', required: true, description: 'Message subject' },
-      { name: 'body', type: 'string', required: true, description: 'Message body text' },
+      { name: 'sender_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_messages_param_sender_id" },
+      { name: 'recipient_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_messages_param_recipient_id" },
+      { name: 'subject', type: 'string', required: true, description: "federation.api_doc_endpoint_post_messages_param_subject" },
+      { name: 'body', type: 'string', required: true, description: "federation.api_doc_endpoint_post_messages_param_body" },
     ],
     response: `{
   "success": true,
@@ -623,12 +623,12 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'POST',
     path: '/api/v1/federation/transactions',
     permission: 'transactions:write',
-    description: 'Create a time credit transfer between members of partner timebanks. Requires an active credit agreement between tenants and sufficient sender balance.',
+    description: "federation.api_doc_endpoint_post_transactions_description",
     params: [
-      { name: 'sender_id', type: 'integer', required: true, description: 'Sender user ID (must belong to your tenant)' },
-      { name: 'recipient_id', type: 'integer', required: true, description: 'Recipient user ID' },
-      { name: 'amount', type: 'integer', required: true, description: 'Amount in whole hours (1-100)' },
-      { name: 'description', type: 'string', required: true, description: 'Transaction description' },
+      { name: 'sender_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_transactions_param_sender_id" },
+      { name: 'recipient_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_transactions_param_recipient_id" },
+      { name: 'amount', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_transactions_param_amount" },
+      { name: 'description', type: 'string', required: true, description: "federation.api_doc_endpoint_post_transactions_param_description" },
     ],
     response: `{
   "success": true,
@@ -643,12 +643,12 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/messages',
     permission: 'messages:read',
-    description: 'Retrieve federated messages involving your tenant. Supports filtering by direction (inbound/outbound) and a since timestamp for incremental syncing.',
+    description: "federation.api_doc_endpoint_get_messages_description",
     params: [
-      { name: 'since', type: 'string', required: false, description: 'ISO 8601 timestamp -- only return messages after this time' },
-      { name: 'direction', type: 'string', required: false, description: '"inbound", "outbound", or "all" (default: "all")' },
-      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
-      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+      { name: 'since', type: 'string', required: false, description: "federation.api_doc_endpoint_get_messages_param_since" },
+      { name: 'direction', type: 'string', required: false, description: "federation.api_doc_endpoint_get_messages_param_direction" },
+      { name: 'page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_messages_param_page" },
+      { name: 'per_page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_messages_param_per_page" },
     ],
     response: `{
   "success": true,
@@ -680,13 +680,13 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'POST',
     path: '/api/v1/federation/reviews',
     permission: 'reviews:write',
-    description: 'Create a federated review for a member in a partner timebank. The reviewer must belong to your tenant and the reviewee must have federated reviews enabled.',
+    description: "federation.api_doc_endpoint_post_reviews_description",
     params: [
-      { name: 'reviewer_id', type: 'integer', required: true, description: 'Reviewer user ID (must belong to your tenant)' },
-      { name: 'reviewee_id', type: 'integer', required: true, description: 'Reviewee user ID (must have federated reviews enabled)' },
-      { name: 'rating', type: 'integer', required: true, description: 'Rating from 1 to 5' },
-      { name: 'comment', type: 'string', required: false, description: 'Review text (max 5000 characters)' },
-      { name: 'transaction_id', type: 'integer', required: false, description: 'Associated transaction ID (optional)' },
+      { name: 'reviewer_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_reviews_param_reviewer_id" },
+      { name: 'reviewee_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_reviews_param_reviewee_id" },
+      { name: 'rating', type: 'integer', required: true, description: "federation.api_doc_endpoint_post_reviews_param_rating" },
+      { name: 'comment', type: 'string', required: false, description: "federation.api_doc_endpoint_post_reviews_param_comment" },
+      { name: 'transaction_id', type: 'integer', required: false, description: "federation.api_doc_endpoint_post_reviews_param_transaction_id" },
     ],
     response: `{
   "success": true,
@@ -707,11 +707,11 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/reviews',
     permission: 'reviews:read',
-    description: 'Get federated reviews for a specific user. Only returns approved reviews where the user has federated reviews enabled.',
+    description: "federation.api_doc_endpoint_get_reviews_description",
     params: [
-      { name: 'user_id', type: 'integer', required: true, description: 'User ID to get reviews for' },
-      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
-      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+      { name: 'user_id', type: 'integer', required: true, description: "federation.api_doc_endpoint_get_reviews_param_user_id" },
+      { name: 'page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_reviews_param_page" },
+      { name: 'per_page', type: 'integer', required: false, description: "federation.api_doc_endpoint_get_reviews_param_per_page" },
     ],
     response: `{
   "success": true,
@@ -738,9 +738,9 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'GET',
     path: '/api/v1/federation/transactions/{id}',
     permission: 'transactions:read',
-    description: 'Get the status and details of a specific federated transaction. Your tenant must be either the sender or receiver tenant.',
+    description: "federation.api_doc_endpoint_get_transactions_id_description",
     params: [
-      { name: 'id', type: 'integer', required: true, description: 'Transaction ID (URL parameter)' },
+      { name: 'id', type: 'integer', required: true, description: "federation.api_doc_endpoint_get_transactions_id_param_id" },
     ],
     response: `{
   "success": true,
@@ -770,7 +770,7 @@ const ENDPOINTS: EndpointDef[] = [
     method: 'POST',
     path: '/api/v1/federation/webhooks/test',
     permission: 'none',
-    description: 'Verify HMAC signature correctness for webhook payloads. Tests that your signing implementation produces valid signatures.',
+    description: "federation.api_doc_endpoint_post_webhooks_test_description",
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
@@ -806,7 +806,7 @@ function EndpointsTab() {
           }
         >
           <div className="space-y-4 pb-2">
-            <p className="text-sm text-muted">{ep.description}</p>
+            <p className="text-sm text-muted">{t(ep.description)}</p>
 
             {ep.params && ep.params.length > 0 && (
               <>
@@ -822,13 +822,14 @@ function EndpointsTab() {
                     {ep.params.map((p) => (
                       <TableRow key={p.name}>
                         <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">{p.name}</code></TableCell>
+                        {/* admin-i18n-ignore: OpenAPI parameter types are invariant protocol identifiers. */}
                         <TableCell><span className="text-sm text-muted">{p.type}</span></TableCell>
                         <TableCell>
                           <Chip size="sm" variant="soft" color={p.required ? 'danger' : 'default'}>
                             {p.required ? t('federation.api_doc_yes') : t('federation.api_doc_no')}
                           </Chip>
                         </TableCell>
-                        <TableCell><span className="text-sm text-muted">{p.description}</span></TableCell>
+                        <TableCell><span className="text-sm text-muted">{t(p.description)}</span></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

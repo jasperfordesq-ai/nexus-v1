@@ -49,5 +49,23 @@
   "extend_session": "Sessie verlengen",
   "dismiss": "Sluiten",
   "idle_logout_title": "Afgemeld wegens inactiviteit",
-  "idle_logout_message": "U bent automatisch afgemeld na een periode van inactiviteit. Meld u opnieuw aan om door te gaan."
+  "idle_logout_message": "U bent automatisch afgemeld na een periode van inactiviteit. Meld u opnieuw aan om door te gaan.",
+  "api": {
+    "request_failed_title": "Verzoek mislukt",
+    "request_failed": "Het verzoek kon niet worden voltooid.",
+    "service_unavailable": "De service is tijdelijk niet beschikbaar. Probeer het later opnieuw.",
+    "invalid_response": "De server gaf een ongeldige reactie terug.",
+    "request_timeout": "Het verzoek is verlopen. Probeer het opnieuw.",
+    "network_error": "Kan geen verbinding maken. Controleer uw internetverbinding en probeer het opnieuw.",
+    "invalid_request": "Het verzoek was ongeldig. Controleer uw invoer.",
+    "permission_denied": "U hebt geen toestemming om deze actie uit te voeren.",
+    "resource_not_found": "De gevraagde bron is niet gevonden.",
+    "too_many_requests": "Te veel verzoeken. Wacht een moment en probeer het opnieuw.",
+    "server_error": "Er is een onverwachte serverfout opgetreden. Probeer het later opnieuw.",
+    "download_failed_status": "Download mislukt (HTTP {{status}}).",
+    "upload_failed": "Upload mislukt.",
+    "upload_failed_retry": "Upload mislukt. Probeer het opnieuw.",
+    "upload_cancelled": "Upload geannuleerd.",
+    "upload_timeout": "De upload is verlopen. Probeer het opnieuw."
+  }
 }

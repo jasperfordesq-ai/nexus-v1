@@ -7,6 +7,7 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
+import { formatPercentValue } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -106,7 +107,7 @@ export function MatchingDiagnostic() {
           <CardBody className="gap-4">
             <p className="text-sm text-muted">{t('diagnostics.diagnose_user_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="secondary" className="max-w-xs" />
+              <Input label={t('diagnostics.label_user_i_d')} placeholder={t('diagnostics.user_id_placeholder')} type="number" value={userId} onValueChange={setUserId} variant="secondary" className="max-w-xs" />
               <Button
                 startContent={loadingUser ? undefined : <Search size={16} />}
                 className="self-end"
@@ -137,7 +138,7 @@ export function MatchingDiagnostic() {
           <CardBody className="gap-4">
             <p className="text-sm text-muted">{t('diagnostics.diagnose_listing_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="secondary" className="max-w-xs" />
+              <Input label={t('diagnostics.label_listing_i_d')} placeholder={t('diagnostics.listing_id_placeholder')} type="number" value={listingId} onValueChange={setListingId} variant="secondary" className="max-w-xs" />
               <Button
                 startContent={loadingListing ? undefined : <Search size={16} />}
                 className="self-end"
@@ -179,7 +180,7 @@ export function MatchingDiagnostic() {
                   <p className="text-sm text-muted">{t('diagnostics.avg_match_score')}</p>
                   <p className="font-medium">
                     {overview?.avg_match_score !== undefined
-                      ? `${Number(overview.avg_match_score).toFixed(1)}%`
+                      ? formatPercentValue(Number(overview.avg_match_score))
                       : '--'}
                   </p>
                 </div>

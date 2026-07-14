@@ -37,14 +37,14 @@
     "loading": "読み込み中",
     "next": "次へ",
     "no": "いいえ",
-    "ok": "OK",
     "pending": "保留中",
     "previous": "前へ",
     "retry": "再試行",
     "save": "保存",
     "select_all": "すべて選択",
     "select_item": "項目の選択",
-    "yes": "はい"
+    "yes": "はい",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "ブローカーのアクション",
@@ -57,7 +57,6 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
-    "loading": "Loading",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -68,9 +67,10 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
-    "select_row": "Select row {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "loading": "読み込み中",
+    "select_row": "行を選択 {{id}}"
   },
   "provisioning_requests": {
     "page_title": "プロビジョニングキュー",
@@ -102,7 +102,8 @@
       "approved": "承認された",
       "provisioned": "プロビジョニング済み",
       "rejected": "拒否されました",
-      "failed": "失敗した"
+      "failed": "失敗した",
+      "unknown": "状態不明"
     },
     "fields": {
       "applicant": "申請者",
@@ -117,8 +118,27 @@
       "rejection_reason": "拒否理由",
       "provisioning_log": "プロビジョニングログ"
     },
-    "loading": "プロビジョニング リクエストを読み込んでいます…"
+    "loading": "プロビジョニング リクエストを読み込んでいます…",
+    "categories": {
+      "community": "コミュニティ",
+      "timebank": "タイムバンク",
+      "kiss_cooperative": "ケアリング・コミュニティ協同組合",
+      "caring_community": "思いやりのあるコミュニティ",
+      "agoris_node": "アゴリス・ノード",
+      "foundation": "財団",
+      "platform": "プラットフォーム",
+      "unknown": "その他のコミュニティタイプ"
+    },
+    "size_buckets": {
+      "under_50": "50人未満のメンバー",
+      "50_250": "50〜250人のメンバー",
+      "250_1000": "250〜1,000人のメンバー",
+      "1000_5000": "1,000〜5,000人のメンバー",
+      "5000_plus": "5,000人以上のメンバー",
+      "50-200": "50–200人のメンバー",
+      "unknown": "サイズ未指定"
+    }
   },
-  "loading": "Loading",
-  "refresh": "リフレッシュ"
+  "refresh": "リフレッシュ",
+  "loading": "読み込み中"
 }

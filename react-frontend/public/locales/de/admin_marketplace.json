@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,7 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
+    "loading": "Laden",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,7 +68,7 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
+    "select_row": "Zeile auswählen {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
   },
@@ -121,14 +121,14 @@
       "suspend": "Aussetzen",
       "delete": "Löschen",
       "columns": {
-        "code": "Code",
         "title": "Titel",
         "seller_id": "Verkäufer ID",
         "discount": "Rabatt",
         "status": "Status",
         "uses": "Verwendungsmöglichkeiten",
         "valid_until": "Gültig bis",
-        "actions": "Aktionen"
+        "actions": "Aktionen",
+        "code": "Code"
       },
       "status": {
         "active": "Aktiv",
@@ -208,7 +208,22 @@
     "verify_seller_title": "Verkäufer bestätigen",
     "view_all": "Alle anzeigen",
     "moderation_tabs_aria": "Filter für den Moderationsstatus des Marktplatzes",
-    "seller_tabs_aria": "Verkäuferstatusfilter"
+    "seller_tabs_aria": "Verkäuferstatusfilter",
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "sold": "Verkauft",
+      "expired": "Abgelaufen",
+      "draft": "Entwurf",
+      "unknown": "Anderer Listungsstatus"
+    },
+    "moderation_status": {
+      "approved": "Genehmigt",
+      "pending": "Ausstehende Überprüfung",
+      "rejected": "Abgelehnt",
+      "flagged": "Gekennzeichnet",
+      "unknown": "Anderer Moderationsstatus"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} ausgewählt",

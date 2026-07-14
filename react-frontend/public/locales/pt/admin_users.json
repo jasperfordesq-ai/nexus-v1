@@ -37,14 +37,14 @@
     "loading": "Carregando",
     "next": "Próximo",
     "no": "Não",
-    "ok": "OK",
     "pending": "Pendente",
     "previous": "Anterior",
     "retry": "Tentar novamente",
     "save": "Salvar",
     "select_all": "Selecionar tudo",
     "select_item": "Selecione o item",
-    "yes": "Sim"
+    "yes": "Sim",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Ações do corretor",
@@ -57,7 +57,6 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -68,9 +67,10 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
-    "select_row": "Select row {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Carregando",
+    "select_row": "Selecionar linha {{id}}"
   },
   "users": {
     "action_approve": "Aprovar",
@@ -168,7 +168,7 @@
     "placeholder_a_short_biography_for_this_user": "Uma breve biografia para este usuário...",
     "placeholder_eg_community_centre": "Por exemplo, Centro Comunitário...",
     "placeholder_eg_community_volunteer": "Por exemplo, voluntário da comunidade...",
-    "placeholder_email": "email@exemplo.com",
+    "placeholder_email": "email@example.com",
     "placeholder_first_name": "Primeiro nome...",
     "placeholder_enter_first_name": "Digite o primeiro nome...",
     "placeholder_enter_last_name": "Digite o sobrenome...",
@@ -220,7 +220,9 @@
     "permissions_editor_unavailable_title": "As permissões são apenas de leitura aqui",
     "permissions_editor_unavailable_desc": "Esta página mostra a função do utilizador e as permissões concedidas, mas não permite alterá-las. Faça a gestão do acesso alterando a função do utilizador na página de edição.",
     "role_unknown": "Função desconhecida",
-    "role_tenant_super_admin": "Superadministrador do inquilino"
+    "role_tenant_super_admin": "Superadministrador do inquilino",
+    "role_super_admin_short": "Super Administrador",
+    "reset_2fa_reason": "Redefinido por um administrador"
   },
   "user_edit": {
     "actions": {
@@ -255,7 +257,8 @@
       "given": "Consentimento dado",
       "not_consented": "Não consentido",
       "not_given": "Consentimento não dado",
-      "withdrawn_on": "Retirado em"
+      "withdrawn_on": "Retirado em",
+      "type_unknown": "Tipo de consentimento desconhecido"
     },
     "descriptions": {
       "balance_amount": "Use valores negativos para deduzir créditos de tempo deste membro",
@@ -326,7 +329,7 @@
       "balance_amount": "por exemplo 2 ou -1,5",
       "balance_reason": "Por que você está ajustando esse equilíbrio?",
       "bio": "Uma breve biografia para este usuário...",
-      "email": "usuário@exemplo.com",
+      "email": "user@example.com",
       "first_name": "Digite o primeiro nome...",
       "last_name": "Digite o sobrenome...",
       "location": "por exemplo Nova York, EUA",
@@ -339,8 +342,8 @@
       "tagline": "Por exemplo, voluntário da comunidade..."
     },
     "profile_types": {
-      "individual": "Individual",
-      "organisation": "Organização"
+      "organisation": "Organização",
+      "individual": "Individual"
     },
     "roles": {
       "admin": "Administrador",
@@ -433,12 +436,28 @@
       "decision_confirmed": "Atestado confirmado",
       "decision_revoked": "Atestado revogado",
       "decision_not_confirmed": "Atestado não confirmado"
+    },
+    "insurance": {
+      "status_none": "Nenhum",
+      "status_pending": "Pendente",
+      "status_submitted": "Enviado",
+      "status_verified": "Verificado",
+      "status_expired": "Expirado",
+      "status_rejected": "Rejeitado",
+      "status_revoked": "Revogado",
+      "status_unknown": "Status desconhecido",
+      "type_public_liability": "Responsabilidade civil",
+      "type_professional_indemnity": "Indenização profissional",
+      "type_employers_liability": "Responsabilidade dos empregadores",
+      "type_product_liability": "Responsabilidade pelo produto",
+      "type_personal_accident": "Acidente pessoal",
+      "type_other": "Outro",
+      "type_unknown": "Tipo de seguro desconhecido"
     }
   },
   "aria": {
     "breadcrumbs": "Pão ralado"
   },
-  "loading": "Loading",
   "residency_admin": {
     "page_title": "Verificações de residência",
     "page_desc": "Analise as declarações de residência enviadas pelos membros e conceda o selo de residência verificada.",
@@ -483,5 +502,6 @@
     "intelligence": "Inteligência",
     "engagement": "Noivado",
     "system": "Sistema"
-  }
+  },
+  "loading": "Carregando"
 }

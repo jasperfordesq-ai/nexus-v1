@@ -794,7 +794,17 @@
       "shared_interests": "Shared interests",
       "score": "Score {{value}}%",
       "dismiss": "Dismiss",
-      "create": "Create Tandem"
+      "create": "Create Tandem",
+      "reason_join": "{{previous}}; {{next}}",
+      "reasons": {
+        "distance": "Lives {{distance_km}} km away",
+        "shared_language": "Shares a language",
+        "complementary_skills": "Has complementary skills",
+        "availability_overlap": "Has compatible availability",
+        "shared_interests": "Shares interests",
+        "intergenerational": "Offers an intergenerational pairing",
+        "overall_fit": "Shows a reasonable overall fit"
+      }
     },
     "safeguarding": {
       "title": "Safeguarding Reports",
@@ -828,6 +838,26 @@
         "investigating": "Investigating",
         "resolved": "Resolved",
         "dismissed": "Dismissed"
+      },
+      "categories": {
+        "exploitation": "Exploitation",
+        "financial_concern": "Financial concern",
+        "inappropriate_behavior": "Inappropriate behaviour",
+        "medical_concern": "Medical concern",
+        "neglect": "Neglect",
+        "other": "Other",
+        "unknown": "Unknown category"
+      },
+      "history_actions": {
+        "assigned": "Assigned",
+        "created": "Created",
+        "dismissed": "Dismissed",
+        "escalated": "Escalated",
+        "note_added": "Note added",
+        "resolved": "Resolved",
+        "status_changed": "Status changed",
+        "triaged": "Triaged",
+        "unknown": "Unknown action"
       },
       "age_hours_one": "{{count}}h",
       "age_hours_other": "{{count}}h",
@@ -942,6 +972,15 @@
       "empty": "No favours recorded yet.",
       "anonymous": "Anonymous",
       "unknown": "Unknown",
+      "categories": {
+        "transport": "Transport",
+        "shopping": "Shopping",
+        "companionship": "Companionship",
+        "household": "Household help",
+        "technology": "Technology help",
+        "other": "Other",
+        "unknown": "Uncategorised"
+      },
       "total_recorded_one": "{{count}} total recorded",
       "total_recorded_other": "{{count}} total recorded"
     },
@@ -1031,6 +1070,12 @@
       "history": "History",
       "forecast": "Forecast",
       "confidence": "Confidence",
+      "load_failed": "Could not load predictive insights.",
+      "confidence_levels": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
       "trend_growing": "Growing {{value}}%",
       "trend_declining": "Declining {{value}}%",
       "trend_stable": "Stable",
@@ -1070,6 +1115,45 @@
         "critical": "Critical",
         "warning": "Warning",
         "info": "Info"
+      },
+      "alert_actions": {
+        "see_suggestions": "See suggestions",
+        "view_members": "View members",
+        "review_now": "Review now",
+        "reassign_reviews": "Reassign reviews",
+        "open_reports": "Open reports",
+        "view_tandems": "View tandems",
+        "view_listings": "View listings"
+      },
+      "alerts": {
+        "recipients_without_tandem": {
+          "title": "Recipients without a regular supporter",
+          "message": "These members received help in the last six months but have no active recurring tandem. Pair them with a steady supporter to strengthen continuity."
+        },
+        "inactive_members": {
+          "title": "Previously active members have gone quiet",
+          "message": "These members logged hours in the last six months but not in the last 30 days. A friendly check-in may help them re-engage."
+        },
+        "overdue_reviews": {
+          "title": "Hour reviews have exceeded the service level",
+          "message": "These pending hour logs are older than {{sla}} days. Approve or escalate them so members receive their credit."
+        },
+        "coordinators_overloaded": {
+          "title": "Coordinators are overloaded",
+          "message": "One or more coordinators have over 10 pending reviews. Reassign work before a bottleneck develops."
+        },
+        "retention_dropping": {
+          "title": "Active member participation is declining",
+          "message": "This month's active member count ({{current}}) is below {{threshold_percent}}% of the recent {{months}}-month average ({{average}}). Consider a targeted outreach nudge."
+        },
+        "overdue_check_ins": {
+          "title": "Tandem check-ins are overdue",
+          "message": "These active recurring relationships have passed their scheduled check-in. Contact both participants to confirm that they are well."
+        },
+        "low_supply": {
+          "title": "Categories have unmet demand",
+          "message": "Active requests outnumber available offers in these categories. Highlight them to potential supporters."
+        }
       }
     },
     "relationships": {
@@ -1208,6 +1292,173 @@
       "private_deployment": "Private deployment",
       "commercial": "Commercial"
     },
+    "classification_descriptions": {
+      "agpl_public": "AGPL-licensed source code in the public repository. Anyone may deploy it under the licence terms.",
+      "tenant_config": "AGPL-licensed functionality controlled by tenant configuration or a feature toggle.",
+      "private_deployment": "An operational deployment layer such as infrastructure, build accounts, or signing-key ownership; this is not a code-licensing boundary.",
+      "commercial": "A separately contracted service that is not included in the public AGPL package."
+    },
+    "categories": {
+      "core_caring": "Core caring community",
+      "community_governance": "Community governance",
+      "gamification_engagement": "Gamification and engagement",
+      "commercial_layer": "Commercial layer",
+      "advanced_ai": "Advanced AI",
+      "mobile_native": "Native mobile apps",
+      "regional_intelligence": "Regional intelligence"
+    },
+    "capabilities": {
+      "caring_community_module": {
+        "label": "Caring Community module",
+        "description": "The umbrella feature flag that activates the complete Caring Community workflow for a tenant.",
+        "notes": "This is the master gate for the other caring features."
+      },
+      "caring_help_requests": {
+        "label": "Help requests",
+        "description": "The caring help-request workflow, including caregiver requests made on another person's behalf, matching, and acceptance.",
+        "notes": ""
+      },
+      "caring_support_relationships": {
+        "label": "Support relationships",
+        "description": "Long-running caring relationships between a recipient and one or more supporters, with recurring check-ins.",
+        "notes": ""
+      },
+      "caring_caregiver_links": {
+        "label": "Caregiver links",
+        "description": "A verified link between an informal caregiver and the person they support, allowing requests to be made on that person's behalf.",
+        "notes": ""
+      },
+      "caring_substitute_cover": {
+        "label": "Substitute and cover scheduling",
+        "description": "Find substitute caregivers when the primary supporter is unavailable, with conflict detection and confirmation.",
+        "notes": ""
+      },
+      "caring_warmth_pass": {
+        "label": "Warmth Pass",
+        "description": "A recipient-controlled dignity layer that governs who may see their needs and supports consent-based introductions.",
+        "notes": ""
+      },
+      "caring_emergency_alerts": {
+        "label": "Emergency alerts",
+        "description": "Emergency broadcasts from a recipient or caregiver to a vetted radius of trusted neighbours.",
+        "notes": ""
+      },
+      "caring_sub_regions": {
+        "label": "Caring sub-regions",
+        "description": "Regional cells within a tenant, such as districts or neighbourhoods, with their own coordinator and KPI roll-up.",
+        "notes": ""
+      },
+      "caring_research_consent": {
+        "label": "Research consent flag",
+        "description": "A member opt-in for inclusion in anonymised research datasets shared with academic or municipal partners.",
+        "notes": ""
+      },
+      "caring_municipal_roi": {
+        "label": "Municipal return-on-investment report",
+        "description": "A report of formal-care cost offsets and prevention value for public-sector procurement discussions.",
+        "notes": ""
+      },
+      "caring_pilot_scoreboard": {
+        "label": "Pilot scoreboard",
+        "description": "A live KPI pack for pilot stand-ups and funder-facing progress reviews.",
+        "notes": ""
+      },
+      "caring_disclosure_pack": {
+        "label": "FADP/nDSG disclosure pack",
+        "description": "An editable Swiss data-protection disclosure pack for legal review before resident onboarding.",
+        "notes": ""
+      },
+      "caring_operating_policy": {
+        "label": "Operating policy workshop",
+        "description": "A schema-driven policy covering approval authority, service levels, legacy-hour settlement, rates, and review cadence.",
+        "notes": ""
+      },
+      "safeguarding_reports": {
+        "label": "Safeguarding reports",
+        "description": "A member-to-coordinator safeguarding concern workflow with an audit trail and escalation routing.",
+        "notes": ""
+      },
+      "trust_tier_system": {
+        "label": "Trust tier system",
+        "description": "Member trust progression that controls which caring actions a new, trusted, or vetted member may perform.",
+        "notes": ""
+      },
+      "municipal_verification": {
+        "label": "Municipal verification badge",
+        "description": "An optional municipal verification marker on a member profile, based on residence or background checks.",
+        "notes": ""
+      },
+      "xp_badges_journeys": {
+        "label": "XP, badges, and journeys",
+        "description": "An engagement layer with XP, badges, journeys, and challenges that recognise caring participation.",
+        "notes": ""
+      },
+      "appreciation_messages": {
+        "label": "Appreciation messages",
+        "description": "A lightweight thank-you flow that lets recipients acknowledge supporters publicly.",
+        "notes": ""
+      },
+      "local_advertising_campaigns": {
+        "label": "Local advertising campaigns",
+        "description": "In-app placements sold to local merchants. The code is AGPL-licensed, participation is tenant-controlled, and revenue stays with the deployer.",
+        "notes": "Opt-in per tenant; the public code does not impose a revenue share with the platform operator."
+      },
+      "paid_push_campaigns": {
+        "label": "Paid push campaigns",
+        "description": "Targeted push-notification campaigns that merchants may purchase to reach opted-in members.",
+        "notes": "The tenant must enable the feature and accept responsibility for push-delivery costs."
+      },
+      "premium_member_tier": {
+        "label": "Premium member tier",
+        "description": "An optional paid membership tier with additional benefits, operated at the tenant's discretion.",
+        "notes": ""
+      },
+      "merchant_loyalty_coupons": {
+        "label": "Merchant loyalty and coupons",
+        "description": "Local merchant loyalty cards and coupon redemption linked to time-credit balances.",
+        "notes": ""
+      },
+      "verein_dues_collection": {
+        "label": "Association dues",
+        "description": "Recurring association-dues collection through Stripe, with member statements and reconciliation.",
+        "notes": "The Stripe account is operational infrastructure; the application code remains AGPL-licensed."
+      },
+      "smart_matching_engine": {
+        "label": "Smart matching engine",
+        "description": "A heuristic matcher that pairs help requests with likely supporters using skills, distance, and history.",
+        "notes": ""
+      },
+      "ki_agenten_framework": {
+        "label": "KI-Agenten framework",
+        "description": "A per-tenant agent runtime that lets coordinators define structured assistants for repeatable workflows.",
+        "notes": "The code is AGPL-licensed; each tenant supplies its own language-model API credentials and pays the provider directly."
+      },
+      "ai_chat_assistant": {
+        "label": "AI chat assistant",
+        "description": "A member-facing assistant grounded in the tenant knowledge base for help and onboarding.",
+        "notes": "Each tenant supplies its own OpenAI API credentials."
+      },
+      "embedding_recommendations": {
+        "label": "Embedding-based recommendations",
+        "description": "Embedding models power listing, member, and group recommendations across the platform.",
+        "notes": "Each tenant is responsible for its embedding-provider usage costs."
+      },
+      "tenant_branded_native_app": {
+        "label": "Tenant-branded native app",
+        "description": "An iOS and Android Capacitor app published under the tenant's brand. The source is AGPL-licensed; the release infrastructure is tenant-owned.",
+        "notes": "Apple and Google developer accounts, signing keys, build pipelines, and store-review workflows are operational responsibilities outside the package."
+      },
+      "paid_regional_analytics": {
+        "label": "Paid regional analytics",
+        "description": "Cross-tenant aggregate analytics for regional and municipal procurement, offered separately to public-sector buyers.",
+        "notes": "This is a separate public-sector product that requires a commercial agreement with the platform operator."
+      },
+      "partner_api_access": {
+        "label": "Partner API access",
+        "description": "A rate-limited API for research, government, and integration partners that may include cross-tenant aggregate queries.",
+        "notes": "A commercial agreement is required; this access is not enabled for AGPL deployers by default."
+      }
+    },
     "labels": {
       "overridden": "Overridden",
       "module": "module",
@@ -1297,6 +1548,88 @@
       "status": "Status",
       "created": "Created"
     },
+    "checks": {
+      "duplicate_emails": {
+        "label": "Duplicate email addresses",
+        "schema_unavailable": "The users table or email column is not available in this tenant schema.",
+        "found": "Multiple users share the same email address. Merge or remove duplicate accounts before launch.",
+        "clear": "No duplicate email addresses were detected."
+      },
+      "duplicate_phones": {
+        "label": "Duplicate phone numbers",
+        "schema_unavailable": "The users table or phone column is not available in this tenant schema.",
+        "found": "Several members share the same phone number. Confirm whether they are different residents.",
+        "clear": "No duplicate phone numbers were detected."
+      },
+      "missing_preferred_language": {
+        "label": "Members without a preferred language",
+        "schema_unavailable": "The preferred-language field is not available in this tenant schema.",
+        "found": "Some members have not selected a preferred language. Set one before sending resident communications.",
+        "clear": "Every member has a preferred language."
+      },
+      "missing_sub_region": {
+        "label": "Members without a sub-region",
+        "regions_unavailable": "Sub-regions are not available in this tenant schema, so this check does not apply.",
+        "column_unavailable": "Member sub-region assignments are not available in this tenant schema, so this check does not apply.",
+        "no_regions": "No sub-regions have been configured, so this check does not apply.",
+        "found": "Members without a sub-region will not appear in neighbourhood-scoped feeds.",
+        "clear": "Every member is assigned to a sub-region."
+      },
+      "missing_coordinator_assignment": {
+        "label": "Caring relationships without a coordinator",
+        "table_unavailable": "Caring support relationships are not available in this tenant schema.",
+        "column_unavailable": "Coordinator assignments are not available in this tenant schema.",
+        "found": "Assign a coordinator to every active caring relationship before launch.",
+        "clear": "Every caring relationship has a coordinator."
+      },
+      "unverified_organisations": {
+        "label": "Unverified organisations",
+        "table_unavailable": "Volunteer organisations are not available in this tenant schema.",
+        "verification_unavailable": "Organisation verification fields are not available in this tenant schema.",
+        "found": "Approve or reject every pending organisation so members can trust its listings.",
+        "clear": "Every organisation has been reviewed."
+      },
+      "seed_marker_users": {
+        "label": "Demo or seed accounts",
+        "table_unavailable": "Members are not available in this tenant schema.",
+        "found": "Demo or seed accounts are still present. Remove them before onboarding real residents.",
+        "clear": "No demo or seed accounts were detected."
+      },
+      "unanswered_help_requests": {
+        "label": "Unanswered help requests older than 30 days",
+        "table_unavailable": "Caring help requests are not available in this tenant schema.",
+        "found": "Old pending help requests undermine trust. Close, decline, or match every one.",
+        "clear": "There are no stale help requests."
+      },
+      "members_without_role": {
+        "label": "Members without a role",
+        "schema_unavailable": "Member roles are not available in this tenant schema.",
+        "found": "Assign every member a role so their permissions resolve correctly.",
+        "clear": "Every member has a role."
+      },
+      "tenant_setting_completeness": {
+        "label": "Tenant settings completeness",
+        "table_unavailable": "Tenant settings are not available in this tenant schema.",
+        "found": "One or more pre-launch settings are missing. Review the AG80 disclosure pack and AG81 operating policy.",
+        "clear": "Every required pre-launch tenant setting is configured."
+      }
+    },
+    "notes": {
+      "drilldown_not_available": "A row-level drill-down is not available for this check."
+    },
+    "identifiers": {
+      "user_id": "User #{{id}}"
+    },
+    "row_status": {
+      "active": "Active",
+      "approved": "Approved",
+      "completed": "Completed",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "unknown": "Unknown status",
+      "verified": "Verified"
+    },
     "empty": {
       "value": "-",
       "rows": "No rows"
@@ -1317,6 +1650,9 @@
       "refresh_aria": "Refresh disclosure pack",
       "export_markdown": "Export Markdown",
       "save_changes": "Save changes"
+    },
+    "export": {
+      "filename": "disclosure-pack.md"
     },
     "about": {
       "title": "About this page",
@@ -1386,6 +1722,81 @@
       "backup_owner": "Legal entity responsible for database backup storage and retention.",
       "update_cadence": "How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')."
     },
+    "default_copy": {
+      "subprocessor_azure": "Microsoft Azure (hosting, EU)",
+      "subprocessor_cloudflare": "Cloudflare (CDN / WAF)",
+      "subprocessor_stripe": "Stripe (payments and identity verification)",
+      "subprocessor_openai": "OpenAI (optional matching and summarisation)",
+      "subprocessor_firebase": "Google Firebase Cloud Messaging (push notifications)",
+      "isolated_node_description": "Canton-controlled deployment with its own email delivery, storage, and backups. Federation can be disabled entirely.",
+      "fadp_authority": "Federal Data Protection and Information Commissioner (FDPIC / EDÖB)",
+      "destination_eu_azure": "European Union (Microsoft Azure)",
+      "destination_us_services": "United States (Cloudflare, Stripe, and OpenAI)",
+      "safeguard_scc": "Standard Contractual Clauses (SCCs)",
+      "safeguard_swiss_us_framework": "Swiss–US Data Privacy Framework, where applicable"
+    },
+    "structured": {
+      "fields": {
+        "identity": "Identity",
+        "profile": "Profile",
+        "caring": "Caring activity",
+        "time_credits": "Time credits",
+        "communications": "Communications",
+        "safeguarding": "Safeguarding",
+        "research_consent": "Research consent",
+        "active_account_data": "Active account data",
+        "inactive_account_data": "Inactive account data",
+        "transactions": "Transactions",
+        "help_requests": "Help requests",
+        "safeguarding_reports": "Safeguarding reports",
+        "research_datasets": "Research datasets",
+        "access": "Access",
+        "export": "Export",
+        "rectify": "Rectification",
+        "erase": "Erasure",
+        "restrict": "Restriction",
+        "object": "Objection",
+        "portability": "Portability",
+        "export_format": "Export format"
+      },
+      "values": {
+        "name": "name",
+        "email": "email address",
+        "phone": "phone number",
+        "date_of_birth": "date of birth",
+        "biography": "biography",
+        "photo": "photo",
+        "skills": "skills",
+        "preferred_language": "preferred language",
+        "help_requests": "help requests",
+        "support_relationships": "support relationships",
+        "caregiver_links": "caregiver links",
+        "transactions": "transactions",
+        "volunteer_logs": "volunteer logs",
+        "wallet_balance": "wallet balance",
+        "messages": "messages",
+        "notifications": "notifications",
+        "announcements": "announcements",
+        "reports": "reports",
+        "flags": "flags",
+        "verification_status": "verification status",
+        "flag": "consent flag",
+        "aggregate_dataset_inclusion": "aggregate dataset inclusion",
+        "contract": "Contract",
+        "consent": "Consent",
+        "legitimate_interest": "Legitimate interest",
+        "lifetime_of_membership": "Lifetime of membership",
+        "24_months_then_anonymise": "24 months, then anonymise",
+        "10_years_after_completion": "10 years after completion",
+        "24_months_after_closure": "24 months after closure",
+        "7_years_after_resolution": "7 years after resolution",
+        "24_months": "24 months",
+        "duration_of_research_partnership": "Duration of the research partnership",
+        "json+csv": "JSON and CSV",
+        "no_personal_data_shared_outside_tenant": "No personal data shared outside the tenant",
+        "monthly": "Monthly"
+      }
+    },
     "footer": {
       "last_saved": "Last saved {{date}}",
       "customised": "Customised"
@@ -1429,6 +1840,32 @@
     "empty": {
       "title": "No integrations tracked yet",
       "body": "Seed a curated set of well-known partner-dependent integrations (AHV submission, Spitex handoff, cantonal master-data feed, PostFinance, Twint, postal-address verification) so the platform operator can track owner, DSA status, and sandbox readiness."
+    },
+    "default_items": {
+      "ahv_submission_gateway": {
+        "name": "AHV submission gateway",
+        "notes": "Official channel for AHV-relevant volunteer-hour reports. The canonical submission interface still needs to be confirmed."
+      },
+      "spitex_handoff": {
+        "name": "Spitex care-coordination handoff",
+        "notes": "Two-way handoff with cantonal Spitex providers for care-recipient circles. A data-sharing agreement and interface specification are needed from each provider."
+      },
+      "cantonal_master_data": {
+        "name": "Cantonal master-data feed",
+        "notes": "Subscribed address and household data from the cantonal registry to keep care-recipient profiles current."
+      },
+      "postfinance_payment": {
+        "name": "PostFinance payment integration",
+        "notes": "Swiss banking partner for cash-out and treasury operations. A merchant agreement is required."
+      },
+      "twint_payment": {
+        "name": "Twint payment",
+        "notes": "Twint acceptance for membership fees and donations. Merchant onboarding through a partner bank is required."
+      },
+      "postal_address_verification": {
+        "name": "Postal-address verification",
+        "notes": "Address normalisation and validation against the Swiss Post directory."
+      }
     },
     "last_updated": "Last updated {{date}}",
     "table": {
@@ -1681,6 +2118,12 @@
       "first_response": "First response",
       "resolution": "Resolution"
     },
+    "status": {
+      "closed": "Closed",
+      "matched": "Matched",
+      "pending": "Pending",
+      "unknown": "Unknown status"
+    },
     "answers": {
       "yes": "Yes",
       "no": "No"
@@ -1717,6 +2160,74 @@
     "sections": {
       "sample_request": "Sample request",
       "read_full_spec": "Read the full spec on GitHub"
+    },
+    "manifest": {
+      "sections": {
+        "openapi": {
+          "title": "OpenAPI specification",
+          "body": "A machine-readable specification for every public API surface, generated from the controllers shipped with this platform."
+        },
+        "partner_api": {
+          "title": "Partner API v1",
+          "body": "An OAuth-secured API for third-party integrators, covering members, listings, wallet credit, community aggregates, and webhook subscriptions."
+        },
+        "oauth": {
+          "title": "OAuth client credentials",
+          "body": "The standard OAuth 2.0 client-credentials flow for trusted partner servers, including token revocation."
+        },
+        "webhooks": {
+          "title": "Webhook subscriptions",
+          "body": "Partners subscribe to event topics. Each payload is signed with HMAC-SHA256 over the complete body using that subscription's secret."
+        },
+        "federation": {
+          "title": "Federation aggregates",
+          "body": "Each tenant exposes a read-only signed aggregate endpoint. Payloads contain counts, brackets, top categories, and locales, but never raw personal data."
+        },
+        "sample_payloads": {
+          "title": "Sample payloads",
+          "body": "Representative payloads for an integration partner. These examples are illustrative and do not contain live tenant data."
+        },
+        "partner_checklist": {
+          "title": "What an integration partner receives",
+          "body": "Share this checklist with a prospective integration partner before implementation begins."
+        }
+      },
+      "endpoints": {
+        "openapi_json": "JSON specification",
+        "openapi_yaml": "YAML specification",
+        "list_users": "List users",
+        "show_user": "Show a user",
+        "list_listings": "List listings",
+        "wallet_balance": "Read a wallet balance",
+        "credit_wallet": "Credit a wallet",
+        "community_aggregates": "Read community aggregates",
+        "list_subscriptions": "List webhook subscriptions",
+        "create_subscription": "Create a webhook subscription",
+        "token_endpoint": "Issue an access token",
+        "revoke_endpoint": "Revoke an access token",
+        "update_subscription": "Update a webhook subscription",
+        "delete_subscription": "Delete a webhook subscription",
+        "tenant_aggregate": "Read a tenant aggregate"
+      },
+      "verification_notes": {
+        "webhook_signature": "Verify the X-NEXUS-Signature header by computing HMAC-SHA256 over the complete request body with the subscription secret, then compare the signatures in constant time. Reject payloads older than the configured replay window, which defaults to five minutes."
+      },
+      "samples": {
+        "federation_aggregate": "Federation aggregate — signed JSON example",
+        "webhook_event": "Webhook event — HMAC-signed example",
+        "partner_aggregates": "Partner API community aggregates — example"
+      },
+      "checklist": {
+        "oauth_credentials": "An OAuth client ID and client secret dedicated to this partner",
+        "allowed_scopes": "The approved scopes, such as read:users, read:listings, and write:wallet",
+        "webhook_subscription": "A webhook subscription, HMAC secret, and endpoint URL allow-list",
+        "openapi_spec": "The OpenAPI specification URL in JSON or YAML format",
+        "sandbox_tenant": "A sandbox tenant slug for integration testing",
+        "federation_public_key": "The federation aggregate signing public key, when the partner participates in federation",
+        "rate_limit_headers": "Documentation for the X-RateLimit-Limit and X-RateLimit-Remaining headers",
+        "data_sharing_agreement": "A draft data-sharing agreement and a named data protection contact",
+        "incident_runbook": "The incident-response runbook URL from the AG80 disclosure pack"
+      }
     },
     "empty": {
       "value": "-"
@@ -1755,6 +2266,63 @@
       "in_progress": "In progress",
       "decided": "Decided",
       "blocked": "Blocked"
+    },
+    "items": {
+      "deployment_mode": {
+        "label": "Deployment mode",
+        "help": "Choose whether this is a shared hosted tenant, a custom-domain hosted tenant, or a fully isolated node controlled by the regional authority."
+      },
+      "hosting_owner": {
+        "label": "Hosting owner",
+        "help": "Name the organisation responsible for the node's servers, domain, and TLS configuration."
+      },
+      "smtp_owner": {
+        "label": "SMTP and outbound email owner",
+        "help": "Name the organisation responsible for outbound email delivery and its mail provider account."
+      },
+      "storage_owner": {
+        "label": "Storage owner",
+        "help": "Name the organisation responsible for file uploads, attachments, and persistent object storage."
+      },
+      "backup_owner": {
+        "label": "Backup owner",
+        "help": "Name the organisation responsible for daily backups, retention, and tested database restores."
+      },
+      "update_cadence": {
+        "label": "Update cadence",
+        "help": "Choose how often the node receives upstream NEXUS source updates."
+      },
+      "source_release_workflow": {
+        "label": "Source release workflow",
+        "help": "Describe how AGPL source updates reach the isolated node, including repository mirrors, signed tags, and manual review."
+      },
+      "telemetry_default": {
+        "label": "Telemetry default",
+        "help": "Choose the default state for outbound telemetry and error reporting on this node."
+      },
+      "federation_key_exchange": {
+        "label": "Federation key exchange",
+        "help": "Describe whether and how this node federates with regional peers, including key custody and exchange protocol."
+      },
+      "dpo_appointed": {
+        "label": "Data protection officer",
+        "help": "Record the named data protection officer and their contact details for the isolated deployment."
+      },
+      "incident_runbook_url": {
+        "label": "Incident runbook URL",
+        "help": "Link to the operational runbook for downtime, breaches, key compromise, and restore drills."
+      }
+    },
+    "choices": {
+      "hosted_tenant": "Hosted tenant",
+      "hosted_custom_domain": "Hosted tenant with a custom domain",
+      "canton_isolated_node": "Region-controlled isolated node",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "on_demand": "On demand",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     },
     "status_counts": {
       "pending": "Pending: {{count}}",
@@ -2176,7 +2744,9 @@
     "status": {
       "verified": "Verified",
       "pending_dns": "Pending DNS",
-      "revoked": "Revoked"
+      "revoked": "Revoked",
+      "unverified": "Unverified",
+      "unknown": "Unknown status"
     },
     "current": {
       "title": "Current status",
@@ -2258,6 +2828,73 @@
       "not_started": "Not started",
       "blocked": "Blocked"
     },
+    "section_labels": {
+      "disclosure_pack": "AG80 — FADP/nDSG disclosure pack",
+      "operating_policy": "AG81 — KISS operating policy",
+      "commercial_boundary": "AG82 — Commercial boundary map",
+      "pilot_scoreboard": "AG83 — Pilot scoreboard baseline",
+      "data_quality": "AG84 — Tenant data quality",
+      "isolated_node": "AG85 — Isolated-node decision gate",
+      "external_integrations": "AG87 — External integration backlog"
+    },
+    "section_summaries": {
+      "disclosure_pack": {
+        "not_started": "The pack still uses platform defaults and has no named controller.",
+        "needs_review": "The controller, data protection officer, or incident contact is incomplete.",
+        "ready": "The controller, data protection officer, and incident contact are recorded."
+      },
+      "operating_policy": {
+        "not_started": "The policy still uses platform defaults. Schedule the policy workshop.",
+        "needs_review": "The workshop is complete, but the appendix URL or safeguarding owner is missing.",
+        "ready": "The policy workshop is complete, the appendix is linked, and a safeguarding owner is assigned."
+      },
+      "commercial_boundary": {
+        "needs_review": "Default classifications are in effect, but a coordinator has not acknowledged the matrix.",
+        "ready_with_overrides": "{{count}} override is applied and the matrix has been reviewed.",
+        "ready_with_overrides_one": "{{count}} override is applied and the matrix has been reviewed.",
+        "ready_with_overrides_other": "{{count}} overrides are applied and the matrix has been reviewed.",
+        "ready_default": "The default matrix has been acknowledged."
+      },
+      "pilot_scoreboard": {
+        "not_started": "No pre-pilot baseline has been captured, so a before-and-after comparison is not yet possible.",
+        "needs_review": "The pre-pilot baseline is captured, but the quarterly review is overdue.",
+        "ready": "The pre-pilot baseline is captured and the quarterly review cadence is on track."
+      },
+      "data_quality": {
+        "blocked": "{{count}} blocking issue remains. Duplicate accounts or seed users are still present.",
+        "blocked_one": "{{count}} blocking issue remains. Duplicate accounts or seed users are still present.",
+        "blocked_other": "{{count}} blocking issues remain. Duplicate accounts or seed users are still present.",
+        "needs_review": "{{count}} warning requires review before launch.",
+        "needs_review_one": "{{count}} warning requires review before launch.",
+        "needs_review_other": "{{count}} warnings require review before launch.",
+        "ready": "Every check passes. The data is ready for real residents."
+      },
+      "isolated_node": {
+        "hosted_closed": "The gate is closed. It remains informational because this deployment is hosted.",
+        "hosted_informational": "The gate is not required for hosted deployments and remains informational.",
+        "blocked": "{{count}} blocked decision prevents the isolated deployment from launching.",
+        "blocked_one": "{{count}} blocked decision prevents the isolated deployment from launching.",
+        "blocked_other": "{{count}} blocked decisions prevent the isolated deployment from launching.",
+        "needs_review": "{{decided}} of {{total}} decisions are recorded. An isolated deployment requires every decision to be complete.",
+        "ready": "Every gate decision is recorded. The isolated deployment is ready."
+      },
+      "external_integrations": {
+        "not_started": "The backlog is empty. Seed the defaults or confirm that no partner integrations are required.",
+        "blocked": "{{count}} integration is blocked, so partner-dependent features cannot launch.",
+        "blocked_one": "{{count}} integration is blocked, so partner-dependent features cannot launch.",
+        "blocked_other": "{{count}} integrations are blocked, so partner-dependent features cannot launch.",
+        "ready": "{{count}} integration item is tracked and none are blocked.",
+        "ready_one": "{{count}} integration item is tracked and none are blocked.",
+        "ready_other": "{{count}} integration items are tracked and none are blocked."
+      }
+    },
+    "overall_summaries": {
+      "blocked": "One or more sections are blocked, so launching the pilot is not safe.",
+      "ready": "Every section is ready and the pilot may launch.",
+      "needs_review": "{{ready}} of {{total}} sections are ready. A coordinator review is required before launch.",
+      "not_started": "{{ready}} of {{total}} sections are ready. The end-to-end pilot evaluation has not been completed.",
+      "fallback": "{{ready}} of {{total}} sections are ready."
+    },
     "missing": {
       "controller_name": "Controller name",
       "controller_contact_email": "Controller contact email",
@@ -2269,7 +2906,12 @@
       "acknowledgement": "Coordinator acknowledgement",
       "pre_pilot_baseline": "Pre-pilot scoreboard baseline",
       "danger_checks": "Data quality issues",
-      "backlog_empty": "Integration backlog empty"
+      "warning_checks": "Data quality warnings",
+      "quarterly_review": "Quarterly scoreboard review",
+      "blocked_integrations": "Blocked integrations",
+      "undecided_items": "Undecided isolated-node items",
+      "backlog_empty": "Integration backlog empty",
+      "unknown": "Unknown requirement"
     },
     "states": {
       "launched_title": "Pilot launched",
@@ -2473,6 +3115,20 @@
       "placeholder_count_other": "{{count}} placeholders",
       "fallback_title": "Agreement Template",
       "placeholder_label": "{{placeholder}}",
+      "placeholders": {
+        "partner_name": "Research partner name",
+        "partner_institution": "Research partner institution",
+        "tenant_name": "Community name",
+        "dpo_name": "Data protection officer name",
+        "dpo_email": "Data protection officer email",
+        "period_start": "Reporting period start",
+        "period_end": "Reporting period end",
+        "jurisdiction": "Governing jurisdiction",
+        "cohort_window_years": "Cohort window in years",
+        "pilot_region": "Pilot region",
+        "study_title": "Study title",
+        "unknown": "Template value"
+      },
       "rendered_markdown": "Rendered Markdown ({{count}} chars)",
       "missing_placeholder_count_one": "{{count}} placeholder missing",
       "missing_placeholder_count_other": "{{count}} placeholders missing",
@@ -2534,6 +3190,18 @@
       "export_generated": "Aggregate dataset export generated",
       "revoke_export_failed": "Failed to revoke dataset export",
       "export_revoked": "Dataset export revoked"
+    }
+  },
+  "regional_points": {
+    "ledger_types": {
+      "admin_adjustment": "Administrator adjustment",
+      "admin_issue": "Administrator issue",
+      "earned_for_hours": "Earned for approved hours",
+      "redemption": "Redemption",
+      "reversal": "Reversal",
+      "transfer_in": "Transfer received",
+      "transfer_out": "Transfer sent",
+      "unknown": "Unknown transaction"
     }
   },
   "smart_nudges": {
@@ -2606,7 +3274,8 @@
     },
     "status": {
       "sent": "Sent",
-      "converted": "Converted"
+      "converted": "Converted",
+      "unknown": "Unknown status"
     },
     "dispatch_modal": {
       "title": "Dispatch nudges now?",
@@ -2736,6 +3405,26 @@
     "empty": {
       "title": "No success stories yet",
       "body": "Seed 3 illustrative demo cards to show what proof cards look like to procurement officers and funders. They are clearly labelled \"Demo / illustrative\" until you mark them as real evidence by hand."
+    },
+    "demo_stories": {
+      "information_distribution": {
+        "title": "30% lower information-distribution effort",
+        "narrative": "Coordinators spend roughly a third less time distributing updates after switching to NEXUS. Announcements, member-segment targeting, and confirmation tracking are consolidated in one place.",
+        "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+        "evidence_source": "Peer municipality page (illustrative)"
+      },
+      "volunteer_engagement": {
+        "title": "25% more volunteer engagement",
+        "narrative": "Pilot communities report a quarter more active volunteer participation after adopting NEXUS, supported by clearer matching, low-friction sign-up, and visible Warmth Pass recognition.",
+        "method_caveat": "Illustrative example based on a peer-community claim; it has not been measured for this tenant.",
+        "evidence_source": "Peer municipality page (illustrative)"
+      },
+      "formal_care_offset": {
+        "title": "CHF 12,250 in formal-care costs offset",
+        "narrative": "Volunteer hours coordinated through NEXUS represent a CHF 12,250 offset against formal home-care costs during the pilot window, valued at the Swiss formal-care assistant rate.",
+        "method_caveat": "Estimate using CHF 35 per hour across 350 hours; the comparison is against the pre-pilot baseline only.",
+        "evidence_source": "AG76 municipal ROI model (illustrative)"
+      }
     },
     "table": {
       "aria": "Success stories",

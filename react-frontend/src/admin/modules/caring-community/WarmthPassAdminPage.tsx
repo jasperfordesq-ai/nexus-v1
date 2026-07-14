@@ -79,12 +79,10 @@ export function WarmthPassAdminPage() {
       if (res.success && res.data) {
         setResult(res.data);
       } else {
-        setErrorMsg(res.error ?? t('admin.warmth_pass.errors.no_data'));
+        setErrorMsg(t('admin.warmth_pass.errors.no_data'));
       }
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : t('admin.warmth_pass.errors.lookup_failed');
-      setErrorMsg(msg);
+    } catch {
+      setErrorMsg(t('admin.warmth_pass.errors.lookup_failed'));
     } finally {
       setLoading(false);
     }

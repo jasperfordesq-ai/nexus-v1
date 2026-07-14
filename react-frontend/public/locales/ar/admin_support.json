@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,83 +67,81 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "support_reports": {
-    "meta_title": "Support Reports",
-    "title": "Support Reports",
     "subtitle": "قم بمراجعة تقارير الأخطاء المقدمة من الأعضاء باستخدام تشخيصات الصفحة ومعرفات أحداث Sentry وملاحظات الفرز.",
     "loading": "جارٍ تحميل تقارير الدعم...",
     "empty": "لا توجد تقارير دعم تتطابق مع عوامل التصفية هذه.",
     "empty_value": "-",
-    "unassigned": "Unassigned",
     "actions": {
-      "refresh": "Refresh",
-      "search": "Search",
-      "clear": "Clear",
-      "review": "Review",
       "open_page": "افتح الصفحة",
-      "open_sentry": "Open Sentry",
       "copy_diagnostics": "نسخ التشخيص",
       "copy_handoff": "نسخ التسليم الهندسي",
-      "close": "Close",
-      "save": "حفظ الفرز"
+      "save": "حفظ الفرز",
+      "refresh": "تحديث",
+      "search": "بحث",
+      "clear": "مسح",
+      "review": "مراجعة",
+      "open_sentry": "افتح سينتري",
+      "close": "إغلاق"
     },
     "stats": {
-      "open": "Open",
-      "triaged": "Triaged",
-      "blocked": "Blocked",
-      "unassigned": "Unassigned"
+      "open": "مفتوح",
+      "triaged": "تم فرزه",
+      "blocked": "محظور",
+      "unassigned": "غير مخصص"
     },
     "filters": {
       "search": "مرجع البحث أو الطريق أو المراسل أو الملخص",
-      "status": "Status",
-      "impact": "Impact"
+      "status": "الحالة",
+      "impact": "الأثر"
     },
     "status": {
       "all": "جميع الحالات",
-      "open": "Open",
-      "triaged": "Triaged",
-      "resolved": "Resolved",
-      "closed": "Closed"
+      "open": "مفتوح",
+      "triaged": "تم فرزه",
+      "resolved": "تم حله",
+      "closed": "مغلق"
     },
     "impact": {
       "all": "جميع التأثيرات",
-      "blocked": "Blocked",
-      "major": "Major",
-      "minor": "Minor",
-      "cosmetic": "Cosmetic"
+      "blocked": "محظور",
+      "major": "رئيسي",
+      "minor": "ثانوي",
+      "cosmetic": "تجميلي"
     },
     "table": {
       "aria": "تقارير الدعم",
-      "reference": "Reference",
-      "summary": "Summary",
-      "impact": "Impact",
-      "status": "Status",
-      "reporter": "Reporter",
-      "assignee": "Assignee",
-      "created": "Created",
-      "actions": "Actions"
+      "reference": "المرجع",
+      "summary": "ملخص",
+      "impact": "الأثر",
+      "status": "الحالة",
+      "reporter": "المراسل",
+      "assignee": "المسؤول",
+      "created": "تم الإنشاء",
+      "actions": "الإجراءات"
     },
     "detail": {
-      "title": "Report {{reference}}",
       "loading": "جارٍ تحميل التقرير...",
-      "summary": "Summary",
-      "description": "Description",
-      "reporter": "Reporter",
-      "page": "Page",
-      "created": "Created",
       "user_agent": "وكيل المستخدم",
       "sentry_event": "حدث الحراسة",
-      "diagnostics": "Diagnostics"
+      "summary": "ملخص",
+      "description": "الوصف",
+      "reporter": "المراسل",
+      "page": "الصفحة",
+      "created": "تم الإنشاء",
+      "diagnostics": "التشخيص",
+      "title": "تقرير {{reference}}"
     },
     "fields": {
-      "status": "Status",
-      "assignee": "Assignee",
       "sentry_issue_url": "عنوان URL لمشكلة الحارس",
-      "triage_notes": "ملاحظات الفرز"
+      "triage_notes": "ملاحظات الفرز",
+      "status": "الحالة",
+      "assignee": "المسؤول"
     },
     "messages": {
       "saved": "تم تحديث تقرير الدعم.",
@@ -157,6 +154,37 @@
       "save": "فشل في حفظ تقرير الدعم.",
       "copy": "لا يمكن نسخ التشخيص.",
       "copy_handoff": "لا يمكن نسخ التسليم الهندسي."
-    }
+    },
+    "handoff": {
+      "title": "تقرير الدعم {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (المستخدم {{id}})",
+      "reporter_without_email": "{{name}} (المستخدم {{id}})",
+      "unknown_reporter": "مراسل غير معروف",
+      "no_diagnostics": "لم يتم تضمين أي تشخيصات.",
+      "not_provided": "لم يتم التقديم",
+      "none_yet": "لا يوجد حتى الآن.",
+      "labels": {
+        "tenant": "المجتمع",
+        "impact": "الأثر",
+        "status": "الحالة",
+        "created": "تم الإنشاء",
+        "reporter": "المراسل",
+        "route": "المسار",
+        "page_url": "رابط الصفحة",
+        "user_agent": "وكيل المستخدم",
+        "sentry_event": "حدث Sentry",
+        "sentry_issue": "مشكلة Sentry"
+      },
+      "headings": {
+        "summary": "ملخص:",
+        "user_description": "وصف المستخدم:",
+        "triage_notes": "ملاحظات الفرز:",
+        "diagnostics": "التشخيصات:"
+      }
+    },
+    "unassigned": "غير مخصص",
+    "meta_title": "تقارير الدعم",
+    "title": "تقارير الدعم"
   }
 }

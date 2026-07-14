@@ -29,25 +29,19 @@ type Classification = 'agpl_public' | 'tenant_config' | 'private_deployment' | '
 
 interface CategoryDef {
   key: string;
-  label: string;
 }
 
 interface ClassificationDef {
   key: Classification;
-  label: string;
-  description: string;
 }
 
 interface Capability {
   key: string;
-  label: string;
-  description: string;
   category: string;
   default_classification: Classification;
   effective_classification: Classification;
   is_overridden: boolean;
   agpl_module: boolean;
-  notes: string;
 }
 
 interface BoundaryMatrix {
@@ -85,6 +79,24 @@ const CLASSIFICATION_OPTIONS: Classification[] = [
 
 type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
+const categoryLabel = (t: AdminT, key: string) =>
+  t(`commercial_boundary.categories.${key}`);
+
+const classificationLabel = (t: AdminT, key: Classification) =>
+  t(`commercial_boundary.classification.${key}`);
+
+const classificationDescription = (t: AdminT, key: Classification) =>
+  t(`commercial_boundary.classification_descriptions.${key}`);
+
+const capabilityLabel = (t: AdminT, key: string) =>
+  t(`commercial_boundary.capabilities.${key}.label`);
+
+const capabilityDescription = (t: AdminT, key: string) =>
+  t(`commercial_boundary.capabilities.${key}.description`);
+
+const capabilityNotes = (t: AdminT, key: string) =>
+  t(`commercial_boundary.capabilities.${key}.notes`);
+
 function buildMarkdown(matrix: BoundaryMatrix, t: AdminT): string {
   const lines: string[] = [];
   lines.push(`# ${t('commercial_boundary.meta.title')}`);
@@ -99,23 +111,25 @@ function buildMarkdown(matrix: BoundaryMatrix, t: AdminT): string {
   lines.push(`## ${t('commercial_boundary.sections.classifications')}`);
   lines.push('');
   for (const c of matrix.classifications) {
-    lines.push(`- **${c.label}** (\`${c.key}\`) — ${c.description}`);
+    lines.push(`- **${classificationLabel(t, c.key)}** (\`${c.key}\`) — ${classificationDescription(t, c.key)}`);
   }
   lines.push('');
 
   for (const cat of matrix.categories) {
     const inCat = matrix.capabilities.filter((c) => c.category === cat.key);
     if (inCat.length === 0) continue;
-    lines.push(`## ${cat.label}`);
+    lines.push(`## ${categoryLabel(t, cat.key)}`);
     lines.push('');
     lines.push(`| ${t('commercial_boundary.export.capability')} | ${t('commercial_boundary.export.classification')} | ${t('commercial_boundary.export.agpl_module')} | ${t('commercial_boundary.export.default')} | ${t('commercial_boundary.export.overridden')} | ${t('commercial_boundary.export.notes')} |`);
     lines.push('|---|---|---|---|---|---|');
     for (const cap of inCat) {
-      const effective = t(`commercial_boundary.classification.${cap.effective_classification}`);
-      const def = t(`commercial_boundary.classification.${cap.default_classification}`);
-      const cleanNotes = (cap.notes || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+      const effective = classificationLabel(t, cap.effective_classification);
+      const def = classificationLabel(t, cap.default_classification);
+      const label = capabilityLabel(t, cap.key);
+      const description = capabilityDescription(t, cap.key);
+      const cleanNotes = capabilityNotes(t, cap.key).replace(/\|/g, '\\|').replace(/\n/g, ' ');
       lines.push(
-        `| **${cap.label}** — ${cap.description.replace(/\|/g, '\\|')} | ${effective} | ${cap.agpl_module ? t('commercial_boundary.export.yes') : t('commercial_boundary.export.no')} | ${def} | ${cap.is_overridden ? t('commercial_boundary.export.yes') : t('commercial_boundary.empty.value')} | ${cleanNotes || t('commercial_boundary.empty.value')} |`,
+        `| **${label}** — ${description.replace(/\|/g, '\\|')} | ${effective} | ${cap.agpl_module ? t('commercial_boundary.export.yes') : t('commercial_boundary.export.no')} | ${def} | ${cap.is_overridden ? t('commercial_boundary.export.yes') : t('commercial_boundary.empty.value')} | ${cleanNotes || t('commercial_boundary.empty.value')} |`,
       );
     }
     lines.push('');
@@ -295,11 +309,11 @@ export default function CommercialBoundaryAdminPage() {
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Chip color={CLASSIFICATION_COLOR[c.key]} variant="soft" size="sm">
-                      {c.label}
+                      {classificationLabel(t, c.key)}
                     </Chip>
                     <code className="text-xs text-muted">{c.key}</code>
                   </div>
-                  <p className="text-sm text-muted">{c.description}</p>
+                  <p className="text-sm text-muted">{classificationDescription(t, c.key)}</p>
                 </div>
               ))}
             </div>
@@ -317,11 +331,11 @@ export default function CommercialBoundaryAdminPage() {
           {groupedCapabilities.map((group) => (
             <AccordionItem
               key={group.category.key} id={group.category.key}
-              aria-label={group.category.label}
+              aria-label={categoryLabel(t, group.category.key)}
               title={
                 <div className="flex items-center gap-3">
                   <Building size={16} className="text-muted" />
-                  <span className="font-semibold">{group.category.label}</span>
+                  <span className="font-semibold">{categoryLabel(t, group.category.key)}</span>
                   <Chip variant="soft" size="sm" color="default">
                     {group.items.length}
                   </Chip>
@@ -362,13 +376,16 @@ interface CapabilityRowProps {
 
 function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityRowProps) {
   const effective = capability.effective_classification;
+  const label = capabilityLabel(t, capability.key);
+  const description = capabilityDescription(t, capability.key);
+  const notes = capabilityNotes(t, capability.key);
 
   return (
     <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="font-semibold text-sm text-foreground">{capability.label}</span>
+            <span className="font-semibold text-sm text-foreground">{label}</span>
             <Chip color={CLASSIFICATION_COLOR[effective]} variant="soft" size="sm">
               {t(`commercial_boundary.classification.${effective}`)}
             </Chip>
@@ -392,9 +409,9 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
               </Chip>
             )}
           </div>
-          <p className="text-sm text-muted">{capability.description}</p>
-          {capability.notes && (
-            <p className="mt-1 text-xs text-muted italic">{capability.notes}</p>
+          <p className="text-sm text-muted">{description}</p>
+          {notes && (
+            <p className="mt-1 text-xs text-muted italic">{notes}</p>
           )}
           <p className="mt-2 text-xs text-muted">
             {t('commercial_boundary.labels.canonical_default')}{' '}
@@ -417,7 +434,7 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
             }}
             isDisabled={saving}
             className="min-w-[200px]"
-            aria-label={t('commercial_boundary.fields.classification_aria', { label: capability.label })}
+            aria-label={t('commercial_boundary.fields.classification_aria', { label })}
           >
             {CLASSIFICATION_OPTIONS.map((opt) => (
               <SelectItem key={opt} id={opt}>

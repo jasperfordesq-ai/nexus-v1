@@ -27,7 +27,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { adminFederation } from '../../api/adminApi';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
+import { formatPercentRatio, formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -252,7 +252,7 @@ export function CreditAgreements() {
         createModal.onClose();
         loadData();
       } else {
-        toast.error(res.error || t('federation.failed_to_create_agreement'));
+        toast.error(t('federation.failed_to_create_agreement'));
       }
     } catch (err) {
       logError('CreditAgreements.create', err);
@@ -270,7 +270,7 @@ export function CreditAgreements() {
         toast.success(t('federation.agreement_action_success'));
         loadData();
       } else {
-        toast.error(res.error || t('federation.agreement_action_failed'));
+        toast.error(t('federation.agreement_action_failed'));
       }
     } catch (err) {
       logError('CreditAgreements.statusChange', err);
@@ -716,7 +716,7 @@ export function CreditAgreements() {
                           <div className="flex items-center justify-between text-sm">
                             <span>{detailMonthUsage.toFixed(1)} / {detailMonthlyLimit.toFixed(1)} {t('federation.credits')}</span>
                             <span className="text-muted">
-                              {((detailMonthUsage / detailMonthlyLimit) * 100).toFixed(0)}%
+                              {formatPercentRatio(detailMonthUsage / detailMonthlyLimit, { maximumFractionDigits: 0 })}
                             </span>
                           </div>
                           <Progress

@@ -137,7 +137,7 @@ export default function LeadNurtureAdminPage() {
         closeEdit();
         await load();
       } else {
-        showToast(res.error || t('lead_nurture.toasts.update_failed'), 'error');
+        showToast(t('lead_nurture.toasts.update_failed'), 'error');
       }
     } catch {
       showToast(t('lead_nurture.toasts.update_failed'), 'error');
@@ -159,7 +159,7 @@ export default function LeadNurtureAdminPage() {
         showToast(t('lead_nurture.toasts.unsubscribed'), 'success');
         await load();
       } else {
-        showToast(res.error || t('lead_nurture.toasts.unsubscribe_failed'), 'error');
+        showToast(t('lead_nurture.toasts.unsubscribe_failed'), 'error');
       }
     } catch {
       showToast(t('lead_nurture.toasts.unsubscribe_failed'), 'error');

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -53,14 +53,11 @@ function csvCell(value: unknown): string {
   return JSON.stringify(/^[=+\-@\t\r]/.test(str) ? `'${str}` : str);
 }
 
-function exportToCsv(data: Array<Record<string, unknown>>, filename: string) {
-  if (data.length === 0) return;
-  const first = data[0];
-  if (!first) return;
-  const headers = Object.keys(first);
+function exportToCsv(headers: string[], rows: unknown[][], filename: string) {
+  if (rows.length === 0) return;
   const csv = [
-    headers.join(','),
-    ...data.map((r) => headers.map((h) => csvCell(r[h])).join(',')),
+    headers.map(csvCell).join(','),
+    ...rows.map((row) => row.map(csvCell).join(',')),
   ].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -332,16 +329,25 @@ export function VolunteerHoursAudit() {
         return true;
       });
 
-      const exportData = rows.map((item) => ({
-        volunteer: `${item.first_name} ${item.last_name}`,
-        organization: item.org_name || '',
-        hours: item.hours,
-        status: item.status,
-        date: item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '',
-        paid: (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
-        paid_amount: item.paid_amount || 0,
-      }));
-      exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
+      const headers = [
+        t('volunteering.export_columns.volunteer'),
+        t('volunteering.export_columns.organization'),
+        t('volunteering.export_columns.hours'),
+        t('volunteering.export_columns.status'),
+        t('volunteering.export_columns.date'),
+        t('volunteering.export_columns.paid'),
+        t('volunteering.export_columns.paid_amount'),
+      ];
+      const exportRows = rows.map((item) => [
+        `${item.first_name} ${item.last_name}`,
+        item.org_name || '',
+        item.hours,
+        t(`volunteering.status_${item.status}`, { defaultValue: t('volunteering.status_unknown') }),
+        item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '',
+        (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
+        item.paid_amount || 0,
+      ]);
+      exportToCsv(headers, exportRows, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
 
       if (truncated) {
         toast.warning(t('volunteering.export_truncated', { count: MAX_EXPORT_PAGES }));
@@ -391,7 +397,7 @@ export function VolunteerHoursAudit() {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
-          {t(`volunteering.status_${item.status}`)}
+          {t(`volunteering.status_${item.status}`, { defaultValue: t('volunteering.status_unknown') })}
         </Chip>
       ),
     },
@@ -406,7 +412,7 @@ export function VolunteerHoursAudit() {
               {isPaid ? t('volunteering.yes') : t('volunteering.no')}
             </Chip>
             {isPaid && item.paid_amount > 0 && (
-              <span className="text-xs text-muted font-mono">{item.paid_amount}</span>
+              <span className="text-xs text-muted font-mono">{formatNumber(toNum(item.paid_amount), { maximumFractionDigits: 2 })}</span>
             )}
           </div>
         );
@@ -678,9 +684,11 @@ export function VolunteerHoursAudit() {
                           </span>
                         </TableCell>
                         <TableCell>{entry.org_name || '--'}</TableCell>
-                        <TableCell className="font-mono">{entry.hours}</TableCell>
+                        <TableCell className="font-mono">{formatNumber(toNum(entry.hours), { maximumFractionDigits: 2 })}</TableCell>
                         <TableCell className="font-mono text-success">
-                          {toNum(entry.paid_amount) > 0 ? toNum(entry.paid_amount).toFixed(2) : '--'}
+                          {toNum(entry.paid_amount) > 0
+                            ? formatNumber(toNum(entry.paid_amount), { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            : '--'}
                         </TableCell>
                         <TableCell className="text-muted">
                           {entry.created_at ? new Date(entry.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
@@ -692,10 +700,10 @@ export function VolunteerHoursAudit() {
                 <div className="mt-3 grid grid-cols-1 gap-2 border-t border-divider pt-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
                   <span className="font-semibold">{t('volunteering.total')}</span>
                   <span className="font-mono font-semibold">
-                    {Number(paidEntries.reduce((sum, e) => sum + toNum(e.hours), 0).toFixed(2))}
+                    {formatNumber(paidEntries.reduce((sum, e) => sum + toNum(e.hours), 0), { maximumFractionDigits: 2 })}
                   </span>
                   <span className="font-mono font-semibold text-success">
-                    {paidEntries.reduce((sum, e) => sum + toNum(e.paid_amount), 0).toFixed(2)}
+                    {formatNumber(paidEntries.reduce((sum, e) => sum + toNum(e.paid_amount), 0), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>

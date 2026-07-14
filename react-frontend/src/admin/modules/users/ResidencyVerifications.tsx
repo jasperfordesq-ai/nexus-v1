@@ -82,7 +82,7 @@ export default function ResidencyVerifications() {
       if (res.success) {
         setItems(res.data?.items || []);
       } else {
-        error(res.error || t('residency_admin.load_failed'));
+        error(t('residency_admin.load_failed'));
       }
     } catch {
       error(t('residency_admin.load_failed'));
@@ -105,7 +105,7 @@ export default function ResidencyVerifications() {
         setApproveTarget(null);
         load();
       } else {
-        error(res.error || t('residency_admin.action_failed'));
+        error(t('residency_admin.action_failed'));
         setApproveTarget(null);
       }
     } catch {
@@ -132,7 +132,7 @@ export default function ResidencyVerifications() {
         load();
       } else {
         // Preserve the modal + typed reason so the admin can retry
-        error(res.error || t('residency_admin.action_failed'));
+        error(t('residency_admin.action_failed'));
       }
     } catch {
       error(t('residency_admin.action_failed'));

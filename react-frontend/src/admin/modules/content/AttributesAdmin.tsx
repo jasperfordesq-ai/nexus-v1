@@ -193,9 +193,7 @@ export function AttributesAdmin() {
         closeModal();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('content.an_unexpected_error_occurred');
+        const errorMsg = t('content.failed_to_save_attribute');
         toast.error(errorMsg);
       }
     } else {
@@ -210,9 +208,7 @@ export function AttributesAdmin() {
         closeModal();
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error
-          || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || t('content.an_unexpected_error_occurred');
+        const errorMsg = t('content.failed_to_save_attribute');
         toast.error(errorMsg);
       }
     }

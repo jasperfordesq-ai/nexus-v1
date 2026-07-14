@@ -49,5 +49,23 @@
   "extend_session": "セッションを延長する",
   "dismiss": "閉じる",
   "idle_logout_title": "無操作のためサインアウトしました",
-  "idle_logout_message": "一定時間操作がなかったため、自動的にサインアウトされました。続行するには再度ログインしてください。"
+  "idle_logout_message": "一定時間操作がなかったため、自動的にサインアウトされました。続行するには再度ログインしてください。",
+  "api": {
+    "request_failed_title": "リクエストに失敗しました",
+    "request_failed": "リクエストを完了できませんでした。",
+    "service_unavailable": "サービスは一時的に利用できません。後でもう一度お試しください。",
+    "invalid_response": "サーバーが無効な応答を返しました。",
+    "request_timeout": "リクエストがタイムアウトしました。もう一度お試しください。",
+    "network_error": "接続できません。インターネット接続を確認して、再度お試しください。",
+    "invalid_request": "リクエストが無効です。入力内容を確認してください。",
+    "permission_denied": "この操作を実行する権限がありません。",
+    "resource_not_found": "要求されたリソースが見つかりませんでした。",
+    "too_many_requests": "リクエストが多すぎます。少し待ってから再度お試しください。",
+    "server_error": "予期しないサーバーエラーが発生しました。後でもう一度お試しください。",
+    "download_failed_status": "ダウンロードに失敗しました (HTTP {{status}})。",
+    "upload_failed": "アップロードに失敗しました。",
+    "upload_failed_retry": "アップロードに失敗しました。もう一度お試しください。",
+    "upload_cancelled": "アップロードがキャンセルされました。",
+    "upload_timeout": "アップロードがタイムアウトしました。もう一度お試しください。"
+  }
 }

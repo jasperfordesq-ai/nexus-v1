@@ -126,7 +126,7 @@ export function TrustTierAdminPage() {
         setLocalCriteria(null);
         void refetch();
       } else {
-        showToast(res.error || t('admin.trust_tier.errors.save_failed'), 'error');
+        showToast(t('admin.trust_tier.errors.save_failed'), 'error');
       }
     } catch {
       showToast(t('admin.trust_tier.errors.save_failed'), 'error');

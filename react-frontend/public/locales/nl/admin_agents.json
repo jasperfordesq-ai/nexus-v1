@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "agents": {
     "actions": {
@@ -191,8 +191,8 @@
         "description": "Overeenkomende voorstellen verschijnen hier wanneer agenten beoordelingsitems voor dit filter maken."
       },
       "edit_modal": {
-        "payload_json": "Payload (JSON)",
-        "title": "Voorstel bewerken en goedkeuren #{{id}}"
+        "title": "Voorstel bewerken en goedkeuren #{{id}}",
+        "payload_json": "Belading (JSON)"
       },
       "labels": {
         "payload": "Laadvermogen",
@@ -219,6 +219,30 @@
         "rejected": "Voorstel afgewezen"
       }
     },
-    "tabs_aria": "Statusfilter voor agentvoorstellen"
+    "tabs_aria": "Statusfilter voor agentvoorstellen",
+    "agent_type": {
+      "activity_summary": "Activiteitsoverzicht",
+      "activity_summariser": "Activiteitssamenvatter",
+      "help_routing": "Helproutering",
+      "listing-enrichment": "Verrijking van vermelding",
+      "matching": "Matchen",
+      "notifications": "Meldingen",
+      "nudge_dispatch": "Aanmoedigingsverzending",
+      "tandem_matching": "Tandemmatching",
+      "matchmaker": "Matchmaker"
+    },
+    "triggered_by": {
+      "admin": "Beheerder",
+      "manual": "Handleiding",
+      "schedule": "Schema",
+      "scheduled": "Gepland"
+    },
+    "proposal_type": {
+      "create_tandem": "Maak tandem",
+      "match_suggestion": "Matchsuggestie",
+      "route_help_request": "Verzoek om hulp doorsturen",
+      "send_activity_summary": "Activiteitsoverzicht verzenden",
+      "send_nudge": "Stuur aansporing"
+    }
   }
 }

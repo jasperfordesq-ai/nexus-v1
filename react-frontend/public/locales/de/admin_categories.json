@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "categories": {
     "categories_admin_desc": "Erstellen und verwalten Sie Kategorien für Einträge und Freiwilligenarbeit",
@@ -97,7 +97,6 @@
     "label_type": "Typ",
     "listings": "Einträge",
     "page_title": "Kategorien",
-    "placeholder_name": "Name...",
     "save_changes": "Änderungen speichern",
     "search_placeholder": "Kategorien durchsuchen...",
     "volunteering": "Freiwilligenarbeit",
@@ -106,6 +105,22 @@
     "type_listing": "Auflistung",
     "type_resource": "Ressource",
     "type_vol_opportunity": "Vol-Gelegenheit",
-    "tabs_aria": "Kategorietypfilter"
+    "tabs_aria": "Kategorietypfilter",
+    "color_blue": "Blau",
+    "color_gray": "Grau",
+    "color_green": "Grün",
+    "color_pink": "Rosa",
+    "color_purple": "Lila",
+    "color_red": "Rot",
+    "color_teal": "Blaugrün",
+    "color_unknown": "Unbekannte Farbe",
+    "color_yellow": "Gelb",
+    "failed_to_save_category": "Kategorie konnte nicht gespeichert werden",
+    "placeholder_name": "z. B. Kunsthandwerk",
+    "color_cyan": "Cyan",
+    "color_fuchsia": "Fuchsia",
+    "color_indigo": "Indigo",
+    "color_orange": "Orange",
+    "color_slate": "Schiefer"
   }
 }

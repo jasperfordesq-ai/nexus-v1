@@ -77,7 +77,7 @@ export function BulkOperations() {
       setSelectedUserIds(new Set());
       loadUsersForTenant(sourceTenant);
     } else {
-      toast.error(res?.error || t('super.bulk_move_failed'));
+      toast.error(t('super.bulk_move_failed'));
     }
     setMoveLoading(false);
     setMoveConfirm(false);
@@ -95,7 +95,7 @@ export function BulkOperations() {
       setSelectedTenantIds(new Set());
       loadTenants();
     } else {
-      toast.error(res?.error || t('super.bulk_update_failed'));
+      toast.error(t('super.bulk_update_failed'));
     }
     setTenantLoading(false);
     setTenantConfirm(false);

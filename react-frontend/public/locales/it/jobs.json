@@ -676,7 +676,7 @@
     "time_credits_label": "Crediti Tempo Offerti",
     "time_credits_placeholder": "es. 5,00",
     "contact_email_label": "Email di Contatto",
-    "contact_email_placeholder": "contatto@esempio.it",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Telefono di Contatto",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Scadenza Candidatura",
@@ -1100,7 +1100,9 @@
     }
   },
   "jobs": {
-    "view_details": "Visualizza dettagli offerta"
+    "view_details": "Visualizza dettagli offerta",
+    "type_unknown": "Tipo sconosciuto",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Vista offerte di lavoro",
   "loading": "Caricamento delle offerte di lavoro...",

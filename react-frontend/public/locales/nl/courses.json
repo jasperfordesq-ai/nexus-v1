@@ -199,7 +199,8 @@
     "moderated": "Cursus bijgewerkt",
     "error": "Er is iets misgegaan. Probeer het opnieuw.",
     "no_courses": "Nog geen cursussen.",
-    "no_instructors": "Nog geen instructeurs toegekend."
+    "no_instructors": "Nog geen instructeurs toegekend.",
+    "status_unknown": "Onbekende status"
   },
   "builder": {
     "add_section": "Sectie toevoegen",

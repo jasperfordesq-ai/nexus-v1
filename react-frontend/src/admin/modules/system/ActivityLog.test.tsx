@@ -43,7 +43,7 @@ const MOCK_ENTRIES = [
     user_name: 'Alice Admin',
     user_email: 'alice@example.com',
     user_avatar: null,
-    action: 'login',
+    action: 'admin_approve_user',
     description: 'Admin logged in',
     ip_address: '192.168.1.1',
     created_at: '2026-06-22T09:00:00Z',
@@ -53,7 +53,7 @@ const MOCK_ENTRIES = [
     user_name: 'Bob Admin',
     user_email: 'bob@example.com',
     user_avatar: null,
-    action: 'delete',
+    action: 'admin_delete_listing',
     description: 'Deleted listing #42',
     ip_address: '10.0.0.1',
     created_at: '2026-06-21T14:30:00Z',
@@ -88,10 +88,8 @@ describe('ActivityLog', () => {
   it('renders action chips', async () => {
     render(<ActivityLog />);
     await waitFor(() => screen.getByText('Alice Admin'));
-    // Action "login" gets formatted/translated via i18n key fall-through
-    // In test env the i18n key resolves to key itself or the capitalize fallback
-    // We verify at least one chip-like element appeared per entry
-    expect(screen.getAllByText(/login/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Approve User')).toBeInTheDocument();
+    expect(screen.getByText('Delete Listing')).toBeInTheDocument();
   });
 
   it('renders IP addresses', async () => {
@@ -99,6 +97,33 @@ describe('ActivityLog', () => {
     await waitFor(() => screen.getByText('Alice Admin'));
     expect(screen.getByText('192.168.1.1')).toBeInTheDocument();
     expect(screen.getByText('10.0.0.1')).toBeInTheDocument();
+  });
+
+  it('localizes structured activity detail codes and parameters', async () => {
+    mockGetActivityLog.mockResolvedValue({
+      success: true,
+      data: [{
+        ...MOCK_ENTRIES[0],
+        description: null,
+        description_code: 'blog_post_created',
+        description_params: { id: 42, title: 'Community update' },
+      }],
+      meta: { total: 1 },
+    });
+
+    render(<ActivityLog />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Created blog post #42: Community update')).toBeInTheDocument();
+    });
+  });
+
+  it('preserves free-form descriptions for historical rows', async () => {
+    render(<ActivityLog />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Admin logged in')).toBeInTheDocument();
+    });
   });
 
   // ── empty state ────────────────────────────────────────────────────────────

@@ -140,7 +140,10 @@ class AdminEmailController extends BaseApiController
                 'sender_email' => $settings['gmail_sender_email'] ?? '',
                 'sender_name' => $settings['gmail_sender_name'] ?? '',
             ],
-            'platform_default' => ['provider' => $platformProvider, 'description' => 'Uses platform-wide environment configuration'],
+            'platform_default' => [
+                'provider' => $platformProvider,
+                'description_code' => 'platform_environment_configuration',
+            ],
             'webhook_url' => rtrim($_ENV['APP_URL'] ?? 'https://api.project-nexus.ie', '/') . '/api/v2/webhooks/postmark',
         ];
 

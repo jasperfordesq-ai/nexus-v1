@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatUnit, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Progress } from '@/components/ui';
 import {
   useEffect,
@@ -55,7 +55,7 @@ const formatCountdown = (ms: number): string => {
   const abs = Math.abs(ms);
   const hours = Math.floor(abs / (1000 * 60 * 60));
   const minutes = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m`;
+  return `${formatUnit(hours, 'hour')} ${formatUnit(minutes, 'minute')}`;
 };
 
 export function GdprBreachDetail() {
@@ -247,8 +247,8 @@ export function GdprBreachDetail() {
                   <p className="text-sm text-muted mb-2">{t('enterprise.gdpr_data_categories_affected')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {breach.data_categories_affected.map((cat) => (
-                      <Chip key={cat} size="sm" variant="soft" className="capitalize">
-                        {cat.replace(/_/g, ' ')}
+                      <Chip key={cat} size="sm" variant="soft">
+                        {t(`enterprise.gdpr_data_category_${cat}`, { defaultValue: t('enterprise.gdpr_data_category_unknown') })}
                       </Chip>
                     ))}
                   </div>
@@ -266,22 +266,22 @@ export function GdprBreachDetail() {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_records_affected')}</p>
-                  <p className="text-xl font-bold">{breach.number_of_records_affected ?? 'N/A'}</p>
+                  <p className="text-xl font-bold">{breach.number_of_records_affected ?? t('enterprise.not_available')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_users_affected')}</p>
-                  <p className="text-xl font-bold">{breach.number_of_users_affected ?? 'N/A'}</p>
+                  <p className="text-xl font-bold">{breach.number_of_users_affected ?? t('enterprise.not_available')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_detected')}</p>
                   <p className="font-medium text-sm">
-                    {breach.detected_at ? new Date(breach.detected_at).toLocaleString(getFormattingLocale()) : 'N/A'}
+                    {breach.detected_at ? new Date(breach.detected_at).toLocaleString(getFormattingLocale()) : t('enterprise.not_available')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_occurred')}</p>
                   <p className="font-medium text-sm">
-                    {breach.occurred_at ? new Date(breach.occurred_at).toLocaleString(getFormattingLocale()) : 'N/A'}
+                    {breach.occurred_at ? new Date(breach.occurred_at).toLocaleString(getFormattingLocale()) : t('enterprise.not_available')}
                   </p>
                 </div>
               </div>

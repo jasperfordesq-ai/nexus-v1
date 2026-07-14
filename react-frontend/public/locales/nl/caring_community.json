@@ -685,7 +685,8 @@
         "answer_count_other": "{{count}}antwoorden",
         "no_open_text": "Nog geen open-tekstreacties.",
         "modal_title": "Analyse -{{title}}",
-        "empty": "Er zijn nog geen analysegegevens beschikbaar."
+        "empty": "Er zijn nog geen analysegegevens beschikbaar.",
+        "option_percentage_aria": "{{option}}: {{percentage}}"
       },
       "common": {
         "yes": "Ja",

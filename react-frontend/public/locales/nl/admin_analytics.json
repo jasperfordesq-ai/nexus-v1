@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "analytics": {
     "category_demand_title": "Categorievraag",
@@ -180,7 +180,6 @@
         "requests": "Verzoeken",
         "offers": "Aanbiedingen",
         "ratio": "Verhouding",
-        "trend": "Trend",
         "active_members": "Actieve leden",
         "vol_hours": "Vrijwilligers uren",
         "new_listings": "Nieuwe vermeldingen",
@@ -191,7 +190,8 @@
         "total": "Totaal",
         "resolved": "Opgelost",
         "resolution_rate": "Resolutiepercentage",
-        "avg_days_to_resolve": "Gem. dagen op te lossen"
+        "avg_days_to_resolve": "Gem. dagen op te lossen",
+        "trend": "Trend"
       },
       "heatmap": {
         "description": "Toplocaties op basis van ledenactiviteit en dichtheid."
@@ -201,7 +201,8 @@
         "language_distribution": "Taaldistributie",
         "member_growth_12m": "Ledengroei, afgelopen 12 maanden",
         "total_with_data": "{{total}}-leden met demografische gegevens",
-        "total_active_members": "{{total}} actieve leden"
+        "total_active_members": "{{total}} actieve leden",
+        "unknown_language": "Onbekende taal"
       },
       "volunteer": {
         "total_hours": "Totaal uren",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "Hulpverzoeken per categorie",
-        "resolution_trend_6m": "Resolutietrend, afgelopen 6 maanden"
+        "resolution_trend_6m": "Resolutietrend, afgelopen 6 maanden",
+        "categories": {
+          "either": "Telefoon of bericht",
+          "message": "Bericht",
+          "phone": "Telefoon",
+          "unknown": "Onbekende voorkeur"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -274,6 +281,17 @@
     "no_trending": "Geen populaire zoekopdrachten in deze periode.",
     "no_zero_results": "Geen zoekopdrachten zonder resultaat in deze periode — elke zoekopdracht vond iets.",
     "count_value_one": "{{count}}×",
-    "count_value_other": "{{count}}×"
+    "count_value_other": "{{count}}×",
+    "result_types": {
+      "blog": "Blog",
+      "events": "Evenementen",
+      "groups": "Groepen",
+      "jobs": "Banen",
+      "listings": "Lijsten",
+      "marketplace": "Marktplaats",
+      "members": "Leden",
+      "resources": "Hulpmiddelen",
+      "volunteering": "Vrijwilligerswerk"
+    }
   }
 }

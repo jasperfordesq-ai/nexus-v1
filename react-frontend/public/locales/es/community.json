@@ -165,7 +165,7 @@
     "form_description_required": "La descripción es obligatoria",
     "form_description_min_length": "La descripción debe tener al menos 20 caracteres",
     "form_email_label": "Correo de Contacto",
-    "form_email_placeholder": "contacto@tuorg.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "El correo de contacto es obligatorio",
     "form_email_invalid": "Por favor introduce una dirección de correo válida",
     "form_website_label": "Sitio Web (opcional)",
@@ -277,7 +277,7 @@
     "add_member_heading": "Añadir Miembro al Grupo",
     "add_member_desc": "Introduzca la dirección de correo electrónico de la persona que desea añadir a esta reserva de grupo. Recibirá una notificación.",
     "email_label": "Dirección de Correo Electrónico",
-    "email_placeholder": "miembro@ejemplo.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Cancelar",
     "add_member_failed": "No se pudo añadir al miembro. Es posible que ya esté en el grupo o que el correo electrónico no sea válido.",
     "add_member_error": "No se pudo añadir al miembro. Por favor, compruebe el correo electrónico e inténtelo de nuevo."

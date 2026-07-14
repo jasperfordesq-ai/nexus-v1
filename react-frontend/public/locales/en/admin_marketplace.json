@@ -208,7 +208,22 @@
     "verify_seller_title": "Verify Seller",
     "view_all": "View All",
     "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "seller_tabs_aria": "Seller status filter",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "sold": "Sold",
+      "expired": "Expired",
+      "draft": "Draft",
+      "unknown": "Other listing status"
+    },
+    "moderation_status": {
+      "approved": "Approved",
+      "pending": "Pending review",
+      "rejected": "Rejected",
+      "flagged": "Flagged",
+      "unknown": "Other moderation status"
+    }
   },
   "bulk": {
     "selected_count": "{{count}} selected",

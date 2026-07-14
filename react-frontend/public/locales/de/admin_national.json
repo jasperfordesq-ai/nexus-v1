@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,15 +67,15 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "national": {
     "trend_chart_aria": "Diagramm, das die Trends der Community-Aktivitäten im Zeitverlauf zeigt"
   },
   "national_kiss_dashboard": {
-    "loading": "Loading",
     "meta": {
       "page_title": "Caring Community – Nationales Dashboard",
       "title": "Caring Community – Nationales Dashboard",
@@ -141,7 +140,8 @@
       "hours_axis": "Std",
       "cooperatives_axis": "Genossenschaften",
       "active_cooperatives": "Aktive Genossenschaften",
-      "total_hours_all": "Gesamtstunden (alle Genossenschaften)"
+      "total_hours_all": "Gesamtstunden (alle Genossenschaften)",
+      "unknown_period": "Unbekannter Zeitraum"
     },
     "comparative": {
       "title": "Vergleichsmetriken",
@@ -160,12 +160,12 @@
       "recipients_title": "Erreichte Pflegebedürftige (Datenschutzgruppe)",
       "recipients": "Empfänger",
       "tandems_title": "Wiederkehrende Helfer/Empfänger-Paare mit mehr als 2 abgeschlossenen Austauschvorgängen",
-      "tandems_sort": "Tandems <->",
       "retention_title": "% der Mitglieder, die sowohl in diesem Zeitraum als auch im vorherigen entsprechenden Zeitraum aktiv waren",
       "retention_sort": "Aufbewahrung <->",
       "reciprocity_title": "% der Unterstützer, die in diesem Zeitraum auch Stunden erhalten haben – zeigt die Gesundheit des gegenseitigen Austauschs an",
       "reciprocity_sort": "Gegenseitigkeit <->",
-      "status": "Status"
+      "status": "Status",
+      "tandems_sort": "Tandems <->"
     },
     "leaderboards": {
       "top_title": "Top 5 nach Stunden",
@@ -181,6 +181,7 @@
     },
     "toasts": {
       "load_failed": "Das Dashboard konnte nicht geladen werden"
-    }
+    },
+    "loading": "Lädt"
   }
 }

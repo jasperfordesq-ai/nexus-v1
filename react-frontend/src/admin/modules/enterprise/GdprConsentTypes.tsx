@@ -293,7 +293,9 @@ export function GdprConsentTypes() {
                 </div>
 
                 {ct.category && (
-                  <Chip size="sm" variant="soft" className="capitalize">{ct.category}</Chip>
+                  <Chip size="sm" variant="soft">
+                    {t(`enterprise.gdpr_category_${ct.category}`, { defaultValue: t('enterprise.gdpr_category_other') })}
+                  </Chip>
                 )}
 
                 {ct.legal_basis && (

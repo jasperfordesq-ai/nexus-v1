@@ -30,7 +30,7 @@ import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisc
 import { BrokerEmptyState } from '@/broker/components';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
@@ -248,7 +248,7 @@ export function Webhooks() {
         }
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.webhooks_save_failed');
+        const errorMsg = t('federation.webhooks_save_failed');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -300,14 +300,20 @@ export function Webhooks() {
       if (res.success) {
         const data = res.data as { response_time_ms?: number; response_code?: number };
         toast.success(
-          t('federation.webhooks_test_success', {
+          t('federation.webhooks_test_success_formatted', {
             code: data?.response_code ?? '?',
-            time: data?.response_time_ms ?? '?',
+            time: data?.response_time_ms == null
+              ? t('federation.response_time_unknown')
+              : new Intl.NumberFormat(getFormattingLocale(), {
+                  style: 'unit',
+                  unit: 'millisecond',
+                  unitDisplay: 'short',
+                }).format(data.response_time_ms),
           })
         );
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || t('federation.webhooks_test_failed');
+        const errorMsg = t('federation.webhooks_test_failed');
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -346,12 +352,18 @@ export function Webhooks() {
       if (res.success) {
         const data = res.data as { success?: boolean; response_code?: number; response_time_ms?: number; error_message?: string };
         if (data?.success) {
-          toast.success(t('federation.webhooks_retry_success', {
+          toast.success(t('federation.webhooks_retry_success_formatted', {
             code: data?.response_code ?? '?',
-            time: data?.response_time_ms ?? '?',
+            time: data?.response_time_ms == null
+              ? t('federation.response_time_unknown')
+              : new Intl.NumberFormat(getFormattingLocale(), {
+                  style: 'unit',
+                  unit: 'millisecond',
+                  unitDisplay: 'short',
+                }).format(data.response_time_ms),
           }));
         } else {
-          toast.error(data?.error_message || t('federation.webhooks_retry_failed'));
+          toast.error(t('federation.webhooks_retry_failed'));
         }
         // Reload logs by re-fetching from the webhook
         const webhook = webhooks.find(w => w.id === logEntry.webhook_id);
@@ -655,7 +667,13 @@ export function Webhooks() {
                               {log.response_code ?? '--'}
                             </span>
                             <span className="text-sm text-muted">
-                              {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
+                              {log.response_time_ms != null
+                                ? new Intl.NumberFormat(getFormattingLocale(), {
+                                    style: 'unit',
+                                    unit: 'millisecond',
+                                    unitDisplay: 'short',
+                                  }).format(log.response_time_ms)
+                                : t('federation.response_time_unknown')}
                             </span>
                             <span className="text-sm text-muted">#{log.attempt_number}</span>
                             <span className="text-sm text-muted">

@@ -192,8 +192,10 @@ export function CampaignList() {
       key: 'target_audience',
       label: t('gamification.col_target'),
       render: (c) => (
-        <span className="text-sm text-muted capitalize">
-          {(c.target_audience || '').replace(/_/g, ' ')}
+        <span className="text-sm text-muted">
+          {t(`gamification.audience_${c.target_audience}`, {
+            defaultValue: t('gamification.audience_unknown'),
+          })}
         </span>
       ),
     },

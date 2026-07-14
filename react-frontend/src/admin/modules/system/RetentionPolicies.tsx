@@ -221,9 +221,9 @@ export function RetentionPolicies() {
                   className="flex flex-wrap items-center gap-2 rounded-lg bg-surface-secondary px-3 py-2 text-sm"
                 >
                   <Chip size="sm" color={statusColor(run.status)} variant="soft">
-                    {t(`retention.status_${run.status}`, { defaultValue: run.status })}
+                    {t(`retention.status_${run.status}`, { defaultValue: t('retention.status_unknown') })}
                   </Chip>
-                  <span className="font-medium">{t(`retention.type_${run.data_type}`, { defaultValue: run.data_type })}</span>
+                  <span className="font-medium">{t(`retention.type_${run.data_type}`, { defaultValue: t('retention.type_unknown') })}</span>
                   <span className="text-muted">
                     {t('retention.run_summary', { rows: run.affected_rows, days: run.retention_days })}
                   </span>

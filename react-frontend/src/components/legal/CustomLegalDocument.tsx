@@ -71,7 +71,7 @@ function parseNumberedTitle(title: string): [string | null, string] {
   return [null, title];
 }
 
-function parseSections(html: string): Section[] {
+function parseSections(html: string, introductionTitle: string): Section[] {
   // Split on <h2 ...>...</h2> while keeping the matched heading
   const parts = html.split(/(<h2[^>]*>[\s\S]*?<\/h2>)/i);
   const sections: Section[] = [];
@@ -109,7 +109,13 @@ function parseSections(html: string): Section[] {
 
   // If there was content before the first h2, prepend as an intro section
   if (hasIntro) {
-    sections.unshift({ id: 'introduction', title: 'Introduction', displayTitle: 'Introduction', numericPrefix: null, html: introHtml });
+    sections.unshift({
+      id: 'introduction',
+      title: introductionTitle,
+      displayTitle: introductionTitle,
+      numericPrefix: null,
+      html: introHtml,
+    });
   }
 
   return sections;
@@ -199,7 +205,11 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
   const { t } = useTranslation('legal');
   const { tenantPath } = useTenant();
   const styles = ACCENT_STYLES[accentColor] ?? ACCENT_STYLES.blue;
-  const sections = useMemo(() => parseSections(doc.content), [doc.content]);
+  const introductionTitle = t('custom_document.introduction');
+  const sections = useMemo(
+    () => parseSections(doc.content, introductionTitle),
+    [doc.content, introductionTitle],
+  );
 
   // Check if the document already uses its own numbering scheme.
   // If most sections have numeric prefixes, use those instead of auto-numbering.

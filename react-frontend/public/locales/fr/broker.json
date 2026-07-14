@@ -321,7 +321,10 @@
     "members_error_title": "Impossible de charger les membres en attente",
     "members_error_hint": "Le chargement de la file d'approbation a échoué. Réessayez pour la récupérer à nouveau.",
     "retry": "Réessayer",
-    "empty_pending_title": "Vous êtes à jour"
+    "empty_pending_title": "Vous êtes à jour",
+    "stage_first_listing": "Première annonce",
+    "stage_repeat_user": "Utilisateur régulier",
+    "stage_unknown": "Étape inconnue"
   },
   "safeguarding": {
     "title": "Protection",
@@ -1128,7 +1131,7 @@
     "field_show_broker_name_help": "Afficher le nom du courtier assigné aux membres.",
     "field_broker_contact_email_label": "E-mail de contact du courtier",
     "field_broker_contact_email_help": "E-mail public de contact pour les demandes au courtier.",
-    "field_broker_contact_email_placeholder": "courtier@exemple.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "E-mail de contact du courtier",
     "field_broker_approval_required_label": "Approbation du courtier requise",
     "field_broker_approval_required_help": "Exiger l'approbation du courtier avant que les échanges puissent se poursuivre.",
@@ -1290,7 +1293,8 @@
     "pending_confirmation": "En attente de confirmation",
     "confirmed": "Confirmé",
     "review_requested": "Révision demandée",
-    "not_confirmed": "Non confirmé"
+    "not_confirmed": "Non confirmé",
+    "unknown": "Inconnu"
   },
   "common": {
     "loading": "Chargement...",

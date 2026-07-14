@@ -23,7 +23,8 @@
     "escalated": "Geëscaleerd",
     "resolved_buyer": "Beslist voor koper",
     "resolved_seller": "Beslist voor verkoper",
-    "closed": "Gesloten"
+    "closed": "Gesloten",
+    "unknown": "Andere zaakstatus"
   },
   "reason": {
     "counterfeit": "Nagemaakt artikel",
@@ -37,7 +38,8 @@
     "payment_issue": "Betalingsprobleem",
     "damaged": "Artikel beschadigd",
     "fraud": "Vermoedelijke fraude",
-    "other": "Overig"
+    "other": "Overig",
+    "unknown": "Andere reden"
   },
   "action": {
     "none": "Geen handhavingsmaatregel",

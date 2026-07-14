@@ -13,6 +13,7 @@ import { adminGamification } from '../../api/adminApi';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import type { GamificationStats, BadgeDefinition } from '../../api/types';
+import { badgeDisplayName } from './badgeDisplay';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -129,8 +130,8 @@ export function GamificationAnalytics() {
               <div className="space-y-3">
                 {stats.badge_distribution.map((badge) => (
                   <div key={badge.badge_name} className="flex items-center gap-3">
-                    <span className="w-32 truncate text-sm text-foreground font-medium" title={badge.badge_name}>
-                      {badge.badge_name}
+                    <span className="w-32 truncate text-sm text-foreground font-medium" title={badgeDisplayName(t, { name: badge.badge_name, name_code: badge.name_code })}>
+                      {badgeDisplayName(t, { name: badge.badge_name, name_code: badge.name_code })}
                     </span>
                     <div className="flex-1 h-6 rounded-lg bg-surface-secondary overflow-hidden">
                       <div
@@ -177,7 +178,7 @@ export function GamificationAnalytics() {
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <Award size={16} className={badge.type === 'custom' ? 'text-success' : 'text-accent'} />
-                      <span className="text-sm font-medium text-foreground truncate">{badge.name}</span>
+                      <span className="text-sm font-medium text-foreground truncate">{badgeDisplayName(t, badge)}</span>
                       {badge.type === 'custom' && (
                         <span className="text-[10px] uppercase tracking-wider text-success bg-success/10 px-1.5 py-0.5 rounded font-semibold">
                           {t('gamification.badge_type_custom')}

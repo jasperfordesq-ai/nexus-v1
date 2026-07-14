@@ -313,7 +313,10 @@
     "members_error_title": "Ausstehende Mitglieder konnten nicht geladen werden",
     "members_error_hint": "Die Genehmigungswarteschlange konnte nicht geladen werden. Erneut versuchen, um sie erneut abzurufen.",
     "retry": "Erneut versuchen",
-    "empty_pending_title": "Alles erledigt"
+    "empty_pending_title": "Alles erledigt",
+    "stage_first_listing": "Erste Auflistung",
+    "stage_repeat_user": "Wiederkehrender Benutzer",
+    "stage_unknown": "Unbekannte Stufe"
   },
   "safeguarding": {
     "title": "Schutzmaßnahmen",
@@ -1117,7 +1120,7 @@
     "field_show_broker_name_help": "Den Namen des/der zugewiesenen Brokers/Brokerin für Mitglieder anzeigen.",
     "field_broker_contact_email_label": "Broker-Kontakt-E-Mail",
     "field_broker_contact_email_help": "Öffentliche Kontakt-E-Mail für Broker-Anfragen.",
-    "field_broker_contact_email_placeholder": "Broker@example.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "Broker-Kontakt-E-Mail",
     "field_broker_approval_required_label": "Broker-Genehmigung erforderlich",
     "field_broker_approval_required_help": "Broker-Genehmigung erforderlich, bevor Austausche fortgesetzt werden können.",
@@ -1279,7 +1282,8 @@
     "pending_confirmation": "Wartet auf Bestätigung",
     "confirmed": "Bestätigt",
     "review_requested": "Rezension angefordert",
-    "not_confirmed": "Nicht bestätigt"
+    "not_confirmed": "Nicht bestätigt",
+    "unknown": "Unbekannt"
   },
   "common": {
     "loading": "Lädt...",

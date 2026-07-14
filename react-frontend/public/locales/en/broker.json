@@ -294,7 +294,10 @@
     "stage_registered": "Registered",
     "stage_email_verified": "Email Verified",
     "stage_profile_complete": "Profile Complete",
+    "stage_first_listing": "First Listing",
     "stage_first_exchange": "First Exchange",
+    "stage_repeat_user": "Repeat User",
+    "stage_unknown": "Unknown Stage",
     "pending_approvals": "Pending Approvals",
     "no_pending": "No pending members to approve.",
     "kpi_registered": "Registered",
@@ -1252,6 +1255,7 @@
     "not_found_hint": "This match approval may have been removed, or the link is wrong."
   },
   "status": {
+    "unknown": "Unknown",
     "active": "Active",
     "pending": "Pending",
     "suspended": "Suspended",

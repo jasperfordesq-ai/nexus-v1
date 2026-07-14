@@ -265,9 +265,10 @@ class PilotLaunchReadinessServiceTest extends TestCase
 
         foreach ($report['sections'] as $section) {
             $this->assertArrayHasKey('key', $section, "Section missing 'key'");
-            $this->assertArrayHasKey('label', $section, "Section missing 'label'");
+            $this->assertArrayHasKey('label_code', $section, "Section missing 'label_code'");
             $this->assertArrayHasKey('status', $section, "Section missing 'status'");
-            $this->assertArrayHasKey('summary', $section, "Section missing 'summary'");
+            $this->assertArrayHasKey('summary_code', $section, "Section missing 'summary_code'");
+            $this->assertArrayHasKey('summary_params', $section, "Section missing 'summary_params'");
             $this->assertArrayHasKey('admin_path', $section, "Section missing 'admin_path'");
         }
     }
@@ -296,7 +297,8 @@ class PilotLaunchReadinessServiceTest extends TestCase
         $this->assertArrayHasKey('status', $overall);
         $this->assertArrayHasKey('ready_section_count', $overall);
         $this->assertArrayHasKey('total_section_count', $overall);
-        $this->assertArrayHasKey('summary', $overall);
+        $this->assertArrayHasKey('summary_code', $overall);
+        $this->assertArrayHasKey('summary_params', $overall);
         $this->assertSame(7, $overall['total_section_count']);
     }
 
@@ -539,7 +541,8 @@ class PilotLaunchReadinessServiceTest extends TestCase
         $section = collect($report['sections'])->firstWhere('key', 'data_quality');
 
         $this->assertSame('blocked', $section['status']);
-        $this->assertStringContainsString('3 blocking', $section['summary']);
+        $this->assertSame('data_quality.blocked', $section['summary_code']);
+        $this->assertSame(['count' => 3], $section['summary_params']);
     }
 
     public function test_data_quality_section_needs_review_when_warning_only(): void
@@ -607,7 +610,8 @@ class PilotLaunchReadinessServiceTest extends TestCase
         $section = collect($report['sections'])->firstWhere('key', 'commercial_boundary');
 
         $this->assertSame('ready', $section['status']);
-        $this->assertStringContainsString('override', $section['summary']);
+        $this->assertSame('commercial_boundary.ready_with_overrides', $section['summary_code']);
+        $this->assertSame(['count' => 1], $section['summary_params']);
     }
 
     public function test_commercial_boundary_needs_review_when_not_acknowledged_and_no_overrides(): void
@@ -725,7 +729,7 @@ class PilotLaunchReadinessServiceTest extends TestCase
 
         $this->assertSame('ready', $section['status']);
         // Summary says "Default matrix acknowledged." (not "override")
-        $this->assertStringContainsString('acknowledged', $section['summary']);
+        $this->assertSame('commercial_boundary.ready_default', $section['summary_code']);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

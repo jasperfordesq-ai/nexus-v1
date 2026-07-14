@@ -1,4 +1,4 @@
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatPercentValue, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,7 +151,7 @@ function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onC
                         {isDown && <TrendingDown size={14} />}
                         {isFlat && <Minus size={14} />}
                         <span>
-                          {isUp ? '+' : ''}{pct.toFixed(1)}%
+                          {formatPercentValue(pct, { signDisplay: isUp ? 'always' : 'auto' })}
                           {mc.delta !== null && (
                             <span className="ml-1 font-normal text-xs">
                               ({isUp ? '+' : ''}{fmt(mc.delta)})
@@ -260,7 +260,7 @@ export default function KpiBaselineAdminPage() {
         setCaptureNotes('');
         await loadBaselines();
       } else {
-        showToast(res.error || t('kpi_baselines.toasts.capture_failed'), 'error');
+        showToast(t('kpi_baselines.toasts.capture_failed'), 'error');
       }
     } catch {
       showToast(t('kpi_baselines.toasts.capture_failed'), 'error');

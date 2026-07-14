@@ -65,6 +65,10 @@ class OnboardingConfigServiceTest extends TestCase
         $this->assertContains('skills', $slugs);
         $this->assertContains('confirm', $slugs);
         $this->assertContains('safeguarding', $slugs);
+        foreach ($steps as $step) {
+            $this->assertSame($step['slug'], $step['label_code']);
+            $this->assertArrayNotHasKey('label', $step);
+        }
     }
 
     public function test_getActiveSteps_includes_safeguarding_when_enabled(): void

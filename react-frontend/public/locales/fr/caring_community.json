@@ -686,7 +686,8 @@
         "answer_count_other": "Réponse de{{count}}",
         "no_open_text": "Aucune réponse en texte ouvert pour l'instant.",
         "modal_title": "Analyses -{{title}}",
-        "empty": "Aucune donnée analytique disponible pour l'instant."
+        "empty": "Aucune donnée analytique disponible pour l'instant.",
+        "option_percentage_aria": "{{option}} : {{percentage}}"
       },
       "common": {
         "yes": "Oui",

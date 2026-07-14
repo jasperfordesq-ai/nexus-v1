@@ -151,6 +151,34 @@
       "copied": "Diagnostics copied.",
       "handoff_copied": "Engineering handoff copied."
     },
+    "handoff": {
+      "title": "Support report {{reference}}",
+      "field": "{{label}}: {{value}}",
+      "reporter_with_email": "{{name}} <{{email}}> (user {{id}})",
+      "reporter_without_email": "{{name}} (user {{id}})",
+      "unknown_reporter": "Unknown reporter",
+      "no_diagnostics": "No diagnostics were included.",
+      "not_provided": "Not provided",
+      "none_yet": "None yet.",
+      "labels": {
+        "tenant": "Community",
+        "impact": "Impact",
+        "status": "Status",
+        "created": "Created",
+        "reporter": "Reporter",
+        "route": "Route",
+        "page_url": "Page URL",
+        "user_agent": "User agent",
+        "sentry_event": "Sentry event",
+        "sentry_issue": "Sentry issue"
+      },
+      "headings": {
+        "summary": "Summary:",
+        "user_description": "User description:",
+        "triage_notes": "Triage notes:",
+        "diagnostics": "Diagnostics:"
+      }
+    },
     "errors": {
       "load": "Failed to load support reports.",
       "load_detail": "Failed to load the support report.",

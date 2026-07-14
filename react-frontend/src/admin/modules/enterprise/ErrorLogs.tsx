@@ -65,7 +65,9 @@ export function ErrorLogs() {
       sortable: true,
       render: (entry) => (
         <Chip size="sm" variant="soft" color="danger">
-          {entry.action}
+          {t(`enterprise.error_log_action_${entry.action.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase()}`, {
+            defaultValue: t('enterprise.error_log_action_unknown'),
+          })}
         </Chip>
       ),
     },

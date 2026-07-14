@@ -222,7 +222,7 @@ export function SsoProviders() {
         toast.success(t('sso.saved'));
         formModal.onClose();
       } else {
-        setFormError(res.message || res.error || t('sso.save_failed'));
+        setFormError(t('sso.save_failed'));
       }
     } catch {
       setFormError(t('sso.save_failed'));
@@ -248,7 +248,7 @@ export function SsoProviders() {
           setProviders((prev) => prev.filter((p) => p.provider_key !== provider.provider_key));
           toast.success(t('sso.deleted'));
         } else {
-          toast.error(res.message || res.error || t('sso.delete_failed'));
+          toast.error(t('sso.delete_failed'));
         }
       } catch {
         toast.error(t('sso.delete_failed'));
@@ -272,7 +272,7 @@ export function SsoProviders() {
         } else {
           setTestResults((prev) => ({
             ...prev,
-            [provider.provider_key]: { ok: false, error: res.message || res.error || t('sso.test_failed') },
+            [provider.provider_key]: { ok: false, error: t('sso.test_failed') },
           }));
         }
       } catch {
@@ -332,7 +332,7 @@ export function SsoProviders() {
                         <p className="font-medium">{provider.display_name}</p>
                         <Chip size="sm" variant="soft">{provider.provider_key}</Chip>
                         <Chip size="sm" variant="soft">
-                          {t(`sso.preset_${provider.preset}`, { defaultValue: provider.preset })}
+                          {t(`sso.preset_${provider.preset}`, { defaultValue: t('sso.preset_unknown') })}
                         </Chip>
                         <Chip size="sm" color={provider.is_enabled ? 'success' : 'warning'} variant="soft">
                           {provider.is_enabled ? t('sso.enabled') : t('sso.disabled')}
@@ -370,7 +370,7 @@ export function SsoProviders() {
                         {result.ok ? t('sso.test_ok') : t('sso.test_error')}
                       </Chip>
                       <span className="text-muted break-all">
-                        {result.ok ? result.authorization_endpoint || result.issuer : result.error}
+                        {result.ok ? result.authorization_endpoint || result.issuer : t('sso.test_failed')}
                       </span>
                     </div>
                   )}
@@ -413,8 +413,8 @@ export function SsoProviders() {
               description={form.preset === 'entra' ? t('sso.preset_entra_hint') : undefined}
             >
               {presets.map((preset) => (
-                <SelectItem key={preset} id={preset} textValue={t(`sso.preset_${preset}`, { defaultValue: preset })}>
-                  {t(`sso.preset_${preset}`, { defaultValue: preset })}
+                <SelectItem key={preset} id={preset} textValue={t(`sso.preset_${preset}`, { defaultValue: t('sso.preset_unknown') })}>
+                  {t(`sso.preset_${preset}`, { defaultValue: t('sso.preset_unknown') })}
                 </SelectItem>
               ))}
             </Select>

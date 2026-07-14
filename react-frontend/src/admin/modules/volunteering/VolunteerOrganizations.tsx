@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 /**
@@ -665,7 +665,9 @@ export function VolunteerOrganizations() {
                         className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3"
                       >
                         <div>
-                          <p className="text-sm font-medium">{tx.description || tx.type}</p>
+                          <p className="text-sm font-medium">
+                            {tx.description || t(`volunteering.transaction_type_${tx.type}`, { defaultValue: t('volunteering.transaction_type_unknown') })}
+                          </p>
                           <p className="text-xs text-muted">
                             {tx.created_at ? new Date(tx.created_at).toLocaleString(getFormattingLocale()) : '--'}
                             {tx.admin_name && t('volunteering.transaction_by_admin', { name: tx.admin_name })}
@@ -676,7 +678,7 @@ export function VolunteerOrganizations() {
                             tx.amount > 0 ? 'text-success' : 'text-danger'
                           }`}
                         >
-                          {tx.amount > 0 ? '+' : ''}{tx.amount}
+                          {formatNumber(tx.amount, { signDisplay: tx.amount > 0 ? 'always' : 'auto' })}
                         </span>
                       </div>
                     ))}

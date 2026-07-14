@@ -98,7 +98,7 @@ export default function AiTraceMetricsAdminPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <Stat icon={MessageSquare} label={t('ai.trace_metrics.stats.turns')} value={metrics?.turns.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} />
-        <Stat icon={DollarSign} label={t('ai.trace_metrics.stats.cost')} value={metrics ? `$${metrics.cost_usd.toFixed(2)}` : t('ai.common.empty_dash')} loading={loading} />
+        <Stat icon={DollarSign} label={t('ai.trace_metrics.stats.cost')} value={metrics ? new Intl.NumberFormat(getFormattingLocale(), { style: 'currency', currency: 'USD' }).format(metrics.cost_usd) : t('ai.common.empty_dash')} loading={loading} />
         <Stat icon={Clock} label={t('ai.trace_metrics.stats.avg_latency')} value={metrics ? t('ai.trace_metrics.stats.latency_value', { value: metrics.avg_latency_ms }) : t('ai.common.empty_dash')} loading={loading} />
         <Stat icon={ThumbsUp} label={t('ai.trace_metrics.stats.thumbs_up')} value={metrics?.thumbs_up.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} color="success" />
         <Stat icon={ThumbsDown} label={t('ai.trace_metrics.stats.thumbs_down')} value={metrics?.thumbs_down.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} color="danger" />

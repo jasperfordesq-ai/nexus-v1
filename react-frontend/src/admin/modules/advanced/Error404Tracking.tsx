@@ -83,7 +83,7 @@ export function Error404Tracking() {
         setDeleteTarget(null);
         await fetchErrors();
       } else {
-        const error = (res as { error?: string }).error || t('failed_to_delete_404_entry');
+        const error = t('failed_to_delete_404_entry');
         toast.error(error);
       }
     } catch {

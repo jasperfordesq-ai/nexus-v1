@@ -9,6 +9,27 @@ import {
   type HelpArticle,
   type HelpStep,
 } from './helpContent';
+import helpTranslations from '../../../public/locales/en/admin_help.json';
+
+function resolveEnglish(key: string): string | undefined {
+  let value: unknown = helpTranslations;
+  for (const segment of key.split('.')) {
+    if (!value || typeof value !== 'object' || !(segment in value)) return undefined;
+    value = (value as Record<string, unknown>)[segment];
+  }
+  return typeof value === 'string' ? value : undefined;
+}
+
+function articleKeys(article: HelpArticle): string[] {
+  return [
+    article.title,
+    article.summary,
+    ...(article.steps ?? []).flatMap((step) => [step.label, ...(step.detail ? [step.detail] : [])]),
+    ...(article.tips ?? []),
+    ...(article.caution ? [article.caution] : []),
+    ...(article.relatedPaths ?? []).map((related) => related.label),
+  ];
+}
 
 // ---------------------------------------------------------------------------
 // Registry-level invariants
@@ -75,6 +96,14 @@ describe('every HelpArticle', () => {
         article.title !== article.summary,
         `"${path}".title and .summary must not be identical`,
       ).toBe(true);
+    }
+  });
+
+  it('resolves every display key to non-empty English copy', () => {
+    for (const [path, article] of entries) {
+      for (const key of articleKeys(article)) {
+        expect(resolveEnglish(key), `Missing English admin-help key "${key}" for "${path}"`).toBeTruthy();
+      }
     }
   });
 });
@@ -213,7 +242,7 @@ describe('HelpArticle.relatedPaths (when present)', () => {
 describe('HELP_CONTENT spot-checks for known paths', () => {
   it('contains the /caring entry', () => {
     expect(HELP_CONTENT['/caring']).toBeDefined();
-    expect(HELP_CONTENT['/caring'].title).toContain('Caring Community');
+    expect(resolveEnglish(HELP_CONTENT['/caring'].title)).toContain('Caring Community');
   });
 
   it('contains the /caring/safeguarding entry', () => {

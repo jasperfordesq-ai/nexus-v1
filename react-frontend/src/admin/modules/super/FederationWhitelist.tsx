@@ -75,7 +75,7 @@ export default function FederationWhitelist() {
       setEntries(mapped);
     } else if (!whitelistRes.success) {
       // Surface the failure instead of silently rendering an empty whitelist.
-      toastRef.current.error(whitelistRes.error || tRef.current('federation_whitelist.failed_to_load'));
+      toastRef.current.error(tRef.current('federation_whitelist.failed_to_load'));
     }
     if (tenantsRes.success && tenantsRes.data) {
       const tenants = (Array.isArray(tenantsRes.data) ? tenantsRes.data : []) as SuperAdminTenant[];
@@ -99,7 +99,7 @@ export default function FederationWhitelist() {
       setNotes('');
       loadData();
     } else {
-      toast.error(res.error || t('federation_whitelist.failed_to_add'));
+      toast.error(t('federation_whitelist.failed_to_add'));
     }
   };
 
@@ -110,7 +110,7 @@ export default function FederationWhitelist() {
       setRemoving(null);
       toast.success(t('federation_whitelist.tenant_removed_from_whitelist'));
     } else {
-      toast.error(res.error || t('federation_whitelist.failed_to_remove'));
+      toast.error(t('federation_whitelist.failed_to_remove'));
       setRemoving(null);
     }
   };

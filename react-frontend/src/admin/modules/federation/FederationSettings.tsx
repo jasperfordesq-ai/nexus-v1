@@ -96,7 +96,7 @@ export function FederationSettings() {
         toast.success(t('federation_settings_saved_successfully'));
         setDirty(false);
       } else {
-        const error = (res as { error?: string }).error || t('save_failed');
+        const error = t('save_failed');
         toast.error(error);
       }
     } catch {

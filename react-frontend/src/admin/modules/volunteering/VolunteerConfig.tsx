@@ -41,10 +41,6 @@ import { EmptyState } from '../../components/EmptyState';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 
-function apiErrorMessage(res: { error?: string; message?: string } | null | undefined): string | undefined {
-  return res?.error || res?.message;
-}
-
 // ─── Custom Fields types ───────────────────────────────────────────────────────
 
 interface CustomField {
@@ -316,8 +312,12 @@ function FieldPreviewModal({
             </CardBody>
           </Card>
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted">
-            <Chip size="sm" variant="soft">{field.field_type}</Chip>
-            <Chip size="sm" variant="soft" color="accent">{field.applies_to}</Chip>
+            <Chip size="sm" variant="soft">
+              {t(`volunteering.field_type_${field.field_type}`, { defaultValue: t('volunteering.field_type_unknown') })}
+            </Chip>
+            <Chip size="sm" variant="soft" color="accent">
+              {t(`volunteering.applies_to_${field.applies_to}`, { defaultValue: t('volunteering.applies_to_unknown') })}
+            </Chip>
             {field.is_required && <Chip size="sm" variant="soft" color="danger">{t('volunteering.required')}</Chip>}
           </div>
         </ModalBody>
@@ -430,11 +430,11 @@ function CustomFieldsTab() {
       };
       if (editingId) {
         const res = await adminVolunteering.updateCustomField(editingId, payload);
-        if (!res.success) throw new Error(apiErrorMessage(res) || 'update_failed');
+        if (!res.success) throw new Error();
         toast.success(t('volunteering.field_updated'));
       } else {
         const res = await adminVolunteering.createCustomField(payload);
-        if (!res.success) throw new Error(apiErrorMessage(res) || 'create_failed');
+        if (!res.success) throw new Error();
         toast.success(t('volunteering.field_created'));
       }
       onClose();
@@ -449,7 +449,7 @@ function CustomFieldsTab() {
     if (!deleteId) return;
     try {
       const res = await adminVolunteering.deleteCustomField(deleteId);
-      if (!res.success) throw new Error(apiErrorMessage(res) || 'delete_failed');
+      if (!res.success) throw new Error();
       toast.success(t('volunteering.field_deleted'));
       onDeleteClose();
       loadData();
@@ -568,7 +568,7 @@ function CustomFieldsTab() {
                     setOrderChanged(false);
                     loadData();
                   } else {
-                    toast.error(res.error || t('volunteering.order_save_failed'));
+                    toast.error(t('volunteering.order_save_failed'));
                     // Revert the local reorder to the server's saved order
                     loadData();
                   }
@@ -954,7 +954,7 @@ function RemindersTab() {
           <div className="flex flex-wrap gap-2">
             {Object.entries(deliveryStats.by_channel).map(([ch, count]) => (
               <Chip key={ch} size="sm" variant="soft" color={ch === 'email' ? 'accent' : ch === 'push' ? 'default' : 'warning'}>
-                {count} {t(`volunteering.channel_${ch}`, ch)}
+                {count} {t(`volunteering.channel_${ch}`, { defaultValue: t('volunteering.channel_unknown') })}
               </Chip>
             ))}
             <Chip size="sm" variant="soft" color="default">
@@ -1152,11 +1152,11 @@ function WebhooksTab() {
       };
       if (editingId) {
         const res = await adminVolunteering.updateWebhook(editingId, payload);
-        if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_update_failed');
+        if (!res.success) throw new Error();
         toast.success(t('volunteering.webhook_updated'));
       } else {
         const res = await adminVolunteering.createWebhook(payload);
-        if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_create_failed');
+        if (!res.success) throw new Error();
         toast.success(t('volunteering.webhook_created'));
       }
       onClose();
@@ -1171,7 +1171,7 @@ function WebhooksTab() {
     if (!deleteId) return;
     try {
       const res = await adminVolunteering.deleteWebhook(deleteId);
-      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_delete_failed');
+      if (!res.success) throw new Error();
       toast.success(t('volunteering.webhook_deleted'));
       onDeleteClose();
       loadData();
@@ -1184,7 +1184,7 @@ function WebhooksTab() {
     setTestingId(id);
     try {
       const res = await adminVolunteering.testWebhook(id);
-      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_test_failed');
+      if (!res.success) throw new Error();
       toast.success(t('volunteering.webhook_test_sent'));
     } catch {
       toast.error(t('volunteering.webhook_test_failed'));
@@ -1200,7 +1200,7 @@ function WebhooksTab() {
     setRetryingId(id);
     try {
       const res = await adminVolunteering.testWebhook(id);
-      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_test_failed');
+      if (!res.success) throw new Error();
       toast.success(t('volunteering.webhook_test_sent'));
       loadData();
     } catch {

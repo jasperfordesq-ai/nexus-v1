@@ -37,14 +37,14 @@
     "loading": "Caricamento",
     "next": "Avanti",
     "no": "No",
-    "ok": "OK",
     "pending": "In sospeso",
     "previous": "Precedente",
     "retry": "Riprova",
     "save": "Salva",
     "select_all": "Seleziona tutto",
     "select_item": "Seleziona elemento",
-    "yes": "Sì"
+    "yes": "Sì",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Azioni del broker",
@@ -57,7 +57,6 @@
     "no_history_available": "Nessuna cronologia disponibile trovata",
     "no_legal_documents_found": "Nessun documento legale trovato trovato",
     "no_members_found": "Nessun membro trovato trovato",
-    "loading": "Loading",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
     "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
@@ -68,9 +67,10 @@
     "refresh": "Aggiorna",
     "search": "Ricerca...",
     "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Select row {{id}}",
     "data_table": "Dati",
-    "total_count": "{{count}}totale"
+    "total_count": "{{count}}totale",
+    "loading": "Caricamento",
+    "select_row": "Seleziona riga {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Abbonati",
       "user_fallback": "Utente n.{{id}}",
       "columns": {
-        "member": "MEMBRO",
-        "email": "EMAIL",
-        "tier": "LIVELLO",
-        "interval": "INTERVALLO",
-        "status": "STATO",
-        "next_billing": "PROSSIMA FATTURAZIONE",
-        "started": "INIZIATO"
+        "member": "Membro",
+        "email": "Email",
+        "tier": "Livello",
+        "interval": "Intervallo",
+        "status": "Stato",
+        "next_billing": "Prossima fatturazione",
+        "started": "Iniziato"
       },
       "status": {
         "active": "Attivo",
@@ -184,32 +184,32 @@
       "settings_save_failed": "Impossibile salvare le impostazioni di routing delle donazioni.",
       "onboarding_failed": "Impossibile avviare l'onboarding di Stripe.",
       "finance_load_failed": "Impossibile caricare le operazioni di finanziamento delle donazioni.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Impossibile scaricare l'esportazione della ricevuta annuale."
+      "annual_receipts_export_failed": "Impossibile scaricare l'esportazione della ricevuta annuale.",
+      "gift_aid_export_failed": "Esportazione Gift Aid non è stato possibile scaricarla."
     },
     "settings": {
-      "title": "Instradamento delle strisce",
       "description": "Lascia vuoto questo campo per utilizzare l'account Stripe della piattaforma con metadati del tenant. Collega un account Stripe del tenant per inviare future donazioni una tantum e regolari a quell'account del tenant.",
       "stripe_connect_account_id": "ID account Stripe Connect del tenant",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "La modifica di questa impostazione influisce sui futuri checkout delle donazioni. Sincronizza nuovamente i livelli di supporto dopo aver aggiunto un account tenant in modo che nell'account Stripe siano presenti prezzi ricorrenti.",
       "route_platform_default": "Ripiego della piattaforma",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Avvia l'onboarding di Stripe",
       "continue_onboarding": "Continua l'onboarding di Stripe",
       "requirements_due": "Requisiti dell'account Stripe che richiedono attenzione: {{count}}.",
       "save": "Salva percorso",
       "status": {
         "not_connected": "Non connesso",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Azione necessaria",
-        "unknown": "Stato sconosciuto"
+        "unknown": "Stato sconosciuto",
+        "pending": "In sospeso",
+        "ready": "Pronto"
       },
       "connect_fallback_active": "Un account Stripe Connect è configurato, ma non è ancora pronto per le donazioni in tempo reale. I pagamenti utilizzeranno il fallback della piattaforma fino al completamento dell'onboarding.",
       "requirements_due_many": "Requisiti dell'account Stripe che richiedono attenzione: {{count}}.",
       "requirements_due_one": "Requisiti dell'account Stripe che richiedono attenzione: {{count}}.",
-      "requirements_due_other": "Requisiti dell'account Stripe che richiedono attenzione: {{count}}."
+      "requirements_due_other": "Requisiti dell'account Stripe che richiedono attenzione: {{count}}.",
+      "route_tenant_connect": "Connessione inquilino",
+      "title": "Stripe instradamento"
     },
     "finance": {
       "title": "Operazioni finanziarie",
@@ -217,16 +217,9 @@
       "completed_volume": "Volume completato",
       "platform_fallback_volume": "Volume di fallback della piattaforma",
       "tenant_connect_volume": "Volume Tenant Connect",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Controversie aperte",
       "active_recurring": "Attivo ricorrente",
       "failed_receipts": "Ricevute non riuscite",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Esportare le entrate annuali",
       "empty": "Nessuna attività finanziaria è stata ancora registrata.",
       "donation_count_many": "{{count}} donation",
@@ -235,7 +228,14 @@
       "declaration_count_one": "Dichiarazione {{count}}",
       "past_due_count_many": "{{count}} past due",
       "past_due_count_one": "{{count}} scaduto",
-      "past_due_count_other": "{{count}} scaduto"
+      "past_due_count_other": "{{count}} scaduto",
+      "gift_aid_ready": "Gift Aid pronto",
+      "export_gift_aid": "Esporta Gift Aid",
+      "donation_count": "{{count}} donazione",
+      "donation_count_other": "{{count}} donazioni",
+      "declaration_count": "{{count}} dichiarazione",
+      "declaration_count_other": "{{count}} dichiarazioni",
+      "past_due_count": "{{count}} scaduto"
     }
   }
 }

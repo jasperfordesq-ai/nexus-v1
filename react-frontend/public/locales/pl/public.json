@@ -457,7 +457,24 @@
     },
     "scroll_down": "Przewiń w dół",
     "audience_cards": {
-      "title": "Gdzie chciałbyś zacząć?"
+      "title": "Gdzie chciałbyś zacząć?",
+      "defaults": {
+        "new_here": {
+          "title": "Nowy tutaj?",
+          "description": "Dowiedz się, jak działa nasza społeczność i jak się zaangażować.",
+          "cta": "Rozpocznij"
+        },
+        "exchange": {
+          "title": "Oferuj lub szukaj pomocy",
+          "description": "Przeglądaj, co oferują inni, lub opublikuj własną prośbę.",
+          "cta": "Przeglądaj ogłoszenia"
+        },
+        "partner": {
+          "title": "Partner lub skieruj",
+          "description": "Dla organizacji, fundatorów i profesjonalistów wspierających naszych członków.",
+          "cta": "Dowiedz się więcej"
+        }
+      }
     },
     "how_it_works": {
       "title": "Jak To Działa",
@@ -595,7 +612,7 @@
       "name_label": "Nazwa",
       "name_placeholder": "Twoje imię",
       "email_label": "E-mail",
-      "email_placeholder": "ty@example.com",
+      "email_placeholder": "you@example.com",
       "subject_label": "Temat",
       "subject_placeholder": "O co chodzi?",
       "subjects": {

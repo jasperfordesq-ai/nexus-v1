@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,15 +67,15 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "national": {
     "trend_chart_aria": "مخطط يوضح اتجاهات نشاط المجتمع مع مرور الوقت"
   },
   "national_kiss_dashboard": {
-    "loading": "Loading",
     "meta": {
       "page_title": "Caring Community - لوحة المعلومات الوطنية",
       "title": "Caring Community - لوحة المعلومات الوطنية",
@@ -141,7 +140,8 @@
       "hours_axis": "ساعات",
       "cooperatives_axis": "التعاونيات",
       "active_cooperatives": "التعاونيات النشطة",
-      "total_hours_all": "إجمالي الساعات (جميع التعاونيات)"
+      "total_hours_all": "إجمالي الساعات (جميع التعاونيات)",
+      "unknown_period": "الفترة غير المعروفة"
     },
     "comparative": {
       "title": "مقاييس المقارنة",
@@ -181,6 +181,7 @@
     },
     "toasts": {
       "load_failed": "فشل تحميل لوحة القيادة"
-    }
+    },
+    "loading": "جارٍ التحميل"
   }
 }

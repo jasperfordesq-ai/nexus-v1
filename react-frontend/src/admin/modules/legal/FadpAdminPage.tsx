@@ -294,7 +294,7 @@ export function FadpAdminPage() {
         void loadActivities();
         void loadRegister();
       } else {
-        toast.showToast(res.error || t('fadp.toasts.activity_save_failed'), 'error');
+        toast.showToast(t('fadp.toasts.activity_save_failed'), 'error');
       }
     } catch {
       toast.showToast(t('fadp.toasts.activity_save_failed'), 'error');
@@ -315,7 +315,7 @@ export function FadpAdminPage() {
         void loadActivities();
         void loadRegister();
       } else {
-        toast.showToast(res.error || t('fadp.toasts.activity_delete_failed'), 'error');
+        toast.showToast(t('fadp.toasts.activity_delete_failed'), 'error');
       }
     } catch {
       toast.showToast(t('fadp.toasts.activity_delete_failed'), 'error');
@@ -332,7 +332,7 @@ export function FadpAdminPage() {
         toast.showToast(t('fadp.toasts.retention_saved'), 'success');
         void loadRegister();
       } else {
-        toast.showToast(res.error || t('fadp.toasts.retention_save_failed'), 'error');
+        toast.showToast(t('fadp.toasts.retention_save_failed'), 'error');
       }
     } catch {
       toast.showToast(t('fadp.toasts.retention_save_failed'), 'error');

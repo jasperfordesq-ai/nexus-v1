@@ -15,67 +15,66 @@
     "federation_audit": "Audyt Federacji",
     "platform_admin": "Administrator platformy",
     "back_to_platform_admin": "Powrót do administratora platformy",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_queue": "Provisioning Queue",
-    "billing_control": "Billing Control",
-    "revenue_dashboard": "Revenue Dashboard",
-    "regional_analytics": "Regional Analytics",
-    "national_dashboard": "National Dashboard"
+    "pilot_inquiries": "Zapytania pilotażowe",
+    "provisioning_queue": "Kolejka świadczenia usług",
+    "billing_control": "Kontrola rozliczeń",
+    "revenue_dashboard": "Panel przychodów",
+    "regional_analytics": "Analizy regionalne",
+    "national_dashboard": "Panel krajowy"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Ładowanie super admina",
+    "skip_to_main": "Przejdź do głównej treści",
+    "close_navigation": "Zamknij nawigację super admina",
+    "navigation": "Nawigacja super admina"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
+    "back_to_admin": "Powrót do panelu administracyjnego",
+    "toggle_sidebar": "Przełącz pasek boczny",
+    "notifications": "Powiadomienia",
+    "my_profile": "Mój profil",
+    "sign_out": "Wyloguj się",
+    "user_fallback": "Super Administrator",
+    "user_menu": "Menu super admina"
   },
   "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "section_overview": "Przegląd",
+    "section_tenants": "Najemcy",
+    "section_federation": "Federacja",
+    "section_commercial": "Handlowy",
+    "expand": "Rozwiń pasek boczny",
+    "collapse": "Zwiń pasek boczny",
+    "nav_label": "Nawigacja super admina"
   },
   "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
     "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
+    "unknown": "{{segment}}",
+    "super_admin": "Super Administrator",
+    "tenants": "Najemcy",
+    "create": "Utwórz",
+    "edit": "Edytuj",
+    "hierarchy": "Hierarchia",
+    "users": "Użytkownicy",
+    "federation": "Federacja",
+    "whitelist": "Biała lista",
+    "partnerships": "Partnerstwa",
+    "tenant": "Najemca",
+    "features": "Funkcje",
+    "billing": "Fakturowanie",
+    "revenue": "Przychody",
+    "platform": "Platforma",
+    "pilot_inquiries": "Zapytania pilotażowe",
+    "provisioning_requests": "Żądania Zaopatrzenia",
+    "national": "Krajowe",
+    "regional_analytics": "Analizy regionalne",
+    "subscriptions": "Subskrypcje",
+    "aria_label": "Ścieżka nawigacyjna",
+    "bulk": "Operacje masowe",
+    "audit": "Dziennik audytu"
   },
   "dashboard": {
     "title": "Panel infrastruktury",
     "subtitle_global": "Globalny przegląd wszystkich najemców i infrastruktury",
-    "subtitle_scoped": "Przegląd: nazwa_dzierżawcy i podnajemców",
     "create_tenant_btn": "Utwórz najemcę",
     "stat_total_tenants": "Całkowita liczba najemców",
     "stat_active_tenants": "Aktywni najemcy",
@@ -103,7 +102,8 @@
     "quick_actions_title": "Szybkie działania",
     "create_new_tenant": "Utwórz nowego najemcę",
     "view_super_admins": "Wyświetl superadministratorów",
-    "back_to_platform_admin": "Powrót do administratora platformy"
+    "back_to_platform_admin": "Powrót do administratora platformy",
+    "subtitle_scoped": "Przegląd :tenant_name i podnajemców"
   },
   "common": {
     "active": "Aktywny",
@@ -147,7 +147,6 @@
       "filter_role_all": "Wszystkie role",
       "filter_role_admin": "Administrator",
       "filter_role_tenant_admin": "Administrator najemcy",
-      "filter_role_moderator": "Moderator",
       "filter_role_member": "Członek",
       "filter_super_admins": "Tylko superadministratorzy",
       "col_user": "Użytkownik",
@@ -162,7 +161,8 @@
       "super_admin_yes": "Tak",
       "super_admin_legacy": "Dziedzictwo",
       "no_users": "Nie znaleziono użytkowników spełniających Twoje kryteria",
-      "showing_first_100": "Wyświetlanie pierwszych 100 wyników. Użyj filtrów, aby zawęzić wyszukiwanie."
+      "showing_first_100": "Wyświetlanie pierwszych 100 wyników. Użyj filtrów, aby zawęzić wyszukiwanie.",
+      "filter_role_moderator": "Moderator"
     },
     "show": {
       "breadcrumb_users": "Użytkownicy",
@@ -188,7 +188,6 @@
       "actions_card_title": "Działania",
       "view_tenant_btn": "Zobacz Najemcę",
       "god_card_title": "Globalny superadministrator (tylko Bóg)",
-      "god_warning": "WARNING:",
       "god_warning_text": "Globalni superadministratorzy mają dostęp do WSZYSTKICH najemców na platformie.",
       "god_has_access": "Użytkownik ma GLOBALNY dostęp superadministratora",
       "god_revoke_btn": "Odwołaj globalnego superadministratora",
@@ -206,12 +205,12 @@
       "stat_user_id": "Identyfikator użytkownika",
       "stat_tenant_id": "Identyfikator najemcy",
       "stat_status": "Stan",
-      "stat_approved": "Zatwierdzone"
+      "stat_approved": "Zatwierdzone",
+      "god_warning": "Ostrzeżenie:"
     },
     "create": {
       "breadcrumb_create": "Utwórz",
       "title": "Utwórz nowego użytkownika",
-      "subtitle_selected": "Tworzenie użytkownika dla:tenant_name",
       "subtitle_default": "Wybierz dzierżawcę, aby utworzyć nowego użytkownika",
       "card_title": "Dane użytkownika",
       "tenant_label": "Najemca",
@@ -229,7 +228,8 @@
       "super_admin_label": "Przyznaj uprawnienia superadministratora",
       "super_admin_help": "Superadministratorzy mogą uzyskać dostęp do super panelu administracyjnego i zarządzać podnajemcami swoich najemców. Dostępne tylko dla dzierżawców Hub (najemców z możliwością podnajemcy).",
       "submit_btn": "Utwórz użytkownika",
-      "cancel_btn": "Anuluj"
+      "cancel_btn": "Anuluj",
+      "subtitle_selected": "Tworzenie użytkownika dla :tenant_name"
     },
     "edit": {
       "breadcrumb_edit": "Edytuj",
@@ -254,7 +254,6 @@
       "assign_what_happens": "Co się dzieje:",
       "assign_step1": "Użytkownik zostaje przeniesiony do wybranego dzierżawcy Hub",
       "assign_step2": "Użytkownik otrzymuje is_tenant_super_admin = 1",
-      "assign_step3": "Rola użytkownika jest ustawiona na najemca_admin",
       "assign_step4": "Użytkownik może teraz uzyskać dostęp do /super-admin w widoku zakresowym",
       "hub_tenant_label": "Wybierz dzierżawcę centrum do przypisania",
       "hub_tenant_placeholder": "-- Wybierz dzierżawcę centrum --",
@@ -272,17 +271,18 @@
       "stat_active": "Aktywny",
       "stat_pending": "Oczekujące",
       "super_admin_card_title": "Stan superadministratora",
-      "super_admin_toggle_desc": "Przełącz superadministratora dla:tenant_name",
       "revoke_btn": "Odwołaj superadministratora",
       "revoke_confirm": "Odwołać uprawnienia superadministratora?",
       "grant_btn": "Przyznaj superadministratora",
       "grant_confirm": "Przyznać uprawnienia superadministratora?",
-      "no_hub_text": "Nie można przyznać superadministratora, ponieważ:tenant_name nie jest dzierżawcą Hub.",
       "no_hub_move_text": "Użyj funkcji „Przenieś i przyznaj superadministratora”, aby przypisać tego użytkownika do dzierżawy Hub.",
       "quick_links_card_title": "Szybkie linki",
       "view_profile_btn": "Zobacz profil",
       "view_tenant_btn": "Zobacz Najemcę",
-      "tenant_users_btn": "Użytkownicy najemcy"
+      "tenant_users_btn": "Użytkownicy najemcy",
+      "assign_step3": "Rola użytkownika ustawiona na tenant_admin",
+      "super_admin_toggle_desc": "Przełącz Super Admin dla :tenant_name",
+      "no_hub_text": "Nie można przyznać uprawnień Super Admin, ponieważ :tenant_name nie jest najemcą Hub."
     }
   },
   "tenants": {
@@ -304,9 +304,9 @@
       "col_status": "Stan",
       "col_actions": "Działania",
       "parent_root": "Korzeń",
-      "level_label": "Poziom: głębokość",
       "you_badge": "Ty",
-      "no_tenants": "Nie znaleziono najemców"
+      "no_tenants": "Nie znaleziono najemców",
+      "level_label": "Poziom :depth"
     },
     "show": {
       "breadcrumb_tenants": "Najemcy",
@@ -319,11 +319,9 @@
       "field_slug": "Ślimak",
       "field_domain": "Domena",
       "field_hierarchy_level": "Poziom hierarchii",
-      "field_level": "Poziom: głębokość",
       "field_parent": "Rodzic",
       "field_total_users": "Całkowita liczba użytkowników",
       "field_sub_tenants": "Podnajemcy",
-      "field_sub_tenants_direct": ":licz bezpośrednio",
       "field_description": "Opis",
       "not_configured": "Nie skonfigurowano",
       "root_tenant": "Główny dzierżawca",
@@ -355,18 +353,18 @@
       "reactivate_card_title": "Aktywuj ponownie najemcę",
       "reactivate_desc": "Ten najemca jest obecnie nieaktywny. Ponowna aktywacja przywróci dostęp użytkownika.",
       "reactivate_btn": "Aktywuj ponownie najemcę",
-      "tenant_id_label": "Identyfikator najemcy::id | Ścieżka::ścieżka"
+      "field_level": "Poziom :depth",
+      "field_sub_tenants_direct": ":count bezpośredni",
+      "tenant_id_label": "ID najemcy: :id | Ścieżka: :path"
     },
     "create": {
       "breadcrumb_create": "Utwórz",
       "title": "Utwórz nowego najemcę",
-      "subtitle_selected": "Tworzenie podnajemcy pod:parent_name",
       "subtitle_default": "Wybierz dzierżawcę nadrzędnego, aby utworzyć nowego podnajemcę",
       "card_title": "Szczegóły najemcy",
       "parent_label": "Najemca-rodzic",
       "parent_placeholder": "-- Wybierz najemcę nadrzędnego --",
       "parent_help": "Wyświetlani są tylko najemcy z możliwością podnajemcy. Nowy najemca zostanie utworzony jako element podrzędny wybranego elementu nadrzędnego.",
-      "depth_label": "(Głębokość::głębokość)",
       "name_label": "Nazwa najemcy",
       "slug_label": "Ślimak",
       "slug_help": "Tylko małe litery, cyfry i łączniki",
@@ -383,12 +381,13 @@
       "max_depth_unlimited": "Nieograniczony",
       "max_depth_help": "Ogranicz liczbę poziomów podnajemców, które można utworzyć poniżej tego najemcy (ma zastosowanie tylko wtedy, gdy włączono Hub)",
       "submit_btn": "Utwórz najemcę",
-      "cancel_btn": "Anuluj"
+      "cancel_btn": "Anuluj",
+      "depth_label": "(Głębokość: :depth)",
+      "subtitle_selected": "Tworzenie pod-najemcy w ramach :parent_name"
     },
     "edit": {
       "breadcrumb_edit": "Edytuj",
       "title": "Edytuj najemcę",
-      "subtitle": "Modyfikowanie::name (Poziom:głębokość)",
       "back_btn": "Powrót do szczegółów",
       "details_card_title": "Szczegóły najemcy",
       "name_label": "Nazwa najemcy",
@@ -461,7 +460,6 @@
       "standard_tenant_badge": "Standardowy najemca",
       "max_depth_label": "Maksymalna głębokość podnajemcy",
       "max_depth_unlimited": "Nieograniczony",
-      "max_depth_levels": ":licz poziomy",
       "disable_hub_btn": "Wyłącz koncentrator",
       "disable_hub_confirm": "Zapobiegnie to tworzeniu się nowych podnajemców. Dotychczasowi podnajemcy pozostaną.",
       "enable_hub_btn": "Włącz koncentrator",
@@ -483,7 +481,9 @@
       "deactivate_confirm": "Czy na pewno chcesz dezaktywować tego najemcę? Użytkownicy utracą dostęp.",
       "reactivate_card_title": "Aktywuj ponownie najemcę",
       "reactivate_desc": "Ten najemca jest obecnie nieaktywny. Ponowna aktywacja przywróci dostęp użytkownika.",
-      "reactivate_btn": "Aktywuj ponownie najemcę"
+      "reactivate_btn": "Aktywuj ponownie najemcę",
+      "subtitle": "Modyfikowanie: :name (Poziom :depth)",
+      "max_depth_levels": ":count poziomy"
     },
     "hierarchy": {
       "breadcrumb_tenants": "Najemcy",
@@ -631,7 +631,6 @@
       "recent_activity_title": "Ostatnia aktywność",
       "full_log_btn": "Pełny dziennik",
       "no_federation_activity": "Nie ma jeszcze żadnej działalności federacyjnej",
-      "by_label": "by",
       "activity_title": "Działalność Federacji (30 dni)",
       "stat_total_actions": "Łączna liczba działań",
       "stat_messages": "Wiadomości",
@@ -640,7 +639,8 @@
       "stat_critical_events": "Wydarzenia krytyczne",
       "most_active_partnerships": "Najbardziej aktywne partnerstwa",
       "quick_nav_title": "Szybka nawigacja",
-      "tenant_whitelist_btn": "Biała lista najemców"
+      "tenant_whitelist_btn": "Biała lista najemców",
+      "by_label": "przez"
     },
     "system_controls": {
       "title": "Kontrole systemu federacyjnego",

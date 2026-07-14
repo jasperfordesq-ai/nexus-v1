@@ -247,7 +247,7 @@ export function IdeationAdmin() {
         toast.success(t('ideation.challenge_status_changed'));
         loadItems();
       } else {
-        toast.error(res?.error || t('ideation.failed_to_update_challenge_status'));
+        toast.error(t('ideation.failed_to_update_challenge_status'));
       }
     } catch {
       toast.error(t('common.an_unexpected_error'));
@@ -265,7 +265,7 @@ export function IdeationAdmin() {
         toast.success(t('ideation.challenge_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || t('ideation.failed_to_delete_challenge'));
+        toast.error(t('ideation.failed_to_delete_challenge'));
       }
     } catch {
       toast.error(t('common.an_unexpected_error'));

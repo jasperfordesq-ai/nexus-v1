@@ -20,7 +20,6 @@ import { logError } from '@/lib/logger';
 
 export interface OnboardingStepConfig {
   slug: string;
-  label: string;
   required: boolean;
 }
 
@@ -80,11 +79,11 @@ const DEFAULT_CONFIG: OnboardingConfig = {
 };
 
 const DEFAULT_STEPS: OnboardingStepConfig[] = [
-  { slug: 'welcome', label: 'Welcome', required: false },
-  { slug: 'profile', label: 'Your Profile', required: true },
-  { slug: 'interests', label: 'Interests', required: false },
-  { slug: 'skills', label: 'Skills', required: false },
-  { slug: 'confirm', label: 'Confirm', required: true },
+  { slug: 'welcome', required: false },
+  { slug: 'profile', required: true },
+  { slug: 'interests', required: false },
+  { slug: 'skills', required: false },
+  { slug: 'confirm', required: true },
 ];
 
 export function useOnboardingConfig() {

@@ -47,11 +47,11 @@ class PilotDisclosurePackService
                 'address'   => '',
                 'contact_email' => 'funding@hour-timebank.ie',
                 'sub_processors' => [
-                    'Microsoft Azure (hosting, EU)',
-                    'Cloudflare (CDN / WAF)',
-                    'Stripe (payments + identity verification)',
-                    'OpenAI (matching & summarisation, optional)',
-                    'Google Firebase Cloud Messaging (push notifications)',
+                    '@copy:subprocessor_azure',
+                    '@copy:subprocessor_cloudflare',
+                    '@copy:subprocessor_stripe',
+                    '@copy:subprocessor_openai',
+                    '@copy:subprocessor_firebase',
                 ],
             ],
             'data_categories' => [
@@ -98,7 +98,7 @@ class PilotDisclosurePackService
             ],
             'isolated_node' => [
                 'available' => true,
-                'description' => 'Canton-controlled deployment with own SMTP, storage, and backups. Federation can be disabled entirely.',
+                'description' => '@copy:isolated_node_description',
                 'hosting_owner' => '',
                 'smtp_owner'    => '',
                 'storage_owner' => '',
@@ -109,12 +109,12 @@ class PilotDisclosurePackService
                 'owner_name' => '',
                 'contact_email' => '',
                 'notification_window_hours' => 72,
-                'fadp_authority' => 'Eidgenössischer Datenschutz- und Öffentlichkeitsbeauftragter (EDÖB)',
+                'fadp_authority' => '@copy:fadp_authority',
             ],
             'cross_border_transfers' => [
                 'occurs' => true,
-                'destinations' => ['EU (Microsoft Azure)', 'US (Cloudflare, Stripe, OpenAI)'],
-                'safeguards' => ['Standard Contractual Clauses (SCCs)', 'Swiss-US Data Privacy Framework where applicable'],
+                'destinations' => ['@copy:destination_eu_azure', '@copy:destination_us_services'],
+                'safeguards' => ['@copy:safeguard_scc', '@copy:safeguard_swiss_us_framework'],
             ],
             'amendments' => [
                 'last_reviewed_at' => null,
@@ -148,17 +148,17 @@ class PilotDisclosurePackService
         if (isset($payload['incident_response']) && is_array($payload['incident_response'])) {
             $email = $payload['incident_response']['contact_email'] ?? null;
             if ($email !== null && $email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = ['field' => 'incident_response.contact_email', 'message' => 'must be a valid email'];
+                $errors[] = ['field' => 'incident_response.contact_email', 'message' => __('caring_community.disclosure_pack.validation.email')];
             }
             $win = $payload['incident_response']['notification_window_hours'] ?? null;
             if ($win !== null && (!is_numeric($win) || (int) $win < 1 || (int) $win > 720)) {
-                $errors[] = ['field' => 'incident_response.notification_window_hours', 'message' => 'must be 1–720'];
+                $errors[] = ['field' => 'incident_response.notification_window_hours', 'message' => __('caring_community.disclosure_pack.validation.notification_window')];
             }
         }
         if (isset($payload['controller']['contact_email'])
             && $payload['controller']['contact_email'] !== ''
             && !filter_var($payload['controller']['contact_email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = ['field' => 'controller.contact_email', 'message' => 'must be a valid email'];
+            $errors[] = ['field' => 'controller.contact_email', 'message' => __('caring_community.disclosure_pack.validation.email')];
         }
 
         if ($errors !== []) {
@@ -190,58 +190,65 @@ class PilotDisclosurePackService
     {
         $pack = $this->get($tenantId)['pack'];
         $lines = [];
-        $lines[] = '# Swiss FADP / nDSG Disclosure Pack';
-        $lines[] = '_Pilot disclosure document — review with counsel before publishing._';
+        $lines[] = '# ' . $this->translation('markdown.title');
+        $lines[] = '_' . $this->translation('markdown.review_notice') . '_';
         $lines[] = '';
-        $lines[] = '## 1. Controller';
+        $lines[] = '## 1. ' . $this->translation('markdown.controller');
         $lines[] = $this->kv($pack['controller']);
         $lines[] = '';
-        $lines[] = '## 2. Processor';
+        $lines[] = '## 2. ' . $this->translation('markdown.processor');
         $lines[] = $this->kv(array_diff_key($pack['processor'], ['sub_processors' => true]));
         $lines[] = '';
-        $lines[] = '### Sub-processors';
+        $lines[] = '### ' . $this->translation('markdown.sub_processors');
         foreach ($pack['processor']['sub_processors'] ?? [] as $sp) {
-            $lines[] = '- ' . $sp;
+            $lines[] = '- ' . $this->displayValue($sp);
         }
         $lines[] = '';
-        $lines[] = '## 3. Data categories';
+        $lines[] = '## 3. ' . $this->translation('markdown.data_categories');
         foreach ($pack['data_categories'] as $cat => $fields) {
-            $lines[] = sprintf('- **%s**: %s', $cat, implode(', ', (array) $fields));
+            $lines[] = sprintf(
+                '- **%s**: %s',
+                $this->fieldLabel((string) $cat),
+                implode(', ', array_map(fn (mixed $field): string => $this->displayValue($field), (array) $fields))
+            );
         }
         $lines[] = '';
-        $lines[] = '## 4. Lawful basis';
+        $lines[] = '## 4. ' . $this->translation('markdown.lawful_basis');
         $lines[] = $this->kv($pack['lawful_basis']);
         $lines[] = '';
-        $lines[] = '## 5. Retention defaults';
+        $lines[] = '## 5. ' . $this->translation('markdown.retention_defaults');
         $lines[] = $this->kv($pack['retention_defaults']);
         $lines[] = '';
-        $lines[] = '## 6. Data subject rights';
+        $lines[] = '## 6. ' . $this->translation('markdown.data_subject_rights');
         $lines[] = $this->kv($pack['data_subject_rights']);
         $lines[] = '';
-        $lines[] = '## 7. Federation policy';
+        $lines[] = '## 7. ' . $this->translation('markdown.federation_policy');
         $lines[] = $this->kv($pack['federation']);
         $lines[] = '';
-        $lines[] = '## 8. Isolated-node deployment option';
+        $lines[] = '## 8. ' . $this->translation('markdown.isolated_node');
         $lines[] = $this->kv($pack['isolated_node']);
         $lines[] = '';
-        $lines[] = '## 9. Incident response';
+        $lines[] = '## 9. ' . $this->translation('markdown.incident_response');
         $lines[] = $this->kv($pack['incident_response']);
         $lines[] = '';
-        $lines[] = '## 10. Cross-border transfers';
+        $lines[] = '## 10. ' . $this->translation('markdown.cross_border_transfers');
         $lines[] = $this->kv(array_diff_key($pack['cross_border_transfers'], ['destinations' => true, 'safeguards' => true]));
-        $lines[] = '### Destinations';
+        $lines[] = '### ' . $this->translation('markdown.destinations');
         foreach ($pack['cross_border_transfers']['destinations'] ?? [] as $d) {
-            $lines[] = '- ' . $d;
+            $lines[] = '- ' . $this->displayValue($d);
         }
-        $lines[] = '### Safeguards';
+        $lines[] = '### ' . $this->translation('markdown.safeguards');
         foreach ($pack['cross_border_transfers']['safeguards'] ?? [] as $s) {
-            $lines[] = '- ' . $s;
+            $lines[] = '- ' . $this->displayValue($s);
         }
         $lines[] = '';
-        $lines[] = '## 11. Amendments';
+        $lines[] = '## 11. ' . $this->translation('markdown.amendments');
         $lines[] = $this->kv($pack['amendments']);
         $lines[] = '';
-        $lines[] = '_Generated ' . now()->toIso8601String() . ' from tenant ID ' . $tenantId . '. Review with FADP/nDSG counsel before publication._';
+        $lines[] = '_' . $this->translation('markdown.generated', [
+            'date' => now()->toIso8601String(),
+            'tenant_id' => $tenantId,
+        ]) . '_';
 
         return implode("\n", $lines);
     }
@@ -251,15 +258,43 @@ class PilotDisclosurePackService
         $out = [];
         foreach ($data as $k => $v) {
             if (is_array($v)) {
-                $v = json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $v = implode(', ', array_map(fn (mixed $item): string => $this->displayValue($item), $v));
             } elseif (is_bool($v)) {
-                $v = $v ? 'true' : 'false';
+                $v = $this->translation($v ? 'markdown.true' : 'markdown.false');
             } elseif ($v === null || $v === '') {
-                $v = '_(unset)_';
+                $v = '_' . $this->translation('markdown.unset') . '_';
+            } else {
+                $v = $this->displayValue($v);
             }
-            $out[] = sprintf('- **%s**: %s', $k, (string) $v);
+            $out[] = sprintf('- **%s**: %s', $this->fieldLabel((string) $k), (string) $v);
         }
         return implode("\n", $out);
+    }
+
+    private function displayValue(mixed $value): string
+    {
+        $value = (string) $value;
+        if (str_starts_with($value, '@copy:')) {
+            return $this->translation('copy.' . substr($value, 6));
+        }
+
+        $key = 'values.' . $value;
+        $translated = $this->translation($key);
+
+        return $translated === 'caring_community.disclosure_pack.' . $key ? $value : $translated;
+    }
+
+    private function fieldLabel(string $field): string
+    {
+        $key = 'fields.' . $field;
+        $translated = $this->translation($key);
+
+        return $translated === 'caring_community.disclosure_pack.' . $key ? $field : $translated;
+    }
+
+    private function translation(string $key, array $replace = []): string
+    {
+        return (string) __('caring_community.disclosure_pack.' . $key, $replace);
     }
 
     private function loadStored(int $tenantId): array

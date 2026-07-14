@@ -179,5 +179,259 @@
     "provider_subject": "Project NEXUS — Test e-mailprovider",
     "provider_heading": "Test e-mailprovider",
     "body_tenant_ok": "Uw tenant-e-mailprovider is geconfigureerd en werkt correct."
+  },
+  "help": {
+    "feedback_recorded": "Feedback geregistreerd",
+    "missing_article_slug": "Ontbrekende article_slug",
+    "article_not_found": "Artikel niet gevonden"
+  },
+  "job_vacancies": {
+    "job_not_found": "Taak niet gevonden",
+    "only_poster_can_rank": "Alleen de vacatureplaatsing kan kandidaten rangschikken",
+    "ai_not_configured": "AI is niet geconfigureerd",
+    "no_active_applications": "Geen actieve sollicitaties om te rangschikken",
+    "ai_parse_error": "Kon AI-rangschikkingsantwoord niet parseren",
+    "ai_ranking_failed": "AI-rangschikking mislukt",
+    "template_name_required": "Sjabloonnaam is verplicht",
+    "template_not_found": "Sjabloon niet gevonden",
+    "employer_id_required": "employer_id is verplicht",
+    "rating_must_be_1_5": "Beoordeling moet 1-5 zijn",
+    "only_review_after_completing": "U kunt werkgevers pas beoordelen nadat u een baan bij hen heeft voltooid",
+    "already_reviewed_employer": "U heeft deze werkgever al beoordeeld",
+    "interview_not_found": "Interview niet gevonden",
+    "access_denied": "Toegang geweigerd",
+    "message_required": "Bericht is verplicht",
+    "ai_chat_failed": "AI-chat mislukt"
+  },
+  "knowledge_base": {
+    "feedback_submitted": "Feedback succesvol ingediend",
+    "article_not_found": "Artikel niet gevonden",
+    "attachment_not_found": "Bijlage niet gevonden",
+    "file_not_found_on_disk": "Bestand niet gevonden op schijf"
+  },
+  "legal": {
+    "all_accepted": "Alle juridische documenten geaccepteerd",
+    "acceptance_recorded": "Acceptatie geregistreerd"
+  },
+  "listings": {
+    "cannot_report_own": "Je kunt je eigen vermelding niet melden.",
+    "valid_reason_required": "Een geldige reden is vereist.",
+    "details_max_500": "Details mogen niet meer dan 500 tekens bevatten.",
+    "already_reported": "Je hebt deze vermelding al gemeld.",
+    "report_thank_you": "Bedankt voor je rapport. Ons team zal het bekijken.",
+    "no_images_uploaded": "Geen afbeeldingen geüpload.",
+    "image_not_found": "Afbeelding niet gevonden.",
+    "image_ids_non_empty": "image_ids moet een niet-lege array zijn."
+  },
+  "marketplace_ai": {
+    "feature_disabled": "De marktplaatsfunctie is niet ingeschakeld voor deze community.",
+    "auth_required": "Authenticatie vereist.",
+    "listing_not_found": "Vermelding niet gevonden.",
+    "only_owner_auto_reply": "Alleen de eigenaar van de vermelding kan automatische antwoorden genereren."
+  },
+  "marketplace_delivery": {
+    "feature_disabled": "De marktplaatsfunctie is niet ingeschakeld voor deze community.",
+    "auth_required": "Authenticatie vereist.",
+    "offer_accepted": "Bezorgaanbod geaccepteerd",
+    "delivery_confirmed": "Bezorging bevestigd, tijdcredits toegekend"
+  },
+  "marketplace_listing": {
+    "feature_disabled": "De marktplaatsfunctie is niet ingeschakeld voor deze community.",
+    "no_permission_modify": "U hebt geen toestemming om deze vermelding te wijzigen.",
+    "not_found": "Marketplace-vermelding niet gevonden.",
+    "create_failed": "Het is niet gelukt om de aanbieding aan te maken. Probeer het opnieuw.",
+    "update_failed": "Het is niet gelukt om de aanbieding bij te werken. Probeer het opnieuw.",
+    "no_image_files": "Geen afbeeldingsbestanden opgegeven.",
+    "no_valid_images": "Geen geldige afbeeldingen konden worden geüpload. Toegestaan: JPEG, PNG, GIF, WebP (maximaal 10 MB).",
+    "image_not_found": "Afbeelding voor deze aanbieding niet gevonden.",
+    "no_video_file": "Geen videobestand opgegeven.",
+    "invalid_video_type": "Ongeldig videotypering. Toegestaan: MP4, WebM, MOV.",
+    "video_too_large": "Videobestand overschrijdt de limiet van 50 MB.",
+    "ai_description_failed": "Kon geen beschrijving genereren. Probeer het opnieuw of schrijf er zelf een.",
+    "lat_lng_required": "Breedte- en lengtegraad zijn vereist.",
+    "invalid_coordinates": "Ongeldige coördinaten.",
+    "csv_read_failed": "Kon het CSV-bestand niet lezen.",
+    "csv_header_required": "CSV-bestand moet een koprij en minimaal één datarij bevatten.",
+    "max_images_reached": "Maximum van :max afbeeldingen per advertentie is bereikt.",
+    "csv_missing_column": "CSV-bestand moet een ':col'-kolom bevatten.",
+    "imported_as_drafts": ":count vermelding(en) geïmporteerd als concepten."
+  },
+  "marketplace_offer": {
+    "feature_disabled": "De marktplaatsfunctie is niet ingeschakeld voor deze community.",
+    "not_own_listing": "U bent niet de eigenaar van deze vermelding.",
+    "only_seller_accept": "Alleen de verkoper kan dit bod accepteren.",
+    "only_seller_decline": "Alleen de verkoper kan dit bod weigeren.",
+    "only_seller_counter": "Alleen de verkoper kan een tegenbod doen.",
+    "only_buyer_accept_counter": "Alleen de koper kan een tegenbod accepteren.",
+    "only_buyer_withdraw": "Alleen de koper kan hun aanbod intrekken.",
+    "withdrawn": "Aanbod succesvol ingetrokken."
+  },
+  "marketplace_report": {
+    "feature_disabled": "De marktplaatsfunctie is niet ingeschakeld voor deze community.",
+    "report_submitted": "Uw rapport is ingediend. Wij zullen het binnen 24 uur beoordelen zoals vereist door de Digital Services Act."
+  },
+  "member_availability": {
+    "slot_deleted": "Slot verwijderd"
+  },
+  "menu": {
+    "cache_cleared": "Menucache succesvol gewist"
+  },
+  "newsletter": {
+    "already_unsubscribed": "Je bent al uitgeschreven."
+  },
+  "notifications": {
+    "deleted": "Melding verwijderd"
+  },
+  "onboarding": {
+    "already_completed": "Onboarding al voltooid",
+    "safeguarding_saved": "Voorkeuren voor beveiliging opgeslagen"
+  },
+  "openapi": {
+    "spec_not_found": "OpenAPI-specificatie niet gevonden"
+  },
+  "identity": {
+    "dob_locked": "Uw naam en geboortedatum worden vergrendeld na identiteitsverificatie.",
+    "dob_required": "Geboortedatum is verplicht.",
+    "dob_invalid": "Voer een geldige geboortedatum in.",
+    "dob_must_be_past": "Geboortedatum moet in het verleden liggen.",
+    "must_be_16": "U moet minstens 16 jaar oud zijn.",
+    "no_fee_required": "Geen vergoeding vereist.",
+    "payment_failed": "Betaling kan niet worden verwerkt. Probeer het alstublieft opnieuw.",
+    "user_not_found": "Gebruiker niet gevonden.",
+    "provide_dob_first": "Geef eerst uw geboortedatum op, alstublieft.",
+    "complete_payment_first": "Voltooi eerst de betaling, alstublieft.",
+    "not_available": "Identiteitsverificatie is momenteel niet beschikbaar.",
+    "start_failed": "Kan verificatie niet starten."
+  },
+  "password_reset": {
+    "link_sent": "Als er een account bestaat met dat e-mailadres, is er een link voor het opnieuw instellen van het wachtwoord verzonden.",
+    "updated": "Wachtwoord succesvol bijgewerkt. Log alstublieft in met uw nieuwe wachtwoord.",
+    "changed_bell": "Uw wachtwoord is gewijzigd. Als u dit niet heeft gedaan, neem dan onmiddellijk contact op met de ondersteuning."
+  },
+  "peer_endorsement": {
+    "recorded": "Peer-aanbeveling geregistreerd"
+  },
+  "push": {
+    "unsubscribed": "Succesvol afgemeld",
+    "no_subscribers": "Geen abonnees gevonden",
+    "token_pending": "Token ontvangen - zal worden gekoppeld bij inloggen",
+    "device_registered": "Apparaat geregistreerd voor pushmeldingen"
+  },
+  "registration": {
+    "email_verified": "E-mail succesvol geverifieerd",
+    "verification_sent": "Verificatie-e-mail verzonden indien account bestaat"
+  },
+  "resource_category": {
+    "reordered": "Bronnen succesvol opnieuw gerangschikt"
+  },
+  "skill_taxonomy": {
+    "category_deleted": "Categorie verwijderd",
+    "skill_removed": "Vaardigheid verwijderd"
+  },
+  "sub_account": {
+    "relationship_revoked": "Relatie ingetrokken"
+  },
+  "two_factor": {
+    "disabled": "Twee-factor-authenticatie is uitgeschakeld",
+    "enabled_notification": "Twee-factor-authenticatie is ingeschakeld op uw account.",
+    "disabled_notification": "Twee-factor-authenticatie is uitgeschakeld op uw account. Als u dit niet heeft gedaan, beveilig uw account onmiddellijk.",
+    "disabled_email_title": "Twee-factor-authenticatie uitgeschakeld",
+    "disabled_email_preview": "2FA is uitgeschakeld op uw account.",
+    "disabled_email_body": "Twee-factor-authenticatie is uitgeschakeld op uw account. Als u deze wijziging niet heeft aangebracht, beveilig uw account dan onmiddellijk door uw wachtwoord te wijzigen en 2FA opnieuw in te schakelen.",
+    "disabled_email_subject": "Beveiligingsmelding: 2FA uitgeschakeld — {{tenant}}"
+  },
+  "users": {
+    "theme_updated": "Themapreferentie bijgewerkt",
+    "password_updated": "Wachtwoord succesvol bijgewerkt",
+    "account_deleted": "Account succesvol verwijderd",
+    "prefs_updated": "Meldingsvoorkeuren bijgewerkt",
+    "notification_settings_update_failed": "Kon meldingsinstellingen niet bijwerken",
+    "invalid_context_type": "Ongeldig contexttype",
+    "invalid_frequency": "Ongeldige frequentie",
+    "context_id_required": "Context-ID vereist",
+    "invalid_group_id": "Ongeldige groeps-ID",
+    "invalid_thread_id": "Ongeldige draad-ID"
+  },
+  "volunteer_checkin": {
+    "checked_out": "Succesvol uitgecheckt"
+  },
+  "volunteer_community": {
+    "joined_waitlist": "Succesvol op de wachtlijst geplaatst",
+    "claimed_spot": "Succesvol de dienstplek geclaimd",
+    "swap_request_sent": "Ruilverzoek verzonden",
+    "swap_admin_pending": "Ruil geaccepteerd maar vereist goedkeuring van de beheerder",
+    "reserved_slots": "Gereserveerd :slots plaatsen",
+    "member_added_reservation": "Lid toegevoegd aan groepsreservering",
+    "recurring_deactivated": "Terugkerend patroon gedeactiveerd",
+    "guardian_consent_granted": "Toestemming van de voogd is succesvol verleend."
+  },
+  "volunteer": {
+    "access_denied": "Toegang geweigerd",
+    "amount_gt_zero": "Het bedrag moet groter zijn dan 0",
+    "no_fields_to_update": "Geen velden om bij te werken",
+    "signed_up_for_shift": "Succesvol aangemeld voor dienst",
+    "hours_logged_pending": "Uren succesvol geregistreerd, in afwachting van verificatie",
+    "review_submitted": "Beoordeling succesvol ingediend"
+  },
+  "volunteer_wellbeing": {
+    "emergency_alert_sent": "Noodmelding verzonden"
+  },
+  "wallet": {
+    "donation_successful": "Donatie geslaagd. Dank u!",
+    "category_deleted": "Categorie verwijderd",
+    "name_required": "Naam is verplicht",
+    "create_category_failed": "Kan categorie niet aanmaken",
+    "update_category_failed": "Kan categorie niet bijwerken",
+    "cannot_delete_category": "Kan deze categorie niet verwijderen (kan een systeemcategorie zijn)",
+    "rating_required": "Beoordeling is verplicht (1-5)",
+    "amount_required": "Bedrag is verplicht",
+    "starting_balance_failed": "Het bijwerken van het beginsaldo is mislukt",
+    "starting_balance_updated": "Beginsaldo bijgewerkt",
+    "statement_exported": "Overzicht geëxporteerd"
+  },
+  "webauthn": {
+    "passkey_registered": "Passkey succesvol geregistreerd",
+    "auth_successful": "Authenticatie succesvol",
+    "credentials_removed": "Referentie(s) verwijderd",
+    "all_removed": "Verwijderd :count toegangssleutel(s). Je kunt nu opnieuw registreren op elk apparaat.",
+    "passkey_removed_bell": "Er is een toegangssleutel uit je account verwijderd. Als jij dit niet hebt gedaan, beveilig dan onmiddellijk je account.",
+    "all_passkeys_removed_bell": "Alle toegangssleutels ({{count}}) zijn uit je account verwijderd. Als jij dit niet hebt gedaan, beveilig dan onmiddellijk je account."
+  },
+  "maintenance": {
+    "under_maintenance": "Het platform is momenteel in onderhoud. Kom binnenkort terug."
+  },
+  "block_user": {
+    "cannot_block_self": "Je kunt jezelf niet blokkeren"
+  },
+  "group_conversation": {
+    "body_required": "Berichttekst is verplicht",
+    "message_too_long": "Bericht is te lang"
+  },
+  "marketplace_group": {
+    "auth_required": "Authenticatie vereist."
+  },
+  "connections": {
+    "accepted_connection": "Verbinding geaccepteerd",
+    "connection_accepted": "Verbinding geaccepteerd"
+  },
+  "admin_crm": {
+    "invalid_type": "Ongeldig typeparameter"
+  },
+  "endorsement": {
+    "cannot_endorse_self": "Je kunt jezelf niet aanbevelen",
+    "member_not_found": "Lid niet gevonden",
+    "already_endorsed": "Je hebt deze vaardigheid al aanbevolen"
+  },
+  "feed": {
+    "content_or_image_required": "Bericht moet inhoud of een afbeelding bevatten",
+    "quoted_post_not_found": "Geciteerd bericht niet gevonden",
+    "post_not_found_or_not_owned": "Bericht niet gevonden of niet van jou",
+    "must_be_group_member": "Je moet lid van de groep zijn om te posten",
+    "create_post_failed": "Posten mislukt"
+  },
+  "verification_badge": {
+    "user_not_found": "Gebruiker niet gevonden",
+    "badge_already_active": "Badge al actief",
+    "invalid_badge_type": "Ongeldig badge-type: :type"
   }
 }

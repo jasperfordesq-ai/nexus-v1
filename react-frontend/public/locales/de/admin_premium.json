@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -103,13 +103,13 @@
       "table_aria": "Abonnenten",
       "user_fallback": "Benutzer #{{id}}",
       "columns": {
-        "member": "MITGLIED",
-        "email": "EMAIL",
-        "tier": "STUFE",
-        "interval": "INTERVALL",
-        "status": "STATUS",
-        "next_billing": "NÄCHSTE RECHNUNG",
-        "started": "GESTARTET"
+        "member": "Mitglied",
+        "email": "E-Mail",
+        "tier": "Stufe",
+        "interval": "Intervall",
+        "status": "Status",
+        "next_billing": "Nächste Abrechnung",
+        "started": "Gestartet"
       },
       "status": {
         "active": "Aktiv",
@@ -183,8 +183,8 @@
       "settings_save_failed": "Die Einstellungen für die Spendenweiterleitung konnten nicht gespeichert werden.",
       "onboarding_failed": "Stripe-Onboarding konnte nicht gestartet werden.",
       "finance_load_failed": "Spendenfinanzierungsvorgänge konnten nicht geladen werden.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Der Export des Jahresbelegs konnte nicht heruntergeladen werden."
+      "annual_receipts_export_failed": "Der Export des Jahresbelegs konnte nicht heruntergeladen werden.",
+      "gift_aid_export_failed": "Gift-Aid-Export konnte nicht heruntergeladen werden."
     },
     "settings": {
       "title": "Stripe-Routing",
@@ -193,21 +193,21 @@
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Wenn Sie dies ändern, wirkt sich dies auf zukünftige Spendenabschlüsse aus. Synchronisieren Sie die Supportstufen nach dem Hinzufügen eines Mandantenkontos erneut, damit in diesem Stripe-Konto wiederkehrende Preise vorhanden sind.",
       "route_platform_default": "Plattform-Fallback",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "Starten Sie das Stripe-Onboarding",
       "continue_onboarding": "Fahren Sie mit dem Stripe-Onboarding fort",
       "requirements_due": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}.",
       "save": "Routing speichern",
       "status": {
         "not_connected": "Nicht verbunden",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "Handlungsbedarf",
-        "unknown": "Status unbekannt"
+        "unknown": "Status unbekannt",
+        "pending": "Ausstehend",
+        "ready": "Bereit"
       },
       "connect_fallback_active": "Ein Stripe Connect-Konto ist konfiguriert, aber noch nicht für Live-Spenden bereit. Zahlungen nutzen das Plattform-Fallback, bis das Onboarding abgeschlossen ist.",
       "requirements_due_one": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}.",
-      "requirements_due_other": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}."
+      "requirements_due_other": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}.",
+      "route_tenant_connect": "Mieter verbinden"
     },
     "finance": {
       "title": "Finanzoperationen",
@@ -215,22 +215,22 @@
       "completed_volume": "Abgeschlossener Band",
       "platform_fallback_volume": "Plattform-Fallback-Volumen",
       "tenant_connect_volume": "Tenant Connect-Volume",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "Offene Streitigkeiten",
       "active_recurring": "Aktiv wiederkehrend",
       "failed_receipts": "Fehlgeschlagene Belege",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Jahresbelege exportieren",
       "empty": "Es wurden noch keine Finanzaktivitäten verzeichnet.",
       "donation_count_one": "{{count}} Spende",
       "declaration_count_one": "{{count}}-Deklaration",
       "past_due_count_one": "{{count}} überfällig",
-      "past_due_count_other": "{{count}} überfällig"
+      "past_due_count_other": "{{count}} überfällig",
+      "gift_aid_ready": "Gift Aid bereit",
+      "export_gift_aid": "Gift Aid exportieren",
+      "donation_count": "{{count}} Spende",
+      "donation_count_other": "{{count}} Spenden",
+      "declaration_count": "{{count}} Erklärung",
+      "declaration_count_other": "{{count}} Erklärungen",
+      "past_due_count": "{{count}} überfällig"
     }
   }
 }

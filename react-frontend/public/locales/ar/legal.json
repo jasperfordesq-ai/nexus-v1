@@ -818,5 +818,8 @@
     "contact_cta_body": "تواصل معنا وسيقوم المنسق بالرد عليك. يتم الرد على معظم الرسائل خلال يوم عمل واحد.",
     "contact_cta_button": "اتصل بنا",
     "community_guidelines_link": "اقرأ إرشادات المجتمع"
+  },
+  "custom_document": {
+    "introduction": "مقدمة"
   }
 }

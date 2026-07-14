@@ -153,7 +153,9 @@ export interface ActivityLogEntry {
   user_email?: string;
   user_avatar?: string | null;
   action: string;
-  description: string;
+  description: string | null;
+  description_code?: string | null;
+  description_params?: Record<string, string | number>;
   ip_address?: string;
   created_at: string;
 }
@@ -289,7 +291,9 @@ export interface CacheStats {
 
 export interface BackgroundJob {
   id: string;
-  name: string;
+  translation_key: string;
+  /** @deprecated Display copy is translated client-side from translation_key. */
+  name?: string;
   status: 'idle' | 'running' | 'failed';
   last_run_at: string | null;
   next_run_at: string | null;
@@ -366,7 +370,12 @@ export interface GamificationStats {
   active_users: number;
   total_xp_awarded: number;
   active_campaigns: number;
-  badge_distribution: Array<{ badge_name: string; count: number }>;
+  badge_distribution: Array<{
+    badge_key?: string;
+    badge_name: string;
+    name_code?: string | null;
+    count: number;
+  }>;
 }
 
 export interface Campaign {
@@ -388,7 +397,9 @@ export interface BadgeDefinition {
   id: number | null;
   key: string;
   name: string;
+  name_code?: string | null;
   description: string;
+  description_code?: string | null;
   icon: string;
   type: 'built_in' | 'custom';
   awarded_count: number;
@@ -397,7 +408,9 @@ export interface BadgeDefinition {
 export interface BadgeConfigEntry {
   key: string;
   name: string;
+  name_code?: string | null;
   description: string;
+  description_code?: string | null;
   icon: string;
   type: string;
   threshold: number;
@@ -891,11 +904,89 @@ export interface SystemHealth {
 export interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
   checks: Array<{
-    name: string;
+    code: string;
+    params?: Record<string, string | number | null>;
+    /** @deprecated Legacy history rows may still contain a server-authored name. */
+    name?: string;
     status: 'ok' | 'fail';
     free?: string;
     total?: string;
   }>;
+}
+
+export type SeoAuditStatus = 'pass' | 'warning' | 'fail';
+
+export type SeoAuditCheckCode =
+  | 'tenant_metadata'
+  | 'seo_settings'
+  | 'blog_meta'
+  | 'page_meta'
+  | 'kb_meta'
+  | 'redirect_health'
+  | 'duplicate_titles'
+  | 'sitemap_coverage'
+  | 'canonical_urls'
+  | 'open_graph'
+  | 'content_quality'
+  | 'unknown';
+
+export type SeoAuditIssueCode =
+  | 'missing_homepage_meta_title'
+  | 'homepage_meta_title_too_long'
+  | 'missing_meta_description'
+  | 'meta_description_too_long'
+  | 'meta_description_too_short'
+  | 'missing_homepage_h1'
+  | 'canonical_urls_not_enabled'
+  | 'open_graph_not_enabled'
+  | 'twitter_cards_not_enabled'
+  | 'title_suffix_missing'
+  | 'blog_post_meta_missing'
+  | 'additional_results_truncated'
+  | 'cms_page_meta_title_missing'
+  | 'kb_article_titles_missing'
+  | 'redirect_chain'
+  | 'redirect_loop'
+  | 'self_redirect'
+  | 'duplicate_meta_title'
+  | 'sitemap_empty'
+  | 'sitemap_low_coverage'
+  | 'sitemap_static_pages_missing'
+  | 'sitemap_profiles_missing'
+  | 'canonical_generation_disabled'
+  | 'custom_canonical_urls_high'
+  | 'open_graph_sharing_disabled'
+  | 'twitter_cards_disabled'
+  | 'open_graph_default_image_missing'
+  | 'thin_blog_content'
+  | 'untitled_published_pages'
+  | 'legacy_result_requires_rerun'
+  | 'unknown';
+
+export type SeoAuditParams = Record<string, string | number | boolean | null>;
+
+export interface SeoAuditIssue {
+  code: SeoAuditIssueCode;
+  params: SeoAuditParams;
+}
+
+export interface SeoAuditCheck {
+  code: SeoAuditCheckCode;
+  params: SeoAuditParams;
+  status: SeoAuditStatus;
+  issues: SeoAuditIssue[];
+  issue_count: number;
+  points: number;
+  max_points: number;
+}
+
+export interface SeoAuditResult {
+  checks: SeoAuditCheck[];
+  score: number;
+  max_score: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F' | 'N/A';
+  run_at: string;
+  stored_at?: string;
 }
 
 export interface GdprDashboardStats {
@@ -910,6 +1001,7 @@ export interface GdprConsent {
   user_id: number;
   user_name: string;
   consent_type: string;
+  consent_type_name?: string | null;
   consented: boolean;
   consented_at?: string;
   created_at: string;
@@ -1114,10 +1206,15 @@ export interface HealthCheckHistoryEntry {
 export interface CronJob {
   id: number;
   slug: string;
-  name: string;
+  translation_key: string;
+  /** @deprecated Display copy is translated client-side from translation_key. */
+  name?: string;
   command: string;
   schedule: string;
   status: 'active' | 'disabled';
+  category: string;
+  /** @deprecated Display copy is translated client-side from translation_key. */
+  description?: string;
   last_run_at: string | null;
   last_status: 'success' | 'failed' | null;
   next_run_at: string | null;
@@ -1690,7 +1787,7 @@ export interface BulkOperationResult {
   moved_count?: number;
   updated_count: number;
   total_requested: number;
-  errors: string[];
+  errors: Array<string | { code: string; params?: Record<string, string | number> }>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1702,12 +1799,16 @@ export interface SuperAuditEntry {
   action_type: string;
   target_type: string;
   target_id: number | null;
-  target_label: string;
+  target_label: string | null;
+  target_label_code?: string | null;
+  target_label_params?: Record<string, string | number>;
   actor_id: number;
   actor_name?: string;
   old_value?: Record<string, unknown> | null;
   new_value?: Record<string, unknown> | null;
-  description: string;
+  description: string | null;
+  description_code?: string | null;
+  description_params?: Record<string, string | number>;
   created_at: string;
 }
 
@@ -2423,7 +2524,9 @@ export interface CrmDashboardStats {
 }
 
 export interface CrmFunnelStage {
-  name: string;
+  code: string;
+  /** @deprecated Display copy is translated client-side from code. */
+  name?: string;
   count: number;
   color: string;
 }
@@ -2497,7 +2600,10 @@ export interface TimelineEntry {
   user_name: string;
   user_avatar: string | null;
   activity_type: string;
-  description: string;
+  description_code: string;
+  description_params: Record<string, string | number | null>;
+  /** @deprecated Display copy is translated client-side from description_code. */
+  description?: string;
   metadata: Record<string, unknown> | null;
   created_at: string;
 }

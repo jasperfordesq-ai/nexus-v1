@@ -143,6 +143,7 @@
     "status_completed": "Completed",
     "status_partial": "Partial",
     "status_failed": "Failed",
+    "status_unknown": "Unknown status",
     "type_activity_log": "Activity log",
     "type_activity_log_desc": "Member and system activity trail (logins, record changes).",
     "type_admin_audit_log": "Admin audit log",
@@ -160,7 +161,8 @@
     "type_vol_safeguarding_incidents": "Safeguarding incidents",
     "type_vol_safeguarding_incidents_desc": "Safeguarding case records. Only resolved or closed cases are purged; check statutory retention duties before enabling.",
     "type_vol_guardian_consents": "Guardian consents",
-    "type_vol_guardian_consents_desc": "Guardian consent records for minors, purged this many days after the consent expires."
+    "type_vol_guardian_consents_desc": "Guardian consent records for minors, purged this many days after the consent expires.",
+    "type_unknown": "Unknown data type"
   },
   "seed_generator": {
     "count_aria_label": "{{label}} count",
@@ -200,6 +202,7 @@
     "preset_generic": "Generic OIDC",
     "preset_entra": "Microsoft Entra ID",
     "preset_hivebrite": "Hivebrite",
+    "preset_unknown": "Unknown preset",
     "preset_entra_hint": "For Microsoft Entra ID, the issuer URL is https://login.microsoftonline.com/{directory-tenant-id}/v2.0",
     "test_connection": "Test connection",
     "testing": "Testing…",
@@ -242,6 +245,9 @@
   },
   "system": {
     "active": "Active",
+    "alert_status_healthy": "Healthy",
+    "alert_status_warning": "Warning",
+    "alert_status_critical": "Critical",
     "activity_log_desc": "View a log of all admin actions taken on this platform",
     "activity_log_title": "Activity Log",
     "additional_configuration": "Additional configuration",
@@ -436,6 +442,12 @@
     "label_thumbnails": "Thumbnails",
     "label_verification_level": "Verification Level",
     "label_verification_provider": "Verification Provider",
+    "verification_level_none": "None",
+    "verification_level_document_only": "Document only",
+    "verification_level_document_selfie": "Document and selfie",
+    "verification_level_reusable_digital_id": "Reusable digital ID",
+    "verification_level_manual_review": "Manual review",
+    "verification_level_unknown": "Unknown verification level",
     "label_webhook_secret": "Webhook Secret",
     "last_failed": "Last Failed",
     "last_run": "Last Run",
@@ -808,7 +820,7 @@
     "label_default_currency": "Default currency",
     "desc_default_currency": "Used for subscription and marketplace pricing",
     "section_branding_legal": "Branding & Legal",
-    "powered_by_branding_section": "Powered By Branding",
+    "powered_by_branding_section": "Powered-by branding",
     "powered_by_branding_desc": "Configure the footer's right-hand 'Powered By' slot. Changes take effect immediately. God-only.",
     "god_only_chip": "God only",
     "label_partner_logo_label": "Partner logo label",
@@ -1113,7 +1125,200 @@
       "vetting_record_rejected": "Vetting Record Rejected",
       "vetting_record_updated": "Vetting Record Updated",
       "vetting_record_verified": "Vetting Record Verified",
-      "welcome_credits_issued": "Welcome Credits Issued"
+      "welcome_credits_issued": "Welcome Credits Issued",
+      "unknown": "Unknown action"
+    },
+    "job_category_notifications": "Notifications",
+    "job_category_newsletters": "Newsletters",
+    "job_category_matching": "Matching",
+    "job_category_geocoding": "Geocoding",
+    "job_category_maintenance": "Maintenance",
+    "job_category_master": "Master",
+    "job_category_gamification": "Gamification",
+    "job_category_groups": "Groups",
+    "job_category_security": "Security",
+    "job_category_other": "Other",
+    "job_category_unknown": "Unknown category",
+    "cron_job_name_unknown": "Scheduled task",
+    "cron_job_description_unknown": "Runs a scheduled background task.",
+    "cron_jobs": {
+      "run_all": {
+        "name": "Master cron runner",
+        "description": "Runs the appropriate scheduled tasks for the current time. All other jobs run through this scheduler entry."
+      },
+      "process_queue": {
+        "name": "Instant notification queue",
+        "description": "Processes pending instant notifications for immediate delivery."
+      },
+      "daily_digest": {
+        "name": "Daily digest",
+        "description": "Sends daily notification digest emails to members who selected daily delivery."
+      },
+      "weekly_digest": {
+        "name": "Monthly digest",
+        "description": "Sends the monthly notification digest on the first day of each month."
+      },
+      "process_newsletters": {
+        "name": "Process scheduled newsletters",
+        "description": "Finds newsletters due for delivery and starts the sending process."
+      },
+      "process_recurring": {
+        "name": "Process recurring newsletters",
+        "description": "Processes recurring and automated newsletters."
+      },
+      "process_newsletter_queue": {
+        "name": "Newsletter queue processor",
+        "description": "Processes queued newsletter deliveries in batches."
+      },
+      "notify_hot_matches": {
+        "name": "Hot match notifications",
+        "description": "Notifies members about new high-scoring matches."
+      },
+      "match_digest_daily": {
+        "name": "Daily match digest",
+        "description": "Sends daily match recommendations to members."
+      },
+      "match_digest_weekly": {
+        "name": "Weekly match digest",
+        "description": "Sends a weekly match recommendation summary."
+      },
+      "gamification_daily": {
+        "name": "Daily gamification tasks",
+        "description": "Processes streak resets, daily bonuses, and badge checks."
+      },
+      "gamification_campaigns": {
+        "name": "Process achievement campaigns",
+        "description": "Processes recurring achievement campaigns."
+      },
+      "gamification_leaderboard": {
+        "name": "Leaderboard snapshot",
+        "description": "Creates daily leaderboard snapshots and finalises seasons."
+      },
+      "gamification_challenges": {
+        "name": "Check challenge expirations",
+        "description": "Expires completed challenges and updates their statuses."
+      },
+      "gamification_weekly_digest": {
+        "name": "Monthly gamification digest",
+        "description": "Sends monthly progress digest emails to members."
+      },
+      "gamification_streaks": {
+        "name": "Gamification streak milestones",
+        "description": "Checks and awards member streak milestones."
+      },
+      "gamification_cleanup": {
+        "name": "Gamification cleanup",
+        "description": "Removes old experience notifications, campaign awards, and analytics data."
+      },
+      "update_featured_groups": {
+        "name": "Update featured groups",
+        "description": "Updates featured groups using the ranking rules."
+      },
+      "group_weekly_digest": {
+        "name": "Monthly group digests",
+        "description": "Sends monthly analytics digest emails to group owners."
+      },
+      "abuse_detection": {
+        "name": "Abuse detection",
+        "description": "Scans transactions for possible abuse patterns."
+      },
+      "abuse_daily_report": {
+        "name": "Daily abuse report",
+        "description": "Sends the daily abuse detection report to administrators."
+      },
+      "abuse_cleanup": {
+        "name": "Abuse alert cleanup",
+        "description": "Archives old alerts and dismisses low-severity items automatically."
+      },
+      "verification_reminders": {
+        "name": "Verification reminders",
+        "description": "Reminds members about incomplete identity verifications."
+      },
+      "expire_verifications": {
+        "name": "Expire abandoned verifications",
+        "description": "Expires verification sessions abandoned for more than 72 hours."
+      },
+      "purge_verification_sessions": {
+        "name": "Purge old verification data",
+        "description": "Purges completed and expired verification sessions after 180 days."
+      },
+      "volunteer_pre_shift": {
+        "name": "Volunteer pre-shift reminders",
+        "description": "Sends reminders before volunteer shifts."
+      },
+      "volunteer_post_shift": {
+        "name": "Volunteer post-shift feedback",
+        "description": "Requests feedback after completed volunteer shifts."
+      },
+      "volunteer_lapsed_nudge": {
+        "name": "Lapsed volunteer nudge",
+        "description": "Nudges volunteers who have not been active recently."
+      },
+      "volunteer_expiry_warnings": {
+        "name": "Volunteer credential expiry",
+        "description": "Warns volunteers about credentials and training that will soon expire."
+      },
+      "recurring_shifts": {
+        "name": "Generate recurring shifts",
+        "description": "Generates upcoming volunteer shifts from recurring templates."
+      },
+      "volunteer_expire_consents": {
+        "name": "Expire guardian consents",
+        "description": "Expires guardian consent records after their expiry date."
+      },
+      "cleanup": {
+        "name": "System cleanup",
+        "description": "Removes expired tokens, old queue entries, API tokens, and tracking data."
+      },
+      "geocode_batch": {
+        "name": "Batch geocoding",
+        "description": "Geocodes members and listings that are missing coordinates."
+      },
+      "event_reminders": {
+        "name": "Event reminders",
+        "description": "Sends reminders before upcoming events."
+      },
+      "inactive_members": {
+        "name": "Inactive member detection",
+        "description": "Finds and flags inactive members for follow-up."
+      },
+      "listing_expiry": {
+        "name": "Listing expiry processing",
+        "description": "Expires listings after their expiry date."
+      },
+      "listing_expiry_reminders": {
+        "name": "Listing expiry reminders",
+        "description": "Warns listing owners before a listing expires."
+      },
+      "job_expiry": {
+        "name": "Job vacancy expiry",
+        "description": "Expires job vacancies after their closing date."
+      },
+      "federation_weekly_digest": {
+        "name": "Monthly federation digest",
+        "description": "Sends a federation activity digest to participating communities."
+      },
+      "balance_alerts": {
+        "name": "Balance alerts",
+        "description": "Checks organisation wallet balances and sends low-balance alerts."
+      },
+      "goal_reminders": {
+        "name": "Goal reminders",
+        "description": "Sends reminders for goals that are due or behind schedule."
+      },
+      "retry_failed_webhooks": {
+        "name": "Retry failed webhooks",
+        "description": "Retries webhook deliveries that previously failed."
+      },
+      "digest_emails": {
+        "name": "Email digest sender"
+      },
+      "badge_checker": {
+        "name": "Badge award checker"
+      },
+      "streak_updater": {
+        "name": "Login streak updater"
+      }
     },
     "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
@@ -1147,7 +1352,31 @@
       "api_unavailable": "Health check API unavailable",
       "run_all": "Run all tests",
       "suites": "Test suites",
-      "unknown_test": "Diagnostic: {{name}}"
+      "unknown_test": "Diagnostic: {{name}}",
+      "tests": {
+        "api_health": "API health check",
+        "database": "Database connection",
+        "redis": "Redis connection",
+        "auth_token": "Authentication token generation",
+        "tenant_bootstrap": "Tenant bootstrap",
+        "file_upload": "File upload (S3 or local)",
+        "email_service": "Email service",
+        "pusher": "Pusher WebSocket"
+      }
+    },
+    "activity_details": {
+      "blog_post_created": "Created blog post #{{id}}: {{title}}",
+      "blog_post_updated": "Updated blog post #{{id}}: {{title}}",
+      "blog_post_deleted": "Deleted blog post #{{id}}: {{title}}",
+      "blog_post_status_changed": "Changed blog post #{{id}} status from {{old_status}} to {{new_status}}.",
+      "blog_posts_bulk_deleted": "Blog posts deleted in bulk: {{count}}",
+      "blog_posts_bulk_published": "Blog posts published in bulk: {{count}}",
+      "unknown": "Activity detail: {{code}}"
+    },
+    "activity_status": {
+      "unknown": "Unknown status",
+      "draft": "draft",
+      "published": "published"
     }
   },
   "verification": {
@@ -1201,6 +1430,18 @@
     "reject_confirm_prefix": "Are you sure you want to",
     "reject_confirm_suffix": "? This will deny their verification request.",
     "reject_user": "Reject User",
+    "provider_mock": "Mock provider",
+    "provider_stripe_identity": "Stripe Identity",
+    "provider_veriff": "Veriff",
+    "provider_jumio": "Jumio",
+    "provider_onfido": "Onfido",
+    "provider_idenfy": "iDenfy",
+    "provider_unknown": "Unknown provider",
+    "actor_type_system": "System",
+    "actor_type_user": "User",
+    "actor_type_admin": "Administrator",
+    "actor_type_webhook": "Webhook",
+    "actor_type_unknown": "Unknown actor",
     "status_cancelled": "Cancelled",
     "status_created": "Created",
     "status_expired": "Expired",
@@ -1209,6 +1450,7 @@
     "status_pending": "Pending",
     "status_processing": "Processing",
     "status_started": "Started",
+    "status_unknown": "Unknown status",
     "total_events": "{{count}} events",
     "user_approved_activated": "User approved and activated",
     "user_verification_rejected": "User verification rejected",

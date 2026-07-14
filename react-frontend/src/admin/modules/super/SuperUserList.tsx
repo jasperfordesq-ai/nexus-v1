@@ -64,11 +64,11 @@ export function SuperUserList() {
         setUsers(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(t('super.users_error_detail', { error: res.error || t('super.failed_to_load_user_list') }));
+        toast.error(t('super.users_error_detail', { error: t('super.failed_to_load_user_list') }));
       }
-    } catch (err) {
+    } catch {
       toast.error(t('super.users_error_detail', {
-        error: err instanceof Error ? err.message : t('super.unknown_error'),
+        error: t('super.unknown_error'),
       }));
     }
     setLoading(false);
@@ -104,7 +104,7 @@ export function SuperUserList() {
       toast.success(t('super.user_updated_successfully'));
       loadUsers();
     } else {
-      toast.error(res?.error || t('super.action_failed'));
+      toast.error(t('super.action_failed'));
     }
     setActionLoading(false);
     setConfirmAction(null);
@@ -137,7 +137,7 @@ export function SuperUserList() {
       key: 'role', label: t('super.col_role'), sortable: true,
       render: (user) => (
         <Chip size="sm" variant="soft" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
-          {user.role}
+          {t(`super.role_${user.role}`, { defaultValue: t('super.role_unknown') })}
         </Chip>
       ),
     },

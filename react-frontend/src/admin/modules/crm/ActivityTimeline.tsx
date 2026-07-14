@@ -37,7 +37,9 @@ interface TimelineEntry {
   user_name: string;
   user_avatar: string | null;
   activity_type: string;
-  description: string;
+  description_code?: string;
+  description_params?: Record<string, string | number | null>;
+  description?: string;
   metadata: Record<string, unknown> | null;
   created_at: string;
 }
@@ -143,8 +145,32 @@ export function ActivityTimeline() {
 
   const getActivityLabel = (type: string): string => {
     const key = `crm.activity_type_${type}`;
-    const translated = t(key);
-    return translated !== key ? translated : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return t(key, { defaultValue: t('crm.activity_type_unknown') });
+  };
+
+  const getActivityDescription = (entry: TimelineEntry): string => {
+    const code = entry.description_code || entry.activity_type;
+    const params = { ...(entry.description_params ?? {}) };
+    const withFallback = (value: string | number | null | undefined, key: string) =>
+      typeof value === 'string' && value.trim() !== '' ? value : t(key);
+
+    if (code === 'listing_created') {
+      params.title = withFallback(params.title, 'crm.activity_value_untitled_listing');
+    } else if (code === 'exchange_completed') {
+      params.member_name = withFallback(params.member_name, 'crm.activity_value_unknown_member');
+    } else if (code === 'note_added') {
+      params.author_name = withFallback(params.author_name, 'crm.activity_value_system');
+      params.content = typeof params.content === 'string' ? params.content : '';
+    } else if (code === 'task_created') {
+      params.title = withFallback(params.title, 'crm.activity_value_untitled_task');
+    } else if (code === 'group_joined') {
+      params.group_name = withFallback(params.group_name, 'crm.activity_value_unknown_group');
+    }
+
+    return t(`crm.activity_description_${code}`, {
+      ...params,
+      defaultValue: t('crm.activity_description_unknown'),
+    });
   };
 
   // State
@@ -198,8 +224,8 @@ export function ActivityTimeline() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title={"Activity Timeline"}
-        description={"Chronological timeline of member actions and coordinator interactions"}
+        title={t('crm.activity_timeline_title')}
+        description={t('crm.activity_timeline_desc')}
         actions={
           <Button
             variant="tertiary"
@@ -287,8 +313,8 @@ export function ActivityTimeline() {
             <p className="text-muted text-lg font-medium">{t('crm.no_activity_found')}</p>
             <p className="text-muted text-sm mt-1">
               {hasActiveFilters
-                ? "No activity matches your current filters"
-                : "No activity has been recorded yet"}
+                ? t('crm.no_activity_hint_filtered')
+                : t('crm.no_activity_hint_default')}
             </p>
           </CardBody>
         </Card>
@@ -345,7 +371,7 @@ export function ActivityTimeline() {
                               </Chip>
                             </div>
                             <p className="text-sm text-muted mt-1">
-                              {entry.description}
+                              {getActivityDescription(entry)}
                             </p>
                             {entry.metadata && Object.keys(entry.metadata).length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mt-2">

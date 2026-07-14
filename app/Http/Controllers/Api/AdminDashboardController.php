@@ -219,6 +219,14 @@ class AdminDashboardController extends BaseApiController
 
         // Format entries
         $formatted = array_map(function ($row) {
+            $decodedDetails = $this->decodeActivityDetails((string) ($row->details ?? ''));
+            $descriptionCode = is_string($decodedDetails['code'] ?? null)
+                ? $decodedDetails['code']
+                : null;
+            $descriptionParams = is_array($decodedDetails['params'] ?? null)
+                ? $decodedDetails['params']
+                : [];
+
             return [
                 'id' => (int) $row->id,
                 'user_id' => (int) ($row->user_id ?? 0),
@@ -226,7 +234,12 @@ class AdminDashboardController extends BaseApiController
                 'user_email' => $row->email ?? '',
                 'user_avatar' => $row->avatar_url ?? null,
                 'action' => $row->action ?? '',
-                'description' => $this->formatActivityDescription($row),
+                // New structured rows are localized by the React consumer.
+                // Historical free-form and older structured rows retain their
+                // legacy server-rendered description as a compatibility fallback.
+                'description' => $descriptionCode === null ? $this->formatActivityDescription($row) : null,
+                'description_code' => $descriptionCode,
+                'description_params' => $descriptionParams,
                 'ip_address' => $row->ip_address ?? null,
                 'created_at' => $row->created_at ?? '',
             ];

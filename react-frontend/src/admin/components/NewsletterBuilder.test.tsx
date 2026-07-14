@@ -26,7 +26,11 @@ const { editorMock, initMock } = vi.hoisted(() => {
     getDevice: vi.fn(() => 'Desktop'),
     getSelected: vi.fn(() => null),
     AssetManager: { add: vi.fn() },
-    BlockManager: { getAll: vi.fn(() => []) },
+    BlockManager: { getAll: vi.fn(() => []), render: vi.fn() },
+    I18n: { addMessages: vi.fn(), setLocale: vi.fn() },
+    StyleManager: { render: vi.fn() },
+    TraitManager: { render: vi.fn() },
+    LayerManager: { render: vi.fn() },
     UndoManager: { undo: vi.fn(), redo: vi.fn(), hasUndo: vi.fn(() => false), hasRedo: vi.fn(() => false) },
   };
   return { editorMock, initMock: vi.fn(() => editorMock) };
@@ -81,6 +85,7 @@ vi.mock('@/components/ui', () => ({
     <div>{typeof children === 'function' ? null : children}</div>
   ),
   ModalHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ModalHeading: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Button: ({ children, onPress }: { children: React.ReactNode; onPress?: () => void }) => (

@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
-    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui"
+    "yes": "Oui",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,7 +57,6 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -68,9 +67,10 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
-    "select_row": "Select row {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "loading": "Chargement",
+    "select_row": "Sélectionner la ligne {{id}}"
   },
   "agents": {
     "actions": {
@@ -220,6 +220,30 @@
         "rejected": "Proposition rejetée"
       }
     },
-    "tabs_aria": "Filtre de statut de proposition d'agent"
+    "tabs_aria": "Filtre de statut de proposition d'agent",
+    "agent_type": {
+      "activity_summary": "Résumé de l'activité",
+      "activity_summariser": "Résumé d'activité",
+      "help_routing": "Aide au routage",
+      "listing-enrichment": "Enrichissement des listes",
+      "matching": "Correspondance",
+      "notifications": "Notifications",
+      "nudge_dispatch": "Envoi de coups de pouce",
+      "tandem_matching": "Correspondance en tandem",
+      "matchmaker": "Entremetteur"
+    },
+    "triggered_by": {
+      "admin": "Administrateur",
+      "manual": "Manuel",
+      "schedule": "Calendrier",
+      "scheduled": "Planifié"
+    },
+    "proposal_type": {
+      "create_tandem": "Créer un tandem",
+      "match_suggestion": "Suggestion de correspondance",
+      "route_help_request": "Demande d'aide pour un itinéraire",
+      "send_activity_summary": "Envoyer le résumé de l'activité",
+      "send_nudge": "Envoyer un coup de pouce"
+    }
   }
 }

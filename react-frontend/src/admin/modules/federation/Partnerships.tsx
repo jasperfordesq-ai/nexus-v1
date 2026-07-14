@@ -949,7 +949,9 @@ export function Partnerships() {
                                   <div className="mt-1 h-2 w-2 rounded-full bg-accent shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium">
-                                      {entry.action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                                      {t(`federation.audit_actions.${entry.action}`, {
+                                        defaultValue: t('federation.audit_actions.unknown'),
+                                      })}
                                     </p>
                                     <p className="text-xs text-muted">
                                       {entry.first_name && entry.last_name

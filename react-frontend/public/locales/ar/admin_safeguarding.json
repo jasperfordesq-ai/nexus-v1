@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "safeguarding": {
     "active": "نشيط",
@@ -329,9 +329,8 @@
     "pending": "قيد الانتظار",
     "placeholder_description_help": "وصف مساعدة...",
     "placeholder_display_label": "على سبيل المثال قد أحتاج إلى دعم إضافي أثناء التبادلات",
-    "placeholder_guardian_email": "Guardian@example.com",
+    "placeholder_guardian_email": "guardian@example.com",
     "placeholder_help_url": "https://...",
-    "placeholder_option_key": "على سبيل المثال need_additional_support",
     "placeholder_review_notes": "ملاحظات المراجعة...",
     "placeholder_search_messages": "البحث في الرسائل...",
     "placeholder_ward_email": "ward@example.com",
@@ -368,7 +367,6 @@
     "ward": "جناح",
     "aria_deactivate_option": "إلغاء تنشيط الخيار",
     "aria_edit_option": "خيار التحرير",
-    "deactivate_confirm_question": "Deactivate Confirm Question",
     "vetting_access_ni": "فحص الوصول ني",
     "vetting_dbs_basic": "فحص Dbs الأساسية",
     "vetting_dbs_enhanced": "تحسين قواعد البيانات الخاصة بالفحص",
@@ -377,6 +375,11 @@
     "vetting_international": "الفحص الدولي",
     "vetting_other": "فحص أخرى",
     "vetting_pvg_scotland": "فحص Pvg اسكتلندا",
-    "tabs_aria": "أقسام الحماية"
+    "tabs_aria": "أقسام الحماية",
+    "status_active": "نشط",
+    "status_revoked": "ملغى",
+    "status_expired": "انتهت صلاحيتها",
+    "deactivate_confirm_question": "إلغاء التفعيل",
+    "placeholder_option_key": "على سبيل المثال needs_additional_support"
   }
 }

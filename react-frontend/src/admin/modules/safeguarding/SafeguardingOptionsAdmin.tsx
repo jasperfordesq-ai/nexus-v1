@@ -179,7 +179,7 @@ export function SafeguardingOptionsAdmin() {
           createModal.onClose();
           fetchOptions();
         } else {
-          toast.error(res.error || t('safeguarding.update_failed'));
+          toast.error(t('safeguarding.update_failed'));
         }
       } else {
         // Create
@@ -189,7 +189,7 @@ export function SafeguardingOptionsAdmin() {
           createModal.onClose();
           fetchOptions();
         } else {
-          toast.error(res.error || t('safeguarding.create_failed'));
+          toast.error(t('safeguarding.create_failed'));
         }
       }
     } catch (error) {
@@ -212,7 +212,7 @@ export function SafeguardingOptionsAdmin() {
         deleteModal.onClose();
         fetchOptions();
       } else {
-        toast.error(res.error || t('safeguarding.deactivation_failed'));
+        toast.error(t('safeguarding.deactivation_failed'));
       }
     } catch (error) {
       logError('Failed to deactivate safeguarding option', error);

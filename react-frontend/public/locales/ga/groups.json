@@ -115,7 +115,7 @@
     "invite": "Cuir ar an liosta",
     "invite_link_desc": "Roinn nasc is féidir le duine ar bith a úsáid chun dul isteach:",
     "invite_email_desc": "Nó cuir cuireadh trí r-phost (scartha le camóg):",
-    "invite_email_placeholder": "rphost1@sampla.com, rphost2@sampla.com",
+    "invite_email_placeholder": "email1@example.com, email2@example.com",
     "invite_emails_aria": "Seoltaí ríomhphoist le cuireadh a thabhairt dóibh",
     "invite_message_label": "Teachtaireacht phearsanta (roghnach)",
     "invite_message_placeholder": "Bí páirteach inár ngrúpa!",

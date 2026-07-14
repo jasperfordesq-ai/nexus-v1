@@ -142,12 +142,12 @@ export async function verifyOfflineCredential(
     const key = await crypto.subtle.importKey(
       'raw',
       base64UrlBytes(verificationKey.public_key),
-      { name: 'Ed25519' },
+      { name: 'Ed25519' }, // admin-i18n-ignore: Web Crypto algorithm identifier
       false,
       ['verify'],
     );
     const valid = await crypto.subtle.verify(
-      { name: 'Ed25519' },
+      { name: 'Ed25519' }, // admin-i18n-ignore: Web Crypto algorithm identifier
       key,
       base64UrlBytes(signaturePart),
       new TextEncoder().encode(claimsPart),

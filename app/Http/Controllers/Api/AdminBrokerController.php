@@ -734,7 +734,7 @@ class AdminBrokerController extends BaseApiController
         }
         $allowedCategories = array_keys(\App\Services\ListingRiskTagService::CATEGORIES);
         if (!in_array($riskCategory, $allowedCategories, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid risk_category value.', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_risk_category'), 'risk_category', 422);
         }
         if (mb_strlen($riskNotes) > 2000) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.risk_notes_max_length'), 'risk_notes');
@@ -1317,14 +1317,24 @@ class AdminBrokerController extends BaseApiController
             try {
                 Carbon::createFromFormat('Y-m-d', $from);
             } catch (\Exception $e) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid date_from format. Use Y-m-d.', 422);
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    __('api.invalid_date_format', ['field' => 'from', 'format' => 'Y-m-d']),
+                    'from',
+                    422,
+                );
             }
         }
         if ($to) {
             try {
                 Carbon::createFromFormat('Y-m-d', $to);
             } catch (\Exception $e) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid date_to format. Use Y-m-d.', 422);
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    __('api.invalid_date_format', ['field' => 'to', 'format' => 'Y-m-d']),
+                    'to',
+                    422,
+                );
             }
         }
 

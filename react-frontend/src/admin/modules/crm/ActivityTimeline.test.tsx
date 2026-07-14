@@ -65,7 +65,9 @@ const ENTRY = {
   user_name: 'Alice Smith',
   user_avatar: null,
   activity_type: 'login',
-  description: 'User logged in',
+  description_code: 'login',
+  description_params: {},
+  description: 'SERVER COPY MUST NOT RENDER',
   metadata: null,
   created_at: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
 };
@@ -76,7 +78,9 @@ const ENTRY_WITH_META = {
   user_name: 'Bob Jones',
   user_avatar: null,
   activity_type: 'listing_created',
-  description: 'Created a listing',
+  description_code: 'listing_created',
+  description_params: { title: 'Community gardening' },
+  description: 'SERVER COPY MUST NOT RENDER',
   metadata: { listing_id: 99 },
   created_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
 };
@@ -123,8 +127,9 @@ describe('ActivityTimeline', () => {
     mockTimelineSuccess([ENTRY]);
     render(<ActivityTimeline />);
     await waitFor(() => {
-      expect(screen.getByText('User logged in')).toBeInTheDocument();
+      expect(screen.getByText('Logged in')).toBeInTheDocument();
     });
+    expect(screen.queryByText('SERVER COPY MUST NOT RENDER')).not.toBeInTheDocument();
   });
 
   it('renders multiple entries in order', async () => {

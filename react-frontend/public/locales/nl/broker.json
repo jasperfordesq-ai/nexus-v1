@@ -313,7 +313,10 @@
     "members_error_title": "Lopende leden konden niet worden geladen",
     "members_error_hint": "De goedkeuringswachtrij kon niet worden geladen. Probeer opnieuw om deze opnieuw op te halen.",
     "retry": "Opnieuw proberen",
-    "empty_pending_title": "Alles is bijgewerkt"
+    "empty_pending_title": "Alles is bijgewerkt",
+    "stage_first_listing": "Eerste vermelding",
+    "stage_repeat_user": "Terugkerende gebruiker",
+    "stage_unknown": "Onbekend stadium"
   },
   "safeguarding": {
     "title": "Bescherming",
@@ -1117,7 +1120,7 @@
     "field_show_broker_name_help": "Toon de naam van de toegewezen makelaar aan leden.",
     "field_broker_contact_email_label": "Contact-e-mailadres van de makelaar",
     "field_broker_contact_email_help": "Openbaar contact-e-mailadres voor makelaarvragen.",
-    "field_broker_contact_email_placeholder": "makelaar@voorbeeld.com",
+    "field_broker_contact_email_placeholder": "broker@example.com",
     "field_broker_contact_email_aria": "Contact-e-mailadres van de makelaar",
     "field_broker_approval_required_label": "Makelaargoedkeuring vereist",
     "field_broker_approval_required_help": "Makelaargoedkeuring vereisen voordat uitwisselingen kunnen doorgaan.",
@@ -1279,7 +1282,8 @@
     "pending_confirmation": "Wacht op bevestiging",
     "confirmed": "Bevestigd",
     "review_requested": "Beoordeling aangevraagd",
-    "not_confirmed": "Niet bevestigd"
+    "not_confirmed": "Niet bevestigd",
+    "unknown": "Onbekend"
   },
   "common": {
     "loading": "Laden...",

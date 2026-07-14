@@ -275,7 +275,7 @@ export function GdprRequestDetail() {
                   color={typeColorMap[request.type] || 'default'}
                   className="capitalize"
                 >
-                  {request.type}
+                  {t(`enterprise.gdpr_type_${request.type}`, { defaultValue: t('enterprise.gdpr_type_unknown') })}
                 </Chip>
                 <StatusBadge status={request.status} />
                 {request.priority && (
@@ -369,7 +369,7 @@ export function GdprRequestDetail() {
                               color={actionColorMap[entry.action] || 'default'}
                               className="capitalize"
                             >
-                              {entry.action.replace(/_/g, ' ')}
+                              {t(`enterprise.gdpr_request_action_${entry.action}`, { defaultValue: t('enterprise.gdpr_request_action_unknown') })}
                             </Chip>
                             {entry.user_name && (
                               <span className="text-sm text-muted">{t('enterprise.gdpr_by_user')}</span>

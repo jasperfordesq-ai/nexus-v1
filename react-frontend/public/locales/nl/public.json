@@ -457,7 +457,24 @@
     },
     "scroll_down": "Scroll naar beneden",
     "audience_cards": {
-      "title": "Waar zou je willen beginnen?"
+      "title": "Waar zou je willen beginnen?",
+      "defaults": {
+        "new_here": {
+          "title": "Nieuw hier?",
+          "description": "Leer hoe onze gemeenschap werkt en hoe je betrokken kunt raken.",
+          "cta": "Begin"
+        },
+        "exchange": {
+          "title": "Bied hulp aan of zoek hulp",
+          "description": "Bekijk wat mensen aanbieden, of plaats zelf een verzoek.",
+          "cta": "Bekijk advertenties"
+        },
+        "partner": {
+          "title": "Word partner of verwijs door",
+          "description": "Voor organisaties, financiers en professionals die onze leden ondersteunen.",
+          "cta": "Meer informatie"
+        }
+      }
     },
     "how_it_works": {
       "title": "Hoe Het Werkt",
@@ -595,7 +612,7 @@
       "name_label": "Naam",
       "name_placeholder": "Je naam",
       "email_label": "E-mail",
-      "email_placeholder": "je@example.com",
+      "email_placeholder": "you@example.com",
       "subject_label": "Onderwerp",
       "subject_placeholder": "Waar gaat dit over?",
       "subjects": {

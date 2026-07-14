@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip } from '@/components/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,10 +15,6 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components/PageHeader';
 import { adminTools } from '../../api/adminApi';
 import { formatNumber } from '@/lib/helpers';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * API Test Runner
@@ -22,7 +23,7 @@ import { formatNumber } from '@/lib/helpers';
 
 
 interface TestResult {
-  name: string;
+  code: string;
   labelKey?: string;
   status: 'pending' | 'running' | 'pass' | 'fail';
   duration?: number;
@@ -30,14 +31,14 @@ interface TestResult {
 }
 
 const INITIAL_TESTS: TestResult[] = [
-  { labelKey: 'test_runner.tests.api_health', name: 'API Health Check', status: 'pending' },
-  { labelKey: 'test_runner.tests.database', name: 'Database Connection', status: 'pending' },
-  { labelKey: 'test_runner.tests.redis', name: 'Redis Connection', status: 'pending' },
-  { labelKey: 'test_runner.tests.auth_token', name: 'Auth Token Generation', status: 'pending' },
-  { labelKey: 'test_runner.tests.tenant_bootstrap', name: 'Tenant Bootstrap', status: 'pending' },
-  { labelKey: 'test_runner.tests.file_upload', name: 'File Upload (S3/Local)', status: 'pending' },
-  { labelKey: 'test_runner.tests.email_service', name: 'Email Service', status: 'pending' },
-  { labelKey: 'test_runner.tests.pusher', name: 'Pusher WebSocket', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.api_health', code: 'api_health', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.database', code: 'database', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.redis', code: 'redis', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.auth_token', code: 'auth_token', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.tenant_bootstrap', code: 'tenant_bootstrap', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.file_upload', code: 'file_upload', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.email_service', code: 'email_service', status: 'pending' },
+  { labelKey: 'system.test_runner.tests.pusher', code: 'pusher', status: 'pending' },
 ];
 
 const statusIcon = (status: string) => {
@@ -63,19 +64,19 @@ export function TestRunner() {
 
     try {
       const res = await adminTools.runHealthCheck();
-      const results = res.data;
+      const results = res.data?.tests;
 
       if (results && Array.isArray(results)) {
         // Map API results back to the test list
         setTests(prev =>
           prev.map(test => {
-            const apiResult = results.find(r => r.name === test.name);
+            const apiResult = results.find(r => r.code === test.code);
             if (apiResult) {
               return {
                 ...test,
                 status: apiResult.status === 'pass' ? 'pass' as const : 'fail' as const,
                 duration: apiResult.duration_ms,
-                error: apiResult.error,
+                error: apiResult.status === 'pass' ? undefined : t('system.health_check_failed'),
               };
             }
             // If the API didn't return a result for this test, mark as pass
@@ -84,17 +85,17 @@ export function TestRunner() {
           })
         );
 
-        // If API returns results with different names, also add those
-        const knownNames = new Set(INITIAL_TESTS.map(t => t.name));
-        const extraResults = results.filter(r => !knownNames.has(r.name));
+        // If the API returns additional diagnostic codes, append those too.
+        const knownCodes = new Set(INITIAL_TESTS.map(t => t.code));
+        const extraResults = results.filter(r => !knownCodes.has(r.code));
         if (extraResults.length > 0) {
           setTests(prev => [
             ...prev,
             ...extraResults.map(r => ({
-              name: r.name,
+              code: r.code,
               status: r.status === 'pass' ? 'pass' as const : 'fail' as const,
               duration: r.duration_ms,
-              error: r.error,
+              error: r.status === 'pass' ? undefined : t('system.health_check_failed'),
             })),
           ]);
         }
@@ -154,14 +155,14 @@ export function TestRunner() {
         <CardBody>
           <div className="space-y-2">
             {tests.map((test) => (
-              <div key={test.name} className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div key={test.code} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div className="flex items-center gap-3">
                   {statusIcon(test.status)}
                   <div>
                     <span className="font-medium">
                       {test.labelKey
                         ? t(test.labelKey)
-                        : t('system.test_runner.unknown_test', { name: test.name })}
+                        : t('system.test_runner.unknown_test', { name: test.code })}
                     </span>
                     {test.error && (
                       <p className="text-xs text-danger mt-0.5">{test.error}</p>

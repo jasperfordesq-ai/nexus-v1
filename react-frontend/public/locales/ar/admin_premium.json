@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "member_premium_admin": {
     "meta": {
@@ -104,12 +104,12 @@
       "user_fallback": "المستخدم #{{id}}",
       "columns": {
         "member": "عضو",
-        "email": "مAIل",
-        "tier": "الطبقة",
-        "interval": "فاصلة",
-        "status": "حالة",
-        "next_billing": "الفواتير القادمة",
-        "started": "بدأت"
+        "email": "البريد الإلكتروني",
+        "tier": "المستوى",
+        "interval": "الفترة",
+        "status": "الحالة",
+        "next_billing": "الفوترة التالية",
+        "started": "بدأ"
       },
       "status": {
         "active": "نشيط",
@@ -185,37 +185,37 @@
       "settings_load_failed": "تعذر تحميل إعدادات توجيه التبرعات.",
       "settings_saved": "تم حفظ إعدادات توجيه التبرع.",
       "settings_save_failed": "لا يمكن حفظ إعدادات توجيه التبرعات.",
-      "onboarding_failed": "تعذر بدء عملية تأهيل الشريط.",
       "finance_load_failed": "لا يمكن تحميل عمليات تمويل التبرعات.",
-      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "تعذر تنزيل تصدير الإيصال السنوي."
+      "annual_receipts_export_failed": "تعذر تنزيل تصدير الإيصال السنوي.",
+      "gift_aid_export_failed": "تعذر تنزيل تصدير المساعدات الهبه.",
+      "onboarding_failed": "تعذر بدء إعداد Stripe."
     },
     "settings": {
-      "title": "توجيه الشريط",
       "description": "اترك هذا فارغًا لاستخدام حساب Stripe الخاص بالنظام الأساسي مع بيانات تعريف المستأجر. قم بتوصيل حساب Stripe للمستأجر لإرسال تبرعات مستقبلية لمرة واحدة ومنتظمة إلى حساب المستأجر هذا.",
       "stripe_connect_account_id": "معرف حساب Tenant Stripe Connect",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "يؤثر تغيير هذا على عمليات سحب التبرعات المستقبلية. قم بإعادة مزامنة مستويات الدعم بعد إضافة حساب المستأجر بحيث تكون الأسعار المتكررة موجودة في حساب Stripe هذا.",
       "route_platform_default": "منصة احتياطية",
-      "route_tenant_connect": "Tenant Connect",
       "start_onboarding": "ابدأ عملية تأهيل Stripe",
-      "continue_onboarding": "مواصلة تأهيل الشريط",
-      "requirements_due": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
       "save": "حفظ التوجيه",
       "status": {
         "not_connected": "غير متصل",
-        "pending": "Pending",
-        "ready": "Ready",
         "restricted": "الإجراء المطلوب",
-        "unknown": "الحالة غير معروفة"
+        "unknown": "الحالة غير معروفة",
+        "pending": "قيد الانتظار",
+        "ready": "جاهز"
       },
       "connect_fallback_active": "تم تكوين حساب Stripe Connect، ولكنه ليس جاهزًا للتبرعات الحية بعد. ستستخدم الدفعات النظام الأساسي الاحتياطي حتى اكتمال عملية الإعداد.",
       "requirements_due_few": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
       "requirements_due_many": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
-      "requirements_due_one": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
-      "requirements_due_other": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
       "requirements_due_two": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
-      "requirements_due_zero": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}."
+      "requirements_due_zero": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "route_tenant_connect": "اتصال المستأجر",
+      "title": "توجيه Stripe",
+      "continue_onboarding": "متابعة إعداد Stripe",
+      "requirements_due": "Stripe متطلبات الحساب التي تحتاج إلى اهتمام: {{count}}.",
+      "requirements_due_one": "Stripe متطلبات الحساب التي تحتاج إلى اهتمام: {{count}}.",
+      "requirements_due_other": "Stripe متطلبات الحساب التي تحتاج إلى اهتمام: {{count}}."
     },
     "finance": {
       "title": "العمليات المالية",
@@ -223,16 +223,9 @@
       "completed_volume": "حجم مكتمل",
       "platform_fallback_volume": "الحجم الاحتياطي للمنصة",
       "tenant_connect_volume": "حجم اتصال المستأجر",
-      "gift_aid_ready": "Gift Aid ready",
       "open_disputes": "النزاعات المفتوحة",
       "active_recurring": "نشط متكرر",
       "failed_receipts": "إيصالات فاشلة",
-      "donation_count": "{{count}} donation",
-      "donation_count_other": "{{count}} donations",
-      "declaration_count": "{{count}} declaration",
-      "declaration_count_other": "{{count}} declarations",
-      "past_due_count": "{{count}} past due",
-      "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "تصدير الإيصالات السنوية",
       "empty": "لم يتم تسجيل أي نشاط تمويلي حتى الآن.",
       "donation_count_few": "{{count}} donation",
@@ -250,7 +243,14 @@
       "past_due_count_one": "{{count}} فات موعد استحقاقه",
       "past_due_count_other": "{{count}} فات موعد استحقاقه",
       "past_due_count_two": "{{count}} past due",
-      "past_due_count_zero": "{{count}} past due"
+      "past_due_count_zero": "{{count}} past due",
+      "gift_aid_ready": "إعانة الهبة جاهزة",
+      "export_gift_aid": "تصدير إعانة الهبة",
+      "donation_count": "{{count}} تبرع",
+      "donation_count_other": "{{count}} التبرعات",
+      "declaration_count": "{{count}} إعلان",
+      "declaration_count_other": "{{count}} إعلانات",
+      "past_due_count": "{{count}} متأخر"
     }
   }
 }

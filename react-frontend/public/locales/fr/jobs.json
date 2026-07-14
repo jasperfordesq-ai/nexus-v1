@@ -677,7 +677,7 @@
     "time_credits_label": "Crédits-temps offerts",
     "time_credits_placeholder": "ex. 5,00",
     "contact_email_label": "E-mail de contact",
-    "contact_email_placeholder": "contact@exemple.fr",
+    "contact_email_placeholder": "contact@example.com",
     "contact_phone_label": "Téléphone de contact",
     "contact_phone_placeholder": "+1 555 123 4567",
     "deadline_label": "Date limite de candidature",
@@ -1101,7 +1101,9 @@
     }
   },
   "jobs": {
-    "view_details": "Voir les détails du poste"
+    "view_details": "Voir les détails du poste",
+    "type_unknown": "Type inconnu",
+    "category_value": "{{category}}"
   },
   "tabs_aria": "Vue des tâches",
   "deadline_countdown_many": "Clôture dans {{count}} jours",

@@ -40,6 +40,17 @@ class GamificationServiceTest extends TestCase
         $this->assertCount(10, GamificationService::LEVEL_THRESHOLDS_V2);
     }
 
+    public function test_static_badges_expose_stable_display_codes(): void
+    {
+        $badges = GamificationService::getStaticBadgeDefinitions();
+
+        $this->assertNotEmpty($badges);
+        foreach ($badges as $badge) {
+            $this->assertSame('badges.' . $badge['key'] . '.name', $badge['name_code']);
+            $this->assertSame('badges.' . $badge['key'] . '.description', $badge['description_code']);
+        }
+    }
+
     // Static methods use Eloquent models extensively
     public function test_getProfile_requires_integration_test(): void
     {

@@ -11,40 +11,43 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * SeoAuditService — Runs real SEO audits per tenant.
+ * Runs tenant SEO audits and returns locale-independent result codes.
  *
- * Checks meta titles, descriptions, canonical URLs, redirect health,
- * Open Graph configuration, sitemap coverage, and content quality signals.
- *
- * Returns structured results with pass/warning/fail status per check.
+ * Display copy is deliberately owned by the consuming client. Check and issue
+ * parameters contain only measurements, identifiers, URLs, or tenant content.
  */
 class SeoAuditService
 {
     private const TITLE_MAX_LENGTH = 60;
-    private const TITLE_MIN_LENGTH = 10;
     private const DESC_MAX_LENGTH = 160;
     private const DESC_MIN_LENGTH = 50;
 
     /**
-     * Run a full SEO audit for a tenant and persist results.
+     * Run a full SEO audit for a tenant and persist the result.
      *
-     * @return array{checks: array, score: int, max_score: int, grade: string}
+     * @return array{
+     *     checks: list<array<string, mixed>>,
+     *     score: int,
+     *     max_score: int,
+     *     grade: string,
+     *     run_at: string
+     * }
      */
     public function runAudit(int $tenantId): array
     {
-        $checks = [];
-
-        $checks[] = $this->checkTenantMetadata($tenantId);
-        $checks[] = $this->checkSeoSettings($tenantId);
-        $checks[] = $this->checkBlogPostMeta($tenantId);
-        $checks[] = $this->checkPageMeta($tenantId);
-        $checks[] = $this->checkKbArticleMeta($tenantId);
-        $checks[] = $this->checkRedirectHealth($tenantId);
-        $checks[] = $this->checkDuplicateTitles($tenantId);
-        $checks[] = $this->checkSitemapCoverage($tenantId);
-        $checks[] = $this->checkCanonicalUrls($tenantId);
-        $checks[] = $this->checkOpenGraph($tenantId);
-        $checks[] = $this->checkContentQuality($tenantId);
+        $checks = [
+            $this->checkTenantMetadata($tenantId),
+            $this->checkSeoSettings($tenantId),
+            $this->checkBlogPostMeta($tenantId),
+            $this->checkPageMeta($tenantId),
+            $this->checkKbArticleMeta($tenantId),
+            $this->checkRedirectHealth($tenantId),
+            $this->checkDuplicateTitles($tenantId),
+            $this->checkSitemapCoverage($tenantId),
+            $this->checkCanonicalUrls($tenantId),
+            $this->checkOpenGraph($tenantId),
+            $this->checkContentQuality($tenantId),
+        ];
 
         $score = 0;
         $maxScore = 0;
@@ -53,29 +56,31 @@ class SeoAuditService
             $score += $check['points'];
         }
 
-        $grade = $this->calculateGrade($score, $maxScore);
-
         $results = [
             'checks' => $checks,
             'score' => $score,
             'max_score' => $maxScore,
-            'grade' => $grade,
+            'grade' => $this->calculateGrade($score, $maxScore),
             'run_at' => now()->toIso8601String(),
         ];
 
-        // Persist to database
         $this->persistResults($tenantId, $results);
 
         return $results;
     }
 
     /**
-     * Get the most recent audit results for a tenant.
+     * Get the most recent audit result in the current code-based contract.
+     *
+     * Older rows contained fixed English fields. They are normalised here so
+     * historical data can never leak untranslated display copy back to clients.
+     *
+     * @return array<string, mixed>|null
      */
     public function getLatestAudit(int $tenantId): ?array
     {
         $row = DB::selectOne(
-            "SELECT results, created_at FROM seo_audits WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1",
+            'SELECT results, created_at FROM seo_audits WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1',
             [$tenantId]
         );
 
@@ -88,48 +93,48 @@ class SeoAuditService
             return null;
         }
 
-        $results['stored_at'] = $row->created_at;
-        return $results;
+        return $this->normaliseStoredResults($results, (string) $row->created_at);
     }
-
-    // =========================================================================
-    // Individual checks
-    // =========================================================================
 
     private function checkTenantMetadata(int $tenantId): array
     {
         $tenant = DB::selectOne(
-            "SELECT meta_title, meta_description, h1_headline FROM tenants WHERE id = ?",
+            'SELECT meta_title, meta_description, h1_headline FROM tenants WHERE id = ?',
             [$tenantId]
         );
 
         $issues = [];
+        $metaTitle = $tenant?->meta_title;
+        $metaDescription = $tenant?->meta_description;
 
-        if (empty($tenant->meta_title)) {
-            $issues[] = 'Missing default meta title for tenant homepage';
-        } elseif (strlen($tenant->meta_title) > self::TITLE_MAX_LENGTH) {
-            $issues[] = "Meta title too long (" . strlen($tenant->meta_title) . " chars, max " . self::TITLE_MAX_LENGTH . ")";
+        if (empty($metaTitle)) {
+            $issues[] = $this->issue('missing_homepage_meta_title');
+        } elseif (strlen($metaTitle) > self::TITLE_MAX_LENGTH) {
+            $issues[] = $this->issue('homepage_meta_title_too_long', [
+                'length' => strlen($metaTitle),
+                'max' => self::TITLE_MAX_LENGTH,
+            ]);
         }
 
-        if (empty($tenant->meta_description)) {
-            $issues[] = 'Missing default meta description';
-        } elseif (strlen($tenant->meta_description) > self::DESC_MAX_LENGTH) {
-            $issues[] = "Meta description too long (" . strlen($tenant->meta_description) . " chars, max " . self::DESC_MAX_LENGTH . ")";
-        } elseif (strlen($tenant->meta_description) < self::DESC_MIN_LENGTH) {
-            $issues[] = "Meta description too short (" . strlen($tenant->meta_description) . " chars, min " . self::DESC_MIN_LENGTH . ")";
+        if (empty($metaDescription)) {
+            $issues[] = $this->issue('missing_meta_description');
+        } elseif (strlen($metaDescription) > self::DESC_MAX_LENGTH) {
+            $issues[] = $this->issue('meta_description_too_long', [
+                'length' => strlen($metaDescription),
+                'max' => self::DESC_MAX_LENGTH,
+            ]);
+        } elseif (strlen($metaDescription) < self::DESC_MIN_LENGTH) {
+            $issues[] = $this->issue('meta_description_too_short', [
+                'length' => strlen($metaDescription),
+                'min' => self::DESC_MIN_LENGTH,
+            ]);
         }
 
-        if (empty($tenant->h1_headline)) {
-            $issues[] = 'Missing H1 headline for homepage';
+        if (empty($tenant?->h1_headline)) {
+            $issues[] = $this->issue('missing_homepage_h1');
         }
 
-        return $this->buildCheck(
-            'tenant_metadata',
-            'Homepage Meta Tags',
-            'Checks that the tenant has a meta title, description, and H1 headline',
-            $issues,
-            10
-        );
+        return $this->buildCheck('tenant_metadata', [], $issues, 10);
     }
 
     private function checkSeoSettings(int $tenantId): array
@@ -142,28 +147,22 @@ class SeoAuditService
         $issues = [];
 
         if (!filter_var($settings['seo_canonical_urls'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Canonical URLs are not enabled';
+            $issues[] = $this->issue('canonical_urls_not_enabled');
         }
 
         if (!filter_var($settings['seo_open_graph'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Open Graph tags are not enabled';
+            $issues[] = $this->issue('open_graph_not_enabled');
         }
 
         if (!filter_var($settings['seo_twitter_cards'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Twitter Cards are not enabled';
+            $issues[] = $this->issue('twitter_cards_not_enabled');
         }
 
         if (empty($settings['seo_title_suffix'])) {
-            $issues[] = 'No title suffix configured (e.g., " | Community Name")';
+            $issues[] = $this->issue('title_suffix_missing');
         }
 
-        return $this->buildCheck(
-            'seo_settings',
-            'SEO Configuration',
-            'Checks that key SEO settings (canonical, OG, Twitter) are enabled',
-            $issues,
-            10
-        );
+        return $this->buildCheck('seo_settings', [], $issues, 10);
     }
 
     private function checkBlogPostMeta(int $tenantId): array
@@ -173,152 +172,126 @@ class SeoAuditService
             [$tenantId]
         )->cnt;
 
-        if ($total === 0) {
-            return $this->buildCheck('blog_meta', 'Blog Post Meta Tags', 'Checks published blog posts for meta titles/descriptions', [], 10);
-        }
-
-        $missingMeta = DB::select(
-            "SELECT bp.id, bp.title, bp.slug
-             FROM posts bp
-             LEFT JOIN seo_metadata sm ON sm.tenant_id = bp.tenant_id
-                AND sm.entity_type = 'post' AND sm.entity_id = bp.id
-             WHERE bp.tenant_id = ? AND bp.status = 'published'
-                AND (sm.meta_title IS NULL OR sm.meta_title = ''
-                     OR sm.meta_description IS NULL OR sm.meta_description = '')
-             LIMIT 20",
-            [$tenantId]
-        );
-
         $issues = [];
-        foreach ($missingMeta as $post) {
-            $issues[] = "Blog post \"{$post->title}\" (/{$post->slug}) missing meta title or description";
+        if ($total > 0) {
+            $missingMeta = DB::select(
+                "SELECT bp.id, bp.title, bp.slug
+                 FROM posts bp
+                 LEFT JOIN seo_metadata sm ON sm.tenant_id = bp.tenant_id
+                    AND sm.entity_type = 'post' AND sm.entity_id = bp.id
+                 WHERE bp.tenant_id = ? AND bp.status = 'published'
+                    AND (sm.meta_title IS NULL OR sm.meta_title = ''
+                         OR sm.meta_description IS NULL OR sm.meta_description = '')
+                 LIMIT 20",
+                [$tenantId]
+            );
+
+            foreach ($missingMeta as $post) {
+                $issues[] = $this->issue('blog_post_meta_missing', [
+                    'title' => (string) $post->title,
+                    'path' => '/' . (string) $post->slug,
+                ]);
+            }
+
+            if (count($missingMeta) >= 20) {
+                $issues[] = $this->issue('additional_results_truncated', ['limit' => 20]);
+            }
         }
 
-        $missingCount = count($missingMeta);
-        if ($missingCount >= 20) {
-            $issues[] = "... and possibly more (showing first 20)";
-        }
-
-        return $this->buildCheck(
-            'blog_meta',
-            'Blog Post Meta Tags',
-            "Checks {$total} published blog posts for meta titles/descriptions",
-            $issues,
-            10
-        );
+        return $this->buildCheck('blog_meta', ['count' => $total], $issues, 10);
     }
 
     private function checkPageMeta(int $tenantId): array
     {
         $total = (int) DB::selectOne(
-            "SELECT COUNT(*) AS cnt FROM pages WHERE tenant_id = ? AND is_published = 1",
+            'SELECT COUNT(*) AS cnt FROM pages WHERE tenant_id = ? AND is_published = 1',
             [$tenantId]
         )->cnt;
 
-        if ($total === 0) {
-            return $this->buildCheck('page_meta', 'CMS Page Meta Tags', 'Checks published CMS pages for meta tags', [], 5);
-        }
-
-        $missingMeta = DB::select(
-            "SELECT p.id, p.title, p.slug
-             FROM pages p
-             LEFT JOIN seo_metadata sm ON sm.tenant_id = p.tenant_id
-                AND sm.entity_type = 'page' AND sm.entity_id = p.id
-             WHERE p.tenant_id = ? AND p.is_published = 1
-                AND (sm.meta_title IS NULL OR sm.meta_title = '')
-             LIMIT 20",
-            [$tenantId]
-        );
-
         $issues = [];
-        foreach ($missingMeta as $page) {
-            $issues[] = "CMS page \"{$page->title}\" (/{$page->slug}) missing meta title";
+        if ($total > 0) {
+            $missingMeta = DB::select(
+                "SELECT p.id, p.title, p.slug
+                 FROM pages p
+                 LEFT JOIN seo_metadata sm ON sm.tenant_id = p.tenant_id
+                    AND sm.entity_type = 'page' AND sm.entity_id = p.id
+                 WHERE p.tenant_id = ? AND p.is_published = 1
+                    AND (sm.meta_title IS NULL OR sm.meta_title = '')
+                 LIMIT 20",
+                [$tenantId]
+            );
+
+            foreach ($missingMeta as $page) {
+                $issues[] = $this->issue('cms_page_meta_title_missing', [
+                    'title' => (string) $page->title,
+                    'path' => '/' . (string) $page->slug,
+                ]);
+            }
         }
 
-        return $this->buildCheck(
-            'page_meta',
-            'CMS Page Meta Tags',
-            "Checks {$total} published CMS pages for meta tags",
-            $issues,
-            5
-        );
+        return $this->buildCheck('page_meta', ['count' => $total], $issues, 5);
     }
 
     private function checkKbArticleMeta(int $tenantId): array
     {
         $total = (int) DB::selectOne(
-            "SELECT COUNT(*) AS cnt FROM knowledge_base_articles WHERE tenant_id = ? AND is_published = 1",
-            [$tenantId]
-        )->cnt;
-
-        if ($total === 0) {
-            return $this->buildCheck('kb_meta', 'KB Article Meta Tags', 'Checks KB articles for meta tags', [], 5);
-        }
-
-        $missingTitle = (int) DB::selectOne(
-            "SELECT COUNT(*) AS cnt FROM knowledge_base_articles
-             WHERE tenant_id = ? AND is_published = 1 AND (title IS NULL OR title = '')",
+            'SELECT COUNT(*) AS cnt FROM knowledge_base_articles WHERE tenant_id = ? AND is_published = 1',
             [$tenantId]
         )->cnt;
 
         $issues = [];
-        if ($missingTitle > 0) {
-            $issues[] = "{$missingTitle} KB article(s) have empty titles";
+        if ($total > 0) {
+            $missingTitle = (int) DB::selectOne(
+                "SELECT COUNT(*) AS cnt FROM knowledge_base_articles
+                 WHERE tenant_id = ? AND is_published = 1 AND (title IS NULL OR title = '')",
+                [$tenantId]
+            )->cnt;
+
+            if ($missingTitle > 0) {
+                $issues[] = $this->issue('kb_article_titles_missing', ['count' => $missingTitle]);
+            }
         }
 
-        return $this->buildCheck(
-            'kb_meta',
-            'KB Article Meta Tags',
-            "Checks {$total} published KB articles for proper titles",
-            $issues,
-            5
-        );
+        return $this->buildCheck('kb_meta', ['count' => $total], $issues, 5);
     }
 
     private function checkRedirectHealth(int $tenantId): array
     {
         $redirects = DB::select(
-            "SELECT id, source_url, destination_url FROM seo_redirects WHERE tenant_id = ?",
+            'SELECT id, source_url, destination_url FROM seo_redirects WHERE tenant_id = ?',
             [$tenantId]
         );
 
         $issues = [];
         $destinationMap = [];
 
-        foreach ($redirects as $r) {
-            $from = $r->source_url;
-            $to = $r->destination_url;
-            $destinationMap[$from] = $to;
+        foreach ($redirects as $redirect) {
+            $destinationMap[(string) $redirect->source_url] = (string) $redirect->destination_url;
         }
 
-        // Check for chains (A → B → C)
         foreach ($destinationMap as $from => $to) {
             if (isset($destinationMap[$to])) {
-                $issues[] = "Redirect chain: {$from} → {$to} → {$destinationMap[$to]}";
+                $issues[] = $this->issue('redirect_chain', [
+                    'from' => $from,
+                    'via' => $to,
+                    'destination' => $destinationMap[$to],
+                ]);
             }
         }
 
-        // Check for loops (A → B → A)
         foreach ($destinationMap as $from => $to) {
             if (isset($destinationMap[$to]) && $destinationMap[$to] === $from) {
-                $issues[] = "Redirect loop: {$from} ↔ {$to}";
+                $issues[] = $this->issue('redirect_loop', ['from' => $from, 'to' => $to]);
             }
         }
 
-        // Check for self-redirects
         foreach ($destinationMap as $from => $to) {
             if ($from === $to) {
-                $issues[] = "Self-redirect: {$from} → {$to}";
+                $issues[] = $this->issue('self_redirect', ['from' => $from, 'to' => $to]);
             }
         }
 
-        return $this->buildCheck(
-            'redirect_health',
-            'Redirect Health',
-            'Checks for redirect chains, loops, and self-redirects (' . count($redirects) . ' redirects)',
-            $issues,
-            10
-        );
+        return $this->buildCheck('redirect_health', ['count' => count($redirects)], $issues, 10);
     }
 
     private function checkDuplicateTitles(int $tenantId): array
@@ -334,46 +307,41 @@ class SeoAuditService
         );
 
         $issues = [];
-        foreach ($duplicates as $dup) {
-            $issues[] = "Duplicate meta title \"{$dup->meta_title}\" used {$dup->cnt} times";
+        foreach ($duplicates as $duplicate) {
+            $issues[] = $this->issue('duplicate_meta_title', [
+                'title' => (string) $duplicate->meta_title,
+                'count' => (int) $duplicate->cnt,
+            ]);
         }
 
-        return $this->buildCheck(
-            'duplicate_titles',
-            'Unique Meta Titles',
-            'Checks for duplicate meta titles across pages',
-            $issues,
-            10
-        );
+        return $this->buildCheck('duplicate_titles', [], $issues, 10);
     }
 
     private function checkSitemapCoverage(int $tenantId): array
     {
-        $service = app(SitemapService::class);
-        $stats = $service->getStats($tenantId);
-
+        $stats = app(SitemapService::class)->getStats($tenantId);
+        $totalUrls = (int) $stats['total_urls'];
         $issues = [];
 
-        if ($stats['total_urls'] === 0) {
-            $issues[] = 'Sitemap contains 0 URLs — no content is being indexed';
-        } elseif ($stats['total_urls'] < 5) {
-            $issues[] = "Sitemap contains only {$stats['total_urls']} URLs — very low coverage";
+        if ($totalUrls === 0) {
+            $issues[] = $this->issue('sitemap_empty');
+        } elseif ($totalUrls < 5) {
+            $issues[] = $this->issue('sitemap_low_coverage', ['count' => $totalUrls]);
         }
 
-        // Check for content types with 0 URLs when they should have content
         foreach ($stats['content_types'] as $type => $count) {
-            if ($count === 0 && in_array($type, ['static_pages', 'profiles'])) {
-                $issues[] = "No {$type} in sitemap — expected at least some";
+            if ((int) $count !== 0) {
+                continue;
+            }
+
+            if ($type === 'static_pages') {
+                $issues[] = $this->issue('sitemap_static_pages_missing');
+            } elseif ($type === 'profiles') {
+                $issues[] = $this->issue('sitemap_profiles_missing');
             }
         }
 
-        return $this->buildCheck(
-            'sitemap_coverage',
-            'Sitemap Coverage',
-            "Checks sitemap URL count and coverage ({$stats['total_urls']} URLs)",
-            $issues,
-            10
-        );
+        return $this->buildCheck('sitemap_coverage', ['count' => $totalUrls], $issues, 10);
     }
 
     private function checkCanonicalUrls(int $tenantId): array
@@ -382,10 +350,9 @@ class SeoAuditService
         $issues = [];
 
         if (!filter_var($settings['seo_canonical_urls'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Canonical URL generation is disabled — duplicate content risk';
+            $issues[] = $this->issue('canonical_generation_disabled');
         }
 
-        // Check for custom canonical URLs that might be stale
         $customCanonicals = (int) DB::selectOne(
             "SELECT COUNT(*) AS cnt FROM seo_metadata
              WHERE tenant_id = ? AND canonical_url IS NOT NULL AND canonical_url != ''",
@@ -393,51 +360,37 @@ class SeoAuditService
         )->cnt;
 
         if ($customCanonicals > 50) {
-            $issues[] = "{$customCanonicals} pages have custom canonical URLs — ensure they are still valid";
+            $issues[] = $this->issue('custom_canonical_urls_high', ['count' => $customCanonicals]);
         }
 
-        return $this->buildCheck(
-            'canonical_urls',
-            'Canonical URLs',
-            'Checks canonical URL configuration and custom overrides',
-            $issues,
-            10
-        );
+        return $this->buildCheck('canonical_urls', [], $issues, 10);
     }
 
     private function checkOpenGraph(int $tenantId): array
     {
         $settings = $this->getTenantSettings($tenantId, ['seo_open_graph', 'seo_twitter_cards']);
-        $tenant = DB::selectOne("SELECT og_image_url FROM tenants WHERE id = ?", [$tenantId]);
-
+        $tenant = DB::selectOne('SELECT og_image_url FROM tenants WHERE id = ?', [$tenantId]);
         $issues = [];
 
         if (!filter_var($settings['seo_open_graph'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Open Graph tags are disabled — social sharing will show generic previews';
+            $issues[] = $this->issue('open_graph_sharing_disabled');
         }
 
         if (!filter_var($settings['seo_twitter_cards'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $issues[] = 'Twitter Cards are disabled';
+            $issues[] = $this->issue('twitter_cards_disabled');
         }
 
         if ($tenant && empty($tenant->og_image_url)) {
-            $issues[] = 'No default Open Graph image configured — social shares will have no image';
+            $issues[] = $this->issue('open_graph_default_image_missing');
         }
 
-        return $this->buildCheck(
-            'open_graph',
-            'Social Sharing (OG/Twitter)',
-            'Checks Open Graph and Twitter Card configuration',
-            $issues,
-            10
-        );
+        return $this->buildCheck('open_graph', [], $issues, 10);
     }
 
     private function checkContentQuality(int $tenantId): array
     {
         $issues = [];
 
-        // Check for very short blog posts (blog data lives in the `posts` table)
         $shortPosts = (int) DB::selectOne(
             "SELECT COUNT(*) AS cnt FROM posts
              WHERE tenant_id = ? AND status = 'published' AND LENGTH(content) < 300",
@@ -445,10 +398,12 @@ class SeoAuditService
         )->cnt;
 
         if ($shortPosts > 0) {
-            $issues[] = "{$shortPosts} published blog post(s) have very short content (<300 chars) — thin content hurts SEO";
+            $issues[] = $this->issue('thin_blog_content', [
+                'count' => $shortPosts,
+                'minimum' => 300,
+            ]);
         }
 
-        // Check for pages without titles
         $untitledPages = (int) DB::selectOne(
             "SELECT COUNT(*) AS cnt FROM pages
              WHERE tenant_id = ? AND is_published = 1 AND (title IS NULL OR title = '')",
@@ -456,23 +411,18 @@ class SeoAuditService
         )->cnt;
 
         if ($untitledPages > 0) {
-            $issues[] = "{$untitledPages} published page(s) have no title";
+            $issues[] = $this->issue('untitled_published_pages', ['count' => $untitledPages]);
         }
 
-        return $this->buildCheck(
-            'content_quality',
-            'Content Quality Signals',
-            'Checks for thin content, missing titles, and other quality issues',
-            $issues,
-            10
-        );
+        return $this->buildCheck('content_quality', [], $issues, 10);
     }
 
-    // =========================================================================
-    // Helpers
-    // =========================================================================
-
-    private function buildCheck(string $key, string $name, string $description, array $issues, int $maxPoints): array
+    /**
+     * @param array<string, string|int|float|bool|null> $params
+     * @param list<array{code: string, params: array<string, string|int|float|bool|null>}> $issues
+     * @return array<string, mixed>
+     */
+    private function buildCheck(string $code, array $params, array $issues, int $maxPoints): array
     {
         $issueCount = count($issues);
 
@@ -488,14 +438,93 @@ class SeoAuditService
         }
 
         return [
-            'key' => $key,
-            'name' => $name,
-            'description' => $description,
+            'code' => $code,
+            'params' => $params,
             'status' => $status,
             'issues' => $issues,
             'issue_count' => $issueCount,
             'points' => $points,
             'max_points' => $maxPoints,
+        ];
+    }
+
+    /**
+     * @param array<string, string|int|float|bool|null> $params
+     * @return array{code: string, params: array<string, string|int|float|bool|null>}
+     */
+    private function issue(string $code, array $params = []): array
+    {
+        return ['code' => $code, 'params' => $params];
+    }
+
+    /**
+     * @param array<string, mixed> $results
+     * @return array<string, mixed>
+     */
+    private function normaliseStoredResults(array $results, string $storedAt): array
+    {
+        $checks = [];
+
+        foreach (($results['checks'] ?? []) as $check) {
+            if (!is_array($check)) {
+                continue;
+            }
+
+            $code = $check['code'] ?? $check['key'] ?? 'unknown';
+            if (!is_string($code) || $code === '') {
+                $code = 'unknown';
+            }
+
+            $params = is_array($check['params'] ?? null) ? $check['params'] : [];
+            $issues = [];
+            $containsLegacyIssue = false;
+
+            foreach (($check['issues'] ?? []) as $issue) {
+                if (!is_array($issue) || !is_string($issue['code'] ?? null)) {
+                    $containsLegacyIssue = true;
+                    continue;
+                }
+
+                $issues[] = [
+                    'code' => $issue['code'],
+                    'params' => is_array($issue['params'] ?? null) ? $issue['params'] : [],
+                ];
+            }
+
+            if ($containsLegacyIssue) {
+                $issues[] = $this->issue('legacy_result_requires_rerun');
+            }
+
+            $status = $check['status'] ?? 'warning';
+            if (!in_array($status, ['pass', 'warning', 'fail'], true)) {
+                $status = 'warning';
+            }
+
+            $checks[] = [
+                'code' => $code,
+                'params' => $params,
+                'status' => $status,
+                'issues' => $issues,
+                'issue_count' => count($issues),
+                'points' => max(0, (int) ($check['points'] ?? 0)),
+                'max_points' => max(0, (int) ($check['max_points'] ?? 0)),
+            ];
+        }
+
+        $grade = $results['grade'] ?? 'N/A';
+        if (!is_string($grade) || !in_array($grade, ['A', 'B', 'C', 'D', 'F', 'N/A'], true)) {
+            $grade = 'N/A';
+        }
+
+        $runAt = $results['run_at'] ?? $storedAt;
+
+        return [
+            'checks' => $checks,
+            'score' => max(0, (int) ($results['score'] ?? 0)),
+            'max_score' => max(0, (int) ($results['max_score'] ?? 0)),
+            'grade' => $grade,
+            'run_at' => is_string($runAt) ? $runAt : $storedAt,
+            'stored_at' => $storedAt,
         ];
     }
 
@@ -505,20 +534,24 @@ class SeoAuditService
             return 'N/A';
         }
 
-        $pct = ($score / $maxScore) * 100;
+        $percentage = ($score / $maxScore) * 100;
 
         return match (true) {
-            $pct >= 90 => 'A',
-            $pct >= 80 => 'B',
-            $pct >= 70 => 'C',
-            $pct >= 60 => 'D',
+            $percentage >= 90 => 'A',
+            $percentage >= 80 => 'B',
+            $percentage >= 70 => 'C',
+            $percentage >= 60 => 'D',
             default => 'F',
         };
     }
 
+    /**
+     * @param list<string> $keys
+     * @return array<string, string>
+     */
     private function getTenantSettings(int $tenantId, array $keys): array
     {
-        if (empty($keys)) {
+        if ($keys === []) {
             return [];
         }
 
@@ -537,6 +570,7 @@ class SeoAuditService
         return $settings;
     }
 
+    /** @param array<string, mixed> $results */
     private function persistResults(int $tenantId, array $results): void
     {
         try {
@@ -544,10 +578,10 @@ class SeoAuditService
                 "INSERT INTO seo_audits (tenant_id, url, results, created_at) VALUES (?, '', ?, NOW())",
                 [$tenantId, json_encode($results)]
             );
-        } catch (\Throwable $e) {
+        } catch (\Throwable $exception) {
             Log::warning('Failed to persist SEO audit results', [
                 'tenant_id' => $tenantId,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
         }
     }

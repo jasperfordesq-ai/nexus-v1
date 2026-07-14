@@ -88,7 +88,8 @@ class ExternalIntegrationBacklogServiceTest extends TestCase
         foreach ($result['items'] as $item) {
             $this->assertSame('proposed', $item['status']);
             $this->assertNotEmpty($item['id']);
-            $this->assertNotEmpty($item['name']);
+            $this->assertNotEmpty($item['copy_code']);
+            $this->assertSame('', $item['name']);
         }
     }
 

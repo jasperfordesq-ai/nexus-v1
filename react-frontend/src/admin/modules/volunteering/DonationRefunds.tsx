@@ -15,7 +15,7 @@
  *   POST /v2/admin/donations/{id}/refund   (Stripe full refund)
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatCurrency, formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -56,11 +56,15 @@ const ROUTE_COLORS: Record<string, 'success' | 'warning' | 'default'> = {
 function formatAmount(amount: number | string, currency: string | null): string {
   const value = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (Number.isNaN(value)) return String(amount);
-  const code = (currency || 'EUR').toUpperCase();
+  if (!currency) {
+    return formatNumber(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  const code = currency.toUpperCase();
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: code }).format(value);
+    return formatCurrency(value, code);
   } catch {
-    return `${value.toFixed(2)} ${code}`;
+    return `${formatNumber(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${code}`;
   }
 }
 
@@ -108,8 +112,8 @@ export function DonationRefunds() {
       } else if (res.success) {
         setDonations([]);
       } else {
-        setLoadError(res.error || t('donation_refunds.load_failed'));
-        toast.error(res.error || t('donation_refunds.load_failed'));
+        setLoadError(t('donation_refunds.load_failed'));
+        toast.error(t('donation_refunds.load_failed'));
       }
     } catch {
       setLoadError(t('donation_refunds.load_failed'));
@@ -143,7 +147,7 @@ export function DonationRefunds() {
   }, [donations]);
 
   const primaryCurrency = useMemo(
-    () => donations.find((d) => d.currency)?.currency ?? 'EUR',
+    () => donations.find((d) => d.currency)?.currency ?? null,
     [donations],
   );
 
@@ -167,7 +171,7 @@ export function DonationRefunds() {
       loadDonations();
     } else {
       // Keep the dialog target so the admin can retry or cancel deliberately.
-      toast.error(res.error || t('donation_refunds.refund_failed'));
+      toast.error(t('donation_refunds.refund_failed'));
     }
 
     setRefunding(false);
@@ -186,7 +190,7 @@ export function DonationRefunds() {
       loadDonations();
     } else {
       // Keep the dialog target so the admin can retry or cancel deliberately.
-      toast.error(res.error || t('donation_refunds.complete_failed'));
+      toast.error(t('donation_refunds.complete_failed'));
     }
 
     setCompleting(false);
@@ -195,9 +199,12 @@ export function DonationRefunds() {
   // ─── Table columns ───
 
   const statusLabel = (status: string) =>
-    t(`donation_refunds.status_${status}`, { defaultValue: status });
+    t(`donation_refunds.status_${status}`, { defaultValue: t('donation_refunds.status_unknown') });
   const routeLabel = (route?: string | null) =>
-    t(`donation_refunds.route_${route || 'platform_default'}`, { defaultValue: route || 'platform_default' });
+    t(`donation_refunds.route_${route || 'platform_default'}`, { defaultValue: t('donation_refunds.route_unknown') });
+  const paymentMethodLabel = (method?: string | null) => method
+    ? t(`donation_refunds.payment_method_${method}`, { defaultValue: t('donation_refunds.payment_method_unknown') })
+    : t('donation_refunds.payment_method_unknown');
 
   const columns: Column<AdminDonation>[] = [
     {
@@ -231,7 +238,7 @@ export function DonationRefunds() {
     {
       key: 'payment_method',
       label: t('donation_refunds.payment_method'),
-      render: (d) => <span className="text-sm text-muted">{d.payment_method || '—'}</span>,
+      render: (d) => <span className="text-sm text-muted">{paymentMethodLabel(d.payment_method)}</span>,
     },
     {
       key: 'payment_route',

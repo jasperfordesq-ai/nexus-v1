@@ -1695,6 +1695,12 @@ describe('adminTools', () => {
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/tools/seo-audit');
   });
 
+  it('getSeoAudit gets the latest code-based audit result', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: null });
+    await adminTools.getSeoAudit();
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/tools/seo-audit');
+  });
+
   it('restoreBlogBackup posts to restore', async () => {
     mockPost.mockResolvedValueOnce({ success: true, data: {} });
     await adminTools.restoreBlogBackup(2);

@@ -110,7 +110,8 @@
     "rate_exchange": "この交換を評価",
     "prep_time_value": "{{count}}h",
     "rating_value": "評価: {{rating}} (5 点満点中)",
-    "prep_time_value_other": "{{count}}h"
+    "prep_time_value_other": "{{count}}h",
+    "prep_time_value_one": "{{count}}h"
   },
   "modal": {
     "decline_title": "交換リクエストを拒否",
@@ -175,5 +176,6 @@
     "detail": {
       "title": "交換の詳細"
     }
-  }
+  },
+  "hours_count_one": "{{count}} 時間"
 }

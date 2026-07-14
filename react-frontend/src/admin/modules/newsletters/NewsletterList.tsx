@@ -9,7 +9,7 @@
  * Parity: PHP Admin\NewsletterController::index()
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';import Mail from 'lucide-react/icons/mail';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -159,11 +159,11 @@ export function NewsletterList() {
     },
     {
       key: 'open_rate', label: t('newsletters.col_open_rate'),
-      render: (item) => <span>{item.open_rate ? `${item.open_rate}%` : '--'}</span>,
+      render: (item) => <span>{item.open_rate !== null && item.open_rate !== undefined ? formatNumber(item.open_rate / 100, { style: 'percent', maximumFractionDigits: 2 }) : '--'}</span>,
     },
     {
       key: 'click_rate', label: t('newsletters.col_click_rate'),
-      render: (item) => <span>{item.click_rate ? `${item.click_rate}%` : '--'}</span>,
+      render: (item) => <span>{item.click_rate !== null && item.click_rate !== undefined ? formatNumber(item.click_rate / 100, { style: 'percent', maximumFractionDigits: 2 }) : '--'}</span>,
     },
     {
       key: 'created_at', label: t('newsletters.col_date'), sortable: true,

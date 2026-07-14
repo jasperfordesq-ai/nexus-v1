@@ -94,7 +94,9 @@
     "unsave": "保存済みから削除",
     "save": "出品を保存",
     "available_count_other": "{{count}} 点在庫あり",
-    "views_count_other": "{{count}} 回閲覧"
+    "views_count_other": "{{count}} 回閲覧",
+    "available_count_one": "{{count}} 利用可能",
+    "views_count_one": "{{count}} 回閲覧"
   },
   "offer": {
     "modal_title": "オファーを出す",
@@ -187,7 +189,8 @@
     "created_error": "リスティングの作成に失敗しました",
     "created_error_retry": "リスティングの作成に失敗しました。もう一度お試しください。",
     "draft_saved": "下書きを保存しました",
-    "title_char_count_other": "{{count}}/120 文字"
+    "title_char_count_other": "{{count}}/120 文字",
+    "title_char_count_one": "{{count}}/120 文字"
   },
   "search": {
     "category_search": "カテゴリを検索...",
@@ -232,7 +235,8 @@
     "price_up_to": "{{max}} 以下",
     "last_days_one": "過去 {{count}} 日間",
     "last_days_other": "過去 {{count}} 日間",
-    "reset_filters_other": "フィルターをリセット ({{count}})"
+    "reset_filters_other": "フィルターをリセット ({{count}})",
+    "reset_filters_one": "フィルターをリセット ({{count}})"
   },
   "seller": {
     "page_title": "セラープロフィール",
@@ -290,7 +294,8 @@
     "results_count_other": "{{count}} 件の結果",
     "load_more": "さらに読み込む",
     "browse_description": "マーケットプレイスで {{name}} のリスティングを閲覧。",
-    "reset_filters_other": "フィルターをリセット ({{count}})"
+    "reset_filters_other": "フィルターをリセット ({{count}})",
+    "reset_filters_one": "フィルターをリセット ({{count}})"
   },
   "common": {
     "loading": "読み込み中...",
@@ -432,7 +437,8 @@
     "empty_sold_description": "まだアイテムを売却していません。",
     "empty_expired_title": "期限切れのリスティングはありません",
     "empty_expired_description": "期限切れのリスティングはありません。",
-    "views_count_aria_other": "{{count}}回の閲覧"
+    "views_count_aria_other": "{{count}}回の閲覧",
+    "views_count_aria_one": "{{count}} 回閲覧"
   },
   "my_offers": {
     "page_title": "マイオファー - マーケットプレイス",
@@ -593,7 +599,10 @@
     },
     "offers_title_count_other": "配送オファー（{{count}}件）",
     "time_credits_value_other": "{{count}} TC",
-    "estimated_minutes_other": "約{{count}}分"
+    "estimated_minutes_other": "約{{count}}分",
+    "offers_title_count_one": "配達オファー ({{count}})",
+    "time_credits_value_one": "{{count}} TC",
+    "estimated_minutes_one": "~{{count}} 分"
   },
   "pickup": {
     "my_pickups_title": "私の受け取り",
@@ -624,7 +633,9 @@
     "low_chip": "在庫: {{count}}（少）",
     "count_chip": "在庫: {{count}}",
     "low_chip_other": "在庫: {{count}}（少）",
-    "count_chip_other": "在庫: {{count}}"
+    "count_chip_other": "在庫: {{count}}",
+    "low_chip_one": "在庫: {{count}} (少ない)",
+    "count_chip_one": "在庫: {{count}}"
   },
   "ai_reply": {
     "suggest": "返信を提案",
@@ -792,7 +803,8 @@
       "success": "評価を送信しました!",
       "error": "評価の送信に失敗しました"
     },
-    "quantity_multiplier_other": "×{{count}}"
+    "quantity_multiplier_other": "×{{count}}",
+    "quantity_multiplier_one": "x{{count}}"
   },
   "onboarding": {
     "page_title": "セラーオンボーディング - マーケットプレイス",

@@ -2674,7 +2674,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
 
         $row = DB::table('email_suppression')->where('id', $id)->first();
         if (!$row) {
-            return $this->respondWithError('NOT_FOUND', 'Suppression entry not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.email_suppression_not_found'), null, 404);
         }
 
         DB::table('email_suppression')->where('id', $id)->delete();
@@ -2700,7 +2700,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
             ->select(['id', 'email', 'first_name', 'name', 'email_verified_at', 'created_at'])
             ->first();
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found in this tenant.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found_in_tenant'), null, 404);
         }
 
         $logs = DB::table('email_log')

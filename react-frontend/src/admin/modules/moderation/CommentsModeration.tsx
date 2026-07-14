@@ -121,7 +121,7 @@ export default function CommentsModeration() {
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || t('common.unexpected_error'));
+        toast.error(t('common.unexpected_error'));
       }
     } catch {
       toast.error(t('common.unexpected_error'));

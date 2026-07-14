@@ -179,5 +179,259 @@
     "provider_subject": "Project NEXUS — اختبار مزوّد البريد الإلكتروني",
     "provider_heading": "اختبار مزوّد البريد الإلكتروني",
     "body_tenant_ok": "مزوّد البريد الإلكتروني للمستأجر مُهيَّأ ويعمل بشكل صحيح."
+  },
+  "help": {
+    "feedback_recorded": "تم تسجيل الملاحظات",
+    "missing_article_slug": "معرف المقالة مفقود",
+    "article_not_found": "المقالة غير موجودة"
+  },
+  "job_vacancies": {
+    "job_not_found": "الوظيفة غير موجودة",
+    "only_poster_can_rank": "فقط صاحب الوظيفة يمكنه تقييم المتقدمين",
+    "ai_not_configured": "لم يتم تكوين الذكاء الاصطناعي",
+    "no_active_applications": "لا توجد طلبات نشطة للتصنيف",
+    "ai_parse_error": "فشل تحليل استجابة تصنيف الذكاء الاصطناعي",
+    "ai_ranking_failed": "فشل تصنيف الذكاء الاصطناعي",
+    "template_name_required": "اسم القالب مطلوب",
+    "template_not_found": "القالب غير موجود",
+    "employer_id_required": "معرّف صاحب العمل مطلوب",
+    "rating_must_be_1_5": "يجب أن يكون التقييم من 1 إلى 5",
+    "only_review_after_completing": "يمكنك فقط مراجعة أصحاب العمل بعد إتمام عمل معهم",
+    "already_reviewed_employer": "لقد قمت بالفعل بمراجعة هذا صاحب العمل",
+    "interview_not_found": "لم يتم العثور على المقابلة",
+    "access_denied": "تم رفض الوصول",
+    "message_required": "الرسالة مطلوبة",
+    "ai_chat_failed": "فشل دردشة الذكاء الاصطناعي"
+  },
+  "knowledge_base": {
+    "feedback_submitted": "تم إرسال الملاحظات بنجاح",
+    "article_not_found": "المقالة غير موجودة",
+    "attachment_not_found": "المرفق غير موجود",
+    "file_not_found_on_disk": "الملف غير موجود على القرص"
+  },
+  "legal": {
+    "all_accepted": "تم قبول جميع المستندات القانونية",
+    "acceptance_recorded": "تم تسجيل القبول"
+  },
+  "listings": {
+    "cannot_report_own": "لا يمكنك الإبلاغ عن قائمتك الخاصة.",
+    "valid_reason_required": "مطلوب سبب صالح.",
+    "details_max_500": "يجب ألا تتجاوز التفاصيل 500 حرف.",
+    "already_reported": "لقد قمت بالإبلاغ عن هذه القائمة بالفعل.",
+    "report_thank_you": "شكراً لتقريرك. سيقوم فريقنا بمراجعته.",
+    "no_images_uploaded": "لم يتم تحميل أي صور.",
+    "image_not_found": "الصورة غير موجودة.",
+    "image_ids_non_empty": "يجب أن تكون image_ids مصفوفة غير فارغة."
+  },
+  "marketplace_ai": {
+    "feature_disabled": "ميزة السوق غير مفعلة لهذه المجتمع.",
+    "auth_required": "يتطلب المصادقة.",
+    "listing_not_found": "القائمة غير موجودة.",
+    "only_owner_auto_reply": "فقط مالك القائمة يمكنه إنشاء الردود التلقائية."
+  },
+  "marketplace_delivery": {
+    "feature_disabled": "ميزة السوق غير مفعلة لهذه المجتمع.",
+    "auth_required": "يتطلب المصادقة.",
+    "offer_accepted": "تم قبول عرض التوصيل",
+    "delivery_confirmed": "تم تأكيد التوصيل، تم منح أرصدة الوقت"
+  },
+  "marketplace_listing": {
+    "feature_disabled": "ميزة السوق غير مفعلة لهذه المجتمع.",
+    "no_permission_modify": "ليس لديك إذن لتعديل هذا الإعلان.",
+    "not_found": "لم يتم العثور على إعلان السوق.",
+    "create_failed": "فشل إنشاء الإعلان. يرجى المحاولة مرة أخرى.",
+    "update_failed": "فشل تحديث القائمة. الرجاء المحاولة مرة أخرى.",
+    "no_image_files": "لم يتم تقديم أي ملفات صور.",
+    "no_valid_images": "لا يمكن رفع أي صور صالحة. الملفات المسموح بها: JPEG، PNG، GIF، WebP (أقصى حجم 10 ميغابايت).",
+    "image_not_found": "الصورة غير موجودة لهذه القائمة.",
+    "no_video_file": "لم يتم تقديم أي ملف فيديو.",
+    "invalid_video_type": "نوع الفيديو غير صالح. المسموح به: MP4، WebM، MOV.",
+    "video_too_large": "حجم ملف الفيديو يتجاوز الحد الأقصى 50 ميغابايت.",
+    "ai_description_failed": "لا يمكن إنشاء وصف. يرجى المحاولة مرة أخرى أو كتابته يدويًا.",
+    "lat_lng_required": "خط العرض وخط الطول مطلوبان.",
+    "invalid_coordinates": "الإحداثيات غير صالحة.",
+    "csv_read_failed": "تعذّر قراءة ملف CSV.",
+    "csv_header_required": "يجب أن يحتوي ملف CSV على صف رأس واحد وعلى الأقل صف بيانات واحد.",
+    "max_images_reached": "تم الوصول إلى الحد الأقصى لعدد الصور :max لكل قائمة.",
+    "csv_missing_column": "يجب أن يحتوي ملف CSV على عمود ':col'.",
+    "imported_as_drafts": "تم استيراد :count قائمة كمسودات."
+  },
+  "marketplace_offer": {
+    "feature_disabled": "ميزة السوق غير مفعلة لهذه المجتمع.",
+    "not_own_listing": "أنت لا تملك هذا الإعلان.",
+    "only_seller_accept": "البائع فقط يمكنه قبول هذا العرض.",
+    "only_seller_decline": "البائع فقط يمكنه رفض هذا العرض.",
+    "only_seller_counter": "البائع فقط يمكنه تقديم عرض مضاد لهذا العرض.",
+    "only_buyer_accept_counter": "المشتري فقط يمكنه قبول العرض المضاد.",
+    "only_buyer_withdraw": "يمكن للمشتري فقط سحب عرضه.",
+    "withdrawn": "تم سحب العرض بنجاح."
+  },
+  "marketplace_report": {
+    "feature_disabled": "ميزة السوق غير مفعلة لهذه المجتمع.",
+    "report_submitted": "تم تقديم تقريرك. سنراجعه خلال 24 ساعة كما هو مطلوب بموجب قانون الخدمات الرقمية."
+  },
+  "member_availability": {
+    "slot_deleted": "تم حذف الفتحة"
+  },
+  "menu": {
+    "cache_cleared": "تم مسح ذاكرة قائمة الطعام بنجاح"
+  },
+  "newsletter": {
+    "already_unsubscribed": "أنت بالفعل غير مشترك."
+  },
+  "notifications": {
+    "deleted": "تم حذف الإشعار"
+  },
+  "onboarding": {
+    "already_completed": "تم إكمال الإعداد بالفعل",
+    "safeguarding_saved": "تم حفظ تفضيلات الحماية"
+  },
+  "openapi": {
+    "spec_not_found": "لم يتم العثور على مواصفة OpenAPI"
+  },
+  "identity": {
+    "dob_locked": "اسمك وتاريخ ميلادك مقفلان بعد التحقق من الهوية.",
+    "dob_required": "تاريخ الميلاد مطلوب.",
+    "dob_invalid": "يرجى إدخال تاريخ ميلاد صالح.",
+    "dob_must_be_past": "يجب أن يكون تاريخ الميلاد في الماضي.",
+    "must_be_16": "يجب أن يكون عمرك 16 عامًا على الأقل.",
+    "no_fee_required": "لا يوجد رسوم مطلوبة.",
+    "payment_failed": "غير قادر على معالجة الدفع. يرجى المحاولة مرة أخرى.",
+    "user_not_found": "المستخدم غير موجود.",
+    "provide_dob_first": "يرجى تقديم تاريخ ميلادك أولاً.",
+    "complete_payment_first": "يرجى إكمال الدفع أولاً.",
+    "not_available": "التحقق من الهوية غير متاح حالياً.",
+    "start_failed": "غير قادر على بدء التحقق."
+  },
+  "password_reset": {
+    "link_sent": "إذا كان هناك حساب بهذا البريد الإلكتروني، تم إرسال رابط إعادة تعيين كلمة المرور.",
+    "updated": "تم تحديث كلمة المرور بنجاح. يرجى تسجيل الدخول باستخدام كلمة المرور الجديدة الخاصة بك.",
+    "changed_bell": "تم تغيير كلمة المرور الخاصة بك. إذا لم تقم بذلك، اتصل بالدعم فوراً."
+  },
+  "peer_endorsement": {
+    "recorded": "تم تسجيل تأييد الزميل"
+  },
+  "push": {
+    "unsubscribed": "تم إلغاء الاشتراك بنجاح",
+    "no_subscribers": "لم يتم العثور على مشتركين",
+    "token_pending": "تم استلام الرمز - سيتم ربطه عند تسجيل الدخول",
+    "device_registered": "تم تسجيل الجهاز للإشعارات الفورية"
+  },
+  "registration": {
+    "email_verified": "تم التحقق من البريد الإلكتروني بنجاح",
+    "verification_sent": "تم إرسال بريد التحقق إذا كان الحساب موجودًا"
+  },
+  "resource_category": {
+    "reordered": "تم إعادة ترتيب الموارد بنجاح"
+  },
+  "skill_taxonomy": {
+    "category_deleted": "تم حذف الفئة",
+    "skill_removed": "تمت إزالة المهارة"
+  },
+  "sub_account": {
+    "relationship_revoked": "تم سحب العلاقة"
+  },
+  "two_factor": {
+    "disabled": "تم تعطيل المصادقة الثنائية",
+    "enabled_notification": "تم تفعيل المصادقة الثنائية على حسابك.",
+    "disabled_notification": "تم تعطيل المصادقة الثنائية على حسابك. إذا لم تقم أنت بذلك، قم بتأمين حسابك فورًا.",
+    "disabled_email_title": "تم تعطيل المصادقة الثنائية",
+    "disabled_email_preview": "تم تعطيل المصادقة الثنائية على حسابك.",
+    "disabled_email_body": "تم تعطيل المصادقة الثنائية على حسابك. إذا لم تقم بهذا التغيير، يرجى تأمين حسابك فورًا عن طريق تغيير كلمة المرور وإعادة تمكين المصادقة الثنائية.",
+    "disabled_email_subject": "تنبيه أمني: تم تعطيل المصادقة ذات العاملين — {{tenant}}"
+  },
+  "users": {
+    "theme_updated": "تم تحديث تفضيلات السمة",
+    "password_updated": "تم تحديث كلمة المرور بنجاح",
+    "account_deleted": "تم حذف الحساب بنجاح",
+    "prefs_updated": "تم تحديث تفضيلات الإشعارات",
+    "notification_settings_update_failed": "فشل تحديث إعدادات الإشعارات",
+    "invalid_context_type": "نوع السياق غير صالح",
+    "invalid_frequency": "تردد غير صالح",
+    "context_id_required": "معرف السياق مطلوب",
+    "invalid_group_id": "معرف المجموعة غير صالح",
+    "invalid_thread_id": "معرف السلسلة غير صالح"
+  },
+  "volunteer_checkin": {
+    "checked_out": "تم تسجيل الخروج بنجاح"
+  },
+  "volunteer_community": {
+    "joined_waitlist": "تم الانضمام إلى قائمة الانتظار بنجاح",
+    "claimed_spot": "تم الاستيلاء على فترة العمل بنجاح",
+    "swap_request_sent": "تم إرسال طلب التبديل",
+    "swap_admin_pending": "تم قبول التبديل ولكن يتطلب موافقة الإدارة",
+    "reserved_slots": "محجوز: :slots فترات",
+    "member_added_reservation": "تمت إضافة العضو إلى الحجز الجماعي",
+    "recurring_deactivated": "تم تعطيل النمط المتكرر",
+    "guardian_consent_granted": "تم منح موافقة الوصي بنجاح."
+  },
+  "volunteer": {
+    "access_denied": "تم رفض الوصول",
+    "amount_gt_zero": "يجب أن تكون القيمة أكبر من 0",
+    "no_fields_to_update": "لا توجد حقول لتحديثها",
+    "signed_up_for_shift": "تم التسجيل في الوردية بنجاح",
+    "hours_logged_pending": "تم تسجيل الساعات بنجاح، في انتظار التحقق",
+    "review_submitted": "تم إرسال التقييم بنجاح"
+  },
+  "volunteer_wellbeing": {
+    "emergency_alert_sent": "تم إرسال التنبيه الطارئ"
+  },
+  "wallet": {
+    "donation_successful": "تم التبرع بنجاح. شكراً لك!",
+    "category_deleted": "تم حذف الفئة",
+    "name_required": "الاسم مطلوب",
+    "create_category_failed": "فشل في إنشاء الفئة",
+    "update_category_failed": "فشل في تحديث الفئة",
+    "cannot_delete_category": "لا يمكن حذف هذه الفئة (قد تكون فئة نظام)",
+    "rating_required": "التقييم مطلوب (1-5)",
+    "amount_required": "المبلغ مطلوب",
+    "starting_balance_failed": "فشل تحديث الرصيد الابتدائي",
+    "starting_balance_updated": "تم تحديث الرصيد الابتدائي",
+    "statement_exported": "تم تصدير البيان"
+  },
+  "webauthn": {
+    "passkey_registered": "تم تسجيل مفتاح المرور بنجاح",
+    "auth_successful": "تم التحقق من الهوية بنجاح",
+    "credentials_removed": "تمت إزالة بيانات الاعتماد",
+    "all_removed": "تمت إزالة :count مفتاح(مفاتيح) مرور. يمكنك الآن إعادة التسجيل على أي جهاز.",
+    "passkey_removed_bell": "تمت إزالة مفتاح مرور من حسابك. إذا لم تقم بذلك، قم بتأمين حسابك فورًا.",
+    "all_passkeys_removed_bell": "تمت إزالة جميع مفاتيح المرور ({{count}}) من حسابك. إذا لم تقم بذلك، فقم بتأمين حسابك فورًا."
+  },
+  "maintenance": {
+    "under_maintenance": "المنصة تحت الصيانة حاليًا. يرجى العودة لاحقًا."
+  },
+  "block_user": {
+    "cannot_block_self": "لا يمكنك حظر نفسك"
+  },
+  "group_conversation": {
+    "body_required": "نص الرسالة مطلوب",
+    "message_too_long": "الرسالة طويلة جدًا"
+  },
+  "marketplace_group": {
+    "auth_required": "يتطلب المصادقة."
+  },
+  "connections": {
+    "accepted_connection": "تم قبول الاتصال",
+    "connection_accepted": "تم قبول الاتصال"
+  },
+  "admin_crm": {
+    "invalid_type": "معامل النوع غير صالح"
+  },
+  "endorsement": {
+    "cannot_endorse_self": "لا يمكنك التأييد لنفسك",
+    "member_not_found": "العضو غير موجود",
+    "already_endorsed": "لقد قمت بالفعل بتأييد هذه المهارة"
+  },
+  "feed": {
+    "content_or_image_required": "يجب أن يحتوي المنشور على محتوى أو صورة",
+    "quoted_post_not_found": "المنشور المقتبس غير موجود",
+    "post_not_found_or_not_owned": "المنشور غير موجود أو لا يخصك",
+    "must_be_group_member": "يجب أن تكون عضوًا في المجموعة لكي تنشر",
+    "create_post_failed": "فشل في إنشاء المنشور"
+  },
+  "verification_badge": {
+    "user_not_found": "المستخدم غير موجود",
+    "badge_already_active": "الشارة مفعلة بالفعل",
+    "invalid_badge_type": "نوع الشارة غير صالح: :type"
   }
 }

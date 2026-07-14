@@ -6,6 +6,8 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Models\Badge;
+use App\Models\TenantBadgeOverride;
 use App\Services\BadgeDefinitionService;
 use Illuminate\Support\Facades\Cache;
 use Tests\Laravel\TestCase;
@@ -35,6 +37,46 @@ class BadgeDefinitionServiceTest extends TestCase
             ->andReturn([]);
 
         $this->assertSame([], BadgeDefinitionService::getEnabledBadges(42));
+    }
+
+    public function test_builtin_copy_exposes_codes_but_tenant_authored_copy_does_not(): void
+    {
+        $badge = (new Badge())->forceFill([
+            'badge_key' => 'community_hero',
+            'name' => 'Community Hero',
+            'description' => 'Help the community.',
+            'icon' => 'award',
+            'category' => 'community',
+            'threshold' => 10,
+            'badge_tier' => 'template',
+            'badge_class' => 'quantity',
+            'threshold_type' => 'count',
+            'evaluation_method' => 'automatic',
+            'config_json' => null,
+            'rarity' => 'common',
+            'xp_value' => 25,
+            'is_enabled' => true,
+        ]);
+
+        $merge = new \ReflectionMethod(BadgeDefinitionService::class, 'mergeBadgeWithOverride');
+        $builtIn = $merge->invoke(null, $badge, null);
+
+        $this->assertSame('badges.community_hero.name', $builtIn['name_code']);
+        $this->assertSame('badges.community_hero.description', $builtIn['description_code']);
+
+        $override = (new TenantBadgeOverride())->forceFill([
+            'custom_name' => 'Neighbourhood Star',
+            'custom_description' => 'Tenant-authored badge copy.',
+            'custom_icon' => null,
+            'custom_threshold' => null,
+            'is_enabled' => true,
+        ]);
+        $custom = $merge->invoke(null, $badge, $override);
+
+        $this->assertSame('Neighbourhood Star', $custom['name']);
+        $this->assertSame('Tenant-authored badge copy.', $custom['description']);
+        $this->assertNull($custom['name_code']);
+        $this->assertNull($custom['description_code']);
     }
 
     // ── getBadgeByKey ────────────────────────────────────────────────

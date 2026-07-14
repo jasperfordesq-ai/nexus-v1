@@ -121,7 +121,7 @@ export function TemplateForm() {
         setContentFormat(((data as { content_format?: ContentFormat }).content_format) || 'richtext');
         setDesignJson(((data as { design_json?: string }).design_json) || null);
       } else {
-        setLoadError(res.error || t('newsletters.failed_to_load_template'));
+        setLoadError(t('newsletters.failed_to_load_template'));
       }
     } catch {
       setLoadError(t('newsletters.unexpected_error_loading'));
@@ -178,7 +178,7 @@ export function TemplateForm() {
         );
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || t('newsletters.failed_to_save_template'));
+        toast.error(t('newsletters.failed_to_save_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -195,7 +195,7 @@ export function TemplateForm() {
         toast.success(t('newsletters.template_duplicated'));
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || t('newsletters.failed_to_duplicate_template'));
+        toast.error(t('newsletters.failed_to_duplicate_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -281,7 +281,7 @@ export function TemplateForm() {
               <CardBody className="gap-4">
                 <Input
                   label={t('newsletters.col_name')}
-                  placeholder="e.g. Monthly Newsletter"
+                  placeholder={t('template_form.name_example')}
                   value={name}
                   onValueChange={setName}
                   isRequired
@@ -335,7 +335,7 @@ export function TemplateForm() {
               <CardBody className="gap-4">
                 <Input
                   label={t('newsletters.default_subject_line')}
-                  placeholder="e.g. Your Monthly Community Update"
+                  placeholder={t('template_form.subject_example')}
                   value={subject}
                   onValueChange={setSubject}
                   isDisabled={submitting}

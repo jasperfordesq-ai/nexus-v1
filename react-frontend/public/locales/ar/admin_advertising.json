@@ -37,14 +37,14 @@
     "loading": "تحميل",
     "next": "التالي",
     "no": "لا",
-    "ok": "OK",
     "pending": "قيد الانتظار",
     "previous": "سابق",
     "retry": "أعد المحاولة",
     "save": "يحفظ",
     "select_all": "حدد الكل",
     "select_item": "حدد العنصر",
-    "yes": "نعم"
+    "yes": "نعم",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "إجراءات الوسيط",
@@ -57,7 +57,6 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -68,9 +67,10 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "select_all_rows": "حدد كافة الصفوف",
-    "select_row": "Select row {{id}}",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "loading": "جارٍ التحميل",
+    "select_row": "اختر الصف {{id}}"
   },
   "advertising": {
     "status": {
@@ -162,11 +162,13 @@
         "all": "جميع المواضع",
         "discovery": "اكتشاف",
         "feed": "يٌطعم",
-        "market": "سوق"
+        "market": "سوق",
+        "markt": "السوق"
       },
       "placeholders": {
         "budget": "على سبيل المثال 5000 = EUR 50.00",
-        "campaign_name": "تخفيضات الصيف - Cafe Helvetia"
+        "campaign_name": "تخفيضات الصيف - Cafe Helvetia",
+        "audience_filters_json": "{\"radius_km\": 5, \"lat\": 47.1758, \"lng\": 8.4622, \"interests\": [\"البستنة\"]}"
       },
       "stats": {
         "active_campaigns": "الحملات النشطة",
@@ -244,7 +246,8 @@
       "placeholders": {
         "body": "الحد الأقصى 400 حرف",
         "campaign_name": "على سبيل المثال ترويج الربيع - Cafe Seeblick",
-        "title": "الحد الأقصى 100 حرف"
+        "title": "الحد الأقصى 100 حرف",
+        "cta_url": "https://... أو nexus://..."
       },
       "stats": {
         "needs_attention": "يحتاج إلى اهتمام",
@@ -264,7 +267,8 @@
         "rejected": "تم رفض الحملة \"{{name}}\".",
         "reject_failed": "فشل رفض الحملة.",
         "required_fields": "الاسم والعنوان والجسم مطلوبة."
-      }
+      },
+      "cost_per_send": "{{cost}} لكل إرسال"
     },
     "tabs_aria": "مرشح حالة الحملة الإعلانية"
   }

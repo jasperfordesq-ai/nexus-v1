@@ -118,7 +118,7 @@ const EVENT_TYPE_OPTION_KEYS = [
   { key: 'federated_search', i18nKey: 'federation.filter_searches' },
 ];
 
-function getEventConfig(type: string, t: (key: string, defaultValue?: string) => string): EventTypeConfig {
+function getEventConfig(type: string, t: (key: string) => string): EventTypeConfig {
   const i18nKey = EVENT_TYPE_I18N_KEYS[type];
   const style = EVENT_TYPE_STYLES[type];
   if (style && i18nKey) {
@@ -128,7 +128,7 @@ function getEventConfig(type: string, t: (key: string, defaultValue?: string) =>
     };
   }
   return {
-    label: type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    label: t('federation.event_type_unknown'),
     icon: Activity,
     color: 'default' as const,
     bgClass: 'bg-surface-secondary text-muted dark:bg-surface-secondary dark:text-muted',
@@ -141,7 +141,7 @@ function getEventConfig(type: string, t: (key: string, defaultValue?: string) =>
 
 function TimelineItem({ item }: { item: ActivityItem }) {
   const { t } = useTranslation('admin_federation');
-  const config = getEventConfig(item.type, ((key: string) => t(key)) as (key: string, defaultValue?: string) => string);
+  const config = getEventConfig(item.type, t);
   const Icon = config.icon;
 
   const absoluteTime = new Date(item.timestamp).toLocaleString(getFormattingLocale());

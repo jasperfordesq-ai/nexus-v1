@@ -15,7 +15,7 @@
     "refresh": "Aktualisieren",
     "unexpected_error": "Unerwarteter Fehler",
     "unknown": "Unbekannt",
-    "unfeature": "Unfeature",
+    "unfeature": "Feature entfernen",
     "actions": "Aktionen",
     "active": "Aktiv",
     "all": "Alle",
@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Als nächstes",
     "no": "Nein",
-    "ok": "OK",
     "pending": "Ausstehend",
     "previous": "Zurück",
     "retry": "Versuchen Sie es noch einmal",
     "save": "Speichern",
     "select_all": "Wählen Sie „Alle“ aus",
     "select_item": "Wählen Sie Artikel aus",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makleraktionen",
@@ -57,7 +57,6 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
-    "loading": "Loading",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -68,9 +67,10 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
-    "select_row": "Select row {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "loading": "Lädt",
+    "select_row": "Zeile auswählen {{id}}"
   },
   "analytics": {
     "category_demand_title": "Kategorienachfrage",
@@ -154,9 +154,9 @@
         "heatmap": "Mitglieder-Heatmap",
         "demographics": "Demografie",
         "demand_supply": "Nachfrage und Angebot",
-        "engagement": "Engagement",
         "help_requests": "Hilfeanfragen",
-        "volunteer": "Freiwilliger"
+        "volunteer": "Freiwilliger",
+        "engagement": "Engagement"
       },
       "sections": {
         "geographic_activity_density": "Geografische Aktivitätsdichte",
@@ -180,18 +180,18 @@
         "requests": "Anfragen",
         "offers": "Angebote",
         "ratio": "Verhältnis",
-        "trend": "Trend",
         "active_members": "Aktive Mitglieder",
         "vol_hours": "Freiwilligenstunden",
         "new_listings": "Neue Angebote",
         "new_events": "Neue Veranstaltungen",
         "help_requests": "Hilfeanfragen",
-        "organisation": "Organisation",
         "volunteers": "Freiwillige",
         "total": "Gesamt",
         "resolved": "Gelöst",
         "resolution_rate": "Auflösungsrate",
-        "avg_days_to_resolve": "Durchschn. Tage zur Lösung"
+        "avg_days_to_resolve": "Durchschn. Tage zur Lösung",
+        "trend": "Trend",
+        "organisation": "Organisation"
       },
       "heatmap": {
         "description": "Top-Standorte nach Mitgliederaktivität und -dichte."
@@ -201,7 +201,8 @@
         "language_distribution": "Sprachverteilung",
         "member_growth_12m": "Mitgliederwachstum, letzte 12 Monate",
         "total_with_data": "{{total}}-Mitglieder mit demografischen Daten",
-        "total_active_members": "{{total}} aktive Mitglieder"
+        "total_active_members": "{{total}} aktive Mitglieder",
+        "unknown_language": "Unbekannte Sprache"
       },
       "volunteer": {
         "total_hours": "Gesamtstunden",
@@ -212,7 +213,13 @@
       },
       "help": {
         "by_category": "Hilfeanfragen nach Kategorie",
-        "resolution_trend_6m": "Auflösungstrend, letzte 6 Monate"
+        "resolution_trend_6m": "Auflösungstrend, letzte 6 Monate",
+        "categories": {
+          "either": "Telefon oder Nachricht",
+          "message": "Nachricht",
+          "phone": "Telefon",
+          "unknown": "Unbekannte Einstellung"
+        }
       },
       "empty": {
         "infinity": "∞",
@@ -274,6 +281,17 @@
     "no_trending": "Keine beliebten Suchanfragen in diesem Zeitraum.",
     "no_zero_results": "Keine Suchanfragen ohne Treffer in diesem Zeitraum — jede Suche hat etwas gefunden.",
     "count_value_one": "{{count}}×",
-    "count_value_other": "{{count}}×"
+    "count_value_other": "{{count}}×",
+    "result_types": {
+      "blog": "Blog",
+      "events": "Ereignisse",
+      "groups": "Gruppen",
+      "listings": "Einträge",
+      "marketplace": "Marktplatz",
+      "members": "Mitglieder",
+      "resources": "Ressourcen",
+      "volunteering": "Freiwilligenarbeit",
+      "jobs": "Jobs"
+    }
   }
 }

@@ -165,7 +165,7 @@
     "form_description_required": "La descrizione è obbligatoria",
     "form_description_min_length": "La descrizione deve avere almeno 20 caratteri",
     "form_email_label": "Email di contatto",
-    "form_email_placeholder": "contatto@latuaorg.com",
+    "form_email_placeholder": "contact@yourorg.com",
     "form_email_required": "L'email di contatto è obbligatoria",
     "form_email_invalid": "La preghiamo di inserire un indirizzo email valido",
     "form_website_label": "Sito web (facoltativo)",
@@ -277,7 +277,7 @@
     "add_member_heading": "Aggiungi Membro al Gruppo",
     "add_member_desc": "Inserisci l'indirizzo email della persona che desideri aggiungere a questa prenotazione di gruppo. Riceverà un invito.",
     "email_label": "Indirizzo Email",
-    "email_placeholder": "membro@esempio.com",
+    "email_placeholder": "member@example.com",
     "cancel": "Annulla",
     "add_member_failed": "Impossibile aggiungere il membro. Potrebbe essere già nel gruppo o l'email non è valida.",
     "add_member_error": "Impossibile aggiungere il membro. Controlla l'email e riprova."

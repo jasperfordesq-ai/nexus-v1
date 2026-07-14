@@ -37,14 +37,14 @@
     "loading": "Laden",
     "next": "Volgende",
     "no": "Nee",
-    "ok": "OK",
     "pending": "In behandeling",
     "previous": "Vorige",
     "retry": "Opnieuw proberen",
     "save": "Opslaan",
     "select_all": "Selecteer Alles",
     "select_item": "Selecteer Artikel",
-    "yes": "Ja"
+    "yes": "Ja",
+    "ok": "OK"
   },
   "shared": {
     "broker_actions": "Makelaarsacties",
@@ -57,7 +57,6 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
-    "loading": "Loading",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -68,9 +67,10 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
-    "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "loading": "Laden",
+    "select_row": "Selecteer rij {{id}}"
   },
   "fadp": {
     "meta": {
@@ -199,10 +199,10 @@
     },
     "legal_basis": {
       "consent": "Toestemming",
-      "contract": "Contract",
       "legal_obligation": "Wettelijke verplichting",
       "legitimate_interest": "Gerechtvaardigd belang",
-      "unknown": "Onbekende wettelijke basis: {{basis}}"
+      "unknown": "Onbekende wettelijke basis: {{basis}}",
+      "contract": "Contract"
     },
     "data_residency": {
       "EU": "EU (EER)",
@@ -233,27 +233,27 @@
     "enter_url": "Voer URL in",
     "undo": "Ongedaan maken",
     "redo": "Opnieuw uitvoeren",
-    "heading_2": "2",
-    "heading_3": "3",
     "bold": "Vet",
     "italic": "Cursief",
     "underline": "Onderstreep",
     "strikethrough": "Doorhalen",
-    "inline_code": "Inline Code",
-    "bullet_list": "Bullet List",
-    "numbered_list": "Numbered List",
-    "block_quote": "Block Quote",
-    "remove_link": "Remove Link",
-    "insert_link": "Insert Link",
-    "notice_box": "Notice Box",
-    "notice_title_placeholder": "Enter notice title...",
-    "notice_body_placeholder": "Enter notice body...",
-    "preview_title_placeholder": "Enter preview title...",
     "content_html": "Inhoud-HTML",
-    "editor_only": "Editor Only",
-    "split_view": "Split View",
-    "content_placeholder": "Content...",
     "preview": "Voorbeeld",
-    "content_helper": "Content"
+    "inline_code": "Inlinecode",
+    "bullet_list": "Opsommingstekens",
+    "numbered_list": "Genummerde lijst",
+    "block_quote": "Citaatblok",
+    "remove_link": "Link verwijderen",
+    "insert_link": "Link invoegen",
+    "notice_box": "Notitievak",
+    "editor_only": "Alleen voor editor",
+    "split_view": "Gescheiden weergave",
+    "heading_2": "Kop 2",
+    "heading_3": "Kop 3",
+    "notice_title_placeholder": "Belangrijke kennisgeving",
+    "notice_body_placeholder": "Voeg hier de details van de kennisgeving toe.",
+    "preview_title_placeholder": "Voorbeeld van juridisch document",
+    "content_placeholder": "Begin met het schrijven van de inhoud van het juridische document...",
+    "content_helper": "Gebruik kopjes voor secties, kennisgevingsvakken voor belangrijke juridische mededelingen, en bekijk een voorbeeld voordat u publiceert."
   }
 }

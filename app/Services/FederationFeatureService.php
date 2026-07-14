@@ -270,8 +270,8 @@ class FederationFeatureService
             foreach ($definitions as $key => $definition) {
                 $features[$key] = [
                     'enabled' => $stored[$key] ?? $definition['default'],
-                    'label' => $definition['label'],
-                    'description' => $definition['description'],
+                    'label_code' => $definition['label_code'],
+                    'description_code' => $definition['description_code'],
                     'category' => $definition['category'],
                     'requires_system' => $definition['requires_system'] ?? null,
                 ];
@@ -279,7 +279,7 @@ class FederationFeatureService
                 if (!empty($definition['requires_system'])) {
                     $features[$key]['system_enabled'] = $this->isSystemFeatureEnabled($definition['requires_system']);
                     if (!$features[$key]['system_enabled']) {
-                        $features[$key]['blocked_reason'] = 'Disabled at system level';
+                        $features[$key]['blocked_reason_code'] = 'system_feature_disabled';
                     }
                 }
             }
@@ -519,61 +519,61 @@ class FederationFeatureService
     {
         return [
             self::TENANT_FEDERATION_ENABLED => [
-                'label' => 'Federation Enabled',
-                'description' => 'Enable federation features for this tenant',
+                'label_code' => 'tenant_federation_enabled',
+                'description_code' => 'tenant_federation_enabled',
                 'category' => 'core',
                 'default' => true,
             ],
             self::TENANT_APPEAR_IN_DIRECTORY => [
-                'label' => 'Appear in Directory',
-                'description' => 'Show this tenant in the federation directory',
+                'label_code' => 'tenant_appear_in_directory',
+                'description_code' => 'tenant_appear_in_directory',
                 'category' => 'core',
                 'default' => true,
             ],
             self::TENANT_AUTO_ACCEPT_HIERARCHY => [
-                'label' => 'Auto-Accept Hierarchy',
-                'description' => 'Automatically accept federation requests from parent/child tenants',
+                'label_code' => 'tenant_auto_accept_hierarchy',
+                'description_code' => 'tenant_auto_accept_hierarchy',
                 'category' => 'core',
                 'default' => false,
             ],
             self::TENANT_PROFILES_ENABLED => [
-                'label' => 'Cross-Tenant Profiles',
-                'description' => 'Allow member profiles to be visible to partner timebanks',
+                'label_code' => 'tenant_profiles_enabled',
+                'description_code' => 'tenant_profiles_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_PROFILES_ENABLED,
             ],
             self::TENANT_MESSAGING_ENABLED => [
-                'label' => 'Cross-Tenant Messaging',
-                'description' => 'Allow members to message users from partner timebanks',
+                'label_code' => 'tenant_messaging_enabled',
+                'description_code' => 'tenant_messaging_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_MESSAGING_ENABLED,
             ],
             self::TENANT_TRANSACTIONS_ENABLED => [
-                'label' => 'Cross-Tenant Transactions',
-                'description' => 'Allow time credit exchanges with partner timebanks',
+                'label_code' => 'tenant_transactions_enabled',
+                'description_code' => 'tenant_transactions_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_TRANSACTIONS_ENABLED,
             ],
             self::TENANT_LISTINGS_ENABLED => [
-                'label' => 'Cross-Tenant Listings',
-                'description' => 'Allow listings to be visible to partner timebanks',
+                'label_code' => 'tenant_listings_enabled',
+                'description_code' => 'tenant_listings_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_LISTINGS_ENABLED,
             ],
             self::TENANT_EVENTS_ENABLED => [
-                'label' => 'Cross-Tenant Events',
-                'description' => 'Allow events to be visible to partner timebanks',
+                'label_code' => 'tenant_events_enabled',
+                'description_code' => 'tenant_events_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_EVENTS_ENABLED,
             ],
             self::TENANT_GROUPS_ENABLED => [
-                'label' => 'Cross-Tenant Groups',
-                'description' => 'Allow groups to accept members from partner timebanks',
+                'label_code' => 'tenant_groups_enabled',
+                'description_code' => 'tenant_groups_enabled',
                 'category' => 'features',
                 'default' => true,
                 'requires_system' => self::SYSTEM_GROUPS_ENABLED,

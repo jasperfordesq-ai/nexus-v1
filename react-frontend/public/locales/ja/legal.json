@@ -404,7 +404,8 @@
     "changes_count": "{{count}} の変更",
     "legend_removed": "削除されました",
     "legend_added": "追加した",
-    "changes_count_other": "{{count}} の変更"
+    "changes_count_other": "{{count}} の変更",
+    "changes_count_one": "{{count}} 変更"
   },
   "platform": {
     "effective_date": "有効 {{date}}",
@@ -809,5 +810,8 @@
     "contact_cta_body": "ご連絡いただければ、コーディネーターが折り返しご連絡させていただきます。ほとんどのメッセージは 1 営業日以内に返信されます。",
     "contact_cta_button": "お問い合わせ",
     "community_guidelines_link": "コミュニティガイドラインを読む"
+  },
+  "custom_document": {
+    "introduction": "はじめに"
   }
 }

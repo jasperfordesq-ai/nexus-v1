@@ -49,5 +49,23 @@
   "extend_session": "Estender sessão",
   "dismiss": "Fechar",
   "idle_logout_title": "Sessão terminada por inatividade",
-  "idle_logout_message": "A sua sessão foi terminada automaticamente após um período de inatividade. Inicie sessão novamente para continuar."
+  "idle_logout_message": "A sua sessão foi terminada automaticamente após um período de inatividade. Inicie sessão novamente para continuar.",
+  "api": {
+    "request_failed_title": "Falha na solicitação",
+    "request_failed": "A solicitação não pôde ser concluída.",
+    "service_unavailable": "O serviço está temporariamente indisponível. Por favor, tente novamente mais tarde.",
+    "invalid_response": "O servidor retornou uma resposta inválida.",
+    "request_timeout": "O tempo da solicitação expirou. Por favor, tente novamente.",
+    "network_error": "Não foi possível conectar. Por favor, verifique sua conexão com a internet e tente novamente.",
+    "invalid_request": "A solicitação era inválida. Por favor, verifique sua entrada.",
+    "permission_denied": "Você não tem permissão para realizar esta ação.",
+    "resource_not_found": "O recurso solicitado não foi encontrado.",
+    "too_many_requests": "Muitas solicitações. Por favor, espere um momento e tente novamente.",
+    "server_error": "Ocorreu um erro inesperado no servidor. Por favor, tente novamente mais tarde.",
+    "download_failed_status": "Falha no download (HTTP {{status}}).",
+    "upload_failed": "Falha no envio.",
+    "upload_failed_retry": "Falha no envio. Por favor, tente novamente.",
+    "upload_cancelled": "Envio cancelado.",
+    "upload_timeout": "O envio expirou. Por favor, tente novamente."
+  }
 }
