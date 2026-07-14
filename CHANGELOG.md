@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.6] - 2026-07-14
+
 ### Changed
 
 - **Translation cleanup now closes the mobile and contextual admin-help ratchets.** All 14,904 missing mobile locale keys are filled across the six maintained non-English mobile locales, with unambiguous web translations reused before machine translation and a new CI check enforcing mobile interpolation-variable parity. The 653 English-only contextual admin-help entries now load from a dedicated `admin_help` namespace across all ten web locales instead of a bundled TypeScript registry, while preserving lazy loading and route structure. Translation files pass exact key and interpolation parity; these machine-assisted translations remain explicitly queued for native-speaker review.
@@ -1817,7 +1819,8 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 ---
 
-[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.5...HEAD
+[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.6...HEAD
+[1.5.6]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.5...v1.5.6
 [1.5.5]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.2...v1.5.3
