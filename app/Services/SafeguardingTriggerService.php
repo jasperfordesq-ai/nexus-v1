@@ -101,12 +101,17 @@ class SafeguardingTriggerService
     }
 
     /**
-     * Activate broker protections based on a user's safeguarding preferences.
+     * Recompute protections based on a user's safeguarding preferences.
      *
-     * Called after preferences are saved (during onboarding or settings update).
-     * Writes to user_messaging_restrictions and syncs user flags.
+     * Enforcement recomputation is notification-silent by default because it
+     * is also called after policy and option maintenance. Only a fresh member
+     * preference save may opt into the safeguarding disclosure notification.
      */
-    public static function activateTriggersForUser(int $userId, ?int $tenantId = null): void
+    public static function activateTriggersForUser(
+        int $userId,
+        ?int $tenantId = null,
+        bool $notifyStaffOfMemberSelection = false,
+    ): void
     {
         $tenantId = $tenantId ?? TenantContext::getId();
 
@@ -182,11 +187,15 @@ class SafeguardingTriggerService
             }
         });
 
-        // Notify admins/brokers if any trigger requires it.
+        // Notify admins/brokers only for a fresh member preference save. Policy
+        // configuration, option maintenance and consent revocation also need to
+        // recompute these triggers, but replaying an onboarding alert from those
+        // administrative/system paths misrepresents an old selection as a new
+        // safeguarding disclosure.
         // Deduplicate: if we just fired the event for this user/tenant within
-        // the last 10 minutes (e.g. user retried their save, or admin re-evaluated),
+        // the last 10 minutes (for example, the member retried their save),
         // skip the dispatch so admins don't receive N copies of the same alert.
-        if ($needsNotification) {
+        if ($notifyStaffOfMemberSelection && $needsNotification) {
             $dedupKey = self::CACHE_PREFIX . "flagged:{$tenantId}:{$userId}";
             if (Cache::add($dedupKey, 1, 600)) {
                 try {

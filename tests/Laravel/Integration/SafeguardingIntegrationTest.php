@@ -6,10 +6,13 @@
 
 namespace Tests\Laravel\Integration;
 
+use App\Events\SafeguardingFlaggedEvent;
 use App\Models\User;
+use App\Services\SafeguardingPreferenceService;
 use App\Services\SafeguardingTriggerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -97,6 +100,38 @@ class SafeguardingIntegrationTest extends TestCase
         $this->assertNull($restriction, 'Member preferences must not create a message-monitoring row');
         $this->assertTrue(SafeguardingTriggerService::requiresBrokerApproval($user->id, $this->testTenantId));
         $this->assertTrue(SafeguardingTriggerService::isMessagingRestricted($user->id, $this->testTenantId));
+    }
+
+    public function test_only_fresh_member_selection_dispatches_safeguarding_disclosure_alert(): void
+    {
+        $user = $this->authenticatedMember();
+        $selectedOptionId = $this->createSafeguardingOption([
+            'notify_admin_on_selection' => true,
+        ], 'selected_alert');
+        $remainingOptionId = $this->createSafeguardingOption([
+            'notify_admin_on_selection' => true,
+        ], 'remaining_alert');
+
+        Event::fake([SafeguardingFlaggedEvent::class]);
+
+        $this->apiPost('/v2/onboarding/safeguarding', [
+            'preferences' => [
+                ['option_id' => $selectedOptionId, 'value' => '1'],
+                ['option_id' => $remainingOptionId, 'value' => '1'],
+            ],
+        ])->assertStatus(200);
+
+        Event::assertDispatched(SafeguardingFlaggedEvent::class, static fn (SafeguardingFlaggedEvent $event): bool =>
+            $event->userId === $user->id
+            && $event->tenantId === $user->tenant_id
+        );
+
+        // A withdrawal already has its own controlled staff notification. The
+        // enforcement recomputation must not describe the remaining historical
+        // selection as a fresh onboarding disclosure.
+        Event::fake([SafeguardingFlaggedEvent::class]);
+        $this->assertTrue(SafeguardingPreferenceService::revokePreference($user->id, $selectedOptionId));
+        Event::assertNotDispatched(SafeguardingFlaggedEvent::class);
     }
 
     public function test_preference_save_does_not_overwrite_a_separately_authorised_monitoring_decision(): void

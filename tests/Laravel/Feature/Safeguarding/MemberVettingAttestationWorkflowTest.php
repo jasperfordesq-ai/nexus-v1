@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Safeguarding;
 
 use App\Core\TenantContext;
+use App\Events\SafeguardingFlaggedEvent;
 use App\Models\User;
 use App\Services\SafeguardingJurisdictionService;
 use App\Services\SafeguardingPreferenceService;
@@ -17,12 +18,45 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
 class MemberVettingAttestationWorkflowTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_configuring_contact_policy_does_not_replay_existing_onboarding_alerts(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        // Recreate the production state: the England/Wales preset options
+        // already existed, but the tenant contact policy had not yet been
+        // explicitly configured.
+        SafeguardingPreferenceService::replaceCountryPreset(
+            $this->testTenantId,
+            'england_wales',
+        );
+        $this->protectRecipientWithPreset($recipient);
+        $this->assertDatabaseMissing('tenant_safeguarding_settings', [
+            'tenant_id' => $this->testTenantId,
+        ]);
+
+        Event::fake([SafeguardingFlaggedEvent::class]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/vetting/policy', [
+            'jurisdiction' => 'england_wales',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.policy.attestation_code', 'dbs_enhanced');
+
+        Event::assertNotDispatched(SafeguardingFlaggedEvent::class);
+        $this->assertTrue(
+            SafeguardingTriggerService::requiresVettedInteraction($recipient->id, $this->testTenantId),
+            'Policy setup must still recompute and preserve the member protection.',
+        );
+    }
 
     public function test_broker_confirmation_without_evidence_clears_direct_message_gate_and_revocation_closes_it(): void
     {

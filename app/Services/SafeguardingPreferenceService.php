@@ -166,8 +166,9 @@ class SafeguardingPreferenceService
         /** @var TenantSafeguardingOption $option */
         $option = $result['option'];
         foreach ($result['affected_user_ids'] as $userId) {
-            // Full re-evaluation: invalidates cache, re-merges triggers, updates
-            // user_messaging_restrictions, and re-dispatches notifications if needed.
+            // Full re-evaluation: invalidates cache, re-merges triggers and
+            // updates enforcement state. This is not a fresh member selection,
+            // so it must not replay the onboarding safeguarding alert.
             SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
         }
 
@@ -876,7 +877,11 @@ class SafeguardingPreferenceService
         // must not 500 the user-facing request; we log loudly so it can be retried
         // by a sweep job or admin tooling.
         try {
-            SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+            SafeguardingTriggerService::activateTriggersForUser(
+                $userId,
+                $tenantId,
+                notifyStaffOfMemberSelection: true,
+            );
         } catch (\Throwable $e) {
             Log::error('SafeguardingPreferenceService: trigger activation failed after consent commit', [
                 'user_id'   => $userId,
