@@ -625,7 +625,8 @@
       "welcome_text_placeholder": "Welcome message...",
       "your_community": "Your Community",
       "n_active_one": "{{count}} active",
-      "n_active_other": "{{count}} active"
+      "n_active_other": "{{count}} active",
+      "preset_united_kingdom": "United Kingdom"
     },
     "overdue_jobs": "Overdue Jobs",
     "page_title": "System",

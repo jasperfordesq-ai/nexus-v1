@@ -11,14 +11,19 @@ namespace App\Services;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MemberVettingAttestation;
 use App\Models\SafeguardingVettingReviewRequest;
+use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Metadata-only community vetting decisions.
+ * Community vetting decisions without certificate evidence.
  *
- * Certificate evidence is deliberately outside this service's contract. All
- * scheme, purpose, scope, policy, actor, and timestamps are derived server-side.
+ * Certificate evidence remains outside this service's contract. The service
+ * stores only controlled certification codes, encrypted operational scope and
+ * private notes, review/expiry dates, policy, actors and timestamps.
  */
 class MemberVettingAttestationService
 {
@@ -47,19 +52,22 @@ class MemberVettingAttestationService
         int $memberId,
         int $actorUserId,
         ?int $reviewRequestId = null,
+        array $details = [],
     ): array {
         $this->assertMemberBelongsToTenant($memberId, $tenantId);
         $this->assertActorMayDecideForMember($actorUserId, $memberId, $tenantId);
 
-        return DB::transaction(function () use ($tenantId, $memberId, $actorUserId, $reviewRequestId): array {
+        return DB::transaction(function () use ($tenantId, $memberId, $actorUserId, $reviewRequestId, $details): array {
             $policy = $this->lockAndRequireAvailablePolicy($tenantId);
+            $decisionDetails = $this->normalizeCertificationDetails($policy, $details);
             $existing = $this->decisionScopeQuery($tenantId, $memberId, $policy)
                 ->lockForUpdate()
                 ->first();
 
             if ($existing !== null
                 && $existing->decision === MemberVettingAttestation::DECISION_CONFIRMED
-                && $existing->policy_version === $policy['policy_version']) {
+                && $existing->policy_version === $policy['policy_version']
+                && $details === []) {
                 $this->resolvePendingReviews($tenantId, $memberId, $policy, $actorUserId, 'confirmed', $reviewRequestId);
 
                 return $this->getById((int) $existing->id, $tenantId) ?? [];
@@ -77,9 +85,14 @@ class MemberVettingAttestationService
                     'user_id' => $memberId,
                     'scheme_code' => $policy['scheme_code'],
                     'attestation_code' => $policy['attestation_code'],
+                    'certification_codes' => json_encode($decisionDetails['certification_codes'], JSON_THROW_ON_ERROR),
                     'purpose_code' => $policy['purpose_code'],
                     'scope_type' => $policy['scope_type'],
                     'scope_identifier' => $policy['scope_identifier'],
+                    'scope_summary_encrypted' => $decisionDetails['scope_summary_encrypted'],
+                    'private_notes_encrypted' => $decisionDetails['private_notes_encrypted'],
+                    'review_due_at' => $decisionDetails['review_due_at'],
+                    'authority_expires_at' => $decisionDetails['authority_expires_at'],
                     'decision' => MemberVettingAttestation::DECISION_CONFIRMED,
                     'confirmed_by' => $actorUserId,
                     'confirmed_at' => $now,
@@ -97,6 +110,16 @@ class MemberVettingAttestationService
                     ->where('tenant_id', $tenantId)
                     ->update([
                         'decision' => MemberVettingAttestation::DECISION_CONFIRMED,
+                        'certification_codes' => json_encode($decisionDetails['certification_codes'], JSON_THROW_ON_ERROR),
+                        'scope_summary_encrypted' => $decisionDetails['scope_summary_encrypted'],
+                        'private_notes_encrypted' => $decisionDetails['private_notes_encrypted'],
+                        'review_due_at' => $decisionDetails['review_due_at'],
+                        'authority_expires_at' => $decisionDetails['authority_expires_at'],
+                        'renewal_reminder_90_sent_at' => null,
+                        'renewal_reminder_30_sent_at' => null,
+                        'renewal_reminder_7_sent_at' => null,
+                        'renewal_due_notified_at' => null,
+                        'expiry_notified_at' => null,
                         'confirmed_by' => $actorUserId,
                         'confirmed_at' => $now,
                         'revoked_by' => null,
@@ -326,7 +349,15 @@ class MemberVettingAttestationService
             ->where('decision', MemberVettingAttestation::DECISION_CONFIRMED)
             ->whereNotNull('confirmed_by')
             ->whereNotNull('confirmed_at')
-            ->whereNull('revoked_at');
+            ->whereNull('revoked_at')
+            ->where(function (Builder $dateQuery): void {
+                $dateQuery->whereNull('review_due_at')
+                    ->orWhere('review_due_at', '>=', now()->toDateString());
+            })
+            ->where(function (Builder $dateQuery): void {
+                $dateQuery->whereNull('authority_expires_at')
+                    ->orWhere('authority_expires_at', '>=', now()->toDateString());
+            });
 
         if ($policyVersion !== null) {
             $query->where('policy_version', $policyVersion);
@@ -380,10 +411,14 @@ class MemberVettingAttestationService
 
         return [
             'policy' => $policy,
-            'decision' => $attestation?->decision ?? 'not_confirmed',
+            'decision' => $attestation === null
+                ? 'not_confirmed'
+                : ($this->rowIsExpired($attestation) ? 'expired' : $attestation->decision),
             'review_status' => $review?->status,
             'confirmed_at' => $attestation?->confirmed_at,
             'revoked_at' => $attestation?->revoked_at,
+            'review_due_at' => $attestation?->review_due_at,
+            'authority_expires_at' => $attestation?->authority_expires_at,
         ];
     }
 
@@ -443,9 +478,15 @@ class MemberVettingAttestationService
             });
         }
 
+        $today = now()->toDateString();
         match ($decisionFilter) {
-            'confirmed' => $query->where('a.decision', MemberVettingAttestation::DECISION_CONFIRMED),
+            'confirmed' => $query
+                ->where('a.decision', MemberVettingAttestation::DECISION_CONFIRMED)
+                ->where(fn (Builder $dateQuery) => $this->whereAttestationCurrent($dateQuery, 'a', $today)),
             'revoked' => $query->where('a.decision', MemberVettingAttestation::DECISION_REVOKED),
+            'expired' => $query
+                ->where('a.decision', MemberVettingAttestation::DECISION_CONFIRMED)
+                ->where(fn (Builder $dateQuery) => $this->whereAttestationExpired($dateQuery, 'a', $today)),
             'review_requested' => $query->where('r.status', SafeguardingVettingReviewRequest::STATUS_PENDING),
             'not_confirmed' => $query->where(function ($statusQuery): void {
                 $statusQuery->whereNull('a.id')
@@ -464,11 +505,14 @@ class MemberVettingAttestationService
                 'u.avatar_url',
                 'a.id as attestation_id',
                 'a.decision',
+                'a.certification_codes',
                 'a.confirmed_by',
                 'a.confirmed_at',
                 'a.revoked_by',
                 'a.revoked_at',
                 'a.revocation_reason_code',
+                'a.review_due_at',
+                'a.authority_expires_at',
                 'a.policy_version',
                 'r.id as review_request_id',
                 'r.status as review_status',
@@ -489,11 +533,15 @@ class MemberVettingAttestationService
             'avatar_url' => $row->avatar_url,
             'attestation_id' => $row->attestation_id !== null ? (int) $row->attestation_id : null,
             'decision' => $row->decision ?? 'not_confirmed',
+            'certification_codes' => $this->decodeCertificationCodes($row->certification_codes ?? null),
+            'is_expired' => $row->attestation_id !== null && $this->rowIsExpired($row),
             'confirmed_by' => $row->confirmed_by !== null ? (int) $row->confirmed_by : null,
             'confirmed_at' => $row->confirmed_at,
             'revoked_by' => $row->revoked_by !== null ? (int) $row->revoked_by : null,
             'revoked_at' => $row->revoked_at,
             'revocation_reason_code' => $row->revocation_reason_code,
+            'review_due_at' => $row->review_due_at,
+            'authority_expires_at' => $row->authority_expires_at,
             'policy_version' => $row->policy_version,
             'review_request_id' => $row->review_request_id !== null ? (int) $row->review_request_id : null,
             'review_status' => $row->review_status,
@@ -523,6 +571,7 @@ class MemberVettingAttestationService
 
         $confirmed = 0;
         $revoked = 0;
+        $expired = 0;
         if ($policy['attestation_code'] !== null) {
             $base = DB::table('member_vetting_attestations')
                 ->where('tenant_id', $tenantId)
@@ -532,7 +581,15 @@ class MemberVettingAttestationService
                 ->where('scope_type', $policy['scope_type'])
                 ->where('scope_identifier', $policy['scope_identifier'])
                 ->where('policy_version', $policy['policy_version']);
-            $confirmed = (clone $base)->where('decision', MemberVettingAttestation::DECISION_CONFIRMED)->count();
+            $today = now()->toDateString();
+            $confirmed = (clone $base)
+                ->where('decision', MemberVettingAttestation::DECISION_CONFIRMED)
+                ->where(fn (Builder $dateQuery) => $this->whereAttestationCurrent($dateQuery, 'member_vetting_attestations', $today))
+                ->count();
+            $expired = (clone $base)
+                ->where('decision', MemberVettingAttestation::DECISION_CONFIRMED)
+                ->where(fn (Builder $dateQuery) => $this->whereAttestationExpired($dateQuery, 'member_vetting_attestations', $today))
+                ->count();
             $revoked = (clone $base)->where('decision', MemberVettingAttestation::DECISION_REVOKED)->count();
         }
 
@@ -554,6 +611,7 @@ class MemberVettingAttestationService
             'total_members' => $totalMembers,
             'confirmed' => $confirmed,
             'revoked' => $revoked,
+            'expired' => $expired,
             'not_confirmed' => max(0, $totalMembers - $confirmed),
             'review_requested' => $reviewRequested,
             'policy' => $policy,
@@ -574,7 +632,9 @@ class MemberVettingAttestationService
             ->where('a.user_id', $memberId)
             ->select([
                 'a.id', 'a.user_id', 'a.scheme_code', 'a.attestation_code', 'a.purpose_code',
-                'a.scope_type', 'a.scope_identifier', 'a.decision', 'a.confirmed_at',
+                'a.certification_codes', 'a.scope_type', 'a.scope_identifier',
+                'a.scope_summary_encrypted', 'a.private_notes_encrypted',
+                'a.review_due_at', 'a.authority_expires_at', 'a.decision', 'a.confirmed_at',
                 'a.revoked_at', 'a.revocation_reason_code', 'a.policy_version',
                 'confirmer.first_name as confirmer_first_name',
                 'confirmer.last_name as confirmer_last_name',
@@ -783,8 +843,175 @@ class MemberVettingAttestationService
         $first = trim((string) ($data['confirmer_first_name'] ?? ''));
         $last = trim((string) ($data['confirmer_last_name'] ?? ''));
         $data['confirmed_by_name'] = trim($first . ' ' . $last) ?: null;
+        $data['certification_codes'] = $this->decodeCertificationCodes($data['certification_codes'] ?? null);
+        $data['scope_summary'] = $this->decryptDecisionText($data['scope_summary_encrypted'] ?? null);
+        $data['private_notes'] = $this->decryptDecisionText($data['private_notes_encrypted'] ?? null);
+        $data['is_expired'] = $this->rowIsExpired((object) $data);
         unset($data['confirmer_first_name'], $data['confirmer_last_name']);
+        unset($data['scope_summary_encrypted'], $data['private_notes_encrypted']);
 
         return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $policy
+     * @param array<string, mixed> $details
+     * @return array{certification_codes: list<string>, scope_summary_encrypted: string|null, private_notes_encrypted: string|null, review_due_at: string|null, authority_expires_at: string|null}
+     */
+    private function normalizeCertificationDetails(array $policy, array $details): array
+    {
+        $options = is_array($policy['certification_options'] ?? null)
+            ? $policy['certification_options']
+            : [];
+        $allowed = [];
+        $expiryRequired = [];
+        foreach ($options as $option) {
+            if (! is_array($option) || ! is_string($option['code'] ?? null)) {
+                continue;
+            }
+            $code = (string) $option['code'];
+            $allowed[] = $code;
+            if (! empty($option['authority_expiry_required'])) {
+                $expiryRequired[] = $code;
+            }
+        }
+
+        $requested = is_array($details['certification_codes'] ?? null)
+            ? $details['certification_codes']
+            : [];
+        $certificationCodes = array_values(array_unique(array_filter(array_map(
+            static fn (mixed $code): string => is_string($code) ? trim($code) : '',
+            $requested,
+        ))));
+        if ($certificationCodes === [] && count($allowed) === 1) {
+            $certificationCodes = $allowed;
+        }
+        if ($certificationCodes === [] || array_diff($certificationCodes, $allowed) !== []) {
+            throw new SafeguardingPolicyException('INVALID_VETTING_CERTIFICATION_CODE');
+        }
+
+        $scopeSummary = trim((string) ($details['scope_summary'] ?? ''));
+        $privateNotes = trim((string) ($details['private_notes'] ?? ''));
+        if (mb_strlen($scopeSummary) > 500 || mb_strlen($privateNotes) > 2000) {
+            throw new SafeguardingPolicyException('VETTING_DECISION_TEXT_TOO_LONG');
+        }
+        if (($policy['jurisdiction'] ?? null) === 'united_kingdom' && $scopeSummary === '') {
+            throw new SafeguardingPolicyException('VETTING_SCOPE_REQUIRED');
+        }
+
+        $reviewDueAt = $this->normalizeDecisionDate($details['review_due_at'] ?? null);
+        $authorityExpiresAt = $this->normalizeDecisionDate($details['authority_expires_at'] ?? null);
+        if (($policy['jurisdiction'] ?? null) === 'united_kingdom' && $reviewDueAt === null) {
+            throw new SafeguardingPolicyException('VETTING_REVIEW_DATE_REQUIRED');
+        }
+        if (array_intersect($certificationCodes, $expiryRequired) !== [] && $authorityExpiresAt === null) {
+            throw new SafeguardingPolicyException('VETTING_AUTHORITY_EXPIRY_REQUIRED');
+        }
+        if ($reviewDueAt !== null && $reviewDueAt < now()->toDateString()) {
+            throw new SafeguardingPolicyException('VETTING_REVIEW_DATE_INVALID');
+        }
+        if ($authorityExpiresAt !== null && $authorityExpiresAt < now()->toDateString()) {
+            throw new SafeguardingPolicyException('VETTING_AUTHORITY_EXPIRY_INVALID');
+        }
+        if ($reviewDueAt !== null && $authorityExpiresAt !== null && $reviewDueAt > $authorityExpiresAt) {
+            throw new SafeguardingPolicyException('VETTING_REVIEW_AFTER_EXPIRY');
+        }
+
+        return [
+            'certification_codes' => $certificationCodes,
+            'scope_summary_encrypted' => $this->encryptDecisionText($scopeSummary),
+            'private_notes_encrypted' => $this->encryptDecisionText($privateNotes),
+            'review_due_at' => $reviewDueAt,
+            'authority_expires_at' => $authorityExpiresAt,
+        ];
+    }
+
+    private function normalizeDecisionDate(mixed $value): ?string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        $value = trim($value);
+        try {
+            $date = CarbonImmutable::createFromFormat('!Y-m-d', $value);
+        } catch (\Throwable) {
+            throw new SafeguardingPolicyException('INVALID_VETTING_DATE');
+        }
+        if ($date === false || $date->format('Y-m-d') !== $value) {
+            throw new SafeguardingPolicyException('INVALID_VETTING_DATE');
+        }
+
+        return $value;
+    }
+
+    private function encryptDecisionText(string $value): ?string
+    {
+        return $value === '' ? null : Crypt::encryptString($value);
+    }
+
+    private function decryptDecisionText(mixed $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($value);
+        } catch (DecryptException $e) {
+            Log::warning('Unable to decrypt private safeguarding decision text', [
+                'exception_class' => $e::class,
+            ]);
+
+            return null;
+        }
+    }
+
+    /** @return list<string> */
+    private function decodeCertificationCodes(mixed $value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_filter($value, 'is_string'));
+        }
+        if (! is_string($value) || $value === '') {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+
+        return is_array($decoded)
+            ? array_values(array_filter($decoded, 'is_string'))
+            : [];
+    }
+
+    private function rowIsExpired(object $row): bool
+    {
+        if (($row->decision ?? null) !== MemberVettingAttestation::DECISION_CONFIRMED) {
+            return false;
+        }
+
+        $today = now()->toDateString();
+
+        return (is_string($row->review_due_at ?? null) && substr($row->review_due_at, 0, 10) < $today)
+            || (is_string($row->authority_expires_at ?? null) && substr($row->authority_expires_at, 0, 10) < $today);
+    }
+
+    private function whereAttestationCurrent(Builder $query, string $alias, string $today): void
+    {
+        $query->where(function (Builder $dateQuery) use ($alias, $today): void {
+            $dateQuery->whereNull("{$alias}.review_due_at")
+                ->orWhere("{$alias}.review_due_at", '>=', $today);
+        })->where(function (Builder $dateQuery) use ($alias, $today): void {
+            $dateQuery->whereNull("{$alias}.authority_expires_at")
+                ->orWhere("{$alias}.authority_expires_at", '>=', $today);
+        });
+    }
+
+    private function whereAttestationExpired(Builder $query, string $alias, string $today): void
+    {
+        $query->where(function (Builder $dateQuery) use ($alias, $today): void {
+            $dateQuery->where("{$alias}.review_due_at", '<', $today)
+                ->orWhere("{$alias}.authority_expires_at", '<', $today);
+        });
     }
 }

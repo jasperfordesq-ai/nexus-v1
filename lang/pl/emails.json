@@ -271,7 +271,8 @@
     "level_integrated": "Zintegrowany"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Sprawd? certyfikacj? ochronn?"
   },
   "group_digest": {
     "subject": "Miesięczne podsumowanie: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Otrzymujesz zaproszenie na :event. Sprawdź szczegóły i odpowiedz przed wygaśnięciem zaproszenia.",
     "expiry": "To zaproszenie wygasa :expiry.",
     "accept_button": "Sprawdź zaproszenie"
+  },
+  "vetting_renewal": {
+    "subject": "Wymagany przegl?d certyfikacji ochronnej dla :name",
+    "title": "Odnowienie certyfikacji ochronnej",
+    "body": "Certyfikacja ochronna spo?eczno?ci dla :name w :community musi zosta? sprawdzona do :date (pozosta?o :days dni)."
+  },
+  "vetting_expired": {
+    "subject": "Certyfikacja ochronna dla :name wygas?a",
+    "title": "Certyfikacja ochronna wygas?a",
+    "body": "Certyfikacja ochronna spo?eczno?ci dla :name w :community wygas?a :date. Chroniony kontakt pozostaje zablokowany do czasu odnowienia przez upowa?niony personel."
   }
 }

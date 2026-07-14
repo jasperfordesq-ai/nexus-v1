@@ -164,5 +164,7 @@
     "preview": ":sender · :group: :preview",
     "fallback_sender": "Qualcuno",
     "fallback_group": "un gruppo"
-  }
+  },
+  "vetting_renewal": "Revisione della certificazione di tutela in scadenza per :name",
+  "vetting_expired": "Certificazione di tutela di :name scaduta; contatto protetto bloccato"
 }

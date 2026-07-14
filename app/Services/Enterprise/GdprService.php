@@ -10,6 +10,7 @@ namespace App\Services\Enterprise;
 
 use App\Core\AudioUploader;
 use App\Services\LegacyVettingEvidenceManager;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use App\Services\Enterprise\LoggerService;
 use App\Services\Enterprise\MetricsService;
@@ -2986,11 +2987,10 @@ class GdprService
     // =========================================================================
 
     /**
-     * Get metadata-only safeguarding attestations for a user (GDPR Article 15).
+     * Get safeguarding attestations for a user (GDPR Article 15).
      *
-     * The export deliberately has no legacy certificate/reference/date/note/path
-     * fields. Decision history and review workflow metadata remain transparent to
-     * the data subject.
+     * Certificate evidence remains excluded. Operational certification codes,
+     * scope, private notes and renewal dates are personal data and are included.
      *
      * @return array{attestations: array<int, array<string, mixed>>, events: array<int, array<string, mixed>>, review_requests: array<int, array<string, mixed>>}
      */
@@ -3000,8 +3000,10 @@ class GdprService
 
         try {
             $data['attestations'] = $this->query(
-                "SELECT id, scheme_code, attestation_code, purpose_code, scope_type,
-                        scope_identifier, decision, confirmed_by, confirmed_at,
+                "SELECT id, scheme_code, attestation_code, certification_codes,
+                        purpose_code, scope_type, scope_identifier,
+                        scope_summary_encrypted, private_notes_encrypted,
+                        review_due_at, authority_expires_at, decision, confirmed_by, confirmed_at,
                         revoked_by, revoked_at, revocation_reason_code, policy_version,
                         created_at, updated_at
                  FROM member_vetting_attestations
@@ -3009,6 +3011,16 @@ class GdprService
                  ORDER BY created_at DESC",
                 [$userId, $this->tenantId]
             )->fetchAll();
+            foreach ($data['attestations'] as &$attestation) {
+                $codes = json_decode((string) ($attestation['certification_codes'] ?? ''), true);
+                $attestation['certification_codes'] = is_array($codes)
+                    ? array_values(array_filter($codes, 'is_string'))
+                    : [];
+                $attestation['scope_summary'] = $this->decryptVettingText($attestation['scope_summary_encrypted'] ?? null);
+                $attestation['private_notes'] = $this->decryptVettingText($attestation['private_notes_encrypted'] ?? null);
+                unset($attestation['scope_summary_encrypted'], $attestation['private_notes_encrypted']);
+            }
+            unset($attestation);
         } catch (\Throwable $e) {
             $this->logger->warning('getVettingAttestationData attestations failed', [
                 'user_id' => $userId,
@@ -3052,6 +3064,19 @@ class GdprService
         }
 
         return $data;
+    }
+
+    private function decryptVettingText(mixed $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

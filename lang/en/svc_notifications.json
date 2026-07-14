@@ -1,6 +1,8 @@
 {
   "vetting_status_updated": "Your community safeguarding vetting confirmation has been updated.",
   "vetting_review_requested": "A member has requested a safeguarding vetting review.",
+  "vetting_renewal": "Safeguarding certification renewal is due for :name.",
+  "vetting_expired": "Safeguarding certification has expired for :name.",
   "badge_collection": {
     "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
   },

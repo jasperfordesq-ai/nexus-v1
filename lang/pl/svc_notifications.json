@@ -164,5 +164,7 @@
     "preview": ":sender · :group: :preview",
     "fallback_sender": "Ktoś",
     "fallback_group": "grupa"
-  }
+  },
+  "vetting_renewal": "Wymagany przegl?d certyfikacji ochronnej dla :name",
+  "vetting_expired": "Certyfikacja ochronna dla :name wygas?a; chroniony kontakt zablokowany"
 }

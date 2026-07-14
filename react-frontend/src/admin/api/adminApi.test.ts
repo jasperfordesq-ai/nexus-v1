@@ -1993,11 +1993,22 @@ describe('adminVetting', () => {
     expect(mockPut).toHaveBeenCalledWith('/v2/admin/vetting/policy', { jurisdiction: 'england_wales' });
   });
 
-  it('confirms with acknowledgement and optional review request only', async () => {
+  it('confirms with controlled certification details and an optional review request', async () => {
     mockPost.mockResolvedValueOnce({ success: true, data: {} });
-    await adminVetting.confirm(5, 12);
+    await adminVetting.confirm(5, {
+      certification_codes: ['dbs_enhanced', 'pvg_scotland'],
+      scope_summary: 'Adult and child workforce activities.',
+      private_notes: 'Scope checked with safeguarding lead.',
+      review_due_at: '2027-07-14',
+      authority_expires_at: '2031-07-14',
+    }, 12);
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/user/5/confirm', {
       acknowledgement: true,
+      certification_codes: ['dbs_enhanced', 'pvg_scotland'],
+      scope_summary: 'Adult and child workforce activities.',
+      private_notes: 'Scope checked with safeguarding lead.',
+      review_due_at: '2027-07-14',
+      authority_expires_at: '2031-07-14',
       review_request_id: 12,
     });
   });

@@ -164,5 +164,7 @@
     "preview": ":sender · :group: :preview",
     "fallback_sender": "Alguém",
     "fallback_group": "um grupo"
-  }
+  },
+  "vetting_renewal": "Revis?o da certifica??o de prote??o pendente para :name",
+  "vetting_expired": "Certifica??o de prote??o de :name expirada; contacto protegido bloqueado"
 }

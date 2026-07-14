@@ -271,7 +271,8 @@
     "level_integrated": "Integrado"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Rever certifica??o de prote??o"
   },
   "group_digest": {
     "subject": "Resumo mensal: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Recebeu um convite para participar em :event. Consulte os detalhes e responda antes de o convite expirar.",
     "expiry": "Este convite expira em :expiry.",
     "accept_button": "Consultar convite"
+  },
+  "vetting_renewal": {
+    "subject": "Revis?o da certifica??o de prote??o pendente para :name",
+    "title": "Renova??o da certifica??o de prote??o",
+    "body": "A certifica??o comunit?ria de prote??o de :name em :community deve ser revista at? :date (faltam :days dias)."
+  },
+  "vetting_expired": {
+    "subject": "A certifica??o de prote??o de :name expirou",
+    "title": "Certifica??o de prote??o expirada",
+    "body": "A certifica??o comunit?ria de prote??o de :name em :community expirou em :date. O contacto protegido permanece bloqueado at? ser renovado por pessoal autorizado."
   }
 }

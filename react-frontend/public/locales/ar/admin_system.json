@@ -633,7 +633,8 @@
       "n_active_one": "{{count}}نشط",
       "n_active_other": "{{count}}نشط",
       "n_active_two": "{{count}}نشط",
-      "n_active_zero": "{{count}}نشط"
+      "n_active_zero": "{{count}}نشط",
+      "preset_united_kingdom": "??????? ???????"
     },
     "overdue_jobs": "الوظائف المتأخرة",
     "page_title": "نظام",

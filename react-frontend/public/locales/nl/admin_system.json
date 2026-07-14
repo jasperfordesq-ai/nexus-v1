@@ -625,7 +625,8 @@
       "welcome_text_placeholder": "Welkomstbericht...",
       "your_community": "Jouw gemeenschap",
       "n_active_one": "{{count}}actief",
-      "n_active_other": "{{count}}actief"
+      "n_active_other": "{{count}}actief",
+      "preset_united_kingdom": "Verenigd Koninkrijk"
     },
     "overdue_jobs": "Achterstallige banen",
     "page_title": "Systeem",

@@ -164,5 +164,7 @@
     "preview": ":sender · :group: :preview",
     "fallback_sender": "Jemand",
     "fallback_group": "eine Gruppe"
-  }
+  },
+  "vetting_renewal": "?berpr?fung der Schutzbescheinigung f?r :name f?llig",
+  "vetting_expired": "Schutzbescheinigung f?r :name abgelaufen; gesch?tzter Kontakt gesperrt"
 }

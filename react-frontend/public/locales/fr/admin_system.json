@@ -627,7 +627,8 @@
       "your_community": "Votre communauté",
       "n_active_many": "{{count}}actif",
       "n_active_one": "{{count}}actif",
-      "n_active_other": "{{count}}actif"
+      "n_active_other": "{{count}}actif",
+      "preset_united_kingdom": "Royaume-Uni"
     },
     "overdue_jobs": "Travaux en retard",
     "page_title": "Système",

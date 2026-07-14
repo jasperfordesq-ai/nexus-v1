@@ -4,11 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Metadata-only safeguarding vetting confirmations.
+ * Safeguarding vetting confirmations without certificate evidence.
  *
- * Brokers record a community decision for the configured safeguarding policy.
- * Certificate evidence, references, dates, results, free-text notes, uploads,
- * and bulk decisions are intentionally absent from this surface.
+ * Brokers record controlled certification schemes, encrypted operational scope
+ * and private notes, and the dates needed to renew the community decision.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -16,8 +15,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Check from 'lucide-react/icons/check';
 import CircleSlash from 'lucide-react/icons/circle-slash';
+import FileText from 'lucide-react/icons/file-text';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import UserCheck from 'lucide-react/icons/user-check';
@@ -30,6 +31,7 @@ import {
   CardBody,
   Checkbox,
   Chip,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -37,6 +39,7 @@ import {
   ModalHeader,
   Select,
   SelectItem,
+  Textarea,
 } from '@/components/ui';
 import { DataTable, type Column } from '@/admin/components';
 import { adminVetting } from '@/admin/api/adminApi';
@@ -44,6 +47,7 @@ import type {
   VettingPolicyResponse,
   VettingRecord,
   VettingStats,
+  VettingAttestation,
 } from '@/admin/api/types';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -70,6 +74,7 @@ const FILTERS = [
   'all',
   'review_requested',
   'confirmed',
+  'expired',
   'revoked',
   'not_confirmed',
 ] as const;
@@ -92,7 +97,8 @@ function memberName(item: VettingRecord): string {
 }
 
 function rowStatus(item: VettingRecord): string {
-  return item.review_status === 'pending' ? 'review_requested' : item.decision;
+  if (item.review_status === 'pending') return 'review_requested';
+  return item.is_expired ? 'expired' : item.decision;
 }
 
 function rowTimestamp(item: VettingRecord): string | null {
@@ -140,7 +146,15 @@ export function VettingRecords() {
 
   const [confirmItem, setConfirmItem] = useState<VettingRecord | null>(null);
   const [acknowledged, setAcknowledged] = useState(false);
+  const [certificationCodes, setCertificationCodes] = useState<Set<string>>(new Set());
+  const [scopeSummary, setScopeSummary] = useState('');
+  const [privateNotes, setPrivateNotes] = useState('');
+  const [reviewDueAt, setReviewDueAt] = useState('');
+  const [authorityExpiresAt, setAuthorityExpiresAt] = useState('');
   const [confirming, setConfirming] = useState(false);
+  const [detailItem, setDetailItem] = useState<VettingRecord | null>(null);
+  const [detailRecord, setDetailRecord] = useState<VettingAttestation | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [revokeItem, setRevokeItem] = useState<VettingRecord | null>(null);
   const [revocationReason, setRevocationReason] = useState('');
   const [revoking, setRevoking] = useState(false);
@@ -160,6 +174,19 @@ export function VettingRecords() {
   const policy = policyData?.policy ?? stats?.policy ?? null;
   const canRecordDecision = Boolean(policy?.configured && policy.contact_policy_available);
   const reviewPending = stats?.review_pending ?? stats?.review_requested ?? 0;
+  const certificationLabel = useCallback((code: string, recordPolicy = policy) =>
+    recordPolicy?.certification_options.find((option) => option.code === code)?.label
+      ?? t(`vetting.attestation_${code}`, { defaultValue: code }), [policy, t]);
+  const authorityExpiryRequired = Array.from(certificationCodes).some((code) =>
+    confirmItem?.policy.certification_options.some((option) =>
+      option.code === code && option.authority_expiry_required,
+    ),
+  );
+  const confirmFormValid = acknowledged
+    && certificationCodes.size > 0
+    && scopeSummary.trim().length > 0
+    && reviewDueAt !== ''
+    && (!authorityExpiryRequired || authorityExpiresAt !== '');
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), SEARCH_DEBOUNCE_MS);
@@ -270,11 +297,49 @@ export function VettingRecords() {
     }
   };
 
+  const openConfirm = useCallback((item: VettingRecord) => {
+    const available = item.policy.certification_options ?? [];
+    const existingCodes = item.certification_codes.filter((code) =>
+      available.some((option) => option.code === code),
+    );
+    setCertificationCodes(new Set(existingCodes.length > 0
+      ? existingCodes
+      : available.length === 1 && available[0] ? [available[0].code] : []));
+    setScopeSummary('');
+    setPrivateNotes('');
+    setReviewDueAt('');
+    setAuthorityExpiresAt('');
+    setAcknowledged(false);
+    setConfirmItem(item);
+  }, []);
+
+  const openDetails = useCallback(async (item: VettingRecord) => {
+    if (!item.attestation_id) return;
+    setDetailItem(item);
+    setDetailRecord(null);
+    setDetailLoading(true);
+    try {
+      const response = await adminVetting.show(item.attestation_id);
+      if (response.success && response.data) setDetailRecord(response.data);
+      else toastRef.current.error(response.error || tRef.current('vetting.toast_details_failed'));
+    } catch {
+      toastRef.current.error(tRef.current('vetting.toast_details_failed'));
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
   const handleConfirm = async () => {
-    if (!confirmItem || !acknowledged || !canRecordDecision) return;
+    if (!confirmItem || !acknowledged || !canRecordDecision || certificationCodes.size === 0 || !scopeSummary.trim() || !reviewDueAt) return;
     setConfirming(true);
     try {
-      const response = await adminVetting.confirm(confirmItem.user_id, confirmItem.review_request_id);
+      const response = await adminVetting.confirm(confirmItem.user_id, {
+        certification_codes: Array.from(certificationCodes),
+        scope_summary: scopeSummary.trim(),
+        ...(privateNotes.trim() ? { private_notes: privateNotes.trim() } : {}),
+        review_due_at: reviewDueAt,
+        ...(authorityExpiresAt ? { authority_expires_at: authorityExpiresAt } : {}),
+      }, confirmItem.review_request_id);
       if (!response.success) {
         toast.error(response.error || t('vetting.toast_confirm_failed'));
         return;
@@ -355,9 +420,15 @@ export function VettingRecords() {
       key: 'scheme',
       label: t('vetting.col_scheme'),
       render: (item) => (
-        <Chip size="sm" variant="soft" color="accent">
-          {item.policy.attestation_label || t('vetting.scheme_unavailable')}
-        </Chip>
+        <div className="flex flex-wrap gap-1">
+          {item.certification_codes.length > 0
+            ? item.certification_codes.map((code) => (
+              <Chip key={code} size="sm" variant="soft" color="accent">
+                {certificationLabel(code, item.policy)}
+              </Chip>
+            ))
+            : <span className="text-sm text-muted">{item.policy.attestation_label || t('vetting.scheme_unavailable')}</span>}
+        </div>
       ),
     },
     {
@@ -379,18 +450,15 @@ export function VettingRecords() {
       label: t('vetting.col_actions'),
       render: (item) => (
         <div className="flex flex-wrap gap-2">
-          {item.decision !== 'confirmed' ? (
+          {item.decision !== 'confirmed' || item.is_expired ? (
             <Button
               size="sm"
               variant="secondary"
               isDisabled={!canRecordDecision}
-              onPress={() => {
-                setConfirmItem(item);
-                setAcknowledged(false);
-              }}
+              onPress={() => openConfirm(item)}
             >
               <Check size={14} aria-hidden="true" />
-              {t('vetting.action_confirm')}
+              {item.is_expired ? t('vetting.action_renew') : t('vetting.action_confirm')}
             </Button>
           ) : (
             <Button
@@ -401,6 +469,12 @@ export function VettingRecords() {
             >
               <CircleSlash size={14} aria-hidden="true" />
               {t('vetting.action_revoke')}
+            </Button>
+          )}
+          {item.attestation_id && (
+            <Button size="sm" variant="tertiary" onPress={() => { void openDetails(item); }}>
+              <FileText size={14} aria-hidden="true" />
+              {t('vetting.action_details')}
             </Button>
           )}
           {item.review_status === 'pending' && item.review_request_id && (
@@ -418,7 +492,7 @@ export function VettingRecords() {
         </div>
       ),
     },
-  ], [canRecordDecision, policyData?.review_resolution_codes, t]);
+  ], [canRecordDecision, certificationLabel, openConfirm, openDetails, policyData?.review_resolution_codes, t]);
 
   const emptyContent = (
     <BrokerEmptyState
@@ -509,10 +583,11 @@ export function VettingRecords() {
           </CardBody>
         </Card>
 
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
           <BrokerStatCard label={t('vetting.stat_total_members')} value={stats?.total_members} icon={Users} color="neutral" loading={statsLoading} />
           <BrokerStatCard label={t('vetting.stat_review_requested')} value={reviewPending} icon={RefreshCw} color="warning" loading={statsLoading} to={tenantPath('/broker/vetting?status=review_requested')} />
           <BrokerStatCard label={t('vetting.stat_confirmed')} value={stats?.confirmed} icon={UserCheck} color="success" loading={statsLoading} to={tenantPath('/broker/vetting?status=confirmed')} />
+          <BrokerStatCard label={t('vetting.stat_expired')} value={stats?.expired} icon={CalendarClock} color="danger" loading={statsLoading} to={tenantPath('/broker/vetting?status=expired')} />
           <BrokerStatCard label={t('vetting.stat_revoked')} value={stats?.revoked} icon={CircleSlash} color="danger" loading={statsLoading} to={tenantPath('/broker/vetting?status=revoked')} />
         </div>
 
@@ -567,6 +642,61 @@ export function VettingRecords() {
           <ModalHeader>{t('vetting.confirm_title')}</ModalHeader>
           <ModalBody className="space-y-4">
             <p>{t('vetting.confirm_body', { name: confirmItem ? memberName(confirmItem) : '' })}</p>
+            <Select
+              label={t('vetting.certification_codes_label')}
+              description={t('vetting.certification_codes_help')}
+              selectionMode="multiple"
+              selectedKeys={certificationCodes}
+              onSelectionChange={(keys) => setCertificationCodes(keys === 'all'
+                ? new Set((confirmItem?.policy.certification_options ?? []).map((option) => option.code))
+                : new Set(Array.from(keys).map(String)))}
+              isRequired
+            >
+              {(confirmItem?.policy.certification_options ?? []).map((option) => (
+                <SelectItem key={option.code} id={option.code} textValue={option.label}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </Select>
+            <Textarea
+              label={t('vetting.scope_summary_label')}
+              description={t('vetting.scope_summary_help')}
+              value={scopeSummary}
+              onValueChange={setScopeSummary}
+              maxLength={500}
+              minRows={2}
+              maxRows={5}
+              isRequired
+            />
+            <Textarea
+              label={t('vetting.private_notes_label')}
+              description={t('vetting.private_notes_help')}
+              value={privateNotes}
+              onValueChange={setPrivateNotes}
+              maxLength={2000}
+              minRows={3}
+              maxRows={8}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input
+                type="date"
+                label={t('vetting.review_due_label')}
+                description={t('vetting.review_due_help')}
+                value={reviewDueAt}
+                onValueChange={setReviewDueAt}
+                isRequired
+              />
+              <Input
+                type="date"
+                label={t('vetting.authority_expiry_label')}
+                description={authorityExpiryRequired
+                  ? t('vetting.authority_expiry_required_help')
+                  : t('vetting.authority_expiry_help')}
+                value={authorityExpiresAt}
+                onValueChange={setAuthorityExpiresAt}
+                isRequired={authorityExpiryRequired}
+              />
+            </div>
             <div className="rounded-xl border border-accent/20 bg-accent/5 p-3 text-sm text-muted">
               {t('vetting.privacy_body')}
             </div>
@@ -576,9 +706,46 @@ export function VettingRecords() {
           </ModalBody>
           <ModalFooter>
             <Button variant="tertiary" onPress={() => setConfirmItem(null)}>{t('vetting.cancel')}</Button>
-            <Button isPending={confirming} isDisabled={!acknowledged} onPress={handleConfirm}>
+            <Button isPending={confirming} isDisabled={!confirmFormValid} onPress={handleConfirm}>
               {t('vetting.confirm_button')}
             </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={Boolean(detailItem)} onOpenChange={(open) => { if (!open) { setDetailItem(null); setDetailRecord(null); } }}>
+        <ModalContent>
+          <ModalHeader>{t('vetting.details_title', { name: detailItem ? memberName(detailItem) : '' })}</ModalHeader>
+          <ModalBody className="space-y-4">
+            {detailLoading ? (
+              <BrokerSkeleton variant="detail" count={3} />
+            ) : detailRecord ? (
+              <>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{t('vetting.certification_codes_label')}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {detailRecord.certification_codes.map((code) => (
+                      <Chip key={code} size="sm" variant="soft" color="accent">{certificationLabel(code, detailItem?.policy)}</Chip>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{t('vetting.scope_summary_label')}</p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{detailRecord.scope_summary || t('vetting.not_recorded')}</p>
+                </div>
+                <div className="rounded-xl border border-divider/70 bg-surface-secondary p-3">
+                  <p className="text-sm font-medium text-foreground">{t('vetting.private_notes_label')}</p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{detailRecord.private_notes || t('vetting.no_private_notes')}</p>
+                </div>
+                <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                  <div><dt className="font-medium text-foreground">{t('vetting.review_due_label')}</dt><dd className="text-muted">{detailRecord.review_due_at || t('vetting.not_recorded')}</dd></div>
+                  <div><dt className="font-medium text-foreground">{t('vetting.authority_expiry_label')}</dt><dd className="text-muted">{detailRecord.authority_expires_at || t('vetting.not_applicable')}</dd></div>
+                </dl>
+              </>
+            ) : null}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={() => { setDetailItem(null); setDetailRecord(null); }}>{t('vetting.close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

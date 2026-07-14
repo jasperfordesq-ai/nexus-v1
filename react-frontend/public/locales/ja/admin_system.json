@@ -623,7 +623,8 @@
       "welcome_text_desc": "オンボーディングの開始時に新しいメンバーに表示されるウェルカム メッセージ",
       "welcome_text_placeholder": "ウェルカムメッセージ...",
       "your_community": "あなたのコミュニティ",
-      "n_active_other": "{{count}}アクティブ"
+      "n_active_other": "{{count}}アクティブ",
+      "preset_united_kingdom": "????"
     },
     "overdue_jobs": "期限を過ぎたジョブ",
     "page_title": "システム",

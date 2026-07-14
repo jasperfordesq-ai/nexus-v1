@@ -625,7 +625,8 @@
       "welcome_text_placeholder": "Willkommensnachricht...",
       "your_community": "Deine Community",
       "n_active_one": "{{count}}aktiv",
-      "n_active_other": "{{count}}aktiv"
+      "n_active_other": "{{count}}aktiv",
+      "preset_united_kingdom": "Vereinigtes K?nigreich"
     },
     "overdue_jobs": "Überfällige Aufträge",
     "page_title": "System",

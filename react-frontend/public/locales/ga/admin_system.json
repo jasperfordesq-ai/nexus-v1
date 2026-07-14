@@ -631,7 +631,8 @@
       "n_active_many": "{{count}}gníomhach",
       "n_active_one": "{{count}}gníomhach",
       "n_active_other": "{{count}}gníomhach",
-      "n_active_two": "{{count}}gníomhach"
+      "n_active_two": "{{count}}gníomhach",
+      "preset_united_kingdom": "An R?ocht Aontaithe"
     },
     "overdue_jobs": "Poist thar téarma",
     "page_title": "Córas",

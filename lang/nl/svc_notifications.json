@@ -164,5 +164,7 @@
     "preview": ":sender · :group: :preview",
     "fallback_sender": "Iemand",
     "fallback_group": "een groep"
-  }
+  },
+  "vetting_renewal": "Herbeoordeling beschermingscertificering voor :name vereist",
+  "vetting_expired": "Beschermingscertificering van :name verlopen; beschermd contact geblokkeerd"
 }

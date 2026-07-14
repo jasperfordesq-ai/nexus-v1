@@ -271,7 +271,8 @@
     "level_integrated": "Comhtháite"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Athbhreithnigh an deimhni? cosanta"
   },
   "group_digest": {
     "subject": "Achoimre Míosúil: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Tugadh cuireadh duit freastal ar :event. Athbhreithnigh sonraí an imeachta agus freagair sula dtéann an cuireadh in éag.",
     "expiry": "Téann an cuireadh seo in éag ag :expiry.",
     "accept_button": "Athbhreithnigh an cuireadh"
+  },
+  "vetting_renewal": {
+    "subject": "Athbhreithni? deimhnithe cosanta dlite do :name",
+    "title": "Deimhni? cosanta a athnuachan",
+    "body": "N? m?r deimhni? cosanta pobail :name in :community a athbhreithni? faoi :date (:days l? f?gtha)."
+  },
+  "vetting_expired": {
+    "subject": "Deimhni? cosanta :name imithe in ?ag",
+    "title": "Deimhni? cosanta imithe in ?ag",
+    "body": "Chuaigh deimhni? cosanta pobail :name in :community in ?ag ar :date. Fanann teagmh?il chosanta bactha go dt? go nd?anann ball foirne ?daraithe ? a athnuachan."
   }
 }

@@ -43,9 +43,11 @@ return [
         'pvg_scotland' => 'PVG Scotland',
         'international' => 'International background check',
         'other' => 'Other vetting check',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance',
     ],
     'jurisdictions' => [
         'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'united_kingdom' => 'United Kingdom ? national policy package',
         'england_wales' => 'England and Wales',
         'scotland' => 'Scotland',
         'northern_ireland' => 'Northern Ireland',
@@ -57,6 +59,7 @@ return [
         'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
         'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
         'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance confirmed for safeguarded member contact',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
@@ -122,6 +125,15 @@ return [
                 'requires_coordinator_contact' => ['description' => 'سيتوسط منسق (وسيط) في جميع الاتصالات ويساعد في ترتيب التبادلات نيابة عنك. لن يتمكن الأعضاء الآخرون من مراسلتك مباشرة.'],
                 'works_with_children' => ['description' => 'قد يناقش معك منسق متطلبات تدقيق غاردا. في أيرلندا، تتطلب بعض الأنشطة التي تشمل أطفالًا تدقيقًا بموجب قانون المكتب الوطني للتدقيق لعام 2012.'],
                 'works_with_vulnerable_adults' => ['description' => 'قد يناقش معك منسق متطلبات تدقيق غاردا. وقد تتطلب الأنشطة التي تشمل بالغين معرّضين للخطر تدقيقًا.'],
+            ],
+        ],
+        'united_kingdom' => [
+            'name' => 'United Kingdom',
+            'vetting_authority' => 'DBS, Disclosure Scotland and AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'Across the United Kingdom, coordinators confirm the appropriate Enhanced DBS, PVG and/or AccessNI basis for safeguarded contact.'],
+                'works_with_children' => ['description' => 'A coordinator will assess the role and applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
+                'works_with_vulnerable_adults' => ['description' => 'A coordinator will assess the role, the adults involved and the applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
             ],
         ],
         'england_wales' => [

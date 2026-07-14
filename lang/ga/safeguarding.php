@@ -43,9 +43,11 @@ return [
         'pvg_scotland' => 'PVG Scotland',
         'international' => 'International background check',
         'other' => 'Other vetting check',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance',
     ],
     'jurisdictions' => [
         'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'united_kingdom' => 'United Kingdom ? national policy package',
         'england_wales' => 'England and Wales',
         'scotland' => 'Scotland',
         'northern_ireland' => 'Northern Ireland',
@@ -57,6 +59,7 @@ return [
         'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
         'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
         'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance confirmed for safeguarded member contact',
     ],
     'confirmation' => [
         'title' => 'Sábháladh do shainroghanna cosanta',
@@ -128,6 +131,15 @@ return [
                 'requires_coordinator_contact' => ['description' => 'Déanfaidh comhordaitheoir (bróicéir) idirghabháil i ngach teagmháil agus cabhróidh sé nó sí le malartuithe a eagrú ar do shon. Ní bheidh baill eile in ann teachtaireacht a chur chugat go díreach.'],
                 'works_with_children' => ['description' => 'D’fhéadfadh comhordaitheoir riachtanais Ghrinnfhiosrúchán an Gharda Síochána a phlé leat. In Éirinn, tá grinnfhiosrúchán de dhíth le haghaidh gníomhaíochtaí áirithe a bhaineann le leanaí faoin Acht um an mBiúró Náisiúnta Grinnfhiosrúcháin, 2012.'],
                 'works_with_vulnerable_adults' => ['description' => 'D’fhéadfadh comhordaitheoir riachtanais Ghrinnfhiosrúchán an Gharda Síochána a phlé leat. D’fhéadfadh grinnfhiosrúchán a bheith de dhíth le haghaidh gníomhaíochtaí a bhaineann le daoine fásta leochaileacha.'],
+            ],
+        ],
+        'united_kingdom' => [
+            'name' => 'United Kingdom',
+            'vetting_authority' => 'DBS, Disclosure Scotland and AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'Across the United Kingdom, coordinators confirm the appropriate Enhanced DBS, PVG and/or AccessNI basis for safeguarded contact.'],
+                'works_with_children' => ['description' => 'A coordinator will assess the role and applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
+                'works_with_vulnerable_adults' => ['description' => 'A coordinator will assess the role, the adults involved and the applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
             ],
         ],
         'england_wales' => [

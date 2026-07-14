@@ -111,6 +111,85 @@ return [
         ],
     ],
 
+    'united_kingdom' => [
+        'name' => 'safeguarding.presets.united_kingdom.name',
+        'vetting_authority' => 'safeguarding.presets.united_kingdom.vetting_authority',
+        'help_text' => 'safeguarding.presets.common.help_text',
+        'options' => [
+            [
+                'option_key' => 'is_vulnerable_adult',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.is_vulnerable_adult.label',
+                'description' => 'safeguarding.presets.common.options.is_vulnerable_adult.description',
+                'triggers' => [
+                    'requires_broker_approval' => true,
+                    'restricts_messaging' => true,
+                    'restricts_matching' => true,
+                    'notify_admin_on_selection' => true,
+                ],
+            ],
+            [
+                'option_key' => 'requires_vetted_partners',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.requires_vetted_partners.label',
+                'description' => 'safeguarding.presets.united_kingdom.options.requires_vetted_partners.description',
+                'triggers' => [
+                    'requires_vetted_interaction' => true,
+                    'restricts_matching' => true,
+                    'notify_admin_on_selection' => true,
+                    'vetting_type_required' => 'uk_safeguarding_clearance',
+                ],
+            ],
+            [
+                'option_key' => 'requires_coordinator_contact',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.requires_coordinator_contact.label',
+                'description' => 'safeguarding.presets.common.options.requires_coordinator_contact.description',
+                'triggers' => [
+                    'requires_broker_approval' => true,
+                    'restricts_messaging' => true,
+                    'notify_admin_on_selection' => true,
+                ],
+            ],
+            [
+                'option_key' => 'no_home_visits',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.no_home_visits.label',
+                'description' => 'safeguarding.presets.common.options.no_home_visits.description',
+                'triggers' => [
+                    'notify_admin_on_selection' => true,
+                ],
+            ],
+            [
+                'option_key' => 'works_with_children',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.works_with_children.label',
+                'description' => 'safeguarding.presets.united_kingdom.options.works_with_children.description',
+                'triggers' => [
+                    'notify_admin_on_selection' => true,
+                    'vetting_type_required' => 'uk_safeguarding_clearance',
+                ],
+            ],
+            [
+                'option_key' => 'works_with_vulnerable_adults',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.works_with_vulnerable_adults.label',
+                'description' => 'safeguarding.presets.united_kingdom.options.works_with_vulnerable_adults.description',
+                'triggers' => [
+                    'notify_admin_on_selection' => true,
+                    'vetting_type_required' => 'uk_safeguarding_clearance',
+                ],
+            ],
+            [
+                'option_key' => 'none_apply',
+                'option_type' => 'checkbox',
+                'label' => 'safeguarding.presets.common.options.none_apply.label',
+                'description' => 'safeguarding.presets.common.options.none_apply.description',
+                'triggers' => [],
+            ],
+        ],
+    ],
+
     'england_wales' => [
         'name' => 'safeguarding.presets.england_wales.name',
         'vetting_authority' => 'safeguarding.presets.england_wales.vetting_authority',

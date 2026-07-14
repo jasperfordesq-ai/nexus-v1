@@ -21,11 +21,11 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Metadata-only broker safeguarding confirmations.
+ * Broker safeguarding confirmations without certificate evidence.
  *
  * There is intentionally no generic record create/edit, arbitrary status,
- * evidence field, certificate reference/date, notes, upload, bulk-confirm, or
- * delete endpoint in this controller.
+ * certificate evidence/reference/result, upload, bulk-confirm, or delete
+ * endpoint. Operational scope/private notes are encrypted by the service.
  */
 class AdminVettingController extends BaseApiController
 {
@@ -232,7 +232,15 @@ class AdminVettingController extends BaseApiController
     public function confirm(int $userId): JsonResponse
     {
         $actorId = $this->requireVettingDecisionMaker();
-        if (($error = $this->rejectProhibitedInput(['acknowledgement', 'review_request_id'])) !== null) {
+        if (($error = $this->rejectProhibitedInput([
+            'acknowledgement',
+            'review_request_id',
+            'certification_codes',
+            'scope_summary',
+            'private_notes',
+            'review_due_at',
+            'authority_expires_at',
+        ])) !== null) {
             return $error;
         }
         if (! $this->inputBool('acknowledgement', false)) {
@@ -244,12 +252,22 @@ class AdminVettingController extends BaseApiController
             );
         }
 
+        $details = request()->validate([
+            'certification_codes' => ['sometimes', 'array', 'min:1', 'max:3'],
+            'certification_codes.*' => ['string', 'max:64', 'distinct'],
+            'scope_summary' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'private_notes' => ['sometimes', 'nullable', 'string', 'max:2000'],
+            'review_due_at' => ['sometimes', 'nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'authority_expires_at' => ['sometimes', 'nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
+        ]);
+
         try {
             $record = $this->attestations->confirmForCurrentPolicy(
                 TenantContext::getId(),
                 $userId,
                 $actorId,
                 $this->optionalPositiveInt('review_request_id'),
+                $details,
             );
             $this->notifyMemberStatusUpdated($userId);
 

@@ -87,6 +87,77 @@ class MemberVettingAttestationWorkflowTest extends TestCase
         ])->assertStatus(201);
     }
 
+    public function test_united_kingdom_policy_records_multiple_schemes_encrypted_scope_and_expiry(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $broker = User::factory()->forTenant($this->testTenantId)->create(['role' => 'broker', 'status' => 'active']);
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        Sanctum::actingAs($admin);
+        $this->apiPut('/v2/admin/vetting/policy', ['jurisdiction' => 'united_kingdom'])
+            ->assertStatus(200)
+            ->assertJsonPath('data.policy.attestation_code', 'uk_safeguarding_clearance')
+            ->assertJsonCount(3, 'data.policy.certification_options');
+
+        $optionId = (int) DB::table('tenant_safeguarding_options')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('option_key', 'requires_vetted_partners')
+            ->where('preset_source', 'united_kingdom')
+            ->value('id');
+        $this->assertGreaterThan(0, $optionId);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $recipient->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => now(),
+            'consent_ip' => '127.0.0.1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        SafeguardingTriggerService::invalidateCache($recipient->id, $this->testTenantId);
+
+        Sanctum::actingAs($broker);
+        $confirmed = $this->apiPost("/v2/admin/vetting/user/{$sender->id}/confirm", [
+            'acknowledgement' => true,
+            'certification_codes' => ['dbs_enhanced', 'pvg_scotland'],
+            'scope_summary' => 'Adult workforce befriending and supervised activities with children',
+            'private_notes' => 'Scope checked with the safeguarding lead.',
+            'review_due_at' => now()->addDays(30)->toDateString(),
+            'authority_expires_at' => now()->addYear()->toDateString(),
+        ])->assertStatus(201)
+            ->assertJsonPath('data.certification_codes.0', 'dbs_enhanced')
+            ->assertJsonPath('data.certification_codes.1', 'pvg_scotland')
+            ->assertJsonPath('data.scope_summary', 'Adult workforce befriending and supervised activities with children')
+            ->assertJsonPath('data.private_notes', 'Scope checked with the safeguarding lead.');
+
+        $attestationId = (int) $confirmed->json('data.id');
+        $stored = DB::table('member_vetting_attestations')->where('id', $attestationId)->first();
+        $this->assertNotSame('Adult workforce befriending and supervised activities with children', $stored->scope_summary_encrypted);
+        $this->assertNotSame('Scope checked with the safeguarding lead.', $stored->private_notes_encrypted);
+
+        Sanctum::actingAs($sender);
+        $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Current UK certification permits this contact',
+        ])->assertStatus(201);
+
+        DB::table('member_vetting_attestations')->where('id', $attestationId)->update([
+            'review_due_at' => now()->subDay()->toDateString(),
+        ]);
+        $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Expired UK certification must fail closed',
+        ])->assertStatus(403)->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+
+        Sanctum::actingAs($broker);
+        $this->apiGet('/v2/admin/vetting?status=expired&search=' . urlencode((string) $sender->email))
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.user_id', $sender->id)
+            ->assertJsonPath('data.0.is_expired', true);
+    }
+
     public function test_broker_confirmation_without_evidence_clears_direct_message_gate_and_revocation_closes_it(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();

@@ -121,7 +121,7 @@ class AdminOnboardingConfigController extends BaseApiController
 
             // Validate country_preset
             if ($key === 'country_preset') {
-                $allowed = ['ireland', 'england_wales', 'scotland', 'northern_ireland', 'custom'];
+                $allowed = ['ireland', 'united_kingdom', 'england_wales', 'scotland', 'northern_ireland', 'custom'];
                 if (!in_array($value, $allowed, true)) {
                     $errors[] = "Invalid country_preset: {$value}";
                     continue;
@@ -196,7 +196,7 @@ class AdminOnboardingConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.preset_required'), 'preset', 422);
         }
 
-        $allowed = ['ireland', 'england_wales', 'scotland', 'northern_ireland', 'custom'];
+        $allowed = ['ireland', 'united_kingdom', 'england_wales', 'scotland', 'northern_ireland', 'custom'];
         if (!in_array($presetKey, $allowed, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_preset', ['preset' => $presetKey]), 'preset', 422);
         }

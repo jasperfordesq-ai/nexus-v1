@@ -271,7 +271,8 @@
     "level_integrated": "Geïntegreerd"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Beschermingscertificering beoordelen"
   },
   "group_digest": {
     "subject": "Maandelijks overzicht: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Je bent uitgenodigd voor :event. Bekijk de evenementdetails en reageer voordat de uitnodiging verloopt.",
     "expiry": "Deze uitnodiging verloopt op :expiry.",
     "accept_button": "Uitnodiging bekijken"
+  },
+  "vetting_renewal": {
+    "subject": "Herbeoordeling beschermingscertificering voor :name vereist",
+    "title": "Beschermingscertificering vernieuwen",
+    "body": "De beschermingscertificering van :name in :community moet v??r :date worden herbeoordeeld (nog :days dagen)."
+  },
+  "vetting_expired": {
+    "subject": "Beschermingscertificering van :name verlopen",
+    "title": "Beschermingscertificering verlopen",
+    "body": "De beschermingscertificering van :name in :community is op :date verlopen. Beschermd contact blijft geblokkeerd totdat bevoegd personeel deze vernieuwt."
   }
 }

@@ -629,7 +629,8 @@
       "n_active_few": "{{count}}aktywny",
       "n_active_many": "{{count}}aktywny",
       "n_active_one": "{{count}}aktywny",
-      "n_active_other": "{{count}}aktywny"
+      "n_active_other": "{{count}}aktywny",
+      "preset_united_kingdom": "Zjednoczone Kr?lestwo"
     },
     "overdue_jobs": "Zaległe prace",
     "page_title": "Systemu",

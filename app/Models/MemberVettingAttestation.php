@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * A community's metadata-only safeguarding decision for one member and purpose.
+ * A community's safeguarding decision for one member and purpose.
  *
- * This model intentionally has no certificate, reference, result, date-of-issue,
- * expiry, document, identity, or free-text evidence fields.
+ * Certificate evidence, reference numbers, results and documents remain outside
+ * NEXUS. A decision may include encrypted operational scope/private notes and
+ * the minimum dates needed to expire and renew the community confirmation.
  */
 class MemberVettingAttestation extends Model
 {
@@ -33,9 +34,19 @@ class MemberVettingAttestation extends Model
         'user_id',
         'scheme_code',
         'attestation_code',
+        'certification_codes',
         'purpose_code',
         'scope_type',
         'scope_identifier',
+        'scope_summary_encrypted',
+        'private_notes_encrypted',
+        'review_due_at',
+        'authority_expires_at',
+        'renewal_reminder_90_sent_at',
+        'renewal_reminder_30_sent_at',
+        'renewal_reminder_7_sent_at',
+        'renewal_due_notified_at',
+        'expiry_notified_at',
         'decision',
         'confirmed_by',
         'confirmed_at',
@@ -45,9 +56,22 @@ class MemberVettingAttestation extends Model
         'policy_version',
     ];
 
+    protected $hidden = [
+        'scope_summary_encrypted',
+        'private_notes_encrypted',
+    ];
+
     protected $casts = [
         'tenant_id' => 'integer',
         'user_id' => 'integer',
+        'certification_codes' => 'array',
+        'review_due_at' => 'date',
+        'authority_expires_at' => 'date',
+        'renewal_reminder_90_sent_at' => 'datetime',
+        'renewal_reminder_30_sent_at' => 'datetime',
+        'renewal_reminder_7_sent_at' => 'datetime',
+        'renewal_due_notified_at' => 'datetime',
+        'expiry_notified_at' => 'datetime',
         'confirmed_by' => 'integer',
         'confirmed_at' => 'datetime',
         'revoked_by' => 'integer',

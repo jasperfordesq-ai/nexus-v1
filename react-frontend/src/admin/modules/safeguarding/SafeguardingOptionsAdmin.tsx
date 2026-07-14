@@ -106,6 +106,7 @@ const PRESET_I18N_KEYS: Record<string, string> = {
   ireland: 'system.onboarding.preset_ireland',
   northern_ireland: 'system.onboarding.preset_northern_ireland',
   scotland: 'system.onboarding.preset_scotland',
+  united_kingdom: 'system.onboarding.preset_united_kingdom',
 };
 
 // ── Component ────────────────────────────────────────────────────────────────

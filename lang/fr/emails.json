@@ -271,7 +271,8 @@
     "level_integrated": "Intégré"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "R?viser la certification de protection"
   },
   "group_digest": {
     "subject": "Bilan mensuel : {{group}}",
@@ -661,5 +662,15 @@
     "message": "Vous avez été invité·e à participer à :event. Consultez les détails et répondez avant l'expiration de l'invitation.",
     "expiry": "Cette invitation expire le :expiry.",
     "accept_button": "Consulter l'invitation"
+  },
+  "vetting_renewal": {
+    "subject": "R?vision de la certification de protection requise pour :name",
+    "title": "Renouvellement de la certification de protection",
+    "body": "La certification communautaire de protection de :name dans :community doit ?tre r?vis?e avant le :date (:days jours restants)."
+  },
+  "vetting_expired": {
+    "subject": "La certification de protection de :name a expir?",
+    "title": "Certification de protection expir?e",
+    "body": "La certification communautaire de protection de :name dans :community a expir? le :date. Le contact prot?g? reste bloqu? jusqu?? son renouvellement par une personne autoris?e."
   }
 }

@@ -271,7 +271,8 @@
     "level_integrated": "Integriert"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Schutzbescheinigung pr?fen"
   },
   "group_digest": {
     "subject": "Monatlicher Bericht: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Sie wurden zu :event eingeladen. Prüfen Sie die Veranstaltungsdetails und antworten Sie, bevor die Einladung abläuft.",
     "expiry": "Diese Einladung läuft am :expiry ab.",
     "accept_button": "Einladung prüfen"
+  },
+  "vetting_renewal": {
+    "subject": "?berpr?fung der Schutzbescheinigung f?r :name f?llig",
+    "title": "Schutzbescheinigung erneuern",
+    "body": "Die Schutzbescheinigung der Community f?r :name in :community muss bis :date ?berpr?ft werden (:days Tage verbleibend)."
+  },
+  "vetting_expired": {
+    "subject": "Schutzbescheinigung f?r :name abgelaufen",
+    "title": "Schutzbescheinigung abgelaufen",
+    "body": "Die Schutzbescheinigung der Community f?r :name in :community ist am :date abgelaufen. Gesch?tzter Kontakt bleibt gesperrt, bis autorisiertes Personal sie erneuert."
   }
 }

@@ -43,9 +43,11 @@ return [
         'pvg_scotland' => 'PVG Scotland',
         'international' => 'International background check',
         'other' => 'Other vetting check',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance',
     ],
     'jurisdictions' => [
         'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'united_kingdom' => 'United Kingdom ? national policy package',
         'england_wales' => 'England and Wales',
         'scotland' => 'Scotland',
         'northern_ireland' => 'Northern Ireland',
@@ -57,6 +59,7 @@ return [
         'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
         'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
         'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+        'uk_safeguarding_clearance' => 'UK safeguarding clearance confirmed for safeguarded member contact',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
@@ -128,6 +131,15 @@ return [
                 'requires_coordinator_contact' => ['description' => 'Una persona coordinadora (intermediaria) mediará en todo contacto y ayudará a organizar los intercambios en su nombre. Los demás miembros no podrán enviarle mensajes directamente.'],
                 'works_with_children' => ['description' => 'Una persona coordinadora puede hablar con usted sobre los requisitos de Garda Vetting. En Irlanda, determinadas actividades con menores requieren evaluación conforme a la Ley de la Oficina Nacional de Evaluación de 2012.'],
                 'works_with_vulnerable_adults' => ['description' => 'Una persona coordinadora puede hablar con usted sobre los requisitos de Garda Vetting. Las actividades con personas adultas vulnerables pueden requerir evaluación.'],
+            ],
+        ],
+        'united_kingdom' => [
+            'name' => 'United Kingdom',
+            'vetting_authority' => 'DBS, Disclosure Scotland and AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'Across the United Kingdom, coordinators confirm the appropriate Enhanced DBS, PVG and/or AccessNI basis for safeguarded contact.'],
+                'works_with_children' => ['description' => 'A coordinator will assess the role and applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
+                'works_with_vulnerable_adults' => ['description' => 'A coordinator will assess the role, the adults involved and the applicable UK jurisdiction before deciding which safeguarding check is legally appropriate.'],
             ],
         ],
         'england_wales' => [

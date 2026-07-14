@@ -1817,11 +1817,15 @@ export interface VettingRecord {
   avatar_url?: string | null;
   attestation_id: number | null;
   decision: 'confirmed' | 'revoked' | 'not_confirmed';
+  certification_codes: string[];
+  is_expired: boolean;
   confirmed_by: number | null;
   confirmed_at: string | null;
   revoked_by: number | null;
   revoked_at: string | null;
   revocation_reason_code: string | null;
+  review_due_at: string | null;
+  authority_expires_at: string | null;
   policy_version: string | null;
   review_request_id: number | null;
   review_status: 'pending' | 'resolved' | null;
@@ -1833,6 +1837,7 @@ export interface VettingStats {
   total_members: number;
   confirmed: number;
   revoked: number;
+  expired: number;
   not_confirmed: number;
   review_pending?: number;
   review_requested?: number;
@@ -1852,6 +1857,14 @@ export interface SafeguardingVettingPolicy {
   label: string;
   attestation_label: string | null;
   preset: string | null;
+  certification_options: VettingCertificationOption[];
+}
+
+export interface VettingCertificationOption {
+  code: string;
+  jurisdiction: string;
+  label: string;
+  authority_expiry_required: boolean;
 }
 
 export interface SafeguardingJurisdictionOption {
@@ -1861,6 +1874,7 @@ export interface SafeguardingJurisdictionOption {
   attestation_label: string | null;
   available_for_contact_policy: boolean;
   contact_policy_available: boolean;
+  certification_options: VettingCertificationOption[];
 }
 
 export interface VettingPolicyResponse {
@@ -1875,9 +1889,15 @@ export interface VettingAttestation {
   user_id: number;
   scheme_code: string;
   attestation_code: string;
+  certification_codes: string[];
   purpose_code: string;
   scope_type: string;
   scope_identifier: string;
+  scope_summary: string | null;
+  private_notes: string | null;
+  review_due_at: string | null;
+  authority_expires_at: string | null;
+  is_expired: boolean;
   decision: 'confirmed' | 'revoked';
   confirmed_at: string | null;
   revoked_at: string | null;

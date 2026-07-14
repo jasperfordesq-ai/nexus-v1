@@ -28,10 +28,37 @@ class SafeguardingJurisdictionService
     private const CACHE_PREFIX = 'safeguarding_jurisdiction:';
     private const CACHE_TTL = 300;
 
-    /**
-     * @var array<string, array{scheme_code: string|null, attestation_code: string|null, policy_version: string, contact_policy_available: bool, label_key: string, attestation_label_key: string|null, preset: string|null}>
-     */
+    /** @var array<string, array<string, mixed>> */
     private const POLICIES = [
+        'united_kingdom' => [
+            'scheme_code' => 'uk_national_safeguarding',
+            'attestation_code' => 'uk_safeguarding_clearance',
+            'policy_version' => 'safeguarded-contact-v2',
+            'contact_policy_available' => true,
+            'label_key' => 'safeguarding.jurisdictions.united_kingdom',
+            'attestation_label_key' => 'safeguarding.attestations.uk_safeguarding_clearance',
+            'preset' => 'united_kingdom',
+            'certification_options' => [
+                [
+                    'code' => 'dbs_enhanced',
+                    'jurisdiction' => 'england_wales',
+                    'label_key' => 'safeguarding.vetting_types.dbs_enhanced',
+                    'authority_expiry_required' => false,
+                ],
+                [
+                    'code' => 'pvg_scotland',
+                    'jurisdiction' => 'scotland',
+                    'label_key' => 'safeguarding.vetting_types.pvg_scotland',
+                    'authority_expiry_required' => true,
+                ],
+                [
+                    'code' => 'access_ni',
+                    'jurisdiction' => 'northern_ireland',
+                    'label_key' => 'safeguarding.vetting_types.access_ni',
+                    'authority_expiry_required' => false,
+                ],
+            ],
+        ],
         'england_wales' => [
             'scheme_code' => 'dbs_england_wales',
             'attestation_code' => 'dbs_enhanced',
@@ -40,24 +67,42 @@ class SafeguardingJurisdictionService
             'label_key' => 'safeguarding.jurisdictions.england_wales',
             'attestation_label_key' => 'safeguarding.attestations.dbs_enhanced',
             'preset' => 'england_wales',
+            'certification_options' => [[
+                'code' => 'dbs_enhanced',
+                'jurisdiction' => 'england_wales',
+                'label_key' => 'safeguarding.vetting_types.dbs_enhanced',
+                'authority_expiry_required' => false,
+            ]],
         ],
         'scotland' => [
             'scheme_code' => 'pvg_scotland',
             'attestation_code' => 'pvg_scotland',
             'policy_version' => 'safeguarded-contact-v1',
-            'contact_policy_available' => false,
+            'contact_policy_available' => true,
             'label_key' => 'safeguarding.jurisdictions.scotland',
             'attestation_label_key' => 'safeguarding.attestations.pvg_scotland',
             'preset' => 'scotland',
+            'certification_options' => [[
+                'code' => 'pvg_scotland',
+                'jurisdiction' => 'scotland',
+                'label_key' => 'safeguarding.vetting_types.pvg_scotland',
+                'authority_expiry_required' => true,
+            ]],
         ],
         'northern_ireland' => [
             'scheme_code' => 'access_ni',
             'attestation_code' => 'access_ni',
             'policy_version' => 'safeguarded-contact-v1',
-            'contact_policy_available' => false,
+            'contact_policy_available' => true,
             'label_key' => 'safeguarding.jurisdictions.northern_ireland',
             'attestation_label_key' => 'safeguarding.attestations.access_ni',
             'preset' => 'northern_ireland',
+            'certification_options' => [[
+                'code' => 'access_ni',
+                'jurisdiction' => 'northern_ireland',
+                'label_key' => 'safeguarding.vetting_types.access_ni',
+                'authority_expiry_required' => false,
+            ]],
         ],
         'ireland' => [
             'scheme_code' => 'garda_vetting',
@@ -67,6 +112,7 @@ class SafeguardingJurisdictionService
             'label_key' => 'safeguarding.jurisdictions.ireland',
             'attestation_label_key' => 'safeguarding.attestations.garda_vetting',
             'preset' => 'ireland',
+            'certification_options' => [],
         ],
         'custom' => [
             'scheme_code' => null,
@@ -76,6 +122,7 @@ class SafeguardingJurisdictionService
             'label_key' => 'safeguarding.jurisdictions.custom',
             'attestation_label_key' => null,
             'preset' => null,
+            'certification_options' => [],
         ],
     ];
 
@@ -332,6 +379,7 @@ class SafeguardingJurisdictionService
             'attestation_label' => null,
             'available_for_contact_policy' => false,
             'contact_policy_available' => false,
+            'certification_options' => [],
         ]];
         foreach (self::POLICIES as $code => $definition) {
             $items[] = [
@@ -343,6 +391,7 @@ class SafeguardingJurisdictionService
                     : null,
                 'available_for_contact_policy' => $definition['contact_policy_available'],
                 'contact_policy_available' => $definition['contact_policy_available'],
+                'certification_options' => $this->localizedCertificationOptions($definition),
             ];
         }
 
@@ -365,6 +414,7 @@ class SafeguardingJurisdictionService
             'label' => __('safeguarding.jurisdictions.unconfigured'),
             'attestation_label' => null,
             'preset' => null,
+            'certification_options' => [],
         ];
     }
 
@@ -399,6 +449,22 @@ class SafeguardingJurisdictionService
                 ? __($definition['attestation_label_key'])
                 : null,
             'preset' => $definition['preset'],
+            'certification_options' => $this->localizedCertificationOptions($definition),
         ];
+    }
+
+    /** @param array<string, mixed> $definition @return list<array<string, mixed>> */
+    private function localizedCertificationOptions(array $definition): array
+    {
+        $options = is_array($definition['certification_options'] ?? null)
+            ? $definition['certification_options']
+            : [];
+
+        return array_values(array_map(static fn (array $option): array => [
+            'code' => (string) $option['code'],
+            'jurisdiction' => (string) $option['jurisdiction'],
+            'label' => __((string) $option['label_key']),
+            'authority_expiry_required' => (bool) ($option['authority_expiry_required'] ?? false),
+        ], $options));
     }
 }

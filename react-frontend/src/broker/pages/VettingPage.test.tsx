@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
     stats: vi.fn(),
     policy: vi.fn(),
     updatePolicy: vi.fn(),
+    show: vi.fn(),
     confirm: vi.fn(),
     revoke: vi.fn(),
     resolveReview: vi.fn(),
@@ -79,6 +80,7 @@ const policy = {
   label: 'England and Wales',
   attestation_label: 'Enhanced DBS',
   preset: 'england_wales',
+  certification_options: [{ code: 'dbs_enhanced', label: 'Enhanced DBS' }],
 };
 
 const policyResponse = {
@@ -90,6 +92,7 @@ const policyResponse = {
     attestation_label: 'Enhanced DBS',
     available_for_contact_policy: true,
     contact_policy_available: true,
+    certification_options: [{ code: 'dbs_enhanced', label: 'Enhanced DBS' }],
   }],
   revocation_reason_codes: ['community_decision_withdrawn'],
   review_resolution_codes: [
@@ -115,6 +118,12 @@ const makeMember = (overrides: Record<string, unknown> = {}) => ({
   revoked_at: null,
   revocation_reason_code: null,
   policy_version: null,
+  certification_codes: [],
+  scope_summary: null,
+  private_notes: null,
+  review_due_at: null,
+  authority_expires_at: null,
+  is_expired: false,
   review_request_id: 9,
   review_status: 'pending',
   requested_at: '2026-07-11T10:00:00Z',
@@ -132,9 +141,33 @@ describe('VettingRecords', () => {
     });
     mocks.adminVetting.stats.mockResolvedValue({
       success: true,
-      data: { total_members: 1, confirmed: 0, revoked: 0, not_confirmed: 1, review_pending: 1, policy },
+      data: { total_members: 1, confirmed: 0, revoked: 0, expired: 0, not_confirmed: 1, review_pending: 1, policy },
     });
     mocks.adminVetting.policy.mockResolvedValue({ success: true, data: policyResponse });
+    mocks.adminVetting.show.mockResolvedValue({
+      success: true,
+      data: {
+        id: 44,
+        user_id: 100,
+        scheme_code: 'dbs_england_wales',
+        attestation_code: 'dbs_enhanced',
+        certification_codes: ['dbs_enhanced'],
+        purpose_code: 'safeguarded_member_contact',
+        scope_type: 'tenant',
+        scope_identifier: '2',
+        scope_summary: 'Adult workforce befriending.',
+        private_notes: 'Scope checked with safeguarding lead.',
+        review_due_at: '2027-07-14',
+        authority_expires_at: null,
+        is_expired: false,
+        decision: 'confirmed',
+        confirmed_at: '2026-07-14T09:00:00Z',
+        revoked_at: null,
+        revocation_reason_code: null,
+        policy_version: 'safeguarded-contact-v1',
+        confirmed_by_name: 'Broker One',
+      },
+    });
     mocks.adminVetting.confirm.mockResolvedValue({ success: true, data: {} });
     mocks.adminVetting.revoke.mockResolvedValue({ success: true, data: {} });
     mocks.adminVetting.resolveReview.mockResolvedValue({ success: true, data: {} });
@@ -150,19 +183,24 @@ describe('VettingRecords', () => {
     expect(mocks.adminVetting.policy).toHaveBeenCalledTimes(1);
   });
 
-  it('does not render certificate evidence, upload, or bulk-decision controls', async () => {
+  it('records scope and renewal dates without collecting certificate evidence', async () => {
     const { VettingRecords } = await import('./VettingPage');
     const { container } = render(<VettingRecords />);
     await waitFor(() => expect(screen.getByText('Alice Smith')).toBeInTheDocument());
 
     expect(container.querySelector('input[type="file"]')).toBeNull();
     expect(screen.queryByText(/reference number/i)).toBeNull();
-    expect(screen.queryByText(/expiry date/i)).toBeNull();
     expect(screen.queryByText(/upload document/i)).toBeNull();
     expect(screen.queryByText(/verify all/i)).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'vetting.action_confirm' }));
+    expect(screen.getByLabelText('vetting.scope_summary_label')).toBeInTheDocument();
+    expect(screen.getByLabelText('vetting.review_due_label')).toBeInTheDocument();
+    expect(screen.getByLabelText('vetting.authority_expiry_label')).toBeInTheDocument();
+    expect(screen.getByLabelText('vetting.private_notes_label')).toBeInTheDocument();
   });
 
-  it('requires acknowledgement and confirms with only the member and review identifiers', async () => {
+  it('requires controlled certification details and acknowledgement before confirming', async () => {
     const { VettingRecords } = await import('./VettingPage');
     render(<VettingRecords />);
     await waitFor(() => expect(screen.getByText('Alice Smith')).toBeInTheDocument());
@@ -171,10 +209,44 @@ describe('VettingRecords', () => {
     const confirmationButton = screen.getByRole('button', { name: 'vetting.confirm_button' });
     expect(confirmationButton).toBeDisabled();
 
+    fireEvent.change(screen.getByLabelText('vetting.scope_summary_label'), {
+      target: { value: 'Supervised one-to-one befriending with adults.' },
+    });
+    fireEvent.change(screen.getByLabelText('vetting.review_due_label'), {
+      target: { value: '2027-07-14' },
+    });
     fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: 'vetting.confirm_button' }));
 
-    await waitFor(() => expect(mocks.adminVetting.confirm).toHaveBeenCalledWith(100, 9));
+    await waitFor(() => expect(mocks.adminVetting.confirm).toHaveBeenCalledWith(100, {
+      certification_codes: ['dbs_enhanced'],
+      scope_summary: 'Supervised one-to-one befriending with adults.',
+      review_due_at: '2027-07-14',
+    }, 9));
+  });
+
+  it('opens the encrypted operational scope and private notes for authorised staff', async () => {
+    mocks.adminVetting.list.mockResolvedValue({
+      success: true,
+      data: [makeMember({
+        attestation_id: 44,
+        decision: 'confirmed',
+        certification_codes: ['dbs_enhanced'],
+        review_status: null,
+        review_request_id: null,
+      })],
+      meta: { pagination: { total: 1 } },
+    });
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'vetting.action_details' })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'vetting.action_details' }));
+
+    await waitFor(() => expect(mocks.adminVetting.show).toHaveBeenCalledWith(44));
+    expect(screen.getByText('Adult workforce befriending.')).toBeInTheDocument();
+    expect(screen.getByText('Scope checked with safeguarding lead.')).toBeInTheDocument();
+    expect(screen.getByText('2027-07-14')).toBeInTheDocument();
   });
 
   it('revokes with a controlled reason code', async () => {
@@ -219,7 +291,7 @@ describe('VettingRecords', () => {
     });
     mocks.adminVetting.stats.mockResolvedValue({
       success: true,
-      data: { total_members: 1, confirmed: 0, revoked: 0, not_confirmed: 1, review_pending: 1, policy: unavailable },
+      data: { total_members: 1, confirmed: 0, revoked: 0, expired: 0, not_confirmed: 1, review_pending: 1, policy: unavailable },
     });
 
     const { VettingRecords } = await import('./VettingPage');

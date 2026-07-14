@@ -271,7 +271,8 @@
     "level_integrated": "Integrado"
   },
   "vetting": {
-    "subject": "{{heading}} - {{tenant}}"
+    "subject": "{{heading}} - {{tenant}}",
+    "review_action": "Revisar certificaci?n de protecci?n"
   },
   "group_digest": {
     "subject": "Resumen mensual: {{group}}",
@@ -661,5 +662,15 @@
     "message": "Te han invitado a asistir a :event. Revisa los detalles y responde antes de que caduque la invitación.",
     "expiry": "Esta invitación caduca el :expiry.",
     "accept_button": "Revisar invitación"
+  },
+  "vetting_renewal": {
+    "subject": "Revisi?n de certificaci?n de protecci?n pendiente para :name",
+    "title": "Renovaci?n de certificaci?n de protecci?n",
+    "body": "La certificaci?n comunitaria de protecci?n de :name en :community debe revisarse antes del :date (quedan :days d?as)."
+  },
+  "vetting_expired": {
+    "subject": "La certificaci?n de protecci?n de :name ha caducado",
+    "title": "Certificaci?n de protecci?n caducada",
+    "body": "La certificaci?n comunitaria de protecci?n de :name en :community caduc? el :date. El contacto protegido permanece bloqueado hasta que la renueve personal autorizado."
   }
 }

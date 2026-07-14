@@ -231,6 +231,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-review-flags');
 
+        // Community vetting confirmations have an explicit review date. Notify
+        // active brokers/admins before renewal and immediately after expiry.
+        $schedule->command('safeguarding:vetting-renewals')
+            ->dailyAt('06:15')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('safeguarding-vetting-renewals');
+
         // Announce podcast episodes whose scheduled publish time has arrived —
         // notifies subscribers + posts the feed activity. Deferred from publish
         // time so future-scheduled episodes aren't announced before they're live.

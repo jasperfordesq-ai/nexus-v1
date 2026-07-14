@@ -2559,7 +2559,7 @@ export const adminImpactReport = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminVetting = {
-  list: (params: { status?: 'all' | 'confirmed' | 'revoked' | 'not_confirmed' | 'review_requested'; search?: string; page?: number; per_page?: number } = {}) =>
+  list: (params: { status?: 'all' | 'confirmed' | 'revoked' | 'expired' | 'not_confirmed' | 'review_requested'; search?: string; page?: number; per_page?: number } = {}) =>
     api.get<VettingRecord[]>(
       `/v2/admin/vetting${buildQuery(params)}`
     ),
@@ -2582,9 +2582,16 @@ export const adminVetting = {
   getUserRecords: (userId: number) =>
     api.get<VettingAttestation[]>(`/v2/admin/vetting/user/${userId}`),
 
-  confirm: (userId: number, reviewRequestId?: number | null) =>
+  confirm: (userId: number, details: {
+    certification_codes: string[];
+    scope_summary: string;
+    private_notes?: string;
+    review_due_at: string;
+    authority_expires_at?: string;
+  }, reviewRequestId?: number | null) =>
     api.post<VettingAttestation>(`/v2/admin/vetting/user/${userId}/confirm`, {
       acknowledgement: true,
+      ...details,
       ...(reviewRequestId ? { review_request_id: reviewRequestId } : {}),
     }),
 

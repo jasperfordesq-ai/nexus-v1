@@ -639,10 +639,17 @@ describe('adminApi', () => {
       expect(mockGet).toHaveBeenCalledWith('/v2/admin/vetting');
     });
 
-    it('confirm sends the metadata-only acknowledgement', async () => {
-      await adminVetting.confirm(5);
+    it('confirm sends the controlled certification decision', async () => {
+      await adminVetting.confirm(5, {
+        certification_codes: ['dbs_enhanced'],
+        scope_summary: 'Adult workforce befriending.',
+        review_due_at: '2027-07-14',
+      });
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/user/5/confirm', {
         acknowledgement: true,
+        certification_codes: ['dbs_enhanced'],
+        scope_summary: 'Adult workforce befriending.',
+        review_due_at: '2027-07-14',
       });
     });
   });

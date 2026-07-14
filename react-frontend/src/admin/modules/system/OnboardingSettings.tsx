@@ -86,6 +86,7 @@ interface SafeguardingOption {
 
 const COUNTRY_PRESET_LABEL_KEYS: Record<string, string> = {
   ireland: 'system.onboarding.preset_ireland',
+  united_kingdom: 'system.onboarding.preset_united_kingdom',
   england_wales: 'system.onboarding.preset_england_wales',
   scotland: 'system.onboarding.preset_scotland',
   northern_ireland: 'system.onboarding.preset_northern_ireland',
