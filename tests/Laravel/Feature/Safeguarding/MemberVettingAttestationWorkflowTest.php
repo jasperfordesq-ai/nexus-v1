@@ -58,6 +58,35 @@ class MemberVettingAttestationWorkflowTest extends TestCase
         );
     }
 
+    public function test_member_preference_revoke_immediately_clears_the_direct_message_gate(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        $this->configureEnglandAndWales($admin);
+        [$optionId] = $this->protectRecipientWithPreset($recipient);
+
+        Sanctum::actingAs($sender);
+        $this->apiGet("/v2/messages/{$recipient->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('meta.conversation.safeguarding.code', 'VETTING_REQUIRED');
+
+        Sanctum::actingAs($recipient);
+        $this->apiPost('/v2/safeguarding/revoke', ['option_id' => $optionId])
+            ->assertStatus(200)
+            ->assertJsonPath('data.revoked', true);
+
+        Sanctum::actingAs($sender);
+        $this->apiGet("/v2/messages/{$recipient->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('meta.conversation.safeguarding', null);
+        $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'The preference change is effective immediately',
+        ])->assertStatus(201);
+    }
+
     public function test_broker_confirmation_without_evidence_clears_direct_message_gate_and_revocation_closes_it(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();

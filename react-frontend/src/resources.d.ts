@@ -47332,7 +47332,7 @@ export default interface Resources {
     "unknown_user": "Unknown user",
     "unread": "{{count}} unread",
     "vetting_review_request": {
-      "button": "Request vetting review",
+      "button": "Request review of my vetting",
       "error": "We could not request a vetting review just now. Please try again shortly.",
       "sent": "Vetting review requested. Your community will contact you about its process.",
       "success_body": "Your community broker has been asked to review your private safeguarding confirmation.",

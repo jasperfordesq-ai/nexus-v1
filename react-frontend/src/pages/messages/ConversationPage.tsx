@@ -130,6 +130,8 @@ const SAFEGUARDING_BLOCK_CODES = new Set([
   'SAFEGUARDING_POLICY_UNAVAILABLE',
 ]);
 
+const SAFEGUARDING_RECHECK_INTERVAL_MS = 5000;
+
 const CONTROLLED_VETTING_TRANSLATION_KEYS: Record<string, string> = {
   dbs_enhanced: 'safeguarding_checks.dbs_enhanced',
   pvg_scotland: 'safeguarding_checks.pvg_scotland',
@@ -921,6 +923,32 @@ export function ConversationPage() {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [isLoading, refreshSafeguardingPolicy, targetId]);
+
+  // A recipient can withdraw a safeguarding contact preference while someone
+  // else already has their conversation open. Message polling does not run for
+  // an empty thread because there is no cursor, so recheck a blocked policy on
+  // its own short interval. This lets the composer unlock promptly without a
+  // page reload or a misleading member-side vetting-review request.
+  useEffect(() => {
+    if (!targetId
+      || isLoading
+      || !isDocumentVisible
+      || safeguardingPolicyStatus === 'allow') {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      void refreshSafeguardingPolicy();
+    }, SAFEGUARDING_RECHECK_INTERVAL_MS);
+
+    return () => window.clearInterval(interval);
+  }, [
+    isDocumentVisible,
+    isLoading,
+    refreshSafeguardingPolicy,
+    safeguardingPolicyStatus,
+    targetId,
+  ]);
 
   function handleSendFailure(response: MessageSendFailure, fallbackKey: string): void {
     const notice = extractSafeguardingBlockNotice(response);

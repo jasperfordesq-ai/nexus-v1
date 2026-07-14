@@ -242,7 +242,7 @@
     "error": "We could not send your request just now. Please try again shortly."
   },
   "vetting_review_request": {
-    "button": "Request vetting review",
+    "button": "Request review of my vetting",
     "success_title": "Review requested",
     "success_body": "Your community broker has been asked to review your private safeguarding confirmation.",
     "sent": "Vetting review requested. Your community will contact you about its process.",

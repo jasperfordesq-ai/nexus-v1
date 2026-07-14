@@ -4,8 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
-import type { FormEventHandler } from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { act, type FormEventHandler } from 'react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const stableMocks = vi.hoisted(() => ({
   hasFeature: vi.fn(() => true),
@@ -219,6 +219,10 @@ describe('ConversationPage', () => {
     vi.clearAllMocks();
     // jsdom doesn't provide scrollIntoView — stub it so the component doesn't crash
     Element.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('shows loading screen while fetching', () => {
@@ -538,6 +542,62 @@ describe('ConversationPage', () => {
     fireEvent.click(screen.getByText('safeguarding_check_again'));
 
     await waitFor(() => expect(screen.getByTestId('message-input-area')).toBeDefined());
+    expect(screen.queryByText('safeguarding_vetting_required.title')).toBeNull();
+  });
+
+  it('automatically unlocks a blocked empty conversation after the recipient clears their preference', async () => {
+    vi.useFakeTimers();
+
+    const blockedEmptyConversation = {
+      ...mockConversationResponse,
+      data: [],
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'VETTING_REQUIRED',
+            required_vetting_types: ['dbs_enhanced'],
+            required_vetting_labels: ['Enhanced DBS'],
+          },
+        },
+      },
+    };
+    const allowedEmptyConversation = {
+      ...mockConversationResponse,
+      data: [],
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: null,
+        },
+      },
+    };
+
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.resolve({ success: true, data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null } });
+      }
+      if (url.includes('per_page=1')) return Promise.resolve(allowedEmptyConversation);
+      return Promise.resolve(blockedEmptyConversation);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(screen.getByTestId('composer-blocked')).toBeDefined();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000);
+    });
+
+    expect(mockApi.get).toHaveBeenCalledWith('/v2/messages/42?per_page=1');
+    expect(screen.getByTestId('message-input-area')).toBeDefined();
     expect(screen.queryByText('safeguarding_vetting_required.title')).toBeNull();
   });
 
