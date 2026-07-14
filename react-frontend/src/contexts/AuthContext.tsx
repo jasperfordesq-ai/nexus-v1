@@ -542,10 +542,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (data.refresh_token) {
       tokenManager.setRefreshToken(data.refresh_token);
     }
-    // Store trusted device token so future logins skip 2FA on this device
-    if (data.trusted_device_token) {
-      tokenManager.setTrustedDeviceToken(data.trusted_device_token);
-    }
     // Only set tenant ID from user data if no tenant was pre-selected at login
     // This allows super admins to access any tenant they selected
     if (data.user?.tenant_id && !tokenManager.getTenantId()) {

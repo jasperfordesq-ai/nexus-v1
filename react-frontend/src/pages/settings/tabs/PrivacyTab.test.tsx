@@ -46,13 +46,17 @@ const defaultProps = {
   insuranceLoading: false,
   insuranceUploading: false,
   insuranceType: 'public_liability',
+  insuranceProvider: '',
+  insuranceExpiry: '',
   insuranceEnabled: false,
   federationEnabled: false,
   onPrivacyChange: vi.fn(),
   onSavePrivacy: vi.fn(),
   onRetryPrivacy: vi.fn(),
-  onInsuranceUpload: vi.fn(),
+  onInsuranceSave: vi.fn(),
   onInsuranceTypeChange: vi.fn(),
+  onInsuranceProviderChange: vi.fn(),
+  onInsuranceExpiryChange: vi.fn(),
   onOpenGdprModal: vi.fn(),
   onOpenDeleteModal: vi.fn(),
 };
@@ -146,17 +150,17 @@ describe('PrivacyTab', () => {
 
   it('hides insurance section when insuranceEnabled is false', () => {
     render(<PrivacyTab {...defaultProps} insuranceEnabled={false} />);
-    expect(screen.queryByText('Insurance Certificates')).toBeNull();
+    expect(screen.queryByText('Insurance records')).toBeNull();
   });
 
   it('shows insurance section when insuranceEnabled is true', () => {
     render(<PrivacyTab {...defaultProps} insuranceEnabled={true} />);
-    expect(screen.getByText('Insurance Certificates')).toBeDefined();
+    expect(screen.getByText('Insurance records')).toBeDefined();
   });
 
   it('shows loading state in insurance section', () => {
     render(<PrivacyTab {...defaultProps} insuranceEnabled={true} insuranceLoading={true} />);
-    expect(screen.getByText('Loading certificates...')).toBeDefined();
+    expect(screen.getByText('Loading insurance records...')).toBeDefined();
   });
 
   it('renders existing insurance certificates', () => {

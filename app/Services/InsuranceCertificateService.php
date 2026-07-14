@@ -25,6 +25,7 @@ class InsuranceCertificateService
         $tenantId = TenantContext::getId();
 
         return DB::table('insurance_certificates')
+            ->select($this->safeColumns())
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
@@ -41,6 +42,7 @@ class InsuranceCertificateService
         $tenantId = TenantContext::getId();
 
         $record = DB::table('insurance_certificates')
+            ->select($this->safeColumns())
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
             ->first();
@@ -84,7 +86,7 @@ class InsuranceCertificateService
             $search = '%' . $filters['search'] . '%';
             $query->where(function ($q) use ($search) {
                 $q->where('insurance_certificates.provider_name', 'LIKE', $search)
-                  ->orWhere('insurance_certificates.policy_number', 'LIKE', $search);
+                  ->orWhere('insurance_certificates.insurance_type', 'LIKE', $search);
             });
         }
 
@@ -103,7 +105,8 @@ class InsuranceCertificateService
 
         $total = $query->count();
 
-        $data = $query->orderByDesc('insurance_certificates.created_at')
+        $data = $query->select($this->safeColumns('insurance_certificates.'))
+            ->orderByDesc('insurance_certificates.created_at')
             ->offset(($page - 1) * $perPage)
             ->limit($perPage)
             ->get()
@@ -168,13 +171,13 @@ class InsuranceCertificateService
             'user_id' => (int) $data['user_id'],
             'insurance_type' => $data['insurance_type'] ?? 'public_liability',
             'provider_name' => $data['provider_name'] ?? null,
-            'policy_number' => $data['policy_number'] ?? null,
-            'coverage_amount' => isset($data['coverage_amount']) ? (float) $data['coverage_amount'] : null,
             'start_date' => $data['start_date'] ?? null,
             'expiry_date' => $data['expiry_date'] ?? null,
-            'certificate_file_path' => $data['certificate_file_path'] ?? null,
+            'certificate_file_path' => null,
+            'policy_number' => null,
+            'coverage_amount' => null,
             'status' => $data['status'] ?? 'pending',
-            'notes' => $data['notes'] ?? null,
+            'notes' => null,
             'created_at' => now(),
         ]);
 
@@ -189,9 +192,7 @@ class InsuranceCertificateService
         $tenantId = TenantContext::getId();
 
         $allowedFields = [
-            'insurance_type', 'provider_name', 'policy_number',
-            'coverage_amount', 'start_date', 'expiry_date',
-            'certificate_file_path', 'notes',
+            'insurance_type', 'provider_name', 'start_date', 'expiry_date',
         ];
 
         $updates = collect($data)->only($allowedFields)->all();
@@ -255,7 +256,6 @@ class InsuranceCertificateService
     {
         $tenantId = TenantContext::getId();
 
-        // Delete the physical file if it exists
         $record = DB::table('insurance_certificates')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
@@ -265,15 +265,24 @@ class InsuranceCertificateService
             return false;
         }
 
-        if (!empty($record->certificate_file_path) && file_exists($record->certificate_file_path)) {
-            @unlink($record->certificate_file_path);
-        }
-
         DB::table('insurance_certificates')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
             ->delete();
 
         return true;
+    }
+
+    /** @return list<string> */
+    private function safeColumns(string $prefix = ''): array
+    {
+        return array_map(
+            static fn (string $column): string => $prefix . $column,
+            [
+                'id', 'tenant_id', 'user_id', 'insurance_type', 'provider_name',
+                'start_date', 'expiry_date', 'status', 'verified_by',
+                'verified_at', 'created_at', 'updated_at',
+            ],
+        );
     }
 }

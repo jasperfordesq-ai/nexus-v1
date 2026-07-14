@@ -23,6 +23,10 @@ TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 LOG_FILE="${NEXUS_BLUEGREEN_LOG_FILE:-$LOG_DIR/bluegreen-deploy-$TIMESTAMP.log}"
 export LOG_FILE
 
+# A deploy with both legacy SQL and Laravel migrations needs one authoritative
+# snapshot before the first schema mutation, not one snapshot per migrator.
+MIGRATION_SNAPSHOT_TAKEN=0
+
 STATE_FILE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
 STATUS_FILE="${NEXUS_BLUEGREEN_STATUS_FILE:-$DEPLOY_DIR/.bluegreen-status}"
 LATEST_LOG_FILE="${NEXUS_BLUEGREEN_LATEST_LOG_FILE:-$DEPLOY_DIR/.bluegreen-latest-log}"
@@ -436,6 +440,12 @@ run_candidate_raw_sql_migrations() {
     fi
 
     log_warn "Pending raw SQL migrations detected; applying with safe_migrate.php"
+    log_info "Taking pre-migration database snapshot before legacy raw SQL..."
+    if ! db_backup_with_offsite "$app_container"; then
+        log_err "Pre-migration backup failed — refusing to run legacy raw SQL migrations"
+        return 1
+    fi
+    MIGRATION_SNAPSHOT_TAKEN=1
     # safe_migrate.php prompts "Type 'yes' to proceed" on PRODUCTION env. The
     # `yes` command emits "y" — wrong answer. Pipe the literal string "yes\n".
     # --skip-backup: mysqldump is not present in the PHP container so the
@@ -490,10 +500,15 @@ run_candidate_migrations() {
     fi
 
     log_warn "$pending pending migration(s) detected. Running expand/contract-safe migrations online."
-    log_info "Taking pre-migration database snapshot..."
-    if ! db_backup_with_offsite "$app_container"; then
-        log_err "Pre-migration backup failed — aborting migration to prevent unrecoverable data loss"
-        return 1
+    if [ "$MIGRATION_SNAPSHOT_TAKEN" != "1" ]; then
+        log_info "Taking pre-migration database snapshot..."
+        if ! db_backup_with_offsite "$app_container"; then
+            log_err "Pre-migration backup failed — aborting migration to prevent unrecoverable data loss"
+            return 1
+        fi
+        MIGRATION_SNAPSHOT_TAKEN=1
+    else
+        log_ok "Pre-migration snapshot already taken before legacy raw SQL"
     fi
 
     repair_laravel_runtime_ownership "$app_container"

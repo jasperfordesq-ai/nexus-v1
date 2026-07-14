@@ -15,6 +15,7 @@ import { Audio, type AVPlaybackStatus } from 'expo-av';
 import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '@/lib/hooks/useTheme';
+import { authenticatedMediaRequest } from '@/lib/api/client';
 
 interface VoiceMessageBubbleProps {
   audioUrl: string;
@@ -83,8 +84,9 @@ export default function VoiceMessageBubble({
       // First play — load the sound
       setIsLoading(true);
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+      const source = await authenticatedMediaRequest(audioUrl);
       const { sound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
+        source,
         { shouldPlay: true },
         onPlaybackStatusUpdate,
       );

@@ -61,6 +61,15 @@ class SsoOidcServiceTest extends TestCase
         $this->assertGreaterThan(0, $payload['authentication_started_at']);
     }
 
+    public function test_upstream_mfa_requires_explicit_assurance_evidence(): void
+    {
+        $this->assertFalse($this->service->hasUpstreamMfaAssurance(['amr' => ['pwd']]));
+        $this->assertFalse($this->service->hasUpstreamMfaAssurance(['acr' => 'arbitrary-high']));
+        $this->assertTrue($this->service->hasUpstreamMfaAssurance(['amr' => ['pwd', 'mfa']]));
+        $this->assertTrue($this->service->hasUpstreamMfaAssurance(['amr' => ['otp']]));
+        $this->assertTrue($this->service->hasUpstreamMfaAssurance(['acr' => 'urn:nist:ac:classes:aal2']));
+    }
+
     public function test_state_without_signed_authentication_start_is_rejected(): void
     {
         $body = base64_encode((string) json_encode([

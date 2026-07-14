@@ -143,10 +143,12 @@ class TotpService
             return false;
         }
 
-        // Prefer header (works cross-origin); fall back to cookie (legacy)
-        $token = request()->header('X-Trusted-Device')
-            ?? $_COOKIE[self::TRUSTED_DEVICE_COOKIE]
-            ?? null;
+        // Browsers use the HttpOnly cookie. Stateless native clients cannot
+        // rely on a shared cookie jar, so only they may use the explicit header.
+        $token = request()->cookie(self::TRUSTED_DEVICE_COOKIE);
+        if (! $token && (request()->hasHeader('X-Nexus-Mobile') || request()->hasHeader('X-Stateless-Auth'))) {
+            $token = request()->header('X-Trusted-Device');
+        }
         if (!$token) {
             return false;
         }
@@ -552,6 +554,17 @@ class TotpService
         }
 
         return ['success' => true];
+    }
+
+    public static function trustedDeviceCookieName(): string
+    {
+        return self::TRUSTED_DEVICE_COOKIE;
+    }
+
+    public static function trustedDeviceLifetimeMinutes(int $tenantId): int
+    {
+        $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
+        return max(1, (int) ($config['two_factor.trusted_device_days'] ?? 30)) * 1440;
     }
 
     /**

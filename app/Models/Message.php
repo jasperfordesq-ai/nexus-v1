@@ -47,6 +47,15 @@ class Message extends Model
         'read_at' => 'datetime',
     ];
 
+    public function getAudioUrlAttribute(?string $value): ?string
+    {
+        if ($value === null || $value === '' || ! $this->exists) {
+            return $value;
+        }
+
+        return "/api/v2/messages/{$this->getKey()}/voice";
+    }
+
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id')->withoutGlobalScopes();

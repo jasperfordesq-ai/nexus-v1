@@ -17,6 +17,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Check from 'lucide-react/icons/check';
 import CheckCheck from 'lucide-react/icons/check-check';
 import FileText from 'lucide-react/icons/file-text';
+import { useAuthenticatedMedia } from '@/hooks/useAuthenticatedMedia';
 import Languages from 'lucide-react/icons/languages';
 import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { api } from '@/lib/api';
@@ -362,37 +363,7 @@ export const MessageBubble = memo(function MessageBubble({
               {message.attachments && message.attachments.length > 0 && (
                 <div className={`flex flex-wrap gap-2 ${message.body ? 'mt-2' : ''}`}>
                   {message.attachments.map((attachment) => (
-                    <a
-                      key={attachment.id}
-                      href={attachment.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block min-w-0 max-w-full"
-                    >
-                      {attachment.type === 'image' ? (
-                        <img
-                          src={attachment.url}
-                          alt={attachment.name}
-                          className="max-w-[min(200px,70vw)] max-h-[200px] rounded-lg object-cover hover:opacity-90 transition-opacity"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex min-w-0 max-w-full items-center gap-2 px-3 py-2 bg-black/10 dark:bg-white/10 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
-                          <FileText className="w-4 h-4 opacity-60 shrink-0" />
-                          <div className="flex min-w-0 flex-col">
-                            <span className="max-w-[min(150px,55vw)] truncate text-xs opacity-80">{attachment.name}</span>
-                            <span className="text-[10px] opacity-40">
-                              {formatNumber(attachment.size / 1024, {
-                                style: 'unit',
-                                unit: 'kilobyte',
-                                unitDisplay: 'short',
-                                maximumFractionDigits: 1,
-                              })}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </a>
+                    <ProtectedAttachment key={attachment.id} attachment={attachment} />
                   ))}
                 </div>
               )}
@@ -555,3 +526,44 @@ export const MessageBubble = memo(function MessageBubble({
     </motion.div>
   );
 });
+
+function ProtectedAttachment({ attachment }: {
+  attachment: { id: number | string; url: string; type: string; name: string; size: number };
+}) {
+  const previewUrl = useAuthenticatedMedia(attachment.type === 'image' ? attachment.url : undefined);
+
+  const download = useCallback(() => {
+    if (!attachment.url.startsWith('/api/')) return;
+    void api.download(attachment.url.slice(4), { filename: attachment.name });
+  }, [attachment.name, attachment.url]);
+
+  return (
+    <Button
+      variant="tertiary"
+      onPress={download}
+      className="block h-auto min-w-0 max-w-full p-0"
+      aria-label={attachment.name}
+    >
+      {attachment.type === 'image' && previewUrl ? (
+        <img
+          src={previewUrl}
+          alt={attachment.name}
+          className="max-h-[200px] max-w-[min(200px,70vw)] rounded-lg object-cover transition-opacity hover:opacity-90"
+          loading="lazy"
+        />
+      ) : (
+        <div className="flex min-w-0 max-w-full items-center gap-2 rounded-lg bg-black/10 px-3 py-2 transition-colors hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20">
+          <FileText className="h-4 w-4 shrink-0 opacity-60" />
+          <div className="flex min-w-0 flex-col">
+            <span className="max-w-[min(150px,55vw)] truncate text-xs opacity-80">{attachment.name}</span>
+            <span className="text-[10px] opacity-40">
+              {formatNumber(attachment.size / 1024, {
+                style: 'unit', unit: 'kilobyte', unitDisplay: 'short', maximumFractionDigits: 1,
+              })}
+            </span>
+          </div>
+        </div>
+      )}
+    </Button>
+  );
+}

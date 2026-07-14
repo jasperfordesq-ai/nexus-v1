@@ -3,7 +3,7 @@
     "name": "Timebank Global",
     "slug": "nexus-mobile",
     "scheme": "nexus",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "assetBundlePatterns": [
@@ -27,7 +27,7 @@
     },
     "ios": {
       "bundleIdentifier": "ie.project.nexus",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "supportsTablet": false,
       "associatedDomains": [
         "applinks:app.project-nexus.ie"
@@ -41,7 +41,7 @@
       }
     },
     "android": {
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#006FEE"
@@ -108,11 +108,11 @@
         }
       ],
       "@sentry/react-native/expo",
+      "./plugins/with-android-network-security",
       [
         "expo-build-properties",
         {
           "android": {
-            "networkSecurityConfig": "./android-network-security-config.xml",
             "useLegacyPackaging": true
           },
           "ios": {
@@ -123,7 +123,7 @@
     ],
     "updates": {
       "enabled": true,
-      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/90f411f3-b6b4-4251-85ad-00937bb0513d"
     },

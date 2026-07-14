@@ -557,6 +557,8 @@ Route::get('/v2/messages/restriction-status', [\App\Http\Controllers\Api\Message
 Route::post('/v2/messages', [\App\Http\Controllers\Api\MessagesController::class, 'send'])->middleware('onboarding-required');
 Route::post('/v2/messages/typing', [\App\Http\Controllers\Api\MessagesController::class, 'typing']);
 Route::post('/v2/messages/voice', [\App\Http\Controllers\Api\MessagesController::class, 'sendVoice']);
+Route::get('/v2/messages/{message}/attachments/{attachment}', [\App\Http\Controllers\Api\MessageMediaController::class, 'attachment']);
+Route::get('/v2/messages/{message}/voice', [\App\Http\Controllers\Api\MessageMediaController::class, 'voice']);
 Route::delete('/v2/messages/conversations/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'archiveConversation']);
 Route::get('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'show']);
 Route::put('/v2/messages/{id}/read', [\App\Http\Controllers\Api\MessagesController::class, 'markRead']);
@@ -746,7 +748,7 @@ Route::get('/v2/users/me/sessions', [\App\Http\Controllers\Api\UsersController::
 Route::get('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'show']);
 Route::put('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'update']);
 Route::get('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'list']);
-Route::post('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'upload']);
+Route::post('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'store']);
 // GDPR / FADP — member personal-data export (R3)
 Route::post('/v2/me/data-export', [\App\Http\Controllers\Api\MemberDataExportController::class, 'create']);
 Route::get('/v2/me/data-export/history', [\App\Http\Controllers\Api\MemberDataExportController::class, 'history']);
@@ -3930,3 +3932,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v2/appreciations/{id}/react', [\App\Http\Controllers\Api\AppreciationsController::class, 'react'])->whereNumber('id');
     Route::delete('/v2/appreciations/{id}/react', [\App\Http\Controllers\Api\AppreciationsController::class, 'removeReaction'])->whereNumber('id');
 });
+Route::post('/csp-report', [\App\Http\Controllers\Api\SecurityReportController::class, 'csp']);

@@ -127,11 +127,8 @@ class AdminInsuranceCertificateController extends BaseApiController
                 'insurance_type' => $insuranceType ?? 'public_liability',
                 'status' => $status,
                 'provider_name' => $this->input('provider_name'),
-                'policy_number' => $this->input('policy_number'),
-                'coverage_amount' => $this->input('coverage_amount'),
                 'start_date' => $this->input('start_date'),
                 'expiry_date' => $this->input('expiry_date'),
-                'notes' => $this->input('notes'),
             ];
 
             $id = $this->insuranceCertificateService->create($data);
@@ -174,8 +171,7 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             $data = [];
-            $allowed = ['insurance_type', 'provider_name', 'policy_number', 'coverage_amount',
-                         'start_date', 'expiry_date', 'status', 'notes'];
+            $allowed = ['insurance_type', 'provider_name', 'start_date', 'expiry_date', 'status'];
             foreach ($allowed as $field) {
                 if (array_key_exists($field, $allInput)) {
                     $data[$field] = $allInput[$field];

@@ -106,11 +106,11 @@ return [
     ],
 
     'insurance' => [
-        'title' => 'Insurance certificates',
+        'title' => 'Insurance records',
         'caption' => 'Account settings',
-        'description' => 'Upload proof of insurance so the team can verify your cover. Accepted file types are PDF, JPG and PNG, up to 10MB.',
-        'certificates_heading' => 'Your certificates',
-        'certificates_empty' => 'You have not uploaded any insurance certificates yet.',
+        'description' => 'Record the insurance type, provider and expiry date only. Do not upload documents or sensitive policy data.',
+        'certificates_heading' => 'Your insurance records',
+        'certificates_empty' => 'You have not added any insurance records yet.',
         'provider_label_short' => 'Provider',
         'expiry_label_short' => 'Expires',
         'status_label' => 'Status',
@@ -132,15 +132,15 @@ return [
             'personal_accident' => 'Personal accident',
             'other' => 'Other',
         ],
-        'upload_heading' => 'Upload a certificate',
+        'upload_heading' => 'Add an insurance record',
         'type_label' => 'Type of insurance',
         'provider_label' => 'Insurance provider (optional)',
         'policy_label' => 'Policy number (optional)',
-        'expiry_label' => 'Expiry date (optional)',
+        'expiry_label' => 'Expiry date',
         'expiry_hint' => 'For example, 27 3 2027',
         'file_label' => 'Certificate file',
         'file_hint' => 'Upload a PDF, JPG or PNG, up to 10MB.',
-        'upload_button' => 'Upload certificate',
+        'upload_button' => 'Save insurance record',
     ],
 
     'states' => [
@@ -170,6 +170,9 @@ return [
         'insurance-file-type' => 'The certificate must be a PDF, JPG or PNG file.',
         'insurance-file-large' => 'The certificate file must be smaller than 10MB.',
         'insurance-failed' => 'Sorry, we could not upload your certificate. Please try again.',
+        'insurance-recorded' => 'Your insurance record has been saved.',
+        'insurance-file-forbidden' => 'Do not upload insurance documents or sensitive policy data.',
+        'insurance-expiry-required' => 'Enter a valid insurance expiry date.',
     ],
 
     'nav' => [

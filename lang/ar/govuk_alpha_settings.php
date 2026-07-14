@@ -117,11 +117,11 @@ return [
     ],
 
     'insurance' => [
-        'title' => 'Insurance certificates',
+        'title' => 'سجلات التأمين',
         'caption' => 'Account settings',
-        'description' => 'Upload proof of insurance so the team can verify your cover. Accepted file types are PDF, JPG and PNG, up to 10MB.',
-        'certificates_heading' => 'Your certificates',
-        'certificates_empty' => 'You have not uploaded any insurance certificates yet.',
+        'description' => 'سجّل نوع التأمين ومزود الخدمة وتاريخ الانتهاء فقط. لا ترفع مستندات أو بيانات وثيقة حساسة.',
+        'certificates_heading' => 'سجلات التأمين الخاصة بك',
+        'certificates_empty' => 'لم تضف أي سجلات تأمين بعد.',
         'provider_label_short' => 'Provider',
         'expiry_label_short' => 'Expires',
         'status_label' => 'Status',
@@ -143,15 +143,15 @@ return [
             'personal_accident' => 'Personal accident',
             'other' => 'Other',
         ],
-        'upload_heading' => 'Upload a certificate',
+        'upload_heading' => 'إضافة سجل تأمين',
         'type_label' => 'Type of insurance',
         'provider_label' => 'Insurance provider (optional)',
         'policy_label' => 'Policy number (optional)',
-        'expiry_label' => 'Expiry date (optional)',
+        'expiry_label' => 'تاريخ الانتهاء',
         'expiry_hint' => 'For example, 27 3 2027',
         'file_label' => 'Certificate file',
         'file_hint' => 'Upload a PDF, JPG or PNG, up to 10MB.',
-        'upload_button' => 'Upload certificate',
+        'upload_button' => 'حفظ سجل التأمين',
     ],
 
     'states' => [
@@ -181,6 +181,9 @@ return [
         'insurance-file-type' => 'The certificate must be a PDF, JPG or PNG file.',
         'insurance-file-large' => 'The certificate file must be smaller than 10MB.',
         'insurance-failed' => 'Sorry, we could not upload your certificate. Please try again.',
+        'insurance-recorded' => 'تم حفظ سجل التأمين.',
+        'insurance-file-forbidden' => 'لا ترفع مستندات التأمين أو بيانات الوثيقة الحساسة.',
+        'insurance-expiry-required' => 'أدخل تاريخ انتهاء صالحًا للتأمين.',
     ],
 
     'nav' => [

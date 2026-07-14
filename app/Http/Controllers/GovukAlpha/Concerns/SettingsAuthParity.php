@@ -41,11 +41,11 @@ use Symfony\Component\HttpFoundation\Response;
  *      React API (UsersController::createGdprRequest) calls; the four request
  *      types are the ones createGdprRequest accepts other than the export/erasure
  *      flows already present on the core profile-settings page.
- *   4. Insurance certificate upload + list — React PrivacyTab insurance section.
+ *   4. Insurance metadata record + list — React PrivacyTab insurance section.
  *      Backed by the SAME App\Services\InsuranceCertificateService the React API
  *      (UserInsuranceController) calls, gated on the tenant compliance toggle
- *      (BrokerControlConfigService::isInsuranceEnabled), a plain no-JS HTML file
- *      upload.
+ *      (BrokerControlConfigService::isInsuranceEnabled). Raw documents and
+ *      sensitive policy data are prohibited.
  *
  * The other audited "gaps" were verified already-present on the core
  * profile-settings page (safeguarding revoke, GDPR export + account deletion,
@@ -87,13 +87,6 @@ trait SettingsAuthParity
         'product_liability',
         'personal_accident',
         'other',
-    ];
-
-    /** Allowed certificate upload MIME types → file extension (mirrors UserInsuranceController). */
-    private const SETTINGS_INSURANCE_MIMES = [
-        'application/pdf' => 'pdf',
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
     ];
 
     // =====================================================================
@@ -524,8 +517,8 @@ trait SettingsAuthParity
     // =====================================================================
 
     /**
-     * Insurance certificates page: list this member's certificates and upload a
-     * new one. Gated on the tenant compliance toggle exactly like the React
+     * Insurance records page: list this member's metadata and add a
+     * new record. Gated on the tenant compliance toggle exactly like the React
      * PrivacyTab (which only renders the section when insurance_enabled is set).
      */
     public function settingsInsurance(Request $request, string $tenantSlug): Response|RedirectResponse
@@ -555,11 +548,7 @@ trait SettingsAuthParity
         ]);
     }
 
-    /**
-     * Upload a new insurance certificate. Mirrors UserInsuranceController::upload
-     * (same MIME/size validation, same storage path, same InsuranceCertificateService
-     * ::create call with status 'submitted').
-     */
+    /** Store metadata only; insurance documents are prohibited. */
     public function settingsUploadInsurance(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -576,58 +565,28 @@ trait SettingsAuthParity
                 ->withFragment('upload');
         }
 
-        $file = $request->file('certificate_file');
-        if (! $file || ! $file->isValid()) {
+        if ($request->hasFile('certificate_file') || $request->has('certificate_file')) {
             return redirect()
-                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-required'])
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-forbidden'])
                 ->withFragment('upload');
         }
 
-        // Validate MIME from file content (not the user-supplied filename).
-        $mimeType = null;
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        if ($finfo !== false) {
-            $detected = finfo_file($finfo, (string) $file->getRealPath());
-            finfo_close($finfo);
-            $mimeType = $detected !== false ? $detected : null;
-        }
-        if ($mimeType === null || ! isset(self::SETTINGS_INSURANCE_MIMES[$mimeType])) {
+        $expiry = trim(self::asStr($request->input('expiry_date')));
+        $parsedExpiry = \DateTimeImmutable::createFromFormat('!Y-m-d', $expiry);
+        if ($parsedExpiry === false || $parsedExpiry->format('Y-m-d') !== $expiry) {
             return redirect()
-                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-type'])
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-expiry-required'])
                 ->withFragment('upload');
         }
-
-        if ($file->getSize() > 10 * 1024 * 1024) {
-            return redirect()
-                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-large'])
-                ->withFragment('upload');
-        }
-
-        $tenantId = TenantContext::getId();
 
         try {
-            $uploadDir = base_path("httpdocs/uploads/insurance/{$tenantId}/{$userId}");
-            $ext = self::SETTINGS_INSURANCE_MIMES[$mimeType];
-            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-
-            if (! is_dir($uploadDir) && ! mkdir($uploadDir, 0755, true) && ! is_dir($uploadDir)) {
-                throw new \RuntimeException('Could not create upload directory.');
-            }
-
-            $file->move($uploadDir, $filename);
-            $filePath = "/uploads/insurance/{$tenantId}/{$userId}/{$filename}";
-
             $provider = trim(self::asStr($request->input('provider_name')));
-            $policy = trim(self::asStr($request->input('policy_number')));
-            $expiry = trim(self::asStr($request->input('expiry_date')));
 
             app(InsuranceCertificateService::class)->create([
                 'user_id' => $userId,
                 'insurance_type' => $insuranceType,
                 'provider_name' => $provider !== '' ? $provider : null,
-                'policy_number' => $policy !== '' ? $policy : null,
-                'expiry_date' => $expiry !== '' ? $expiry : null,
-                'certificate_file_path' => $filePath,
+                'expiry_date' => $expiry,
                 'status' => 'submitted',
             ]);
         } catch (\Throwable $e) {
@@ -639,7 +598,7 @@ trait SettingsAuthParity
         }
 
         return redirect()
-            ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-uploaded'])
+            ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-recorded'])
             ->withFragment('certificates');
     }
 }

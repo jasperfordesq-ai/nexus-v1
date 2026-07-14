@@ -233,6 +233,9 @@ function parseLink(link: string): { section: string; segments: string[]; params:
   } catch {
     return null;
   }
+  const isTrustedWebLink = url.protocol === 'https:' && url.hostname === 'app.project-nexus.ie';
+  const isTrustedAppLink = url.protocol === 'nexus:';
+  if (!isTrustedWebLink && !isTrustedAppLink) return null;
 
   const pathSegments = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
   if (pathSegments.length === 0) return null;

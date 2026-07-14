@@ -1,0 +1,32 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import fs from 'node:fs';
+
+const app = JSON.parse(fs.readFileSync(new URL('../app.json', import.meta.url), 'utf8')).expo;
+const eas = JSON.parse(fs.readFileSync(new URL('../eas.json', import.meta.url), 'utf8'));
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const network = fs.readFileSync(new URL('../android-network-security-config.xml', import.meta.url), 'utf8');
+
+const failures = [];
+const assert = (condition, message) => { if (!condition) failures.push(message); };
+assert(app.version === pkg.version, 'app.json and package.json versions must match');
+assert(Number.isInteger(app.android?.versionCode) && app.android.versionCode > 1, 'Android versionCode must be incremented');
+assert(app.runtimeVersion?.policy === 'appVersion', 'runtimeVersion must use appVersion policy');
+assert(app.updates?.enabled === true && app.updates?.checkAutomatically === 'ON_LOAD', 'OTA checks must be enabled on load');
+assert(eas.build?.production?.channel === 'production', 'production build must be pinned to production OTA channel');
+assert(eas.build?.staging?.channel === 'staging', 'staging build must be pinned to staging OTA channel');
+assert(app.plugins?.includes('./plugins/with-android-network-security'), 'Android network security config plugin is required');
+assert(!network.includes('trustkit-config'), 'Android config contains an unsupported TrustKit element');
+assert((network.match(/<pin digest="SHA-256">/g) ?? []).length >= 2, 'certificate pin set needs primary and backup pins');
+const expiry = network.match(/<pin-set expiration="([0-9-]+)"/)?.[1];
+assert(Boolean(expiry) && Date.parse(expiry) > Date.now() + 90 * 86400_000, 'certificate pins must remain valid for at least 90 days');
+assert(app.android?.intentFilters?.every((filter) => filter.data?.every((entry) => entry.scheme === 'nexus' || (entry.scheme === 'https' && entry.host === 'app.project-nexus.ie'))), 'Android app links must allow only the trusted host or nexus scheme');
+
+if (failures.length) {
+  failures.forEach((failure) => console.error(`release gate: ${failure}`));
+  process.exit(1);
+}
+console.log('mobile release configuration verified');

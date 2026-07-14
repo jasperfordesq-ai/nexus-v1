@@ -40,6 +40,15 @@ class MessageAttachment extends Model
         'created_at' => 'datetime',
     ];
 
+    protected $hidden = ['file_path'];
+
+    public function getFileUrlAttribute(): string
+    {
+        $messageId = (int) ($this->attributes['message_id'] ?? 0);
+        $id = (int) ($this->attributes['id'] ?? 0);
+        return $messageId > 0 && $id > 0 ? "/api/v2/messages/{$messageId}/attachments/{$id}" : '';
+    }
+
     /**
      * React's MessageAttachment type expects { id, url, type, name, size }; the
      * accessible Blade reads the raw columns (file_url/file_name/mime_type). We
@@ -52,7 +61,7 @@ class MessageAttachment extends Model
 
     public function getUrlAttribute(): string
     {
-        return (string) ($this->attributes['file_url'] ?? '');
+        return $this->getFileUrlAttribute();
     }
 
     public function getNameAttribute(): string

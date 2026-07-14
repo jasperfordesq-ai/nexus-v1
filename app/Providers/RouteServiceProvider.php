@@ -66,9 +66,17 @@ class RouteServiceProvider extends ServiceProvider
         View::addNamespace('accessible-frontend', base_path('accessible-frontend/views'));
 
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(120)->by(
-                $request->user()?->id ?: $request->ip()
-            );
+            $tenant = (string) ($request->header('X-Tenant-ID') ?: $request->header('X-Tenant-Slug') ?: 'unresolved');
+            $identity = $request->user()?->id;
+            if (! $identity && $request->bearerToken()) {
+                $identity = 'token:' . hash('sha256', $request->bearerToken());
+            }
+            $key = $tenant . '|' . ($identity ?: 'ip:' . $request->ip());
+
+            return [
+                Limit::perMinute(300)->by('minute|' . $key),
+                Limit::perMinutes(10, 2000)->by('sustained|' . $key),
+            ];
         });
 
         RateLimiter::for('auth', function (Request $request) {

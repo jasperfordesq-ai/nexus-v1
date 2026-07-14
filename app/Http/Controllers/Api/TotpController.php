@@ -381,13 +381,29 @@ class TotpController extends BaseApiController
             $response['codes_remaining'] = $result['codes_remaining'];
         }
 
-        // Include trusted device token so frontend can store it in localStorage
-        // and send it via X-Trusted-Device header on future login requests
-        if ($trustedDeviceToken) {
+        // Native stateless clients keep the token in secure storage. Browsers
+        // receive only an HttpOnly cookie so injected JavaScript cannot read it.
+        if ($trustedDeviceToken && $isMobile) {
             $response['trusted_device_token'] = $trustedDeviceToken;
         }
 
-        return response()->json($response);
+        $jsonResponse = response()->json($response);
+        if ($trustedDeviceToken && ! $isMobile) {
+            $secure = request()->secure() || app()->environment('production');
+            $jsonResponse->withCookie(cookie(
+                TotpService::trustedDeviceCookieName(),
+                $trustedDeviceToken,
+                TotpService::trustedDeviceLifetimeMinutes($tenantId),
+                '/',
+                null,
+                $secure,
+                true,
+                false,
+                $secure ? 'none' : 'lax',
+            ));
+        }
+
+        return $jsonResponse;
     }
 
     /**

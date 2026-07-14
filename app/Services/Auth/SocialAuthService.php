@@ -577,7 +577,8 @@ class SocialAuthService
         bool $isNew,
         int $authenticationStartedAt,
         string $browserChallenge,
-        ?array $identityLink = null
+        ?array $identityLink = null,
+        bool $upstreamMfaVerified = false
     ): array {
         if ($userId < 1 || $tenantId < 1 || $authenticationStartedAt < 1) {
             throw new \InvalidArgumentException('OAuth login issuance context is invalid.');
@@ -592,7 +593,8 @@ class SocialAuthService
                 $isNew,
                 $authenticationStartedAt,
                 $browserChallenge,
-                $identityLink
+                $identityLink,
+                $upstreamMfaVerified
             );
         }
 
@@ -600,7 +602,8 @@ class SocialAuthService
             $userId,
             $tenantId,
             $authenticationStartedAt,
-            null
+            null,
+            $upstreamMfaVerified
         );
 
         if (($issuance['status'] ?? null) !== 'credentials_issued') {
@@ -663,7 +666,8 @@ class SocialAuthService
         bool $isNew,
         int $authenticationStartedAt,
         string $browserChallenge,
-        array $identityLink
+        array $identityLink,
+        bool $upstreamMfaVerified = false
     ): array {
         $identityProvider = (string) ($identityLink['provider'] ?? '');
         $expectedIdentityProvider = str_starts_with($provider, 'sso:')
@@ -693,6 +697,7 @@ class SocialAuthService
                 'user_id' => $userId,
                 'authentication_started_at' => $authenticationStartedAt,
                 'identity_link' => $identityLink,
+                'upstream_mfa_verified' => $upstreamMfaVerified,
             ],
         ]);
 
@@ -710,13 +715,15 @@ class SocialAuthService
         int $userId,
         int $tenantId,
         int $authenticationStartedAt,
-        ?array $identityLink
+        ?array $identityLink,
+        bool $upstreamMfaVerified = false
     ): array {
         return DB::transaction(function () use (
             $userId,
             $tenantId,
             $authenticationStartedAt,
-            $identityLink
+            $identityLink,
+            $upstreamMfaVerified
         ): array {
             $lockedRow = DB::table('users')
                 ->where('id', $userId)
@@ -742,8 +749,21 @@ class SocialAuthService
             if (
                 $this->totp->isEnabled($userId, $tenantId)
                 && !$this->totp->isTrustedDevice($userId, null, $tenantId)
+                && !$upstreamMfaVerified
             ) {
                 return ['status' => 'two_factor_required'];
+            }
+
+            $isAdmin = in_array((string) ($user['role'] ?? ''), ['admin', 'tenant_admin', 'org_admin', 'super_admin'], true)
+                || !empty($user['is_super_admin'])
+                || !empty($user['is_tenant_super_admin']);
+            if (
+                (bool) config('auth.force_admin_2fa', false)
+                && $isAdmin
+                && !$this->totp->isEnabled($userId, $tenantId)
+                && !$upstreamMfaVerified
+            ) {
+                return ['status' => 'two_factor_setup_required'];
             }
 
             if ($identityLink !== null) {
@@ -977,7 +997,8 @@ class SocialAuthService
                     (int) $pending['user_id'],
                     (int) $payload['tenant_id'],
                     (int) $pending['authentication_started_at'],
-                    $identityLink
+                    $identityLink,
+                    (bool) ($pending['upstream_mfa_verified'] ?? false)
                 );
                 if (($issuance['status'] ?? null) !== 'credentials_issued') {
                     throw new \RuntimeException('OAuth callback code is invalid or expired.');

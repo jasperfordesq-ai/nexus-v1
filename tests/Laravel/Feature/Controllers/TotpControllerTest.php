@@ -467,4 +467,32 @@ class TotpControllerTest extends TestCase
             ->where('tenant_id', $this->testTenantId)
             ->count());
     }
+
+    public function test_browser_trusted_device_uses_httponly_cookie_not_json_token(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+        $secret = $this->enableTotpForUser((int) $user->id);
+        $token = app(TwoFactorChallengeManager::class)->create((int) $user->id);
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES,
+            true,
+            $this->testTenantId,
+        );
+
+        $response = $this->apiPost('/totp/verify', [
+            'two_factor_token' => $token,
+            'code' => TOTP::createFromSecret($secret)->now(),
+            'trust_device' => true,
+        ]);
+
+        $response->assertOk()->assertJsonMissingPath('trusted_device_token');
+        $cookie = collect($response->headers->getCookies())
+            ->first(fn ($candidate) => $candidate->getName() === TotpService::trustedDeviceCookieName());
+        $this->assertNotNull($cookie);
+        $this->assertTrue($cookie->isHttpOnly());
+    }
 }

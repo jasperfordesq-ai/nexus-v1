@@ -117,11 +117,11 @@ return [
     ],
 
     'insurance' => [
-        'title' => 'Insurance certificates',
+        'title' => 'Dossiers d’assurance',
         'caption' => 'Account settings',
-        'description' => 'Upload proof of insurance so the team can verify your cover. Accepted file types are PDF, JPG and PNG, up to 10MB.',
-        'certificates_heading' => 'Your certificates',
-        'certificates_empty' => 'You have not uploaded any insurance certificates yet.',
+        'description' => 'Enregistrez uniquement le type d’assurance, l’assureur et la date d’expiration. Ne téléversez aucun document ni donnée sensible de police.',
+        'certificates_heading' => 'Vos dossiers d’assurance',
+        'certificates_empty' => 'Vous n’avez encore ajouté aucun dossier d’assurance.',
         'provider_label_short' => 'Provider',
         'expiry_label_short' => 'Expires',
         'status_label' => 'Status',
@@ -143,15 +143,15 @@ return [
             'personal_accident' => 'Personal accident',
             'other' => 'Other',
         ],
-        'upload_heading' => 'Upload a certificate',
+        'upload_heading' => 'Ajouter un dossier d’assurance',
         'type_label' => 'Type of insurance',
         'provider_label' => 'Insurance provider (optional)',
         'policy_label' => 'Policy number (optional)',
-        'expiry_label' => 'Expiry date (optional)',
+        'expiry_label' => 'Date d’expiration',
         'expiry_hint' => 'For example, 27 3 2027',
         'file_label' => 'Certificate file',
         'file_hint' => 'Upload a PDF, JPG or PNG, up to 10MB.',
-        'upload_button' => 'Upload certificate',
+        'upload_button' => 'Enregistrer le dossier',
     ],
 
     'states' => [
@@ -181,6 +181,9 @@ return [
         'insurance-file-type' => 'The certificate must be a PDF, JPG or PNG file.',
         'insurance-file-large' => 'The certificate file must be smaller than 10MB.',
         'insurance-failed' => 'Sorry, we could not upload your certificate. Please try again.',
+        'insurance-recorded' => 'Votre dossier d’assurance a été enregistré.',
+        'insurance-file-forbidden' => 'Ne téléversez aucun document d’assurance ni donnée sensible de police.',
+        'insurance-expiry-required' => 'Saisissez une date d’expiration valide.',
     ],
 
     'nav' => [

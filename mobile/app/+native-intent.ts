@@ -133,6 +133,9 @@ function parseSystemPath(rawPath: string | null): { section: string; segments: s
   if (!trimmed) return null;
   const normalized = trimmed.includes('://') || trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   const url = new URL(normalized, 'https://app.project-nexus.ie');
+  const isTrustedWebLink = url.protocol === 'https:' && url.hostname === 'app.project-nexus.ie';
+  const isTrustedAppLink = url.protocol === 'nexus:';
+  if (!isTrustedWebLink && !isTrustedAppLink) return null;
 
   let pathSegments = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
   if (url.protocol === 'nexus:' && url.host && KNOWN_SECTIONS.has(url.host)) {

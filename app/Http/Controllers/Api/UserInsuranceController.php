@@ -7,18 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\InsuranceCertificateService;
+use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
-use App\Core\TenantContext;
 
-/**
- * UserInsuranceController -- User insurance certificate upload and listing.
- *
- * All methods are native Laravel — no legacy delegation remains.
- *
- * Endpoints:
- *   GET  /api/v2/users/me/insurance  list()
- *   POST /api/v2/users/me/insurance  upload()  (delegation — file upload)
- */
+/** Metadata-only insurance records. Raw documents are never accepted. */
 class UserInsuranceController extends BaseApiController
 {
     protected bool $isV2Api = true;
@@ -27,97 +19,59 @@ class UserInsuranceController extends BaseApiController
         private readonly InsuranceCertificateService $insuranceCertificateService,
     ) {}
 
-    /**
-     * GET /api/v2/users/me/insurance
-     *
-     * List the authenticated user's insurance certificates.
-     */
     public function list(): JsonResponse
     {
         $userId = $this->requireAuth();
 
         try {
-            $records = $this->insuranceCertificateService->getUserCertificates($userId);
-            return $this->respondWithData($records);
-        } catch (\Exception $e) {
+            return $this->respondWithData($this->insuranceCertificateService->getUserCertificates($userId));
+        } catch (\Throwable) {
             return $this->respondWithData([]);
         }
     }
 
-    /**
-     * POST /api/v2/users/me/insurance
-     *
-     * Upload a new insurance certificate. Uses request()->file() (Laravel native).
-     * Field name: 'certificate_file'. Form fields: insurance_type, provider_name,
-     * policy_number, coverage_amount, start_date, expiry_date, notes.
-     */
-    public function upload(): JsonResponse
+    /** Store only the type, optional provider, and required expiry date. */
+    public function store(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $tenantId = TenantContext::getId();
 
-        $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
-                        'product_liability', 'personal_accident', 'other'];
-
-        $insuranceType = request()->input('insurance_type', 'public_liability');
-        if (!in_array($insuranceType, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_insurance_type'), 'insurance_type');
+        if (request()->hasFile('certificate_file') || request()->has('certificate_file')) {
+            return $this->respondWithError(
+                'DOCUMENT_UPLOAD_FORBIDDEN',
+                __('api.insurance_documents_forbidden'),
+                'certificate_file',
+                422,
+            );
         }
 
-        // Handle file upload
-        $filePath = null;
-        $file = request()->file('certificate_file');
-        if ($file && $file->isValid()) {
-            // Validate MIME type using file content
-            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $file->getRealPath());
-            finfo_close($finfo);
+        $validTypes = [
+            'public_liability', 'professional_indemnity', 'employers_liability',
+            'product_liability', 'personal_accident', 'other',
+        ];
+        $insuranceType = (string) request()->input('insurance_type', 'public_liability');
+        if (! in_array($insuranceType, $validTypes, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_insurance_type'), 'insurance_type', 422);
+        }
 
-            if (!in_array($mimeType, $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.insurance_file_types'), 'certificate_file');
-            }
-
-            // Validate file size (10MB max)
-            if ($file->getSize() > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.file_exceeds_limit'), 'certificate_file');
-            }
-
-            // Store file — derive extension from validated MIME type (not user filename)
-            $uploadDir = base_path("httpdocs/uploads/insurance/{$tenantId}/{$userId}");
-            $extMap = ['application/pdf' => 'pdf', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
-            $ext = $extMap[$mimeType] ?? 'bin';
-            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
-            $file->move($uploadDir, $filename);
-            $filePath = "/uploads/insurance/{$tenantId}/{$userId}/{$filename}";
+        $expiryDate = trim((string) request()->input('expiry_date', ''));
+        $parsedExpiry = DateTimeImmutable::createFromFormat('!Y-m-d', $expiryDate);
+        if ($parsedExpiry === false || $parsedExpiry->format('Y-m-d') !== $expiryDate) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.insurance_expiry_required'), 'expiry_date', 422);
         }
 
         try {
-            $data = [
+            $provider = mb_substr(trim((string) request()->input('provider_name', '')), 0, 255);
+            $id = $this->insuranceCertificateService->create([
                 'user_id' => $userId,
                 'insurance_type' => $insuranceType,
-                'provider_name' => request()->input('provider_name'),
-                'policy_number' => request()->input('policy_number'),
-                'coverage_amount' => request()->input('coverage_amount') !== null && request()->input('coverage_amount') !== ''
-                    ? (float) request()->input('coverage_amount') : null,
-                'start_date' => request()->input('start_date'),
-                'expiry_date' => request()->input('expiry_date'),
-                'certificate_file_path' => $filePath,
+                'provider_name' => $provider !== '' ? $provider : null,
+                'expiry_date' => $expiryDate,
                 'status' => 'submitted',
-                'notes' => request()->input('notes'),
-            ];
+            ]);
 
-            $id = $this->insuranceCertificateService->create($data);
-            $record = $this->insuranceCertificateService->getById($id);
-
-            return $this->respondWithData($record, null, 201);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.insurance_upload_failed'), null, 500);
+            return $this->respondWithData($this->insuranceCertificateService->getById($id), null, 201);
+        } catch (\Throwable) {
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_record_failed'), null, 500);
         }
     }
 }

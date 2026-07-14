@@ -139,6 +139,7 @@ class SsoOidcService
      *   is_new:bool,
      *   tenant_id:int,
      *   provider_key:string,
+     *   upstream_mfa_verified:bool,
      *   authentication_started_at:int,
      *   browser_challenge:string
      * }
@@ -194,6 +195,7 @@ class SsoOidcService
             $payload['authentication_started_at']
         );
         $result['provider_key'] = $providerKey;
+        $result['upstream_mfa_verified'] = $this->hasUpstreamMfaAssurance($claims);
         $result['authentication_started_at'] = $payload['authentication_started_at'];
         $result['browser_challenge'] = $payload['browser_challenge'];
         return $result;
@@ -891,6 +893,39 @@ class SsoOidcService
     {
         unset($claims['at_hash'], $claims['c_hash'], $claims['nonce']);
         return $claims;
+    }
+
+    /**
+     * Accept only explicit, standards-based MFA evidence from the validated
+     * ID token. Password-only and arbitrary ACR values never satisfy local
+     * MFA policy. Deployments may extend the ACR allow-list deliberately.
+     *
+     * @param array<string, mixed> $claims
+     */
+    public function hasUpstreamMfaAssurance(array $claims): bool
+    {
+        $amr = $claims['amr'] ?? null;
+        if (is_array($amr)) {
+            $methods = array_map(
+                static fn (mixed $method): string => strtolower(trim(is_string($method) ? $method : '')),
+                $amr
+            );
+            if (array_intersect($methods, ['mfa', 'otp', 'hwk', 'swk']) !== []) {
+                return true;
+            }
+        }
+
+        $acr = is_string($claims['acr'] ?? null) ? trim((string) $claims['acr']) : '';
+        if ($acr === '') {
+            return false;
+        }
+
+        $configured = array_filter(array_map(
+            'trim',
+            explode(',', (string) config('services.sso.mfa_acr_values', 'urn:nist:ac:classes:aal2,urn:nist:ac:classes:aal3'))
+        ));
+
+        return in_array($acr, $configured, true);
     }
 
     private function splitName(?string $name, string $email): array

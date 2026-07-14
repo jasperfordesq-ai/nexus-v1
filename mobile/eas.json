@@ -61,6 +61,21 @@
         "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
+    "staging": {
+      "distribution": "internal",
+      "channel": "staging",
+      "android": {
+        "buildType": "apk"
+      },
+      "cache": {
+        "key": "nexus-staging-v1"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
+    },
     "website": {
       "distribution": "internal",
       "channel": "website",

@@ -74,19 +74,20 @@ class AudioUploader
         // Tenant-scoped directory
         $tenantId = TenantContext::getId();
         // nosemgrep: tainted-filename — tenant is an int and filename is generated from 128 random bits
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
+        $targetDir = storage_path('app/private/message-media/' . (int) $tenantId . '/voice');
 
         if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0700, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . (int)$tenantId . '/voice_messages/' . $filename;
+        $publicPath = 'message-media/' . (int) $tenantId . '/voice/' . $filename;
 
         // Move uploaded file
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
             throw new \Exception("Failed to save audio file");
         }
+        @chmod($targetPath, 0600);
 
         return [
             'url' => $publicPath,
@@ -154,19 +155,20 @@ class AudioUploader
         // Tenant-scoped directory
         $tenantId = TenantContext::getId();
         // nosemgrep: tainted-filename — tenant is an int and filename is generated from 128 random bits
-        $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
+        $targetDir = storage_path('app/private/message-media/' . (int) $tenantId . '/voice');
 
         if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0700, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;
-        $publicPath = '/uploads/' . (int)$tenantId . '/voice_messages/' . $filename;
+        $publicPath = 'message-media/' . (int) $tenantId . '/voice/' . $filename;
 
         // Save file
         if (file_put_contents($targetPath, $audioData) === false) { // nosemgrep: tainted-filename
             throw new \Exception("Failed to save audio file");
         }
+        @chmod($targetPath, 0600);
 
         return [
             'url' => $publicPath,
@@ -229,64 +231,35 @@ class AudioUploader
         if ($url === '' || $tenantId <= 0 || str_contains($url, "\0") || str_contains($url, '\\')) {
             return null;
         }
-
-        $parts = parse_url($url);
-        if ($parts === false
-            || isset($parts['scheme'])
-            || isset($parts['host'])
-            || isset($parts['user'])
-            || isset($parts['pass'])
-            || isset($parts['port'])
-            || isset($parts['query'])
-            || isset($parts['fragment'])) {
+        $privatePrefix = "message-media/{$tenantId}/voice/";
+        $legacyPrefix = "/uploads/{$tenantId}/voice_messages/";
+        if (str_starts_with($url, $privatePrefix)) {
+            $filename = substr($url, strlen($privatePrefix));
+            $rootPath = storage_path("app/private/message-media/{$tenantId}/voice");
+        } elseif (str_starts_with($url, $legacyPrefix)) {
+            $filename = substr(rawurldecode($url), strlen($legacyPrefix));
+            $documentRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
+            $rootPath = ($documentRoot !== '' ? $documentRoot : base_path('httpdocs'))
+                . "/uploads/{$tenantId}/voice_messages";
+        } else {
             return null;
         }
 
-        $path = rawurldecode((string) ($parts['path'] ?? ''));
-        if (str_contains($path, "\0") || str_contains($path, '\\')) {
-            return null;
-        }
-        $prefix = "/uploads/{$tenantId}/voice_messages/";
-        if (!str_starts_with($path, $prefix)) {
-            return null;
-        }
-
-        $filename = substr($path, strlen($prefix));
-        // Voice URLs are server-issued with a `voice_` prefix and MIME-derived
-        // extension. The bounded portable basename alphabet keeps historical
-        // server-issued variants valid while preventing wrappers and traversal
-        // from reaching any filesystem operation.
         if (preg_match('/\Avoice_[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.(?:webm|ogg|mp3|wav|m4a|aac)\z/D', $filename) !== 1) {
             return null;
         }
 
-        $configuredRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
-        if ($configuredRoot === '') {
-            $configuredRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
-        }
-        $documentRoot = $configuredRoot !== '' ? realpath($configuredRoot) : false;
-        if ($documentRoot === false) {
-            return null;
-        }
-
-        $voiceRoot = $documentRoot
-            . DIRECTORY_SEPARATOR . 'uploads'
-            . DIRECTORY_SEPARATOR . $tenantId
-            . DIRECTORY_SEPARATOR . 'voice_messages';
-        $resolvedRoot = realpath($voiceRoot);
+        $resolvedRoot = realpath($rootPath);
         if ($resolvedRoot === false) {
             return null;
         }
 
-        $resolved = realpath($voiceRoot . DIRECTORY_SEPARATOR . $filename);
+        $resolved = realpath($resolvedRoot . DIRECTORY_SEPARATOR . $filename);
         $rootPrefix = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         if ($resolved === false || !str_starts_with($resolved, $rootPrefix)) {
             return null;
         }
 
-        // nosemgrep: tainted-filename -- $resolved is canonical, its source
-        // basename passed the exact server-issued allowlist above, and the
-        // preceding prefix check proves containment inside $resolvedRoot.
         return is_file($resolved) ? $resolved : null;
     }
 

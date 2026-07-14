@@ -548,7 +548,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SeoRedirectMiddleware::class,
-        ]);
+        ], append: ['throttle:api']);
 
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,

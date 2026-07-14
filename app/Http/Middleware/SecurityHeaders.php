@@ -136,8 +136,11 @@ class SecurityHeaders
             . "frame-ancestors 'self'; "
             . "form-action 'self'; "
             . "base-uri 'self'; "
-            . "object-src 'none';";
+            . "object-src 'none'; "
+            . "report-uri /api/csp-report; "
+            . "report-to nexus-csp;";
         $response->headers->set('Content-Security-Policy', $csp);
+        $response->headers->set('Reporting-Endpoints', 'nexus-csp="/api/csp-report"');
         // Keep an endpoint's equally strict or stricter policy (for example,
         // one-time calendar feed secrets), while replacing unknown or weaker
         // policies with the platform default.

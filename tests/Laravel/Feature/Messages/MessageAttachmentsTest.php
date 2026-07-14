@@ -7,9 +7,12 @@
 namespace Tests\Laravel\Feature\Messages;
 
 use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\MessageService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
 /**
@@ -61,7 +64,10 @@ class MessageAttachmentsTest extends TestCase
             $att = $result['attachments'][0];
             $this->assertSame('photo.png', $att['file_name']);
             // React's MessageAttachment shape { url, type, name, size } via model accessors.
-            $this->assertSame('/uploads/' . $tenantId . '/message_attachments/abc.png', $att['url']);
+            $this->assertSame(
+                '/api/v2/messages/' . $result['id'] . '/attachments/' . $att['id'],
+                $att['url'],
+            );
             $this->assertSame('image', $att['type']);
             $this->assertSame('photo.png', $att['name']);
             $this->assertSame(1234, (int) $att['size']);
@@ -131,6 +137,44 @@ class MessageAttachmentsTest extends TestCase
             $this->assertNotNull($withAttachment, 'getMessages did not return the attachment');
             $this->assertSame('x.png', $withAttachment['attachments'][0]['file_name']);
         } finally {
+            TenantContext::reset();
+        }
+    }
+
+    public function test_private_attachment_delivery_requires_message_participation(): void
+    {
+        [$tenantId, $sender, $receiver] = $this->tenantAndTwoUsers();
+        $message = MessageService::send($sender, $receiver, ['body' => 'private media']);
+        $relative = "message-media/{$tenantId}/attachments/test-private.pdf";
+        $privatePath = storage_path('app/private/' . $relative);
+        File::ensureDirectoryExists(dirname($privatePath), 0700, true);
+        File::put($privatePath, "%PDF-1.4\nprivate\n");
+
+        try {
+            $attachmentId = DB::table('message_attachments')->insertGetId([
+                'tenant_id' => $tenantId,
+                'message_id' => (int) $message['id'],
+                'file_url' => $relative,
+                'file_path' => $relative,
+                'file_name' => 'private.pdf',
+                'file_type' => 'file',
+                'file_size' => filesize($privatePath),
+                'mime_type' => 'application/pdf',
+                'created_at' => now(),
+            ]);
+
+            $outsider = User::factory()->forTenant($tenantId)->create(['status' => 'active', 'is_approved' => true]);
+            Sanctum::actingAs($outsider, ['*']);
+            $this->apiGet("/v2/messages/{$message['id']}/attachments/{$attachmentId}")->assertForbidden();
+
+            Sanctum::actingAs(User::withoutGlobalScopes()->findOrFail($sender), ['*']);
+            $this->apiGet("/v2/messages/{$message['id']}/attachments/{$attachmentId}")
+                ->assertOk()
+                ->assertHeader('Cache-Control', 'private, no-store, max-age=0');
+
+            $this->assertFileDoesNotExist(base_path("httpdocs/uploads/{$tenantId}/message_attachments/test-private.pdf"));
+        } finally {
+            @unlink($privatePath);
             TenantContext::reset();
         }
     }

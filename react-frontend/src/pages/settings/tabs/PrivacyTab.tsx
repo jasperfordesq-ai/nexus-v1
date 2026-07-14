@@ -1,13 +1,14 @@
 import { getFormattingLocale } from '@/lib/helpers';
-import { Button } from '@/components/ui/Button';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { Select, SelectItem } from '@/components/ui/Select';
-import { Switch } from '@/components/ui/Switch';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Input } from '@/components/ui/Input';
+import { Switch } from '@/components/ui/Switch';
 
 import Save from 'lucide-react/icons/save';
 import Eye from 'lucide-react/icons/eye';
@@ -21,7 +22,6 @@ import Ban from 'lucide-react/icons/ban';
 import Scale from 'lucide-react/icons/scale';
 import Info from 'lucide-react/icons/info';
 import FileCheck from 'lucide-react/icons/file-check';
-import Upload from 'lucide-react/icons/upload';
 import Globe from 'lucide-react/icons/globe';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -73,13 +73,17 @@ interface PrivacyTabProps {
   insuranceLoading: boolean;
   insuranceUploading: boolean;
   insuranceType: string;
+  insuranceProvider: string;
+  insuranceExpiry: string;
   insuranceEnabled: boolean;
   federationEnabled: boolean;
   onPrivacyChange: (updater: (prev: PrivacySettings) => PrivacySettings) => void;
   onSavePrivacy: () => void;
   onRetryPrivacy: () => void;
-  onInsuranceUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onInsuranceSave: () => void;
   onInsuranceTypeChange: (value: string) => void;
+  onInsuranceProviderChange: (value: string) => void;
+  onInsuranceExpiryChange: (value: string) => void;
   onOpenGdprModal: (type: string) => void;
   onOpenDeleteModal: () => void;
 }
@@ -128,13 +132,17 @@ export function PrivacyTab({
   insuranceLoading,
   insuranceUploading,
   insuranceType,
+  insuranceProvider,
+  insuranceExpiry,
   insuranceEnabled,
   federationEnabled,
   onPrivacyChange,
   onSavePrivacy,
   onRetryPrivacy,
-  onInsuranceUpload,
+  onInsuranceSave,
   onInsuranceTypeChange,
+  onInsuranceProviderChange,
+  onInsuranceExpiryChange,
   onOpenGdprModal,
   onOpenDeleteModal,
 }: PrivacyTabProps) {
@@ -377,7 +385,7 @@ export function PrivacyTab({
         </div>
       </GlassCard>
 
-      {/* Insurance Certificates — gated behind compliance flag */}
+      {/* Insurance records — raw documents and sensitive data are prohibited. */}
       {insuranceEnabled && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
@@ -424,7 +432,7 @@ export function PrivacyTab({
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <Select
                   label={t('insurance.type_label')}
                   selectedKeys={[insuranceType]}
@@ -443,19 +451,29 @@ export function PrivacyTab({
                   <SelectItem key="personal_accident" id="personal_accident">{t('insurance.personal_accident')}</SelectItem>
                   <SelectItem key="other" id="other">{t('insurance.other')}</SelectItem>
                 </Select>
-                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-border">
-                  <Upload className="w-4 h-4 text-theme-primary" aria-hidden="true" />
-                  <span className="text-sm font-medium text-theme-primary">
-                    {insuranceUploading ? t('insurance.uploading') : t('insurance.upload_certificate')}
-                  </span>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    className="hidden"
-                    onChange={onInsuranceUpload}
-                    disabled={insuranceUploading}
-                  />
-                </label>
+                <Input
+                  label={t('insurance.provider_label')}
+                  value={insuranceProvider}
+                  maxLength={255}
+                  onValueChange={onInsuranceProviderChange}
+                  variant="secondary"
+                />
+                <Input
+                  label={t('insurance.expiry_label')}
+                  type="date"
+                  value={insuranceExpiry}
+                  onValueChange={onInsuranceExpiryChange}
+                  isRequired
+                  variant="secondary"
+                />
+                <Button
+                  onPress={onInsuranceSave}
+                  isLoading={insuranceUploading}
+                  isDisabled={!insuranceExpiry}
+                  className="self-end"
+                >
+                  {t('insurance.save_record')}
+                </Button>
               </div>
             </>
           )}

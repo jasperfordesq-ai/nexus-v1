@@ -9,7 +9,6 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
-  Linking,
   Platform,
   RefreshControl,
   Text,
@@ -43,6 +42,8 @@ import OfflineBanner from '@/components/OfflineBanner';
 import TypingIndicator from '@/components/TypingIndicator';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 import { resolveMediaUrl } from '@/lib/utils/resolveImageUrl';
+import { authenticatedMediaRequest } from '@/lib/api/client';
+import { openAuthenticatedMessageMedia } from '@/lib/messageMedia';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 const REACTION_EMOJIS = ['\u{1F44D}', '\u2764\uFE0F', '\u{1F602}', '\u{1F62E}', '\u{1F622}', '\u{1F64F}'];
@@ -730,6 +731,26 @@ function ThreadScreenInner() {
   );
 }
 
+function AuthenticatedMessageImage({ path }: { path: string }) {
+  const [source, setSource] = useState<{ uri: string; headers: Record<string, string> } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void authenticatedMediaRequest(path).then((request) => {
+      if (active) setSource(request);
+    }).catch(() => {
+      if (active) setSource(null);
+    });
+    return () => { active = false; };
+  }, [path]);
+
+  return source ? (
+    <Image source={source} className="h-[132px] w-[180px] rounded-panel-inner" resizeMode="cover" />
+  ) : (
+    <View className="h-[132px] w-[180px] rounded-panel-inner bg-default-100" />
+  );
+}
+
 function RestrictionNotice({
   primary,
   t,
@@ -908,16 +929,12 @@ function MessageBubble({
                     className="self-start rounded-panel-inner p-0"
                     onPress={() => {
                       if (attachment.url) {
-                        void Linking.openURL(attachment.url);
+                        void openAuthenticatedMessageMedia(attachment.url, attachmentLabel);
                       }
                     }}
                   >
                     {isImage ? (
-                      <Image
-                        source={{ uri: attachment.url }}
-                        className="h-[132px] w-[180px] rounded-panel-inner"
-                        resizeMode="cover"
-                      />
+                      <AuthenticatedMessageImage path={attachment.url} />
                     ) : (
                       <View className="max-w-[220px] flex-row items-center gap-2 rounded-panel-inner px-3 py-2" style={{ backgroundColor: isOwn ? 'rgba(255,255,255,0.14)' : theme.bg }}>
                         <Ionicons name="document-text-outline" size={18} color={isOwn ? '#fff' : theme.textSecondary} />

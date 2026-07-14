@@ -123,7 +123,7 @@ class VoiceMessageController extends BaseApiController
             return $this->respondWithData([
                 'success'              => true,
                 'message_id'           => $messageId,
-                'audio_url'            => $audioResult['url'],
+                'audio_url'            => $messageId ? "/api/v2/messages/{$messageId}/voice" : null,
                 'duration'             => $audioResult['duration'],
                 'transcript'           => $transcript,
                 'transcript_language'  => $transcriptLanguage,

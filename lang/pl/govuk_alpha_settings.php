@@ -117,11 +117,11 @@ return [
     ],
 
     'insurance' => [
-        'title' => 'Insurance certificates',
+        'title' => 'Dane ubezpieczenia',
         'caption' => 'Account settings',
-        'description' => 'Upload proof of insurance so the team can verify your cover. Accepted file types are PDF, JPG and PNG, up to 10MB.',
-        'certificates_heading' => 'Your certificates',
-        'certificates_empty' => 'You have not uploaded any insurance certificates yet.',
+        'description' => 'Zapisz tylko rodzaj ubezpieczenia, ubezpieczyciela i datę wygaśnięcia. Nie przesyłaj dokumentów ani poufnych danych polisy.',
+        'certificates_heading' => 'Twoje dane ubezpieczenia',
+        'certificates_empty' => 'Nie dodano jeszcze danych ubezpieczenia.',
         'provider_label_short' => 'Provider',
         'expiry_label_short' => 'Expires',
         'status_label' => 'Status',
@@ -143,15 +143,15 @@ return [
             'personal_accident' => 'Personal accident',
             'other' => 'Other',
         ],
-        'upload_heading' => 'Upload a certificate',
+        'upload_heading' => 'Dodaj dane ubezpieczenia',
         'type_label' => 'Type of insurance',
         'provider_label' => 'Insurance provider (optional)',
         'policy_label' => 'Policy number (optional)',
-        'expiry_label' => 'Expiry date (optional)',
+        'expiry_label' => 'Data wygaśnięcia',
         'expiry_hint' => 'For example, 27 3 2027',
         'file_label' => 'Certificate file',
         'file_hint' => 'Upload a PDF, JPG or PNG, up to 10MB.',
-        'upload_button' => 'Upload certificate',
+        'upload_button' => 'Zapisz dane ubezpieczenia',
     ],
 
     'states' => [
@@ -181,6 +181,9 @@ return [
         'insurance-file-type' => 'The certificate must be a PDF, JPG or PNG file.',
         'insurance-file-large' => 'The certificate file must be smaller than 10MB.',
         'insurance-failed' => 'Sorry, we could not upload your certificate. Please try again.',
+        'insurance-recorded' => 'Dane ubezpieczenia zostały zapisane.',
+        'insurance-file-forbidden' => 'Nie przesyłaj dokumentów ubezpieczeniowych ani poufnych danych polisy.',
+        'insurance-expiry-required' => 'Wprowadź prawidłową datę wygaśnięcia.',
     ],
 
     'nav' => [

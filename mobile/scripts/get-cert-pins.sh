@@ -29,7 +29,7 @@ if ! command -v openssl &>/dev/null; then
 fi
 
 # Fetch the full certificate chain from the server
-CHAIN=$(openssl s_client -connect "${HOST}:${PORT}" -showcerts 2>/dev/null)
+CHAIN=$(openssl s_client -servername "$HOST" -connect "${HOST}:${PORT}" -showcerts </dev/null 2>/dev/null)
 
 if [[ -z "$CHAIN" ]]; then
   echo "ERROR: Could not connect to ${HOST}:${PORT}. Check network connectivity." >&2
@@ -49,6 +49,25 @@ if [[ -z "$LEAF_PIN" ]]; then
 else
   echo "$LEAF_PIN"
 fi
+
+echo ""
+echo "=== Full served chain pins (leaf first) ==="
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+awk -v dir="$TMP_DIR" '
+  /-----BEGIN CERTIFICATE-----/ { count++; output = dir "/cert-" count ".pem"; active = 1 }
+  active { print > output }
+  /-----END CERTIFICATE-----/ { close(output); active = 0 }
+' <<< "$CHAIN"
+for cert in "$TMP_DIR"/cert-*.pem; do
+  [ -f "$cert" ] || continue
+  subject=$(openssl x509 -in "$cert" -noout -subject | sed 's/^subject=//')
+  pin=$(openssl x509 -in "$cert" -pubkey -noout \
+    | openssl pkey -pubin -outform DER 2>/dev/null \
+    | openssl dgst -sha256 -binary \
+    | base64 | tr -d '\n')
+  echo "$pin  $subject"
+done
 
 echo ""
 echo "=== Instructions ==="

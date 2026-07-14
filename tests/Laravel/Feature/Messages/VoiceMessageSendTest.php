@@ -33,12 +33,12 @@ class VoiceMessageSendTest extends TestCase
         TenantContext::setById($tenantId);
         $this->app->instance('tenant.id', $tenantId);
 
-        $voiceDirectory = public_path("uploads/{$tenantId}/voice_messages");
+        $voiceDirectory = storage_path("app/private/message-media/{$tenantId}/voice");
         if (!is_dir($voiceDirectory)) {
             mkdir($voiceDirectory, 0775, true);
         }
-        $voiceUrl = "/uploads/{$tenantId}/voice_messages/voice_test_" . uniqid() . '.webm';
-        $voicePath = public_path(ltrim($voiceUrl, '/'));
+        $voiceUrl = "message-media/{$tenantId}/voice/voice_test_" . uniqid() . '.webm';
+        $voicePath = storage_path('app/private/' . $voiceUrl);
         file_put_contents($voicePath, 'test voice bytes');
 
         try {

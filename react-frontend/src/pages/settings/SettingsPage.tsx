@@ -297,6 +297,8 @@ export function SettingsPage() {
   const [insuranceLoading, setInsuranceLoading] = useState(false);
   const [insuranceUploading, setInsuranceUploading] = useState(false);
   const [insuranceType, setInsuranceType] = useState('public_liability');
+  const [insuranceProvider, setInsuranceProvider] = useState('');
+  const [insuranceExpiry, setInsuranceExpiry] = useState('');
   const activeTabLabel = t(`tabs.${activeTab === 'linked-accounts' ? 'linked' : activeTab === 'connected-accounts' ? 'connected_accounts' : activeTab}`);
 
   const setTabSearchParam = useCallback((tab: SettingsTabKey) => {
@@ -907,8 +909,6 @@ export function SettingsPage() {
       if (response.success) {
         setTwoFactorEnabled(false);
         setBackupCodesRemaining(0);
-        // Clear the trusted device token since 2FA is now disabled
-        tokenManager.clearTrustedDeviceToken();
         toast.success(t('toasts.twofa_disabled'), t('toasts.twofa_disabled_desc'));
         twoFactorDisableModal.onClose();
         setTwoFactorDisablePassword('');
@@ -1000,41 +1000,34 @@ export function SettingsPage() {
     gdprModal.onOpen();
   }
 
-  // Insurance certificate upload handler — #7: uses shared API client instead of raw fetch
-  async function handleInsuranceUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error(t('toasts.invalid_file'), t('toasts.invalid_insurance_file_desc'));
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(t('toasts.file_too_large'), t('toasts.insurance_file_too_large_desc'));
+  // Insurance metadata only. Raw documents and sensitive policy data are prohibited.
+  async function handleInsuranceRecord() {
+    if (!insuranceExpiry) {
+      toast.error(t('toasts.request_failed'), t('insurance.expiry_required'));
       return;
     }
 
     setInsuranceUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('certificate_file', file);
-      formData.append('insurance_type', insuranceType);
-
-      const res = await api.upload('/v2/users/me/insurance', formData);
+      const res = await api.post('/v2/users/me/insurance', {
+        insurance_type: insuranceType,
+        provider_name: insuranceProvider.trim() || null,
+        expiry_date: insuranceExpiry,
+      });
 
       if (res.success) {
-        toast.success(t('toasts.certificate_uploaded'), t('toasts.certificate_uploaded_desc'));
+        toast.success(t('insurance.record_saved'), t('insurance.record_saved_desc'));
         loadInsuranceCerts();
         setInsuranceType('public_liability');
+        setInsuranceProvider('');
+        setInsuranceExpiry('');
       } else {
-        toast.error(t('toasts.upload_failed'), res.error || t('toasts.insurance_upload_failed_desc'));
+        toast.error(t('toasts.request_failed'), res.error || t('insurance.record_failed_desc'));
       }
     } catch {
-      toast.error(t('toasts.upload_failed'), t('toasts.insurance_upload_failed_desc'));
+      toast.error(t('toasts.request_failed'), t('insurance.record_failed_desc'));
     } finally {
       setInsuranceUploading(false);
-      event.target.value = '';
     }
   }
 
@@ -1258,13 +1251,17 @@ export function SettingsPage() {
             insuranceLoading={insuranceLoading}
             insuranceUploading={insuranceUploading}
             insuranceType={insuranceType}
+            insuranceProvider={insuranceProvider}
+            insuranceExpiry={insuranceExpiry}
             insuranceEnabled={!!tenant?.compliance?.insurance_enabled}
             federationEnabled={!!hasFeature?.('federation')}
             onPrivacyChange={(updater) => { setPrivacy(updater); markDirty('privacy'); }}
             onSavePrivacy={savePrivacy}
             onRetryPrivacy={loadPrivacySettings}
-            onInsuranceUpload={handleInsuranceUpload}
+            onInsuranceSave={handleInsuranceRecord}
             onInsuranceTypeChange={setInsuranceType}
+            onInsuranceProviderChange={setInsuranceProvider}
+            onInsuranceExpiryChange={setInsuranceExpiry}
             onOpenGdprModal={openGdprModal}
             onOpenDeleteModal={handleOpenDeleteModal}
           />

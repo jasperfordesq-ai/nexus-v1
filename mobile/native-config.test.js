@@ -134,11 +134,11 @@ describe('native app configuration', () => {
     expect(app.android.adaptiveIcon.foregroundImage).toBe('./assets/adaptive-icon.png');
   });
 
-  it('does not block cold starts on launch-time remote update checks', () => {
+  it('checks the pinned release channel for updates on launch', () => {
     const app = readJson('app.json').expo;
 
     expect(app.updates.enabled).toBe(true);
-    expect(app.updates.checkAutomatically).toBe('ON_ERROR_RECOVERY');
+    expect(app.updates.checkAutomatically).toBe('ON_LOAD');
     expect(app.updates.fallbackToCacheTimeout).toBe(0);
   });
 
@@ -190,12 +190,12 @@ describe('native app configuration', () => {
     expect(envExample).toContain('http://localhost:8090');
   });
 
-  it('keeps the network-security source fail-closed for a future explicit config plugin', () => {
+  it('keeps the generated network-security source fail-closed', () => {
     const networkConfig = read('android-network-security-config.xml');
 
-    expect(networkConfig).toContain('<domain-config cleartextTrafficPermitted="true">');
-    expect(networkConfig).toContain('<domain includeSubdomains="false">10.0.2.2</domain>');
-    expect(networkConfig).toContain('<domain includeSubdomains="false">localhost</domain>');
+    expect(networkConfig).not.toContain('cleartextTrafficPermitted="true"');
+    expect(networkConfig).not.toContain('10.0.2.2');
+    expect(networkConfig).not.toContain('localhost');
     expect(networkConfig).toContain('<base-config cleartextTrafficPermitted="false">');
   });
 });

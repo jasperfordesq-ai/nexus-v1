@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react';
 import { LogBox } from 'react-native';
 import { Stack, router, usePathname } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -206,13 +207,22 @@ function RootNavigator() {
   const pendingDeepLinkRef = useRef<string | null>(null);
 
   useEffect(() => {
+    void Linking.getInitialURL().then((url) => {
+      if (url) pendingDeepLinkRef.current = url;
+    });
+    const linkSubscription = Linking.addEventListener('url', ({ url }) => {
+      pendingDeepLinkRef.current = url;
+    });
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as { link?: string } | undefined;
       if (data?.link) {
         pendingDeepLinkRef.current = data.link;
       }
     });
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      linkSubscription.remove();
+    };
   }, []);
 
   // Auth redirect — check for a pending deep link BEFORE defaulting to home.

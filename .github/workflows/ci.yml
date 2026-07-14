@@ -49,6 +49,8 @@ jobs:
     outputs:
       php: ${{ steps.filter.outputs.php }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+      accessible: ${{ steps.filter.outputs.accessible }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -72,6 +74,15 @@ jobs:
               - '.github/workflows/ci.yml'
             frontend:
               - 'react-frontend/**'
+              - '.github/workflows/ci.yml'
+            mobile:
+              - 'mobile/**'
+              - '.github/workflows/ci.yml'
+            accessible:
+              - 'accessible-frontend/**'
+              - 'app/Http/Controllers/GovukAlpha/**'
+              - 'lang/**/govuk_alpha*.php'
+              - 'vite.accessible-frontend.config.ts'
               - '.github/workflows/ci.yml'
 
   # ─────────────────────────────────────────────────────────────────
@@ -735,6 +746,9 @@ jobs:
 
       - name: "BLOCKING: Block new legacy SQL migrations (use Laravel instead)"
         run: bash scripts/check-no-new-legacy-sql.sh origin/${{ github.base_ref || 'main' }}
+
+      - name: "BLOCKING: Prerender cron installer runtime test"
+        run: bash tests/scripts/install-prerender-cron-test.sh
 
       - name: "WARNING: Schema dump drift detection"
         run: bash scripts/check-schema-drift.sh || true
@@ -1515,3 +1529,160 @@ jobs:
             echo "PASS: No WCAG 2.1 AA violations detected."
             exit 0
           fi
+
+  mobile-release:
+    name: Android Native Release Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install mobile dependencies
+        working-directory: mobile
+        run: npm ci
+
+      - name: "BLOCKING: Verify Android release and OTA policy"
+        working-directory: mobile
+        run: npm run verify:release
+
+      - name: "BLOCKING: Mobile typecheck and tests"
+        working-directory: mobile
+        run: |
+          npm run type-check
+          npm test -- --runInBand
+          npx expo-doctor
+
+      - name: "BLOCKING: Generate and inspect native Android policy"
+        working-directory: mobile
+        run: |
+          npx expo prebuild --platform android --no-install --clean
+          test -f android/app/src/main/res/xml/network_security_config.xml
+          grep -q 'android:networkSecurityConfig="@xml/network_security_config"' android/app/src/main/AndroidManifest.xml
+          grep -q '<domain includeSubdomains="false">api.project-nexus.ie</domain>' android/app/src/main/res/xml/network_security_config.xml
+          grep -q 'digest="SHA-256"' android/app/src/main/res/xml/network_security_config.xml
+
+  accessible-frontend:
+    name: Accessible Frontend Release Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: changes
+    if: needs.changes.outputs.accessible == 'true' || github.event_name == 'workflow_dispatch'
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: nexus_test
+          MYSQL_USER: nexus
+          MYSQL_PASSWORD: nexus_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: nexus_test
+      DB_USER: root
+      DB_PASS: testing
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, zip, intl
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          composer install --no-interaction --prefer-dist
+          npx playwright install --with-deps chromium
+
+      - name: Prepare accessible frontend test database
+        run: |
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test < database/schema/mysql-schema.sql
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT INTO tenants (id, name, slug, is_active) VALUES (1, 'Test Tenant', 'test-tenant', 1), (2, 'Hour Timebank', 'hour-timebank', 1);"
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
+          php artisan migrate --force
+
+      - name: "BLOCKING: Build accessible frontend"
+        run: npm run build:accessible-frontend
+
+      - name: "BLOCKING: Accessible frontend PHP contract"
+        run: php vendor/bin/phpunit --no-coverage --testsuite=Laravel --filter=GovukAlphaFrontendTest
+
+      - name: "BLOCKING: Accessible frontend browser accessibility"
+        run: |
+          php -S 127.0.0.1:8090 -t httpdocs httpdocs/index.php > /tmp/accessible-frontend.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:8090/hour-timebank/accessible/login >/dev/null && break
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8090/hour-timebank/accessible/login >/dev/null
+          npx playwright test --config=e2e/playwright.alpha.config.ts
+
+  release-gate:
+    name: Release Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - changes
+      - php-checks
+      - react-build
+      - api-contract
+      - docker-verify
+      - dockerfile-drift
+      - migration-gate
+      - i18n-changed
+      - i18n-drift
+      - docs-hygiene
+      - spdx-compliance
+      - regression-patterns
+      - e2e-smoke
+      - accessibility-check
+      - mobile-release
+      - accessible-frontend
+
+    steps:
+      - name: Require every authoritative release gate
+        env:
+          RESULTS: >-
+            ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Gate results: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              echo "::error::At least one authoritative release gate failed or was cancelled."
+              exit 1
+            fi
+          done

@@ -131,7 +131,8 @@ class SsoAuthController extends Controller
                 (string) $result['browser_challenge'],
                 isset($result['identity_link']) && is_array($result['identity_link'])
                     ? $result['identity_link']
-                    : null
+                    : null,
+                (bool) ($result['upstream_mfa_verified'] ?? false)
             );
             if (($issuance['status'] ?? null) !== 'issued' || empty($issuance['callback_code'])) {
                 throw new \RuntimeException(

@@ -37,4 +37,8 @@ return [
     // check (PasswordHistoryService). 0 disables the history check; the
     // current password is always rejected regardless.
     'password_history_depth' => env('PASSWORD_HISTORY_DEPTH', 5),
+
+    // Applies equally to password and federated sign-in. Federated sessions
+    // may satisfy it only with explicit validated upstream MFA assurance.
+    'force_admin_2fa' => filter_var(env('FORCE_ADMIN_2FA', false), FILTER_VALIDATE_BOOLEAN),
 ];

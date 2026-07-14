@@ -65,6 +65,28 @@ export function registerUnauthorizedCallback(cb: () => void): void {
   onUnauthorizedCallback = cb;
 }
 
+/** Build headers for native media players/downloaders without exposing tokens in URLs. */
+export async function authenticatedMediaRequest(path: string): Promise<{ uri: string; headers: Record<string, string> }> {
+  const base = new URL(API_BASE_URL);
+  const resolved = new URL(path, `${base.origin}/`);
+  if (resolved.origin !== base.origin || !resolved.pathname.startsWith('/api/v2/messages/')) {
+    throw new ApiResponseError(400, i18n.t('common:errors.requestFailed'));
+  }
+  const [token, tenantSlug] = await Promise.all([
+    storage.get(STORAGE_KEYS.AUTH_TOKEN),
+    storage.get(STORAGE_KEYS.TENANT_SLUG),
+  ]);
+  if (!token) throw new ApiResponseError(401, i18n.t('common:errors.unauthorized'));
+  return {
+    uri: resolved.toString(),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'X-Tenant-Slug': tenantSlug?.trim() || DEFAULT_TENANT,
+      'X-Nexus-Mobile': '1',
+    },
+  };
+}
+
 /**
  * Silently refresh the access token using the stored refresh token.
  * Concurrent refresh attempts are collapsed into a single request —

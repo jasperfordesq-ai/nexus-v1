@@ -117,11 +117,11 @@ return [
     ],
 
     'insurance' => [
-        'title' => 'Insurance certificates',
+        'title' => 'Registros de seguro',
         'caption' => 'Account settings',
-        'description' => 'Upload proof of insurance so the team can verify your cover. Accepted file types are PDF, JPG and PNG, up to 10MB.',
-        'certificates_heading' => 'Your certificates',
-        'certificates_empty' => 'You have not uploaded any insurance certificates yet.',
+        'description' => 'Registra solo el tipo de seguro, el proveedor y la fecha de vencimiento. No subas documentos ni datos sensibles de la póliza.',
+        'certificates_heading' => 'Tus registros de seguro',
+        'certificates_empty' => 'Todavía no has añadido registros de seguro.',
         'provider_label_short' => 'Provider',
         'expiry_label_short' => 'Expires',
         'status_label' => 'Status',
@@ -143,15 +143,15 @@ return [
             'personal_accident' => 'Personal accident',
             'other' => 'Other',
         ],
-        'upload_heading' => 'Upload a certificate',
+        'upload_heading' => 'Añadir un registro de seguro',
         'type_label' => 'Type of insurance',
         'provider_label' => 'Insurance provider (optional)',
         'policy_label' => 'Policy number (optional)',
-        'expiry_label' => 'Expiry date (optional)',
+        'expiry_label' => 'Fecha de vencimiento',
         'expiry_hint' => 'For example, 27 3 2027',
         'file_label' => 'Certificate file',
         'file_hint' => 'Upload a PDF, JPG or PNG, up to 10MB.',
-        'upload_button' => 'Upload certificate',
+        'upload_button' => 'Guardar registro de seguro',
     ],
 
     'states' => [
@@ -181,6 +181,9 @@ return [
         'insurance-file-type' => 'The certificate must be a PDF, JPG or PNG file.',
         'insurance-file-large' => 'The certificate file must be smaller than 10MB.',
         'insurance-failed' => 'Sorry, we could not upload your certificate. Please try again.',
+        'insurance-recorded' => 'Se ha guardado tu registro de seguro.',
+        'insurance-file-forbidden' => 'No subas documentos de seguro ni datos sensibles de la póliza.',
+        'insurance-expiry-required' => 'Introduce una fecha de vencimiento válida.',
     ],
 
     'nav' => [

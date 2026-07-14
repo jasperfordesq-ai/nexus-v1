@@ -94,13 +94,16 @@ class MessageAttachmentTest extends TestCase
     // Accessor: getUrlAttribute
     // -------------------------------------------------------------------
 
-    public function test_url_accessor_returns_file_url_value(): void
+    public function test_url_accessor_returns_authenticated_delivery_url(): void
     {
         $attachment = $this->makeAttachment(['file_url' => 'https://cdn.example.com/photo.jpg']);
-        $this->assertSame('https://cdn.example.com/photo.jpg', $attachment->url);
+        $this->assertSame(
+            "/api/v2/messages/{$attachment->message_id}/attachments/{$attachment->id}",
+            $attachment->url,
+        );
     }
 
-    public function test_url_accessor_returns_empty_string_when_null(): void
+    public function test_url_accessor_never_exposes_empty_raw_storage_value(): void
     {
         $msgId = $this->seedMessage();
         DB::table('message_attachments')->insert([
@@ -113,7 +116,10 @@ class MessageAttachmentTest extends TestCase
             'file_size'  => 0,
         ]);
         $attachment = MessageAttachment::where('message_id', $msgId)->firstOrFail();
-        $this->assertSame('', $attachment->url);
+        $this->assertSame(
+            "/api/v2/messages/{$attachment->message_id}/attachments/{$attachment->id}",
+            $attachment->url,
+        );
     }
 
     // -------------------------------------------------------------------
@@ -227,6 +233,7 @@ class MessageAttachmentTest extends TestCase
         $this->assertArrayHasKey('name', $arr);
         $this->assertArrayHasKey('size', $arr);
         $this->assertArrayHasKey('type', $arr);
+        $this->assertArrayNotHasKey('file_path', $arr);
     }
 
     // -------------------------------------------------------------------

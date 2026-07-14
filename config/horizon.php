@@ -40,9 +40,15 @@ return [
             'queue' => ['federation-high', 'federation', 'default', 'search', 'webhooks'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 4,
+            // Five queues are listed above. Keep at least one available
+            // process per queue so a busy default queue cannot starve
+            // federation, search, or webhook work.
+            'maxProcesses' => 5,
             'minProcesses' => 1,
-            'maxTime' => 60,
+            // Recycle hourly rather than every minute. The prior one-minute
+            // lifetime caused needless process churn and inflated the steady
+            // Horizon footprint.
+            'maxTime' => 3600,
             'maxJobs' => 500,
             'memory' => 256,
             'tries' => 3,
@@ -53,7 +59,7 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 4,
+                'maxProcesses' => 5,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],

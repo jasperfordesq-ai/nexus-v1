@@ -7,7 +7,7 @@
 namespace Tests\Laravel\Unit\Core;
 
 use App\Core\AudioUploader;
-use PHPUnit\Framework\TestCase;
+use Tests\Laravel\TestCase;
 
 class AudioUploaderTest extends TestCase
 {
@@ -185,10 +185,11 @@ class AudioUploaderTest extends TestCase
         // validation, content sniffing AND persistence — must succeed.
         $result = AudioUploader::uploadFromBase64(base64_encode($content), $claimedMime, 5);
 
-        $this->assertStringStartsWith('/uploads/', $result['url']);
-        $this->assertSame($this->docRoot . $result['url'], $result['local_path']);
+        $this->assertStringStartsWith('message-media/', $result['url']);
+        $this->assertStringNotContainsString('/httpdocs/', str_replace('\\', '/', $result['local_path']));
         $this->assertFileExists($result['local_path']);
         $this->assertSame($content, file_get_contents($result['local_path']));
+        @unlink($result['local_path']);
     }
 
     public function test_resolveTenantVoiceFilePath_accepts_only_canonical_server_issued_file(): void

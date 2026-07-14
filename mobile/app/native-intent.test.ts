@@ -48,4 +48,10 @@ describe('native intent route rewriting', () => {
     expect(mapSystemPathToNativeRoute('/(modals)/exchange-detail?id=90877')).toBeNull();
     expect(redirectSystemPath({ path: '/(modals)/exchange-detail?id=90877', initial: false })).toBe('/(modals)/exchange-detail?id=90877');
   });
+
+  it('rejects untrusted web origins and non-https links', () => {
+    expect(mapSystemPathToNativeRoute('https://evil.example/messages/123')).toBeNull();
+    expect(mapSystemPathToNativeRoute('http://app.project-nexus.ie/messages/123')).toBeNull();
+    expect(mapSystemPathToNativeRoute('javascript:alert(1)')).toBeNull();
+  });
 });

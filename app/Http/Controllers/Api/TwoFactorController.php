@@ -350,8 +350,11 @@ class TwoFactorController extends BaseApiController
             Log::warning('[2FA] Failed to send 2FA disabled email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
-        return $this->respondWithData([
+        $response = $this->respondWithData([
             'message' => __('api_controllers_2.two_factor.disabled'),
         ]);
+        $response->withCookie(cookie()->forget(TotpService::trustedDeviceCookieName()));
+
+        return $response;
     }
 }

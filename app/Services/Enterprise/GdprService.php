@@ -1212,6 +1212,58 @@ class GdprService
             // user and scrub the body where this user authored it. The row
             // stays so the counterparty's audit trail remains intact.
             //
+            // Message attachments are private user content. Delete attachments
+            // authored by the erased member while preserving any physical file
+            // still referenced by another sender. Failed unlinks retain their
+            // database pointer so the erasure remains retryable.
+            try {
+                $attachmentRows = $this->query(
+                    "SELECT ma.id, ma.file_path, m.sender_id
+                       FROM message_attachments ma
+                       JOIN messages m ON m.id = ma.message_id AND m.tenant_id = ma.tenant_id
+                      WHERE ma.tenant_id = ?",
+                    [$this->tenantId]
+                )->fetchAll();
+                $pathsInUseByOthers = [];
+                foreach ($attachmentRows as $attachmentRow) {
+                    if ((int) ($attachmentRow['sender_id'] ?? 0) === $userId) continue;
+                    $resolved = \App\Core\MessageAttachmentUploader::resolveForTenant(
+                        (string) ($attachmentRow['file_path'] ?? ''),
+                        $this->tenantId,
+                    );
+                    if ($resolved !== null) $pathsInUseByOthers[$resolved] = true;
+                }
+                foreach ($attachmentRows as $attachmentRow) {
+                    if ((int) ($attachmentRow['sender_id'] ?? 0) !== $userId) continue;
+                    $attachmentId = (int) ($attachmentRow['id'] ?? 0);
+                    $resolved = \App\Core\MessageAttachmentUploader::resolveForTenant(
+                        (string) ($attachmentRow['file_path'] ?? ''),
+                        $this->tenantId,
+                    );
+                    $deleted = $resolved === null
+                        || isset($pathsInUseByOthers[$resolved])
+                        || @unlink($resolved);
+                    if ($deleted) {
+                        $this->query(
+                            'DELETE FROM message_attachments WHERE id = ? AND tenant_id = ?',
+                            [$attachmentId, $this->tenantId]
+                        );
+                    } else {
+                        $criticalErasureFailed = true;
+                        $this->logger->error('GDPR CRITICAL erasure step failed (message attachment unlink)', [
+                            'user_id' => $userId,
+                            'attachment_id' => $attachmentId,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $criticalErasureFailed = true;
+                $this->logger->error('GDPR CRITICAL erasure step failed (message attachments)', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Voice recordings are biometric-adjacent PII stored on disk under
             // uploads/{tenant}/voice_messages (NOT the per-user uploads dir
             // that step 6 removes). Treat every database pointer as untrusted:

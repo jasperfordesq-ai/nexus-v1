@@ -497,7 +497,7 @@ class SettingsAuthParityTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function test_settings_insurance_upload_requires_file(): void
+    public function test_settings_insurance_record_requires_expiry(): void
     {
         $this->enableInsurance();
         $this->authenticatedUser();
@@ -507,13 +507,13 @@ class SettingsAuthParityTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        $this->assertStringContainsString('status=insurance-file-required', (string) $response->headers->get('Location'));
+        $this->assertStringContainsString('status=insurance-expiry-required', (string) $response->headers->get('Location'));
     }
 
-    public function test_settings_insurance_upload_persists_certificate(): void
+    public function test_settings_insurance_record_persists_metadata_only(): void
     {
         $this->enableInsurance();
-        $me = $this->authenticatedUser(['name' => 'Upload Cert Me']);
+        $me = $this->authenticatedUser(['name' => 'Insurance Record Me']);
 
         // A valid PNG file so finfo reports image/png.
         $pngBytes = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
@@ -525,16 +525,19 @@ class SettingsAuthParityTest extends TestCase
         $response = $this->post("/{$this->testTenantSlug}/accessible/settings/insurance", [
             'insurance_type' => 'professional_indemnity',
             'provider_name' => 'Indemnity Co',
-            'certificate_file' => $file,
+            'expiry_date' => '2027-01-01',
         ]);
 
         $response->assertRedirect();
-        $this->assertStringContainsString('status=insurance-uploaded', (string) $response->headers->get('Location'));
+        $this->assertStringContainsString('status=insurance-recorded', (string) $response->headers->get('Location'));
         $this->assertDatabaseHas('insurance_certificates', [
             'user_id' => $me->id,
             'tenant_id' => $this->testTenantId,
             'insurance_type' => 'professional_indemnity',
             'provider_name' => 'Indemnity Co',
+            'expiry_date' => '2027-01-01',
+            'certificate_file_path' => null,
+            'policy_number' => null,
             'status' => 'submitted',
         ]);
     }

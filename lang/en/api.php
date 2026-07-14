@@ -1967,6 +1967,9 @@ return [
     'credential_file_types'                => 'Only PDF, JPEG, PNG, and WebP files are allowed',
     'insurance_file_types'                 => 'Only PDF, JPG, and PNG files are accepted',
     'insurance_upload_failed'              => 'Failed to upload insurance certificate',
+    'insurance_documents_forbidden'        => 'Insurance documents and sensitive policy data must not be uploaded.',
+    'insurance_expiry_required'             => 'Enter a valid insurance expiry date.',
+    'insurance_record_failed'               => 'Failed to save the insurance record.',
 
     // Onboarding
     'profile_photo_required'               => 'Profile photo is required to complete onboarding',

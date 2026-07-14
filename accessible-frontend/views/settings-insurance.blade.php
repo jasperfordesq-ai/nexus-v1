@@ -8,13 +8,12 @@
     @php
         $certificates = $certificates ?? [];
         $insuranceTypes = $insuranceTypes ?? [];
-        $successStates = ['insurance-uploaded'];
+        $successStates = ['insurance-recorded'];
         $errorAnchors = [
             'insurance-type-invalid' => 'insurance_type',
-            'insurance-file-required' => 'certificate_file',
-            'insurance-file-type' => 'certificate_file',
-            'insurance-file-large' => 'certificate_file',
-            'insurance-failed' => 'certificate_file',
+            'insurance-expiry-required' => 'expiry_date',
+            'insurance-file-forbidden' => 'insurance_type',
+            'insurance-failed' => 'insurance_type',
         ];
     @endphp
 
@@ -95,7 +94,7 @@
             <section aria-labelledby="insurance-upload-heading" id="upload">
                 <h2 class="govuk-heading-l" id="insurance-upload-heading">{{ __('govuk_alpha_settings.insurance.upload_heading') }}</h2>
 
-                <form method="post" action="{{ route('govuk-alpha.settings.insurance.upload', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" novalidate>
+                <form method="post" action="{{ route('govuk-alpha.settings.insurance.upload', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                     @csrf
                     @php
                         $typeError = ($errorAnchors[$status ?? ''] ?? null) === 'insurance_type';
@@ -120,30 +119,19 @@
                         <input class="govuk-input govuk-!-width-two-thirds" id="provider_name" name="provider_name" type="text" maxlength="255">
                     </div>
 
-                    <div class="govuk-form-group">
-                        <label class="govuk-label" for="policy_number">{{ __('govuk_alpha_settings.insurance.policy_label') }}</label>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="policy_number" name="policy_number" type="text" maxlength="100">
-                    </div>
-
-                    <div class="govuk-form-group">
+                    @php
+                        $expiryError = ($errorAnchors[$status ?? ''] ?? null) === 'expiry_date';
+                    @endphp
+                    <div class="govuk-form-group {{ $expiryError ? 'govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="expiry_date">{{ __('govuk_alpha_settings.insurance.expiry_label') }}</label>
                         <div id="expiry-date-hint" class="govuk-hint">{{ __('govuk_alpha_settings.insurance.expiry_hint') }}</div>
-                        <input class="govuk-input govuk-input--width-10" id="expiry_date" name="expiry_date" type="date" aria-describedby="expiry-date-hint">
-                    </div>
-
-                    @php
-                        $fileError = ($errorAnchors[$status ?? ''] ?? null) === 'certificate_file';
-                    @endphp
-                    <div class="govuk-form-group {{ $fileError ? 'govuk-form-group--error' : '' }}">
-                        <label class="govuk-label" for="certificate_file">{{ __('govuk_alpha_settings.insurance.file_label') }}</label>
-                        <div id="certificate-file-hint" class="govuk-hint">{{ __('govuk_alpha_settings.insurance.file_hint') }}</div>
-                        @if ($fileError)
-                            <p id="certificate-file-error" class="govuk-error-message">
+                        @if ($expiryError)
+                            <p id="expiry-date-error" class="govuk-error-message">
                                 <span class="govuk-visually-hidden">{{ __('govuk_alpha_settings.common.error_title') }}:</span>
                                 {{ __('govuk_alpha_settings.states.' . $status) }}
                             </p>
                         @endif
-                        <input class="govuk-file-upload" id="certificate_file" name="certificate_file" type="file" accept="application/pdf,image/jpeg,image/png" aria-describedby="certificate-file-hint{{ $fileError ? ' certificate-file-error' : '' }}">
+                        <input class="govuk-input govuk-input--width-10" id="expiry_date" name="expiry_date" type="date" required aria-describedby="expiry-date-hint{{ $expiryError ? ' expiry-date-error' : '' }}">
                     </div>
 
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha_settings.insurance.upload_button') }}</button>

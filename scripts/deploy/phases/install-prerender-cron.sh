@@ -25,6 +25,11 @@ REAPER_INTERVAL_MINUTES="${PRERENDER_REAPER_INTERVAL_MINUTES:-5}"
 
 log() { echo "[$(date -Is)] install-prerender-cron: $*"; }
 
+if ! [[ "$REAPER_INTERVAL_MINUTES" =~ ^[1-9]$|^[1-5][0-9]$ ]]; then
+    log "ERROR: PRERENDER_REAPER_INTERVAL_MINUTES must be an integer from 1 to 59 (received: $REAPER_INTERVAL_MINUTES)"
+    exit 64
+fi
+
 if [ ! -f "$PROCESSOR_SCRIPT" ]; then
     log "WARN: $PROCESSOR_SCRIPT not present — skipping cron install"
     exit 0
@@ -48,7 +53,7 @@ DEPLOY_DIR=$DEPLOY_DIR
 NEXUS_BLUEGREEN_STATE_FILE=$STATE_FILE
 
 # Claim & process the next queued prerender job every minute (host-side).
-# The processor acquires this lock internally. Wrapping it in a second `flock`
+# The processor acquires this lock internally. Wrapping it in a second flock
 # on the same file makes the child contend with its parent's lock and causes
 # every cron tick to exit without claiming a job.
 * * * * * root /bin/bash $PROCESSOR_SCRIPT >> $LOG_DIR/prerender-job-processor.log 2>&1

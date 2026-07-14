@@ -88,6 +88,12 @@ return [
         // Base URL identity providers redirect back to; defaults to
         // app.url. Override when the API is served from another host.
         'redirect_base' => env('SSO_REDIRECT_BASE'),
+        // Explicit ACR allow-list for upstream assertions accepted in place
+        // of local MFA. Validated `amr` MFA evidence is preferred.
+        'mfa_acr_values' => env(
+            'SSO_MFA_ACR_VALUES',
+            'urn:nist:ac:classes:aal2,urn:nist:ac:classes:aal3'
+        ),
     ],
 
     'slack' => [

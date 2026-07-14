@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';import Play from 'lucide-react/ic
 import Pause from 'lucide-react/icons/pause';
 import FileText from 'lucide-react/icons/file-text';
 import { resolveAssetUrl } from '@/lib/helpers';
+import { useAuthenticatedMedia } from '@/hooks/useAuthenticatedMedia';
 
 export interface VoiceMessagePlayerProps {
   audioUrl?: string;
@@ -33,6 +34,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
   const [duration, setDuration] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const authenticatedAudioUrl = useAuthenticatedMedia(audioUrl);
 
   useEffect(() => {
     // Create audio element
@@ -41,8 +43,8 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
 
     if (audioBlob) {
       audio.src = URL.createObjectURL(audioBlob);
-    } else if (audioUrl) {
-      audio.src = resolveAssetUrl(audioUrl);
+    } else if (authenticatedAudioUrl) {
+      audio.src = resolveAssetUrl(authenticatedAudioUrl);
     }
 
     audio.onloadedmetadata = () => {
@@ -64,7 +66,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
       }
       audio.pause();
     };
-  }, [audioUrl, audioBlob]);
+  }, [authenticatedAudioUrl, audioBlob]);
 
   function togglePlay() {
     const audio = audioRef.current;

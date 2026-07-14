@@ -129,6 +129,15 @@ class SecurityHeadersTest extends TestCase
         $this->assertEquals('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
     }
 
+    public function test_handle_configures_csp_reporting_endpoint(): void
+    {
+        $response = $this->middleware->handle(Request::create('/api/v2/feed', 'GET'), $this->makeNext());
+
+        $this->assertStringContainsString('report-uri /api/csp-report', (string) $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('report-to nexus-csp', (string) $response->headers->get('Content-Security-Policy'));
+        $this->assertSame('nexus-csp="/api/csp-report"', $response->headers->get('Reporting-Endpoints'));
+    }
+
     public function test_handle_preserves_a_stricter_endpoint_referrer_policy(): void
     {
         $request = Request::create('/api/v2/events/calendar/feed-tokens', 'POST');
