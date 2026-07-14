@@ -69,6 +69,8 @@ class ProductionContentSecurityPolicyTest extends TestCase
                 'media-src' => ["'self'", 'https:'],
                 'worker-src' => ["'self'", 'blob:'],
                 'frame-ancestors' => ["'self'"],
+                'report-uri' => ['https://api.project-nexus.ie/api/csp-report'],
+                'report-to' => ['nexus-csp'],
             ];
             foreach ($requiredSources as $directive => $sources) {
                 self::assertArrayHasKey($directive, $directives, "{$file} is missing {$directive}");
@@ -128,9 +130,15 @@ class ProductionContentSecurityPolicyTest extends TestCase
     {
         $lines = preg_split('/\R/', $source) ?: [];
         $spaPolicyCount = 0;
+        $reportingEndpointCount = 0;
         $resetPolicyCount = 0;
 
         foreach ($lines as $line) {
+            if (trim($line) === 'add_header Reporting-Endpoints \'nexus-csp="https://api.project-nexus.ie/api/csp-report"\' always;') {
+                $reportingEndpointCount++;
+                continue;
+            }
+
             if (! str_contains($line, 'add_header Content-Security-Policy')) {
                 continue;
             }
@@ -155,6 +163,11 @@ class ProductionContentSecurityPolicyTest extends TestCase
         }
 
         self::assertGreaterThan(0, $spaPolicyCount, "{$file} must emit the canonical SPA CSP");
+        self::assertSame(
+            $spaPolicyCount,
+            $reportingEndpointCount,
+            "{$file} must emit a reporting endpoint alongside every canonical SPA CSP",
+        );
         self::assertSame(1, $resetPolicyCount, "{$file} must have one route-scoped service-worker reset policy");
     }
 }
