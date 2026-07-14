@@ -19,6 +19,13 @@ type HeroUIRadioGroupProps = ComponentPropsWithoutRef<typeof HeroUIRadioGroup>;
 type RadioColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 type RadioSize = 'sm' | 'md' | 'lg';
 
+const visibleControlClass = [
+  '[border-width:1px]',
+  'border-[var(--text-muted)]',
+  'group-hover/radio:border-[var(--text-secondary)]',
+  'group-data-[selected=true]/radio:border-transparent',
+].join(' ');
+
 export type RadioProps = Omit<HeroUIRadioProps, 'children' | 'className' | 'color'> & {
   children?: ReactNode | HeroUIRadioProps['children'];
   className?: string;
@@ -103,7 +110,7 @@ export function Radio({
     return (
       <HeroUIRadio
         ref={ref}
-        className={combineClasses(classNames?.base, className)}
+        className={combineClasses('group/radio', classNames?.base, className)}
         {...props}
       >
         {children}
@@ -114,10 +121,10 @@ export function Radio({
   return (
     <HeroUIRadio
       ref={ref}
-      className={combineClasses(classNames?.base, className)}
+      className={combineClasses('group/radio', classNames?.base, className)}
       {...props}
     >
-      <HeroUIRadio.Control className={combineClasses(classNames?.wrapper, classNames?.control, colorClass(color), sizeClass(size))}>
+      <HeroUIRadio.Control className={combineClasses(visibleControlClass, classNames?.wrapper, classNames?.control, colorClass(color), sizeClass(size))}>
         <HeroUIRadio.Indicator />
       </HeroUIRadio.Control>
       {children || description ? (

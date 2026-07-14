@@ -66,6 +66,18 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
+
+vi.mock('@/contexts/NotificationsContext', () => ({
+  useNotificationsOptional: (...args: unknown[]) => mockUseNotifications(...args),
+}));
+
 vi.mock('./QuickCreateMenu', () => ({
   QuickCreateMenu: ({ isOpen }: { isOpen?: boolean }) => (
     isOpen ? <div data-testid="quick-create-menu">Quick Create</div> : null
@@ -163,6 +175,47 @@ describe('MobileTabBar', () => {
     it('renders Menu tab', () => {
       render(<MobileTabBar />);
       expect(screen.getByLabelText('Menu')).toBeInTheDocument();
+    });
+
+    it('keeps every tab label on one shared baseline', () => {
+      render(<MobileTabBar />);
+
+      const navigation = screen.getByLabelText('Mobile navigation');
+      const labels = navigation.querySelectorAll('[data-mobile-tab-label]');
+
+      expect(labels).toHaveLength(5);
+      labels.forEach((label) => {
+        expect(label).toHaveClass('absolute', 'inset-x-0', 'bottom-4');
+      });
+    });
+
+    it('reserves horizontal safe areas for landscape devices', () => {
+      render(<MobileTabBar />);
+
+      const navigation = screen.getByLabelText('Mobile navigation');
+      const tabList = navigation.querySelector('.items-stretch');
+
+      expect(tabList).toHaveClass(
+        'ps-[calc(var(--safe-area-left)+0.25rem)]',
+        'pe-[calc(var(--safe-area-right)+0.25rem)]',
+      );
+    });
+
+    it('gives the badged Messages tab the same flexible width as its siblings', () => {
+      render(<MobileTabBar />);
+
+      const messagesButton = screen.getByLabelText('Messages');
+      const badgeAnchor = messagesButton.closest('[data-slot="badge-anchor"]');
+
+      expect(badgeAnchor).toHaveClass('flex', 'min-w-0', 'flex-1');
+    });
+
+    it('keeps the raised Create action clear of the shared label row', () => {
+      render(<MobileTabBar />);
+
+      const createButton = screen.getByLabelText('Create new content');
+
+      expect(createButton.parentElement).toHaveClass('top-[-1rem]');
     });
   });
 

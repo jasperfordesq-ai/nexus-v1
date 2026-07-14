@@ -108,7 +108,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
       >
         {/* Glass surface */}
         <div className="bg-[var(--glass-bg)] backdrop-blur-xl border-t border-[var(--border-default)] shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <div className="flex items-stretch h-16 px-1">
+          <div className="flex h-16 items-stretch ps-[calc(var(--safe-area-left)+0.25rem)] pe-[calc(var(--safe-area-right)+0.25rem)]">
             {visibleTabs.map((tab) => {
               const Icon = tab.icon;
               const active = tab.path ? isActive(tab.path) : false;
@@ -118,23 +118,28 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                 return (
                   <div
                     key={tab.key}
-                    className="flex flex-col items-center justify-center flex-1 -mt-3"
+                    className="relative min-w-0 flex-1"
                   >
-                    <Button
-                      isIconOnly
-                      radius="full"
-                      onPress={tab.action}
-                      className="w-[52px] h-[52px] min-w-0 bg-gradient-to-br from-accent to-accent-gradient-end text-white shadow-lg shadow-accent/40 hover:shadow-accent/60 hover:scale-105 active:scale-95 transition-all duration-200"
-                      aria-label={t('mobile_tab.create_new_content')}
-                    >
-                      <motion.div
-                        animate={{ rotate: isCreateOpen ? 45 : 0 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    <div className="absolute start-1/2 top-[-1rem] -translate-x-1/2 rtl:translate-x-1/2">
+                      <Button
+                        isIconOnly
+                        radius="full"
+                        onPress={tab.action}
+                        className="w-[52px] h-[52px] min-w-0 bg-gradient-to-br from-accent to-accent-gradient-end text-white shadow-lg shadow-accent/40 hover:shadow-accent/60 hover:scale-105 active:scale-95 transition-all duration-200"
+                        aria-label={t('mobile_tab.create_new_content')}
                       >
-                        <Plus className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
-                      </motion.div>
-                    </Button>
-                    <span className="max-w-full truncate px-1 text-[10px] mt-0.5 font-medium text-theme-subtle leading-none">
+                        <motion.div
+                          animate={{ rotate: isCreateOpen ? 45 : 0 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                        >
+                          <Plus className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
+                        </motion.div>
+                      </Button>
+                    </div>
+                    <span
+                      data-mobile-tab-label
+                      className="pointer-events-none absolute inset-x-0 bottom-4 truncate px-1 text-center text-[10px] font-medium leading-none text-theme-subtle"
+                    >
                       {tab.label}
                     </span>
                   </div>
@@ -173,13 +178,18 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                     }`}
                   />
 
-                  <div className="relative z-10 flex min-w-0 max-w-full flex-col items-center gap-0.5">
+                  <div className="absolute inset-0 z-10">
                     <Icon
-                      className={`w-5 h-5 transition-transform duration-150 ${active ? 'scale-110' : ''}`}
+                      className={`absolute start-1/2 top-3 w-5 h-5 -translate-x-1/2 transition-transform duration-150 rtl:translate-x-1/2 ${active ? 'scale-110' : ''}`}
                       strokeWidth={active ? 2.5 : 2}
                       aria-hidden="true"
                     />
-                    <span className="max-w-full truncate px-1 text-[10px] font-medium leading-none">{tab.label}</span>
+                    <span
+                      data-mobile-tab-label
+                      className="pointer-events-none absolute inset-x-0 bottom-4 truncate px-1 text-center text-[10px] font-medium leading-none"
+                    >
+                      {tab.label}
+                    </span>
                   </div>
 
                   {/* Active indicator dot — always rendered, opacity-driven */}
@@ -203,6 +213,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                     size="sm"
                     placement="top-right"
                     isInvisible={!hasBadge}
+                    classNames={{ base: 'flex min-w-0 flex-1' }}
                     className="translate-x-[-8px] translate-y-[6px]"
                   >
                     {tabButton}

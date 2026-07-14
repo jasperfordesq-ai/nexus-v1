@@ -48,6 +48,26 @@ describe('Radio', () => {
 
     expect(screen.getByText('Helper text')).toBeInTheDocument();
   });
+
+  it('keeps the unselected control boundary visible in every theme', () => {
+    render(
+      <RadioGroup>
+        <Radio value="visible">Visible option</Radio>
+      </RadioGroup>
+    );
+
+    const input = screen.getByRole('radio', { name: 'Visible option' });
+    const radio = input.closest('[data-slot="radio"]');
+    const control = radio?.querySelector('[data-slot="radio-control"]');
+
+    expect(radio).not.toBeNull();
+    expect(radio).toHaveClass('group/radio');
+    expect(control).toHaveClass(
+      '[border-width:1px]',
+      'border-[var(--text-muted)]',
+      'group-data-[selected=true]/radio:border-transparent',
+    );
+  });
 });
 
 describe('RadioGroup', () => {
