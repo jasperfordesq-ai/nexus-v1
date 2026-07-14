@@ -1628,6 +1628,7 @@ jobs:
 
       - name: Prepare accessible frontend test database
         run: |
+          mkdir -p storage/framework/{cache,sessions,testing,views}
           mysql -h 127.0.0.1 -u root -ptesting nexus_test < database/schema/mysql-schema.sql
           mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT INTO tenants (id, name, slug, is_active) VALUES (1, 'Test Tenant', 'test-tenant', 1), (2, 'Hour Timebank', 'hour-timebank', 1);"
           mysql -h 127.0.0.1 -u root -ptesting nexus_test -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
