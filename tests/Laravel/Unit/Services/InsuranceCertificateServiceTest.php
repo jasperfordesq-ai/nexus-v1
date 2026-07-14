@@ -23,6 +23,7 @@ class InsuranceCertificateServiceTest extends TestCase
     public function test_getUserCertificates_returns_array(): void
     {
         DB::shouldReceive('table')->with('insurance_certificates')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([
@@ -37,6 +38,7 @@ class InsuranceCertificateServiceTest extends TestCase
     public function test_getById_returns_null_when_not_found(): void
     {
         DB::shouldReceive('table')->with('insurance_certificates')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturn(null);
 
@@ -46,6 +48,7 @@ class InsuranceCertificateServiceTest extends TestCase
     public function test_getById_returns_array_when_found(): void
     {
         DB::shouldReceive('table')->with('insurance_certificates')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) ['id' => 1, 'status' => 'pending']);
 
