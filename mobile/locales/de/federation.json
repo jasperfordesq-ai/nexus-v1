@@ -11,15 +11,399 @@
     "exchanges": "{{count}} gemeinschaftsübergreifender Austausch",
     "exchanges_other": "{{count}} gemeinschaftsübergreifende Austausche"
   },
+  "hub": {
+    "eyebrow": "Partnergemeinschaften",
+    "heroTitle": "Föderations-Hub",
+    "heroDescription": "Verbinden Sie sich mit vertrauenswürdigen Zeitbanken, entdecken Sie Verbundmitglieder und tauschen Sie sich über Partnergemeinschaften aus.",
+    "statusActive": "Föderation aktiv",
+    "statusInactive": "Föderation inaktiv",
+    "shortActive": "Aktiv",
+    "shortInactive": "Inaktiv",
+    "statPartners": "Partner",
+    "statMessages": "Nachrichten",
+    "statExchanges": "Austausch",
+    "statStatus": "Status",
+    "exploreNetwork": "Erkunden Netzwerk",
+    "partnerCommunities": "Partnergemeinschaften",
+    "recentActivity": "Letzte Aktivität",
+    "noPartnersYet": "Noch keine Partnergemeinden",
+    "noPartnersDescription": "Genehmigte Föderationspartner werden hier angezeigt, sobald Ihre Community eine Verbindung herstellt.",
+    "noActivityYet": "Noch keine Aktivität",
+    "noActivityDescription": "Communityübergreifende Nachrichten, Partnerschaften und Austausch werden hier angezeigt.",
+    "memberCount": "{{count}}-Mitglied",
+    "memberCount_other": "{{count}}-Mitglieder",
+    "viewCommunity": "Community anzeigen",
+    "quick": {
+      "partners": {
+        "title": "Partner",
+        "description": "Verbundene Communities durchsuchen"
+      },
+      "members": {
+        "title": "Mitglieder",
+        "description": "Verbund suchen Mitglieder"
+      },
+      "connections": {
+        "title": "Verbindungen",
+        "description": "Gemeinschaftsübergreifende Kontakte verwalten"
+      },
+      "messages": {
+        "title": "Nachrichten",
+        "description": "Zeitbankübergreifend koordinieren"
+      },
+      "listings": {
+        "title": "Einträge",
+        "description": "Geteilte Angebote und Anfragen ansehen"
+      },
+      "groups": {
+        "title": "Gruppen",
+        "description": "Partner-Community-Bereichen beitreten"
+      },
+      "events": {
+        "title": "Veranstaltungen",
+        "description": "Partner-Community-Events beitreten"
+      },
+      "setup": {
+        "title": "Einrichtung",
+        "description": "Configure federation access"
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "description": "Manage federation visibility"
+      }
+    }
+  },
   "partners": "Partner-Gemeinschaften",
   "connectedSince": "Verbunden seit {{date}}",
   "visitWebsite": "Website besuchen",
   "empty": "Noch keine Verbundpartner.",
+  "reviews": {
+    "fromPartner": "über {{partner}}",
+    "verified": "Verified"
+  },
+  "relative": {
+    "today": "today",
+    "daysAgo": "{{count}}vor einem Tag",
+    "daysAgo_other": "{{count}} days ago",
+    "monthsAgo": "{{count}} vor einem Monat",
+    "monthsAgo_other": "{{count}} vor einem Monat"
+  },
   "detail": {
     "title": "Partner-Gemeinschaft",
+    "eyebrow": "Verbundzeitbank",
     "about": "Über",
     "members": "Mitglieder",
+    "memberTotal": "Mitgliederzahl",
+    "memberCount": "{{count}} Mitglied",
+    "memberCount_other": "{{count}} Mitglieder",
+    "partnerSince": "Partner seit {{date}}",
+    "partnerSinceLabel": "Partner seit",
+    "connectedDate": "Verbunden {{date}}",
+    "level": "Föderationsebene",
+    "levelUnknown": "Föderationspartner",
+    "levelDiscovery": "Discovery",
+    "levelSocial": "Soziale Netzwerke",
+    "levelEconomic": "Wirtschaftlich",
+    "levelIntegrated": "Integriert",
+    "availableFeatures": "Verfügbare Funktionen",
+    "externalPartner": "Externer Partner",
+    "integratedPartner": "Integrierter Partner",
+    "website": "Website",
+    "share": "Partner teilen",
+    "shareMessage": "{{name}} — {{url}}",
+    "noDescription": "Dieser Partner hat noch keine öffentliche Beschreibung hinzugefügt.",
+    "explorePartner": "Erkunden Sie dies partner",
+    "browseMembers": "Browse members",
+    "browseListings": "Browse listings",
+    "browseGroups": "Browse groups",
+    "browseEvents": "Browse events",
+    "openMessages": "Open Nachrichten",
+    "federationSettings": "Föderationseinstellungen",
+    "browseNetwork": "Zurück zur Föderation",
+    "retry": "Wiederholen",
+    "permissionProfiles": "Profile",
+    "permissionMessaging": "Nachrichten",
+    "permissionTransactions": "Transaktionen",
+    "permissionListings": "Einträge",
+    "permissionEvents": "Ereignisse",
+    "permissionGroups": "Gruppen",
     "notFound": "Partner nicht gefunden.",
     "goBack": "Zurück"
+  },
+  "directory": {
+    "tryAgain": "Erneut versuchen",
+    "backToHub": "Zurück zum Föderations-Hub",
+    "resultsCount": "{{count}} Ergebnis",
+    "resultsCount_other": "{{count}} Ergebnisse",
+    "memberCount": "{{count}} Mitglied",
+    "memberCount_other": "{{count}} Mitglieder",
+    "external": "Extern",
+    "unknownCommunity": "Partnergemeinschaft",
+    "filters": {
+      "allCommunities": "Alle Communities"
+    },
+    "partners": {
+      "eyebrow": "Partnercommunities",
+      "title": "Föderationspartner",
+      "subtitle": "Verbundene Zeitbanken durchsuchen und ihre Föderationsprofile öffnen.",
+      "emptyTitle": "Noch keine Partnergemeinden",
+      "emptyDescription": "Genehmigte Föderationspartner werden angezeigt hier.",
+      "loadMore": "Weitere Partner laden"
+    },
+    "members": {
+      "eyebrow": "Verbundverzeichnis",
+      "title": "Verbundene Mitglieder",
+      "subtitle": "Mitglieder aus Partner-Communities finden und Community-übergreifende Gespräche starten.",
+      "search": "Mitglieder suchen...",
+      "skillsSearch": "Nach Fähigkeiten filtern...",
+      "emptyTitle": "Keine Verbundmitglieder gefunden",
+      "emptyDescription": "Versuchen Sie eine andere Suche oder schauen Sie noch einmal vorbei, wenn weitere Partner ihre Verzeichnisse teilen.",
+      "unavailableTitle": "Verbundmitgliederverzeichnis ist nicht aktiviert",
+      "unavailableDescription": "Föderation ist für diesen Mandanten aktiv, aber die Funktion für gemeinschaftsübergreifende Profile ist deaktiviert. Ein Community-Administrator muss Verbundprofile aktivieren, bevor Mitglieder aufgelistet werden können.",
+      "memberFallback": "Mitglied",
+      "viewProfile": "Profil anzeigen",
+      "message": "Nachricht",
+      "loadMore": "Weitere Mitglieder laden",
+      "reach": {
+        "all": "Alle erreichen",
+        "local_only": "Nur lokal",
+        "remote_ok": "Remote ok",
+        "travel_ok": "Kann reisen"
+      }
+    },
+    "connections": {
+      "eyebrow": "Gemeinschaftsübergreifende Kontakte",
+      "title": "Föderationsverbindungen",
+      "subtitle": "Verwalten Sie Mitglieder, mit denen Sie über Partnerzeitbanken hinweg verbunden sind.",
+      "tabs": {
+        "accepted": "Verbunden",
+        "pending_received": "Empfangen",
+        "pending_sent": "Gesendet"
+      },
+      "empty": {
+        "accepted": {
+          "title": "Noch keine verbundenen Mitglieder",
+          "description": "Verbundmitglieder durchsuchen und senden Verbindungsanfragen."
+        },
+        "pending_received": {
+          "title": "Keine wartenden Anfragen",
+          "description": "Eingehende Verbundverbindungsanfragen werden hier angezeigt."
+        },
+        "pending_sent": {
+          "title": "Keine gesendeten Anfragen",
+          "description": "Anfragen, die Sie an Partnermitglieder senden, werden hier angezeigt."
+        }
+      },
+      "status": {
+        "pending": "Ausstehend",
+        "accepted": "Verbunden",
+        "rejected": "Abgelehnt"
+      },
+      "message": "Nachricht",
+      "browseMembers": "Verbundmitglieder durchsuchen",
+      "viewProfile": "Profil anzeigen für {{name}}",
+      "remove": "Entfernen",
+      "accept": "Akzeptieren",
+      "reject": "Ablehnen",
+      "cancel": "Abbrechen Anfrage",
+      "actionFailedTitle": "Verbindung nicht aktualisiert",
+      "actionFailedDescription": "Bitte überprüfen Sie, ob die Verbundprofile aktiviert sind, und versuchen Sie es erneut."
+    },
+    "messages": {
+      "eyebrow": "Gemeinschaftsübergreifender Posteingang",
+      "title": "Verbund Nachrichten",
+      "subtitle": "Überprüfen Sie Gespräche mit Mitgliedern aus Partnergemeinschaften.",
+      "emptyTitle": "Noch keine Verbundnachrichten",
+      "emptyDescription": "Nachrichten mit Partner-Communities werden hier angezeigt.",
+      "emptyForPartnerTitle": "Noch keine Nachrichten mit diesem Partner",
+      "emptyForPartnerDescription": "Beginnen Sie mit einem Verbundmitgliedsprofil oder löschen Sie den Community-Filter, um alle Konversationen anzuzeigen.",
+      "unavailableTitle": "Verbundnachrichten sind nicht verfügbar aktiviert",
+      "unavailableDescription": "Föderation ist für diesen Mandanten aktiv, aber Community-übergreifendes Messaging ist deaktiviert. Ein Community-Administrator muss Verbundnachrichten aktivieren, bevor Konversationen verwendet werden können.",
+      "unknownSender": "Community-Mitglied",
+      "delivered": "zugestellt",
+      "composeEyebrow": "Neue Verbundnachricht",
+      "loadingRecipient": "Empfänger wird geladen...",
+      "recipientFallback": "Verbundmitglied",
+      "federated": "Verbundmitglied",
+      "noRecipient": "Wählen Sie ein Verbundmitglied aus, bevor Sie eine Nachricht senden.",
+      "recipientSearch": "Empfänger suchen",
+      "recipientSearchPlaceholder": "Verbund suchen Mitglieder...",
+      "selectRecipient": "Nachricht an {{name}}",
+      "changeRecipient": "Empfänger ändern",
+      "noRecipientsFound": "Keine föderierten Mitglieder gefunden.",
+      "subject": "Betreff",
+      "subjectPlaceholder": "Kurzbetreff hinzufügen",
+      "body": "Nachricht",
+      "bodyPlaceholder": "Schreiben Sie Ihre Nachricht...",
+      "send": "Nachricht senden",
+      "sentTitle": "Nachricht gesendet",
+      "sentDescription": "Ihre Nachricht an {{name}} wurde zugestellt.",
+      "sendFailedTitle": "Nachricht nicht gesendet",
+      "sendFailedDescription": "Bitte überprüfen Sie, ob Federation Messaging aktiviert ist, und versuchen Sie es erneut.",
+      "openThread": "Konversation öffnen mit {{name}}",
+      "unreadCount": "{{count}} ungelesen",
+      "threadEyebrow": "Verbundkonversation",
+      "backToInbox": "Zurück zum Posteingang",
+      "translate": "Übersetzen",
+      "showOriginal": "Original anzeigen",
+      "translatedLabel": "Übersetzt",
+      "translateFailed": "Übersetzung ist Im Moment nicht verfügbar.",
+      "reply": "Antworten",
+      "replyPlaceholder": "Antwort schreiben...",
+      "sendReply": "Antwort senden"
+    },
+    "listings": {
+      "eyebrow": "Geteilte Angebote und Anfragen",
+      "title": "Verbundeinträge",
+      "subtitle": "Angebote durchsuchen und Anfragen, die über vertrauenswürdige Zeitbanken hinweg geteilt werden.",
+      "search": "Einträge durchsuchen...",
+      "emptyTitle": "Keine Verbundeinträge gefunden",
+      "emptyDescription": "Gemeinsame Partnereinträge werden hier angezeigt.",
+      "unavailableTitle": "Verbundeinträge sind nicht aktiviert",
+      "unavailableDescription": "Föderation ist für diesen Mandanten aktiv, aber geteilte Angebote und Anfragen sind deaktiviert. Ein Community-Administrator muss Verbundeinträge aktivieren.",
+      "offer": "Angebot",
+      "request": "Anfrage",
+      "hours": "{{hours}} Stunden",
+      "anonymousUser": "Community-Mitglied",
+      "viewDetails": "Details anzeigen",
+      "openDetails": "Details öffnen für {{title}}",
+      "backToListings": "Zurück zu Einträge",
+      "loadMore": "Weitere Einträge laden",
+      "noDescription": "Dieser freigegebene Eintrag hat noch keine Beschreibung.",
+      "details": "Eintragsdetails",
+      "postedBy": "Gepostet von",
+      "viewProfile": "Profil anzeigen",
+      "contactAuthor": "Autor der Nachricht",
+      "type": {
+        "all": "Alle Einträge",
+        "offer": "Angebote",
+        "request": "Anfragen"
+      }
+    },
+    "groups": {
+      "eyebrow": "Partnergruppen",
+      "title": "Verbundgruppen",
+      "subtitle": "Gemeinsam genutzte Community-Bereiche aus Partnerzeitbanken entdecken.",
+      "search": "Gruppen durchsuchen...",
+      "emptyTitle": "Keine Verbundgruppen gefunden",
+      "emptyDescription": "Partnergruppen werden hier angezeigt, wenn Communities sie teilen.",
+      "unavailableTitle": "Verbundgruppen sind nicht aktiviert",
+      "unavailableDescription": "Der Verbund ist für diesen Mandanten aktiv, aber Partnergruppen sind deaktiviert. Ein Community-Administrator muss Verbundgruppen aktivieren.",
+      "memberCount": "{{count}} Mitglied",
+      "memberCount_other": "{{count}} Mitglieder",
+      "loadMore": "Weitere Gruppen laden",
+      "openDetails": "Details öffnen für {{name}}",
+      "backToGroups": "Zurück zu den Gruppen",
+      "detailEyebrow": "Verbundgruppe",
+      "noDescription": "Diese freigegebene Gruppe hat noch keine Beschreibung.",
+      "privacy": {
+        "public": "Öffentlich",
+        "private": "Privat",
+        "closed": "Geschlossen"
+      }
+    },
+    "events": {
+      "eyebrow": "Partnerkalender",
+      "title": "Verbundene Veranstaltungen",
+      "subtitle": "Entdecken Sie Partnerworkshops, Socials und Online-Treffen.",
+      "search": "Veranstaltungen suchen...",
+      "emptyTitle": "Keine Verbundveranstaltungen gefunden",
+      "emptyDescription": "Anstehende Partnerveranstaltungen werden hier angezeigt.",
+      "unavailableTitle": "Verbundveranstaltungen sind nicht aktiviert",
+      "unavailableDescription": "Föderation ist für diesen Mandanten aktiv, Partnerveranstaltungen sind jedoch deaktiviert. Ein Community-Administrator muss Verbundereignisse aktivieren.",
+      "online": "Online",
+      "upcomingOnly": "Nur demnächst verfügbar",
+      "loadMore": "Weitere Veranstaltungen laden",
+      "openDetails": "Details öffnen für {{title}}",
+      "backToEvents": "Zurück zu Ereignissen",
+      "detailEyebrow": "Verbundereignis",
+      "noDescription": "Diese gemeinsame Veranstaltung hat noch keine Beschreibung.",
+      "organizer": "Gehostet von",
+      "organizerFallback": "Veranstalter",
+      "ends": "Endet am {{date}}",
+      "attendeeCount": "{{count}} Teilnehmer",
+      "attendeeCount_other": "{{count}} Teilnehmer"
+    },
+    "onboarding": {
+      "eyebrow": "Föderationseinrichtung",
+      "title": "Föderations-Setup",
+      "subtitle": "Wählen Sie aus, was Sie mit Partner-Communities teilen und aktivieren Sie zeitbankübergreifende Entdeckung.",
+      "privacy": "Profilsichtbarkeit",
+      "communication": "Kommunikation",
+      "reach": "Servicereichweite",
+      "next": "Weiter",
+      "finish": "Föderation aktivieren",
+      "review": "Föderationseinrichtung überprüfen",
+      "reviewDescription": "Bestätigen Sie, welche Partnergemeinschaften sehen können und wie Mitglieder Kontakt aufnehmen können Sie.",
+      "doLater": "Machen Sie dies später",
+      "ready": "Bereit zum Aktivieren der Föderation",
+      "on": "An",
+      "off": "Aus",
+      "failedTitle": "Einrichtung fehlgeschlagen",
+      "failedDescription": "Wir konnten Ihre Föderationseinrichtung nicht speichern. Bitte versuchen Sie es erneut.",
+      "benefits": {
+        "discover": {
+          "title": "Partnermitglieder entdecken",
+          "description": "Erscheinen Sie in der Verbundsuche und finden Sie Personen in vertrauenswürdigen Zeitbanken."
+        },
+        "message": {
+          "title": "Sicher koordinieren",
+          "description": "Verwenden Sie Community-übergreifendes Messaging, ohne Ihre eigene Zeitbank zu verlassen Konto."
+        },
+        "exchange": {
+          "title": "Zeitguthabenaktivität teilen",
+          "description": "Partneraustausch ermöglichen, wo Ihre Community dies zulässt."
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": "Föderationskontrollen",
+      "title": "Föderationseinstellungen",
+      "subtitle": "Kontrollieren Sie Ihre Profilsichtbarkeit, Nachrichtenübermittlung und Servicereichweite im gesamten Netzwerk.",
+      "active": "Föderation aktiv",
+      "inactive": "Föderation inaktiv",
+      "statusDescription": "Diese Steuerelemente entscheiden, was Partnergemeinschaften sehen und verwenden können.",
+      "enable": "Föderation aktivieren",
+      "disable": "Föderation deaktivieren",
+      "statusFailedTitle": "Föderationsstatus nicht aktualisiert",
+      "statusFailedDescription": "Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "save": "Einstellungen speichern",
+      "reach": {
+        "local_only": "Nur lokal",
+        "remote_ok": "Remote ok",
+        "travel_ok": "Kann Reisen"
+      },
+      "profile_visible_federated": {
+        "label": "Zeige mein Profil",
+        "description": "Erlauben Sie Partnergemeinschaften, Ihr Basismitgliedsprofil zu sehen."
+      },
+      "appear_in_federated_search": {
+        "label": "In der Suche erscheinen",
+        "description": "Erlauben Sie Partnermitgliedern, Sie in der Verbundsuche zu entdecken."
+      },
+      "show_skills_federated": {
+        "label": "Fähigkeiten teilen",
+        "description": "Fügen Sie Ihre aufgelisteten Fähigkeiten in die Föderation ein Ergebnisse."
+      },
+      "show_location_federated": {
+        "label": "Standort teilen",
+        "description": "Zeigen Sie Partnergemeinschaften Ihren allgemeinen Standort."
+      },
+      "show_reviews_federated": {
+        "label": "Bewertungen teilen",
+        "description": "Reputation und Bewertungen in Verbundvertrauenssignale einbeziehen."
+      },
+      "messaging_enabled_federated": {
+        "label": "Föderationsnachrichten zulassen",
+        "description": "Erlauben Sie Partnermitgliedern, Ihnen Community-übergreifende Nachrichten zu senden."
+      },
+      "transactions_enabled_federated": {
+        "label": "Föderationsaustausch zulassen",
+        "description": "Erlauben Sie Partnermitgliedern, Zeitguthabenaustausch mit Ihnen zu vereinbaren."
+      },
+      "email_notifications": {
+        "label": "E-Mail-Benachrichtigungen",
+        "description": "E-Mail-Updates für Verbundaktivitäten erhalten."
+      }
+    }
   }
 }

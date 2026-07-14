@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Carregando superadministrador",
+    "skip_to_main": "Pular para o conteúdo principal",
+    "close_navigation": "Fechar navegação de superadministrador",
+    "navigation": "Navegação de superadministrador"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Voltar ao administrador",
+    "toggle_sidebar": "Alternar barra lateral",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "Menu de superadministrador",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Expandir barra lateral",
+    "collapse": "Recolher barra lateral",
+    "nav_label": "Navegação de superadministrador"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "Atividade recente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Nenhuma atividade da federação ainda",
-      "by_label": "by",
+      "by_label": "por",
       "activity_title": "Atividade da Federação (30 dias)",
       "stat_total_actions": "Total de ações",
       "stat_messages": "Mensagens",

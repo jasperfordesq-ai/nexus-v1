@@ -1,8 +1,16 @@
 {
   "title": "Ricerca",
+  "heroEyebrow": "Ricerca globale",
+  "subtitle": "Trova membri, elenchi, eventi, gruppi e storie della community in un unico posto.",
   "placeholder": "Cerca persone, annunci, eventi…",
+  "clearSearch": "Cancella ricerca",
   "empty": "Nessun risultato trovato.",
+  "emptyHint": "Nessuna corrispondenza per \"{{query}}\". Prova una ricerca più ampia o un altro filtro.",
+  "initialTitle": "Cerca nella tua comunità",
   "startTyping": "Inizia a digitare per cercare…",
+  "searching": "Ricerca in corso...",
+  "resultsCount": "{{count}} risultato",
+  "resultsCount_other": "{{count}} risultati",
   "types": {
     "user": "Persone",
     "listing": "Annunci",
@@ -11,6 +19,7 @@
     "blog_post": "Blog"
   },
   "filterAll": "Tutti",
+  "errorTitle": "La ricerca non è riuscita",
   "error": "Ricerca fallita. Riprova.",
   "saved": {
     "title": "Saved searches",

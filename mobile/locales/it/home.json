@@ -11,7 +11,52 @@
     "welcome": "Benvenuto nella tua banca del tempo",
     "empty": "Niente nel feed ancora. Torna presto!",
     "loading": "Caricamento feed…",
-    "emptySubtitle": "Inizia a connetterti con la tua comunità per vedere i post qui."
+    "greeting": "Ciao, {{name}}",
+    "subtitle": "Ecco cosa succede nella tua banca del tempo",
+    "emptyTitle": "Ancora nessuna attività. Saluta la tua community!",
+    "emptySubtitle": "Inizia a connetterti con la tua comunità per vedere i post qui.",
+    "currentView": "{{filter}} visualizza"
+  },
+  "mode": {
+    "forYou": "Per te",
+    "recent": "Recenti"
+  },
+  "filter": {
+    "all": "Tutti",
+    "following": "Segui",
+    "saved": "Salvati",
+    "posts": "Post",
+    "listings": "Scambi",
+    "events": "Eventi",
+    "polls": "Sondaggi",
+    "goals": "Obiettivi",
+    "jobs": "Lavori",
+    "challenges": "Sfide",
+    "volunteering": "Volontariato",
+    "blogs": "Blog",
+    "discussions": "Discussioni",
+    "more": "Altro",
+    "clear": "Cancella controlli feed"
+  },
+  "subFilter": {
+    "offer": "Offerte",
+    "request": "Richieste"
+  },
+  "composer": {
+    "title": "Condividi qualcosa con la tua community",
+    "subtitle": "Crea uno scambio, sfoglia sondaggi o aggiungi feed.",
+    "exchange": "Nuovo scambio",
+    "polls": "Sondaggi",
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Saldo",
+    "hours": "{{count}} ore",
+    "upcomingEvents": "Eventi in arrivo",
+    "openRequests": "Richieste aperte",
+    "notifications": "Notifiche",
+    "unavailable": "-",
+    "openCard": "Apri {{label}}"
   },
   "activity": {
     "title": "Activity",
@@ -35,17 +80,99 @@
     "title": "Annunci",
     "offer": "Offerte",
     "request": "Richieste",
-    "empty": "Nessun annuncio ancora."
+    "empty": "Nessun annuncio ancora.",
+    "searchPlaceholder": "Cerca elenchi...",
+    "newListing": "Nuova inserzione"
+  },
+  "events": {
+    "upcoming": "Prossimamente",
+    "past": "Passato",
+    "loadError": "Impossibile caricare gli eventi.",
+    "going": "Parteciperò",
+    "interested": "Interessato",
+    "full": "Completo",
+    "noUpcoming": "Nessun evento imminente.",
+    "noPast": "Nessun evento passato.",
+    "noEvents": "Nessun evento {{when}}.",
+    "attendees": "{{going}} in corso · {{interested}} interessato",
+    "aboutEvent": "Informazioni",
+    "organizer": "Organizzatore",
+    "eventNotFound": "Evento non trovato.",
+    "onlineTapToJoin": "Online: tocca per partecipare",
+    "onlineEvent": "Evento online",
+    "rsvpError": "Impossibile aggiornare RSVP."
   },
   "notifications": {
     "newMessage": "Nuovo messaggio da {{name}}",
-    "newMatch": "Hai un nuovo match!"
+    "newMatch": "Hai un nuovo match!",
+    "title": "Notifiche",
+    "markAllRead": "Segna tutte come lette",
+    "marking": "Contrassegno...",
+    "markError": "Impossibile contrassegnare le notifiche come lette.",
+    "allCaughtUp": "Sei tutto preso!",
+    "justNow": "proprio ora"
+  },
+  "tenant": {
+    "logoLabel": "logo {{name}}"
+  },
+  "stories": {
+    "you": "Tu",
+    "member": "Membro",
+    "memberInitial": "?"
+  },
+  "feedTypes": {
+    "post": "Pubblica",
+    "listing": "Scambio",
+    "event": "Evento",
+    "poll": "Sondaggio",
+    "goal": "Obiettivo",
+    "job": "Lavoro",
+    "challenge": "Sfida",
+    "volunteer": "Volontario",
+    "review": "Recensisci",
+    "blog": "Blog",
+    "discussion": "Discussione",
+    "resource": "Risorsa",
+    "level_up": "Livello su",
+    "badge_earned": "Distintivo",
+    "unlike": "Non mi piace più",
+    "like": "Mi piace"
   },
   "poll": {
     "totalVotes": "{{count}} voti",
     "voted": "Hai votato",
     "closed": "Sondaggio chiuso",
     "vote": "Vota"
+  },
+  "pollsScreen": {
+    "title": "Sondaggi",
+    "heroEyebrow": "Voce della comunità",
+    "subtitle": "Vota sulle domande aperte e scopri cosa pensa la tua comunità.",
+    "emptyTitle": "Nessun sondaggio ancora",
+    "emptySubtitle": "Quando i membri creano sondaggi, questi verranno visualizzati qui.",
+    "errorTitle": "Impossibile caricare i sondaggi",
+    "feedItemTitle": "{{title}}",
+    "statusOpen": "Apri",
+    "statusClosed": "Chiuso",
+    "totalVotes": "{{count}} voti",
+    "createPoll": "Create poll",
+    "createTitle": "Create a poll",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Ask a question",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Add context for voters",
+    "optionsLabel": "Options",
+    "optionPlaceholder": "Option {{number}}",
+    "addOption": "Add option",
+    "removeOption": "Remove option {{number}}",
+    "submitPoll": "Publish poll",
+    "creating": "Publishing",
+    "createMissingTitle": "Poll not ready",
+    "createQuestionRequired": "Add a question.",
+    "createOptionsRequired": "Add at least two options.",
+    "createdTitle": "Poll created",
+    "createdMessage": "Your poll is now open.",
+    "createError": "Could not create poll."
   },
   "imageViewer": {
     "close": "Chiudi",
@@ -54,17 +181,41 @@
   "likePost": "Mi piace questo post",
   "unlikePost": "Non mi piace più questo post",
   "readMore": "Leggi di più",
-  "composer": {
-    "hashtags": "Hashtags"
+  "moreOptions": "Altre opzioni",
+  "share": "Condividi",
+  "save": "Salva",
+  "unsave": "Annulla salvataggio",
+  "comment": "Commenta",
+  "official": "Ufficiale",
+  "detail": {
+    "post": "Visualizza post",
+    "listing": "Visualizza scambio",
+    "event": "Visualizza evento",
+    "job": "Visualizza lavoro",
+    "volunteer": "Visualizza opportunità",
+    "goal": "Visualizza obiettivo",
+    "profile": "Vedi profilo",
+    "blog": "Leggi post"
   },
-  "dashboard": {
-    "balance": "Saldo",
-    "hours": "{{count}} ore",
-    "upcomingEvents": "Eventi in arrivo",
-    "openRequests": "Richieste aperte",
-    "notifications": "Notifiche",
-    "unavailable": "-",
-    "openCard": "Apri {{label}}"
+  "stats": {
+    "reactions": "{{count}} reazione",
+    "comments": "{{count}} commento",
+    "views": "{{count}} visualizzazione",
+    "shares": "{{count}} condivisione",
+    "reactions_other": "{{count}} reazioni",
+    "comments_other": "{{count}} commenti",
+    "views_other": "{{count}} visualizzazioni",
+    "shares_other": "{{count}} condivisioni"
+  },
+  "milestone": {
+    "badgeUnlocked": "Badge sbloccato",
+    "levelReached": "Livello raggiunto",
+    "badgeMessage": "{{name}} guadagnato {{badge}}",
+    "levelMessage": "{{name}} raggiunto {{level}}"
+  },
+  "media": {
+    "video": "Filmato",
+    "videoDescription": "Apri questo elemento per visualizzare il video."
   },
   "hashtags": {
     "title": "Hashtags",
@@ -89,26 +240,6 @@
     "emptyTitle": "Ancora nessun post",
     "emptySubtitle": "Nessun post del feed e ancora taggato #{{tag}}."
   },
-  "pollsScreen": {
-    "createPoll": "Create poll",
-    "createTitle": "Create a poll",
-    "questionLabel": "Question",
-    "questionPlaceholder": "Ask a question",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "Add context for voters",
-    "optionsLabel": "Options",
-    "optionPlaceholder": "Option {{number}}",
-    "addOption": "Add option",
-    "removeOption": "Remove option {{number}}",
-    "submitPoll": "Publish poll",
-    "creating": "Publishing",
-    "createMissingTitle": "Poll not ready",
-    "createQuestionRequired": "Add a question.",
-    "createOptionsRequired": "Add at least two options.",
-    "createdTitle": "Poll created",
-    "createdMessage": "Your poll is now open.",
-    "createError": "Could not create poll."
-  },
   "reaction": {
     "like": "Mi piace",
     "love": "Amore",
@@ -127,16 +258,6 @@
     "viewReactors": "Vedi chi ha reagito",
     "reactorsTitle": "Reazioni",
     "noReactors": "Ancora nessuna reazione"
-  },
-  "stats": {
-    "reactions": "{{count}} reazione",
-    "reactions_other": "{{count}} reazioni",
-    "comments": "{{count}} commento",
-    "comments_other": "{{count}} commenti",
-    "views": "{{count}} visualizzazione",
-    "views_other": "{{count}} visualizzazioni",
-    "shares": "{{count}} condivisione",
-    "shares_other": "{{count}} condivisioni"
   },
   "saveFailed": "Impossibile aggiornare gli elementi salvati. Riprova."
 }

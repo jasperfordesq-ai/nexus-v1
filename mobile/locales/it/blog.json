@@ -1,16 +1,32 @@
 {
   "title": "Blog",
   "postTitle": "Articolo del blog",
+  "heroEyebrow": "Diario della community",
+  "subtitle": "Storie, guide e aggiornamenti dalla community della banca del tempo.",
   "searchPlaceholder": "Cerca articoli…",
+  "searchAction": "Cerca",
+  "clearSearch": "Cancella ricerca",
   "empty": "Nessun articolo ancora.",
+  "emptyHint": "Le storie e gli aggiornamenti della community verranno visualizzati qui.",
+  "emptyFiltered": "Nessuna corrispondenza articoli",
+  "emptyFilteredHint": "Prova una ricerca diversa.",
+  "loadMore": "Carica altro",
+  "postsCount": "{{count}} post",
+  "postsCount_other": "{{count}} post",
+  "publishedOn": "{{date}}",
   "readingTime": "{{minutes}} min di lettura",
   "by": "Di {{name}}",
   "detail": {
     "title": "Articolo",
     "notFound": "Articolo non trovato.",
+    "notFoundHint": "Questo articolo potrebbe essere stato rimosso o non è più disponibile.",
     "invalidId": "ID articolo non valido.",
+    "invalidIdHint": "Impossibile identificare quale articolo aprire.",
     "goBack": "Indietro",
+    "backToBlog": "Torna al blog",
     "readFull": "Leggi l'articolo completo",
-    "share": "Condividi post"
+    "share": "Condividi post",
+    "tags": "Argomenti",
+    "article": "Articolo"
   }
 }

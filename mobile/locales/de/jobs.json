@@ -1,6 +1,9 @@
 {
   "title": "Stellenangebote",
+  "eyebrow": "Community-Rollen",
+  "subtitle": "Bezahlte, ehrenamtliche und Zeitguthaben-Rollen aus der Community durchsuchen.",
   "detailTitle": "Stellendetails",
+  "createJob": "Job erstellen",
   "tabs": {
     "browse": "Durchsuchen",
     "myApplications": "Meine Bewerbungen",
@@ -8,7 +11,13 @@
     "alerts": "Alerts"
   },
   "search": {
-    "placeholder": "Stellen suchen..."
+    "placeholder": "Stellen suchen...",
+    "advanced": "Erweiterte Suche",
+    "boolean_hint": "z.B. \"Entwickler | Ingenieur\", \"React -Junior\"",
+    "salary_min": "Mindestgehalt",
+    "salary_max": "Maximalgehalt",
+    "company_size_filter": "Unternehmensgrösse",
+    "benefits_filter": "Vorteile-Stichwort"
   },
   "filters": {
     "type": {
@@ -47,7 +56,10 @@
     "closesIn": "Endet in {{count}} Tagen",
     "goBack": "Zurück",
     "notFound": "Stelle nicht gefunden.",
+    "notFoundHint": "Diese Rolle wurde möglicherweise entfernt, geschlossen oder verschoben.",
     "invalidId": "Ungültige Stellen-ID.",
+    "invalidIdHint": "Wir konnten nicht identifizieren, welche Rolle geöffnet werden soll.",
+    "browseJobs": "Jobs durchsuchen",
     "saveError": "Gespeicherter Status konnte nicht aktualisiert werden.",
     "timeCredits": "{{count}} Zeitgutschriften",
     "salaryAnnual": "Jahr",
@@ -59,6 +71,9 @@
     "kanban_board": "Pipeline",
     "close_vacancy": "Schließen",
     "reopen_vacancy": "Wieder öffnen",
+    "postedBy": "Gepostet von",
+    "keyDetails": "Rollendetails",
+    "views": "{{count}} Aufrufe",
     "closesIn_one": "Endet in {{count}} Tag",
     "timeCredits_one": "{{count}} Zeitgutschrift"
   },
@@ -119,11 +134,6 @@
     "successMessage": "Ihre Bewerbung wurde gesendet. Viel Erfolg!",
     "error": "Bewerbung konnte nicht gesendet werden"
   },
-  "saved_profile": {
-    "found": "Gespeichertes Bewerbungsprofil gefunden",
-    "use": "Gespeichertes Anschreiben verwenden",
-    "start_fresh": "Neu beginnen"
-  },
   "applications": {
     "empty": "Noch keine Bewerbungen",
     "emptyHint": "Bewerben Sie sich auf Stellen, um sie hier zu sehen",
@@ -140,6 +150,14 @@
       "rejected": "Abgelehnt",
       "withdrawn": "Zurückgezogen"
     },
+    "interview_proposed": "Interview angefordert",
+    "accept_interview": "Annehmen",
+    "decline_interview": "Ablehnen",
+    "interview_confirmed": "Vorstellungsgespräch bestätigt",
+    "offer_received": "Sie haben ein Stellenangebot erhalten!",
+    "accept_offer": "Angebot annehmen",
+    "decline_offer": "Ablehnen",
+    "offer_accepted": "Angebot angenommen",
     "showMessage": "Show cover message",
     "hideMessage": "Hide cover message",
     "history": "History",
@@ -150,10 +168,6 @@
     "withdraw": "Withdraw",
     "withdrawSuccess": "Application withdrawn.",
     "withdrawError": "Could not withdraw this application."
-  },
-  "postings": {
-    "empty": "Noch keine Anzeigen",
-    "emptyHint": "Erstellen Sie eine Stelle, um Ihre Rollen hier zu verwalten."
   },
   "owner": {
     "toolsTitle": "Eigentümer-Werkzeuge",
@@ -180,6 +194,27 @@
     "moveToInterview": "Interview",
     "updateError": "Diese Bewerbung konnte nicht aktualisiert werden."
   },
+  "postings": {
+    "empty": "Noch keine Anzeigen",
+    "emptyHint": "Erstellen Sie eine Stelle, um Ihre Rollen hier zu verwalten."
+  },
+  "template": {
+    "start_from": "Von Vorlage starten (optional)",
+    "no_templates": "Noch keine Vorlagen",
+    "save_as": "Als Vorlage speichern",
+    "template_name": "Vorlagenname",
+    "share_with_team": "Mit Team teilen (öffentliche Vorlage)",
+    "saving": "Wird gespeichert...",
+    "saved": "Vorlage gespeichert!"
+  },
+  "benchmark": {
+    "market_rate": "Markttarif für \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (Median: {{currency}}{{median}})"
+  },
+  "saved_profile": {
+    "found": "Gespeichertes Bewerbungsprofil gefunden",
+    "use": "Gespeichertes Anschreiben verwenden",
+    "start_fresh": "Neu beginnen"
+  },
   "empty": "Keine Stellen gefunden",
   "emptyHint": "Passen Sie Ihre Filter an oder schauen Sie später wieder vorbei",
   "loadMore": "Mehr laden",
@@ -191,6 +226,7 @@
     "title": "Job erstellen",
     "editTitle": "Job bearbeiten",
     "subtitle": "Veröffentlichen Sie eine bezahlte, ehrenamtliche oder zeitbasierte Rolle.",
+    "editSubtitle": "Aktualisieren Sie die Rollendetails, die Gehaltstransparenz und die Bewerbung Einstellungen.",
     "titleLabel": "Titel",
     "titlePlaceholder": "Rollentitel",
     "descriptionLabel": "Beschreibung",
@@ -232,6 +268,14 @@
     "taglinePlaceholder": "Was macht dieses Team besonders?",
     "videoUrlLabel": "Kulturvideo-URL",
     "videoUrlPlaceholder": "https://example.org/video",
+    "companySizeLabel": "Unternehmensgrösse",
+    "companySize": {
+      "1-10": "1-10",
+      "11-50": "11-50",
+      "51-200": "51-200",
+      "201-500": "201-500",
+      "500+": "500+"
+    },
     "benefitsLabel": "Vorteile und Extras",
     "benefitsPlaceholder": "Kommagetrennte Vorteile",
     "deadlineLabel": "Frist",
@@ -245,9 +289,14 @@
     "updateSubmit": "Job aktualisieren",
     "validationTitle": "Jobdetails prüfen",
     "validationRequired": "Fügen Sie Titel und Beschreibung hinzu.",
+    "deadlinePast": "Frist muss in der Zukunft liegen.",
+    "salaryRangeInvalid": "Das Mindestgehalt darf das Höchstgehalt nicht überschreiten.",
+    "salaryRequired": "Gehaltsbereich erforderlich. Sie können das Gehalt als verhandelbar markieren, um es wegzulassen.",
     "failedTitle": "Job nicht gespeichert",
     "loadFailed": "Dieser Job konnte nicht zum Bearbeiten geladen werden.",
-    "failedDescription": "Der Job konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+    "failedDescription": "Der Job konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "editFailedTitle": "Job nicht aktualisiert",
+    "editFailedDescription": "Wir konnten den Job nicht aktualisieren. Bitte versuchen Sie es erneut."
   },
   "alerts": {
     "title": "Job alerts",

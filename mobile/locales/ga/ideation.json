@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "Dúshlán nua",
+    "title": "Dúshlán nua",
+    "subtitle": "Tabhair cuireadh do bhaill smaointe a chur isteach le haghaidh ceist phobail dhírithe.",
+    "titleLabel": "Teideal an dúshláin",
+    "titlePlaceholder": "Cad ba cheart don phobal a réiteach?",
+    "descriptionLabel": "Cur síos",
+    "descriptionPlaceholder": "Déan cur síos ar an bhfadhb, ar na critéir, agus ar an gcomhthéacs úsáideach",
+    "categoryLabel": "Catagóir",
+    "categoryPlaceholder": "Teicneolaíocht, sábháilteacht, comhshaol...",
+    "statusLabel": "Mód foilsitheoireachta",
+    "status": {
+      "open": "Oscail anois",
+      "draft": "Sábháil dréacht"
+    },
+    "submissionDeadlineLabel": "Spriocdháta aighneachta",
+    "votingDeadlineLabel": "Spriocdháta vótála",
+    "deadlinePlaceholder": " 2026-06-30 17:00",
+    "maxIdeasLabel": " Uasmhéid smaointe in aghaidh an bhaill",
+    "maxIdeasPlaceholder": "Roghnach",
+    "prizeLabel": "Duais nó aitheantas",
+    "prizePlaceholder": "Roghnach",
+    "reviewTitle": "Réidh le foilsiú?",
+    "reviewSubtitle": "Is féidir le baill smaointe a chur isteach nuair atá an dúshlán oscailte.",
+    "footerTitle": "Réidh",
+    "footerSubtitle": "Oscail le haghaidh smaointe.",
+    "submit": "Cruthaigh dúshlán",
+    "saving": "Á chruthú...",
+    "validationTitle": "Seiceáil sonraí an dúshláin",
+    "validationRequired": "Cuir teideal agus cur síos leis sula leanann tú ar aghaidh.",
+    "validationDates": "Úsáid dáta agus am bailí, mar shampla 2026-06-30 17:00.",
+    "validationMaxIdeas": "Úsáid slánuimhir idir 1 agus 50.",
+    "failedTitle": "Níorbh fhéidir dúshlán a chruthú",
+    "failedDescription": "Déan iarracht arís i gceann bomaite."
   }
 }

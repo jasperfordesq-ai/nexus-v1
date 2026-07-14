@@ -1,8 +1,24 @@
 {
   "title": "Objetivos",
+  "subtitle": "Defina marcos pessoais, acompanhe o progresso e mantenha seu impulso visível.",
+  "heroEyebrow": "Progresso pessoal",
   "confirmAbandon": "Tens a certeza de que queres abandonar este objetivo?",
   "empty": "Ainda não tens objetivos.",
   "addGoal": "Adicionar objetivo",
+  "percent": "{{percent}}%",
+  "momentumOn": "Construindo",
+  "momentumEmpty": "Pronto",
+  "buddy": "Amigo: {{name}}",
+  "visibility": {
+    "public": "Público"
+  },
+  "stats": {
+    "active": "Ativo",
+    "completed": "Concluído",
+    "total": "Total Amount",
+    "momentum": "Momentum",
+    "averageProgress": "Progresso médio"
+  },
   "status": {
     "active": "Ativo",
     "completed": "Concluído",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Cria o teu primeiro objetivo para começar a acompanhar o teu progresso.",
   "create": {
     "title": "Novo objetivo",
+    "subtitle": "Dê a si mesmo uma visão clara meta a ser alcançada.",
+    "close": "Fechar formulário de meta",
     "titleLabel": "Título do objetivo",
     "titlePlaceholder": "ex. Ajudar 5 vizinhos",
     "descriptionLabel": "Descrição (opcional)",
+    "descriptionPlaceholder": "Adicione um pouco de contexto ou uma primeira etapa.",
     "targetHoursLabel": "Horas alvo (opcional)",
+    "targetPlaceholder": "por exemplo, 10",
     "dueDateLabel": "Data limite (opcional)",
     "submit": "Criar objetivo",
     "error": "Não foi possível criar o objetivo."

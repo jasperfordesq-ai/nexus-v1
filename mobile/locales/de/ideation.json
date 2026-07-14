@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "Neue Herausforderung",
+    "title": "Neue Herausforderung",
+    "subtitle": "Laden Sie Mitglieder ein, Ideen für eine gezielte Community-Frage einzureichen.",
+    "titleLabel": "Titel der Herausforderung",
+    "titlePlaceholder": "Was soll die Community lösen?",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "Beschreiben Sie das Problem, die Kriterien und den nützlichen Kontext",
+    "categoryLabel": "Kategorie",
+    "categoryPlaceholder": "Technologie, Sicherheit, Umwelt...",
+    "statusLabel": "Veröffentlichungsmodus",
+    "status": {
+      "open": "Jetzt geöffnet",
+      "draft": "Entwurf speichern"
+    },
+    "submissionDeadlineLabel": "Einreichungsschluss",
+    "votingDeadlineLabel": "Abstimmungsschluss",
+    "deadlinePlaceholder": "2026-06-30 17:00",
+    "maxIdeasLabel": "Max. Ideen pro Mitglied",
+    "maxIdeasPlaceholder": "Optional",
+    "prizeLabel": "Preis oder Anerkennung",
+    "prizePlaceholder": "Optional",
+    "reviewTitle": "Bereit zur Veröffentlichung?",
+    "reviewSubtitle": "Mitglieder können nach der Herausforderung Ideen einreichen ist offen.",
+    "footerTitle": "Bereit",
+    "footerSubtitle": "Offen für Ideen.",
+    "submit": "Herausforderung erstellen",
+    "saving": "Wird erstellt...",
+    "validationTitle": "Herausforderungsdetails prüfen",
+    "validationRequired": "Fügen Sie einen Titel und eine Beschreibung hinzu, bevor Sie fortfahren.",
+    "validationDates": "Verwenden Sie ein gültiges Datum und eine gültige Uhrzeit, z. B. 30.06.2026 17:00 Uhr.",
+    "validationMaxIdeas": "Verwenden Sie eine ganze Zahl zwischen 1 und 50.",
+    "failedTitle": "Herausforderung konnte nicht erstellt werden",
+    "failedDescription": "Versuchen Sie es gleich noch einmal."
   }
 }

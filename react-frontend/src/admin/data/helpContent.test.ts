@@ -4,11 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect } from 'vitest';
-import {
-  HELP_CONTENT,
-  type HelpArticle,
-  type HelpStep,
-} from './helpContent';
+import englishHelp from '../../../public/locales/en/admin_help.json';
+import type { HelpArticle, HelpStep } from './helpContent';
+
+const HELP_CONTENT = englishHelp.articles as Record<string, HelpArticle>;
 
 // ---------------------------------------------------------------------------
 // Registry-level invariants

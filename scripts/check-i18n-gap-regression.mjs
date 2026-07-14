@@ -201,7 +201,15 @@ function compareAgainstBaseline(current, baseline) {
 
 const args = process.argv.slice(2);
 const shouldWriteBaseline = args.includes('--write-baseline');
+const showDetails = args.includes('--details');
 const currentSnapshot = buildSnapshot();
+
+if (showDetails) {
+  for (const [file, count] of Object.entries(currentSnapshot.files)) {
+    console.log(`${file}: ${count}`);
+  }
+  console.log('');
+}
 
 if (shouldWriteBaseline) {
   fs.writeFileSync(BASELINE_PATH, `${JSON.stringify(currentSnapshot, null, 2)}\n`);

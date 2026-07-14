@@ -1,5 +1,31 @@
 {
   "title": "Messaggi",
+  "heroEyebrow": "Messaggi privati",
+  "subtitle": "Tieni traccia delle tue conversazioni con i membri nella banca del tempo.",
+  "inbox": "Posta in arrivo",
+  "tabs": {
+    "inbox": "Posta in arrivo",
+    "archived": "Archiviati"
+  },
+  "filtersIntro": "Cerca conversazioni per membro o messaggio recente.",
+  "searchPlaceholder": "Cerca messaggi",
+  "resultsLoading": "Caricamento",
+  "conversationCount": "{{count}} conversazione",
+  "conversationCount_other": "{{count}} conversazioni",
+  "visibleCount": "{{count}} mostrato",
+  "archivedCount": "{{count}} archiviato",
+  "unreadCount": "{{count}} non letti",
+  "clearSearch": "Cancella ricerca",
+  "readStatus": "Nessun messaggio non letto",
+  "unknownMember": "Membro della comunità",
+  "openThread": "Apri",
+  "archive": "Archivia",
+  "archiveConversation": "Archivia conversazione",
+  "archiveConversationWithName": "Archiviare conversazione con {{name}}",
+  "archiveConfirm": "Archiviare conversazione con {{name}}? Puoi ripristinarlo da Archiviato.",
+  "restore": "Ripristina",
+  "restoreConversation": "Ripristina conversazione",
+  "restoreConversationWithName": "Ripristina conversazione con {{name}}",
   "threadTitle": "Conversazione",
   "thread": {
     "inputPlaceholder": "Scrivi un messaggio…",
@@ -8,6 +34,14 @@
     "noMessages": "Nessun messaggio. Di' ciao!",
     "today": "Oggi",
     "yesterday": "Ieri",
+    "invalidConversation": "Conversazione non valida.",
+    "loadError": "Impossibile caricare la conversazione.",
+    "voiceMessage": "Messaggio vocale",
+    "sendFailed": "Impossibile inviare il messaggio. Riprova.",
+    "you": "Voi:",
+    "goBack": "Torna indietro",
+    "messageCount": "Messaggio {{count}}",
+    "messageCount_other": "{{count}} messaggi",
     "messagingRestrictedTitle": "Messaggi in pausa",
     "messagingRestrictedContact": "Contatta il team della comunita prima di inviare altri messaggi.",
     "messageOptions": "Opzioni messaggio",
@@ -23,6 +57,8 @@
     "deleteSelfConfirm": "Rimuovere questo messaggio dalla tua vista?",
     "deleteEveryoneConfirm": "Eliminare questo messaggio per tutti?",
     "deletedMessage": "Questo messaggio e stato eliminato.",
+    "reactWith": "Reagisci con {{emoji}}",
+    "toggleReaction": "Attiva/disattiva {{emoji}} reazione",
     "attachmentName": "Attachment {{index}}",
     "attachments": {
       "add": "Add attachment",
@@ -50,24 +86,62 @@
       "sendFailed": "Voice message could not be sent. Please try again."
     }
   },
+  "context": {
+    "regarding": "Riguardante",
+    "open": "Apri elemento correlato",
+    "title": "{{type}} #{{id}}",
+    "type": {
+      "listing": "Elenco",
+      "event": "Evento",
+      "job": "Lavoro",
+      "volunteering": "Volontariato"
+    }
+  },
   "voice": {
     "label": "Messaggio vocale",
+    "failed": "Non riuscito",
     "play": "Riproduci",
     "pause": "Pausa",
     "recording": "Registrazione…",
     "tapToRecord": "Tieni premuto per registrare"
   },
+  "newMessage": "Nuovo messaggio",
+  "newGroup": "Nuovo gruppo",
+  "composer": {
+    "eyebrow": "Avvia una conversazione",
+    "subtitle": "Cerca un membro, quindi apri una discussione privata.",
+    "searchPlaceholder": "Cerca membri",
+    "loading": "Caricamento membri",
+    "emptyTitle": "Nessun membro trovato",
+    "emptySubtitle": "Prova con un nome diverso o controlla la directory dei membri.",
+    "memberFallback": "Community membro",
+    "resultsCount": "Membro {{count}} mostrato",
+    "resultsCount_other": "{{count}} membri mostrati",
+    "openThread": "Invia messaggio a {{name}}"
+  },
   "empty": {
     "title": "Nessuna conversazione",
-    "subtitle": "Connettiti con i membri per iniziare a scrivere"
+    "subtitle": "Connettiti con i membri per iniziare a scrivere",
+    "archivedTitle": "Nessuna conversazione archiviata",
+    "archivedSubtitle": "Le conversazioni archiviate verranno visualizzate qui.",
+    "searchTitle": "Nessuna conversazione corrispondente",
+    "searchSubtitle": "Prova con un nome membro o una parola chiave del messaggio diversi."
   },
-  "deleteConfirm": "Eliminare la conversazione con {{name}}?",
   "errors": {
+    "archiveFailedTitle": "Archivio non riuscito",
+    "archiveFailed": "Impossibile archiviare questa conversazione.",
     "sendFailed": "Invio fallito. Tocca per riprovare.",
     "loadFailed": "Impossibile caricare i messaggi.",
+    "threadUnavailableTitle": "Conversazione non disponibile",
+    "threadUnavailable": "Questa conversazione non ha più un destinatario valido. Aggiorna i messaggi e riprova.",
+    "restoreFailedTitle": "Ripristino non riuscito",
+    "restoreFailed": "Impossibile ripristinare questa conversazione.",
+    "reactionFailedTitle": "Reazione non riuscita",
+    "reactionFailed": "Impossibile aggiornare quella reazione.",
     "editFailedTitle": "Modifica non riuscita",
     "editFailed": "Impossibile aggiornare questo messaggio.",
     "deleteFailedTitle": "Eliminazione non riuscita",
     "deleteFailed": "Impossibile eliminare questo messaggio."
-  }
+  },
+  "deleteConfirm": "Eliminare la conversazione con {{name}}?"
 }

@@ -564,10 +564,10 @@
         },
         "labels": {
           "spoofed_count": "{{count}} sfałszowany",
-          "spoofed_count_few": "{{count}} sfałszowany",
-          "spoofed_count_many": "{{count}} sfałszowany",
           "spoofed_count_one": "{{count}} sfałszowany",
-          "spoofed_count_other": "{{count}} sfałszowany"
+          "spoofed_count_other": "{{count}} sfałszowany",
+          "spoofed_count_few": "{{count}} sfałszowany",
+          "spoofed_count_many": "{{count}} sfałszowany"
         },
         "log_summary": "Log: {{size}} - od {{time}}",
         "sections": {
@@ -575,10 +575,10 @@
           "hits_by_status": "Trafienia według statusu HTTP",
           "recent_activity": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
           "top_uris": "Najpopularniejsze tokeny NEXUSTERM12 (50 najlepszych według liczby trafień)",
-          "recent_activity_few": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
-          "recent_activity_many": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
           "recent_activity_one": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
-          "recent_activity_other": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})"
+          "recent_activity_other": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
+          "recent_activity_few": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
+          "recent_activity_many": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Ostatnie trafienia botów",
@@ -595,10 +595,10 @@
           "open_in_inventory": "Otwórz w ekwipunku",
           "refresh": "Odświeżać",
           "refresh_all_stale": "Odśwież wszystkie nieaktualne ({{count}})",
-          "refresh_all_stale_few": "Odśwież wszystkie nieaktualne ({{count}})",
-          "refresh_all_stale_many": "Odśwież wszystkie nieaktualne ({{count}})",
           "refresh_all_stale_one": "Odśwież wszystkie nieaktualne ({{count}})",
-          "refresh_all_stale_other": "Odśwież wszystkie nieaktualne ({{count}})"
+          "refresh_all_stale_other": "Odśwież wszystkie nieaktualne ({{count}})",
+          "refresh_all_stale_few": "Odśwież wszystkie nieaktualne ({{count}})",
+          "refresh_all_stale_many": "Odśwież wszystkie nieaktualne ({{count}})"
         },
         "columns": {
           "actions": "ŻETON NEXUSARM25",
@@ -611,10 +611,10 @@
         },
         "confirm": {
           "queue_recache": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
-          "queue_recache_few": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
-          "queue_recache_many": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
           "queue_recache_one": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
-          "queue_recache_other": "Odzyskiwanie kolejki dla dzierżawców {{count}}?"
+          "queue_recache_other": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
+          "queue_recache_few": "Odzyskiwanie kolejki dla dzierżawców {{count}}?",
+          "queue_recache_many": "Odzyskiwanie kolejki dla dzierżawców {{count}}?"
         },
         "empty": "Żadnych najemców",
         "errors": {
@@ -626,18 +626,18 @@
           "bulk_queued": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
           "no_stale": "Brak nieaktualnych najemców – zasięg jest dobry",
           "tenant_queued": "Dodano #{{id}} do kolejki dla {{slug}}",
-          "bulk_queued_few": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
-          "bulk_queued_many": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
           "bulk_queued_one": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
-          "bulk_queued_other": "Pamięć podręczna w kolejce dla dzierżawców {{count}}"
+          "bulk_queued_other": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
+          "bulk_queued_few": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
+          "bulk_queued_many": "Pamięć podręczna w kolejce dla dzierżawców {{count}}"
         },
         "summary": {
           "healthy": "Wszyscy najemcy {{count}} zdrowi.",
           "needs_work": "{{needing}} z dzierżawców {{total}} ma brakujące, nieaktualne lub uszkodzone trasy.",
-          "healthy_few": "Wszyscy najemcy {{count}} zdrowi.",
-          "healthy_many": "Wszyscy najemcy {{count}} zdrowi.",
           "healthy_one": "Wszyscy najemcy {{count}} zdrowi.",
-          "healthy_other": "Wszyscy najemcy {{count}} zdrowi."
+          "healthy_other": "Wszyscy najemcy {{count}} zdrowi.",
+          "healthy_few": "Wszyscy najemcy {{count}} zdrowi.",
+          "healthy_many": "Wszyscy najemcy {{count}} zdrowi."
         },
         "table_aria": "Zasięg"
       },
@@ -666,14 +666,14 @@
           "drift_dry_run": "Zakończono jazdę na sucho",
           "purge_dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
           "purged_ungated": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
-          "purged_ungated_few": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
-          "purged_ungated_many": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
           "purged_ungated_one": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
           "purged_ungated_other": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
-          "purge_dry_run_few": "Praca próbna: migawki {{count}} zostaną usunięte",
-          "purge_dry_run_many": "Praca próbna: migawki {{count}} zostaną usunięte",
           "purge_dry_run_one": "Praca próbna: migawki {{count}} zostaną usunięte",
-          "purge_dry_run_other": "Praca próbna: migawki {{count}} zostaną usunięte"
+          "purge_dry_run_other": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged_ungated_few": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
+          "purged_ungated_many": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}",
+          "purge_dry_run_few": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purge_dry_run_many": "Praca próbna: migawki {{count}} zostaną usunięte"
         },
         "no_output": "(brak wyjścia)",
         "purge_ungated": {
@@ -685,14 +685,14 @@
         "result": {
           "deleted": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
           "would_delete": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
-          "would_delete_few": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
-          "would_delete_many": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
           "would_delete_one": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
           "would_delete_other": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
-          "deleted_few": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
-          "deleted_many": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
           "deleted_one": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
-          "deleted_other": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}"
+          "deleted_other": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
+          "would_delete_few": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
+          "would_delete_many": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}",
+          "deleted_few": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
+          "deleted_many": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}"
         },
         "title": "Automatyzacja świeżości"
       },
@@ -757,10 +757,10 @@
           "reload": "Przeładować",
           "select_all_visible": "Wybierz wszystkie widoczne",
           "select_snapshot": "Wybierz {{path}}",
-          "recache_selected_few": "Wybrano pamięć podręczną ({{count}})",
-          "recache_selected_many": "Wybrano pamięć podręczną ({{count}})",
           "recache_selected_one": "Wybrano pamięć podręczną ({{count}})",
-          "recache_selected_other": "Wybrano pamięć podręczną ({{count}})"
+          "recache_selected_other": "Wybrano pamięć podręczną ({{count}})",
+          "recache_selected_few": "Wybrano pamięć podręczną ({{count}})",
+          "recache_selected_many": "Wybrano pamięć podręczną ({{count}})"
         },
         "columns": {
           "actions": "Działania",
@@ -796,10 +796,10 @@
         },
         "messages": {
           "bulk_recache": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
-          "bulk_recache_few": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
-          "bulk_recache_many": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
           "bulk_recache_one": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
-          "bulk_recache_other": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce"
+          "bulk_recache_other": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
+          "bulk_recache_few": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce",
+          "bulk_recache_many": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce"
         },
         "inspect": {
           "load_failed": "Nie udało się wczytać tej migawki. Poprzednie dane inspekcji zostały wyczyszczone.",
@@ -835,22 +835,22 @@
           "size": "Rozmiar",
           "tips": "Wskazówki ({{count}})",
           "title": "Tytuł",
-          "must_fix_few": "Należy naprawić ({{count}})",
-          "must_fix_many": "Należy naprawić ({{count}})",
           "must_fix_one": "Należy naprawić ({{count}})",
           "must_fix_other": "Należy naprawić ({{count}})",
-          "tips_few": "Wskazówki ({{count}})",
-          "tips_many": "Wskazówki ({{count}})",
           "tips_one": "Wskazówki ({{count}})",
           "tips_other": "Wskazówki ({{count}})",
-          "asset_references_few": "Referencje zasobów ({{count}})",
-          "asset_references_many": "Referencje zasobów ({{count}})",
           "asset_references_one": "Referencje zasobów ({{count}})",
           "asset_references_other": "Referencje zasobów ({{count}})",
-          "dead_assets_few": "{{count}} nie żyje",
-          "dead_assets_many": "{{count}} nie żyje",
           "dead_assets_one": "{{count}} nie żyje",
-          "dead_assets_other": "{{count}} nie żyje"
+          "dead_assets_other": "{{count}} nie żyje",
+          "must_fix_few": "Należy naprawić ({{count}})",
+          "must_fix_many": "Należy naprawić ({{count}})",
+          "tips_few": "Wskazówki ({{count}})",
+          "tips_many": "Wskazówki ({{count}})",
+          "asset_references_few": "Referencje zasobów ({{count}})",
+          "asset_references_many": "Referencje zasobów ({{count}})",
+          "dead_assets_few": "{{count}} nie żyje",
+          "dead_assets_many": "{{count}} nie żyje"
         },
         "selected": "Wybrano {{count}}",
         "status": {
@@ -860,10 +860,10 @@
         },
         "summary": "{{filtered}} z migawek {{total}}",
         "table_aria": "Inwentarz migawkowy",
-        "selected_few": "Wybrano {{count}}",
-        "selected_many": "Wybrano {{count}}",
         "selected_one": "Wybrano {{count}}",
-        "selected_other": "Wybrano {{count}}"
+        "selected_other": "Wybrano {{count}}",
+        "selected_few": "Wybrano {{count}}",
+        "selected_many": "Wybrano {{count}}"
       },
       "jobs": {
         "actions": {
@@ -935,10 +935,10 @@
         },
         "result": {
           "invalid": "{{count}} nieprawidłowy",
-          "invalid_few": "{{count}} nieprawidłowy",
-          "invalid_many": "{{count}} nieprawidłowy",
           "invalid_one": "{{count}} nieprawidłowy",
-          "invalid_other": "{{count}} nieprawidłowy"
+          "invalid_other": "{{count}} nieprawidłowy",
+          "invalid_few": "{{count}} nieprawidłowy",
+          "invalid_many": "{{count}} nieprawidłowy"
         },
         "scope": {
           "all_tenants": "wszyscy najemcy"
@@ -981,10 +981,10 @@
           "supersede": "Zastąpić",
           "unknown": "Nieznane zdarzenie: {{event}}"
         },
-        "summary_few": "Wydarzenia {{count}}",
-        "summary_many": "Wydarzenia {{count}}",
         "summary_one": "Wydarzenia {{count}}",
-        "summary_other": "Wydarzenia {{count}}"
+        "summary_other": "Wydarzenia {{count}}",
+        "summary_few": "Wydarzenia {{count}}",
+        "summary_many": "Wydarzenia {{count}}"
       },
       "failures": {
         "columns": {
@@ -1081,14 +1081,14 @@
           "healthy": "Zdrowy",
           "missing": "Brak {{count}}",
           "stale": "{{count}} jest nieaktualny",
-          "missing_few": "Brak {{count}}",
-          "missing_many": "Brak {{count}}",
           "missing_one": "Brak {{count}}",
           "missing_other": "Brak {{count}}",
-          "stale_few": "{{count}} jest nieaktualny",
-          "stale_many": "{{count}} jest nieaktualny",
           "stale_one": "{{count}} jest nieaktualny",
-          "stale_other": "{{count}} jest nieaktualny"
+          "stale_other": "{{count}} jest nieaktualny",
+          "missing_few": "Brak {{count}}",
+          "missing_many": "Brak {{count}}",
+          "stale_few": "{{count}} jest nieaktualny",
+          "stale_many": "{{count}} jest nieaktualny"
         },
         "hints": {
           "unexpected": "Zapisane migawki spoza bieżących planów tras tenantów",
@@ -1102,14 +1102,14 @@
           "no_events": "Brak wydarzeń",
           "prometheus": "Format tekstowy Prometeusza",
           "tenants_routes": "Najemcy {{tenants}} x trasy {{routes}}",
-          "aging_few": "{{count}} starzenie się (>7 dni)",
-          "aging_many": "{{count}} starzenie się (>7 dni)",
           "aging_one": "{{count}} starzenie się (>7 dni)",
           "aging_other": "{{count}} starzenie się (>7 dni)",
-          "active_jobs_few": "{{count}} aktywny",
-          "active_jobs_many": "{{count}} aktywny",
           "active_jobs_one": "{{count}} aktywny",
-          "active_jobs_other": "{{count}} aktywny"
+          "active_jobs_other": "{{count}} aktywny",
+          "aging_few": "{{count}} starzenie się (>7 dni)",
+          "aging_many": "{{count}} starzenie się (>7 dni)",
+          "active_jobs_few": "{{count}} aktywny",
+          "active_jobs_many": "{{count}} aktywny"
         },
         "kpi": {
           "age_stale": "Wiek nieaktualny (>14d)",
@@ -1167,14 +1167,14 @@
         "messages": {
           "dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
           "purged": "Usunięto migawki {{count}}{{job}}",
-          "dry_run_few": "Praca próbna: migawki {{count}} zostaną usunięte",
-          "dry_run_many": "Praca próbna: migawki {{count}} zostaną usunięte",
           "dry_run_one": "Praca próbna: migawki {{count}} zostaną usunięte",
           "dry_run_other": "Praca próbna: migawki {{count}} zostaną usunięte",
-          "purged_few": "Usunięto migawki {{count}}{{job}}",
-          "purged_many": "Usunięto migawki {{count}}{{job}}",
           "purged_one": "Usunięto migawki {{count}}{{job}}",
-          "purged_other": "Usunięto migawki {{count}}{{job}}"
+          "purged_other": "Usunięto migawki {{count}}{{job}}",
+          "dry_run_few": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "dry_run_many": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged_few": "Usunięto migawki {{count}}{{job}}",
+          "purged_many": "Usunięto migawki {{count}}{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* lub /listy/**",
@@ -1183,24 +1183,24 @@
         "result": {
           "deleted": "Usunięto migawki {{count}}",
           "would_delete": "Spowoduje usunięcie migawek {{count}}",
-          "would_delete_few": "Spowoduje usunięcie migawek {{count}}",
-          "would_delete_many": "Spowoduje usunięcie migawek {{count}}",
           "would_delete_one": "Spowoduje usunięcie migawek {{count}}",
           "would_delete_other": "Spowoduje usunięcie migawek {{count}}",
-          "deleted_few": "Usunięto migawki {{count}}",
-          "deleted_many": "Usunięto migawki {{count}}",
           "deleted_one": "Usunięto migawki {{count}}",
-          "deleted_other": "Usunięto migawki {{count}}"
+          "deleted_other": "Usunięto migawki {{count}}",
+          "would_delete_few": "Spowoduje usunięcie migawek {{count}}",
+          "would_delete_many": "Spowoduje usunięcie migawek {{count}}",
+          "deleted_few": "Usunięto migawki {{count}}",
+          "deleted_many": "Usunięto migawki {{count}}"
         },
         "title": "Czyszczenie pamięci podręcznej symboli wieloznacznych",
         "preview_gate": {
           "title": "Przed usunięciem na żywo wymagany jest podgląd",
           "required": "Usuwanie na żywo jest zablokowane do czasu wyświetlenia podglądu tego samego wzorca trasy i zakresu dzierżawy.",
           "ready": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
-          "ready_few": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
-          "ready_many": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
           "ready_one": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
-          "ready_other": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie."
+          "ready_other": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
+          "ready_few": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie.",
+          "ready_many": "Znaleziono pasujący podgląd. Usuwanie na żywo jest ograniczone do {{count}} pasujących migawek pokazanych w podglądzie."
         }
       },
       "ttl_inspector": {
@@ -1228,18 +1228,18 @@
           "days": "{{count}}d",
           "hours": "{{count}} godz",
           "minutes": "{{count}}min",
-          "minutes_few": "{{count}}min",
-          "minutes_many": "{{count}}min",
           "minutes_one": "{{count}}min",
           "minutes_other": "{{count}}min",
-          "hours_few": "{{count}} godz",
-          "hours_many": "{{count}} godz",
           "hours_one": "{{count}} godz",
           "hours_other": "{{count}} godz",
-          "days_few": "{{count}}d",
-          "days_many": "{{count}}d",
           "days_one": "{{count}}d",
-          "days_other": "{{count}}d"
+          "days_other": "{{count}}d",
+          "minutes_few": "{{count}}min",
+          "minutes_many": "{{count}}min",
+          "hours_few": "{{count}} godz",
+          "hours_many": "{{count}} godz",
+          "days_few": "{{count}}d",
+          "days_many": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1250,18 +1250,18 @@
           "dynamic": "{{count}} dynamiczny",
           "static": "{{count}} statyczny",
           "total": "Łącznie {{count}}",
-          "static_few": "{{count}} statyczny",
-          "static_many": "{{count}} statyczny",
           "static_one": "{{count}} statyczny",
           "static_other": "{{count}} statyczny",
-          "dynamic_few": "{{count}} dynamiczny",
-          "dynamic_many": "{{count}} dynamiczny",
           "dynamic_one": "{{count}} dynamiczny",
           "dynamic_other": "{{count}} dynamiczny",
-          "total_few": "Łącznie {{count}}",
-          "total_many": "Łącznie {{count}}",
           "total_one": "Łącznie {{count}}",
-          "total_other": "Łącznie {{count}}"
+          "total_other": "Łącznie {{count}}",
+          "static_few": "{{count}} statyczny",
+          "static_many": "{{count}} statyczny",
+          "dynamic_few": "{{count}} dynamiczny",
+          "dynamic_many": "{{count}} dynamiczny",
+          "total_few": "Łącznie {{count}}",
+          "total_many": "Łącznie {{count}}"
         },
         "description_prefix": "Zobacz dokładnie, które trasy silnik planuje renderować dla najemcy — podłoga statyczna (ograniczona funkcja/moduł) plus dynamiczne znaczniki URL z",
         "description_suffix": "Pracownik dramaturga odwiedza tę listę.",
@@ -1321,10 +1321,10 @@
         "status": {
           "clean": "Nie znaleziono żadnych problemów",
           "needs_attention": "Element {{count}} wymaga uwagi",
-          "needs_attention_few": "Element {{count}} wymaga uwagi",
-          "needs_attention_many": "Element {{count}} wymaga uwagi",
           "needs_attention_one": "Element {{count}} wymaga uwagi",
-          "needs_attention_other": "Element {{count}} wymaga uwagi"
+          "needs_attention_other": "Element {{count}} wymaga uwagi",
+          "needs_attention_few": "Element {{count}} wymaga uwagi",
+          "needs_attention_many": "Element {{count}} wymaga uwagi"
         },
         "counts": {
           "expected": "Expected",
@@ -1760,55 +1760,55 @@
         "rollback_path_required": "Wymagana ścieżka wycofania"
       }
     },
-    "health_meta_description_length_few": "Znaki{{count}}(idealnie: 150–160)",
-    "health_meta_description_length_many": "Znaki{{count}}(idealnie: 150–160)",
     "health_meta_description_length_one": "Znaki{{count}}(idealnie: 150–160)",
     "health_meta_description_length_other": "Znaki{{count}}(idealnie: 150–160)",
-    "health_auto_sitemap_active_count_few": "Aktywne — indeksowane są adresy URL{{count}}",
-    "health_auto_sitemap_active_count_many": "Aktywne — indeksowane są adresy URL{{count}}",
     "health_auto_sitemap_active_count_one": "Aktywne — indeksowane są adresy URL{{count}}",
     "health_auto_sitemap_active_count_other": "Aktywne — indeksowane są adresy URL{{count}}",
-    "pass_count_few": "{{count}} zaliczone",
-    "pass_count_many": "{{count}} zaliczone",
     "pass_count_one": "{{count}} zaliczone",
     "pass_count_other": "{{count}} zaliczone",
-    "warning_count_few": "{{count}} ostrzeżenie",
-    "warning_count_many": "{{count}} ostrzeżenie",
     "warning_count_one": "{{count}} ostrzeżenie",
     "warning_count_other": "{{count}} ostrzeżenie",
-    "fail_count_few": "Niepowodzenie{{count}}",
-    "fail_count_many": "Niepowodzenie{{count}}",
     "fail_count_one": "Niepowodzenie{{count}}",
     "fail_count_other": "Niepowodzenie{{count}}",
-    "meta_description_count_few": "{{count}}/160 znaków metaopisu",
-    "meta_description_count_many": "{{count}}/160 znaków metaopisu",
     "meta_description_count_one": "{{count}}/160 znaków metaopisu",
     "meta_description_count_other": "{{count}}/160 znaków metaopisu",
-    "global_meta_description_count_few": "{{count}}/160 znaków globalnego metaopisu",
-    "global_meta_description_count_many": "{{count}}/160 znaków globalnego metaopisu",
     "global_meta_description_count_one": "{{count}}/160 znaków globalnego metaopisu",
     "global_meta_description_count_other": "{{count}}/160 znaków globalnego metaopisu",
-    "passed_count_with_value_few": "{{count}}zaliczony",
-    "passed_count_with_value_many": "{{count}}zaliczony",
     "passed_count_with_value_one": "{{count}}zaliczony",
     "passed_count_with_value_other": "{{count}}zaliczony",
-    "warnings_count_with_value_few": "Ostrzeżenia{{count}}",
-    "warnings_count_with_value_many": "Ostrzeżenia{{count}}",
     "warnings_count_with_value_one": "Ostrzeżenia{{count}}",
     "warnings_count_with_value_other": "Ostrzeżenia{{count}}",
-    "failed_count_with_value_few": "Niepowodzenie{{count}}",
-    "failed_count_with_value_many": "Niepowodzenie{{count}}",
     "failed_count_with_value_one": "Niepowodzenie{{count}}",
     "failed_count_with_value_other": "Niepowodzenie{{count}}",
+    "total_count_one": "Razem: {{count}}",
+    "total_count_other": "Razem: {{count}}",
+    "score_out_of": "z {{maximum}}",
+    "health_meta_description_length_few": "Znaki{{count}}(idealnie: 150–160)",
+    "health_meta_description_length_many": "Znaki{{count}}(idealnie: 150–160)",
+    "health_auto_sitemap_active_count_few": "Aktywne — indeksowane są adresy URL{{count}}",
+    "health_auto_sitemap_active_count_many": "Aktywne — indeksowane są adresy URL{{count}}",
+    "pass_count_few": "{{count}} zaliczone",
+    "pass_count_many": "{{count}} zaliczone",
+    "warning_count_few": "{{count}} ostrzeżenie",
+    "warning_count_many": "{{count}} ostrzeżenie",
+    "fail_count_few": "Niepowodzenie{{count}}",
+    "fail_count_many": "Niepowodzenie{{count}}",
+    "meta_description_count_few": "{{count}}/160 znaków metaopisu",
+    "meta_description_count_many": "{{count}}/160 znaków metaopisu",
+    "global_meta_description_count_few": "{{count}}/160 znaków globalnego metaopisu",
+    "global_meta_description_count_many": "{{count}}/160 znaków globalnego metaopisu",
+    "passed_count_with_value_few": "{{count}}zaliczony",
+    "passed_count_with_value_many": "{{count}}zaliczony",
+    "warnings_count_with_value_few": "Ostrzeżenia{{count}}",
+    "warnings_count_with_value_many": "Ostrzeżenia{{count}}",
+    "failed_count_with_value_few": "Niepowodzenie{{count}}",
+    "failed_count_with_value_many": "Niepowodzenie{{count}}",
     "match_count_few": "Dopasowania{{count}}",
     "match_count_many": "Dopasowania{{count}}",
     "top_matches_for_user_few": "Najpopularniejsze mecze{{count}}dla{{name}}",
     "top_matches_for_user_many": "Najpopularniejsze mecze{{count}}dla{{name}}",
     "total_count_few": "Razem: {{count}}",
-    "total_count_many": "Razem: {{count}}",
-    "total_count_one": "Razem: {{count}}",
-    "total_count_other": "Razem: {{count}}",
-    "score_out_of": "z {{maximum}}"
+    "total_count_many": "Razem: {{count}}"
   },
   "email_deliverability": {
     "title": "Dostarczalność e-maili",
@@ -1848,14 +1848,14 @@
       "unconfirmed": "{{count}} zaakceptowany, ale niepotwierdzony",
       "webhook_confirmed": "Potwierdzone przez webhook dostawcy",
       "window_days": "Okno dzienne {{days}}",
-      "unconfirmed_few": "{{count}} zaakceptowany, ale niepotwierdzony",
-      "unconfirmed_many": "{{count}} zaakceptowany, ale niepotwierdzony",
       "unconfirmed_one": "{{count}} zaakceptowany, ale niepotwierdzony",
       "unconfirmed_other": "{{count}} zaakceptowany, ale niepotwierdzony",
-      "bad_outcomes_few": "{{count}} nie powiódł się, został odrzucony lub pominięty",
-      "bad_outcomes_many": "{{count}} nie powiódł się, został odrzucony lub pominięty",
       "bad_outcomes_one": "{{count}} nie powiódł się, został odrzucony lub pominięty",
-      "bad_outcomes_other": "{{count}} nie powiódł się, został odrzucony lub pominięty"
+      "bad_outcomes_other": "{{count}} nie powiódł się, został odrzucony lub pominięty",
+      "unconfirmed_few": "{{count}} zaakceptowany, ale niepotwierdzony",
+      "unconfirmed_many": "{{count}} zaakceptowany, ale niepotwierdzony",
+      "bad_outcomes_few": "{{count}} nie powiódł się, został odrzucony lub pominięty",
+      "bad_outcomes_many": "{{count}} nie powiódł się, został odrzucony lub pominięty"
     },
     "status": {
       "bounced": "Odbił się",
@@ -2218,9 +2218,9 @@
       "web": "Web dostarczone",
       "recent_failures": "Ostatnie błędy"
     },
-    "trigger_coverage_few": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
-    "trigger_coverage_many": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
     "trigger_coverage_one": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
-    "trigger_coverage_other": "Problemy z {{issues}} w monitorowanych przepływach {{count}}"
+    "trigger_coverage_other": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
+    "trigger_coverage_few": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
+    "trigger_coverage_many": "Problemy z {{issues}} w monitorowanych przepływach {{count}}"
   }
 }

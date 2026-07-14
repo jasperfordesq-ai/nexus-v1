@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Superbeheerder laden",
+    "skip_to_main": "Ga naar de hoofdinhoud",
+    "close_navigation": "Sluit de hoofdbeheerdernavigatie",
+    "navigation": "Super admin-navigatie"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Terug naar beheerder",
+    "toggle_sidebar": "Zijbalk schakelen",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "Super beheerdersmenu",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Zijbalk uitvouwen",
+    "collapse": "Zijbalk samenvouwen",
+    "nav_label": "Super admin-navigatie"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "Recente activiteit",
       "full_log_btn": "Volledig logboek",
       "no_federation_activity": "Nog geen federatieactiviteit",
-      "by_label": "by",
+      "by_label": "door",
       "activity_title": "Federatie-activiteit (30 dagen)",
       "stat_total_actions": "Totaal aantal acties",
       "stat_messages": "Berichten",

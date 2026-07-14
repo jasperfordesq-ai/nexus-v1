@@ -57,7 +57,7 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
-    "loading": "Loading",
+    "loading": "Ag lódáil",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -83,12 +83,12 @@
     "categories": {
       "general_admin": "Riarachán Ginearálta",
       "caring_community": "Pobal Cúramach",
-      "kiss_agoris": "Caring Community"
+      "kiss_agoris": "Pobal Cúramach"
     },
-    "search_placeholder_few": "Cuardaigh altanna cabhrach{{count}}...",
-    "search_placeholder_many": "Cuardaigh altanna cabhrach{{count}}...",
     "search_placeholder_one": "Cuardaigh altanna cabhrach{{count}}...",
     "search_placeholder_other": "Cuardaigh altanna cabhrach{{count}}...",
+    "search_placeholder_few": "Cuardaigh altanna cabhrach{{count}}...",
+    "search_placeholder_many": "Cuardaigh altanna cabhrach{{count}}...",
     "search_placeholder_two": "Cuardaigh altanna cabhrach{{count}}..."
   },
   "help_faqs": {

@@ -1,16 +1,32 @@
 {
   "title": "Blog",
   "postTitle": "Entrada del blog",
+  "heroEyebrow": "Diario de la comunidad",
+  "subtitle": "Historias, guías y actualizaciones de la comunidad del banco de tiempo.",
   "searchPlaceholder": "Buscar artículos…",
+  "searchAction": "Buscar",
+  "clearSearch": "Borrar búsqueda",
   "empty": "Todavía no hay artículos.",
+  "emptyHint": "Las historias y actualizaciones de la comunidad aparecerán aquí.",
+  "emptyFiltered": "No hay artículos coincidentes",
+  "emptyFilteredHint": "Pruebe con una búsqueda diferente.",
+  "loadMore": "Cargar más",
+  "postsCount": "{{count}} publicación",
+  "postsCount_other": "{{count}} publicaciones",
+  "publishedOn": "{{date}}",
   "readingTime": "{{minutes}} min de lectura",
   "by": "Por {{name}}",
   "detail": {
     "title": "Artículo",
     "notFound": "Artículo no encontrado.",
+    "notFoundHint": "Es posible que este artículo se haya eliminado o ya no esté disponible.",
     "invalidId": "ID de artículo no válido.",
+    "invalidIdHint": "No pudimos identificar qué artículo abrir.",
     "goBack": "Volver",
+    "backToBlog": "Volver al blog",
     "readFull": "Leer el artículo completo",
-    "share": "Compartir publicación"
+    "share": "Compartir publicación",
+    "tags": "Temas",
+    "article": "Artículo"
   }
 }

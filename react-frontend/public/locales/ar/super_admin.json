@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "تحميل المشرف المتميز",
+    "skip_to_main": "انتقل إلى المحتوى الرئيسي",
+    "close_navigation": "أغلق تنقل المشرف المتميز",
+    "navigation": "التنقل المشرف الفائق"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "العودة إلى المشرف",
+    "toggle_sidebar": "تبديل الشريط الجانبي",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "قائمة المشرف المتميز",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "قم بتوسيع الشريط الجانبي",
+    "collapse": "طي الشريط الجانبي",
+    "nav_label": "التنقل المشرف الفائق"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "النشاط الأخير",
       "full_log_btn": "سجل كامل",
       "no_federation_activity": "لا يوجد أي نشاط للاتحاد حتى الآن",
-      "by_label": "by",
+      "by_label": "بواسطة",
       "activity_title": "نشاط الاتحاد (30 يومًا)",
       "stat_total_actions": "إجمالي الإجراءات",
       "stat_messages": "رسائل",

@@ -1,6 +1,6 @@
 {
-  "skip_to_main": "Skip to main content",
-  "admin_navigation": "Admin navigation",
+  "skip_to_main": "Przejdź do głównej treści",
+  "admin_navigation": "Nawigacja administratora",
   "community_fund": "Community Fund",
   "dashboard": "Panel",
   "users": "Użytkownicy",
@@ -66,7 +66,7 @@
   "platform_operations": "Operacje platformy",
   "intelligence_diagnostics": "Inteligencja i diagnostyka",
   "integrations": "Integracje",
-  "partner_api_integrations": "Partner APIs & integrations",
+  "partner_api_integrations": "Interfejsy API i integracje partnerów",
   "partner_timebanks": "Partnerskie banki czasu",
   "super_admin": "Superadministrator",
   "super_admin_panel": "Super Admin Panel",
@@ -89,7 +89,7 @@
   "back_to_site": "Powrót do witryny",
   "back_to_site_header": "Powrót do strony",
   "toggle_sidebar": "Przełącz pasek boczny",
-  "close_sidebar": "Close sidebar",
+  "close_sidebar": "Zamknij pasek boczny",
   "notifications": "Powiadomienia",
   "support_requests": "Zgłoszenia do pomocy",
   "support_requests_count": "{{count}} otwartych zgłoszeń do pomocy",
@@ -249,10 +249,10 @@
   "module_configuration": "Konfiguracja modułu",
   "translation_config": "Ustawienia tłumaczeń",
   "federation_cc_config": "Konfiguracja karty kredytowej",
-  "federation_group_core_network": "Core network",
-  "federation_group_trust_settlement": "Trust & settlement",
-  "federation_group_partner_protocols": "Partner protocols",
-  "federation_group_monitoring_data": "Monitoring & data",
+  "federation_group_core_network": "Sieć rdzeniowa",
+  "federation_group_trust_settlement": "Zaufanie i rozliczenie",
+  "federation_group_partner_protocols": "Protokoły partnerów",
+  "federation_group_monitoring_data": "Monitorowanie i dane",
   "expand_sidebar": "Rozwiń pasek boczny",
   "collapse_sidebar": "Zwiń pasek boczny",
   "search_nav": "Wyszukaj administratora...",
@@ -521,12 +521,10 @@
     "refresh": "Odświeżać",
     "total_count": "Łącznie{{count}}",
     "data_table": "Dane",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "select_row": "Select row {{id}}",
-    "total_count_few": "Łącznie{{count}}",
-    "total_count_many": "Łącznie{{count}}",
     "total_count_one": "Łącznie{{count}}",
     "total_count_other": "Łącznie{{count}}",
     "statuses": {
@@ -553,7 +551,9 @@
       "user_created": "Utworzono użytkownika",
       "user_moved": "Przeniesiono użytkownika",
       "unknown": "Nieznany"
-    }
+    },
+    "total_count_few": "Łącznie{{count}}",
+    "total_count_many": "Łącznie{{count}}"
   },
   "help_drawer": {
     "aria_label": "Pomoc: {{title}}",
@@ -571,14 +571,14 @@
     "destructive_warning": "Tej akcji nie można cofnąć.",
     "reason_label": "Powód",
     "reason_placeholder": "Podaj powód tego działania",
-    "selected_count_few": "Wybrano {{count}}",
-    "selected_count_many": "Wybrano {{count}}",
     "selected_count_one": "Wybrano {{count}}",
     "selected_count_other": "Wybrano {{count}}",
-    "confirm_message_few": "Czy na pewno chcesz {{action}} {{count}}?",
-    "confirm_message_many": "Czy na pewno chcesz {{action}} {{count}}?",
     "confirm_message_one": "Czy na pewno chcesz {{action}} {{count}}?",
-    "confirm_message_other": "Czy na pewno chcesz {{action}} {{count}}?"
+    "confirm_message_other": "Czy na pewno chcesz {{action}} {{count}}?",
+    "selected_count_few": "Wybrano {{count}}",
+    "selected_count_many": "Wybrano {{count}}",
+    "confirm_message_few": "Czy na pewno chcesz {{action}} {{count}}?",
+    "confirm_message_many": "Czy na pewno chcesz {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Anuluj"
@@ -624,8 +624,8 @@
       "search": "Szukaj"
     }
   },
-  "support_requests_count_few": "{{count}} otwartych zgłoszeń do pomocy",
-  "support_requests_count_many": "{{count}} otwartych zgłoszeń do pomocy",
   "support_requests_count_one": "{{count}} otwartych zgłoszeń do pomocy",
-  "support_requests_count_other": "{{count}} otwartych zgłoszeń do pomocy"
+  "support_requests_count_other": "{{count}} otwartych zgłoszeń do pomocy",
+  "support_requests_count_few": "{{count}} otwartych zgłoszeń do pomocy",
+  "support_requests_count_many": "{{count}} otwartych zgłoszeń do pomocy"
 }

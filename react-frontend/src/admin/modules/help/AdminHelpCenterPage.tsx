@@ -8,7 +8,7 @@ import BookOpen from 'lucide-react/icons/book-open';
 import SearchIcon from 'lucide-react/icons/search';
 import HelpCircle from 'lucide-react/icons/help-circle';
 import { PageHeader } from '../../components/PageHeader';
-import { HELP_CONTENT, type HelpArticle } from '../../data/helpContent';
+import { getHelpContent, type HelpArticle } from '../../data/helpContent';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -56,17 +56,18 @@ function categoryKey(category: Category): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function AdminHelpCenterPage() {
-  const { t } = useTranslation('admin_help_module');
+  const { t } = useTranslation(['admin_help_module', 'admin_help']);
   usePageTitle(t('admin_help.page_title'));
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const helpContent = useMemo(() => getHelpContent(t), [t]);
 
   // Filter + categorise in one pass
   const categorised = useMemo(() => {
     const q = query.toLowerCase().trim();
 
-    const filtered = Object.entries(HELP_CONTENT).filter(
+    const filtered = Object.entries(helpContent).filter(
       ([, article]: [string, HelpArticle]) =>
         !q ||
         article.title.toLowerCase().includes(q) ||
@@ -84,11 +85,11 @@ export default function AdminHelpCenterPage() {
       category: cat,
       articles: groups.get(cat) ?? [],
     })).filter((g) => g.articles.length > 0);
-  }, [query]);
+  }, [helpContent, query]);
 
   const totalArticles = useMemo(
-    () => Object.keys(HELP_CONTENT).length,
-    [],
+    () => Object.keys(helpContent).length,
+    [helpContent],
   );
 
   const isEmpty = query.trim() && categorised.length === 0;

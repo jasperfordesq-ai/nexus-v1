@@ -1,8 +1,24 @@
 {
   "title": "Obiettivi",
+  "subtitle": "Imposta traguardi personali, monitora i progressi e mantieni visibile il tuo slancio.",
+  "heroEyebrow": "Progresso personale",
   "confirmAbandon": "Sei sicuro di voler abbandonare questo obiettivo?",
   "empty": "Nessun obiettivo ancora.",
   "addGoal": "Aggiungi obiettivo",
+  "percent": "{{percent}}%",
+  "momentumOn": "Costruisci",
+  "momentumEmpty": "Pronto",
+  "buddy": "Amico: {{name}}",
+  "visibility": {
+    "public": "Pubblico"
+  },
+  "stats": {
+    "active": "Attivo",
+    "completed": "Completato",
+    "total": "Totale",
+    "momentum": "Slancio",
+    "averageProgress": "Progresso medio"
+  },
   "status": {
     "active": "Attivo",
     "completed": "Completato",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Crea il tuo primo obiettivo per iniziare a monitorare i tuoi progressi.",
   "create": {
     "title": "Nuovo obiettivo",
+    "subtitle": "Datti un obiettivo chiaro su cui lavorare.",
+    "close": "Modulo obiettivo vicino",
     "titleLabel": "Titolo dell'obiettivo",
     "titlePlaceholder": "es. Aiutare 5 vicini",
     "descriptionLabel": "Descrizione (facoltativo)",
+    "descriptionPlaceholder": "Aggiungi un piccolo contesto o un primo passaggio.",
     "targetHoursLabel": "Ore target (facoltativo)",
+    "targetPlaceholder": "ad es. 10",
     "dueDateLabel": "Data di scadenza (facoltativo)",
     "submit": "Crea obiettivo",
     "error": "Impossibile creare l'obiettivo."

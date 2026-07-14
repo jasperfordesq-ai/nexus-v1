@@ -1,6 +1,59 @@
 {
   "title": "Baill",
+  "heroEyebrow": "Eolaire an phobail",
+  "subtitle": "Aimsigh comharsana, scileanna, leasanna comhroinnte, agus baill iontaofa an bhainc ama.",
+  "directory": " Eolaire ball",
+  "filtersIntro": "Cuardaigh de réir ainm, téacs próifíle, nó sonraí ball áitiúil.",
+  "resultsLoading": "Lódáil",
+  "memberCount": "{{count}} ball",
+  "memberCount_other": "{{count}} baill",
+  "verifiedCount": "{{count}} fíoraithe",
+  "hoursCount": "{{count}} uair malartaithe",
+  "loadedCount": "{{count}} luchtaithe",
+  "clearSearch": "Glan cuardach",
+  "back": "Ar ais",
+  "share": "Comhroinn próifíl",
   "profileTitle": "Próifíl an bhaill",
+  "connections": {
+    "title": "Ceangail",
+    "eyebrow": "Sreafaí oibre na mball",
+    "subtitle": "Bainistigh do naisc bhall, iarratais ar feitheamh, agus bealaí teachtaireachtaí díreacha.",
+    "tabs": {
+      "accepted": "Ceangailte",
+      "pending_received": "Faighte",
+      "pending_sent": "Seolta"
+    },
+    "empty": {
+      "accepted": {
+        "title": "Níl ceangail ann fós",
+        "description": "Aimsigh baill agus seol iarratais ar cheangail."
+      },
+      "pending_received": {
+        "title": "Ní dhéanfar aon iarratas ar athbhreithniú",
+        "description": "Ní bheidh iarratais ar cheangail isteach le feiceáil anseo."
+      },
+      "pending_sent": {
+        "title": "Níl iarratais seolta ann",
+        "description": "Beidh iarratais ar cheangail a sheolann tú le feiceáil anseo go dtí go nglacfar leo."
+      }
+    },
+    "status": {
+      "accepted": "Ceangailte",
+      "pending_received": "Faighte",
+      "pending_sent": "Seolta"
+    },
+    "browseMembers": "Brabhsáil baill",
+    "viewProfile": "Féach ar phróifíl le haghaidh {{name}}",
+    "connectedSince": "Ceangailte {{date}}",
+    "message": "Teachtaireacht",
+    "remove": "Bain",
+    "accept": "Glac le",
+    "decline": "Diúltaigh",
+    "cancel": "Cealaigh an t-iarratas",
+    "unknownMember": "Ball anaithnid",
+    "actionFailedTitle": "Theip ar nuashonrú an cheangail",
+    "actionFailedDescription": "Déan iarracht eile, le do thoil."
+  },
   "search": {
     "placeholder": "Cuardaigh baill…"
   },
@@ -13,7 +66,48 @@
   "profile": {
     "timeCredits": "{{count}} creidmheas ama",
     "timeCredits_other": "{{count}} creidmheas ama",
+    "hoursGiven": "Uaireanta Tugtha",
+    "hoursReceived": "Uaireanta Faighte",
+    "totalHours": "Uaireanta Iomlána",
+    "about": "Maidir",
     "memberSince": "Ball ó {{date}}",
+    "lastActive": " Gníomhach deireanach {{date}}",
+    "shareMessage": "{{name}} — {{url}}",
+    "sendMessage": "Seol Teachtaireacht",
+    "myProfile": "Mo Phróifíl",
+    "editProfile": "Cuir Próifíl in Eagar",
+    "ownProfileHint": "Coinnigh do phróifíl úr ionas go mbeidh a fhios ag baill eile cad is féidir leat a thairiscint agus cad a bhfuil suim agat ann.",
+    "noBio": "Níor chuir an ball seo beathaisnéis leis fós.",
+    "noBioOwn": "Cuir beathaisnéis ghairid leis ionas go mbeidh a fhios ag baill eile conas teagmháil a dhéanamh leat.",
+    "signInRequired": "Sínigh isteach chun do phróifíl a fheiceáil.",
+    "verified": "Fíoraithe",
+    "federatedMember": "Ball Cónaidhme",
+    "federatedProfile": "Próifíl chónaidhme",
+    "federatedProfileHint": " Roinntear an phróifíl seo ó {{community}} trí líonra an chónaidhm.",
+    "externalFederatedMember": "Ball cónasctha seachtrach",
+    "externalFederatedMemberDescription": " Tá an comhalta seo roinnte ag comhpháirtí seachtrach. Is féidir leat teachtaireacht chónaidhme a thosú, ach fanann an phróifíl iomlán ar an gcóras comhpháirtíochta.",
+    "externalFederatedTrustHint": "Taispeánfar léirmheasanna arna soláthar ag comhpháirtí anseo nuair a roinneann comhpháirtí an chónaidhm iad.",
+    "backToFederatedMembers": "Ar ais chuig baill chónaidhme",
+    "federatedMessaging": "Teachtaireachtaí cumasaithe",
+    "federatedExchanges": "Malartuithe cumasaithe",
+    "sendCredits": "Seol creidmheasanna",
+    "sendCreditsTo": "Seol creidmheasanna chuig {{name}}",
+    "amountHours": "Méid (uaireanta)",
+    "amountPlaceholder": "1-100",
+    "transferDescription": "Cur Síos",
+    "transferDescriptionPlaceholder": "Cad as a bhfuil na creidmheasanna seo?",
+    "transferSummary": "Ag seoladh {{amount}} uair(eanna) chuig {{name}}.",
+    "transferValidationTitle": "Seiceáil sonraí an aistrithe",
+    "transferAmountRequired": "Cuir isteach méid iomlán idir 1 agus 100.",
+    "transferDescriptionRequired": "Cuir cur síos leis ar an aistriú seo.",
+    "transferSuccessTitle": "Creidmheasanna seolta",
+    "transferSuccessMessage": "{{amount}} uair(eanna) seolta chuig {{name}}.",
+    "transferFailedTitle": "Níorbh fhéidir creidmheasanna a sheoladh",
+    "transferFailedMessage": "Seiceáil le do thoil go bhfuil malartuithe cónaidhm cumasaithe agus bain triail eile as.",
+    "cancelTransfer": "Cealaigh an t-aistriú",
+    "sharedListings": "Liostaí comhroinnte",
+    "sharedListing": "Liostú comhroinnte",
+    "loadError": "Níorbh fhéidir próifíl na mball a lódáil. Bain triail eile as le do thoil.",
     "connect": "Ceangail",
     "connected": "Ceangailte",
     "pendingSent": "Iarratas seolta",
@@ -127,7 +221,11 @@
     "noResults": "Gan baill aimsithe do \"{{query}}\""
   },
   "memberCard": {
-    "accessibilityLabel": "Féach ar phróifíl {{name}}"
+    "accessibilityLabel": "Féach ar phróifíl {{name}}",
+    "noTagline": "Ball den Chomhphobal"
   },
-  "loading": "Ag luchtú baill…"
+  "loading": "Ag luchtú baill…",
+  "hrsGiven": "uair tugtha",
+  "hoursGivenShort": "{{count}} tugtha",
+  "hoursTotalShort": "{{count}} iomlán"
 }

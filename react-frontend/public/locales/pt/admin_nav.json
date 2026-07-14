@@ -1,6 +1,6 @@
 {
-  "skip_to_main": "Skip to main content",
-  "admin_navigation": "Admin navigation",
+  "skip_to_main": "Pular para o conteúdo principal",
+  "admin_navigation": "Navegação administrativa",
   "community_fund": "Community Fund",
   "dashboard": "Painel",
   "users": "Usuários",
@@ -66,7 +66,7 @@
   "platform_operations": "Operações da plataforma",
   "intelligence_diagnostics": "Inteligência e diagnósticos",
   "integrations": "Integrações",
-  "partner_api_integrations": "Partner APIs & integrations",
+  "partner_api_integrations": "APIs e integrações de parceiros",
   "partner_timebanks": "Bancos de tempo parceiros",
   "super_admin": "Superadministrador",
   "super_admin_panel": "Super Admin Panel",
@@ -89,7 +89,7 @@
   "back_to_site": "Voltar ao site",
   "back_to_site_header": "Voltar ao site",
   "toggle_sidebar": "Alternar barra lateral",
-  "close_sidebar": "Close sidebar",
+  "close_sidebar": "Fechar barra lateral",
   "notifications": "Notificações",
   "support_requests": "Pedidos de suporte",
   "support_requests_count": "{{count}} pedidos de suporte abertos",
@@ -249,10 +249,10 @@
   "module_configuration": "Configuração do módulo",
   "translation_config": "Configurações de tradução",
   "federation_cc_config": "Configuração de cartão de crédito",
-  "federation_group_core_network": "Core network",
-  "federation_group_trust_settlement": "Trust & settlement",
-  "federation_group_partner_protocols": "Partner protocols",
-  "federation_group_monitoring_data": "Monitoring & data",
+  "federation_group_core_network": "Rede principal",
+  "federation_group_trust_settlement": "Confiança e liquidação",
+  "federation_group_partner_protocols": "Protocolos de parceiros",
+  "federation_group_monitoring_data": "Monitoramento e dados",
   "expand_sidebar": "Expandir barra lateral",
   "collapse_sidebar": "Recolher barra lateral",
   "search_nav": "Pesquisar administrador...",
@@ -521,11 +521,10 @@
     "refresh": "Atualizar",
     "total_count": "{{count}}total",
     "data_table": "Dados",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "select_row": "Select row {{id}}",
-    "total_count_many": "{{count}}total",
     "total_count_one": "{{count}}total",
     "total_count_other": "{{count}}total",
     "statuses": {
@@ -552,7 +551,8 @@
       "user_created": "Utilizador criado",
       "user_moved": "Utilizador movido",
       "unknown": "Desconhecido"
-    }
+    },
+    "total_count_many": "{{count}}total"
   },
   "help_drawer": {
     "aria_label": "Ajuda: {{title}}",
@@ -570,12 +570,12 @@
     "destructive_warning": "Esta ação não pode ser desfeita.",
     "reason_label": "Razão",
     "reason_placeholder": "Forneça um motivo para esta ação",
-    "selected_count_many": "{{count}} selecionado",
     "selected_count_one": "{{count}} selecionado",
     "selected_count_other": "{{count}} selecionado",
-    "confirm_message_many": "Tem certeza de que deseja itens {{action}} {{count}}?",
     "confirm_message_one": "Tem certeza de que deseja itens {{action}} {{count}}?",
-    "confirm_message_other": "Tem certeza de que deseja itens {{action}} {{count}}?"
+    "confirm_message_other": "Tem certeza de que deseja itens {{action}} {{count}}?",
+    "selected_count_many": "{{count}} selecionado",
+    "confirm_message_many": "Tem certeza de que deseja itens {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Cancelar"
@@ -621,7 +621,7 @@
       "search": "Pesquisar"
     }
   },
-  "support_requests_count_many": "{{count}} pedidos de suporte abertos",
   "support_requests_count_one": "{{count}} pedidos de suporte abertos",
-  "support_requests_count_other": "{{count}} pedidos de suporte abertos"
+  "support_requests_count_other": "{{count}} pedidos de suporte abertos",
+  "support_requests_count_many": "{{count}} pedidos de suporte abertos"
 }

@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Super Admin wird geladen",
+    "skip_to_main": "Zum Hauptinhalt springen",
+    "close_navigation": "Schließen Sie die Super-Admin-Navigation",
+    "navigation": "Super Admin-Navigation"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Zurück zum Admin",
+    "toggle_sidebar": "Seitenleiste umschalten",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "Super-Admin-Menü",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Seitenleiste erweitern",
+    "collapse": "Seitenleiste einklappen",
+    "nav_label": "Super Admin-Navigation"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "Letzte Aktivität",
       "full_log_btn": "Vollständiges Protokoll",
       "no_federation_activity": "Noch keine Verbandsaktivität",
-      "by_label": "by",
+      "by_label": "von",
       "activity_title": "Föderationsaktivität (30 Tage)",
       "stat_total_actions": "Gesamtaktionen",
       "stat_messages": "Nachrichten",

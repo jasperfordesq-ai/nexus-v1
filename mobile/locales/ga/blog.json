@@ -1,16 +1,32 @@
 {
   "title": "Blag",
   "postTitle": "Postáil bhlag",
+  "heroEyebrow": "Iris an Chomhphobail",
+  "subtitle": "Scéalta, treoracha, agus nuashonruithe ó phobal an bhainc ama.",
   "searchPlaceholder": "Cuardach alt…",
+  "searchAction": "Cuardaigh",
+  "clearSearch": "Glan cuardach",
   "empty": "Níl aon alt ann fós.",
+  "emptyHint": "Beidh scéalta agus nuashonruithe pobail le feiceáil anseo.",
+  "emptyFiltered": "Níl ailt ar bith ann",
+  "emptyFilteredHint": "Bain triail as cuardach eile.",
+  "loadMore": "Lódáil tuilleadh",
+  "postsCount": "{{count}} postáil",
+  "postsCount_other": "{{count}} postáil",
+  "publishedOn": "{{date}}",
   "readingTime": "{{minutes}} nóim léitheoireachta",
   "by": "Le {{name}}",
   "detail": {
     "title": "Alt",
     "notFound": "Alt gan aimsiú.",
+    "notFoundHint": "Seans gur baineadh an t-alt seo nó nach bhfuil sé ar fáil a thuilleadh.",
     "invalidId": "Aitheantas ailt neamhbhailí.",
+    "invalidIdHint": "Níorbh fhéidir linn a aithint cén alt le hoscailt.",
     "goBack": "Ar ais",
+    "backToBlog": "Ar ais go blag",
     "readFull": "Léigh an t-alt iomlán",
-    "share": "Roinn an postáil"
+    "share": "Roinn an postáil",
+    "tags": "Topaicí",
+    "article": "Airteagal"
   }
 }

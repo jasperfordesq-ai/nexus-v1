@@ -1,6 +1,69 @@
 {
   "title": "Impostazioni",
+  "eyebrow": "Preferenze",
+  "subtitle": "Gestisci notifiche, sicurezza e informazioni sulle app.",
+  "appearance": {
+    "title": "Aspetto",
+    "hint": "Scegli come appare l’app su questo dispositivo.",
+    "mode": {
+      "system": "Sistema",
+      "systemHint": "Segui le impostazioni del dispositivo",
+      "light": "Chiaro",
+      "lightHint": "Usa sempre il tema chiaro",
+      "dark": "Scuro",
+      "darkHint": "Usa sempre il tema scuro"
+    }
+  },
   "changePasswordTitle": "Cambia password",
+  "pushNotifications": "Notifiche push",
+  "pushHint": "Scegli quali attività possono essere visualizzate come notifiche del dispositivo.",
+  "emailNotifications": "Notifiche email",
+  "emailHint": "Scegli quali aggiornamenti devono arrivare anche via email.",
+  "push": {
+    "messages": "Nuovi messaggi",
+    "transactions": "Operazioni di accredito temporale",
+    "social": "Attività social"
+  },
+  "email": {
+    "messages": "Messaggi",
+    "connections": "Connessioni",
+    "transactions": "Tempo transazioni di credito",
+    "reviews": "Recensioni"
+  },
+  "saveError": "Impossibile salvare l'impostazione. Riprova.",
+  "about": "Informazioni",
+  "aboutHint": "Versione dell'app e licenze open source.",
+  "version": "Versione",
+  "unknownVersion": "Sconosciuta",
+  "license": "Licenza",
+  "security": "Sicurezza",
+  "securityHint": "Mantieni aggiornato l'accesso al tuo account.",
+  "changePassword": "Cambia Password",
+  "password": {
+    "eyebrow": "Sicurezza dell'account",
+    "title": "Cambia Password",
+    "hint": "Inserisci la tua password attuale, quindi scegline una nuova.",
+    "currentLabel": "Password attuale",
+    "currentPlaceholder": "Inserisci quella corrente password",
+    "newLabel": "Nuova password",
+    "newPlaceholder": "Inserisci la nuova password",
+    "confirmLabel": "Conferma la nuova password",
+    "confirmPlaceholder": "Reinserisci la nuova password",
+    "newHint": "Utilizza almeno 8 caratteri.",
+    "save": "Salva password",
+    "saving": "Salvataggio password...",
+    "reviewTitle": "Pronto per l'aggiornamento?",
+    "reviewSubtitle": "Salva solo quando la nuova password e la conferma corrispondono.",
+    "success": "Password modificata",
+    "successMessage": "La tua password è stata stato aggiornato correttamente.",
+    "validation": {
+      "currentRequired": "Inserisci la tua password attuale.",
+      "newRequired": "Inserisci una nuova password.",
+      "mismatch": "La nuova password e la conferma non corrispondono.",
+      "tooShort": "La nuova password deve essere almeno 12 caratteri."
+    },
+    "changeError": "Impossibile cambiare la password. Riprova."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Privacy",
+    "hint": "Controlla chi può trovarti, visualizzarti e contattarti.",
+    "profileVisibility": "Visibilità del profilo",
+    "changeVisibility": "Modifica",
+    "searchIndexing": "Appare nella ricerca membri",
+    "saveError": "Impossibile salvare le impostazioni sulla privacy. Riprova.",
+    "visibility": {
+      "public": "Visibile pubblicamente",
+      "members": "Visibile ai membri che hanno effettuato l'accesso",
+      "connections": "Visibile alle tue connessioni"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Aspetto",
-    "hint": "Scegli come appare l’app su questo dispositivo.",
-    "mode": {
-      "system": "Sistema",
-      "systemHint": "Segui le impostazioni del dispositivo",
-      "light": "Chiaro",
-      "lightHint": "Usa sempre il tema chiaro",
-      "dark": "Scuro",
-      "darkHint": "Usa sempre il tema scuro"
-    }
   }
 }

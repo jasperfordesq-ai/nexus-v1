@@ -200,6 +200,15 @@ function validateMobileNativeLocales() {
 
 function snapshotAdminHelpContent() {
   const source = fs.readFileSync(ADMIN_HELP_CONTENT_PATH, 'utf8');
+  // Once the registry is served from locale JSON, this file contains only
+  // types and an i18next accessor. Implementation keys are not translation
+  // debt, so the legacy static-registry ratchet is complete.
+  if (!source.includes('export const HELP_CONTENT')) {
+    return {
+      count: 0,
+      sha256: createHash('sha256').update('localized-admin-help', 'utf8').digest('hex'),
+    };
+  }
   const sourceFile = ts.createSourceFile(
     ADMIN_HELP_CONTENT_PATH,
     source,
@@ -243,33 +252,72 @@ function flattenLocaleKeys(value, prefix = '', keys = new Set()) {
   return keys;
 }
 
+function flattenLocaleValues(value, prefix = '', values = new Map()) {
+  for (const [key, child] of Object.entries(value)) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (child && typeof child === 'object' && !Array.isArray(child)) {
+      flattenLocaleValues(child, fullKey, values);
+    } else {
+      values.set(fullKey, child);
+    }
+  }
+  return values;
+}
+
+function interpolationVariables(value) {
+  return [...String(value).matchAll(/\{\{\s*([^},\s]+)[^}]*\}\}/g)]
+    .map((match) => match[1])
+    .sort()
+    .join(',');
+}
+
 function snapshotMobileLocaleGaps() {
   const englishDirectory = path.join(MOBILE_LOCALES_ROOT, 'en');
   const namespaceFiles = fs.readdirSync(englishDirectory)
     .filter((file) => file.endsWith('.json'))
     .sort();
   let missingKeys = 0;
+  const files = {};
+  const interpolationErrors = [];
 
   for (const namespaceFile of namespaceFiles) {
-    const english = flattenLocaleKeys(
-      JSON.parse(fs.readFileSync(path.join(englishDirectory, namespaceFile), 'utf8')),
-    );
+    const englishPayload = JSON.parse(fs.readFileSync(path.join(englishDirectory, namespaceFile), 'utf8'));
+    const english = flattenLocaleKeys(englishPayload);
+    const englishValues = flattenLocaleValues(englishPayload);
     for (const language of MOBILE_LANGUAGES.filter((item) => item !== 'en')) {
       const localePath = path.join(MOBILE_LOCALES_ROOT, language, namespaceFile);
       if (!fs.existsSync(localePath)) {
         missingKeys += english.size;
+        files[`${language}/${namespaceFile}`] = english.size;
         continue;
       }
-      const translated = flattenLocaleKeys(JSON.parse(fs.readFileSync(localePath, 'utf8')));
+      const translatedPayload = JSON.parse(fs.readFileSync(localePath, 'utf8'));
+      const translated = flattenLocaleKeys(translatedPayload);
+      const translatedValues = flattenLocaleValues(translatedPayload);
+      let fileMissingKeys = 0;
       for (const key of english) {
         if (!translated.has(key)) {
           missingKeys += 1;
+          fileMissingKeys += 1;
+        }
+      }
+      if (fileMissingKeys > 0) {
+        files[`${language}/${namespaceFile}`] = fileMissingKeys;
+      }
+      for (const [key, englishValue] of englishValues) {
+        if (!translatedValues.has(key)) continue;
+        const expected = interpolationVariables(englishValue);
+        const actual = interpolationVariables(translatedValues.get(key));
+        if (expected !== actual) {
+          interpolationErrors.push(
+            `${language}/${namespaceFile}:${key} interpolation variables differ (${expected || 'none'} -> ${actual || 'none'})`,
+          );
         }
       }
     }
   }
 
-  return { missingKeys };
+  return { missingKeys, files, interpolationErrors };
 }
 
 function parseLiterals(output, scopePrefix = '') {
@@ -363,6 +411,7 @@ const parsedMobileLint = parseLiterals(mobileLintResult.output, 'mobile/');
 const literals = [...parsedLint.literals, ...parsedMobileLint.literals];
 const adminHelpSnapshot = snapshotAdminHelpContent();
 const mobileLocaleGapSnapshot = snapshotMobileLocaleGaps();
+nativeLocaleErrors.push(...mobileLocaleGapSnapshot.interpolationErrors);
 const byFile = summarizeByFile(literals);
 const interpolationDiagnostics = [
   ...parsedLint.interpolationDiagnostics,
@@ -451,6 +500,12 @@ console.log(`  Baseline:                   ${baseline.count}`);
 console.log('  Scope:                      member/admin web + mobile (legal corpus separately governed)');
 console.log(`  Ratcheted admin-help text:  ${adminHelpSnapshot.count}`);
 console.log(`  Mobile locale-key gaps:     ${mobileLocaleGapSnapshot.missingKeys}`);
+console.log(`  Mobile interpolation gaps:  ${mobileLocaleGapSnapshot.interpolationErrors.length}`);
+if (args.includes('--details')) {
+  for (const [file, count] of Object.entries(mobileLocaleGapSnapshot.files)) {
+    console.log(`    ${file}: ${count}`);
+  }
+}
 
 if (literals.length > baseline.count || adminHelpRegressed || mobileLocaleGapsRegressed) {
   console.error('');

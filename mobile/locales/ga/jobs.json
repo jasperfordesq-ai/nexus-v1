@@ -1,6 +1,9 @@
 {
   "title": "Poist",
+  "eyebrow": "Róil phobail",
+  "subtitle": "Brabhsáil róil íoctha, oibrithe deonacha agus creidmheasa ama ón bpobal.",
   "detailTitle": "Sonraí an phoist",
+  "createJob": "Cruthaigh post",
   "tabs": {
     "browse": "Brabhsáil",
     "myApplications": "Mo iarratais",
@@ -8,7 +11,13 @@
     "alerts": "Alerts"
   },
   "search": {
-    "placeholder": "Cuardaigh poist..."
+    "placeholder": "Cuardaigh poist...",
+    "advanced": "Cuardach Casta",
+    "boolean_hint": "m.sh. \"forbróir | innealtóir\", \"react -sóisearach\"",
+    "salary_min": "Íostuarastal",
+    "salary_max": "Uastuarastal",
+    "company_size_filter": "Méid na cuideachta",
+    "benefits_filter": "Eochairfhocal sochar"
   },
   "filters": {
     "type": {
@@ -47,7 +56,10 @@
     "closesIn": "Dúnann i {{count}} lá",
     "goBack": "Ar ais",
     "notFound": "Post gan aimsiú.",
+    "notFoundHint": " Seans gur baineadh, dúnadh nó bogadh an ról seo.",
     "invalidId": "Aitheantas poist neamhbhailí.",
+    "invalidIdHint": "Níorbh fhéidir linn an ról atá le hoscailt a aithint.",
+    "browseJobs": "Brabhsáil poist",
     "saveError": "Níorbh fhéidir an staid shábháilte a nuashonrú.",
     "timeCredits": "{{count}} creidmheas ama",
     "salaryAnnual": "bliain",
@@ -59,6 +71,9 @@
     "kanban_board": "Píblíne",
     "close_vacancy": "Dún",
     "reopen_vacancy": "Oscail arís",
+    "postedBy": "Postáilte ag",
+    "keyDetails": "Sonraí an róil",
+    "views": "{{count}} amharc",
     "closesIn_one": "Dúnann i {{count}} lá",
     "timeCredits_one": "{{count}} creidmheas ama"
   },
@@ -119,11 +134,6 @@
     "successMessage": "Seoladh d'iarratas. Ádh mór ort!",
     "error": "Theip ar sheoladh an iarratais"
   },
-  "saved_profile": {
-    "found": "Próifíl iarratais sábháilte aimsithe",
-    "use": "Úsáid litir chlúdaigh shábháilte",
-    "start_fresh": "Tosaigh ón tús"
-  },
   "applications": {
     "empty": "Gan iarratas fós",
     "emptyHint": "Déan iarratas ar phoist chun iad a fheiceáil anseo",
@@ -140,6 +150,14 @@
       "rejected": "Diúltaithe",
       "withdrawn": "Tarraingthe siar"
     },
+    "interview_proposed": "Agallamh iarrtha",
+    "accept_interview": "Glac le",
+    "decline_interview": "Diúltaigh",
+    "interview_confirmed": "Agallamh Deimhnithe",
+    "offer_received": "Fuair ​​tú tairiscint poist!",
+    "accept_offer": "Glac le Tairiscint",
+    "decline_offer": "Diúltaigh",
+    "offer_accepted": "Tairiscint Glactha",
     "showMessage": "Show cover message",
     "hideMessage": "Hide cover message",
     "history": "History",
@@ -150,10 +168,6 @@
     "withdraw": "Withdraw",
     "withdrawSuccess": "Application withdrawn.",
     "withdrawError": "Could not withdraw this application."
-  },
-  "postings": {
-    "empty": "Níl aon fhógraí fós",
-    "emptyHint": "Cruthaigh post chun do róil a bhainistiú anseo."
   },
   "owner": {
     "toolsTitle": "Uirlisí úinéara",
@@ -180,6 +194,27 @@
     "moveToInterview": "Agallamh",
     "updateError": "Níorbh fhéidir an t-iarratas seo a nuashonrú."
   },
+  "postings": {
+    "empty": "Níl aon fhógraí fós",
+    "emptyHint": "Cruthaigh post chun do róil a bhainistiú anseo."
+  },
+  "template": {
+    "start_from": "Tosaigh ó theimpléad (roghnach)",
+    "no_templates": "Níl aon teimpléid fós",
+    "save_as": "Sábháil mar Theimpléad",
+    "template_name": "Ainm an teimpléid",
+    "share_with_team": "Roinn leis an bhfoireann (teimpléad poiblí)",
+    "saving": "Sábháil...",
+    "saved": "Teimpléad sábháilte!"
+  },
+  "benchmark": {
+    "market_rate": "Ráta margaidh do \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (meánach: {{currency}}{{median}})"
+  },
+  "saved_profile": {
+    "found": "Próifíl iarratais sábháilte aimsithe",
+    "use": "Úsáid litir chlúdaigh shábháilte",
+    "start_fresh": "Tosaigh ón tús"
+  },
   "empty": "Níor aimsíodh aon phoist",
   "emptyHint": "Bain triail as do scagairí a choigeartú nó fill níos déanaí",
   "loadMore": "Luchtaigh níos mó",
@@ -191,6 +226,7 @@
     "title": "Cruthaigh post",
     "editTitle": "Cuir post in eagar",
     "subtitle": "Foilsigh ról íoctha, deonach nó le creidmheasanna ama.",
+    "editSubtitle": "Nuashonraigh sonraí an róil, trédhearcacht tuarastail agus socruithe feidhmchláir.",
     "titleLabel": "Teideal",
     "titlePlaceholder": "Teideal an róil",
     "descriptionLabel": "Cur síos",
@@ -232,6 +268,14 @@
     "taglinePlaceholder": "Cad a dhéanann an fhoireann seo speisialta?",
     "videoUrlLabel": "URL físe cultúir",
     "videoUrlPlaceholder": "https://example.org/video",
+    "companySizeLabel": "Méid na cuideachta",
+    "companySize": {
+      "1-10": "1-10",
+      "11-50": "11-50",
+      "51-200": "51-200",
+      "201-500": "201-500",
+      "500+": "500+"
+    },
     "benefitsLabel": "Sochair",
     "benefitsPlaceholder": "Sochair scartha le camóga",
     "deadlineLabel": "Spriocdháta",
@@ -245,9 +289,14 @@
     "updateSubmit": "Nuashonraigh post",
     "validationTitle": "Seiceáil sonraí an phoist",
     "validationRequired": "Cuir teideal agus cur síos leis.",
+    "deadlinePast": "Caithfidh an spriocdháta a bheith ina dháta sa todhchaí.",
+    "salaryRangeInvalid": "Ní féidir le híostuarastal a bheith níos mó ná uastuarastal.",
+    "salaryRequired": "Réimse tuarastail ag teastáil. Is féidir leat an tuarastal a mharcáil in soshannta chun é a fhágáil ar lár.",
     "failedTitle": "Níor sábháladh an post",
     "loadFailed": "Níorbh fhéidir an post seo a luchtú lena chur in eagar.",
-    "failedDescription": "Níorbh fhéidir an post a shábháil. Bain triail eile as."
+    "failedDescription": "Níorbh fhéidir an post a shábháil. Bain triail eile as.",
+    "editFailedTitle": " Post gan nuashonrú",
+    "editFailedDescription": "Níorbh fhéidir linn an post a nuashonrú. Bain triail eile as."
   },
   "alerts": {
     "title": "Job alerts",

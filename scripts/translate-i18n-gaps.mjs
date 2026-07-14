@@ -28,8 +28,12 @@
  *   --missing-only     Only translate absent keys, not existing English fallback values
  *   --force            Re-translate strings even if they already differ from EN
  *   --include-simple   Translate short/simple strings too (useful for missing UI labels)
+ *   --include-title-case  Translate title-cased labels normally treated as product names
+ *   --include-core-namespaces  Include namespaces normally handled by dedicated checks
  *   --translate-skipped-missing  Translate otherwise protected values only when the key is absent
+ *   --copy-skipped-missing  Copy missing invariant values (paths, tokens, URLs) from English
  *   --google           Use Google's public translate endpoint when no API key is available
+ *   --concurrency <n>  Maximum parallel Google requests (default: 1, maximum: 10)
  *   --summary          Print a summary of gaps before translating
  */
 
@@ -109,6 +113,7 @@ const SKIP_NAMESPACES = new Set([
 // formatter fragments, sample values, and product/technology names).
 const HARD_NO_TRANSLATE_PATTERNS = [
   /^https?:\/\//,           // URLs
+  /^\/[a-z0-9/_-]+$/i,      // application paths
   /^\{\{.*\}\}$/,           // pure Handlebars templates
   /^\d+$/,                  // pure numbers
   /^[A-Z_]+$/,              // ALL_CAPS constants
@@ -137,8 +142,8 @@ const HARD_NO_TRANSLATE_PATTERNS = [
   /^Capacitor\s+\(iOS\s+\+\s+Android\)$/i,
   /^(?:AI|API|URL|ID|XP|CV|OAuth|GDPR|DSA|FAQ|UTC|HTTP|HTTPS|JSON|CSV|PDF|PNG|JPG|JPEG|WebP|MP4|MOV|WebM|ICS)$/i,
   /^(?:Google|Facebook|Outlook|OpenAI|MariaDB|Meilisearch|Laravel|PHP|React|TypeScript|HeroUI|Tailwind CSS|Firebase Cloud Messaging|Pusher WebSockets|NexusScore|NEXUS|Verein|Vereine|Spitex)(?:\b.*)?$/i,
-  /^[A-Z][A-Za-z0-9+.-]*(?:\s+[A-Z][A-Za-z0-9+.-]*)*(?:\s+v?\d+(?:\.\d+)*(?:\+)?)*$/,
 ];
+const TITLE_CASE_NO_TRANSLATE_PATTERN = /^[A-Z][A-Za-z0-9+.-]*(?:\s+[A-Z][A-Za-z0-9+.-]*)*(?:\s+v?\d+(?:\.\d+)*(?:\+)?)*$/;
 
 // Strings matching these patterns are skipped by default, but --include-simple
 // can still process them when intentionally translating short UI labels.
@@ -196,12 +201,19 @@ const DRY_RUN = args.includes('--dry-run');
 const MISSING_ONLY = args.includes('--missing-only');
 const FORCE = args.includes('--force');
 const INCLUDE_SIMPLE = args.includes('--include-simple');
+const INCLUDE_TITLE_CASE = args.includes('--include-title-case');
+const INCLUDE_CORE_NAMESPACES = args.includes('--include-core-namespaces');
 const TRANSLATE_SKIPPED_MISSING = args.includes('--translate-skipped-missing');
+const COPY_SKIPPED_MISSING = args.includes('--copy-skipped-missing');
 const USE_GOOGLE = args.includes('--google');
 const nsFilter = args.includes('--namespace') ? args[args.indexOf('--namespace') + 1] : null;
 const langFilter = args.includes('--lang') ? args[args.indexOf('--lang') + 1] : null;
 const SUMMARY_ONLY = args.includes('--summary');
 const SHOW_DETAILS = args.includes('--details');
+const concurrencyArg = args.includes('--concurrency') ? Number(args[args.indexOf('--concurrency') + 1]) : 1;
+const GOOGLE_CONCURRENCY = Number.isInteger(concurrencyArg)
+  ? Math.min(10, Math.max(1, concurrencyArg))
+  : 1;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -209,7 +221,7 @@ function flattenKeys(obj, prefix = '') {
   const result = {};
   for (const [k, v] of Object.entries(obj)) {
     const key = prefix ? `${prefix}.${k}` : k;
-    if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+    if (typeof v === 'object' && v !== null) {
       Object.assign(result, flattenKeys(v, key));
     } else {
       result[key] = v;
@@ -222,8 +234,8 @@ function setNestedKey(obj, keyPath, value) {
   const parts = keyPath.split('.');
   let cur = obj;
   for (let i = 0; i < parts.length - 1; i++) {
-    if (typeof cur[parts[i]] !== 'object' || cur[parts[i]] === null || Array.isArray(cur[parts[i]])) {
-      cur[parts[i]] = {};
+    if (typeof cur[parts[i]] !== 'object' || cur[parts[i]] === null) {
+      cur[parts[i]] = /^\d+$/.test(parts[i + 1]) ? [] : {};
     }
     cur = cur[parts[i]];
   }
@@ -234,6 +246,7 @@ function shouldSkipValue(val) {
   if (typeof val !== 'string') return true;
   if (!val.trim()) return true;
   if (HARD_NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
+  if (!INCLUDE_TITLE_CASE && TITLE_CASE_NO_TRANSLATE_PATTERN.test(val.trim())) return true;
   if (isTemplateFragment(val)) return true;
   if (INCLUDE_SIMPLE) {
     return false;
@@ -409,9 +422,10 @@ ${JSON.stringify(toTranslate, null, 2)}`;
 }
 
 async function translateBatchGoogle(texts, targetLangCode) {
-  const results = [];
+  const results = new Array(texts.length);
+  let nextIndex = 0;
 
-  for (const text of texts) {
+  async function translateOne(text, attempt = 1) {
     const { escaped, vars } = escapeVars(text);
     const url = new URL('https://translate.googleapis.com/translate_a/single');
     url.searchParams.set('client', 'gtx');
@@ -423,6 +437,10 @@ async function translateBatchGoogle(texts, targetLangCode) {
     const res = await fetch(url);
     if (!res.ok) {
       const err = await res.text();
+      if ((res.status === 429 || res.status >= 500) && attempt < 4) {
+        await new Promise(resolve => setTimeout(resolve, 250 * (2 ** attempt)));
+        return translateOne(text, attempt + 1);
+      }
       throw new Error(`Google Translate error ${res.status}: ${err}`);
     }
 
@@ -430,10 +448,20 @@ async function translateBatchGoogle(texts, targetLangCode) {
     const translated = Array.isArray(data?.[0])
       ? data[0].map((part) => part?.[0] ?? '').join('')
       : '';
-    results.push(restoreVars(translated, vars));
-
-    await new Promise(r => setTimeout(r, 80));
+    return restoreVars(translated, vars);
   }
+
+  async function worker() {
+    while (nextIndex < texts.length) {
+      const index = nextIndex++;
+      results[index] = await translateOne(texts[index]);
+    }
+  }
+
+  await Promise.all(Array.from(
+    { length: Math.min(GOOGLE_CONCURRENCY, texts.length) },
+    () => worker(),
+  ));
 
   return results;
 }
@@ -504,7 +532,7 @@ async function main() {
     if (!fs.existsSync(langDir)) fs.mkdirSync(langDir, { recursive: true });
 
     for (const file of enFiles) {
-      if (SKIP_NAMESPACES.has(file)) continue;
+      if (!INCLUDE_CORE_NAMESPACES && SKIP_NAMESPACES.has(file)) continue;
       if (nsFilter && !file.includes(nsFilter)) continue;
 
       const enPath = path.join(enDir, file);
@@ -523,6 +551,7 @@ async function main() {
       // - Value is identical to English (gap-fill fallback — not yet translated)
       // - --force: re-translate even strings that already differ from English
       const keysToTranslate = [];
+      const keysToCopy = [];
       for (const [key, enVal] of Object.entries(enFlat)) {
         if (typeof enVal !== 'string') continue;
         const langVal = langFlat[key];
@@ -532,7 +561,10 @@ async function main() {
         // gaps. This opt-in translates only those ABSENT values; it never
         // rewrites an existing protected token.
         if (shouldSkipValue(enVal)
-          && !(TRANSLATE_SKIPPED_MISSING && langVal === undefined)) continue;
+          && !(TRANSLATE_SKIPPED_MISSING && langVal === undefined)) {
+          if (COPY_SKIPPED_MISSING && langVal === undefined) keysToCopy.push({ key, enVal });
+          continue;
+        }
         const needsTranslation =
           langVal === undefined ||   // missing
           (!MISSING_ONLY && langVal === enVal && !isAllowedIdenticalValue(lang, enVal)) ||
@@ -543,7 +575,7 @@ async function main() {
         }
       }
 
-      if (keysToTranslate.length === 0) continue;
+      if (keysToTranslate.length === 0 && keysToCopy.length === 0) continue;
 
       totalGaps += keysToTranslate.length;
 
@@ -570,16 +602,19 @@ async function main() {
       }
 
       try {
-        const translated = await translateBatch(
+        const translated = keysToTranslate.length > 0 ? await translateBatch(
           keysToTranslate.map(k => k.enVal),
           lang,
           deeplCode
-        );
+        ) : [];
 
         // Merge translations back into langData
         const updated = JSON.parse(JSON.stringify(langData)); // deep clone
         keysToTranslate.forEach(({ key }, idx) => {
           setNestedKey(updated, key, translated[idx]);
+        });
+        keysToCopy.forEach(({ key, enVal }) => {
+          setNestedKey(updated, key, enVal);
         });
 
         // Preserve key order from EN file

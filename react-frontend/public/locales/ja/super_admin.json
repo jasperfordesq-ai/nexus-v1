@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "スーパー管理者の読み込み中",
+    "skip_to_main": "メインコンテンツにスキップ",
+    "close_navigation": "スーパー管理者のナビゲーションを閉じる",
+    "navigation": "スーパー管理者のナビゲーション"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "管理者に戻る",
+    "toggle_sidebar": "サイドバーの切り替え",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "スーパー管理者メニュー",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "サイドバーを展開する",
+    "collapse": "サイドバーを折りたたむ",
+    "nav_label": "スーパー管理者のナビゲーション"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "最近の活動",
       "full_log_btn": "完全なログ",
       "no_federation_activity": "連盟の活動はまだありません",
-      "by_label": "by",
+      "by_label": "による",
       "activity_title": "連盟活動（30日間）",
       "stat_total_actions": "合計アクション数",
       "stat_messages": "メッセージ",

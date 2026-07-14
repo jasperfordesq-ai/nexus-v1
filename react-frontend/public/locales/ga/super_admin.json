@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Super admin íoslódáil",
+    "skip_to_main": "Téigh ar aghaidh chuig an bpríomhábhar",
+    "close_navigation": "Dún an sár-loingseoireachta admin",
+    "navigation": "Sár-loingseoireachta admin"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Ar ais go admin",
+    "toggle_sidebar": "Scoránaigh barra taoibh",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "Sár-roghchlár admin",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Leathnaigh barra taoibh",
+    "collapse": "Laghdaigh an barra taoibh",
+    "nav_label": "Sár-loingseoireachta admin"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "Gníomhaíocht le Déanaí",
       "full_log_btn": "Log Iomlán",
       "no_federation_activity": "Níl aon ghníomhaíocht chónaidhme fós",
-      "by_label": "by",
+      "by_label": "le",
       "activity_title": "Gníomhaíocht Cónaidhme (30 lá)",
       "stat_total_actions": "Gníomhartha Iomlána",
       "stat_messages": "Teachtaireachtaí",

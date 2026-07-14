@@ -57,7 +57,7 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
-    "loading": "Loading",
+    "loading": "Carregando",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -85,9 +85,9 @@
       "caring_community": "Comunidade atenciosa",
       "kiss_agoris": "BEIJO E Caring Community"
     },
-    "search_placeholder_many": "Pesquise artigos de ajuda do{{count}}...",
     "search_placeholder_one": "Pesquise artigos de ajuda do{{count}}...",
-    "search_placeholder_other": "Pesquise artigos de ajuda do{{count}}..."
+    "search_placeholder_other": "Pesquise artigos de ajuda do{{count}}...",
+    "search_placeholder_many": "Pesquise artigos de ajuda do{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQs de ajuda",

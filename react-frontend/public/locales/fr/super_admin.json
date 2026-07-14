@@ -23,17 +23,17 @@
     "national_dashboard": "National Dashboard"
   },
   "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
+    "loading": "Chargement du super administrateur",
+    "skip_to_main": "Passer au contenu principal",
+    "close_navigation": "Fermer la navigation du super-administrateur",
+    "navigation": "Navigation super-administrateur"
   },
   "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
+    "back_to_admin": "Retour à l'administrateur",
+    "toggle_sidebar": "Basculer la barre latérale",
     "notifications": "Notifications",
     "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
+    "user_menu": "Menu super administrateur",
     "my_profile": "My Profile",
     "sign_out": "Sign Out"
   },
@@ -42,9 +42,9 @@
     "section_tenants": "Tenants",
     "section_federation": "Federation",
     "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
+    "expand": "Développer la barre latérale",
+    "collapse": "Réduire la barre latérale",
+    "nav_label": "Navigation super-administrateur"
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
@@ -631,7 +631,7 @@
       "recent_activity_title": "Activité récente",
       "full_log_btn": "Journal complet",
       "no_federation_activity": "Aucune activité de la fédération pour l'instant",
-      "by_label": "by",
+      "by_label": "par",
       "activity_title": "Activité de la Fédération (30 jours)",
       "stat_total_actions": "Actions totales",
       "stat_messages": "Messages",

@@ -1,5 +1,31 @@
 {
   "title": "Teachtaireachtaí",
+  "heroEyebrow": "Teachtaireachtaí príobháideacha",
+  "subtitle": "Coinnigh súil ar do chomhráite le baill thar an mbanc ama.",
+  "inbox": "Bosca Isteach",
+  "tabs": {
+    "inbox": "Bosca Isteach",
+    "archived": "Cartlannaithe"
+  },
+  "filtersIntro": "Cuardaigh comhráite de réir ball nó teachtaireacht le déanaí.",
+  "searchPlaceholder": "Cuardaigh teachtaireachtaí",
+  "resultsLoading": "Áluchtú",
+  "conversationCount": "{{count}} comhrá",
+  "conversationCount_other": "{{count}} comhráite",
+  "visibleCount": "{{count}} léirithe",
+  "archivedCount": "{{count}} sa chartlann",
+  "unreadCount": "{{count}} gan léamh",
+  "clearSearch": "Glan cuardach",
+  "readStatus": "Níl aon teachtaireacht gan léamh",
+  "unknownMember": "Ball den Phobal",
+  "openThread": "Oscail",
+  "archive": "Cartlann",
+  "archiveConversation": "Comhrá sa chartlann",
+  "archiveConversationWithName": "Cartlann comhrá le {{name}}",
+  "archiveConfirm": "Cartlann comhrá le {{name}}? Is féidir leat é a aischur ó Cartlannaithe.",
+  "restore": "Athchóirigh",
+  "restoreConversation": "Aischuir an comhrá",
+  "restoreConversationWithName": "Aischuir an comhrá le {{name}}",
   "threadTitle": "Comhrá",
   "thread": {
     "inputPlaceholder": "Clóscríobh teachtaireacht…",
@@ -8,6 +34,14 @@
     "noMessages": "Gan teachtaireachtaí fós. Abair haló!",
     "today": "Inniu",
     "yesterday": "Inné",
+    "invalidConversation": "Comhrá neamhbhailí.",
+    "loadError": "Níorbh fhéidir an comhrá a luchtú.",
+    "voiceMessage": "Teachtaireacht ghutha",
+    "sendFailed": "Níorbh fhéidir an teachtaireacht a sheoladh. Bain triail eile as.",
+    "you": "Tusa:",
+    "goBack": "Téigh ar ais",
+    "messageCount": "{{count}} teachtaireacht",
+    "messageCount_other": "{{count}} teachtaireacht",
     "messagingRestrictedTitle": "Teachtaireachtaí curtha ar sos",
     "messagingRestrictedContact": "Déan teagmháil le d'fhoireann pobail sula seolann tú tuilleadh teachtaireachtaí.",
     "messageOptions": "Roghanna teachtaireachta",
@@ -23,6 +57,8 @@
     "deleteSelfConfirm": "Bain an teachtaireacht seo as do radharc?",
     "deleteEveryoneConfirm": "Scrios an teachtaireacht seo do gach duine?",
     "deletedMessage": "Scriosadh an teachtaireacht seo.",
+    "reactWith": "Imoibrigh le {{emoji}}",
+    "toggleReaction": "Scoránaigh {{emoji}} imoibriú",
     "attachmentName": "Attachment {{index}}",
     "attachments": {
       "add": "Add attachment",
@@ -50,24 +86,62 @@
       "sendFailed": "Voice message could not be sent. Please try again."
     }
   },
+  "context": {
+    "regarding": "Maidir Le",
+    "open": "Oscail mír ghaolmhar",
+    "title": "{{type}} #{{id}}",
+    "type": {
+      "listing": "Liostú",
+      "event": "Imeacht",
+      "job": "Job",
+      "volunteering": "Deonach"
+    }
+  },
   "voice": {
     "label": "Teachtaireacht gutha",
+    "failed": "Theip",
     "play": "Seinn",
     "pause": "Cuir ar sos",
     "recording": "Ag taifeadadh…",
     "tapToRecord": "Coinnigh síos le taifeadadh"
   },
+  "newMessage": "Teachtaireacht nua",
+  "newGroup": "Grúpa nua",
+  "composer": {
+    "eyebrow": "Cuir tús le comhrá",
+    "subtitle": "Cuardaigh ball, ansin oscail snáithe príobháideach.",
+    "searchPlaceholder": "Cuardaigh baill",
+    "loading": "Baill á luchtú",
+    "emptyTitle": "Níor aimsíodh aon bhall",
+    "emptySubtitle": "Bain triail as ainm eile nó seiceáil eolaire na mball.",
+    "memberFallback": "Ball den Phobal",
+    "resultsCount": "{{count}} ball taispeánta",
+    "resultsCount_other": "{{count}} ball á dtaispeáint",
+    "openThread": "Teachtaireacht chuig {{name}}"
+  },
   "empty": {
     "title": "Gan comhráití fós",
-    "subtitle": "Ceangail le baill le teachtaireachtaí a sheoladh"
+    "subtitle": "Ceangail le baill le teachtaireachtaí a sheoladh",
+    "archivedTitle": "Gan comhráite cartlannaithe",
+    "archivedSubtitle": "Beidh comhráite sa chartlann le feiceáil anseo.",
+    "searchTitle": "Níl aon chomhráite ar bith ann",
+    "searchSubtitle": "Bain triail as ainm ball nó eochairfhocal teachtaireachta eile."
   },
-  "deleteConfirm": "Scrios comhrá le {{name}}?",
   "errors": {
+    "archiveFailedTitle": "Theip ar an gcartlann",
+    "archiveFailed": "Níorbh fhéidir an comhrá seo a chur sa chartlann.",
     "sendFailed": "Theip ar an teachtaireacht a sheoladh. Tapáil le triail arís.",
     "loadFailed": "Níorbh fhéidir teachtaireachtaí a luchtú.",
+    "threadUnavailableTitle": "Níl an comhrá ar fáil",
+    "threadUnavailable": "Níl faighteoir bailí ag an gcomhrá seo a thuilleadh. Athnuaigh teachtaireachtaí agus bain triail eile as.",
+    "restoreFailedTitle": "Theip ar an athchóiriú",
+    "restoreFailed": "Níorbh fhéidir an comhrá seo a chur ar ais.",
+    "reactionFailedTitle": "Theip ar an bhfreagra",
+    "reactionFailed": "Níorbh fhéidir an imoibriú sin a nuashonrú.",
     "editFailedTitle": "Theip ar eagarthóireacht",
     "editFailed": "Níorbh fhéidir an teachtaireacht seo a nuashonrú.",
     "deleteFailedTitle": "Theip ar scriosadh",
     "deleteFailed": "Níorbh fhéidir an teachtaireacht seo a scriosadh."
-  }
+  },
+  "deleteConfirm": "Scrios comhrá le {{name}}?"
 }

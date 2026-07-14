@@ -1,6 +1,9 @@
 {
   "title": "Lavori",
+  "eyebrow": "Ruoli della comunità",
+  "subtitle": "Sfoglia i ruoli retribuiti, di volontariato e con credito di tempo dalla comunità.",
   "detailTitle": "Dettagli lavoro",
+  "createJob": "Crea lavoro",
   "tabs": {
     "browse": "Sfoglia",
     "myApplications": "Le mie candidature",
@@ -8,7 +11,13 @@
     "alerts": "Alerts"
   },
   "search": {
-    "placeholder": "Cerca lavori..."
+    "placeholder": "Cerca lavori...",
+    "advanced": "Ricerca Avanzata",
+    "boolean_hint": "es. \"sviluppatore | ingegnere\", \"react -junior\"",
+    "salary_min": "Stipendio minimo",
+    "salary_max": "Stipendio massimo",
+    "company_size_filter": "Dimensione azienda",
+    "benefits_filter": "Parola chiave benefit"
   },
   "filters": {
     "type": {
@@ -47,7 +56,10 @@
     "closesIn": "Scade tra {{count}} giorni",
     "goBack": "Indietro",
     "notFound": "Lavoro non trovato.",
+    "notFoundHint": "Questo ruolo potrebbe essere stato rimosso, chiuso o spostato.",
     "invalidId": "ID lavoro non valido.",
+    "invalidIdHint": "Non siamo riusciti a identificare quale ruolo aprire.",
+    "browseJobs": "Sfoglia offerte di lavoro",
     "saveError": "Impossibile aggiornare lo stato salvato.",
     "timeCredits": "{{count}} crediti tempo",
     "salaryAnnual": "anno",
@@ -59,6 +71,9 @@
     "kanban_board": "Pipeline",
     "close_vacancy": "Chiudi",
     "reopen_vacancy": "Riapri",
+    "postedBy": "Inserito da",
+    "keyDetails": "Dettagli ruolo",
+    "views": "{{count}} visualizzazioni",
     "closesIn_one": "Scade tra {{count}} giorno",
     "timeCredits_one": "{{count}} credito tempo"
   },
@@ -119,11 +134,6 @@
     "successMessage": "La tua candidatura è stata inviata. Buona fortuna!",
     "error": "Invio della candidatura non riuscito"
   },
-  "saved_profile": {
-    "found": "Profilo di candidatura salvato trovato",
-    "use": "Usa lettera di presentazione salvata",
-    "start_fresh": "Ricomincia da zero"
-  },
   "applications": {
     "empty": "Nessuna candidatura ancora",
     "emptyHint": "Candidati a posizioni lavorative per vederle qui",
@@ -140,6 +150,14 @@
       "rejected": "Rifiutata",
       "withdrawn": "Ritirata"
     },
+    "interview_proposed": "Colloquio richiesto",
+    "accept_interview": "Accetta",
+    "decline_interview": "Rifiuta",
+    "interview_confirmed": "Colloquio Confermato",
+    "offer_received": "Hai ricevuto un'offerta di lavoro!",
+    "accept_offer": "Accetta Offerta",
+    "decline_offer": "Rifiuta",
+    "offer_accepted": "Offerta accettata",
     "showMessage": "Show cover message",
     "hideMessage": "Hide cover message",
     "history": "History",
@@ -150,10 +168,6 @@
     "withdraw": "Withdraw",
     "withdrawSuccess": "Application withdrawn.",
     "withdrawError": "Could not withdraw this application."
-  },
-  "postings": {
-    "empty": "Nessun annuncio ancora",
-    "emptyHint": "Crea un lavoro per gestire qui i tuoi ruoli."
   },
   "owner": {
     "toolsTitle": "Strumenti proprietario",
@@ -180,6 +194,27 @@
     "moveToInterview": "Colloquio",
     "updateError": "Impossibile aggiornare questa candidatura."
   },
+  "postings": {
+    "empty": "Nessun annuncio ancora",
+    "emptyHint": "Crea un lavoro per gestire qui i tuoi ruoli."
+  },
+  "template": {
+    "start_from": "Inizia da modello (opzionale)",
+    "no_templates": "Nessun modello ancora",
+    "save_as": "Salva come Modello",
+    "template_name": "Nome modello",
+    "share_with_team": "Condividi con il team (modello pubblico)",
+    "saving": "Salvataggio...",
+    "saved": "Modello salvato!"
+  },
+  "benchmark": {
+    "market_rate": "Tariffa di mercato per \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (mediana: {{currency}}{{median}})"
+  },
+  "saved_profile": {
+    "found": "Profilo di candidatura salvato trovato",
+    "use": "Usa lettera di presentazione salvata",
+    "start_fresh": "Ricomincia da zero"
+  },
   "empty": "Nessun lavoro trovato",
   "emptyHint": "Prova a modificare i filtri o torna più tardi",
   "loadMore": "Carica altri",
@@ -191,6 +226,7 @@
     "title": "Crea lavoro",
     "editTitle": "Modifica lavoro",
     "subtitle": "Pubblica un ruolo retribuito, volontario o con crediti tempo.",
+    "editSubtitle": "Aggiorna i dettagli del ruolo, la trasparenza salariale e le impostazioni della domanda.",
     "titleLabel": "Titolo",
     "titlePlaceholder": "Titolo del ruolo",
     "descriptionLabel": "Descrizione",
@@ -232,6 +268,14 @@
     "taglinePlaceholder": "Cosa rende ottimo questo team?",
     "videoUrlLabel": "URL video cultura",
     "videoUrlPlaceholder": "https://example.org/video",
+    "companySizeLabel": "Dimensione azienda",
+    "companySize": {
+      "1-10": "1-10",
+      "11-50": "11-50",
+      "51-200": "51-200",
+      "201-500": "201-500",
+      "500+": "500+"
+    },
     "benefitsLabel": "Benefit e vantaggi",
     "benefitsPlaceholder": "Benefit separati da virgole",
     "deadlineLabel": "Scadenza",
@@ -245,9 +289,14 @@
     "updateSubmit": "Aggiorna lavoro",
     "validationTitle": "Controlla i dettagli",
     "validationRequired": "Aggiungi titolo e descrizione.",
+    "deadlinePast": "La scadenza deve essere una data futura.",
+    "salaryRangeInvalid": "Lo stipendio minimo non può superare lo stipendio massimo.",
+    "salaryRequired": "Intervallo di stipendio richiesto. Puoi contrassegnare lo stipendio negoziabile per ometterlo.",
     "failedTitle": "Lavoro non salvato",
     "loadFailed": "Impossibile caricare questo lavoro per la modifica.",
-    "failedDescription": "Impossibile salvare il lavoro. Riprova."
+    "failedDescription": "Impossibile salvare il lavoro. Riprova.",
+    "editFailedTitle": "Lavoro non aggiornato",
+    "editFailedDescription": "Non è stato possibile aggiornare il lavoro. Per favore riprova."
   },
   "alerts": {
     "title": "Job alerts",

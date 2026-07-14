@@ -1,0 +1,1627 @@
+{
+  "articles": {
+    "/caring": {
+      "title": "Troskliwa społeczność — centrum modułów",
+      "summary": "Moduł Caring Community to punkt dostępu najwyższego poziomu do wszystkich funkcji współpracy Caring Community. Stąd możesz przejść do każdej podsekcji: poziomy zaufania członków, zabezpieczenia, raportowanie ROI, gotowość do pilotażu i nie tylko.",
+      "steps": [
+        {
+          "label": "Szybki przegląd stanu modułu",
+          "detail": "Centrum pokazuje bieżącą liczbę aktywnych członków, otwarte prośby o pomoc, oczekujące raporty dotyczące zabezpieczeń i stopień zgodności z umową SLA."
+        },
+        {
+          "label": "Skorzystaj z siatki szybkich linków",
+          "detail": "Każda karta łączy się bezpośrednio z jej obszarem funkcjonalnym. Karty z czerwoną plakietką wymagają natychmiastowej uwagi (np. zaległa umowa SLA, raport dotyczący krytycznych zabezpieczeń)."
+        },
+        {
+          "label": "Sprawdź pasek ogłoszeń",
+          "detail": "Jeśli Twój partner kantonalny lub krajowe biuro Caring Community opublikowało ogłoszenie, zostanie ono przypięte w górnej części centrum."
+        }
+      ],
+      "tips": [
+        "Dodaj tę stronę do zakładek — to najszybszy sposób na wykrycie problemów wymagających Twojej uwagi bez konieczności poruszania się po głębokich menu.",
+        "Moduł pojawia się na pasku bocznym tylko wtedy, gdy dla tego najemcy włączona jest flaga funkcji careing_community."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        },
+        {
+          "label": "Safeguarding",
+          "path": "/caring/safeguarding"
+        },
+        {
+          "label": "Gotowość do uruchomienia",
+          "path": "/caring/launch-readiness"
+        }
+      ]
+    },
+    "/caring/workflow": {
+      "title": "Panel przepływu pracy koordynatora",
+      "summary": "Tablica w stylu Kanban działająca w czasie rzeczywistym, pokazująca każdą troskliwą wymianę zdań w locie. Giełdy przechodzą przez stany: Żądanie → Dopasowane → W toku → Ukończone → Sprawdzone. Koordynatorzy używają tej strony do wykrywania wąskich gardeł, ponownego przydzielania giełd i eskalacji zablokowanych żądań.",
+      "steps": [
+        {
+          "label": "Filtruj według statusu lub kategorii",
+          "detail": "Użyj górnego paska filtrów, aby zawęzić wybór do określonego stanu (np. tylko „Dopasowane”) lub kategorii opieki (np. Transport, Towarzystwo)."
+        },
+        {
+          "label": "Otwórz kartę wymiany",
+          "detail": "Kliknij dowolną kartę, aby wyświetlić pełny panel szczegółów: profile członków, uzgodniony czas, notatki koordynatora i ścieżkę audytu."
+        },
+        {
+          "label": "Przypisz ponownie lub eskaluj",
+          "detail": "Użyj menu z trzema kropkami na karcie, aby ponownie przypisać zadanie innemu koordynatorowi, dodać notatkę lub oznaczyć jako przekazane do sprawdzenia."
+        },
+        {
+          "label": "Oznacz jako ukończone",
+          "detail": "Gdy obie strony potwierdzą, użyj opcji „Oznacz jako ukończone”, aby uruchomić przelew godzinowy i odblokować monit o sprawdzenie dla obu członków."
+        }
+      ],
+      "tips": [
+        "Giełdy, które utknęły w stanie „Dopasowane” przez ponad 48 godzin, są podświetlone na pomarańczowo — skontaktuj się z obydwoma członkami.",
+        "Przełącznik „Moje giełdy” umożliwia filtrowanie tylko giełd, w przypadku których jesteś przypisanym koordynatorem.",
+        "Zakończone wymiany, które nie zostały sprawdzone po 7 dniach, są oznaczane – recenzje są ważne dla danych bazowych KPI."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Transfery godzinowe",
+          "path": "/caring/hour-transfers"
+        },
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        },
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        }
+      ]
+    },
+    "/caring/projects": {
+      "title": "Projekty opiekuńcze i inicjatywy społeczne",
+      "summary": "Projekty to zorganizowane inicjatywy społeczne, które grupują wiele wymian wokół wspólnego celu — na przykład „Zimowe wsparcie sąsiadów 2025” lub „Sieć mobilności osób starszych”. Każdy projekt ma budżet w godzinach, koordynatora, daty rozpoczęcia/zakończenia i kamienie milowe raportowania.",
+      "steps": [
+        {
+          "label": "Utwórz nowy projekt",
+          "detail": "Kliknij „Nowy projekt”, nadaj mu nazwę i opis, ustal budżet godzinowy i przypisz koordynatora wiodącego."
+        },
+        {
+          "label": "Dodaj uczestniczących członków",
+          "detail": "Użyj wyszukiwania członków, aby dodać pomocników i odbiorców. Członkowie mogą także rejestrować się samodzielnie, jeśli projekt jest oznaczony jako otwarty."
+        },
+        {
+          "label": "Linkuj wymianę do projektu",
+          "detail": "Tworząc lub edytując wymianę, użyj menu rozwijanego „Projekt”, aby ją powiązać. Wszystkie powiązane giełdy pojawiają się w raporcie z postępu projektu."
+        },
+        {
+          "label": "Przejrzyj kamienie milowe postępu",
+          "detail": "Strona szczegółów projektu pokazuje godziny dostarczone w porównaniu z budżetem, aktywnych członków i harmonogram zakończonych wymian."
+        },
+        {
+          "label": "Zamknij i zgłoś",
+          "detail": "Po zakończeniu projektu użyj opcji „Generuj raport”, aby utworzyć podsumowanie w formacie PDF odpowiednie dla interesariuszy z kantonów."
+        }
+      ],
+      "tips": [
+        "Projekty z zerową wymianą po 14 dniach są oznaczane jako „Zablokowane” — zastanów się, czy członkowie dobrze rozumieją cel.",
+        "Budżet godzinowy jest wskazówką, a nie sztywnym limitem. Możesz przesadzić; system oznaczy to, ale nie zablokuje wymiany.",
+        "W przypadku projektów finansowanych z dotacji użyj pola „Odniesienie zewnętrzne”, aby zapisać kod projektu fundatora."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Praca koordynatora",
+          "path": "/caring/workflow"
+        },
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        }
+      ]
+    },
+    "/caring/trust-tier": {
+      "title": "Poziomy zaufania — drabina reputacji",
+      "summary": "System Trust Tier ocenia wiarygodność członków w pięciostopniowej skali: Nowicjusz (0) → Członek (1) → Zaufany (2) → Zweryfikowany (3) → Koordynator (4). Poziom określa, co może zrobić członek — na przykład tylko członkowie Trusted+ mogą eksportować karnet Ciepła lub brać udział w intensywnych wymianach opiekuńczych.",
+      "steps": [
+        {
+          "label": "Zobacz rozkład poziomów",
+          "detail": "Wykres podsumowujący pokazuje, ilu członków znajduje się na każdym poziomie. Zdrowa spółdzielnia ma większość członków na poziomach 1–2."
+        },
+        {
+          "label": "Przejrzyj oczekujące promocje poziomów",
+          "detail": "Członkowie, którzy spełnili kryteria następnego poziomu, pojawiają się na liście „Gotowi do promowania”. Przejrzyj ich aktywność i zatwierdź lub odłóż."
+        },
+        {
+          "label": "Ręcznie dostosuj poziom",
+          "detail": "Znajdź członka, kliknij jego plakietkę bieżącego poziomu i wybierz nowy poziom. Napisz krótką notatkę wyjaśniającą korektę – jest to kontrolowane."
+        },
+        {
+          "label": "Skonfiguruj progi poziomów",
+          "detail": "W „Ustawieniach poziomu” dostosuj liczbę ukończonych wymian i średni wynik recenzji wymagany do osiągnięcia każdego poziomu."
+        },
+        {
+          "label": "Przejrzyj kandydatów do degradacji",
+          "detail": "Członkowie oznaczeni za przedłużającą się nieaktywność lub incydenty związane z bezpieczeństwem mogą zostać poddani ocenie. Sprawdź kontekst przed degradacją."
+        }
+      ],
+      "tips": [
+        "Awanse na poziomy nie są domyślnie automatyczne — każdą promocję musi zatwierdzić koordynator. Możesz włączyć automatyczną promocję dla poziomu 0 → 1 w Ustawieniach poziomu.",
+        "Członkowie nie mogą zobaczyć swojego liczbowego wyniku na poziomie – zamiast tego widzą nazwaną plakietkę (np. „Zaufany członek”).",
+        "Poziom koordynatora (4) powinien być rzadki i przydzielany wyłącznie osobom obsługującym transakcje zabezpieczające lub wymiany o dużej wartości."
+      ],
+      "caution": "Zdegradowanie Zaufanego członka (poziom 2 → 1) natychmiast unieważnia jego Karnet Ciepła we wszystkich witrynach spółdzielni Caring Community. Powiadom członka przed degradacją.",
+      "relatedPaths": [
+        {
+          "label": "Przepustka Ciepła",
+          "path": "/caring/warmth-pass"
+        },
+        {
+          "label": "Safeguarding",
+          "path": "/caring/safeguarding"
+        }
+      ]
+    },
+    "/caring/warmth-pass": {
+      "title": "Warmth Pass — przenośne poświadczenie zaufania",
+      "summary": "Warmth Pass to kryptograficznie podpisane dane uwierzytelniające, które pozwalają członkowi Trusted+ (poziom 2+) wykazać swoją reputację w dowolnej stowarzyszonej spółdzielni Caring Community, a nie tylko w społeczności domowej. Jest ono wydawane tutaj i może zostać odwołane w dowolnym momencie.",
+      "steps": [
+        {
+          "label": "Wydaj przepustkę rozgrzewającą",
+          "detail": "Znajdź członka (musi to być poziom 2 lub wyższy) i kliknij „Wydaj przepustkę Warmth Pass”. System generuje podpisany token kodu QR z terminem ważności 12 miesięcy."
+        },
+        {
+          "label": "Ustaw okres ważności",
+          "detail": "Wartość domyślna to 12 miesięcy. Możesz skrócić ten okres do 3 lub 6 miesięcy w przypadku członków objętych promocją próbną."
+        },
+        {
+          "label": "Cofnij przepustkę",
+          "detail": "Kliknij aktywną przepustkę, a następnie „Unieważnij”. Cofnięcie jest przekazywane do wszystkich członków federacji Caring Community w ciągu kilku minut za pośrednictwem synchronizacji federacji."
+        },
+        {
+          "label": "Sprawdź wykorzystanie karnetu",
+          "detail": "Dziennik audytu pokazuje, kiedy i u której spółdzielni zeskanowano przepustkę. Nietypowe wzorce lokalizacji powinny skłonić koordynatora do przeglądu."
+        }
+      ],
+      "tips": [
+        "Członek może posiadać jednocześnie tylko jedną aktywną przepustkę Warmth Pass. Wydanie nowego unieważnia poprzednie.",
+        "Karnety wydawane członkom, którzy następnie zostaną zdegradowani poniżej poziomu 2, zostaną automatycznie unieważnione — nie trzeba tego robić ręcznie.",
+        "Kod QR przepustki jest dostępny w profilu członka w postaci pliku PDF do pobrania."
+      ],
+      "caution": "Nie wydawaj przepustek członkom z nierozwiązanymi raportami dotyczącymi zabezpieczeń, nawet jeśli ich poziom kwalifikuje ich pod względem technicznym.",
+      "relatedPaths": [
+        {
+          "label": "Poziomy zaufania",
+          "path": "/caring/trust-tier"
+        },
+        {
+          "label": "Spółdzielnie Partnerskie",
+          "path": "/partner-timebanks/caring/peers"
+        }
+      ]
+    },
+    "/caring/safeguarding": {
+      "title": "Ochrona — raporty o incydentach i umowy SLA",
+      "summary": "Na tej stronie zarządzane są wszystkie raporty dotyczące incydentów związanych z bezpieczeństwem zgłaszane w Twojej spółdzielni. Raporty są sortowane według ważności: Krytyczny (odpowiedź w ciągu 1 godziny), Wysoki (24 godziny), Średni (72 godziny), Niski (następne zaplanowane spotkanie). Koordynatorzy muszą potwierdzić i podjąć działania w przypadku każdego raportu w oknie SLA.",
+      "steps": [
+        {
+          "label": "Przejrzyj kolejkę otwartych zdarzeń",
+          "detail": "Raporty są sortowane według ważności i czasu, jaki upłynął. Czerwone wiersze naruszają lub naruszyły umowę SLA."
+        },
+        {
+          "label": "Potwierdź raport",
+          "detail": "Kliknij raport, a następnie „Potwierdź”, aby zatrzymać zegar umowy SLA i zasygnalizować, że koordynator przejął odpowiedzialność."
+        },
+        {
+          "label": "Zapisz swoje notatki z dochodzenia",
+          "detail": "Użyj pola Notatki, aby udokumentować podjęte kroki, osoby, z którymi się skontaktowano, i wyniki. Notatki są poufne i niewidoczne dla członków."
+        },
+        {
+          "label": "Eskaluj do agencji zewnętrznych",
+          "detail": "W przypadku incydentów krytycznych wiążących się z ryzykiem szkody użyj opcji „Eskaluj na zewnątrz”, aby zarejestrować, że skontaktowałeś się ze służbami ustawowymi (policją, opieką socjalną itp.)."
+        },
+        {
+          "label": "Zamknij raport",
+          "detail": "Po rozwiązaniu oznacz raport jako Zamknięty i podsumuj rozwiązanie. Zamknięte raporty są archiwizowane, ale nigdy nie są usuwane."
+        }
+      ],
+      "tips": [
+        "Incydenty o wadze krytycznej powodują również natychmiastowe powiadomienie push do wszystkich członków na poziomie koordynatora.",
+        "Jeśli nie masz pewności co do powagi, wybierz ustawienie domyślne Wysokie — lepiej zareagować nadmiernie, niż przeoczyć rzeczywisty problem z zabezpieczeniami.",
+        "Wszystkie dane dotyczące incydentów są wyłączone z Raportu wpływu na społeczeństwo — jest on przeznaczony wyłącznie dla koordynatora."
+      ],
+      "caution": "Nigdy nie zamykaj raportu zabezpieczającego bez pisemnego podsumowania uchwały. Puste zamknięcia są oznaczane w audycie jakości danych.",
+      "relatedPaths": [
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        },
+        {
+          "label": "Jakość danych",
+          "path": "/caring/data-quality"
+        }
+      ]
+    },
+    "/caring/category-coefficients": {
+      "title": "Współczynniki substytucji kategorii",
+      "summary": "Każda kategoria opieki ma współczynnik substytucji, który przelicza godziny wymiany społecznościowej na ekwiwalenty opieki formalnej. Współczynnik 1,0 oznacza, że ​​godzina opieki środowiskowej jest traktowana jako równowartość jednej godziny opieki zawodowej (35 CHF/godz.). Intensywna opieka osobista może wynosić 2,0; lekki kontakt społeczny może wynosić 0,5.",
+      "steps": [
+        {
+          "label": "Przejrzyj istniejące współczynniki",
+          "detail": "Tabela pokazuje każdą kategorię aktywnej opieki z jej aktualnym współczynnikiem i datą ostatniego uzgodnienia z partnerem kantonalnym."
+        },
+        {
+          "label": "Edytuj współczynnik",
+          "detail": "Kliknij ikonę ołówka obok kategorii, wprowadź nową wartość, dodaj uzasadnienie i zapisz. Zmiana jest wersjonowana."
+        },
+        {
+          "label": "Dodaj nową kategorię",
+          "detail": "Użyj opcji „Dodaj kategorię”, aby utworzyć nowy rodzaj opieki (np. „Wsparcie fizjoterapii”) i przypisz mu początkowy współczynnik."
+        },
+        {
+          "label": "Wygeneruj raport współczynników",
+          "detail": "Użyj opcji „Eksportuj PDF”, aby utworzyć sformatowany dokument do zatwierdzenia przez partnera kantonalnego, zawierający listę wszystkich kategorii i ich podstawę dowodową."
+        }
+      ],
+      "tips": [
+        "Współczynniki powyżej 1,5 wymagają pisemnej zgody kantonalnego partnera ds. opieki zdrowotnej — udokumentuj to w polu uzasadnienia.",
+        "Raport ROI mnoży rzeczywiste godziny przepracowane przez współczynnik każdej kategorii, aby uzyskać całkowity uniknięty koszt opieki formalnej.",
+        "Dokonuj przeglądu wszystkich współczynników co najmniej raz w roku — standardy praktyki opieki zmieniają się, a baza danych powinna pozostać aktualna."
+      ],
+      "caution": "Zmiana współczynnika ma natychmiastowy wpływ na wszystkie przyszłe obliczenia ROI. Raporty historyczne nie są aktualizowane z mocą wsteczną – przy prezentacji danych wieloletnich należy zwrócić uwagę na datę zmiany.",
+      "relatedPaths": [
+        {
+          "label": "Polityka operacyjna",
+          "path": "/caring/operating-policy"
+        },
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        }
+      ]
+    },
+    "/caring/operating-policy": {
+      "title": "Polityka operacyjna — dbałość o parametry społeczności",
+      "summary": "Polityka operacyjna przechowuje podstawowe parametry ekonomiczne Twojego wspólnego wdrożenia: stawkę godzinową za opiekę formalną w CHF, mnożnik wyrównania kosztów, maksymalne limity czasu trwania wymiany i inne ograniczenia globalne. Wartości te uwzględniane są we wszystkich obliczeniach ROI i wpływie.",
+      "steps": [
+        {
+          "label": "Ustal stawkę godzinową za opiekę formalną",
+          "detail": "Wpisz aktualną stawkę opieki profesjonalnej w CHF (szwajcarska norma to 35 CHF/godz.). Dostosuj do swojego regionu lub rodzaju opieki, jeśli umowa kantonalna określa inaczej."
+        },
+        {
+          "label": "Ustaw mnożnik offsetu kosztów",
+          "detail": "Ten mnożnik dostosowuje liczbę godzin ważonych współczynnikiem, aby uwzględnić administrację, koordynację wolontariuszy i koszty ogólne. Wartość domyślna to 0,8."
+        },
+        {
+          "label": "Skonfiguruj limity wymiany",
+          "detail": "Ustaw maksymalny czas trwania pojedynczej wymiany (np. 8 godzin) i minimalny (np. 15 minut). Giełdy przekraczające te limity wymagają zgody koordynatora."
+        },
+        {
+          "label": "Ustaw datę wejścia w życie polisy",
+          "detail": "Określ, kiedy te parametry zaczną obowiązywać. Zmiany są wersjonowane, dzięki czemu raporty historyczne pozostają dokładne."
+        },
+        {
+          "label": "Publikuj i powiadamiaj",
+          "detail": "Użyj „Zasady publikowania”, aby wprowadzić nowe wartości. Rozważ powiadomienie koordynatorów za pośrednictwem systemu ogłoszeń."
+        }
+      ],
+      "tips": [
+        "Uzgodnij wszystkie zmiany parametrów ze swoim partnerem kantonalnym przed publikacją – jednostronne zmiany mogą unieważnić raportowanie dotacji.",
+        "Historia wersji polisy jest w pełni kontrolowana – zawsze możesz zobaczyć, jakie parametry obowiązywały w danym dniu."
+      ],
+      "caution": "Zmiana stawki godzinowej opieki formalnej w trakcie pilotażu będzie miała wpływ na wszystkie przyszłe raporty ROI. Najpierw uzgodnij ze swoim partnerem kantonalnym i udokumentuj przyczynę zmiany.",
+      "relatedPaths": [
+        {
+          "label": "Współczynniki kategorii",
+          "path": "/caring/category-coefficients"
+        },
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        }
+      ]
+    },
+    "/caring/isolated-node": {
+      "title": "Izolowany węzeł — tryb suwerenności danych",
+      "summary": "Tryb izolowanego węzła konfiguruje to wdrożenie do przechowywania wszystkich danych osobowych w określonych granicach geograficznych i wyłącza synchronizację danych federacji z zewnętrznymi spółdzielniami Caring Community. Jest to wymagane w przypadku wdrożeń, które muszą być zgodne ze szwajcarską ustawą FADP/nDSG (federalna ustawa o ochronie danych).",
+      "steps": [
+        {
+          "label": "Włącz tryb izolowanego węzła",
+          "detail": "Włącz wyłącznik główny. Zostaniesz poproszony o potwierdzenie granicy geograficznej (np. „Kanton Bern”) i podstawy prawnej ograniczenia."
+        },
+        {
+          "label": "Skonfiguruj dozwolone przepływy danych",
+          "detail": "Niektóre przepływy danych (np. anonimowe statystyki zbiorcze dla krajowego panelu kontrolnego) można umieścić na białej liście. Przejrzyj każdy przepływ i zatwierdź go lub zablokuj."
+        },
+        {
+          "label": "Wyłącz synchronizację federacyjną",
+          "detail": "Gdy węzeł izolowany jest aktywny, synchronizacja federacyjna Warmth Pass i połączenia kooperacyjne równorzędne są zawieszone. Członkowie zobaczą powiadomienie wyjaśniające tę kwestię."
+        },
+        {
+          "label": "Wygeneruj rekord zgodności FADP",
+          "detail": "Użyj „Generuj raport zgodności”, aby utworzyć rejestr granic danych, okresów przechowywania i podstaw prawnych odpowiednich do audytu FADP."
+        }
+      ],
+      "tips": [
+        "Tryb izolowanego węzła nie wpływa na operacje lokalne — członkowie nadal mogą wymieniać godziny pracy, zdobywać odznaki i korzystać ze wszystkich funkcji spółdzielni.",
+        "Jeśli nie masz pewności, czy Twoje wdrożenie wymaga trybu izolowanego węzła, przed jego włączeniem skonsultuj się z zespołem technicznym Caring Community."
+      ],
+      "caution": "Włączenie trybu izolowanego węzła natychmiast przerywa przenośność Warmth Pass dla wszystkich członków. Powiadom członków przed włączeniem.",
+      "relatedPaths": [
+        {
+          "label": "Granica handlowa",
+          "path": "/caring/commercial-boundary"
+        },
+        {
+          "label": "Pakiet ujawnień",
+          "path": "/caring/disclosure-pack"
+        },
+        {
+          "label": "Spółdzielnie Partnerskie",
+          "path": "/partner-timebanks/caring/peers"
+        }
+      ]
+    },
+    "/caring/commercial-boundary": {
+      "title": "Granica handlowa — klasyfikacja zdolności AGPL",
+      "summary": "Na tej stronie sklasyfikowano możliwości każdej platformy w zależności od tego, czy jest objęta licencją open source AGPL-3.0, czy można ją konfigurować dla każdego dzierżawcy, czy wymaga prywatnej umowy wdrożeniowej, czy też stanowi dodatek komercyjny. Użyj tego jako punktu odniesienia podczas omawiania licencji z gminami partnerskimi lub spółdzielniami.",
+      "steps": [
+        {
+          "label": "Przeglądaj rejestr możliwości",
+          "detail": "Każda funkcja jest wymieniona wraz z klasyfikacją AGPL (publiczna / konfiguracja dzierżawcy / wdrożenie prywatne / komercyjna) i prostym opisem."
+        },
+        {
+          "label": "Filtruj według klasyfikacji",
+          "detail": "Użyj kart filtrów, aby wyświetlić tylko funkcje komercyjne lub tylko funkcje publiczne AGPL, w zależności od tego, co chcesz przekazać."
+        },
+        {
+          "label": "Eksportuj w celach referencyjnych dla partnerów",
+          "detail": "Użyj opcji „Eksportuj PDF”, aby utworzyć sformatowany dokument, który możesz udostępnić gminie lub fundatorowi, który musi zrozumieć, czym jest oprogramowanie typu open source i zastrzeżone."
+        }
+      ],
+      "tips": [
+        "AGPL Public features must remain publicly available under AGPL-3.0 — you cannot restrict access to them in any deployment.",
+        "Funkcje komercyjne wymagają osobnej pisemnej umowy z Caring Community lub operatorem platformy NEXUS."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Izolowany węzeł",
+          "path": "/caring/isolated-node"
+        },
+        {
+          "label": "Pakiet ujawnień",
+          "path": "/caring/disclosure-pack"
+        }
+      ]
+    },
+    "/caring/disclosure-pack": {
+      "title": "Pakiet informacyjny dotyczący ochrony danych FADP/nDSG",
+      "summary": "Pakiet informacyjny gromadzi całą dokumentację dotyczącą ochrony danych wymaganą na mocy szwajcarskiego FADP/nDSG: informacje o ochronie prywatności, umowy o przetwarzaniu danych, harmonogramy przechowywania, listy podwykonawców przetwarzania oraz szablon odpowiedzi dotyczący prawa dostępu. Wygeneruj je i przejrzyj, zanim Twoja spółdzielnia udostępni dane osobowe.",
+      "steps": [
+        {
+          "label": "Przejrzyj automatycznie wypełnione pola",
+          "detail": "System wstępnie wypełnia nazwę organizacji, dane administratora danych i okresy przechowywania z Polityki operacyjnej. Sprawdź każde pole pod kątem dokładności."
+        },
+        {
+          "label": "Dodaj podwykonawców przetwarzania",
+          "detail": "Wymień wszelkie usługi stron trzecich, które przetwarzają dane członków (np. usługa e-mail, dostawca usług hostingowych). Każdy podprzetwarzający potrzebuje nazwy, lokalizacji i podstawy prawnej."
+        },
+        {
+          "label": "Ustaw okresy przechowywania",
+          "detail": "Sprawdź domyślne okresy przechowywania dla każdej kategorii danych (np. zapisy wymiany: 7 lat w przypadku audytu finansowego; raporty zabezpieczające: 10 lat). Dostosuj, jeśli zasady kantonalne różnią się od siebie."
+        },
+        {
+          "label": "Wygeneruj pełny pakiet",
+          "detail": "Kliknij „Generuj paczkę”, aby utworzyć plik ZIP dokumentów PDF. Udostępnij swojemu inspektorowi ochrony danych (lub organowi kantonalnemu) w celu podpisania."
+        },
+        {
+          "label": "Opublikuj informację o ochronie prywatności skierowaną do członków",
+          "detail": "Po zatwierdzeniu użyj opcji „Opublikuj informację o ochronie prywatności”, aby udostępnić powiadomienie na stronie Polityki prywatności swojej spółdzielni."
+        }
+      ],
+      "tips": [
+        "Generuj pakiet ponownie za każdym razem, gdy dodasz nowy podprocesor, zmienisz okresy przechowywania lub włączysz tryb izolowanego węzła.",
+        "Pakiet zawiera szablon odpowiedzi dotyczącej prawa dostępu – skorzystaj z niego, gdy członek zażąda danych zgodnie z art. 25 nDSG."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Izolowany węzeł",
+          "path": "/caring/isolated-node"
+        },
+        {
+          "label": "Granica handlowa",
+          "path": "/caring/commercial-boundary"
+        }
+      ]
+    },
+    "/caring/municipal-roi": {
+      "title": "Raport ROI dla gmin/kantonów",
+      "summary": "Generuje formalny raport dotyczący unikania kosztów dla interesariuszy z kantonu, pokazujący, ile godzin profesjonalnej opieki zastąpiono wymianami społecznościowymi, wyrażoną w CHF. Jest to podstawowy dokument finansowy potwierdzający odnowienie dotacji i umowy o partnerstwie gminnym.",
+      "steps": [
+        {
+          "label": "Wybierz okres raportowania",
+          "detail": "Wybierz daty rozpoczęcia i zakończenia. Typowe okresy to okresy kwartalne lub roczne, dostosowane do cyklu raportowania dotacji."
+        },
+        {
+          "label": "Wybierz tryb odbiorców",
+          "detail": "Tryb kantonowy pokazuje dane dotyczące unikania kosztów dla danego kantonu. Tryb gminny koncentruje się na wynikach partnerstwa lokalnego. Tryb współpracy pokazuje wskaźniki wzajemności i retencji."
+        },
+        {
+          "label": "Zapoznaj się z ostrzeżeniem dotyczącym jakości danych",
+          "detail": "Jeśli wynik jakości danych spadnie poniżej 80%, pojawi się ostrzeżenie. Przed wygenerowaniem formalnego raportu przejrzyj stronę Jakość danych."
+        },
+        {
+          "label": "Wygeneruj raport",
+          "detail": "Kliknij „Wygeneruj raport”. System oblicza: łączną liczbę godzin wymiany × współczynnik dla poszczególnych kategorii × stawkę godzinową za opiekę formalną (domyślnie 35 CHF)."
+        },
+        {
+          "label": "Eksportuj i dystrybuuj",
+          "detail": "Pobierz jako plik PDF (sformatowany do użytku oficjalnego) lub CSV (dla zespołów finansowych kantonów, które potrzebują surowych danych)."
+        }
+      ],
+      "tips": [
+        "Zablokuj parametry polityki operacyjnej przed wygenerowaniem raportu, który złożysz oficjalnie – zmiany wprowadzone po fakcie powodują, że liczby stają się niespójne.",
+        "Dołącz migawkę linii bazowej KPI do raportu ROI, aby przedstawić kontekst: jak kształtowały się uczestnictwo, jakość życia i unikanie kosztów na przestrzeni czasu?",
+        "Najpierw przeprowadź kontrolę jakości danych – raport z zaznaczonymi lukami podważy wiarygodność w oczach partnerów kantonalnych."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Współczynniki kategorii",
+          "path": "/caring/category-coefficients"
+        },
+        {
+          "label": "Polityka operacyjna",
+          "path": "/caring/operating-policy"
+        },
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        },
+        {
+          "label": "Jakość danych",
+          "path": "/caring/data-quality"
+        }
+      ]
+    },
+    "/caring/municipal-impact": {
+      "title": "Pakiet dowodów na wpływ na gminę",
+      "summary": "Interaktywny panel dowodów dla partnerów miejskich z trzema trybami odbiorców — Kanton (koncentracja na unikaniu kosztów), Gmina (koncentracja na partnerach lokalnych) i Spółdzielnia (koncentracja na wzajemności członków). Każdy tryb udostępnia inne wskaźniki i wizualizacje dostosowane do danej grupy odbiorców.",
+      "steps": [
+        {
+          "label": "Wybierz tryb odbiorców",
+          "detail": "Użyj selektora trybu u góry: Kanton dla departamentów finansów/zdrowia kantonu, Gmina dla partnerów samorządów lokalnych, Spółdzielnia dla własnego zarządu."
+        },
+        {
+          "label": "Przejrzyj metryki nagłówka",
+          "detail": "Każdy tryb przedstawia najważniejsze dane: Canton widzi możliwość uniknięcia kosztów w CHF; Gmina widzi aktywnych członków i częstotliwość wymiany; Spółdzielnia widzi wskaźniki retencji i wzajemności."
+        },
+        {
+          "label": "Zapoznaj się z wizualizacjami",
+          "detail": "Wykresy są interaktywne — najedź kursorem, aby wyświetlić podpowiedzi, kliknij, aby filtrować według okresu, kategorii lub podregionu."
+        },
+        {
+          "label": "Eksportuj pakiet wydruku",
+          "detail": "Użyj opcji „Eksportuj do prezentacji”, aby utworzyć plik PDF gotowy do slajdów z kluczowymi wykresami i numerami nagłówków dla trybu odbiorców."
+        }
+      ],
+      "tips": [
+        "Tryb odbiorców w Kantonie łączy się bezpośrednio z danymi zawartymi w miejskim raporcie ROI — powinny być spójne.",
+        "Aby przygotować prezentację rady, przejdź do trybu gminy i skup się na sekcji „Historie członków”, która zawiera anonimowe historie sukcesu."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        },
+        {
+          "label": "Historie sukcesu",
+          "path": "/caring/success-stories"
+        },
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        }
+      ]
+    },
+    "/caring/kpi-baselines": {
+      "title": "Wartości bazowe KPI – przed/po pomiarze wpływu",
+      "summary": "Linie bazowe KPI rejestrują migawkę kluczowych wskaźników zdrowia społeczności w określonym momencie (zwykle uruchomienie pilotażowe). Kolejne migawki porównuje się z wartością bazową, aby zmierzyć zmianę – na przykład 15% redukcję zgłaszanej samotności lub 20% wzrost kontaktów społecznych.",
+      "steps": [
+        {
+          "label": "Utwórz linię bazową uruchomienia",
+          "detail": "Zanim Twój program pilotażowy zostanie uruchomiony, kliknij „Utwórz migawkę linii bazowej”. Blokuje to bieżące wartości dla wszystkich wymiarów KPI (wskaźnik samotności, aktywni członkowie, wymiany/tydzień itp.)."
+        },
+        {
+          "label": "Nagraj migawkę porównawczą",
+          "detail": "Po każdym kamieniu milowym raportowania (3 miesiące, 6 miesięcy, 12 miesięcy) utwórz nową migawkę. System automatycznie oblicza procentową zmianę w stosunku do wartości bazowej."
+        },
+        {
+          "label": "Dodaj wskaźniki pochodzące z ankiety",
+          "detail": "W przypadku wskaźników KPI pochodzących z ankiet prowadzonych przez członków (np. samodzielnie zgłaszany wynik dobrostanu) użyj pól do ręcznego wprowadzania danych, aby wprowadzić wyniki."
+        },
+        {
+          "label": "Przejrzyj panel zmian",
+          "detail": "Tabela porównawcza obok siebie przedstawia każdy KPI, jego wartość bazową, wartość bieżącą i trend kierunkowy (dodatni/ujemny)."
+        },
+        {
+          "label": "Uwzględnij w raportach",
+          "detail": "Zarówno pakiet dowodów wpływu, jak i raport ROI w gminach mogą zawierać porównanie wartości wyjściowych. Aby go dołączyć, użyj opcji „Link do pakietu Impact”."
+        }
+      ],
+      "tips": [
+        "Utwórz poziom bazowy uruchomienia przed zarejestrowaniem jakichkolwiek członków — poziom bazowy sporządzony po dołączeniu członków nie jest prawdziwą miarą przed wprowadzeniem na rynek.",
+        "W przypadku wskaźników KPI dotyczących samotności i dobrostanu należy zastosować ustaloną, zatwierdzoną skalę (np. Skala samotności UCLA, Dobre samopoczucie ONS), aby uzyskać wiarygodność w oczach partnerów akademickich lub zdrowotnych."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        },
+        {
+          "label": "Tablica wyników pilota",
+          "path": "/caring/pilot-scoreboard"
+        }
+      ]
+    },
+    "/caring/sla-dashboard": {
+      "title": "Poproś o pomoc w panelu śledzenia SLA",
+      "summary": "Śledzi wszystkie otwarte prośby o pomoc w odniesieniu do ich zobowiązań SLA zgodnie z Polityką operacyjną: Krytyczny (1 godzina), Wysoki (24 godziny), Średni (72 godziny), Niski (następne zaplanowane spotkanie). Kodowanie kolorami na pierwszy rzut oka pokazuje zgodność w czasie rzeczywistym.",
+      "steps": [
+        {
+          "label": "Przejrzyj karty podsumowań umowy SLA",
+          "detail": "Cztery karty u góry pokazują, ile żądań znajduje się na każdym poziomie ważności i jaki procent jest objęty umową SLA. Czerwony = naruszony; bursztynowy = w ciągu 20% terminu."
+        },
+        {
+          "label": "Filtruj do zaległych żądań",
+          "detail": "Kliknij „Tylko przeterminowane”, aby wyświetlić tylko żądania, które już naruszyły umowę SLA. Wymagają one natychmiastowej uwagi."
+        },
+        {
+          "label": "Przypisz lub przypisz ponownie",
+          "detail": "Kliknij dowolne żądanie, aby otworzyć panel szczegółów. Aby przydzielić odpowiedzialność, użyj opcji „Przypisz do koordynatora”. Osoba cesjonowana otrzymuje powiadomienie w aplikacji."
+        },
+        {
+          "label": "Odłóż drzemkę z uzasadnieniem",
+          "detail": "Jeśli na żądanie nie można jeszcze wykonać żadnego działania (np. oczekiwanie na informacje zewnętrzne), użyj opcji „Odłóż” i podaj powód. Odłożone żądania tymczasowo wstrzymują zegar umowy SLA."
+        },
+        {
+          "label": "Eksportuj raport zgodności",
+          "detail": "Generuj cotygodniowy plik CSV dotyczący zgodności z umową SLA dla dokumentacji zarządzania jakością."
+        }
+      ],
+      "tips": [
+        "Panel SLA odświeża się co 60 sekund — nie ma potrzeby ręcznego ponownego ładowania.",
+        "Okresy o dużym wolumenie (zima, wydarzenia) często powodują presję dotyczącą umowy SLA. Użyj inteligentnych podpowiedzi, aby zapobiegawczo aktywować pomocników, zanim narosną prośby."
+      ],
+      "caution": "Odłożone żądania nadal pojawiają się w raporcie zgodności. Częste odkładanie żądań krytycznych zostanie oznaczone w audycie jakości danych.",
+      "relatedPaths": [
+        {
+          "label": "Safeguarding",
+          "path": "/caring/safeguarding"
+        },
+        {
+          "label": "Inteligentne podpowiedzi",
+          "path": "/caring/nudges"
+        },
+        {
+          "label": "Polityka operacyjna",
+          "path": "/caring/operating-policy"
+        }
+      ]
+    },
+    "/caring/data-quality": {
+      "title": "Kontrole jakości danych",
+      "summary": "Przeprowadza automatyczne kontrole danych Twojej spółdzielni i raportuje problemy według wagi: Krytyczny (blokuje raportowanie), Wysoki (pogarsza dokładność raportu), Średni (doradczy), Niski (kosmetyczny). Napraw problemy krytyczne i wysokie przed wygenerowaniem raportu dla interesariuszy zewnętrznych.",
+      "steps": [
+        {
+          "label": "Przeprowadź pełną kontrolę jakości",
+          "detail": "Kliknij „Uruchom sprawdź teraz”. Skanowanie trwa zwykle 30–60 sekund. Wyniki są przechowywane w pamięci podręcznej przez 6 godzin — uruchom ponownie, jeśli dokonałeś znaczących zmian w danych."
+        },
+        {
+          "label": "Najpierw przejrzyj problemy krytyczne",
+          "detail": "Przed wygenerowaniem raportów gminnych należy rozwiązać krytyczne problemy (kolor czerwony). Kliknij każdy problem, aby wyświetlić opis problemu i bezpośredni link do jego rozwiązania."
+        },
+        {
+          "label": "Pracuj nad problemami wysokimi i średnimi",
+          "detail": "Wysokie problemy (pomarańczowe) wpływają na dokładność obliczeń ROI. Średnie problemy (żółty) mają charakter doradczy — napraw je, gdy jest to wygodne."
+        },
+        {
+          "label": "Zaznacz fałszywe alarmy",
+          "detail": "Jeśli oznaczony problem w rzeczywistości nie stanowi problemu (np. członek faktycznie nie ma adresu e-mail), użyj opcji „Oznacz jako potwierdzony” i podając powód. To wycisza flagę."
+        },
+        {
+          "label": "Śledź wynik jakości w czasie",
+          "detail": "Wykres trendów Wyniku Jakości (0–100) pomaga określić, czy jakość danych poprawia się po podjęciu działań."
+        }
+      ],
+      "tips": [
+        "Przeprowadź kontrolę jakości w ramach comiesięcznej rutyny koordynatora, a nie tylko przed wygenerowaniem raportów.",
+        "Brakujące podsumowania rozwiązań dotyczących zabezpieczeń są zawsze oznaczane jako krytyczne — zobacz stronę Zabezpieczanie, aby je dodać."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Miejski zwrot z inwestycji",
+          "path": "/caring/municipal-roi"
+        },
+        {
+          "label": "Safeguarding",
+          "path": "/caring/safeguarding"
+        }
+      ]
+    },
+    "/caring/launch-readiness": {
+      "title": "Brama gotowości do startu pilotażowego",
+      "summary": "Bramkowana lista kontrolna kryteriów, które muszą zostać spełnione, zanim Twój pilot zostanie uznany za gotowy do uruchomienia. Gotowość ocenia się w czterech obszarach sygnałowych: dostosowanie wartości miejskich, udział społeczności, sieć partnerów i lokalna zdolność wymiany. Wszystko musi być zielone przed startem.",
+      "steps": [
+        {
+          "label": "Przejrzyj cztery sygnały gotowości",
+          "detail": "Wartość miejska, uczestnictwo, sieć partnerów i wymiana lokalna są oceniane w skali 0–100. Wszystkie cztery muszą osiągnąć skonfigurowany próg (domyślnie 70), zanim brama się otworzy."
+        },
+        {
+          "label": "Wgłębij się w zawodzące sygnały",
+          "detail": "Kliknij dowolną bursztynową lub czerwoną kartę sygnalizacyjną, aby wyświetlić konkretne kryteria cząstkowe, które nie zostały jeszcze spełnione, wraz z praktycznymi wskazówkami, jak rozwiązać każde z nich."
+        },
+        {
+          "label": "Prześlij dowody potwierdzające",
+          "detail": "Niektóre kryteria wymagają przesłania dowodów (np. podpisanego listu partnerstwa gminnego lub wypełnionej ankiety podstawowej). Użyj przycisku przesyłania dla odpowiedniego kryterium."
+        },
+        {
+          "label": "Poproś o opinię koordynatora",
+          "detail": "Gdy uznasz, że wszystkie kryteria zostały spełnione, użyj opcji „Poproś o sprawdzenie”, aby powiadomić starszego koordynatora lub krajowego przedstawiciela Wspólnoty Opieki w celu zatwierdzenia bramki gotowości."
+        },
+        {
+          "label": "Odblokuj wdrożenie na żywo",
+          "detail": "Gdy recenzja zatwierdzi wszystkie kryteria, przycisk „Rozpocznij transmisję” stanie się dostępny. Umożliwia to członkom moduł Caring Community."
+        }
+      ],
+      "tips": [
+        "Możesz pracować nad kryteriami w dowolnej kolejności – nie ma wymaganej kolejności.",
+        "Dokumenty dowodowe są bezpiecznie przechowywane i dostępne dla obywateli Wspólnoty Opiekuńczej.",
+        "Bramkę gotowości można w dowolnym momencie ponownie ocenić — jeśli zmienią się okoliczności (np. partner miejski wycofa się), status bramki zostanie automatycznie zaktualizowany."
+      ],
+      "caution": "Nie próbuj ręcznie ominąć bramki gotowości. Rozpoczęcie programu bez spełnienia wszystkich kryteriów grozi pogorszeniem doświadczeń członków i podważa rozliczalność dotacji.",
+      "relatedPaths": [
+        {
+          "label": "Tablica wyników pilota",
+          "path": "/caring/pilot-scoreboard"
+        },
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        },
+        {
+          "label": "Polityka operacyjna",
+          "path": "/caring/operating-policy"
+        }
+      ]
+    },
+    "/caring/pilot-scoreboard": {
+      "title": "Tablica wyników troskliwego pilota społecznościowego",
+      "summary": "Karta wyników na żywo dla pilota Caring Community, śledząca postępy w odniesieniu do wskaźników metodologii Caring Community. Mierniki obejmują wolumen wymiany, utrzymanie członków, współczynnik wzajemności (pomocnicy, którzy są również odbiorcami), czas reakcji koordynatora i wskaźnik zgodności.",
+      "steps": [
+        {
+          "label": "Przejrzyj najwyższy wynik",
+          "detail": "Ogólny wynik pilotażowy (0–100) jest sumą wszystkich wskaźników metodologicznych. Dąż do tego, aby osoby w wieku 75+ zakwalifikowały się do uznania „Założonej spółdzielni” przez Wspólnotę Opiekuńczą."
+        },
+        {
+          "label": "Zrozumienie indywidualnych wyników metryk",
+          "detail": "Każda metryka ma zakres docelowy zdefiniowany w Polityce Operacyjnej. Zielony = cel; bursztynowy = w granicach 10% wartości docelowej; czerwony = poniżej progu."
+        },
+        {
+          "label": "Porównaj z testem porównawczym Caring Community",
+          "detail": "Włącz opcję „Pokaż test porównawczy społeczności troskliwej”, aby nałożyć zanonimizowane średnie wyniki ze wszystkich spółdzielni społeczności troskliwej. To pokazuje, jak wypadasz na tle rówieśników."
+        },
+        {
+          "label": "Pobierz raport metodologiczny",
+          "detail": "Wygeneruj raport metodologiczny w formacie społeczności opiekuńczej, który należy przedłożyć społeczności opiekuńczej podczas kwartalnego przeglądu."
+        }
+      ],
+      "tips": [
+        "Współczynnik wzajemności (proporcja członków, którzy dają ORAZ otrzymują) jest najważniejszym pojedynczym miernikiem akredytacji Caring Community – cel na poziomie 60%+.",
+        "Niski wynik czasu reakcji koordynatora prawie zawsze odzwierciedla naruszenia umowy SLA — sprawdź pulpit nawigacyjny SLA pod kątem pierwotnej przyczyny."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        },
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        },
+        {
+          "label": "Gotowość do uruchomienia",
+          "path": "/caring/launch-readiness"
+        }
+      ]
+    },
+    "/caring/nudges": {
+      "title": "Inteligentne podpowiedzi — automatyczne zaangażowanie",
+      "summary": "Inteligentne podpowiedzi to zautomatyzowane, spersonalizowane wiadomości wysyłane do nieaktywnych lub zagrożonych członków w celu ponownego ich zaangażowania. Reguły są definiowane na podstawie progu braku aktywności, poziomu zaufania członków i kategorii opieki. Wszystkie podpowiedzi są przeglądane przed publikacją.",
+      "steps": [
+        {
+          "label": "Utwórz regułę podpowiedzi",
+          "detail": "Kliknij „Nowe posunięcie”. Ustaw wyzwalacz (np. „członek nie logował się od 14 dni”), segment docelowy (np. członkowie poziomu 1 lub wyższego w kategorii Transport) i kanał (e-mail / w aplikacji)."
+        },
+        {
+          "label": "Napisz wiadomość szturchniętą",
+          "detail": "Skorzystaj z asystenta Communication Copilot, aby przygotować ciepłą, spersonalizowaną wiadomość. Imię członka jest zawsze łączone automatycznie."
+        },
+        {
+          "label": "Ustaw harmonogram wysyłania",
+          "detail": "Wybierz, kiedy można wysyłać podpowiedzi (np. tylko w dni powszednie w godzinach 9:00–18:00) i maksymalną częstotliwość (np. nie częściej niż raz w tygodniu na członka)."
+        },
+        {
+          "label": "Wyświetl podgląd i aktywuj",
+          "detail": "Przejrzyj listę podglądu członków, którzy obecnie otrzymaliby szturchnięcie. Jeśli liczba jest rozsądna, przełącz regułę na Aktywną."
+        },
+        {
+          "label": "Sprawdź skuteczność szturchnięć",
+          "detail": "Panel analityczny pokazuje współczynnik otwarć, współczynnik klikalności i współczynnik ponownego zaangażowania (członkowie, którzy ukończyli wymianę w ciągu 7 dni od szturchnięcia)."
+        }
+      ],
+      "tips": [
+        "Zacznij od niskiej częstotliwości – zwykle wystarczy jedno szturchnięcie na dwa tygodnie. Nadmierne namawianie prowadzi do rezygnacji.",
+        "Podsunięcia są najskuteczniejsze w przypadku członków poziomu 0–1, którzy nie ukończyli jeszcze swojej pierwszej wymiany.",
+        "Nigdy nie używaj podpowiedzi w celu zapewnienia dalszych działań — użyj do tego modułu Zabezpieczenia."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Drugi pilot komunikacyjny",
+          "path": "/caring/copilot"
+        },
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        }
+      ]
+    },
+    "/caring/emergency-alerts": {
+      "title": "Alerty awaryjne — transmitowane do wszystkich członków",
+      "summary": "Wysyłaj natychmiastowe powiadomienia o wysokim priorytecie do wszystkich członków spółdzielni. Używaj tego tylko w przypadku autentycznych sytuacji awaryjnych: trudnych warunków pogodowych wpływających na podróż na giełdy, ochrony ogłoszeń publicznych lub pilnych porad zdrowotnych w społeczności. Wszystkie alerty są rejestrowane i oznaczane znacznikiem czasu.",
+      "steps": [
+        {
+          "label": "Wybierz typ alertu",
+          "detail": "Wybierz spośród: Alert bezpieczeństwa, Ostrzeżenie pogodowe, Zakłócenie usług lub Ogólna awaria. Typ określa styl wizualny i pilność powiadomienia push."
+        },
+        {
+          "label": "Napisz wiadomość ostrzegawczą",
+          "detail": "Zachowaj zwięzłość (poniżej 160 znaków w celu zapewnienia zgodności z wiadomościami SMS). Określ, jaka jest sytuacja, co członkowie powinni zrobić i kiedy przekażesz aktualne informacje."
+        },
+        {
+          "label": "Wybierz kanały dostawy",
+          "detail": "Wybierz: Baner w aplikacji, E-mail, Powiadomienie push lub Wszystkie kanały. Push jest natychmiastowy; e-mail trwa do 5 minut."
+        },
+        {
+          "label": "Ustaw czas wygaśnięcia",
+          "detail": "Alerty wygasają automatycznie po ustawionym czasie (domyślnie 24 godziny). Wygasłe alerty są automatycznie usuwane z ekranów członków."
+        },
+        {
+          "label": "Wysyłaj i monitoruj",
+          "detail": "Kliknij „Wyślij powiadomienie”. Pulpit nawigacyjny dostawy pokazuje stawki wysyłania/odczytu w czasie rzeczywistym. Opublikuj wiadomość „Wszystko jasne” w ramach dalszych działań, gdy sytuacja zostanie rozwiązana."
+        }
+      ],
+      "tips": [
+        "Co miesiąc testuj system alertów za pomocą alertu „Tryb testowy” (widocznego tylko dla członków na poziomie koordynatora), aby sprawdzić, czy wszystkie kanały działają.",
+        "Jeśli alert dotyczy tylko części Twojej społeczności, użyj podregionów, aby filtrować odbiorców, zamiast wysyłać powiadomienie do wszystkich."
+      ],
+      "caution": "Nie używaj alertów awaryjnych do rutynowej komunikacji. Zmęczenie alertami spowoduje, że członkowie będą ignorować przyszłe autentyczne alerty.",
+      "relatedPaths": [
+        {
+          "label": "Sub-Regions",
+          "path": "/caring/sub-regions"
+        },
+        {
+          "label": "Drugi pilot komunikacyjny",
+          "path": "/caring/copilot"
+        }
+      ]
+    },
+    "/caring/surveys": {
+      "title": "Ankiety miejskie",
+      "summary": "Twórz ankiety i rozpowszechniaj je wśród osób kontaktowych w Twojej gminie — urzędników samorządowych, pracowników wydziału zdrowia i organów finansujących. Ankiety można wykorzystać do gromadzenia ocen potrzeb, informacji zwrotnych na temat zadowolenia lub dowodów na potrzeby raportowania dotacji.",
+      "steps": [
+        {
+          "label": "Utwórz nową ankietę",
+          "detail": "Kliknij „Nowa ankieta”. Wybieraj spośród typów pytań: wielokrotnego wyboru, skala ocen (1–5 lub 1–10), tekst otwarty i tak/nie."
+        },
+        {
+          "label": "Dodaj odbiorców z miejskiej listy kontaktów",
+          "detail": "Selektor odbiorców pobiera dane z Twojej listy kontaktów Lead Nurture. Filtruj według roli (np. „Urzędnik ds. zdrowia kantonu”) lub organizacji."
+        },
+        {
+          "label": "Zaplanuj lub wyślij natychmiast",
+          "detail": "Ankiety można wysłać od razu lub zaplanować na konkretny termin (np. przed kwartalnym spotkaniem przeglądowym)."
+        },
+        {
+          "label": "Analizuj odpowiedzi",
+          "detail": "Panel wyników pokazuje współczynniki odpowiedzi, zbiorcze wyniki i pełne odpowiedzi w postaci otwartego tekstu. Filtruj według roli lub organizacji respondenta."
+        },
+        {
+          "label": "Eksport do raportów",
+          "detail": "Użyj opcji „Eksportuj CSV” w przypadku nieprzetworzonych danych lub „Eksportuj podsumowanie w formacie PDF”, aby uzyskać sformatowane podsumowanie nadające się do umieszczenia w dokumentacji wpływu."
+        }
+      ],
+      "tips": [
+        "Ankiety powinny być krótkie (5 pytań lub mniej). Osoby kontaktowe w gminach są zajęte — krótkie ankiety uzyskują znacznie wyższy wskaźnik wypełnienia.",
+        "Skontaktuj się z osobami, które nie odpowiedziały, raz na 7 dni, korzystając z automatycznego przypomnienia. Nie wysyłaj więcej niż jednego przypomnienia."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Pielęgnowanie leadów",
+          "path": "/caring/lead-nurture"
+        },
+        {
+          "label": "Wpływ miejski",
+          "path": "/caring/municipal-impact"
+        }
+      ]
+    },
+    "/caring/copilot": {
+      "title": "Drugi pilot komunikacyjny — kreślenie wspomagane sztuczną inteligencją",
+      "summary": "Asystent pisania AI przeszkolony w zakresie standardów komunikacji społeczności Caring Community. Wklej przybliżony pomysł, a Copilot zwróci dopracowaną wersję roboczą w ciepłym, włączającym tonie, odpowiednim dla społeczności korzystających z banków czasu. Przed wysłaniem przeglądasz i edytujesz.",
+      "steps": [
+        {
+          "label": "Wybierz rodzaj komunikacji",
+          "detail": "Wybierz spośród: Ogłoszenie członkowskie, E-mail powitalny, Podsumowanie raportu wpływu, Aktualizacja partnera miejskiego lub Wersja robocza w dowolnej formie."
+        },
+        {
+          "label": "Opisz, co chcesz powiedzieć",
+          "detail": "Napisz 1–3 zdania opisujące najważniejsze punkty. Na przykład: „W marcu przeprowadziliśmy 120 wymian. Wyniki w zakresie samotności poprawiły się o 12%. Podziękuj członkom za ich wkład”."
+        },
+        {
+          "label": "Wygeneruj i przejrzyj wersję roboczą",
+          "detail": "Kliknij „Generuj wersję roboczą”. Przeczytaj uważnie wyniki — wersje robocze AI mogą zawierać nieścisłości. Przed użyciem popraw wszelkie liczby i nazwy."
+        },
+        {
+          "label": "Dostosuj ton i długość",
+          "detail": "Za pomocą suwaków dostosuj stopień formalny (nieformalny ↔ formalny) i długość (krótki ↔ szczegółowy). Regeneruj się, aż będziesz szczęśliwy."
+        },
+        {
+          "label": "Skopiuj do narzędzia do wysyłania",
+          "detail": "Użyj opcji „Kopiuj do schowka” i wklej do swojego klienta poczty e-mail, narzędzia do tworzenia ogłoszeń lub edytora biuletynów."
+        }
+      ],
+      "tips": [
+        "Copilot działa najlepiej w przypadku określonych danych wejściowych — niejasne podpowiedzi tworzą ogólne wersje robocze. Podaj liczby rzeczywiste i nazwane wyniki.",
+        "Zawsze sprawdzaj fakty w tekście wygenerowanym przez sztuczną inteligencję. Copilot nie ma dostępu do bieżących danych — zapisuje dane na podstawie tego, co mu powiesz."
+      ],
+      "caution": "Nigdy nie wysyłaj wersji roboczej Copilot do zewnętrznych interesariuszy (kanton, media, fundatorzy) bez sprawdzenia przez człowieka. Sztuczna inteligencja może błędnie podawać liczby lub używać nieodpowiednich sformułowań w kontekście formalnym.",
+      "relatedPaths": [
+        {
+          "label": "Inteligentne podpowiedzi",
+          "path": "/caring/nudges"
+        },
+        {
+          "label": "Alerty awaryjne",
+          "path": "/caring/emergency-alerts"
+        },
+        {
+          "label": "Przegląd Obywatelski",
+          "path": "/caring/civic-digest"
+        }
+      ]
+    },
+    "/caring/civic-digest": {
+      "title": "Przegląd obywatelski — spersonalizowane ustawienia podsumowania członkowskiego",
+      "summary": "Przegląd Obywatelski to spersonalizowana wiadomość e-mail z podsumowaniem wysyłana do każdego członka na podstawie jego zainteresowań, aktywności i roli w społeczności. Ta strona kontroluje globalne ustawienia podsumowania: opcje częstotliwości, moduły treści, które należy uwzględnić oraz to, które segmenty członkowskie otrzymują jaki typ podsumowania.",
+      "steps": [
+        {
+          "label": "Ustaw dostępne częstotliwości podsumowań",
+          "detail": "Wybierz częstotliwości, z których mogą skorzystać członkowie: Codziennie, Co tydzień, Co dwa tygodnie, Co miesiąc lub Nigdy. Wartość domyślna dla nowych członków to Cotygodniowa."
+        },
+        {
+          "label": "Skonfiguruj moduły treści podsumowania",
+          "detail": "Przełącz, które bloki treści mają być wyświetlane: nadchodzące wydarzenia, otwarte prośby o pomoc, powitanie nowych członków, podsumowanie mojej wymiany, najważniejsze informacje z tablicy wyników pilotażu itp."
+        },
+        {
+          "label": "Ustaw reguły specyficzne dla segmentu",
+          "detail": "Koordynatorzy mogą otrzymać wzbogacone podsumowanie zawierające ostrzeżenia dotyczące statusu SLA i jakości danych. Ustaw to w sekcji „Dodatki Coordinator Digest”."
+        },
+        {
+          "label": "Podgląd podsumowania",
+          "detail": "Kliknij „Podgląd”, aby zobaczyć przykładowe podsumowanie wyrenderowane dla profilu członka testowego. Sprawdź układ, linki i kolejność treści."
+        },
+        {
+          "label": "Wyślij jednorazowe podsumowanie",
+          "detail": "Użyj opcji „Wyślij teraz”, aby wysłać podsumowanie poza normalnym harmonogramem – przydatne przy uruchamianiu kampanii lub udostępnianiu wyników kluczowych."
+        }
+      ],
+      "tips": [
+        "Członkowie z wybraną opcją „Nigdy” nadal będą otrzymywać alerty alarmowe — preferencje podsumowania nie wpływają na komunikację o znaczeniu krytycznym.",
+        "Cotygodniowe podsumowania wysyłane we wtorkowe lub środowe poranki zwykle uzyskują najwyższy współczynnik otwarć na platformach społecznościowych."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Inteligentne podpowiedzi",
+          "path": "/caring/nudges"
+        },
+        {
+          "label": "Drugi pilot komunikacyjny",
+          "path": "/caring/copilot"
+        }
+      ]
+    },
+    "/caring/lead-nurture": {
+      "title": "Lead Nurture — Miejski CRM kontaktowy",
+      "summary": "Lekki system zarządzania kontaktami umożliwiający śledzenie rozmów z potencjalnymi pilotażowymi kontaktami w gminach — lokalnymi radnymi, urzędnikami wydziału zdrowia, pracownikami kantonów i fundacjami lokalnymi. Śledź etap zapytania, datę ostatniego kontaktu i następną akcję dla każdego potencjalnego klienta.",
+      "steps": [
+        {
+          "label": "Dodaj kontakt",
+          "detail": "Kliknij „Nowy kontakt”. Wpisz imię i nazwisko, rolę, organizację, adres e-mail oraz kanton lub gminę, którą reprezentują."
+        },
+        {
+          "label": "Ustaw etap zapytania",
+          "detail": "Wybierz etap rurociągu: Potencjalny → Wstępny zasięg → Zainteresowany → Wysłana propozycja → Zgoda pilotażowa → Wdrożony → Odrzucony. Przesuwaj scenę w miarę postępu rozmów."
+        },
+        {
+          "label": "Zarejestruj notatkę kontaktową",
+          "detail": "Po każdej interakcji (e-mail, telefon, spotkanie) dodawaj notatkę z datą, omawianym tematem i uzgodnionym kolejnym działaniem. Notatki są prywatne dla koordynatorów."
+        },
+        {
+          "label": "Ustaw kolejne przypomnienie",
+          "detail": "Skorzystaj z opcji „Ustaw przypomnienie”, aby utworzyć zadanie, które w wybranym terminie pojawi się w panelu Twojego koordynatora."
+        },
+        {
+          "label": "Link do najemcy",
+          "detail": "Gdy gmina wyrazi zgodę na pilotaż, użyj „Link do najemcy”, aby powiązać kontakt z nowym najemcą NEXUSA, który jest dla niej tworzony."
+        }
+      ],
+      "tips": [
+        "Zapisuj krótkie, ale konkretne notatki — „Zadzwoniłem do Marii, ona rozpatrzy propozycję do piątku 14 lutego” jest bardziej przydatne niż „Zadzwoniłem do kontaktu”.",
+        "Podświetlone zostaną kontakty, które znajdowały się na tym samym etapie przygotowania przez ponad 60 dni — zastanów się, czy potrzebują innego podejścia, czy też powinny zostać przeniesione do kategorii Odrzucone."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Ankiety miejskie",
+          "path": "/caring/surveys"
+        },
+        {
+          "label": "Zapytania pilotażowe",
+          "path": "/admin/pilot-inquiries"
+        }
+      ]
+    },
+    "/caring/success-stories": {
+      "title": "Historie sukcesu — karty odporne na uderzenia",
+      "summary": "Zbieraj i zarządzaj krótkimi, anonimowymi historiami członków na temat zmian, jakie w ich życiu wywołały wymiany trosk i troski. Historie są wykorzystywane w raportach wpływu, prezentacjach miejskich i dostępnym publicznie pakiecie dowodów wpływu.",
+      "steps": [
+        {
+          "label": "Zbierz historię",
+          "detail": "Kliknij „Nowa historia”. Wpisz pseudonim członka (nigdy w materiałach publicznych jego prawdziwe imię i nazwisko), rodzaj wymiany, wynik i bezpośredni cytat (za zaznaczoną zgodą)."
+        },
+        {
+          "label": "Oznacz według kategorii wpływu",
+          "detail": "Oznacz każdą historię odpowiednimi tematami wpływu: Zmniejszona samotność, Poprawa mobilności, Praktyczne wsparcie, Połączenia międzypokoleniowe itp. Powodują one filtrowanie raportów."
+        },
+        {
+          "label": "Zaznacz stan zgody",
+          "detail": "Każda historia musi mieć zapis zgody, zanim będzie mogła zostać opublikowana. Zaznacz opcję „Uzyskano zgodę ustną” lub prześlij pisemny formularz zgody."
+        },
+        {
+          "label": "Przejrzyj i opublikuj",
+          "detail": "Użyj opcji „Opublikuj w pakiecie Impact”, aby udostępnić historię w panelu sterowania Municipal Impact i eksporcie pakietu Evidence Pack."
+        },
+        {
+          "label": "Archiwizuj nieaktualne historie",
+          "detail": "Historie starsze niż 2 lata należy sprawdzić pod kątem ich dalszej przydatności. Archiwizuj te, które nie odzwierciedlają już bieżących operacji."
+        }
+      ],
+      "tips": [
+        "Najbardziej przekonujące historie są konkretne: „Maria, lat 78, była w stanie pozostać niezależna przez kolejne 6 miesięcy, ponieważ…” jest lepsze niż ogólne stwierdzenia dotyczące dobrego samopoczucia.",
+        "Staraj się stworzyć co najmniej 3 historie w każdej kategorii opieki — raporty dotyczące wpływu są bardziej wiarygodne dzięki szeregowi dowodów."
+      ],
+      "caution": "Nigdy nie publikuj historii bez zgody. Publikowanie bez zgody stanowi naruszenie FADP/nDSG.",
+      "relatedPaths": [
+        {
+          "label": "Wpływ miejski",
+          "path": "/caring/municipal-impact"
+        },
+        {
+          "label": "Pakiet ujawnień",
+          "path": "/caring/disclosure-pack"
+        }
+      ]
+    },
+    "/caring/feedback": {
+      "title": "Skrzynka odbiorcza opinii — segregacja opinii gminy",
+      "summary": "Centralizuje informacje zwrotne przekazywane przez partnerów miejskich i zainteresowane strony — wątpliwości, pytania, sugestie i skargi. Każdy element jest sortowany według ważności, przydzielany koordynatorowi i śledzony aż do rozwiązania.",
+      "steps": [
+        {
+          "label": "Przejrzyj nowe elementy opinii",
+          "detail": "Nowe elementy pojawiają się u góry skrzynki odbiorczej. Przeczytaj każdy z nich i oceń jego wagę: Krytyczny (awaria usługi / formalna skarga), Wysoki (poważny problem), Średni (zapytanie), Niski (sugestia)."
+        },
+        {
+          "label": "Przypisz do koordynatora",
+          "detail": "Użyj opcji „Przypisz”, aby przypisać element koordynatorowi, który najlepiej potrafi udzielić odpowiedzi. Otrzymają powiadomienie w aplikacji."
+        },
+        {
+          "label": "Przygotuj odpowiedź",
+          "detail": "Skorzystaj z panelu „Odpowiedz”, aby przygotować swoją odpowiedź. W przypadku przesyłek krytycznych użyj drugiego pilota komunikacyjnego, aby upewnić się, że ton jest odpowiedni."
+        },
+        {
+          "label": "Wyślij i zaloguj",
+          "detail": "Wysłanie odpowiedzi rejestruje cały wątek w historii elementu. Osoba kontaktowa w gminie otrzyma odpowiedź e-mailem."
+        },
+        {
+          "label": "Zamknij lub eskaluj",
+          "detail": "Oznacz jako rozwiązaną po zakończeniu sprawy lub skorzystaj z opcji „Przekaż sprawę do Krajowej Wspólnoty Opieki”, jeśli rozwiązanie problemu wykracza poza kompetencje Twojej spółdzielni."
+        }
+      ],
+      "tips": [
+        "Staraj się przyjmować krytyczne uwagi w ciągu 4 godzin, nawet jeśli pełne rozwiązanie zajmuje więcej czasu. Samo potwierdzenie zapobiega eskalacji.",
+        "Rozpoznawanie wzorców: jeśli trzy lub więcej elementów opinii dotyczy tego samego tematu (np. „powolna reakcja koordynatora”), sygnalizuje to problem systemowy wymagający zbadania."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Drugi pilot komunikacyjny",
+          "path": "/caring/copilot"
+        },
+        {
+          "label": "Panel SLA",
+          "path": "/caring/sla-dashboard"
+        }
+      ]
+    },
+    "/caring/verification": {
+      "title": "Weryfikacja miejska — odznaka DNS/atestacyjna",
+      "summary": "Zweryfikowani partnerzy gmin otrzymują odznakę cyfrową wyświetlaną na ich profilu społeczności oraz w raportach wpływu. Weryfikacja wymaga potwierdzenia rekordu DNS (poświadczającego kontrolę nad oficjalną domeną gminy) i podpisanego pisma atestacyjnego.",
+      "steps": [
+        {
+          "label": "Rozpocznij weryfikację dla gminy",
+          "detail": "Znajdź kontakt miejski w Lead Nurture, kliknij „Rozpocznij weryfikację”. System generuje dla nich unikalną wartość rekordu DNS TXT, którą mogą dodać do swojej domeny."
+        },
+        {
+          "label": "Poinstruuj zespół IT gminy",
+          "detail": "Udostępnij instrukcję obsługi DNS (plik PDF do pobrania) administratorowi sieci gminy. Dodają rekord TXT do swojego DNS."
+        },
+        {
+          "label": "Uruchom sprawdzanie DNS",
+          "detail": "Po potwierdzeniu dodania rekordu kliknij „Sprawdź DNS”. System automatycznie odpytuje domenę. Weryfikacja jest natychmiastowa, jeśli rekord zostanie znaleziony."
+        },
+        {
+          "label": "Prześlij list atestacyjny",
+          "detail": "Prześlij podpisane oświadczenie (na oficjalnym papierze firmowym, podpisane przez odpowiedzialnego urzędnika). Dane te są przechowywane jako część rejestru zgodności."
+        },
+        {
+          "label": "Wydaj odznakę",
+          "detail": "Po potwierdzeniu zarówno DNS, jak i zaświadczenia, kliknij „Wydaj zweryfikowaną odznakę”. Odznaka pojawia się od razu na profilu partnerskim gminy."
+        }
+      ],
+      "tips": [
+        "Propagacja DNS może zająć do 48 godzin. Odczekaj wystarczająco dużo czasu przed sprawdzeniem — nie ponawiaj próby częściej niż raz na godzinę.",
+        "Plakietka zostanie automatycznie unieważniona, jeśli rekord DNS zostanie później usunięty. Należy zalecić zweryfikowanym partnerom, aby prowadzili dokumentację na stałe."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Pielęgnowanie leadów",
+          "path": "/caring/lead-nurture"
+        },
+        {
+          "label": "Wpływ miejski",
+          "path": "/caring/municipal-impact"
+        }
+      ]
+    },
+    "/caring/hour-transfers": {
+      "title": "Ręczne godzinowe przelewy kredytowe",
+      "summary": "Umożliwia koordynatorom ręczne przesyłanie kredytów godzinowych pomiędzy kontami członkowskimi poza ukończoną wymianą. Użyj tego do poprawek, przyznania kredytów społecznościowych lub dostosowań administracyjnych. Wszystkie transfery są stale kontrolowane.",
+      "steps": [
+        {
+          "label": "Wybierz element źródłowy",
+          "detail": "Wyszukaj członka, którego godziny zostaną potrącone. Zanim przejdziesz dalej, potwierdź bieżące saldo."
+        },
+        {
+          "label": "Wybierz docelowego członka",
+          "detail": "Wyszukaj członka odbierającego. System ostrzega, jeśli docelowy element członkowski znajduje się w innej dzierżawie."
+        },
+        {
+          "label": "Wpisz kwotę i powód",
+          "detail": "Wprowadź liczbę godzin (dozwolone cyfry po przecinku, np. 0,5 dla 30 minut). Podaj jasny powód — pojawi się on w historii transakcji obu członków."
+        },
+        {
+          "label": "Potwierdź i wykonaj",
+          "detail": "Przejrzyj podsumowanie i kliknij „Potwierdź przelew”. Regulacja zaczyna obowiązywać natychmiast."
+        },
+        {
+          "label": "Sprawdź dziennik audytu",
+          "detail": "Sprawdź wpis dziennika audytu, aby upewnić się, że oba salda zostały poprawnie zaktualizowane."
+        }
+      ],
+      "tips": [
+        "Nie możesz przeciążyć konta członka do ujemnego salda bez flagi zastąpienia — skontaktuj się z superadministratorem, jeśli rzeczywiście potrzebne jest ujemne saldo.",
+        "W przypadku poprawek zbiorczych (np. po błędzie systemu) użyj importu CSV do transferów zbiorczych, zamiast wykonywać je pojedynczo."
+      ],
+      "caution": "Przeniesień ręcznych nie można cofnąć automatycznie. Przed zatwierdzeniem dokładnie sprawdź kwoty – korekty wymagają drugiego ręcznego przelewu w przeciwnym kierunku.",
+      "relatedPaths": [
+        {
+          "label": "Praca koordynatora",
+          "path": "/caring/workflow"
+        },
+        {
+          "label": "Lojalność",
+          "path": "/caring/loyalty"
+        }
+      ]
+    },
+    "/caring/loyalty": {
+      "title": "Program lojalnościowy — Nagrody członkowskie",
+      "summary": "Skonfiguruj program nagród lojalnościowych: odznaki, nagrody za kamienie milowe, premie za serię i specjalne uznanie dla długoterminowych członków i najlepszych współpracowników. Mechanika lojalności napędza zaangażowanie, nie zaburzając wewnętrznej wartości wzajemnej pomocy.",
+      "steps": [
+        {
+          "label": "Przejrzyj zasady aktywnych nagród",
+          "detail": "Tabela zasad pokazuje każdy aktywny aktywator lojalnościowy: kamienie milowe wymiany (1., 5., 25. wymiana), premie za polecenie, kredyty urodzinowe itp."
+        },
+        {
+          "label": "Edytuj lub dodaj regułę",
+          "detail": "Kliknij „Nowa reguła”. Ustaw typ wyzwalacza (liczba wymian, wynik recenzji, dni serii, wydarzenie niestandardowe), kwotę nagrody w godzinach oraz to, czy jest to nagroda jednorazowa czy cykliczna."
+        },
+        {
+          "label": "Skonfiguruj odznaki kamieni milowych",
+          "detail": "Połącz odznakę (utworzoną w panelu administracyjnym Odznak) z kamieniem milowym lojalności, aby członkowie otrzymali zarówno nagrodę godzinową, jak i widoczne uznanie."
+        },
+        {
+          "label": "Przejrzyj tabelę wyników",
+          "detail": "Sprawdź tabelę wyników lojalnościowych dla najlepszych autorów w tym miesiącu. Rozważ wysłanie im osobistego podziękowania za pośrednictwem drugiego pilota komunikacyjnego."
+        },
+        {
+          "label": "Kontrola wypłat nagród",
+          "detail": "Dziennik wypłat pokazuje każdą przyznaną nagrodę, komu i dlaczego. Użyj tego, aby wykryć anomalie."
+        }
+      ],
+      "tips": [
+        "Premie wzajemności (dla członków, którzy dają i otrzymują w tym samym miesiącu) bardzo skutecznie poprawiają współczynnik wzajemności na tablicy wyników pilotażu.",
+        "Staraj się, aby program był prosty — zbyt wiele reguł powoduje zamieszanie. Trzy do pięciu dobrze rozumianych nagród przewyższa złożoną matrycę punktów."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Punkty regionalne",
+          "path": "/caring/regional-points"
+        },
+        {
+          "label": "Tablica wyników pilota",
+          "path": "/caring/pilot-scoreboard"
+        }
+      ]
+    },
+    "/caring/regional-points": {
+      "title": "Punkty regionalne — księga trzeciej waluty",
+      "summary": "Punkty regionalne to waluta uzupełniająca, która towarzyszy kredytom godzinowym. Wydawane są przez organy subregionalne (rady dzielnic, grupy sąsiedzkie) i można je wymienić na lokalne towary lub usługi nieobjęte wymianą godzinową. Ta strona zarządza regionalną księgą punktów.",
+      "steps": [
+        {
+          "label": "Przejrzyj bilans punktów regionalnych",
+          "detail": "Księga pokazuje sumę punktów w obiegu, wydanych w tym miesiącu, wykorzystanych w tym miesiącu oraz zaległe zobowiązanie."
+        },
+        {
+          "label": "Wydaj partię punktów",
+          "detail": "Użyj „Punktów wydania”, aby przyznać punkty członkowi lub grupie członków. Wpisz kwotę, podregion i powód (np. „Udział w sprzątaniu okolicy”)."
+        },
+        {
+          "label": "Skonfiguruj opcje realizacji",
+          "detail": "W „Katalogu realizacji” dodaj przedmioty, na które członkowie mogą wymienić punkty (np. „Kupon na lokalną piekarnię — 50 punktów”). Każdy przedmiot wymaga stanu magazynowego lub nieograniczonego przełącznika."
+        },
+        {
+          "label": "Przejrzyj prośby o umorzenie",
+          "detail": "Oczekujące żądania realizacji pojawiają się w kolejce. Zatwierdź lub odrzuć każdą z nich, podając powód odmowy."
+        },
+        {
+          "label": "Eksportuj księgę",
+          "detail": "Wygeneruj okresowy raport księgowy dla swojego partnera subregionalnego, pokazujący wydane i wykorzystane punkty."
+        }
+      ],
+      "tips": [
+        "Punkty regionalne powinny uzupełniać, a nie konkurować z punktami godzinowymi. Unikaj konfigurowania przedmiotów podlegających wymianie, które można również wymienić w ramach usług godzinowych.",
+        "Niech odpowiedzialność (niewykorzystane, zaległe punkty) będzie widoczna dla partnerów subregionalnych – to stanowi prawdziwe zobowiązanie."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Sub-Regions",
+          "path": "/caring/sub-regions"
+        },
+        {
+          "label": "Lojalność",
+          "path": "/caring/loyalty"
+        }
+      ]
+    },
+    "/caring/sub-regions": {
+      "title": "Podregiony — zarządzanie podziałami geograficznymi",
+      "summary": "Podregiony dzielą obszar geograficzny spółdzielni na mniejsze jednostki administracyjne, takie jak Quartier (dzielnica), Ortsteil (dzielnica powiatowa) lub wioska. Członkowie mogą być przypisani do podregionów w celu zapewnienia ukierunkowanej komunikacji, raportów lokalnych i zarządzania punktami regionalnymi.",
+      "steps": [
+        {
+          "label": "Utwórz podregion",
+          "detail": "Kliknij „Nowy podregion”. Wpisz nazwę (np. „Länggasse-Felsenau”), typ (Quartier / Ortsteil / Village / Custom) i opcjonalny opis granicy."
+        },
+        {
+          "label": "Przypisz członków",
+          "detail": "Użyj narzędzia do przypisania zbiorczego, aby przypisać członków na podstawie ich kodu pocztowego/adresu, lub ręcznie przypisz poszczególnych członków."
+        },
+        {
+          "label": "Wyznacz koordynatora podregionu",
+          "detail": "Przypisz członka na poziomie koordynatora jako osobę kontaktową odpowiedzialną za ten podregion. Otrzymują SLA i powiadomienia podsumowujące specyficzne dla podregionu."
+        },
+        {
+          "label": "Zastosowanie w komunikacji",
+          "detail": "Wysyłając alerty alarmowe, inteligentne podpowiedzi lub podsumowania obywatelskie, filtruj odbiorców według podregionu, aby kierować reklamy tylko do odpowiednich członków."
+        },
+        {
+          "label": "Przejrzyj statystyki podregionów",
+          "detail": "Karta analityczna pokazuje gęstość wymiany, stawkę aktywnego członka i zgodność z umową SLA w podziale na podregiony."
+        }
+      ],
+      "tips": [
+        "Podregiony działają najlepiej, gdy odwzorowują prawdziwą tożsamość społeczności rozpoznawalną przez członków – używają nazw, których ludzie faktycznie używają w odniesieniu do swojego sąsiedztwa.",
+        "Unikaj tworzenia zbyt wielu podregionów (więcej niż 10 to zwykle zbyt szczegółowy opis dla spółdzielni pilotażowej)."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Punkty regionalne",
+          "path": "/caring/regional-points"
+        },
+        {
+          "label": "Alerty awaryjne",
+          "path": "/caring/emergency-alerts"
+        }
+      ]
+    },
+    "/partner-timebanks/caring/peers": {
+      "title": "Spółdzielnie partnerskie - Federacja Społeczności Opiekuńczych",
+      "summary": "Zarządzaj partnerskimi połączeniami banku czasu pomiędzy Twoją spółdzielnią a innymi spółdzielniami Caring Community. Ta strona jest przeznaczona dla zaufanych łączy typu kooperacja, a nie ogólnych klientów API lub integracji stron trzecich.",
+      "steps": [
+        {
+          "label": "Zobacz aktywne spółdzielnie partnerskie",
+          "detail": "Tabela pokazuje każdą podłączoną spółdzielnię Caring Community, jej adres URL instancji, status i ostatni zweryfikowany uścisk dłoni."
+        },
+        {
+          "label": "Zaproś nową spółdzielnię",
+          "detail": "Kliknij „Zaproś spółdzielnię rówieśniczą”. Wpisz adres URL instancji NEXUS. Otrzymują zaproszenie do przyjęcia i podpisania dwustronnej umowy powierniczej."
+        },
+        {
+          "label": "Zaakceptuj przychodzące zaproszenie",
+          "detail": "Zaproszenia oczekujące pojawiają się w zakładce „Przychodzące”. Przed zaakceptowaniem przejrzyj profil spółdzielni składającej wniosek."
+        },
+        {
+          "label": "Skonfiguruj reguły udostępniania danych",
+          "detail": "Dla każdego uczestnika wybierz, które dane udostępniasz: tylko weryfikacja Warmth Pass lub zbiorcze statystyki wymiany dla krajowego panelu kontrolnego społeczności Caring Community."
+        },
+        {
+          "label": "Zawieś połączenie równorzędne",
+          "detail": "Jeśli spółdzielnia nie jest już aktywna lub wystąpiły problemy związane z bezpieczeństwem, użyj opcji „Zawieś”, aby wstrzymać połączenie federacyjne bez jego trwałego usuwania."
+        }
+      ],
+      "tips": [
+        "Łącz się tylko ze spółdzielniami, które zweryfikowałeś osobiście lub za pośrednictwem krajowej sieci Caring Community — mogą pojawiać się automatyczne zaproszenia spamowe.",
+        "Gdy tryb izolowanego węzła jest aktywny, cała synchronizacja danych równorzędnych federacji jest automatycznie wstrzymywana. Włącz ponownie indywidualnie po sprawdzeniu zgodności z FADP."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Przepustka Ciepła",
+          "path": "/caring/warmth-pass"
+        },
+        {
+          "label": "Izolowany węzeł",
+          "path": "/caring/isolated-node"
+        }
+      ]
+    },
+    "/caring/providers": {
+      "title": "Katalog dostawców usług opieki",
+      "summary": "Wyselekcjonowany katalog profesjonalnych i półprofesjonalnych dostawców usług opieki stowarzyszonych z Twoją spółdzielnią. Dostawcy różnią się od wolontariuszy będących członkami — są to organizacje lub osoby fizyczne świadczące specjalistyczne usługi opiekuńcze, które uzupełniają wymianę społeczną (np. profesjonalną fizjoterapię, medyczną pracę socjalną).",
+      "steps": [
+        {
+          "label": "Dodaj dostawcę",
+          "detail": "Kliknij „Nowy dostawca”. Wprowadź nazwę organizacji, dane kontaktowe, specjalizację opieki, zasięg geograficzny i informację, czy akceptuje ona skierowania NEXUS."
+        },
+        {
+          "label": "Zweryfikuj dostawcę",
+          "detail": "Prześlij dowód rejestracji lub akredytacji dostawcy (np. rejestracja w KESB, członkostwo w organizacji zawodowej). Oznacz je jako zweryfikowane po potwierdzeniu dokumentacji."
+        },
+        {
+          "label": "Link do kategorii opieki",
+          "detail": "Powiąż usługodawcę z kategoriami opieki, które obejmuje. Dzięki temu silnik dopasowujący może je sugerować, gdy prośba o pomoc przekracza możliwości wolontariusza."
+        },
+        {
+          "label": "Przejrzyj możliwości dostawcy",
+          "detail": "Dostawcy mogą aktualizować swoją dostępną pojemność (np. „przyjmowanie nowych poleceń”, „w miarę możliwości”). Sprawdź to przed skierowaniem."
+        },
+        {
+          "label": "Rejestruj wyniki poleceń",
+          "detail": "Po skierowaniu członka zapisz wynik polecenia w rejestrze wymiany członka — zostanie to uwzględnione w danych KPI."
+        }
+      ],
+      "tips": [
+        "Dostawcy nie potrzebują kont NEXUS – katalogiem zarządza koordynator. Członkowie widzą uproszczoną wersję katalogu na swoim profilu.",
+        "Przeglądaj katalog dostawców co najmniej dwa razy w roku, aby usunąć organizacje, które zamknęły lub zmieniły swoje usługi."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Krąg odbiorców opieki",
+          "path": "/caring/recipient-circle"
+        },
+        {
+          "label": "Praca koordynatora",
+          "path": "/caring/workflow"
+        }
+      ]
+    },
+    "/caring/recipient-circle": {
+      "title": "Kręgi odbiorców opieki i zarządzanie beneficjentami",
+      "summary": "Krąg odbiorców opieki grupuje sieć wsparcia wokół konkretnego członka społeczności, który potrzebuje regularnej opieki — na przykład osoby starszej, która otrzymuje pomoc od trzech sąsiadów, koordynatora i zawodowej pielęgniarki. Ta strona tworzy te kręgi i zarządza nimi.",
+      "steps": [
+        {
+          "label": "Utwórz krąg dla odbiorcy",
+          "detail": "Kliknij „Nowy krąg”. Wybierz odbiorcę opieki (musi być członkiem). Nadaj kręgowi opisową nazwę (np. „Hans S. — grupa wsparcia wtorkowego poranka”)."
+        },
+        {
+          "label": "Dodaj członków kręgu",
+          "detail": "Dodaj pomocników-wolontariuszy, przypisanego koordynatora i wszelkich profesjonalnych usługodawców. Każdy członek ma przypisaną rolę (Pomocnik / Główny Koordynator / Profesjonalny Dostawca)."
+        },
+        {
+          "label": "Ustal plan opieki",
+          "detail": "Użyj pola Plan opieki, aby udokumentować uzgodnione działania wspierające, częstotliwość oraz wszelkie uwagi dotyczące zdrowia i bezpieczeństwa istotne dla pomagających."
+        },
+        {
+          "label": "Połącz wymiany z kręgiem",
+          "detail": "Wymiany dla odbiorcy opieki można oznaczyć kółkiem. Daje to skonsolidowany obraz całego wsparcia otrzymanego przez tę osobę."
+        },
+        {
+          "label": "Przejrzyj aktywność w kręgu",
+          "detail": "Oś czasu działań pokazuje ostatnie wymiany zdań, notatki i wszelkie flagi zabezpieczające powiązane z tym odbiorcą."
+        }
+      ],
+      "tips": [
+        "Treść planu opieki jest poufna — mogą ją zobaczyć tylko członkowie kręgu i koordynatorzy.",
+        "Kiedy członek kręgu odejdzie (np. odejdzie wolontariusz), zarchiwizuj go w kręgu, zamiast usuwać rolę — pozwala to zachować historię opieki."
+      ],
+      "caution": "Plany opieki mogą zawierać wrażliwe informacje zdrowotne. Traktuj je jako poufne zapisy w ramach FADP/nDSG.",
+      "relatedPaths": [
+        {
+          "label": "Providers",
+          "path": "/caring/providers"
+        },
+        {
+          "label": "Safeguarding",
+          "path": "/caring/safeguarding"
+        }
+      ]
+    },
+    "/caring/research": {
+      "title": "Partnerstwa badawcze — współpraca akademicka",
+      "summary": "Zarządzaj formalnymi partnerstwami badawczymi z uniwersytetami, instytutami zdrowia publicznego i organizacjami zajmującymi się badaniami społecznymi. Partnerom można przyznać dostęp w trybie tylko do odczytu do zanonimizowanych danych zbiorczych na potrzeby studiów akademickich, pod warunkiem podpisania umowy dotyczącej danych.",
+      "steps": [
+        {
+          "label": "Utwórz rekord partnerstwa badawczego",
+          "detail": "Kliknij „Nowe partnerstwo”. Wprowadź nazwę instytucji, głównego badacza, pytanie badawcze, numer referencyjny zatwierdzenia etycznego i uzgodniony zakres danych."
+        },
+        {
+          "label": "Prześlij umowę dotyczącą danych",
+          "detail": "Prześlij podpisaną umowę powierzenia przetwarzania danych. Partnerstwa nie mogą zostać aktywowane, dopóki podpisana umowa nie będzie dostępna w aktach."
+        },
+        {
+          "label": "Skonfiguruj dostęp do danych",
+          "detail": "Użyj selektora zakresu danych, aby określić, do których zanonimizowanych zbiorów danych partner może uzyskać dostęp: agregaty wymiany, trendy KPI, wyniki ankiet, zestawienia demograficzne."
+        },
+        {
+          "label": "Wydaj dane uwierzytelniające badacza",
+          "detail": "Po aktywacji użyj opcji „Dostęp do problemu”, aby wysłać badaczowi klucz API tylko do odczytu lub harmonogram eksportu danych."
+        },
+        {
+          "label": "Przejrzyj i odnowij",
+          "detail": "Partnerstwa wygasają po ustalonym terminie (zwykle jeden rok akademicki). Skorzystaj z procedury odnawiania, aby przedłużyć umowę ze zaktualizowaną zgodą."
+        }
+      ],
+      "tips": [
+        "Nigdy nie udostępniaj niezanonimizowanych danych członków. Platforma automatycznie anonimizuje dane dla punktu końcowego eksportu badań, należy jednak zweryfikować to u swojego inspektora ochrony danych.",
+        "Zachowaj numer referencyjny etyki w aktach — audyty zewnętrzne mogą wymagać przedstawienia dowodów nadzoru etycznego."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Wartości bazowe KPI",
+          "path": "/caring/kpi-baselines"
+        },
+        {
+          "label": "Pakiet ujawnień",
+          "path": "/caring/disclosure-pack"
+        }
+      ]
+    },
+    "/caring/external-integrations": {
+      "title": "Śledzenie integracji partnerów — zależności zewnętrzne",
+      "summary": "Śledź integracje zależne od partnera, które wymagają zewnętrznego właściciela, umowy o udostępnianiu danych, piaskownicy lub specyfikacji interfejsu, zanim będą mogły zostać uruchomione. Ta strona służy do śledzenia gotowości, a nie strony konfiguracji federacji Partner Timebanks.",
+      "steps": [
+        {
+          "label": "Przejrzyj stan zależności",
+          "detail": "Lista przedstawia każdego właściciela integracji, kategorię, status operacyjny, status DSA, status piaskownicy i adres URL specyfikacji interfejsu."
+        },
+        {
+          "label": "Dodaj śledzoną zależność",
+          "detail": "Kliknij „Dodaj”, gdy nowy podmiot zewnętrzny musi udostępnić interfejs API, piaskownicę, umowę dotyczącą danych lub kontakt operacyjny, zanim będzie można kontynuować dostawę."
+        },
+        {
+          "label": "Oddziel gotowość od poświadczeń",
+          "detail": "Użyj tej strony, aby sprawdzić, czy partner jest gotowy. Jeśli konieczne jest skonfigurowanie poświadczeń lub punktów końcowych, należy używać partnerów interfejsu API przychodzącego, partnerów protokołu zewnętrznego lub elementów webhook."
+        },
+        {
+          "label": "Aktualizuj notatki",
+          "detail": "Rejestruj blokery, kolejne działania i aktualizacje właścicieli, aby interesariusze mogli sprawdzić, czy opóźnienie ma charakter techniczny, prawny czy zewnętrzny."
+        },
+        {
+          "label": "Zamknij nieaktualne wpisy",
+          "detail": "Usuń lub zarchiwizuj zależności, które nie są już częścią planu dostaw Caring Community."
+        }
+      ],
+      "tips": [
+        "Nie wklejaj sekretów ani tokenów OAuth do notatek. Przechowuj poświadczenia tylko na odpowiedniej stronie poświadczeń.",
+        "Zielona piaskownica nie oznacza, że ​​integracja została zatwierdzona. Sprawdź DSA i status właściciela, zanim potraktujesz go jako gotowy."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Informacje o integracji programistów",
+          "path": "/caring/integration-showcase"
+        },
+        {
+          "label": "Pakiet ujawnień",
+          "path": "/caring/disclosure-pack"
+        }
+      ]
+    },
+    "/caring/integration-showcase": {
+      "title": "Informacje o integracji programistów",
+      "summary": "Strona referencyjna dla programistów zawierająca dostępne punkty końcowe API Caring Community, schematy zdarzeń webhook, konfigurację OAuth i przykładowe ładunki. Użyj go, aby wyjaśnić szczegóły implementacji po wybraniu prawidłowego typu integracji.",
+      "steps": [
+        {
+          "label": "Przeglądaj dostępne punkty końcowe",
+          "detail": "Użyj przeglądarki punktów końcowych, aby eksplorować dostępne ścieżki API REST pogrupowane według domeny (Członkowie, Giełdy, Portfel, Wydarzenia itp.). Każdy wpis przedstawia metodę, ścieżkę, parametry i schemat odpowiedzi."
+        },
+        {
+          "label": "Skopiuj przykładowe ładunki",
+          "detail": "Kliknij „Kopiuj próbkę” obok dowolnego zdarzenia elementu webhook, aby uzyskać realistyczny przykładowy ładunek JSON do wykorzystania w kodzie integracyjnym lub testowaniu."
+        },
+        {
+          "label": "Przejrzyj zakresy protokołu OAuth",
+          "detail": "Tabela zakresów protokołu OAuth przedstawia wszystkie dostępne zakresy uprawnień, dane, do których zapewniają dostęp, oraz minimalny poziom zaufania wymagany do ich autoryzacji."
+        },
+        {
+          "label": "Pobierz specyfikację OpenAPI",
+          "detail": "Użyj opcji „Pobierz specyfikację OpenAPI 3.1”, aby uzyskać pełną definicję API do odczytu maszynowego, zgodną z narzędziami Postman, Insomnia i do generowania kodu."
+        },
+        {
+          "label": "Przetestuj w piaskownicy API",
+          "detail": "Wbudowana piaskownica umożliwia wykonywanie uwierzytelnionych wywołań testowych w oparciu o dane tymczasowe Twojej spółdzielni bez wpływu na bieżące zapisy."
+        }
+      ],
+      "tips": [
+        "Udostępniaj specyfikację OpenAPI zewnętrznym programistom, zamiast pisać ręcznie dokumentację API — jest ona automatycznie aktualizowana.",
+        "Piaskownica wykorzystuje oddzielny zestaw poświadczeń testowych od aktywnych kluczy API — nie mieszaj ich."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Narzędzie do śledzenia integracji partnerów",
+          "path": "/caring/external-integrations"
+        }
+      ]
+    },
+    "/super-admin/national/kiss": {
+      "title": "Społeczność troskliwa — Krajowy panel współpracy międzyspółdzielczej",
+      "summary": "Zbiorczy panel na poziomie krajowym widoczny tylko dla krajowego personelu Caring Community i superadministratorów. Agreguje kluczowe wskaźniki dla wszystkich aktywnych spółdzielni Caring Community: łączną liczbę godzin wymiany, łączne unikanie kosztów w CHF, wykorzystanie międzyspółdzielczej karty Warmth Pass i stan federacji.",
+      "steps": [
+        {
+          "label": "Przejrzyj krajowe karty podsumowań",
+          "detail": "Górny wiersz pokazuje: całkowitą liczbę aktywnych spółdzielni, łączną liczbę godzin wymiany (miesiąc/rok), łączną redukcję kosztów w CHF oraz łączną liczbę unikalnych członków we wszystkich spółdzielniach."
+        },
+        {
+          "label": "Poznaj konkretną spółdzielnię",
+          "detail": "Kliknij wiersz dowolnej spółdzielni w tabeli, aby otworzyć szczegółowy pulpit nawigacyjny. Masz dostęp tylko do odczytu do ich danych."
+        },
+        {
+          "label": "Przejrzyj stan federacji",
+          "detail": "Mapa stanu federacji pokazuje, które spółdzielnie są połączone poprzez federację Warmth Pass, a które ostatnio nie powiodły się."
+        },
+        {
+          "label": "Eksportuj raport krajowy",
+          "detail": "Użyj opcji „Eksportuj raport krajowy”, aby utworzyć zbiorczy plik PDF na potrzeby posiedzeń zarządu Wspólnoty Opieki Społecznej lub wniosków do federalnych władz ds. zdrowia."
+        },
+        {
+          "label": "Podnieść alarm narodowy",
+          "detail": "Użyj „Ogłoszenia krajowego”, aby jednocześnie wysłać wiadomość do wszystkich koordynatorów ds. współpracy — na przykład aktualizację metodologii lub powiadomienie o konserwacji systemu."
+        }
+      ],
+      "tips": [
+        "Krajowy panel kontrolny nie zawiera żadnych danych umożliwiających indywidualną identyfikację członków – jedynie dane zagregowane na poziomie spółdzielni.",
+        "Użyj „Widoku porównawczego”, aby pokazać wynik pilotażowy każdej spółdzielni w ramach Wspólnoty Opiekuńczej wraz z medianą krajową."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Agenci KI",
+          "path": "/admin/ki-agents"
+        },
+        {
+          "label": "Zapytania pilotażowe",
+          "path": "/admin/pilot-inquiries"
+        }
+      ]
+    },
+    "/admin/ki-agents": {
+      "title": "KI-Agenten — środowisko agenta autonomicznego",
+      "summary": "Framework KI-Agenten (Agent AI) pozwala NEXUSowi proponować zautomatyzowane działania w oparciu o wzorce danych — na przykład sugerowanie kampanii Smart Nudge, oznaczanie członka zagrożonego odejściem lub zalecenie dostosowania współczynnika. Wszystkie propozycje wymagają zgody człowieka, zanim zaczną obowiązywać. Agenci nigdy nie działają jednostronnie, chyba że wyraźnie podniesiesz próg automatycznego stosowania.",
+      "steps": [
+        {
+          "label": "Przejrzyj oczekujące propozycje",
+          "detail": "Kolejka propozycji przedstawia rekomendację każdego agenta, stojące za nią dane i proponowane działanie. Przed zatwierdzeniem przeczytaj uważnie dowody."
+        },
+        {
+          "label": "Zatwierdź lub odrzuć propozycję",
+          "detail": "Kliknij „Zatwierdź”, aby natychmiast wykonać akcję, „Odrzuć”, aby ją odrzucić, lub „Odłóż”, aby ponownie rozważyć ją w późniejszym terminie. Dodaj notatkę wyjaśniającą swoją decyzję."
+        },
+        {
+          "label": "Skonfiguruj próg automatycznego stosowania",
+          "detail": "W Ustawieniach agenta możesz ustawić próg ufności, powyżej którego automatycznie stosowane będą propozycje niskiego ryzyka (domyślnie: wyłączone). Włącz tę opcję tylko dla określonych typów akcji niskiego ryzyka."
+        },
+        {
+          "label": "Sprawdź wydajność agenta",
+          "detail": "Zakładka analityka agenta pokazuje, ile propozycji zostało złożonych, zatwierdzonych, odrzuconych i odroczonych oraz jakie są efekty zatwierdzonych działań (czy osiągnęły zamierzony efekt?)."
+        },
+        {
+          "label": "Dodaj lub wyłącz typy agentów",
+          "detail": "Użyj rejestru agentów, aby włączyć lub wyłączyć określone typy agentów. Zacznij od małego zestawu i rozszerzaj go, gdy będziesz mieć pewność co do ich zaleceń."
+        }
+      ],
+      "tips": [
+        "Model „zaproponuj, a następnie zatwierdź” to celowy mechanizm bezpieczeństwa — nie należy go wyłączać w przypadku działań wynikowych (np. zabezpieczania eskalacji, dużych przelewów kredytowych).",
+        "Agenci z biegiem czasu uczą się na podstawie Twoich decyzji o zatwierdzeniu/odrzuceniu. Konsekwentne odrzucanie konkretnego typu agenta jest sygnałem do przeglądu jego konfiguracji."
+      ],
+      "caution": "Nigdy nie podnoś progu automatycznego stosowania dla agentów, którzy mogą inicjować transfery finansowe, zabezpieczać eskalacje lub zmiany poziomu członkostwa. Muszą one zawsze wymagać sprawdzenia przez człowieka.",
+      "relatedPaths": [
+        {
+          "label": "Inteligentne podpowiedzi",
+          "path": "/caring/nudges"
+        },
+        {
+          "label": "Panel Krajowej Społeczności Opieki",
+          "path": "/super-admin/national/kiss"
+        }
+      ]
+    },
+    "/admin/pilot-inquiries": {
+      "title": "Zapytania pilotażowe — rurociąg wdrożeniowy Gemeinde",
+      "summary": "Zarządza kompleksowym rurociągiem dla gmin (Gemeinde), które wyrażają zainteresowanie pilotażowym programem NEXUS/Caring Community. Każde zapytanie jest śledzone od pierwszego kontaktu aż do umowy pilotażowej i rozpoczęcia współpracy. Jest to punkt wyjścia dla nowego wdrożenia w ramach współpracy.",
+      "steps": [
+        {
+          "label": "Przejrzyj nowe zapytania",
+          "detail": "Nowe zapytania napływają z ogólnodostępnego formularza kontaktowego, skierowań krajowych Wspólnoty Opieki lub z wpisów ręcznych. Na każdym z nich widnieje nazwa gminy, kanton, osoba kontaktowa i uwagi dotyczące wstępnego zapytania."
+        },
+        {
+          "label": "Zakwalifikuj zapytanie",
+          "detail": "Skorzystaj z listy kontrolnej kwalifikacji, aby ocenić gotowość: Czy jest wyznaczony koordynator? Czy jest wsparcie Urzędu Miejskiego? Czy istnieje odpowiednia istniejąca sieć społecznościowa? Oceń każdy czynnik."
+        },
+        {
+          "label": "Przejdź przez rurociąg",
+          "detail": "Przeciągnij lub przeprowadź zapytanie przez kolejne etapy: Nowy → Kwalifikacja → Propozycja wysłana → Umowa pilotażowa → Wdrożenie → Aktywne. Na każdym etapie wymagane działania są udokumentowane."
+        },
+        {
+          "label": "Wygeneruj propozycję pilotażową",
+          "detail": "Na etapie wysłania propozycji użyj opcji „Generuj propozycję”, aby utworzyć spersonalizowaną propozycję w formacie PDF, korzystając z danych gminy, stawki za opiekę w jej kantonie i standardowych warunków metodologii Wspólnoty Opieki."
+        },
+        {
+          "label": "Wyzwól tworzenie dzierżawy",
+          "detail": "Po podpisaniu i przesłaniu umowy pilotażowej użyj opcji „Utwórz najemcę spółdzielczego”, aby udostępnić im nowego najemcę NEXUS. Spowoduje to połączenie zapytania z bramką gotowości do uruchomienia na żywo."
+        }
+      ],
+      "tips": [
+        "Zapytania, które utknęły w „Kwalifikacjach” przez ponad 30 dni, zazwyczaj nie mają wewnętrznego lidera miejskiego – skupiają się na znalezieniu starszego sponsora.",
+        "Potok ma widok towarzyszący na stronie Lead Nurture — użyj dowolnego widoku, który pasuje do Twojego przepływu pracy, współdzielą te same dane."
+      ],
+      "relatedPaths": [
+        {
+          "label": "Pielęgnowanie leadów",
+          "path": "/caring/lead-nurture"
+        },
+        {
+          "label": "Gotowość do uruchomienia",
+          "path": "/caring/launch-readiness"
+        },
+        {
+          "label": "Panel Krajowej Społeczności Opieki",
+          "path": "/super-admin/national/kiss"
+        }
+      ]
+    }
+  }
+}

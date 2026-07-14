@@ -16,7 +16,7 @@
     "unexpected_error": "Erreur inattendue",
     "unknown": "Inconnu",
     "unfeature": "Inutilité",
-    "actions": "Actions",
+    "actions": "Actes",
     "active": "Actif",
     "all": "Tout",
     "approved": "Approuvé",
@@ -57,7 +57,7 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
-    "loading": "Loading",
+    "loading": "Chargement",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -85,9 +85,9 @@
       "caring_community": "Communauté bienveillante",
       "kiss_agoris": "BAISER & Caring Community"
     },
-    "search_placeholder_many": "Rechercher les articles d'aide de{{count}}...",
     "search_placeholder_one": "Rechercher les articles d'aide de{{count}}...",
-    "search_placeholder_other": "Rechercher les articles d'aide de{{count}}..."
+    "search_placeholder_other": "Rechercher les articles d'aide de{{count}}...",
+    "search_placeholder_many": "Rechercher les articles d'aide de{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ d'aide",

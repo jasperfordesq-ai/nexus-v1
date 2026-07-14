@@ -1,6 +1,59 @@
 {
   "title": "Membros",
+  "heroEyebrow": "Diretório da comunidade",
+  "subtitle": "Encontre vizinhos, habilidades, interesses comuns e membros confiáveis do banco de tempo.",
+  "directory": "Diretório de membros",
+  "filtersIntro": "Pesquise por nome, texto do perfil ou detalhes de membros locais.",
+  "resultsLoading": "Carregando",
+  "memberCount": "{{count}} membro",
+  "memberCount_other": "{{count}} membros",
+  "verifiedCount": "{{count}} verificado",
+  "hoursCount": "{{count}} horas trocadas",
+  "loadedCount": "{{count}} carregado",
+  "clearSearch": "Limpar pesquisa",
+  "back": "Voltar",
+  "share": "Compartilhar perfil",
   "profileTitle": "Perfil do membro",
+  "connections": {
+    "title": "Conexões",
+    "eyebrow": "Membro fluxos de trabalho",
+    "subtitle": "Gerencie suas conexões de membros, solicitações pendentes e rotas de mensagens diretas.",
+    "tabs": {
+      "accepted": "Conectado",
+      "pending_received": "Recebidas",
+      "pending_sent": "Enviadas"
+    },
+    "empty": {
+      "accepted": {
+        "title": "Ainda sem conexões",
+        "description": "Encontre membros e envie solicitações de conexão."
+      },
+      "pending_received": {
+        "title": "Nenhuma solicitação para revisão",
+        "description": "As solicitações de conexão recebidas aparecerão aqui."
+      },
+      "pending_sent": {
+        "title": "Sem pedidos enviados",
+        "description": "As solicitações de conexão enviadas aparecerão aqui até serem aceitas."
+      }
+    },
+    "status": {
+      "accepted": "Conectado",
+      "pending_received": "Recebidas",
+      "pending_sent": "Enviadas"
+    },
+    "browseMembers": "Procurar membros",
+    "viewProfile": "Ver perfil de {{name}}",
+    "connectedSince": "Conectado {{date}}",
+    "message": "Mensagem",
+    "remove": "Remover",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "cancel": "Cancelar solicitação",
+    "unknownMember": "Membro desconhecido",
+    "actionFailedTitle": "Atualização de conexão falhou",
+    "actionFailedDescription": "Tente novamente."
+  },
   "search": {
     "placeholder": "Pesquisar membros…"
   },
@@ -13,7 +66,48 @@
   "profile": {
     "timeCredits": "{{count}} crédito de tempo",
     "timeCredits_other": "{{count}} créditos de tempo",
+    "hoursGiven": "Horas fornecidas",
+    "hoursReceived": "Horas recebidas",
+    "totalHours": "Total de horas",
+    "about": "Sobre",
     "memberSince": "Membro desde {{date}}",
+    "lastActive": "Último ativo {{date}}",
+    "shareMessage": "{{name}} — {{url}}",
+    "sendMessage": "Enviar mensagem",
+    "myProfile": "Meu perfil",
+    "editProfile": "Editar Perfil",
+    "ownProfileHint": "Mantenha seu perfil atualizado para que outros membros saibam o que você pode oferecer e no que você está interessado.",
+    "noBio": "Este membro não adicionou uma biografia ainda.",
+    "noBioOwn": "Adicione uma breve biografia para que outros membros saibam como se conectar com você.",
+    "signInRequired": "Faça login para ver seu perfil.",
+    "verified": "Verificado",
+    "federatedMember": "Membro federado",
+    "federatedProfile": "Perfil federado",
+    "federatedProfileHint": "Este perfil é compartilhado de {{community}} por meio da rede da federação.",
+    "externalFederatedMember": "Membro federado externo",
+    "externalFederatedMemberDescription": "Este membro é compartilhado por um parceiro de federação externo. Você pode iniciar uma mensagem federada, mas o perfil completo permanece no sistema do parceiro.",
+    "externalFederatedTrustHint": "As avaliações fornecidas pelo parceiro aparecem aqui quando o parceiro da federação as compartilha.",
+    "backToFederatedMembers": "Voltar aos membros federados",
+    "federatedMessaging": "Mensagens ativadas",
+    "federatedExchanges": "Trocas habilitadas",
+    "sendCredits": "Enviar créditos",
+    "sendCreditsTo": "Envie créditos para {{name}}",
+    "amountHours": "Quantidade (horas)",
+    "amountPlaceholder": "1-100",
+    "transferDescription": "Descrição",
+    "transferDescriptionPlaceholder": "Para que servem esses créditos?",
+    "transferSummary": "Enviando {{amount}} hora(s) para {{name}}.",
+    "transferValidationTitle": "Verificar transferência detalhes",
+    "transferAmountRequired": "Insira um valor de hora inteira entre 1 e 100.",
+    "transferDescriptionRequired": "Adicione uma descrição para esta transferência.",
+    "transferSuccessTitle": "Créditos enviados",
+    "transferSuccessMessage": "{{amount}} hora(s) enviada(s) para {{name}}.",
+    "transferFailedTitle": "Não foi possível enviar créditos",
+    "transferFailedMessage": "Verifique se as trocas de federação estão ativadas e tente novamente.",
+    "cancelTransfer": "Cancelar transferência",
+    "sharedListings": "Listagens compartilhadas",
+    "sharedListing": "Listagens compartilhadas",
+    "loadError": "Não foi possível carregar o perfil do membro. Tente novamente.",
     "connect": "Ligar",
     "connected": "Ligado",
     "pendingSent": "Pedido enviado",
@@ -127,7 +221,11 @@
     "noResults": "Nenhum membro encontrado para \"{{query}}\""
   },
   "memberCard": {
-    "accessibilityLabel": "Ver o perfil de {{name}}"
+    "accessibilityLabel": "Ver o perfil de {{name}}",
+    "noTagline": "Membro da comunidade"
   },
-  "loading": "A carregar membros…"
+  "loading": "A carregar membros…",
+  "hrsGiven": "horas dadas",
+  "hoursGivenShort": "{{count}} dadas",
+  "hoursTotalShort": "{{count}}total"
 }

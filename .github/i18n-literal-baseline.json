@@ -1,16 +1,16 @@
 {
   "count": 0,
-  "updated": "2026-07-13T19:26:53.697Z",
+  "updated": "2026-07-14T14:35:15.035Z",
   "source": "scripts/check-i18n-literals.mjs",
   "scope": "react-frontend/src (except lawyer-controlled platform legal pages) and mobile app/components/lib",
   "staticRegistries": {
     "react-frontend/src/admin/data/helpContent.ts": {
-      "count": 653,
-      "sha256": "45fa47e26261106c4ee8f65b9d835a0ad42f1f870b1eaf15d36645daf08c2200"
+      "count": 0,
+      "sha256": "7858f5031293dd2f9cfe7641884a1afbb5ad6d4badb9ad09a1e295303ee3881d"
     }
   },
   "localeGaps": {
-    "mobileMissingKeys": 14904
+    "mobileMissingKeys": 0
   },
   "topFiles": []
 }

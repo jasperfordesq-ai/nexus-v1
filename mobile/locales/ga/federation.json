@@ -11,15 +11,399 @@
     "exchanges": "{{count}} malartú tras-pobail",
     "exchanges_other": "{{count}} malartú tras-pobail"
   },
+  "hub": {
+    "eyebrow": "Pobail chomhpháirtíochta",
+    "heroTitle": "Mol Cónaidhme",
+    "heroDescription": "Ceangail le bainc ama iontaofa, aimsigh baill chónaidhme, agus roinn malartuithe thar phobail chomhpháirtíochta.",
+    "statusActive": "Cónaidhm gníomhach",
+    "statusInactive": "Cónaidhm neamhghníomhach",
+    "shortActive": "Gníomhach",
+    "shortInactive": "Neamhghníomhach",
+    "statPartners": "Comhpháirtithe",
+    "statMessages": "Teachtaireachtaí",
+    "statExchanges": "Malartuithe",
+    "statStatus": "Stádas",
+    "exploreNetwork": "Féach ar an líonra",
+    "partnerCommunities": "Pobail chomhpháirtíochta",
+    "recentActivity": "Gníomhaíocht le déanaí",
+    "noPartnersYet": "Níl pobail chomhpháirtíochta ar bith fós",
+    "noPartnersDescription": "Beidh comhpháirtithe cónaidhme ceadaithe le feiceáil anseo nuair a bheidh do phobal nasctha.",
+    "noActivityYet": "Níl aon ghníomhaíocht fós",
+    "noActivityDescription": "Beidh teachtaireachtaí trasphobail, comhpháirtíochtaí agus malartuithe le feiceáil anseo.",
+    "memberCount": "{{count}} ball",
+    "memberCount_other": "{{count}} ball",
+    "viewCommunity": "Féach ar an bpobal",
+    "quick": {
+      "partners": {
+        "title": "Comhpháirtithe",
+        "description": "Brabhsáil pobail nasctha"
+      },
+      "members": {
+        "title": "Baill",
+        "description": "Aimsigh baill chónasctha"
+      },
+      "connections": {
+        "title": "Naisc",
+        "description": "Bainistigh teagmhálaithe trasphobail"
+      },
+      "messages": {
+        "title": "Teachtaireachtaí",
+        "description": "community"
+      },
+      "listings": {
+        "title": "Listings",
+        "description": "Féach ar thairiscintí agus iarratais roinnte"
+      },
+      "groups": {
+        "title": "Grúpaí",
+        "description": "Glac isteach i spásanna pobail comhpháirtíochta"
+      },
+      "events": {
+        "title": "Imeachtaí",
+        "description": " Glac páirt in imeachtaí pobail comhpháirtíochta"
+      },
+      "setup": {
+        "title": "Socrú",
+        "description": "Cumraigh rochtain chónaidhme"
+      },
+      "settings": {
+        "title": "Socruithe",
+        "description": "Bainistigh infheictheacht an chónaidhm"
+      }
+    }
+  },
   "partners": "Pobail Chomhpháirtíochta",
   "connectedSince": "Ceangailte ó {{date}}",
   "visitWebsite": "Tabhair cuairt ar an suíomh gréasáin",
   "empty": "Níl aon chomhpháirtithe cónaidhme ann go fóill.",
+  "reviews": {
+    "fromPartner": "trí {{partner}}",
+    "verified": "Fíoraithe"
+  },
+  "relative": {
+    "today": "inniu",
+    "daysAgo": "{{count}}lá ó shin",
+    "daysAgo_other": "{{count}} lá ó shin",
+    "monthsAgo": "{{count}} mí ó shin",
+    "monthsAgo_other": "{{count}} mí ó shin"
+  },
   "detail": {
     "title": "Pobal Comhpháirtíochta",
+    "eyebrow": "Banc ama cónaidhme",
     "about": "Faoi",
     "members": "baill",
+    "memberTotal": "Comhaireamh na mball",
+    "memberCount": "{{count}} ball",
+    "memberCount_other": "{{count}} ball",
+    "partnerSince": "Comhpháirtí ó {{date}}",
+    "partnerSinceLabel": "Comhpháirtí ó",
+    "connectedDate": "Ceangailte {{date}}",
+    "level": "Leibhéal Cónaidhme",
+    "levelUnknown": "Comhpháirtí Cónaidhme",
+    "levelDiscovery": "Fionnachtain",
+    "levelSocial": "Sóisialta",
+    "levelEconomic": "Eacnamaí",
+    "levelIntegrated": "Comhtháite",
+    "availableFeatures": "Gnéithe atá ar fáil",
+    "externalPartner": "Comhpháirtí seachtrach",
+    "integratedPartner": "Comhpháirtí comhtháite",
+    "website": "Suíomh Gréasáin",
+    "share": " Roinn an comhpháirtí",
+    "shareMessage": "{{name}} — {{url}}",
+    "noDescription": "Níor chuir an comhpháirtí seo cur síos poiblí leis fós.",
+    "explorePartner": "Fiosraigh an comhpháirtí seo",
+    "browseMembers": "Brabhsáil baill",
+    "browseListings": "Brabhsáil liostaí",
+    "browseGroups": "Brabhsáil grúpaí",
+    "browseEvents": "Brabhsáil imeachtaí",
+    "openMessages": "Oscail teachtaireachtaí",
+    "federationSettings": "Socruithe Cónaidhm",
+    "browseNetwork": "Ar ais chuig an gcónaidhm",
+    "retry": "Atriail",
+    "permissionProfiles": "Próifílí",
+    "permissionMessaging": "Teachtaireachtaí",
+    "permissionTransactions": "Idirbhearta",
+    "permissionListings": "Listings",
+    "permissionEvents": "Imeachtaí",
+    "permissionGroups": "Grúpaí",
     "notFound": "Comhpháirtí gan aimsiú.",
     "goBack": "Téigh ar ais"
+  },
+  "directory": {
+    "tryAgain": "Déan iarracht eile",
+    "backToHub": "Ar ais chuig mol an chónaidhm",
+    "resultsCount": "{{count}} toradh",
+    "resultsCount_other": "{{count}} toradh",
+    "memberCount": "{{count}} ball",
+    "memberCount_other": "{{count}} ball",
+    "external": "Seachtrach",
+    "unknownCommunity": "Comhphobal comhpháirtíochta",
+    "filters": {
+      "allCommunities": "Gach pobal"
+    },
+    "partners": {
+      "eyebrow": "Pobail comhpháirtíochta",
+      "title": " Comhpháirtithe Cónaidhme",
+      "subtitle": "Brabhsáil bainc ama nasctha agus oscail a bpróifílí cónaidhm.",
+      "emptyTitle": "Níl pobail chomhpháirtíochta ar bith fós",
+      "emptyDescription": "Beidh comhpháirtithe cónaidhme ceadaithe le feiceáil anseo.",
+      "loadMore": "Lódáil tuilleadh comhpháirtithe"
+    },
+    "members": {
+      "eyebrow": "Comhadlann Chónaidhme",
+      "title": "Comhaltaí Cónaidhme",
+      "subtitle": "Aimsigh baill ó phobail chomhpháirtíochta agus cuir tús le comhráite trasphobail.",
+      "search": "Cuardaigh baill...",
+      "skillsSearch": "Scag de réir scileanna...",
+      "emptyTitle": "Níor aimsíodh aon bhall cónasctha",
+      "emptyDescription": "Bain triail as cuardach eile nó seiceáil ar ais nuair a roinneann níos mó comhpháirtithe a n-eolairí.",
+      "unavailableTitle": "Níl eolaire ball Cónaidhme cumasaithe",
+      "unavailableDescription": "Tá an Cónaidhm gníomhach don tionónta seo, ach tá cumas na bpróifílí trasphobail díchumasaithe. Ní mór do riarthóir pobail próifílí cónasctha a chumasú sular féidir baill a liostú.",
+      "memberFallback": "Ball",
+      "viewProfile": "Féach ar phróifíl",
+      "message": "Teachtaireacht",
+      "loadMore": "Luchtaigh tuilleadh ball",
+      "reach": {
+        "all": "Gach sroichint",
+        "local_only": "Áitiúil amháin",
+        "remote_ok": "Iarchéim",
+        "travel_ok": "Is féidir taisteal"
+      }
+    },
+    "connections": {
+      "eyebrow": "Teagmhálaithe trasphobail",
+      "title": "Naisc Chónaidhme",
+      "subtitle": "Bainistigh na baill a bhfuil baint agat leo thar bhainc ama comhpháirtíochta.",
+      "tabs": {
+        "accepted": "Ceangailte",
+        "pending_received": "Faighte",
+        "pending_sent": "Seolta"
+      },
+      "empty": {
+        "accepted": {
+          "title": "Níl aon bhall ceangailte fós",
+          "description": "Brabhsáil baill chónasctha agus seol iarratais naisc."
+        },
+        "pending_received": {
+          "title": "Níl aon iarratas ar feitheamh",
+          "description": " seol chuig baill chomhpháirtíochta le feiceáil anseo."
+        },
+        "pending_sent": {
+          "title": "Níl iarratais seolta ann",
+          "description": "Beidh iarratais a sheolann tú chuig baill chomhpháirtíochta le feiceáil anseo."
+        }
+      },
+      "status": {
+        "pending": "Ar feitheamh",
+        "accepted": "Ceangailte",
+        "rejected": "Diúltaithe"
+      },
+      "message": "Teachtaireacht",
+      "browseMembers": "Brabhsáil baill chónaidhme",
+      "viewProfile": "Féach ar phróifíl le haghaidh {{name}}",
+      "remove": "Bain",
+      "accept": "Glac le",
+      "reject": "Diúltaigh",
+      "cancel": "Cealaigh iarratas",
+      "actionFailedTitle": "Ceangal gan nuashonrú",
+      "actionFailedDescription": "Seiceáil le do thoil go bhfuil próifílí cónaidhme cumasaithe agus bain triail eile as."
+    },
+    "messages": {
+      "eyebrow": "Bosca isteach trasphobail",
+      "title": "Teachtaireachtaí Cónaidhme",
+      "subtitle": "Athbhreithnigh comhráite le baill ó phobail chomhpháirtíochta.",
+      "emptyTitle": "Níl aon teachtaireacht chónaidhme fós",
+      "emptyDescription": "Beidh teachtaireachtaí le pobail chomhpháirtíochta le feiceáil anseo.",
+      "emptyForPartnerTitle": "Níl aon teachtaireacht leis an gcomhpháirtí seo fós",
+      "emptyForPartnerDescription": " Tosaigh ó phróifíl bhall chónaidhme, nó glan an scagaire pobail chun gach comhrá a fheiceáil.",
+      "unavailableTitle": "Níl teachtaireachtaí cónaidhme cumasaithe",
+      "unavailableDescription": "Tá an Cónaidhm gníomhach don tionónta seo, ach tá teachtaireachtaí trasphobail díchumasaithe. Ní mór do riarthóir pobail teachtaireachtaí cónasctha a chumasú sular féidir comhráite a úsáid.",
+      "unknownSender": "Ball pobail",
+      "delivered": "seachadta",
+      "composeEyebrow": "Teachtaireacht nua chónaidhme",
+      "loadingRecipient": "Faighteoir á luchtú...",
+      "recipientFallback": "Ball Cónaidhme",
+      "federated": "Cónaidhme",
+      "noRecipient": "Roghnaigh ball cónasctha sula seolann tú teachtaireacht.",
+      "recipientSearch": "Faigh faighteoir",
+      "recipientSearchPlaceholder": "Cuardaigh baill chónasctha...",
+      "selectRecipient": "Teachtaireacht chuig {{name}}",
+      "changeRecipient": "Athraigh faighteoir",
+      "noRecipientsFound": "Níor aimsíodh baill chónasctha.",
+      "subject": "Ábhar",
+      "subjectPlaceholder": "Cuir ábhar gairid leis",
+      "body": "Teachtaireacht",
+      "bodyPlaceholder": "Scríobh do theachtaireacht...",
+      "send": "Seol teachtaireacht",
+      "sentTitle": "Teachtaireacht seolta",
+      "sentDescription": "Tá do theachtaireacht chuig {{name}} seachadta.",
+      "sendFailedTitle": "Níor seoladh an teachtaireacht",
+      "sendFailedDescription": "Seiceáil le do thoil go bhfuil teachtaireachtaí an chónaidhm cumasaithe agus bain triail eile as.",
+      "openThread": "Oscail an comhrá seo le do thoil {{name}}",
+      "unreadCount": "{{count}} gan léamh",
+      "threadEyebrow": "Comhrá cónasctha",
+      "backToInbox": "Ar ais sa bhosca isteach",
+      "translate": "Aistrigh",
+      "showOriginal": "Taispeáin an bunleagan",
+      "translatedLabel": "Aistrithe",
+      "translateFailed": "Níl an t-aistriúchán ar fáil faoi láthair.",
+      "reply": "Freagra",
+      "replyPlaceholder": "Scríobh freagra...",
+      "sendReply": "Seol freagra"
+    },
+    "listings": {
+      "eyebrow": "Tairiscintí agus iarratais roinnte",
+      "title": "Liostaí Cónaidhme",
+      "subtitle": "Brabhsáil tairiscintí agus iarratais a roinntear thar bhainc ama iontaofa.",
+      "search": "Cuardaigh liostaí...",
+      "emptyTitle": "Níor aimsíodh aon liostú cónasctha",
+      "emptyDescription": " id=\"4\">Tá Cónaidhm gníomhach don tionónta seo, ach tá tairiscintí agus iarratais roinnte díchumasaithe. Ní mór do riarthóir pobail liostaí cónasctha a chumasú.",
+      "unavailableTitle": " liostú nach bhfuil cumasaithe cheana féin",
+      "unavailableDescription": "Tá Cónaidhm gníomhach don tionónta seo, ach díchumasaítear tairiscintí agus iarratais roinnte. Ní mór do riarthóir pobail liostaí cónasctha a chumasú.",
+      "offer": "Tairiscint",
+      "request": "Iarratas",
+      "hours": "{{hours}} uair",
+      "anonymousUser": "Ball den Phobal",
+      "viewDetails": "Féach ar na sonraí",
+      "openDetails": "Oscail sonraí le haghaidh {{title}}",
+      "backToListings": "Ar ais go liostaí",
+      "loadMore": "Lódáil tuilleadh liostaí",
+      "noDescription": "Níl cur síos ar an liostú roinnte seo fós.",
+      "details": "Sonraí liostála",
+      "postedBy": "Postáilte ag",
+      "viewProfile": "Féach ar phróifíl",
+      "contactAuthor": "Údar na teachtaireachta",
+      "type": {
+        "all": "Gach liostú",
+        "offer": "Tairiscintí",
+        "request": "Iarratais"
+      }
+    },
+    "groups": {
+      "eyebrow": "Grúpaí comhpháirtíochta",
+      "title": "Grúpaí Cónaidhme",
+      "subtitle": "Faigh spásanna pobail roinnte ó bhainc ama comhpháirtíochta.",
+      "search": "Cuardaigh grúpaí...",
+      "emptyTitle": "Níor aimsíodh aon ghrúpa cónasctha",
+      "emptyDescription": "Beidh grúpaí comhpháirtíochta le feiceáil anseo nuair a roinneann pobail iad.",
+      "unavailableTitle": "Níl grúpaí Cónaidhme cumasaithe",
+      "unavailableDescription": "Tá Cónaidhm gníomhach don tionónta seo, ach tá grúpaí comhpháirtíochta díchumasaithe. Ní mór do riarthóir pobail grúpaí cónasctha a chumasú.",
+      "memberCount": "{{count}} ball",
+      "memberCount_other": "{{count}} baill",
+      "loadMore": "Lódáil tuilleadh grúpaí",
+      "openDetails": "Sonraí oscailte do {{name}}",
+      "backToGroups": "Ar ais go grúpaí",
+      "detailEyebrow": "Grúpa Cónaidhme",
+      "noDescription": "Níl cur síos ag an ngrúpa comhroinnte seo fós.",
+      "privacy": {
+        "public": "Poiblí",
+        "private": "Príobháideach",
+        "closed": "Dúnta"
+      }
+    },
+    "events": {
+      "eyebrow": "Féilire comhpháirtíochta",
+      "title": "Imeachtaí Cónaidhme",
+      "subtitle": "Faigh ceardlanna comhpháirtithe, imeachtaí sóisialta agus cruinnithe ar líne.",
+      "search": "Cuardaigh imeachtaí...",
+      "emptyTitle": "Níor aimsíodh aon imeachtaí cónasctha",
+      "emptyDescription": "Beidh imeachtaí comhpháirtithe atá le teacht le feiceáil anseo.",
+      "unavailableTitle": "Níl imeachtaí cónasctha cumasaithe",
+      "unavailableDescription": "Tá Cónaidhm gníomhach don tionónta seo, ach tá imeachtaí comhpháirtíochta díchumasaithe. Ní mór do riarthóir pobail imeachtaí cónasctha a chumasú.",
+      "online": "Ar líne",
+      "upcomingOnly": "Le teacht amháin",
+      "loadMore": "Luchtaigh tuilleadh imeachtaí",
+      "openDetails": "Oscail sonraí le haghaidh {{title}}",
+      "backToEvents": "Ar ais chuig imeachtaí",
+      "detailEyebrow": "Imeacht cónasctha",
+      "noDescription": "Níl cur síos ar an teagmhas roinnte seo fós.",
+      "organizer": "Arna óstáil ag",
+      "organizerFallback": "Eagraí an imeachta",
+      "ends": "Ag críochnú {{date}}",
+      "attendeeCount": "{{count}} freastail",
+      "attendeeCount_other": "{{count}} lucht freastail"
+    },
+    "onboarding": {
+      "eyebrow": "Socrú Cónaidhm",
+      "title": "Socrú Cónaidhm",
+      "subtitle": "Roghnaigh a roinneann tú le pobail chomhpháirtíochta agus cumasaigh fionnachtain tras-ama bainc.",
+      "privacy": "Infheictheacht próifíle",
+      "communication": "Cumarsáid",
+      "reach": "Sroich seirbhís",
+      "next": "Ar aghaidh",
+      "finish": "Cumasaigh an chónaidhm",
+      "review": "Déan athbhreithniú ar shocrú do chónaidhm",
+      "reviewDescription": "Deimhnigh cad is féidir le pobail chomhpháirtíochta a fheiceáil agus conas is féidir le baill teagmháil a dhéanamh leat.",
+      "doLater": "Déan é seo níos déanaí",
+      "ready": "Réidh chun cónaidhm a chumasú",
+      "on": "Ar",
+      "off": "As",
+      "failedTitle": "Theip ar an socrú",
+      "failedDescription": "Níorbh fhéidir linn do shocrú cónaidhm a shábháil. Bain triail eile as.",
+      "benefits": {
+        "discover": {
+          "title": "Faigh baill chomhpháirtíochta",
+          "description": "Léirigh sa chuardach cónaidhme agus aimsigh daoine thar bhainc ama iontaofa."
+        },
+        "message": {
+          "title": "Comhordaigh go sábháilte",
+          "description": "Úsáid teachtaireachtaí trasphobail gan do chuntas bainc ama féin a fhágáil."
+        },
+        "exchange": {
+          "title": "Comhroinn gníomhaíocht chreidmheasa ama",
+          "description": "Cumasaigh malartuithe comhpháirtíochta nuair a cheadaíonn do phobal iad."
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": "Rialaíonn an Chónaidhm",
+      "title": "Socruithe Cónaidhme",
+      "subtitle": "Rialaigh infheictheacht do phróifíle, teachtaireachtaí agus rochtain seirbhíse ar fud an líonra.",
+      "active": "Cónaidhm gníomhach",
+      "inactive": "Cónaidhm neamhghníomhach",
+      "statusDescription": " Cinneann na rialuithe seo cad is féidir le pobail chomhpháirtíochta a fheiceáil agus a úsáid.",
+      "enable": "Cumasaigh cónaidhm",
+      "disable": "Díchumasaigh an chónaidhm",
+      "statusFailedTitle": "Stádas Cónaidhme gan uasdátú",
+      "statusFailedDescription": "Seiceáil do nasc agus bain triail eile as.",
+      "save": "Sábháil socruithe",
+      "reach": {
+        "local_only": "Áitiúil amháin",
+        "remote_ok": " Cianda ceart go leor",
+        "travel_ok": "Is féidir taisteal"
+      },
+      "profile_visible_federated": {
+        "label": "Taispeáin mo phróifíl",
+        "description": "Lig do phobail chomhpháirtíochta do phróifíl bhall bhunúsach a fheiceáil."
+      },
+      "appear_in_federated_search": {
+        "label": "Le feiceáil sa chuardach",
+        "description": " Lig do chomhaltaí comhpháirtíochta tú a aimsiú i gcuardach cónaidhme."
+      },
+      "show_skills_federated": {
+        "label": "Comhroinn scileanna",
+        "description": "Cuir do scileanna liostaithe san áireamh i dtorthaí an chónaidhm."
+      },
+      "show_location_federated": {
+        "label": "Comhroinn suíomh",
+        "description": "Taispeáin do shuíomh ginearálta do phobail chomhpháirtíochta."
+      },
+      "show_reviews_federated": {
+        "label": " Roinn léirmheasanna",
+        "description": "Cuir clú agus léirmheasanna san áireamh i gcomharthaí iontaobhais an chónaidhm."
+      },
+      "messaging_enabled_federated": {
+        "label": "Ceadaigh teachtaireachtaí cónaidhme",
+        "description": "Lig le baill chomhpháirtíochta teachtaireachtaí trasphobail a sheoladh chugat."
+      },
+      "transactions_enabled_federated": {
+        "label": "Ceadaigh malartuithe cónaidhm",
+        "description": "Lig le baill chomhpháirtíochta malartuithe creidmheasa ama a shocrú leat."
+      },
+      "email_notifications": {
+        "label": "Fógraí ríomhphoist",
+        "description": "Faigh nuashonruithe ríomhphoist le haghaidh gníomhaíochta cónaidhme."
+      }
+    }
   }
 }

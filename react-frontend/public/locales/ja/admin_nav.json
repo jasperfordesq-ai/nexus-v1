@@ -1,6 +1,6 @@
 {
-  "skip_to_main": "Skip to main content",
-  "admin_navigation": "Admin navigation",
+  "skip_to_main": "メインコンテンツにスキップ",
+  "admin_navigation": "管理者のナビゲーション",
   "community_fund": "Community Fund",
   "dashboard": "ダッシュボード",
   "users": "ユーザー",
@@ -66,7 +66,7 @@
   "platform_operations": "プラットフォーム運用",
   "intelligence_diagnostics": "インテリジェンスと診断",
   "integrations": "連携",
-  "partner_api_integrations": "Partner APIs & integrations",
+  "partner_api_integrations": "パートナー API と統合",
   "partner_timebanks": "パートナータイムバンク",
   "super_admin": "スーパー管理者",
   "super_admin_panel": "Super Admin Panel",
@@ -89,7 +89,7 @@
   "back_to_site": "サイトに戻る",
   "back_to_site_header": "サイトに戻る",
   "toggle_sidebar": "サイドバーを切り替え",
-  "close_sidebar": "Close sidebar",
+  "close_sidebar": "サイドバーを閉じる",
   "notifications": "通知",
   "support_requests": "サポートリクエスト",
   "support_requests_count": "未対応のサポートリクエスト {{count}} 件",
@@ -249,10 +249,10 @@
   "module_configuration": "モジュール構成",
   "translation_config": "翻訳設定",
   "federation_cc_config": "クレジットカードの設定",
-  "federation_group_core_network": "Core network",
-  "federation_group_trust_settlement": "Trust & settlement",
-  "federation_group_partner_protocols": "Partner protocols",
-  "federation_group_monitoring_data": "Monitoring & data",
+  "federation_group_core_network": "コアネットワーク",
+  "federation_group_trust_settlement": "信託・決済",
+  "federation_group_partner_protocols": "パートナープロトコル",
+  "federation_group_monitoring_data": "モニタリングとデータ",
   "expand_sidebar": "サイドバーを展開する",
   "collapse_sidebar": "サイドバーを折りたたむ",
   "search_nav": "管理者を検索...",
@@ -521,7 +521,7 @@
     "refresh": "リフレッシュ",
     "total_count": "{{count}}合計",
     "data_table": "データ",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "select_row": "Select row {{id}}",
@@ -569,6 +569,7 @@
     "reason_label": "理由",
     "reason_placeholder": "このアクションの理由を入力してください",
     "selected_count_other": "{{count}} が選択されました",
+    "confirm_message_one": "{{action}} {{count}} アイテムを作成してもよろしいですか?",
     "confirm_message_other": "{{action}} {{count}} アイテムを取得してもよろしいですか?"
   },
   "common": {
@@ -615,5 +616,6 @@
       "search": "検索"
     }
   },
+  "support_requests_count_one": "{{count}} オープンサポートリクエスト",
   "support_requests_count_other": "未対応のサポートリクエスト {{count}} 件"
 }

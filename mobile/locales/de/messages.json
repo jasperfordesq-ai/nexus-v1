@@ -1,5 +1,31 @@
 {
   "title": "Nachrichten",
+  "heroEyebrow": "Private Nachrichten",
+  "subtitle": "Verfolgen Sie Ihre Gespräche mit Mitgliedern im gesamten Zeitrahmen.",
+  "inbox": "Posteingang",
+  "tabs": {
+    "inbox": "Posteingang",
+    "archived": "Archiviert"
+  },
+  "filtersIntro": "Suchen Sie Konversationen nach Mitglied oder aktueller Nachricht.",
+  "searchPlaceholder": "Nachrichten suchen",
+  "resultsLoading": "Laden",
+  "conversationCount": "{{count}} Konversation",
+  "conversationCount_other": "{{count}} Konversationen",
+  "visibleCount": "{{count}} angezeigt",
+  "archivedCount": "{{count}} archiviert",
+  "unreadCount": "{{count}} ungelesen",
+  "clearSearch": "Suche löschen",
+  "readStatus": "Keine ungelesenen Nachrichten",
+  "unknownMember": "Community-Mitglied",
+  "openThread": "Öffnen",
+  "archive": "Archiv",
+  "archiveConversation": "Konversation archivieren",
+  "archiveConversationWithName": "Konversation archivieren mit {{name}}",
+  "archiveConfirm": "Konversation mit {{name}} archivieren? Sie können es aus dem Archiv wiederherstellen.",
+  "restore": "Wiederherstellen",
+  "restoreConversation": "Konversation wiederherstellen",
+  "restoreConversationWithName": "Konversation wiederherstellen mit {{name}}",
   "threadTitle": "Unterhaltung",
   "thread": {
     "inputPlaceholder": "Nachricht eingeben…",
@@ -8,6 +34,14 @@
     "noMessages": "Noch keine Nachrichten. Sag Hallo!",
     "today": "Heute",
     "yesterday": "Gestern",
+    "invalidConversation": "Ungültige Konversation.",
+    "loadError": "Konversation konnte nicht geladen werden.",
+    "voiceMessage": "Sprachnachricht",
+    "sendFailed": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "you": "Du:",
+    "goBack": "Zurück",
+    "messageCount": "{{count}}-Nachricht",
+    "messageCount_other": "{{count}} Nachrichten",
     "messagingRestrictedTitle": "Nachrichten pausiert",
     "messagingRestrictedContact": "Bitte kontaktiere dein Community-Team, bevor du weitere Nachrichten sendest.",
     "messageOptions": "Nachrichtenoptionen",
@@ -23,6 +57,8 @@
     "deleteSelfConfirm": "Diese Nachricht aus deiner Ansicht entfernen?",
     "deleteEveryoneConfirm": "Diese Nachricht fuer alle loeschen?",
     "deletedMessage": "Diese Nachricht wurde geloescht.",
+    "reactWith": "Mit {{emoji}} reagieren",
+    "toggleReaction": "{{emoji}}-Reaktion umschalten",
     "attachmentName": "Attachment {{index}}",
     "attachments": {
       "add": "Add attachment",
@@ -50,24 +86,62 @@
       "sendFailed": "Voice message could not be sent. Please try again."
     }
   },
+  "context": {
+    "regarding": "Bezüglich",
+    "open": "Verwandtes Element öffnen",
+    "title": "{{type}} #{{id}}",
+    "type": {
+      "listing": "Eintrag",
+      "event": "Ereignis",
+      "job": "Auftrag",
+      "volunteering": "Freiwilligenarbeit"
+    }
+  },
   "voice": {
     "label": "Sprachnachricht",
+    "failed": "Fehlgeschlagen",
     "play": "Abspielen",
     "pause": "Pausieren",
     "recording": "Aufnahme läuft…",
     "tapToRecord": "Gedrückt halten zum Aufnehmen"
   },
+  "newMessage": "Neue Nachricht",
+  "newGroup": "Neue Gruppe",
+  "composer": {
+    "eyebrow": "Starten Sie einen Konversation",
+    "subtitle": "Nach einem Mitglied suchen und dann einen privaten Thread öffnen.",
+    "searchPlaceholder": "Mitglieder suchen",
+    "loading": "Mitglieder werden geladen",
+    "emptyTitle": "Keine Mitglieder gefunden",
+    "emptySubtitle": "Versuchen Sie es mit einem anderen Namen oder überprüfen Sie das Mitgliederverzeichnis.",
+    "memberFallback": "Community-Mitglied",
+    "resultsCount": "{{count}} Mitglied angezeigt",
+    "resultsCount_other": "{{count}} Mitglieder angezeigt",
+    "openThread": "Nachricht an {{name}}"
+  },
   "empty": {
     "title": "Noch keine Unterhaltungen",
-    "subtitle": "Verbinde dich mit Mitgliedern, um Nachrichten zu senden"
+    "subtitle": "Verbinde dich mit Mitgliedern, um Nachrichten zu senden",
+    "archivedTitle": "Keine archivierten Gespräche",
+    "archivedSubtitle": "Archivierte Konversationen werden hier angezeigt.",
+    "searchTitle": "Keine passenden Konversationen",
+    "searchSubtitle": "Versuchen Sie es mit einem anderen Mitgliedsnamen oder Nachrichtenschlüsselwort."
   },
-  "deleteConfirm": "Unterhaltung mit {{name}} löschen?",
   "errors": {
+    "archiveFailedTitle": "Archivieren fehlgeschlagen",
+    "archiveFailed": "Diese Konversation konnte nicht archiviert werden.",
     "sendFailed": "Nachricht konnte nicht gesendet werden. Tippe zum Wiederholen.",
     "loadFailed": "Nachrichten konnten nicht geladen werden.",
+    "threadUnavailableTitle": "Konversation nicht verfügbar",
+    "threadUnavailable": "Diese Konversation hat keinen gültigen Empfänger mehr. Nachrichten aktualisieren und erneut versuchen.",
+    "restoreFailedTitle": "Wiederherstellung fehlgeschlagen",
+    "restoreFailed": "Diese Konversation konnte nicht wiederhergestellt werden.",
+    "reactionFailedTitle": "Reaktion fehlgeschlagen",
+    "reactionFailed": "Diese Reaktion konnte nicht aktualisiert werden.",
     "editFailedTitle": "Bearbeitung fehlgeschlagen",
     "editFailed": "Diese Nachricht konnte nicht aktualisiert werden.",
     "deleteFailedTitle": "Loeschen fehlgeschlagen",
     "deleteFailed": "Diese Nachricht konnte nicht geloescht werden."
-  }
+  },
+  "deleteConfirm": "Unterhaltung mit {{name}} löschen?"
 }

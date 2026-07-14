@@ -1,6 +1,69 @@
 {
   "title": "Einstellungen",
+  "eyebrow": "Präferenzen",
+  "subtitle": "Benachrichtigungen, Sicherheit und App-Informationen verwalten.",
+  "appearance": {
+    "title": "Darstellung",
+    "hint": "Wählen Sie, wie die App auf diesem Gerät aussieht.",
+    "mode": {
+      "system": "System",
+      "systemHint": "An Geräteeinstellungen anpassen",
+      "light": "Hell",
+      "lightHint": "Immer das helle Design verwenden",
+      "dark": "Dunkel",
+      "darkHint": "Immer das dunkle Design verwenden"
+    }
+  },
   "changePasswordTitle": "Passwort ändern",
+  "pushNotifications": "Push-Benachrichtigungen",
+  "pushHint": "Wählen Sie aus, welche Aktivitäten als Gerätebenachrichtigungen angezeigt werden können.",
+  "emailNotifications": "E-Mail-Benachrichtigungen",
+  "emailHint": "Wählen Sie aus, welche Updates auch per E-Mail eingehen sollen.",
+  "push": {
+    "messages": "Neue Nachrichten",
+    "transactions": "Zeitguthabentransaktionen",
+    "social": "Soziale Aktivität"
+  },
+  "email": {
+    "messages": "Nachrichten",
+    "connections": "Verbindungen",
+    "transactions": "Zeitguthabentransaktionen",
+    "reviews": "Bewertungen"
+  },
+  "saveError": "Einstellung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+  "about": "Über",
+  "aboutHint": "App-Version und Open-Source-Lizenzierung.",
+  "version": "Version",
+  "unknownVersion": "Unbekannt",
+  "license": "Lizenz",
+  "security": "Sicherheit",
+  "securityHint": "Halten Sie Ihren Kontozugriff auf dem neuesten Stand.",
+  "changePassword": "Passwort ändern",
+  "password": {
+    "eyebrow": "Kontosicherheit",
+    "title": "Passwort ändern",
+    "hint": "Geben Sie Ihr aktuelles Passwort ein und wählen Sie dann ein neues.",
+    "currentLabel": "Aktuelles Passwort",
+    "currentPlaceholder": "Geben Sie das aktuelle ein Passwort",
+    "newLabel": "Neues Passwort",
+    "newPlaceholder": "Neues Passwort eingeben",
+    "confirmLabel": "Neues Passwort bestätigen",
+    "confirmPlaceholder": "Neues Passwort erneut eingeben",
+    "newHint": "Mindestens 8 Zeichen verwenden.",
+    "save": "Speichern Passwort",
+    "saving": "Passwort wird gespeichert...",
+    "reviewTitle": "Bereit zur Aktualisierung?",
+    "reviewSubtitle": "Nur speichern, wenn Ihr neues Passwort und Ihre Bestätigung übereinstimmen.",
+    "success": "Passwort geändert",
+    "successMessage": "Ihr Passwort wurde erfolgreich aktualisiert.",
+    "validation": {
+      "currentRequired": "Bitte geben Sie Ihr aktuelles Passwort ein.",
+      "newRequired": "Bitte geben Sie ein neues Passwort ein.",
+      "mismatch": "Neues Passwort und Bestätigung stimmen nicht überein.",
+      "tooShort": "Neues Passwort muss mindestens 12 Zeichen lang sein."
+    },
+    "changeError": "Konnte nicht geändert werden Passwort. Bitte versuchen Sie es erneut."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Datenschutz",
+    "hint": "Kontrollieren Sie, wer Sie finden, sehen und kontaktieren kann.",
+    "profileVisibility": "Profilsichtbarkeit",
+    "changeVisibility": "Ändern",
+    "searchIndexing": "Erscheint in der Mitgliedersuche",
+    "saveError": "Die Datenschutzeinstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "visibility": {
+      "public": "Öffentlich sichtbar",
+      "members": "Sichtbar für angemeldete Mitglieder",
+      "connections": "Sichtbar für Ihre Verbindungen"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Darstellung",
-    "hint": "Wählen Sie, wie die App auf diesem Gerät aussieht.",
-    "mode": {
-      "system": "System",
-      "systemHint": "An Geräteeinstellungen anpassen",
-      "light": "Hell",
-      "lightHint": "Immer das helle Design verwenden",
-      "dark": "Dunkel",
-      "darkHint": "Immer das dunkle Design verwenden"
-    }
   }
 }

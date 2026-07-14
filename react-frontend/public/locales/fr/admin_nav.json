@@ -1,6 +1,6 @@
 {
-  "skip_to_main": "Skip to main content",
-  "admin_navigation": "Admin navigation",
+  "skip_to_main": "Passer au contenu principal",
+  "admin_navigation": "Navigation administrateur",
   "community_fund": "Community Fund",
   "dashboard": "Tableau de bord",
   "users": "Utilisateurs",
@@ -66,7 +66,7 @@
   "platform_operations": "Opérations de la plateforme",
   "intelligence_diagnostics": "Intelligence et diagnostics",
   "integrations": "Intégrations",
-  "partner_api_integrations": "Partner APIs & integrations",
+  "partner_api_integrations": "API et intégrations partenaires",
   "partner_timebanks": "Banques de temps des partenaires",
   "super_admin": "Super administrateur",
   "super_admin_panel": "Super Admin Panel",
@@ -89,7 +89,7 @@
   "back_to_site": "Retour au site",
   "back_to_site_header": "Retour au site",
   "toggle_sidebar": "Afficher/masquer la barre latérale",
-  "close_sidebar": "Close sidebar",
+  "close_sidebar": "Fermer la barre latérale",
   "notifications": "Notifications",
   "support_requests": "Demandes d'assistance",
   "support_requests_count": "{{count}} demandes d'assistance ouvertes",
@@ -249,10 +249,10 @@
   "module_configuration": "Configuration des modules",
   "translation_config": "Paramètres de traduction",
   "federation_cc_config": "Configuration de la carte de crédit",
-  "federation_group_core_network": "Core network",
-  "federation_group_trust_settlement": "Trust & settlement",
-  "federation_group_partner_protocols": "Partner protocols",
-  "federation_group_monitoring_data": "Monitoring & data",
+  "federation_group_core_network": "Réseau central",
+  "federation_group_trust_settlement": "Fiducie et règlement",
+  "federation_group_partner_protocols": "Protocoles partenaires",
+  "federation_group_monitoring_data": "Surveillance et données",
   "expand_sidebar": "Développer la barre latérale",
   "collapse_sidebar": "Réduire la barre latérale",
   "search_nav": "Rechercher un administrateur...",
@@ -521,11 +521,10 @@
     "refresh": "Rafraîchir",
     "total_count": "{{count}}total",
     "data_table": "Données",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "select_row": "Select row {{id}}",
-    "total_count_many": "{{count}}total",
     "total_count_one": "{{count}}total",
     "total_count_other": "{{count}}total",
     "statuses": {
@@ -552,7 +551,8 @@
       "user_created": "Utilisateur créé",
       "user_moved": "Utilisateur déplacé",
       "unknown": "Inconnu"
-    }
+    },
+    "total_count_many": "{{count}}total"
   },
   "help_drawer": {
     "aria_label": "Aide : {{title}}",
@@ -570,12 +570,12 @@
     "destructive_warning": "Cette action ne peut pas être annulée.",
     "reason_label": "Raison",
     "reason_placeholder": "Donnez la raison de cette action",
-    "selected_count_many": "{{count}} sélectionné",
     "selected_count_one": "{{count}} sélectionné",
     "selected_count_other": "{{count}} sélectionné",
-    "confirm_message_many": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?",
     "confirm_message_one": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?",
-    "confirm_message_other": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?"
+    "confirm_message_other": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?",
+    "selected_count_many": "{{count}} sélectionné",
+    "confirm_message_many": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?"
   },
   "common": {
     "cancel": "Annuler"
@@ -621,7 +621,7 @@
       "search": "Rechercher"
     }
   },
-  "support_requests_count_many": "{{count}} demandes d'assistance ouvertes",
   "support_requests_count_one": "{{count}} demandes d'assistance ouvertes",
-  "support_requests_count_other": "{{count}} demandes d'assistance ouvertes"
+  "support_requests_count_other": "{{count}} demandes d'assistance ouvertes",
+  "support_requests_count_many": "{{count}} demandes d'assistance ouvertes"
 }

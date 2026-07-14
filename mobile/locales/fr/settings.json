@@ -1,6 +1,69 @@
 {
   "title": "Paramètres",
+  "eyebrow": "Préférences",
+  "subtitle": "Gérez les notifications, la sécurité et les informations sur les applications.",
+  "appearance": {
+    "title": "Apparence",
+    "hint": "Choisissez l’apparence de l’app sur cet appareil.",
+    "mode": {
+      "system": "Système",
+      "systemHint": "Suivre les réglages de l’appareil",
+      "light": "Clair",
+      "lightHint": "Toujours utiliser le thème clair",
+      "dark": "Sombre",
+      "darkHint": "Toujours utiliser le thème sombre"
+    }
+  },
   "changePasswordTitle": "Changer le mot de passe",
+  "pushNotifications": "Notifications push",
+  "pushHint": "Choisissez quelle activité peut apparaître dans les notifications de l'appareil.",
+  "emailNotifications": "Notifications par e-mail",
+  "emailHint": "Choisissez quelles mises à jour doivent arrivent également par e-mail.",
+  "push": {
+    "messages": "Nouveaux messages",
+    "transactions": "Transactions de crédit de temps",
+    "social": "Activité sociale"
+  },
+  "email": {
+    "messages": "Messages",
+    "connections": "Connexions",
+    "transactions": "Transactions de crédit de temps",
+    "reviews": "Avis"
+  },
+  "saveError": "Impossible d'enregistrer le paramètre. Veuillez réessayer.",
+  "about": "À propos",
+  "aboutHint": "Version de l'application et licence open source.",
+  "version": "Version",
+  "unknownVersion": "Inconnue",
+  "license": "Licence",
+  "security": "Sécurité",
+  "securityHint": "Gardez l'accès à votre compte à jour.",
+  "changePassword": "Changer le mot de passe",
+  "password": {
+    "eyebrow": "Sécurité du compte",
+    "title": "Changer le mot de passe",
+    "hint": "Entrez votre mot de passe actuel, puis choisissez-en un nouveau.",
+    "currentLabel": "Mot de passe actuel",
+    "currentPlaceholder": "Entrez le mot de passe actuel",
+    "newLabel": "Nouveau mot de passe",
+    "newPlaceholder": "Entrez le nouveau mot de passe",
+    "confirmLabel": "Confirmez le nouveau mot de passe",
+    "confirmPlaceholder": "Entrez à nouveau le nouveau mot de passe",
+    "newHint": "Utilisez au moins 8 caractères.",
+    "save": "Enregistrer le mot de passe",
+    "saving": "Enregistrement du mot de passe...",
+    "reviewTitle": "Prêt à mettre à jour ?",
+    "reviewSubtitle": "Enregistrez uniquement lorsque votre nouveau mot de passe et votre confirmation correspondent.",
+    "success": "Mot de passe modifie",
+    "successMessage": "Votre mot de passe a été mis à jour avec succès.",
+    "validation": {
+      "currentRequired": "Veuillez saisir votre mot de passe actuel.",
+      "newRequired": "Veuillez saisir un nouveau mot de passe.",
+      "mismatch": "Le nouveau mot de passe et la confirmation ne correspondent pas.",
+      "tooShort": "Le nouveau mot de passe doit comporter au moins 12 caractères."
+    },
+    "changeError": "Impossible de modifier le mot de passe. Veuillez réessayer."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Confidentialité",
+    "hint": "Contrôlez qui peut vous trouver, vous voir et vous contacter.",
+    "profileVisibility": "Visibilité du profil",
+    "changeVisibility": "Modifier",
+    "searchIndexing": "Apparaître dans la recherche de membres",
+    "saveError": "Impossible d'enregistrer les paramètres de confidentialité. Veuillez réessayer.",
+    "visibility": {
+      "public": "Visible publiquement",
+      "members": "Visible par les membres connectés",
+      "connections": "Visible par vos connexions"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Apparence",
-    "hint": "Choisissez l’apparence de l’app sur cet appareil.",
-    "mode": {
-      "system": "Système",
-      "systemHint": "Suivre les réglages de l’appareil",
-      "light": "Clair",
-      "lightHint": "Toujours utiliser le thème clair",
-      "dark": "Sombre",
-      "darkHint": "Toujours utiliser le thème sombre"
-    }
   }
 }

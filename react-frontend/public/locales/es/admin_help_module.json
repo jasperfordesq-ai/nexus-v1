@@ -57,7 +57,7 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
+    "loading": "Cargando",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -85,9 +85,9 @@
       "caring_community": "Comunidad solidaria",
       "kiss_agoris": "BESO Y Caring Community"
     },
-    "search_placeholder_many": "Buscar artículos de ayuda de{{count}}...",
     "search_placeholder_one": "Buscar artículos de ayuda de{{count}}...",
-    "search_placeholder_other": "Buscar artículos de ayuda de{{count}}..."
+    "search_placeholder_other": "Buscar artículos de ayuda de{{count}}...",
+    "search_placeholder_many": "Buscar artículos de ayuda de{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ de ayuda",

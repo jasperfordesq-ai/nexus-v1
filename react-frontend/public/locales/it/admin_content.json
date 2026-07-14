@@ -347,7 +347,7 @@
     "failed_to_save_language_settings": "Impossibile salvare le impostazioni della lingua",
     "module_enabled": "{{name}}abilitato",
     "module_disabled": "{{name}}disabilitato",
-    "enabled": "enabled",
+    "enabled": "abilitato",
     "disabled": "disabled",
     "translation_settings_title": "Impostazioni di traduzione",
     "translation_settings_desc": "Configura la traduzione automatica, il glossario e le preferenze di traduzione per tenant",

@@ -57,7 +57,7 @@
     "no_history_available": "لم يتم العثور على أي سجل متاح",
     "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
     "no_members_found": "لم يتم العثور على أعضاء وجدت",
-    "loading": "Loading",
+    "loading": "تحميل",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
     "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
@@ -85,10 +85,10 @@
       "caring_community": "مجتمع الرعاية",
       "kiss_agoris": "قبلة وأغوريس"
     },
-    "search_placeholder_few": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
-    "search_placeholder_many": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
     "search_placeholder_one": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
     "search_placeholder_other": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
+    "search_placeholder_few": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
+    "search_placeholder_many": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
     "search_placeholder_two": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
     "search_placeholder_zero": "البحث في مقالات المساعدة الخاصة بـ{{count}}..."
   },

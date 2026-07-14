@@ -1,6 +1,6 @@
 {
-  "skip_to_main": "Skip to main content",
-  "admin_navigation": "Admin navigation",
+  "skip_to_main": "Téigh ar aghaidh chuig an bpríomhábhar",
+  "admin_navigation": "Nascleanúint admin",
   "community_fund": "Community Fund",
   "dashboard": "Deais",
   "users": "Úsáideoirí",
@@ -66,7 +66,7 @@
   "platform_operations": "Oibríochtaí an Ardáin",
   "intelligence_diagnostics": "Faisnéis agus Diagnóisic",
   "integrations": "Comhtháthuithe",
-  "partner_api_integrations": "Partner APIs & integrations",
+  "partner_api_integrations": "APIs Comhpháirtithe & comhtháthú",
   "partner_timebanks": "Bainc Ama Comhpháirtithe",
   "super_admin": "Sár-Riarachán",
   "super_admin_panel": "Super Admin Panel",
@@ -89,7 +89,7 @@
   "back_to_site": "Ar ais go Suíomh",
   "back_to_site_header": "Ar ais go dtí an suíomh",
   "toggle_sidebar": "Scoránaigh an barra taoibh",
-  "close_sidebar": "Close sidebar",
+  "close_sidebar": "Dún barra taoibh",
   "notifications": "Fógraí",
   "support_requests": "Iarratais tacaíochta",
   "support_requests_count": "{{count}} iarratas tacaíochta oscailte",
@@ -249,10 +249,10 @@
   "module_configuration": "Cumraíocht an Mhodúil",
   "translation_config": "Socruithe Aistriúcháin",
   "federation_cc_config": "Cumraíocht Cárta Creidmheasa",
-  "federation_group_core_network": "Core network",
-  "federation_group_trust_settlement": "Trust & settlement",
-  "federation_group_partner_protocols": "Partner protocols",
-  "federation_group_monitoring_data": "Monitoring & data",
+  "federation_group_core_network": "Croíghréasán",
+  "federation_group_trust_settlement": "Iontaobhas & socrú",
+  "federation_group_partner_protocols": "Prótacail comhpháirtíochta",
+  "federation_group_monitoring_data": "Monatóireacht & sonraí",
   "expand_sidebar": "Leathnaigh barra taoibh",
   "collapse_sidebar": "Laghdaigh an barra taoibh",
   "search_nav": "Cuardaigh riarthóir...",
@@ -521,15 +521,12 @@
     "refresh": "Athnuaigh",
     "total_count": "{{count}}iomlán",
     "data_table": "Sonraí",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "select_row": "Select row {{id}}",
-    "total_count_few": "{{count}}iomlán",
-    "total_count_many": "{{count}}iomlán",
     "total_count_one": "{{count}}iomlán",
     "total_count_other": "{{count}}iomlán",
-    "total_count_two": "{{count}}iomlán",
     "statuses": {
       "active": "Gníomhach",
       "approved": "Faofa",
@@ -554,7 +551,10 @@
       "user_created": "Úsáideoir cruthaithe",
       "user_moved": "Úsáideoir bogtha",
       "unknown": "Anaithnid"
-    }
+    },
+    "total_count_few": "{{count}}iomlán",
+    "total_count_many": "{{count}}iomlán",
+    "total_count_two": "{{count}}iomlán"
   },
   "help_drawer": {
     "aria_label": "Cabhair: {{title}}",
@@ -572,15 +572,15 @@
     "destructive_warning": "Ní féidir an gníomh seo a chealú.",
     "reason_label": "Cúis",
     "reason_placeholder": "Tabhair cúis leis an ngníomh seo",
-    "selected_count_few": "{{count}} roghnaithe",
-    "selected_count_many": "{{count}} roghnaithe",
     "selected_count_one": "{{count}} roghnaithe",
     "selected_count_other": "{{count}} roghnaithe",
+    "confirm_message_one": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "confirm_message_other": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "selected_count_few": "{{count}} roghnaithe",
+    "selected_count_many": "{{count}} roghnaithe",
     "selected_count_two": "{{count}} roghnaithe",
     "confirm_message_few": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
     "confirm_message_many": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
-    "confirm_message_one": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
-    "confirm_message_other": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
     "confirm_message_two": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?"
   },
   "common": {
@@ -627,9 +627,9 @@
       "search": "Cuardach"
     }
   },
-  "support_requests_count_few": "{{count}} iarratas tacaíochta oscailte",
-  "support_requests_count_many": "{{count}} iarratas tacaíochta oscailte",
   "support_requests_count_one": "{{count}} iarratas tacaíochta oscailte",
   "support_requests_count_other": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_few": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_many": "{{count}} iarratas tacaíochta oscailte",
   "support_requests_count_two": "{{count}} iarratas tacaíochta oscailte"
 }

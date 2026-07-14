@@ -18,12 +18,12 @@ vi.mock('./AdminHelpDrawer', () => ({
 
 // Stub helpContent so we control when a help article exists.
 vi.mock('../data/helpContent', () => ({
-  HELP_CONTENT: {
+  getHelpContent: () => ({
     '/admin/dashboard': {
       title: 'Dashboard Help',
       summary: 'Help for dashboard',
     },
-  },
+  }),
 }));
 
 import { PageHeader } from './PageHeader';
