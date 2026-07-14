@@ -2197,11 +2197,11 @@
       "reminder_failed": "Kon herinnering niet verzenden.",
       "waive_failed": "Kon contributies niet kwijtschelden."
     },
+    "badge_none": "Geen contributie",
     "admin_bulk_reminder_sent_one": "{{count}} herinneringen verzonden.",
     "admin_bulk_reminder_sent_other": "{{count}} herinneringen verzonden.",
     "admin_overdue_count_one": "{{count}} lid/leden hebben achterstallige contributies.",
-    "admin_overdue_count_other": "{{count}} lid/leden hebben achterstallige contributies.",
-    "badge_none": "Geen contributie"
+    "admin_overdue_count_other": "{{count}} lid/leden hebben achterstallige contributies."
   },
   "collections": {
     "save": "Opslaan",
@@ -2369,14 +2369,14 @@
   "wellbeing": {
     "mood_struggling": "Worstelend",
     "mood_low": "Laag",
-    "mood_okay": "Oké",
     "mood_good": "Goed",
     "mood_great": "Geweldig",
-    "mood_unknown": "Onbekend",
     "score_excellent": "Uitstekend",
     "score_good": "Goed",
     "score_fair": "Eerlijk",
     "score_needs_attention": "Heeft aandacht nodig",
+    "mood_okay": "Oké",
+    "mood_unknown": "Onbekend",
     "score_critical": "Kritisch"
   },
   "credentials": {
@@ -2385,6 +2385,33 @@
     "status_expired": "Verlopen",
     "status_rejected": "Afgewezen"
   },
+  "submit_error": "Kan niet indienen. Probeer het opnieuw.",
+  "submitting": "Verzenden…",
+  "submit": "Indienen",
+  "caregiver": {
+    "hours_short": "{{hours}}u",
+    "burnout_high": "Hoge belasting voor zorgverleners:{{hours}}-uren deze week",
+    "burnout_moderate": "Matige belasting:{{hours}}-uren deze week",
+    "burnout_warning": "Je hebt deze week veel uren geregistreerd. Zorg ervoor dat je rust neemt",
+    "upcoming_care": "Aankomende zorg",
+    "no_upcoming_care": "Nog geen geplande ondersteuning",
+    "recent_care": "Recente zorg",
+    "no_recent_care": "Nog geen recente zorglogboeken",
+    "view_schedule": "Bekijk het zorgschema",
+    "request_on_behalf": "Vraag namens hen hulp aan"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Niet geïnteresseerd",
+    "too_far": "Te ver weg",
+    "not_my_skills": "Niet mijn vaardigheden"
+  },
+  "under_25": "Onder de 25",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Onbekend",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2428,7 +2455,6 @@
   },
   "required_error": "Beantwoord alle verplichte vragen.",
   "already_responded": "U heeft al deelgenomen aan deze enquête.",
-  "submitting": "Verzenden…",
   "time_ago_just_now": "Zojuist",
   "time_ago_hours_one": "{{count}}u geleden",
   "time_ago_hours_other": "{{count}}u geleden",
@@ -2445,18 +2471,6 @@
     "email_aria": "E-mailprovider bij{{email}}",
     "website_aria": "Bezoek de website van de provider{{url}}",
     "website": "Website"
-  },
-  "caregiver": {
-    "burnout_high": "Hoge belasting voor zorgverleners:{{hours}}-uren deze week",
-    "burnout_moderate": "Matige belasting:{{hours}}-uren deze week",
-    "burnout_warning": "Je hebt deze week veel uren geregistreerd. Zorg ervoor dat je rust neemt",
-    "upcoming_care": "Aankomende zorg",
-    "no_upcoming_care": "Nog geen geplande ondersteuning",
-    "recent_care": "Recente zorg",
-    "no_recent_care": "Nog geen recente zorglogboeken",
-    "view_schedule": "Bekijk het zorgschema",
-    "request_on_behalf": "Vraag namens hen hulp aan",
-    "hours_short": "{{hours}}u"
   },
   "cover": {
     "title": "Dekking zorg"
@@ -2555,11 +2569,6 @@
     "preview_device_label": "Voorbeeldapparaat",
     "preview_desktop": "Bureaublad",
     "preview_mobile": "Mobiel"
-  },
-  "dismiss_reasons": {
-    "too_far": "Te ver weg",
-    "not_my_skills": "Niet mijn vaardigheden",
-    "not_interested": "Niet geïnteresseerd"
   },
   "qa": {
     "upvote_aria": "Omhoog stemmen",
@@ -3046,7 +3055,6 @@
       "empty_value": "-"
     }
   },
-  "unknown": "Onbekend",
   "advertising": {
     "push": {
       "no_daily_data": "Nog geen dagelijkse gegevens.",
@@ -3059,13 +3067,5 @@
       "chart_opens_title_one": "{{count}} wordt geopend",
       "chart_opens_title_other": "{{count}} wordt geopend"
     }
-  },
-  "submit_error": "Kan niet indienen. Probeer het opnieuw.",
-  "submit": "Indienen",
-  "under_25": "Onder de 25",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+"
+  }
 }

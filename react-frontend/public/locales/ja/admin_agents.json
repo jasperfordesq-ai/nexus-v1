@@ -131,6 +131,7 @@
         "toggle_failed": "エージェントの切り替えに失敗しました",
         "updated": "エージェントが更新されました",
         "update_failed": "エージェントの更新に失敗しました",
+        "run_created_one": "#{{runId}} が作成した {{count}} プロポーザルを実行します",
         "run_created_other": "#{{runId}} を実行して {{count}} プロポーザルを作成しました"
       }
     },

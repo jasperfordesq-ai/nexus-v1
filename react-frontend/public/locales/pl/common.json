@@ -74,10 +74,10 @@
     "courses": "Kursy",
     "podcasts": "Podcasty",
     "switch_community": "Zmień społeczność",
-    "unread_notifications_few": "{{count}} nieprzeczytanych powiadomień",
-    "unread_notifications_many": "{{count}} nieprzeczytanych powiadomień",
     "unread_notifications_one": "{{count}} nieprzeczytanych powiadomień",
-    "unread_notifications_other": "{{count}} nieprzeczytanych powiadomień"
+    "unread_notifications_other": "{{count}} nieprzeczytanych powiadomień",
+    "unread_notifications_few": "{{count}} nieprzeczytanych powiadomień",
+    "unread_notifications_many": "{{count}} nieprzeczytanych powiadomień"
   },
   "landing_links": {
     "title": "Poznaj tę społeczność",
@@ -373,18 +373,18 @@
     "load_more_failed": "Nie udało się załadować więcej członków",
     "my_profile": "Mój profil",
     "load_more_count": "Załaduj więcej ({{remaining}} pozostało)",
-    "results_count_few": "Wyświetlono {{count}} członków",
-    "results_count_many": "Wyświetlono {{count}} członków",
     "results_count_one": "Wyświetlono {{count}} członków",
     "results_count_other": "Wyświetlono {{count}} członków",
-    "hours_exchanged_aria_few": "Wymieniono {{count}} godz.",
-    "hours_exchanged_aria_many": "Wymieniono {{count}} godz.",
     "hours_exchanged_aria_one": "Wymieniono {{count}} godz.",
     "hours_exchanged_aria_other": "Wymieniono {{count}} godz.",
-    "hours_short_few": "{{count}} g",
-    "hours_short_many": "{{count}} g",
     "hours_short_one": "{{count}} g",
-    "hours_short_other": "{{count}} g"
+    "hours_short_other": "{{count}} g",
+    "results_count_few": "Wyświetlono {{count}} członków",
+    "results_count_many": "Wyświetlono {{count}} członków",
+    "hours_exchanged_aria_few": "Wymieniono {{count}} godz.",
+    "hours_exchanged_aria_many": "Wymieniono {{count}} godz.",
+    "hours_short_few": "{{count}} g",
+    "hours_short_many": "{{count}} g"
   },
   "error_boundary": {
     "title": "Coś poszło nie tak",
@@ -897,14 +897,14 @@
     "feed_sidebar": "Pasek boczny społeczności",
     "filter_panel": "Panel filtrów",
     "remove": "Remove",
-    "location_results_few": "Dostępne są sugestie adresów {{count}}",
-    "location_results_many": "Dostępne są sugestie adresów {{count}}",
     "location_results_one": "Dostępne są sugestie adresów {{count}}",
     "location_results_other": "Dostępne są sugestie adresów {{count}}",
-    "search_results_few": "{{count}} results available",
-    "search_results_many": "{{count}} results available",
     "search_results_one": "Dostępne wyniki {{count}}",
-    "search_results_other": "Dostępne wyniki {{count}}"
+    "search_results_other": "Dostępne wyniki {{count}}",
+    "location_results_few": "Dostępne są sugestie adresów {{count}}",
+    "location_results_many": "Dostępne są sugestie adresów {{count}}",
+    "search_results_few": "{{count}} results available",
+    "search_results_many": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Katalog umiejętności społeczności",
@@ -955,10 +955,10 @@
     "aria_close_members_list": "Zamknij listę członków",
     "category_optional": "Kategoria (opcjonalna)",
     "proficiency_level": "Poziom umiejętności",
-    "aria_results_few": "Dostępne sugestie umiejętności {{count}}",
-    "aria_results_many": "Dostępne sugestie umiejętności {{count}}",
     "aria_results_one": "Dostępne sugestie umiejętności {{count}}",
-    "aria_results_other": "Dostępne sugestie umiejętności {{count}}"
+    "aria_results_other": "Dostępne sugestie umiejętności {{count}}",
+    "aria_results_few": "Dostępne sugestie umiejętności {{count}}",
+    "aria_results_many": "Dostępne sugestie umiejętności {{count}}"
   },
   "hours_display_one": "{{count}} godzina",
   "hours_display_other": "{{count}} godzin",
@@ -1138,10 +1138,10 @@
     "errors": {
       "load_failed": "Nie udało się załadować klubów. Spróbuj ponownie."
     },
-    "member_count_few": "{{count}} członków",
-    "member_count_many": "{{count}} członków",
     "member_count_one": "{{count}} członków",
-    "member_count_other": "{{count}} członków"
+    "member_count_other": "{{count}} członków",
+    "member_count_few": "{{count}} członków",
+    "member_count_many": "{{count}} członków"
   },
   "feed": {
     "personalisation": {
@@ -1225,10 +1225,10 @@
       "size": "Rozmiar",
       "count": "{{count}} eksportów",
       "empty": "Nie eksportowałeś/aś jeszcze swoich danych.",
-      "count_few": "{{count}} eksportów",
-      "count_many": "{{count}} eksportów",
       "count_one": "{{count}} eksportów",
-      "count_other": "{{count}} eksportów"
+      "count_other": "{{count}} eksportów",
+      "count_few": "{{count}} eksportów",
+      "count_many": "{{count}} eksportów"
     },
     "errors": {
       "rate_limit": "Możesz zażądać 5 eksportów dziennie. Spróbuj ponownie jutro.",
@@ -1474,10 +1474,10 @@
     "create_error": "Nie udało się utworzyć kampanii push. Spróbuj ponownie.",
     "submit_create": "Utwórz kampanię",
     "feature_disabled": "Kampanie push nie są dostępne dla Twojego konta.",
-    "estimate_result_few": "Szacowany zasięg: {{count}} członków",
-    "estimate_result_many": "Szacowany zasięg: {{count}} członków",
     "estimate_result_one": "Szacowany zasięg: {{count}} członków",
-    "estimate_result_other": "Szacowany zasięg: {{count}} członków"
+    "estimate_result_other": "Szacowany zasięg: {{count}} członków",
+    "estimate_result_few": "Szacowany zasięg: {{count}} członków",
+    "estimate_result_many": "Szacowany zasięg: {{count}} członków"
   },
   "push_campaign_opt_in": "Odbieraj promowane powiadomienia push",
   "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie Ci ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
@@ -1548,10 +1548,10 @@
       "usage_count": "Użyto {{count}} razy",
       "saved": "Kupon zapisany",
       "deleted": "Kupon usunięty",
-      "usage_count_few": "Użyto {{count}} razy",
-      "usage_count_many": "Użyto {{count}} razy",
       "usage_count_one": "Użyto {{count}} razy",
-      "usage_count_other": "Użyto {{count}} razy"
+      "usage_count_other": "Użyto {{count}} razy",
+      "usage_count_few": "Użyto {{count}} razy",
+      "usage_count_many": "Użyto {{count}} razy"
     },
     "qr_code_alt": "Kod QR"
   },
@@ -2113,10 +2113,10 @@
       "from_label": "Od",
       "load_failed": "Nie udało się załadować kalendarza."
     },
-    "char_count_few": "{{count}}/500",
-    "char_count_many": "{{count}}/500",
     "char_count_one": "{{count}}/500",
-    "char_count_other": "{{count}}/500"
+    "char_count_other": "{{count}}/500",
+    "char_count_few": "{{count}}/500",
+    "char_count_many": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Kontynuuj z Google",
@@ -2221,15 +2221,15 @@
       "reminder_failed": "Nie udało się wysłać przypomnienia.",
       "waive_failed": "Nie udało się anulować składek."
     },
-    "admin_bulk_reminder_sent_few": "Wysłano {{count}} przypomnień.",
-    "admin_bulk_reminder_sent_many": "Wysłano {{count}} przypomnień.",
+    "badge_none": "Żadnych składek",
     "admin_bulk_reminder_sent_one": "Wysłano {{count}} przypomnień.",
     "admin_bulk_reminder_sent_other": "Wysłano {{count}} przypomnień.",
-    "admin_overdue_count_few": "{{count}} członek(ów) ma zaległe składki.",
-    "admin_overdue_count_many": "{{count}} członek(ów) ma zaległe składki.",
     "admin_overdue_count_one": "{{count}} członek(ów) ma zaległe składki.",
     "admin_overdue_count_other": "{{count}} członek(ów) ma zaległe składki.",
-    "badge_none": "Żadnych składek"
+    "admin_bulk_reminder_sent_few": "Wysłano {{count}} przypomnień.",
+    "admin_bulk_reminder_sent_many": "Wysłano {{count}} przypomnień.",
+    "admin_overdue_count_few": "{{count}} członek(ów) ma zaległe składki.",
+    "admin_overdue_count_many": "{{count}} członek(ów) ma zaległe składki."
   },
   "collections": {
     "save": "Zapisz",
@@ -2374,10 +2374,10 @@
   "max_characters": "maks. {{count}} znaków",
   "map": {
     "listings_here": "{{count}} ogłoszeń tutaj",
-    "listings_here_few": "{{count}} ogłoszeń tutaj",
-    "listings_here_many": "{{count}} ogłoszeń tutaj",
     "listings_here_one": "{{count}} ogłoszeń tutaj",
-    "listings_here_other": "{{count}} ogłoszeń tutaj"
+    "listings_here_other": "{{count}} ogłoszeń tutaj",
+    "listings_here_few": "{{count}} ogłoszeń tutaj",
+    "listings_here_many": "{{count}} ogłoszeń tutaj"
   },
   "time_credits_short": "{{count}}h kredytów",
   "level_plain": "Poziom {{level}}",
@@ -2396,19 +2396,17 @@
     "scheme_system": "System"
   },
   "alpha_badge": "Alfa",
-  "hours_display_few": "{{count}} godzin",
-  "hours_display_many": "{{count}} godzin",
   "wellbeing": {
     "mood_struggling": "Zmagający się",
     "mood_low": "Niski",
-    "mood_okay": "Dobra",
     "mood_good": "Dobry",
     "mood_great": "Świetnie",
-    "mood_unknown": "Nieznany",
     "score_excellent": "Doskonały",
     "score_good": "Dobry",
     "score_fair": "Sprawiedliwy",
     "score_needs_attention": "Wymaga uwagi",
+    "mood_okay": "Dobra",
+    "mood_unknown": "Nieznany",
     "score_critical": "Krytyczny"
   },
   "credentials": {
@@ -2417,6 +2415,33 @@
     "status_expired": "Wygasły",
     "status_rejected": "Odrzucony"
   },
+  "submit_error": "Nie udało się przesłać. Spróbuj ponownie.",
+  "submitting": "Przedkładający…",
+  "submit": "Składać",
+  "caregiver": {
+    "hours_short": "{{hours}}godz",
+    "burnout_high": "Duże obciążenie opiekunów: godziny{{hours}}w tym tygodniu",
+    "burnout_moderate": "Umiarkowane obciążenie: godziny{{hours}}w tym tygodniu",
+    "burnout_warning": "Zalogowałeś się w tym tygodniu przez wiele godzin — pamiętaj o odpoczynku",
+    "upcoming_care": "Nadchodząca opieka",
+    "no_upcoming_care": "Nie ma jeszcze zaplanowanego wsparcia",
+    "recent_care": "Niedawna pielęgnacja",
+    "no_recent_care": "Nie ma jeszcze żadnych aktualnych dzienników opieki",
+    "view_schedule": "Zobacz harmonogram opieki",
+    "request_on_behalf": "Poproś o pomoc w ich imieniu"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Nie jestem zainteresowany",
+    "too_far": "Za daleko",
+    "not_my_skills": "Nie moje umiejętności"
+  },
+  "under_25": "Poniżej 25. roku życia",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Nieznany",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2444,12 +2469,8 @@
     "action_goal": "ustawił nowy cel",
     "action_post": "podzielił się postem"
   },
-  "hours_short_few": "{{count}} g",
-  "hours_short_many": "{{count}} g",
   "hours_short_one": "{{count}} g",
   "hours_short_other": "{{count}} g",
-  "time_credits_short_few": "{{count}}h kredytów",
-  "time_credits_short_many": "{{count}}h kredytów",
   "time_credits_short_one": "{{count}}h kredytów",
   "time_credits_short_other": "{{count}}h kredytów",
   "question_required": "Wymagane",
@@ -2465,12 +2486,8 @@
   "required_error": "Odpowiedz na wszystkie wymagane pytania.",
   "already_responded": "Już wzięłeś/wzięłaś udział w tej ankiecie.",
   "time_ago_just_now": "Przed chwilą",
-  "time_ago_hours_few": "{{count}}h temu",
-  "time_ago_hours_many": "{{count}}h temu",
   "time_ago_hours_one": "{{count}}h temu",
   "time_ago_hours_other": "{{count}}h temu",
-  "time_ago_days_few": "{{count}}d temu",
-  "time_ago_days_many": "{{count}}d temu",
   "time_ago_days_one": "{{count}}d temu",
   "time_ago_days_other": "{{count}}d temu",
   "providers": {
@@ -2485,35 +2502,23 @@
     "website_aria": "Odwiedź witrynę dostawcy{{url}}",
     "website": "Strona internetowa"
   },
-  "caregiver": {
-    "burnout_high": "Duże obciążenie opiekunów: godziny{{hours}}w tym tygodniu",
-    "burnout_moderate": "Umiarkowane obciążenie: godziny{{hours}}w tym tygodniu",
-    "burnout_warning": "Zalogowałeś się w tym tygodniu przez wiele godzin — pamiętaj o odpoczynku",
-    "upcoming_care": "Nadchodząca opieka",
-    "no_upcoming_care": "Nie ma jeszcze zaplanowanego wsparcia",
-    "recent_care": "Niedawna pielęgnacja",
-    "no_recent_care": "Nie ma jeszcze żadnych aktualnych dzienników opieki",
-    "view_schedule": "Zobacz harmonogram opieki",
-    "request_on_behalf": "Poproś o pomoc w ich imieniu",
-    "hours_short": "{{hours}}godz"
-  },
   "cover": {
     "title": "Pielęgnacja okładki"
   },
   "viewer": {
     "time_just_now": "Właśnie teraz",
-    "time_minutes_ago_few": "{{count}}m temu",
-    "time_minutes_ago_many": "{{count}}m temu",
     "time_minutes_ago_one": "{{count}}m temu",
     "time_minutes_ago_other": "{{count}}m temu",
-    "time_hours_ago_few": "{{count}}h temu",
-    "time_hours_ago_many": "{{count}}h temu",
     "time_hours_ago_one": "{{count}}h temu",
     "time_hours_ago_other": "{{count}}h temu",
-    "time_days_ago_few": "{{count}}d temu",
-    "time_days_ago_many": "{{count}}d temu",
     "time_days_ago_one": "{{count}}d temu",
-    "time_days_ago_other": "{{count}}d temu"
+    "time_days_ago_other": "{{count}}d temu",
+    "time_minutes_ago_few": "{{count}}m temu",
+    "time_minutes_ago_many": "{{count}}m temu",
+    "time_hours_ago_few": "{{count}}h temu",
+    "time_hours_ago_many": "{{count}}h temu",
+    "time_days_ago_few": "{{count}}d temu",
+    "time_days_ago_many": "{{count}}d temu"
   },
   "biometric": {
     "label_builtin": "Wbudowany uwierzytelniacz",
@@ -2601,45 +2606,38 @@
     "preview_desktop": "Komputer",
     "preview_mobile": "Telefon"
   },
-  "dismiss_reasons": {
-    "too_far": "Za daleko",
-    "not_my_skills": "Nie moje umiejętności",
-    "not_interested": "Nie jestem zainteresowany"
-  },
   "qa": {
     "upvote_aria": "Głos za",
-    "vote_count_aria_few": "{{count}} głosów",
-    "vote_count_aria_many": "{{count}} głosów",
     "vote_count_aria_one": "{{count}} głosów",
     "vote_count_aria_other": "{{count}} głosów",
-    "downvote_aria": "Głos przeciw"
+    "downvote_aria": "Głos przeciw",
+    "vote_count_aria_few": "{{count}} głosów",
+    "vote_count_aria_many": "{{count}} głosów"
   },
   "challenges": {
     "time_ended": "Zakończone",
     "time_remaining_days_hours": "Pozostało {{days}}d {{hours}}h",
     "time_remaining_hours_minutes": "Pozostało {{hours}}h {{minutes}}m"
   },
-  "max_characters_few": "maks. {{count}} znaków",
-  "max_characters_many": "maks. {{count}} znaków",
   "max_characters_one": "maks. {{count}} znaków",
   "max_characters_other": "maks. {{count}} znaków",
   "volunteering": {
     "time_just_now": "Właśnie teraz",
-    "time_minutes_ago_few": "{{count}}minutę temu",
-    "time_minutes_ago_many": "{{count}}minutę temu",
     "time_minutes_ago_one": "{{count}}minutę temu",
     "time_minutes_ago_other": "{{count}}minutę temu",
-    "time_hours_ago_few": "{{count}}godzinę temu",
-    "time_hours_ago_many": "{{count}}godzinę temu",
     "time_hours_ago_one": "{{count}}godzinę temu",
     "time_hours_ago_other": "{{count}}godzinę temu",
-    "time_days_ago_few": "{{count}}dzień temu",
-    "time_days_ago_many": "{{count}}dzień temu",
     "time_days_ago_one": "{{count}}dzień temu",
     "time_days_ago_other": "{{count}}dzień temu",
     "wellbeing_user_number": "Wolontariusz #{{id}}",
     "wellbeing_unknown_user": "Nieznany wolontariusz",
-    "wellbeing_unknown_type": "Kwestia dobrostanu"
+    "wellbeing_unknown_type": "Kwestia dobrostanu",
+    "time_minutes_ago_few": "{{count}}minutę temu",
+    "time_minutes_ago_many": "{{count}}minutę temu",
+    "time_hours_ago_few": "{{count}}godzinę temu",
+    "time_hours_ago_many": "{{count}}godzinę temu",
+    "time_days_ago_few": "{{count}}dzień temu",
+    "time_days_ago_many": "{{count}}dzień temu"
   },
   "users": {
     "action_edit": "Edytuj",
@@ -2656,18 +2654,18 @@
   "system": {
     "never": "Nigdy",
     "just_now": "Właśnie teraz",
-    "minutes_ago_few": "{{count}}m temu",
-    "minutes_ago_many": "{{count}}m temu",
     "minutes_ago_one": "{{count}}m temu",
     "minutes_ago_other": "{{count}}m temu",
-    "hours_ago_few": "{{count}}godz. temu",
-    "hours_ago_many": "{{count}}godz. temu",
     "hours_ago_one": "{{count}}godz. temu",
     "hours_ago_other": "{{count}}godz. temu",
-    "days_ago_few": "{{count}}d temu",
-    "days_ago_many": "{{count}}d temu",
     "days_ago_one": "{{count}}d temu",
-    "days_ago_other": "{{count}}d temu"
+    "days_ago_other": "{{count}}d temu",
+    "minutes_ago_few": "{{count}}m temu",
+    "minutes_ago_many": "{{count}}m temu",
+    "hours_ago_few": "{{count}}godz. temu",
+    "hours_ago_many": "{{count}}godz. temu",
+    "days_ago_few": "{{count}}d temu",
+    "days_ago_many": "{{count}}d temu"
   },
   "super": {
     "tenant_actions": "Działania najemcy",
@@ -2682,6 +2680,14 @@
   },
   "help_faqs": {
     "actions_aria": "Akcje FAQ"
+  },
+  "groups": {
+    "policy_features": "Funkcje zasad",
+    "policy_moderation": "Umiarkowanie polityki",
+    "policy_membership": "Członkostwo w polityce",
+    "policy_creation": "Tworzenie polityki",
+    "policy_content": "Treść zasad",
+    "policy_notifications": "Powiadomienia o zasadach"
   },
   "gamification": {
     "label_campaign_actions": "Działania kampanii",
@@ -2705,14 +2711,6 @@
     "event_type_partnership_terminated": "Współpraca zakończyła się",
     "event_type_profile_viewed": "Przeglądano profil",
     "event_type_federated_search": "Wyszukiwanie partnera"
-  },
-  "groups": {
-    "policy_features": "Funkcje zasad",
-    "policy_moderation": "Umiarkowanie polityki",
-    "policy_membership": "Członkostwo w polityce",
-    "policy_creation": "Tworzenie polityki",
-    "policy_content": "Treść zasad",
-    "policy_notifications": "Powiadomienia o zasadach"
   },
   "enterprise": {
     "config_group_general": "Ogólny",
@@ -2793,29 +2791,29 @@
     "validation_min": "Musi wynosić {{value}} lub więcej",
     "validation_max": "Musi wynosić {{value}} lub mniej",
     "validation_format": "Nieprawidłowy format",
-    "gdpr_sla_overdue_few": "{{count}} dni opóźnienia",
-    "gdpr_sla_overdue_many": "{{count}} dni opóźnienia",
     "gdpr_sla_overdue_one": "{{count}} dni opóźnienia",
     "gdpr_sla_overdue_other": "{{count}} dni opóźnienia",
-    "gdpr_sla_days_left_few": "Pozostało {{count}} dni",
-    "gdpr_sla_days_left_many": "Pozostało {{count}} dni",
     "gdpr_sla_days_left_one": "Pozostało {{count}} dni",
-    "gdpr_sla_days_left_other": "Pozostało {{count}} dni"
+    "gdpr_sla_days_left_other": "Pozostało {{count}} dni",
+    "gdpr_sla_overdue_few": "{{count}} dni opóźnienia",
+    "gdpr_sla_overdue_many": "{{count}} dni opóźnienia",
+    "gdpr_sla_days_left_few": "Pozostało {{count}} dni",
+    "gdpr_sla_days_left_many": "Pozostało {{count}} dni"
   },
   "crm": {
     "just_now": "Just Now",
-    "minutes_ago_few": "{{count}} min temu",
-    "minutes_ago_many": "{{count}} min temu",
     "minutes_ago_one": "{{count}} min temu",
     "minutes_ago_other": "{{count}} min temu",
-    "hours_ago_few": "{{count}} godz. temu",
-    "hours_ago_many": "{{count}} godz. temu",
     "hours_ago_one": "{{count}} godz. temu",
     "hours_ago_other": "{{count}} godz. temu",
-    "days_ago_few": "{{count}} dni temu",
-    "days_ago_many": "{{count}} dni temu",
     "days_ago_one": "{{count}} dni temu",
-    "days_ago_other": "{{count}} dni temu"
+    "days_ago_other": "{{count}} dni temu",
+    "minutes_ago_few": "{{count}} min temu",
+    "minutes_ago_many": "{{count}} min temu",
+    "hours_ago_few": "{{count}} godz. temu",
+    "hours_ago_many": "{{count}} godz. temu",
+    "days_ago_few": "{{count}} dni temu",
+    "days_ago_many": "{{count}} dni temu"
   },
   "config": {
     "module_name_dashboard": "Pulpit nawigacyjny",
@@ -2870,12 +2868,12 @@
     "no_data": "Brak dostępnych danych",
     "drag_hint": "Przeciągnij elementy, aby zmienić ich kolejność",
     "drag_to_reorder": "Przeciągnij, aby zmienić kolejność",
-    "sub_items_few": "{{count}} podelement(y)",
-    "sub_items_many": "{{count}} podelement(y)",
     "sub_items_one": "{{count}} podelement(y)",
     "sub_items_other": "{{count}} podelement(y)",
     "edit_item": "Edytuj element",
-    "delete_item": "Usuń element"
+    "delete_item": "Usuń element",
+    "sub_items_few": "{{count}} podelement(y)",
+    "sub_items_many": "{{count}} podelement(y)"
   },
   "content": {
     "label_attribute_actions": "Akcje atrybutów",
@@ -2910,11 +2908,11 @@
     "surveys": {
       "analytics": {
         "total_responses": "Łączna liczba odpowiedzi",
-        "answer_count_few": "Odpowiedzi{{count}}",
-        "answer_count_many": "Odpowiedzi{{count}}",
         "answer_count_one": "Odpowiedź{{count}}",
         "answer_count_other": "Odpowiedzi{{count}}",
-        "no_open_text": "Nie ma jeszcze odpowiedzi w formie otwartego tekstu."
+        "no_open_text": "Nie ma jeszcze odpowiedzi w formie otwartego tekstu.",
+        "answer_count_few": "Odpowiedzi{{count}}",
+        "answer_count_many": "Odpowiedzi{{count}}"
       }
     }
   },
@@ -2986,8 +2984,6 @@
       "active_members": "Aktyw",
       "recipients_reached": "Dotarto do odbiorców",
       "sub_region_coverage": "Zasięg podregionu (ostatnie dni {{days}})",
-      "under_supplied_count_few": "Niedostateczna podaż {{count}}",
-      "under_supplied_count_many": "Niedostateczna podaż {{count}}",
       "under_supplied_count_one": "Niedostateczna podaż {{count}}",
       "under_supplied_count_other": "Niedostateczna podaż {{count}}",
       "sub_region_coverage_aria": "Zasięg subregionu",
@@ -3016,13 +3012,15 @@
       "helper_churn_note": "{{lapsed}} z {{prior}} wcześniej aktywnych pomocników nie rejestrował ostatnio godzin.",
       "helper_churn_aria": "Odpływ pomocników według kategorii",
       "coefficient_drift": "Dryf współczynnika kategorii",
-      "drifting_count_few": "{{count}} dryfuje",
-      "drifting_count_many": "{{count}} dryfuje",
       "drifting_count_one": "{{count}} dryfuje",
       "drifting_count_other": "{{count}} dryfuje",
       "coefficient_drift_note": "Kategorie z dryfem absolutnym > {{threshold}}% są oznaczone. Przejrzyj współczynniki bazowe w edytorze współczynników kategorii.",
       "coefficient_drift_aria": "Dryf współczynnika kategorii",
-      "proactive_alerts": "Proaktywne alerty"
+      "proactive_alerts": "Proaktywne alerty",
+      "under_supplied_count_few": "Niedostateczna podaż {{count}}",
+      "under_supplied_count_many": "Niedostateczna podaż {{count}}",
+      "drifting_count_few": "{{count}} dryfuje",
+      "drifting_count_many": "{{count}} dryfuje"
     },
     "empty": {
       "value": "-"
@@ -3119,10 +3117,10 @@
         "resolution_trend_6m": "Trend rozdzielczości, ostatnie 6 miesięcy"
       },
       "units": {
-        "days_count_few": "{{count}} dni",
-        "days_count_many": "{{count}} dni",
         "days_count_one": "{{count}} dni",
-        "days_count_other": "{{count}} dni"
+        "days_count_other": "{{count}} dni",
+        "days_count_few": "{{count}} dni",
+        "days_count_many": "{{count}} dni"
       },
       "empty_value": "-"
     }
@@ -3134,24 +3132,26 @@
         "sends": "Wysyła",
         "opens": "Otwiera się"
       },
-      "chart_sends_title_few": "{{count}} wysyła",
-      "chart_sends_title_many": "{{count}} wysyła",
       "chart_sends_title_one": "{{count}} wysyła",
       "chart_sends_title_other": "{{count}} wysyła",
-      "chart_opens_title_few": "Otwiera się {{count}}",
-      "chart_opens_title_many": "Otwiera się {{count}}",
       "chart_opens_title_one": "Otwiera się {{count}}",
-      "chart_opens_title_other": "Otwiera się {{count}}"
+      "chart_opens_title_other": "Otwiera się {{count}}",
+      "chart_sends_title_few": "{{count}} wysyła",
+      "chart_sends_title_many": "{{count}} wysyła",
+      "chart_opens_title_few": "Otwiera się {{count}}",
+      "chart_opens_title_many": "Otwiera się {{count}}"
     }
   },
-  "submit_error": "Nie udało się przesłać. Spróbuj ponownie.",
-  "submitting": "Przedkładający…",
-  "submit": "Składać",
-  "under_25": "Poniżej 25. roku życia",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+",
-  "unknown": "Nieznany"
+  "hours_display_few": "{{count}} godzin",
+  "hours_display_many": "{{count}} godzin",
+  "hours_short_few": "{{count}} g",
+  "hours_short_many": "{{count}} g",
+  "time_credits_short_few": "{{count}}h kredytów",
+  "time_credits_short_many": "{{count}}h kredytów",
+  "time_ago_hours_few": "{{count}}h temu",
+  "time_ago_hours_many": "{{count}}h temu",
+  "time_ago_days_few": "{{count}}d temu",
+  "time_ago_days_many": "{{count}}d temu",
+  "max_characters_few": "maks. {{count}} znaków",
+  "max_characters_many": "maks. {{count}} znaków"
 }

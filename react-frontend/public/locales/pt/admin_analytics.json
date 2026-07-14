@@ -246,9 +246,9 @@
         "unknown": "Desconhecido"
       }
     },
-    "location_marker_title_many": "{{area}}: membros{{count}}",
     "location_marker_title_one": "{{area}}: membros{{count}}",
     "location_marker_title_other": "{{area}}: membros{{count}}",
+    "location_marker_title_many": "{{area}}: membros{{count}}",
     "member_count_many": "Membros{{count}}"
   },
   "search_analytics": {
@@ -275,8 +275,8 @@
     "empty_description": "Nenhuma pesquisa foi registada no período selecionado.",
     "no_trending": "Sem pesquisas em tendência neste período.",
     "no_zero_results": "Sem pesquisas sem resultados neste período — todas as pesquisas encontraram algo.",
-    "count_value_many": "{{count}}×",
     "count_value_one": "{{count}}×",
-    "count_value_other": "{{count}}×"
+    "count_value_other": "{{count}}×",
+    "count_value_many": "{{count}}×"
   }
 }

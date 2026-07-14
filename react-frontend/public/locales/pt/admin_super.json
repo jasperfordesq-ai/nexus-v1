@@ -793,33 +793,33 @@
     "impersonate_user_warning": "A representação registra todas as ações sob a identidade desse usuário. Use somente quando necessário para suporte.",
     "partnerships_tabs_aria": "Filtro de status de parceria da federação",
     "tenant_list_tabs_aria": "Filtro de status de locatário",
-    "tab_with_count_many": "{{label}}({{count}})",
     "tab_with_count_one": "{{label}}({{count}})",
     "tab_with_count_other": "{{label}}({{count}})",
-    "users_count_many": "{{count}} usuários",
     "users_count_one": "{{count}} usuários",
     "users_count_other": "{{count}} usuários",
-    "bulk_users_moved_count_many": "Usuários em massa movidos ({{count}})",
     "bulk_users_moved_count_one": "Usuários em massa movidos ({{count}})",
     "bulk_users_moved_count_other": "Usuários em massa movidos ({{count}})",
-    "bulk_tenants_updated_count_many": "Locatários em massa atualizados ({{count}})",
     "bulk_tenants_updated_count_one": "Locatários em massa atualizados ({{count}})",
     "bulk_tenants_updated_count_other": "Locatários em massa atualizados ({{count}})",
-    "move_n_users_many": "Mover {{count}} usuários",
     "move_n_users_one": "Mover {{count}} usuários",
     "move_n_users_other": "Mover {{count}} usuários",
-    "apply_to_n_tenants_many": "Aplicar a inquilinos {{count}}",
     "apply_to_n_tenants_one": "Aplicar a inquilinos {{count}}",
     "apply_to_n_tenants_other": "Aplicar a inquilinos {{count}}",
-    "bulk_move_confirm_message_with_grant_many": "Mova usuários {{count}} e conceda acesso de superadministrador ao locatário.",
     "bulk_move_confirm_message_with_grant_one": "Mova usuários {{count}} e conceda acesso de superadministrador ao locatário.",
     "bulk_move_confirm_message_with_grant_other": "Mova usuários {{count}} e conceda acesso de superadministrador ao locatário.",
-    "bulk_move_confirm_message_many": "Mover usuário(s) {{count}}.",
     "bulk_move_confirm_message_one": "Mover usuário(s) {{count}}.",
     "bulk_move_confirm_message_other": "Mover usuário(s) {{count}}.",
-    "bulk_update_confirm_message_many": "Aplique esta atualização ao(s) inquilino(s) {{count}}.",
     "bulk_update_confirm_message_one": "Aplique esta atualização ao(s) inquilino(s) {{count}}.",
-    "bulk_update_confirm_message_other": "Aplique esta atualização ao(s) inquilino(s) {{count}}."
+    "bulk_update_confirm_message_other": "Aplique esta atualização ao(s) inquilino(s) {{count}}.",
+    "tab_with_count_many": "{{label}}({{count}})",
+    "users_count_many": "{{count}} usuários",
+    "bulk_users_moved_count_many": "Usuários em massa movidos ({{count}})",
+    "bulk_tenants_updated_count_many": "Locatários em massa atualizados ({{count}})",
+    "move_n_users_many": "Mover {{count}} usuários",
+    "apply_to_n_tenants_many": "Aplicar a inquilinos {{count}}",
+    "bulk_move_confirm_message_with_grant_many": "Mova usuários {{count}} e conceda acesso de superadministrador ao locatário.",
+    "bulk_move_confirm_message_many": "Mover usuário(s) {{count}}.",
+    "bulk_update_confirm_message_many": "Aplique esta atualização ao(s) inquilino(s) {{count}}."
   },
   "tenant_form": {
     "active": "Ativo",
@@ -1025,9 +1025,9 @@
     "whitelisted_tenants_aria": "Inquilinos na lista de permissões",
     "whitelisted_tenants_count": "Inquilinos permitidos ({{count}})",
     "failed_to_load": "Falha ao carregar a lista de permissões",
-    "whitelisted_tenants_count_many": "Inquilinos permitidos ({{count}})",
     "whitelisted_tenants_count_one": "Inquilinos permitidos ({{count}})",
-    "whitelisted_tenants_count_other": "Inquilinos permitidos ({{count}})"
+    "whitelisted_tenants_count_other": "Inquilinos permitidos ({{count}})",
+    "whitelisted_tenants_count_many": "Inquilinos permitidos ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Consultas piloto",
@@ -1124,9 +1124,9 @@
       "months": "{{count}} meses",
       "no": "Não",
       "yes": "Sim",
-      "months_many": "{{count}} meses",
       "months_one": "{{count}} meses",
-      "months_other": "{{count}} meses"
+      "months_other": "{{count}} meses",
+      "months_many": "{{count}} meses"
     },
     "velocity": {
       "avg_to_agreed": "Média a acordada:",
@@ -1134,12 +1134,16 @@
       "avg_to_proposal": "Média da proposta:",
       "days": "{{count}}d",
       "title": "Velocidade do pipeline – média de dias desde o envio da consulta até cada marco:",
-      "days_many": "{{count}}d",
       "days_one": "{{count}}d",
-      "days_other": "{{count}}d"
+      "days_other": "{{count}}d",
+      "days_many": "{{count}}d"
     }
   },
   "events": "Eventos",
+  "exchange_workflow": "Fluxo de trabalho do Exchange",
+  "organisations": "Organizações",
+  "listings": "Listagens",
+  "feed": "Alimentar",
   "groups": "Grupos",
   "gamification": "Gamificação",
   "goals": "Metas",
@@ -1149,9 +1153,5 @@
   "federation": "Federação",
   "wallet": "Carteira",
   "messages": "Mensagens",
-  "dashboard": "Painel",
-  "exchange_workflow": "Fluxo de trabalho do Exchange",
-  "organisations": "Organizações",
-  "listings": "Listagens",
-  "feed": "Alimentar"
+  "dashboard": "Painel"
 }

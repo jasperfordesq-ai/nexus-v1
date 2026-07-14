@@ -127,8 +127,11 @@
     "rule_summary_with_target": "「{{stage}}」に {{count}}日 いる場合 -> {{action}} -> {{target}}",
     "rules_title": "自動化ルール",
     "reviewed": "確認済み",
+    "rule_summary_with_target_one": "「{{stage}}」の場合、{{count}}d -> {{action}} -> {{target}}",
     "rule_summary_with_target_other": "「{{stage}}」に {{count}}日 いる場合 -> {{action}} -> {{target}}",
+    "rule_summary_one": "「{{stage}}」の場合、{{count}}d -> {{action}}",
     "rule_summary_other": "「{{stage}}」に {{count}}日 いる場合 -> {{action}}",
+    "generated_name_one": "{{stage}} から {{count}} 後の {{target}}",
     "generated_name_other": "{{stage}} から {{target}} へ {{count}}日後"
   },
   "employer": {
@@ -164,6 +167,7 @@
     "submit_review": "レビューを送信",
     "no_reviews": "まだレビューはありません",
     "anonymous": "匿名",
+    "meta_description_one": "この雇用主プロフィール、募集中の職種、{{count}} の現在の機会に関するコミュニティ レビューを表示します。",
     "meta_description_other": "{{count}}件の現在の機会から、雇用主のプロフィール、募集中の職務、コミュニティのレビューを表示します。",
     "open_roles_count_other": "{{count}}件の募集中の職務"
   },
@@ -269,6 +273,7 @@
     "not_available": "該当なし",
     "views_tooltip_other": "{{date}}: {{count}}回の閲覧",
     "applications_tooltip_other": "{{week}}: {{count}}件の応募",
+    "based_on_one": "{{count}} の同様のジョブに基づく",
     "based_on_other": "{{count}}件の類似求人に基づく",
     "days_short_value_other": "{{count}}日"
   },
@@ -483,6 +488,7 @@
     "confirm_close": "閉じると、新しいアプリケーションの受信が停止されます。いつでも再度開くことができます。",
     "confirm_reopen_title": "この求人を再開しますか?",
     "confirm_reopen": "再開により求人が再び表示され、応募できるようになります。",
+    "owner_has_applicants_one": "{{count}} の申請者 — 下にスクロールして確認します",
     "owner_has_applicants_other": "{{count}} 応募者 — 下にスクロールして確認してください",
     "views_other": "{{count}} 回覧"
   },
@@ -785,6 +791,7 @@
     "skills_chip": "スキル: {{skills}}",
     "days_ago_other": "{{count}}日前",
     "weeks_ago_other": "{{count}}週間前",
+    "results_count_one": "{{count}} 個の候補が見つかりました",
     "results_count_other": "{{count}} 人の候補が見つかりました"
   },
   "resume_visibility": {

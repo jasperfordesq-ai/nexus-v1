@@ -475,6 +475,7 @@
         "no_partner_activity": "この期間はパートナーによるアクティビティはありません。",
         "top_5_categories": "上位 5 カテゴリ (地理的/アクティビティ分割)",
         "no_category_data": "この期間にはカテゴリ データがありません。",
+        "trusted_total_one": "{{count}} の信頼できる合計。",
         "trusted_total_other": "{{count}} 件の信頼できる合計。"
       },
       "cooperative": {
@@ -493,8 +494,11 @@
         "coordinator_load_desc": "{{pending}} は {{coordinators}} コーディネーター間で保留中です。",
         "future_care_credit_pool": "フューチャーケア信用残高プール",
         "future_care_credit_pool_desc": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。",
+        "member_retention_desc_one": "この期間と以前の同等の期間の両方でアクティブな {{count}} メンバー。",
         "member_retention_desc_other": "{{count}} メンバーは、この期間と以前の同等の期間の両方でアクティブでした。",
+        "reciprocity_rate_desc_one": "{{count}} のサポーターも期間中に何時間も受け取りました。",
         "reciprocity_rate_desc_other": "{{count}} サポーターも期間中に何時間も受け取りました。",
+        "future_care_credit_pool_desc_one": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。",
         "future_care_credit_pool_desc_other": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。"
       },
       "logs_count_other": "{{count}} ログ"

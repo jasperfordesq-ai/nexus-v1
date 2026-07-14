@@ -109,9 +109,9 @@
       "candidates": "No se pudieron cargar candidatos sustitutos",
       "assign": "El sustituto no pudo ser igualado"
     },
-    "skill_matches_many": "Habilidades de combinación{{count}}",
     "skill_matches_one": "Habilidades de combinación{{count}}",
-    "skill_matches_other": "Habilidades de combinación{{count}}"
+    "skill_matches_other": "Habilidades de combinación{{count}}",
+    "skill_matches_many": "Habilidades de combinación{{count}}"
   },
   "providers": {
     "title": "Directorio de proveedores de atención",
@@ -492,7 +492,7 @@
         "maximum_discount_description": "Límite sobre la cantidad del total del pedido que se puede pagar en créditos de tiempo.",
         "save": "Guardar configuración",
         "view_only": "Los usuarios de solo lectura no pueden cambiar la configuración de fidelización.",
-        "per_hour_short": "/ h"
+        "per_hour_short": "/h"
       },
       "ledger": {
         "title": "Canjes recientes",

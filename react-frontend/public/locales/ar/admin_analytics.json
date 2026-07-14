@@ -246,10 +246,10 @@
         "unknown": "مجهول"
       }
     },
-    "location_marker_title_few": "{{area}}: أعضاء{{count}}",
-    "location_marker_title_many": "{{area}}: أعضاء{{count}}",
     "location_marker_title_one": "{{area}}: أعضاء{{count}}",
     "location_marker_title_other": "{{area}}: أعضاء{{count}}",
+    "location_marker_title_few": "{{area}}: أعضاء{{count}}",
+    "location_marker_title_many": "{{area}}: أعضاء{{count}}",
     "location_marker_title_two": "{{area}}: أعضاء{{count}}",
     "location_marker_title_zero": "{{area}}: أعضاء{{count}}",
     "member_count_few": "أعضاء{{count}}",
@@ -281,10 +281,10 @@
     "empty_description": "لم تُسجَّل أي عمليات بحث في الفترة المحددة.",
     "no_trending": "لا توجد عمليات بحث رائجة في هذه الفترة.",
     "no_zero_results": "لا توجد عمليات بحث بدون نتائج في هذه الفترة — كل بحث وجد شيئًا.",
-    "count_value_few": "{{count}}×",
-    "count_value_many": "{{count}}×",
     "count_value_one": "{{count}}×",
     "count_value_other": "{{count}}×",
+    "count_value_few": "{{count}}×",
+    "count_value_many": "{{count}}×",
     "count_value_two": "{{count}}×",
     "count_value_zero": "{{count}}×"
   }

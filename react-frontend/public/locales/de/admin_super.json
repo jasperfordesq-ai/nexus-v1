@@ -1128,6 +1128,10 @@
     }
   },
   "events": "Veranstaltungen",
+  "exchange_workflow": "Exchange-Workflow",
+  "organisations": "Organisationen",
+  "listings": "Einträge",
+  "feed": "Füttern",
   "groups": "Gruppen",
   "gamification": "Gamifizierung",
   "goals": "Ziele",
@@ -1137,9 +1141,5 @@
   "federation": "Föderation",
   "wallet": "Geldbörse",
   "messages": "Nachrichten",
-  "dashboard": "Armaturenbrett",
-  "exchange_workflow": "Exchange-Workflow",
-  "organisations": "Organisationen",
-  "listings": "Einträge",
-  "feed": "Füttern"
+  "dashboard": "Armaturenbrett"
 }

@@ -456,12 +456,12 @@
     "resend_queued_count": "{{count}}erneut gesendet in der Warteschlange",
     "resend_queued_count_plural": "{{count}}in der Warteschlange wird erneut gesendet",
     "template_tabs_aria": "Kategorienfilter für Newsletter-Vorlagen",
-    "resend_queued_count_one": "{{count}}erneut gesendet in der Warteschlange",
-    "resend_queued_count_other": "{{count}}erneut gesendet in der Warteschlange",
     "your_average": "Ihr Durchschnitt",
     "industry_avg": "Branchendurchschnitt",
     "above_benchmark": "Über dem Benchmark",
     "below_benchmark": "Unter dem Benchmark",
+    "resend_queued_count_one": "{{count}}erneut gesendet in der Warteschlange",
+    "resend_queued_count_other": "{{count}}erneut gesendet in der Warteschlange",
     "benchmark_difference": "{{pointSign}}{{pointValue}} Prozentpunkte ({{percentSign}}{{percentValue}} %)"
   },
   "newsletter_form": {

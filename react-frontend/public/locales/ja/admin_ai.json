@@ -238,6 +238,7 @@
         "run_trigger_failed": "実行のトリガーに失敗しました。",
         "run_triggered": "実行がトリガーされました: {{count}} 件の提案が生成されました。",
         "runs_load_failed": "実行のロードに失敗しました。",
+        "run_triggered_one": "実行トリガー: {{count}} プロポーザルが生成されました。",
         "run_triggered_other": "実行がトリガーされました: {{count}} 件の提案が生成されました。"
       }
     },
@@ -306,6 +307,7 @@
         "seed_failed": "シードに失敗しました。",
         "seeded": "シードされた{{count}}のデフォルト・ドキュメント。",
         "updated": "ドキュメントが更新されました。",
+        "seeded_one": "{{count}} のデフォルト ドキュメントがシードされました。",
         "seeded_other": "シードされた{{count}}のデフォルト・ドキュメント。"
       }
     },

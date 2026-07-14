@@ -494,6 +494,7 @@
     "accept_aria": "すべての更新された法的文書に同意して続行する",
     "accepting": "受け入れ中…",
     "accept_continue": "受け入れて続行",
+    "subtitle_other_one": "{{count}} のドキュメントが更新されました。続行するには、内容を確認して同意してください。",
     "subtitle_other_other": "{{count}}の文書が更新されました。続行するには、レビューして受け入れてください。"
   },
   "custom": {

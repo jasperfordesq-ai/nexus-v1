@@ -397,10 +397,10 @@
       "messages": {
         "recomputed": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
         "saved": "Trust tier settings saved.",
-        "recomputed_few": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
-        "recomputed_many": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
         "recomputed_one": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
-        "recomputed_other": "Ponownie obliczono poziomy zaufania dla {{count}} członków."
+        "recomputed_other": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
+        "recomputed_few": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
+        "recomputed_many": "Ponownie obliczono poziomy zaufania dla {{count}} członków."
       },
       "recompute_confirm": "Czy ponownie obliczyć poziomy zaufania dla wszystkich członków? Może to potrwać kilka minut."
     },
@@ -746,22 +746,22 @@
       "approve_success": "Recenzja zatwierdzona.",
       "decline_success": "Recenzja odrzucona.",
       "decision_failed": "Nie udało się zapisać decyzji.",
-      "manual_escalation_note_few": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
-      "manual_escalation_note_many": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
       "manual_escalation_note_one": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
       "manual_escalation_note_other": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
-      "escalated_count_few": "Eskalacja {{count}}",
-      "escalated_count_many": "Eskalacja {{count}}",
       "escalated_count_one": "Eskalacja {{count}}",
       "escalated_count_other": "Eskalacja {{count}}",
-      "overdue_count_few": "{{count}} spóźniony",
-      "overdue_count_many": "{{count}} spóźniony",
       "overdue_count_one": "{{count}} spóźniony",
       "overdue_count_other": "{{count}} spóźniony",
-      "age_days_few": "{{count}} ma już kilka dni",
-      "age_days_many": "{{count}} ma już kilka dni",
       "age_days_one": "{{count}} ma już kilka dni",
-      "age_days_other": "{{count}} ma już kilka dni"
+      "age_days_other": "{{count}} ma już kilka dni",
+      "manual_escalation_note_few": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
+      "manual_escalation_note_many": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
+      "escalated_count_few": "Eskalacja {{count}}",
+      "escalated_count_many": "Eskalacja {{count}}",
+      "overdue_count_few": "{{count}} spóźniony",
+      "overdue_count_many": "{{count}} spóźniony",
+      "age_days_few": "{{count}} ma już kilka dni",
+      "age_days_many": "{{count}} ma już kilka dni"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -839,14 +839,14 @@
         "resolved": "Rozwiązany",
         "dismissed": "Zwolniony"
       },
-      "age_hours_few": "{{count}}godz",
-      "age_hours_many": "{{count}}godz",
       "age_hours_one": "{{count}}godz",
       "age_hours_other": "{{count}}godz",
-      "age_days_few": "{{count}}D",
-      "age_days_many": "{{count}}D",
       "age_days_one": "{{count}}D",
-      "age_days_other": "{{count}}D"
+      "age_days_other": "{{count}}D",
+      "age_hours_few": "{{count}}godz",
+      "age_hours_many": "{{count}}godz",
+      "age_days_few": "{{count}}D",
+      "age_days_many": "{{count}}D"
     },
     "role_pack": {
       "title": "Wstępne ustawienia ról",
@@ -886,10 +886,10 @@
           "description": "Szybko zatwierdzaj godziny pracy dzięki łatwemu nadzorowi."
         }
       },
-      "available_count_few": "Dostępne wstępne ustawienia ról {{count}}",
-      "available_count_many": "Dostępne wstępne ustawienia ról {{count}}",
       "available_count_one": "Dostępne wstępne ustawienia ról {{count}}",
-      "available_count_other": "Dostępne wstępne ustawienia ról {{count}}"
+      "available_count_other": "Dostępne wstępne ustawienia ról {{count}}",
+      "available_count_few": "Dostępne wstępne ustawienia ról {{count}}",
+      "available_count_many": "Dostępne wstępne ustawienia ról {{count}}"
     },
     "policy": {
       "title": "Polityka przepływu pracy",
@@ -958,10 +958,10 @@
       "empty": "Nie zarejestrowano jeszcze żadnych przysług.",
       "anonymous": "Anonimowy",
       "unknown": "Nieznany",
-      "total_recorded_few": "Łącznie zarejestrowano {{count}}",
-      "total_recorded_many": "Łącznie zarejestrowano {{count}}",
       "total_recorded_one": "Łącznie zarejestrowano {{count}}",
-      "total_recorded_other": "Łącznie zarejestrowano {{count}}"
+      "total_recorded_other": "Łącznie zarejestrowano {{count}}",
+      "total_recorded_few": "Łącznie zarejestrowano {{count}}",
+      "total_recorded_many": "Łącznie zarejestrowano {{count}}"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1261,10 +1261,10 @@
       "exported": "Wyeksportowana mapa granic",
       "export_failed": "Nie udało się wyeksportować mapy granic"
     },
-    "overrides_count_few": "Zastąpienie {{count}}",
-    "overrides_count_many": "Zastąpienie {{count}}",
     "overrides_count_one": "Zastąpienie {{count}}",
-    "overrides_count_other": "Zastąpienie {{count}}"
+    "overrides_count_other": "Zastąpienie {{count}}",
+    "overrides_count_few": "Zastąpienie {{count}}",
+    "overrides_count_many": "Zastąpienie {{count}}"
   },
   "data_quality": {
     "meta": {
@@ -1302,10 +1302,10 @@
       "count": "{{count}} {{label}}",
       "generated": "Wygenerowano {{date}}",
       "affected": "dotknięty",
-      "count_few": "{{count}} {{label}}",
-      "count_many": "{{count}} {{label}}",
       "count_one": "{{count}} {{label}}",
-      "count_other": "{{count}} {{label}}"
+      "count_other": "{{count}} {{label}}",
+      "count_few": "{{count}} {{label}}",
+      "count_many": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "Do 50 wierszy, których dotyczy problem — rozwiąż lub udokumentuj przed uruchomieniem.",
@@ -1669,26 +1669,26 @@
       "target_hours": "Cel {{hours}}godz",
       "over_by": "Koniec o {{duration}}",
       "left": "Pozostało {{duration}}",
-      "subtitle_few": "{{count}} otwarte — najpierw posortowano naruszenie",
-      "subtitle_many": "{{count}} otwarte — najpierw posortowano naruszenie",
       "subtitle_one": "{{count}} otwarte — najpierw posortowano naruszenie",
       "subtitle_other": "{{count}} otwarte — najpierw posortowano naruszenie",
-      "all_count_few": "Wszystko ({{count}})",
-      "all_count_many": "Wszystko ({{count}})",
       "all_count_one": "Wszystko ({{count}})",
       "all_count_other": "Wszystko ({{count}})",
-      "breached_count_few": "Naruszony ({{count}})",
-      "breached_count_many": "Naruszony ({{count}})",
       "breached_count_one": "Naruszony ({{count}})",
       "breached_count_other": "Naruszony ({{count}})",
-      "at_risk_count_few": "Zagrożone ({{count}})",
-      "at_risk_count_many": "Zagrożone ({{count}})",
       "at_risk_count_one": "Zagrożone ({{count}})",
       "at_risk_count_other": "Zagrożone ({{count}})",
-      "on_track_count_few": "Na dobrej drodze ({{count}})",
-      "on_track_count_many": "Na dobrej drodze ({{count}})",
       "on_track_count_one": "Na dobrej drodze ({{count}})",
-      "on_track_count_other": "Na dobrej drodze ({{count}})"
+      "on_track_count_other": "Na dobrej drodze ({{count}})",
+      "subtitle_few": "{{count}} otwarte — najpierw posortowano naruszenie",
+      "subtitle_many": "{{count}} otwarte — najpierw posortowano naruszenie",
+      "all_count_few": "Wszystko ({{count}})",
+      "all_count_many": "Wszystko ({{count}})",
+      "breached_count_few": "Naruszony ({{count}})",
+      "breached_count_many": "Naruszony ({{count}})",
+      "at_risk_count_few": "Zagrożone ({{count}})",
+      "at_risk_count_many": "Zagrożone ({{count}})",
+      "on_track_count_few": "Na dobrej drodze ({{count}})",
+      "on_track_count_many": "Na dobrej drodze ({{count}})"
     },
     "resolved": {
       "title": "Niedawno rozwiązane (ostatnie 72h)",
@@ -1793,22 +1793,22 @@
       "in_progress": "W toku: {{count}}",
       "decided": "Zdecydowano: {{count}}",
       "blocked": "Zablokowano: {{count}}",
-      "pending_few": "Oczekujące: {{count}}",
-      "pending_many": "Oczekujące: {{count}}",
       "pending_one": "Oczekujące: {{count}}",
       "pending_other": "Oczekujące: {{count}}",
-      "in_progress_few": "W toku: {{count}}",
-      "in_progress_many": "W toku: {{count}}",
       "in_progress_one": "W toku: {{count}}",
       "in_progress_other": "W toku: {{count}}",
-      "decided_few": "Zdecydowano: {{count}}",
-      "decided_many": "Zdecydowano: {{count}}",
       "decided_one": "Zdecydowano: {{count}}",
       "decided_other": "Zdecydowano: {{count}}",
-      "blocked_few": "Zablokowano: {{count}}",
-      "blocked_many": "Zablokowano: {{count}}",
       "blocked_one": "Zablokowano: {{count}}",
-      "blocked_other": "Zablokowano: {{count}}"
+      "blocked_other": "Zablokowano: {{count}}",
+      "pending_few": "Oczekujące: {{count}}",
+      "pending_many": "Oczekujące: {{count}}",
+      "in_progress_few": "W toku: {{count}}",
+      "in_progress_many": "W toku: {{count}}",
+      "decided_few": "Zdecydowano: {{count}}",
+      "decided_many": "Zdecydowano: {{count}}",
+      "blocked_few": "Zablokowano: {{count}}",
+      "blocked_many": "Zablokowano: {{count}}"
     },
     "gate": {
       "closed": "Brama zamknięta - gotowa do uruchomienia",
@@ -1816,10 +1816,10 @@
       "decided_count": "Zdecydowano {{decided}} z {{total}} elementów",
       "blocked_count": "- {{count}} zablokowane",
       "progress_aria": "Postęp dzięki bramce decyzyjnej",
-      "blocked_count_few": "- {{count}} zablokowane",
-      "blocked_count_many": "- {{count}} zablokowane",
       "blocked_count_one": "- {{count}} zablokowane",
-      "blocked_count_other": "- {{count}} zablokowane"
+      "blocked_count_other": "- {{count}} zablokowane",
+      "blocked_count_few": "- {{count}} zablokowane",
+      "blocked_count_many": "- {{count}} zablokowane"
     },
     "fields": {
       "value": "Wartość",
@@ -1965,10 +1965,10 @@
       "title": "Kontakty ({{count}})",
       "empty": "Żadne kontakty nie pasują do bieżących filtrów.",
       "table_aria": "Kontakty pielęgnujące leady",
-      "title_few": "Kontakty ({{count}})",
-      "title_many": "Kontakty ({{count}})",
       "title_one": "Kontakty ({{count}})",
-      "title_other": "Kontakty ({{count}})"
+      "title_other": "Kontakty ({{count}})",
+      "title_few": "Kontakty ({{count}})",
+      "title_many": "Kontakty ({{count}})"
     },
     "table": {
       "name_email": "Imię/e-mail",
@@ -2056,10 +2056,10 @@
       "polished_text": "Wypolerowany tekst",
       "reason": "Powód",
       "reason_placeholder": "Dlaczego ta propozycja zostaje odrzucona?",
-      "character_count_few": "{{count}} / 4000 znaków",
-      "character_count_many": "{{count}} / 4000 znaków",
       "character_count_one": "{{count}} / 4000 znaków",
-      "character_count_other": "{{count}} / 4000 znaków"
+      "character_count_other": "{{count}} / 4000 znaków",
+      "character_count_few": "{{count}} / 4000 znaków",
+      "character_count_many": "{{count}} / 4000 znaków"
     },
     "status": {
       "proposed": "Zaproponowano",
@@ -2327,10 +2327,10 @@
       "blocked_title": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
       "blocked_title_plural": "Nie można jeszcze uruchomić – pozostały {{count}} blokery",
       "blocked_body": "Rozwiąż każdą sekcję poniżej, zanim przycisk uruchamiania zostanie włączony.",
-      "blocked_title_few": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
-      "blocked_title_many": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
       "blocked_title_one": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
-      "blocked_title_other": "Nie można jeszcze uruchomić — pozostała blokada {{count}}"
+      "blocked_title_other": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
+      "blocked_title_few": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
+      "blocked_title_many": "Nie można jeszcze uruchomić — pozostała blokada {{count}}"
     },
     "overall": {
       "ready": "Pilot jest gotowy do startu",
@@ -2380,10 +2380,10 @@
       "unexpected_response": "Raport gotowości do uruchomienia zwrócił nieoczekiwaną odpowiedź.",
       "unavailable_title": "Raport gotowości niedostępny"
     },
-    "more_count_few": "+{{count}} więcej",
-    "more_count_many": "+{{count}} więcej",
     "more_count_one": "+{{count}} więcej",
-    "more_count_other": "+{{count}} więcej"
+    "more_count_other": "+{{count}} więcej",
+    "more_count_few": "+{{count}} więcej",
+    "more_count_many": "+{{count}} więcej"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2526,12 +2526,12 @@
       "rendered_markdown": "Renderowane Markdown ({{count}} znaków)",
       "missing_placeholder_count_one": "Brak {{count}} symbolu zastępczego",
       "missing_placeholder_count_other": "Brak {{count}} symboli zastępczych",
+      "rendered_markdown_one": "Renderowane Markdown ({{count}} znaków)",
+      "rendered_markdown_other": "Renderowane Markdown ({{count}} znaków)",
       "placeholder_count_few": "{{count}} symbole zastępcze",
       "placeholder_count_many": "{{count}} symbole zastępcze",
       "rendered_markdown_few": "Renderowane Markdown ({{count}} znaków)",
       "rendered_markdown_many": "Renderowane Markdown ({{count}} znaków)",
-      "rendered_markdown_one": "Renderowane Markdown ({{count}} znaków)",
-      "rendered_markdown_other": "Renderowane Markdown ({{count}} znaków)",
       "missing_placeholder_count_few": "Brak {{count}} symboli zastępczych",
       "missing_placeholder_count_many": "Brak {{count}} symboli zastępczych"
     },
@@ -2644,10 +2644,10 @@
       "candidates": "{{count}} kandydatów",
       "empty": "W tej chwili brak odpowiednich kandydatów.",
       "table_aria": "Wyselekcjonowani kandydaci szturchają",
-      "candidates_few": "{{count}} kandydatów",
-      "candidates_many": "{{count}} kandydatów",
       "candidates_one": "{{count}} kandydatów",
-      "candidates_other": "{{count}} kandydatów"
+      "candidates_other": "{{count}} kandydatów",
+      "candidates_few": "{{count}} kandydatów",
+      "candidates_many": "{{count}} kandydatów"
     },
     "recent": {
       "title": "Ostatnie szturchnięcia",
@@ -2678,14 +2678,14 @@
       "dry_run": "Próba próbna: {{count}} kwalifikujący się kandydaci",
       "dispatched": "Wysłano {{count}} podpowiedzi",
       "dispatch_failed": "Wysyłka nie powiodła się",
-      "dry_run_few": "Próba próbna: {{count}} kwalifikujący się kandydaci",
-      "dry_run_many": "Próba próbna: {{count}} kwalifikujący się kandydaci",
       "dry_run_one": "Próba próbna: {{count}} kwalifikujący się kandydaci",
       "dry_run_other": "Próba próbna: {{count}} kwalifikujący się kandydaci",
-      "dispatched_few": "Wysłano {{count}} podpowiedzi",
-      "dispatched_many": "Wysłano {{count}} podpowiedzi",
       "dispatched_one": "Wysłano {{count}} podpowiedzi",
-      "dispatched_other": "Wysłano {{count}} podpowiedzi"
+      "dispatched_other": "Wysłano {{count}} podpowiedzi",
+      "dry_run_few": "Próba próbna: {{count}} kwalifikujący się kandydaci",
+      "dry_run_many": "Próba próbna: {{count}} kwalifikujący się kandydaci",
+      "dispatched_few": "Wysłano {{count}} podpowiedzi",
+      "dispatched_many": "Wysłano {{count}} podpowiedzi"
     }
   },
   "sub_regions": {

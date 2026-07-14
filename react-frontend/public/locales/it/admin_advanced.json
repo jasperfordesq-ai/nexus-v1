@@ -67,14 +67,14 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
   },
   "advanced": {
     "loading": "Loading",
-    "health_loading": "Loading algorithm health...",
+    "health_loading": "Caricamento integrità dell'algoritmo...",
     "404_entry_dismissed": "404 voce respinta",
     "a_i_settings_saved_successfully": "Impostazioni AI salvate correttamente",
     "active_provider": "Fornitore attivo",
@@ -483,48 +483,48 @@
       },
       "description": "Snapshot sottoposti a rendering del server solo per bot. Monitora la copertura, rileva i problemi obsoleti e forza gli aggiornamenti.",
       "guide": {
-        "title": "Plain-English guide",
-        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "title": "Guida in inglese semplice",
+        "intro": "Il motore di prerendering crea copie HTML salvate di pagine pubbliche per motori di ricerca e anteprime social. I membri utilizzano la normale app; queste istantanee sono solo per i crawler.",
         "bot_only": {
-          "title": "What gets rendered",
-          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+          "title": "Cosa viene renderizzato",
+          "body": "Pagine del tenant pubblico, ad esempio pagine Informazioni, elenchi, post di blog e gruppi pubblici. Le aree private dei membri non dovrebbero essere renderizzate."
         },
         "tenant_scope": {
-          "title": "Tenant safety",
-          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+          "title": "Sicurezza degli inquilini",
+          "body": "Quando una pagina appartiene a un tenant, le azioni dovrebbero includere lo slug del tenant. Il motore ora controlla il percorso dell'host e del tenant prima di toccare gli snapshot."
         },
         "dry_run": {
-          "title": "Preview first",
-          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+          "title": "Prima l'anteprima",
+          "body": "Un test mostra cosa accadrebbe senza eliminare file o mettere in coda il lavoro. Utilizzarlo prima delle azioni di eliminazione o riparazione."
         },
         "repair": {
-          "title": "Repair stuck queue",
-          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+          "title": "Ripara la coda bloccata",
+          "body": "Non si tratta di un ripristino del contenuto. Rilascia solo i lavori che sembrano abbandonati e consente al lavoratore di riprendere dopo ripetuti fallimenti."
         }
       },
       "workflows": {
-        "title": "What are you trying to do?",
-        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "title": "Cosa stai cercando di fare?",
+        "description": "Inizia con l'attività semplice, quindi utilizza la scheda che si apre. Ciò mantiene il lavoro di routine lontano dai controlli rischiosi.",
         "open": "Open",
         "refresh_one_tenant": {
-          "title": "Refresh one tenant",
-          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+          "title": "Aggiorna un tenant",
+          "body": "Da utilizzare quando il contenuto pubblico è cambiato per una singola comunità. Inserisci lo slug del suo inquilino prima di mettere in coda il lavoro."
         },
         "find_stale_pages": {
-          "title": "Find stale or missing pages",
-          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+          "title": "Trova pagine obsolete o mancanti",
+          "body": "Controlla prima la copertura per vedere quali tenant hanno vecchie istantanee, pagine mancanti o risorse danneggiate."
         },
         "inspect_cache": {
-          "title": "Inspect saved pages",
-          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+          "title": "Esamina le pagine salvate",
+          "body": "Cerca nella cache, ispeziona i tag SEO e memorizza nuovamente gli snapshot selezionati utilizzando percorsi sicuri per il tenant."
         },
         "investigate_failures": {
-          "title": "Investigate failed renders",
-          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+          "title": "Esamina i rendering non riusciti",
+          "body": "Esamina i percorsi nella finestra di backoff prima di riprovare, eliminare o riparare la coda."
         },
         "check_tenant_safety": {
-          "title": "Check one tenant is safe",
-          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+          "title": "Controlla che un inquilino sia al sicuro",
+          "body": "Controlla esattamente cosa dovrebbe avere questo tenant, cosa viene salvato e se eventuali istantanee appartengono altrove."
         }
       },
       "analytics": {
@@ -564,9 +564,9 @@
         },
         "labels": {
           "spoofed_count": "{{count}} falsificato",
-          "spoofed_count_many": "{{count}} falsificato",
           "spoofed_count_one": "{{count}} falsificato",
-          "spoofed_count_other": "{{count}} falsificato"
+          "spoofed_count_other": "{{count}} falsificato",
+          "spoofed_count_many": "{{count}} falsificato"
         },
         "log_summary": "Registro: {{size}} - dal {{time}}",
         "sections": {
@@ -574,9 +574,9 @@
           "hits_by_status": "Hit per stato HTTP",
           "recent_activity": "Attività recente (prima il più recente, l'ultimo {{count}})",
           "top_uris": "I migliori URI (i primi 50 per numero di visite)",
-          "recent_activity_many": "Attività recente (prima il più recente, l'ultimo {{count}})",
           "recent_activity_one": "Attività recente (prima il più recente, l'ultimo {{count}})",
-          "recent_activity_other": "Attività recente (prima il più recente, l'ultimo {{count}})"
+          "recent_activity_other": "Attività recente (prima il più recente, l'ultimo {{count}})",
+          "recent_activity_many": "Attività recente (prima il più recente, l'ultimo {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Hit recenti dei bot",
@@ -593,9 +593,9 @@
           "open_in_inventory": "Apri nell'inventario",
           "refresh": "Aggiorna",
           "refresh_all_stale": "Aggiorna tutto obsoleto ({{count}})",
-          "refresh_all_stale_many": "Aggiorna tutto obsoleto ({{count}})",
           "refresh_all_stale_one": "Aggiorna tutto obsoleto ({{count}})",
-          "refresh_all_stale_other": "Aggiorna tutto obsoleto ({{count}})"
+          "refresh_all_stale_other": "Aggiorna tutto obsoleto ({{count}})",
+          "refresh_all_stale_many": "Aggiorna tutto obsoleto ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -608,9 +608,9 @@
         },
         "confirm": {
           "queue_recache": "Ricocheca della coda per gli inquilini {{count}}?",
-          "queue_recache_many": "Ricocheca della coda per gli inquilini {{count}}?",
           "queue_recache_one": "Ricocheca della coda per gli inquilini {{count}}?",
-          "queue_recache_other": "Ricocheca della coda per gli inquilini {{count}}?"
+          "queue_recache_other": "Ricocheca della coda per gli inquilini {{count}}?",
+          "queue_recache_many": "Ricocheca della coda per gli inquilini {{count}}?"
         },
         "empty": "Nessun inquilino",
         "errors": {
@@ -622,16 +622,16 @@
           "bulk_queued": "Ricoche in coda per i tenant {{count}}",
           "no_stale": "Nessun inquilino stantio: la copertura è sana",
           "tenant_queued": "#{{id}} accodato per {{slug}}",
-          "bulk_queued_many": "Ricoche in coda per i tenant {{count}}",
           "bulk_queued_one": "Ricoche in coda per i tenant {{count}}",
-          "bulk_queued_other": "Ricoche in coda per i tenant {{count}}"
+          "bulk_queued_other": "Ricoche in coda per i tenant {{count}}",
+          "bulk_queued_many": "Ricoche in coda per i tenant {{count}}"
         },
         "summary": {
           "healthy": "Tutti gli inquilini {{count}} sani.",
           "needs_work": "{{needing}} dei tenant {{total}} hanno percorsi mancanti, obsoleti o danneggiati.",
-          "healthy_many": "Tutti gli inquilini {{count}} sani.",
           "healthy_one": "Tutti gli inquilini {{count}} sani.",
-          "healthy_other": "Tutti gli inquilini {{count}} sani."
+          "healthy_other": "Tutti gli inquilini {{count}} sani.",
+          "healthy_many": "Tutti gli inquilini {{count}} sani."
         },
         "table_aria": "Copertura"
       },
@@ -660,12 +660,12 @@
           "drift_dry_run": "Prova di deriva completata",
           "purge_dry_run": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
           "purged_ungated": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
-          "purged_ungated_many": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
           "purged_ungated_one": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
           "purged_ungated_other": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
-          "purge_dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
           "purge_dry_run_one": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
-          "purge_dry_run_other": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati"
+          "purge_dry_run_other": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "purged_ungated_many": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
+          "purge_dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati"
         },
         "no_output": "(nessuna uscita)",
         "purge_ungated": {
@@ -677,12 +677,12 @@
         "result": {
           "deleted": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
           "would_delete": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
-          "would_delete_many": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
           "would_delete_one": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
           "would_delete_other": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
-          "deleted_many": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
           "deleted_one": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
-          "deleted_other": "Snapshot {{count}} eliminati nei tenant {{tenants}}"
+          "deleted_other": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
+          "would_delete_many": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
+          "deleted_many": "Snapshot {{count}} eliminati nei tenant {{tenants}}"
         },
         "title": "Automazione della freschezza"
       },
@@ -715,20 +715,20 @@
           "queue_reset_many": "Reimposta {{count}} righe bloccate; l'interruttore è stato liberato"
         },
         "checks": {
-          "cache_readable": "Cache can be read",
-          "cache_writable": "Cache can be written",
-          "cache_filesystem": "Cache storage",
-          "route_planner": "Tenant route planner",
-          "job_table": "Job queue table",
-          "circuit_breaker": "Circuit breaker",
-          "queue_age": "Queue age",
-          "recent_failures": "Recent failures",
-          "stuck_jobs": "Stuck jobs",
-          "last_successful_pass": "Last successful run",
-          "last_failed_pass": "Last failed run",
-          "sched_prerender-detect-drift": "Drift detector heartbeat",
-          "sched_prerender-auto-recache": "Auto-recache heartbeat",
-          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+          "cache_readable": "La cache può essere letta",
+          "cache_writable": "La cache può essere scritta",
+          "cache_filesystem": "Archiviazione della cache",
+          "route_planner": "Pianificatore del percorso dell'inquilino",
+          "job_table": "Tabella della coda dei lavori",
+          "circuit_breaker": "Interruttore automatico",
+          "queue_age": "Età della coda",
+          "recent_failures": "Fallimenti recenti",
+          "stuck_jobs": "Lavori bloccati",
+          "last_successful_pass": "Ultima corsa riuscita",
+          "last_failed_pass": "Ultima esecuzione non riuscita",
+          "sched_prerender-detect-drift": "Battito cardiaco del rilevatore di deriva",
+          "sched_prerender-auto-recache": "Battito cardiaco con memorizzazione automatica",
+          "sched_prerender-reap-stale": "Battito cardiaco per la pulizia dei lavori obsoleti"
         },
         "issue_count_many": "Problemi di {{count}}"
       },
@@ -745,9 +745,9 @@
           "reload": "Ricaricare",
           "select_all_visible": "Seleziona tutto visibile",
           "select_snapshot": "Selezionare {{path}}",
-          "recache_selected_many": "Memorizza nuovamente nella cache selezionata ({{count}})",
           "recache_selected_one": "Memorizza nuovamente nella cache selezionata ({{count}})",
-          "recache_selected_other": "Memorizza nuovamente nella cache selezionata ({{count}})"
+          "recache_selected_other": "Memorizza nuovamente nella cache selezionata ({{count}})",
+          "recache_selected_many": "Memorizza nuovamente nella cache selezionata ({{count}})"
         },
         "columns": {
           "actions": "Azioni",
@@ -783,9 +783,9 @@
         },
         "messages": {
           "bulk_recache": "Istantanee {{count}} e ricodifica in coda non valide",
-          "bulk_recache_many": "Istantanee {{count}} e ricodifica in coda non valide",
           "bulk_recache_one": "Istantanee {{count}} e ricodifica in coda non valide",
-          "bulk_recache_other": "Istantanee {{count}} e ricodifica in coda non valide"
+          "bulk_recache_other": "Istantanee {{count}} e ricodifica in coda non valide",
+          "bulk_recache_many": "Istantanee {{count}} e ricodifica in coda non valide"
         },
         "inspect": {
           "load_failed": "Non è stato possibile caricare questo snapshot. I dati dell’ispezione precedente sono stati cancellati.",
@@ -821,18 +821,18 @@
           "size": "Misurare",
           "tips": "Suggerimenti ({{count}})",
           "title": "Titolo",
-          "must_fix_many": "È necessario correggere ({{count}})",
           "must_fix_one": "È necessario correggere ({{count}})",
           "must_fix_other": "È necessario correggere ({{count}})",
-          "tips_many": "Suggerimenti ({{count}})",
           "tips_one": "Suggerimenti ({{count}})",
           "tips_other": "Suggerimenti ({{count}})",
-          "asset_references_many": "Riferimenti delle risorse ({{count}})",
           "asset_references_one": "Riferimenti delle risorse ({{count}})",
           "asset_references_other": "Riferimenti delle risorse ({{count}})",
-          "dead_assets_many": "{{count}} morto",
           "dead_assets_one": "{{count}} morto",
-          "dead_assets_other": "{{count}} morto"
+          "dead_assets_other": "{{count}} morto",
+          "must_fix_many": "È necessario correggere ({{count}})",
+          "tips_many": "Suggerimenti ({{count}})",
+          "asset_references_many": "Riferimenti delle risorse ({{count}})",
+          "dead_assets_many": "{{count}} morto"
         },
         "selected": "{{count}} selezionato",
         "status": {
@@ -842,9 +842,9 @@
         },
         "summary": "{{filtered}} degli snapshot {{total}}",
         "table_aria": "Inventario delle istantanee",
-        "selected_many": "{{count}} selezionato",
         "selected_one": "{{count}} selezionato",
-        "selected_other": "{{count}} selezionato"
+        "selected_other": "{{count}} selezionato",
+        "selected_many": "{{count}} selezionato"
       },
       "jobs": {
         "actions": {
@@ -916,9 +916,9 @@
         },
         "result": {
           "invalid": "{{count}} non valido",
-          "invalid_many": "{{count}} non valido",
           "invalid_one": "{{count}} non valido",
-          "invalid_other": "{{count}} non valido"
+          "invalid_other": "{{count}} non valido",
+          "invalid_many": "{{count}} non valido"
         },
         "scope": {
           "all_tenants": "tutti gli inquilini"
@@ -961,9 +961,9 @@
           "supersede": "Sostituire",
           "unknown": "Evento sconosciuto: {{event}}"
         },
-        "summary_many": "Eventi {{count}}",
         "summary_one": "Eventi {{count}}",
-        "summary_other": "Eventi {{count}}"
+        "summary_other": "Eventi {{count}}",
+        "summary_many": "Eventi {{count}}"
       },
       "failures": {
         "columns": {
@@ -989,14 +989,14 @@
         "actions": {
           "reset_all": "Reimposta e ricostruisci tutto",
           "auto_recache": "Auto-recache",
-          "cancel": "Cancel job",
-          "detect_drift": "Detect drift",
-          "enqueue": "Queue refresh",
-          "invalidate": "Invalidate route",
-          "purge": "Delete snapshots",
-          "purge_unexpected": "Clean unexpected snapshots",
-          "reset_breaker": "Reset safety breaker",
-          "reset_queue": "Repair stuck queue"
+          "cancel": "Annulla lavoro",
+          "detect_drift": "Rileva la deriva",
+          "enqueue": "Aggiornamento della coda",
+          "invalidate": "Invalidare il percorso",
+          "purge": "Elimina istantanee",
+          "purge_unexpected": "Pulisci istantanee inaspettate",
+          "reset_breaker": "Ripristinare l'interruttore di sicurezza",
+          "reset_queue": "Ripara la coda bloccata"
         },
         "buttons": {
           "export_csv": "Esporta CSV",
@@ -1030,7 +1030,7 @@
           "denied": "Denied",
           "failed": "Failed"
         },
-        "details_empty": "No extra details"
+        "details_empty": "Nessun dettaglio aggiuntivo"
       },
       "overview": {
         "actions": {
@@ -1060,12 +1060,12 @@
           "healthy": "Salutare",
           "missing": "{{count}} mancante",
           "stale": "{{count}} stantio",
-          "missing_many": "{{count}} mancante",
           "missing_one": "{{count}} mancante",
           "missing_other": "{{count}} mancante",
-          "stale_many": "{{count}} stantio",
           "stale_one": "{{count}} stantio",
-          "stale_other": "{{count}} stantio"
+          "stale_other": "{{count}} stantio",
+          "missing_many": "{{count}} mancante",
+          "stale_many": "{{count}} stantio"
         },
         "hints": {
           "unexpected": "Snapshot salvati al di fuori degli attuali piani delle route dei tenant",
@@ -1079,12 +1079,12 @@
           "no_events": "Nessun evento",
           "prometheus": "Formato testo Prometeo",
           "tenants_routes": "Inquilini {{tenants}} x percorsi {{routes}}",
-          "aging_many": "{{count}} invecchiamento (>7d)",
           "aging_one": "{{count}} invecchiamento (>7d)",
           "aging_other": "{{count}} invecchiamento (>7d)",
-          "active_jobs_many": "{{count}} attivo",
           "active_jobs_one": "{{count}} attivo",
-          "active_jobs_other": "{{count}} attivo"
+          "active_jobs_other": "{{count}} attivo",
+          "aging_many": "{{count}} invecchiamento (>7d)",
+          "active_jobs_many": "{{count}} attivo"
         },
         "kpi": {
           "age_stale": "Età stantia (>14 giorni)",
@@ -1117,37 +1117,37 @@
           "dry_run": "Corsa a secco",
           "preview_purge": "Anteprima dell'eliminazione",
           "purge_now": "Epura adesso",
-          "continue_to_delete": "Continue to live delete"
+          "continue_to_delete": "Continua a vivere elimina"
         },
         "description_middle": "per un segmento di percorso,",
         "description_prefix": "Elimina gli snapshot che corrispondono a un modello glob. Utilizzo",
         "description_suffix": "per qualsiasi discendente. Esempi:",
         "all_tenants_warning": {
-          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
-          "confirm": "I understand this delete applies to every tenant",
-          "title": "All-tenant delete"
+          "body": "Lasciando vuoto lo slug del tenant verranno eliminati gli snapshot corrispondenti in ogni tenant. Questo è solo per la pulizia a livello di piattaforma dopo aver visualizzato in anteprima i file esatti.",
+          "confirm": "Capisco che questa eliminazione si applica a ogni inquilino",
+          "title": "Eliminazione di tutti i tenant"
         },
         "errors": {
-          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "confirm_all_tenants": "Confermare l'eliminazione di tutti i tenant prima di continuare",
           "pattern_required": "Il pattern è obbligatorio (ad esempio /blog/*)",
           "purge_failed": "Eliminazione non riuscita",
-          "preview_required": "Run a matching preview before deleting snapshots.",
-          "confirm_text": "Type {{phrase}} to confirm this live delete."
+          "preview_required": "Esegui un'anteprima corrispondente prima di eliminare gli snapshot.",
+          "confirm_text": "Digita {{phrase}} per confermare questa eliminazione in tempo reale."
         },
         "fields": {
           "pattern": "Modello",
           "tenant_slug": "Lumaca dell'inquilino",
-          "confirm_text": "Type {{phrase}} to confirm"
+          "confirm_text": "Digita {{phrase}} per confermare"
         },
         "messages": {
           "dry_run": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
           "purged": "Istantanee {{count}} eliminate{{job}}",
-          "dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
           "dry_run_one": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
           "dry_run_other": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
-          "purged_many": "Istantanee {{count}} eliminate{{job}}",
           "purged_one": "Istantanee {{count}} eliminate{{job}}",
-          "purged_other": "Istantanee {{count}} eliminate{{job}}"
+          "purged_other": "Istantanee {{count}} eliminate{{job}}",
+          "dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "purged_many": "Istantanee {{count}} eliminate{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* o /elenchi/**",
@@ -1156,21 +1156,21 @@
         "result": {
           "deleted": "Istantanee {{count}} eliminate",
           "would_delete": "Eliminerebbe gli snapshot {{count}}",
-          "would_delete_many": "Eliminerebbe gli snapshot {{count}}",
           "would_delete_one": "Eliminerebbe gli snapshot {{count}}",
           "would_delete_other": "Eliminerebbe gli snapshot {{count}}",
-          "deleted_many": "Istantanee {{count}} eliminate",
           "deleted_one": "Istantanee {{count}} eliminate",
-          "deleted_other": "Istantanee {{count}} eliminate"
+          "deleted_other": "Istantanee {{count}} eliminate",
+          "would_delete_many": "Eliminerebbe gli snapshot {{count}}",
+          "deleted_many": "Istantanee {{count}} eliminate"
         },
         "title": "Eliminazione della cache dei caratteri jolly",
         "preview_gate": {
-          "title": "Preview required before live delete",
-          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
-          "ready_many": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "title": "Anteprima richiesta prima dell'eliminazione live",
+          "required": "Un'eliminazione in tempo reale è bloccata finché non si visualizza in anteprima lo stesso modello di route e ambito tenant.",
+          "ready": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima.",
           "ready_one": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima.",
-          "ready_other": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima."
+          "ready_other": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima.",
+          "ready_many": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
         }
       },
       "ttl_inspector": {
@@ -1198,15 +1198,15 @@
           "days": "{{count}} g",
           "hours": "{{count}} h",
           "minutes": "{{count}} min",
-          "minutes_many": "{{count}} min",
           "minutes_one": "{{count}} min",
           "minutes_other": "{{count}} min",
-          "hours_many": "{{count}} h",
           "hours_one": "{{count}} h",
           "hours_other": "{{count}} h",
-          "days_many": "{{count}} g",
           "days_one": "{{count}} g",
-          "days_other": "{{count}} g"
+          "days_other": "{{count}} g",
+          "minutes_many": "{{count}} min",
+          "hours_many": "{{count}} h",
+          "days_many": "{{count}} g"
         }
       },
       "sitemap_explorer": {
@@ -1217,15 +1217,15 @@
           "dynamic": "{{count}} dinamico",
           "static": "{{count}} statico",
           "total": "{{count}} totale",
-          "static_many": "{{count}} statico",
           "static_one": "{{count}} statico",
           "static_other": "{{count}} statico",
-          "dynamic_many": "{{count}} dinamico",
           "dynamic_one": "{{count}} dinamico",
           "dynamic_other": "{{count}} dinamico",
-          "total_many": "{{count}} totale",
           "total_one": "{{count}} totale",
-          "total_other": "{{count}} totale"
+          "total_other": "{{count}} totale",
+          "static_many": "{{count}} statico",
+          "dynamic_many": "{{count}} dinamico",
+          "total_many": "{{count}} totale"
         },
         "description_prefix": "Scopri esattamente quali percorsi il motore intende eseguire per un inquilino: piano statico (funzionalità/modulo recintato) più i URL dinamici da",
         "description_suffix": "L'operaio drammaturgo visita questo elenco.",
@@ -1258,36 +1258,36 @@
         "inventory": "Inventario",
         "jobs": "Lavori",
         "overview": "Panoramica",
-        "tenant_safety": "Tenant safety"
+        "tenant_safety": "Sicurezza degli inquilini"
       },
       "tabs_aria": "Schede di prerendering",
       "title": "Motore di prerendering",
       "tenant_safety": {
-        "title": "Tenant safety inspector",
-        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "title": "Ispettore per la sicurezza degli inquilini",
+        "description": "Controlla una comunità prima di aggiornare o eliminare qualsiasi cosa. Questa visualizzazione confronta il piano di instradamento del tenant con la cache salvata e spiega il motivo per cui esiste ogni snapshot.",
         "fields": {
-          "tenant_slug": "Tenant slug"
+          "tenant_slug": "Lumaca dell'inquilino"
         },
         "placeholders": {
           "tenant_slug": "hour-timebank"
         },
         "actions": {
-          "inspect": "Inspect tenant",
-          "open_inventory": "Open inventory"
+          "inspect": "Ispezionare l'inquilino",
+          "open_inventory": "Apri l'inventario"
         },
         "errors": {
-          "tenant_required": "Enter a tenant slug first.",
-          "load": "Failed to load tenant safety report."
+          "tenant_required": "Immettere prima uno slug del tenant.",
+          "load": "Impossibile caricare il rapporto sulla sicurezza del locatario."
         },
         "messages": {
-          "loaded": "Loaded safety report for {{slug}}."
+          "loaded": "Rapporto sulla sicurezza caricato per {{slug}}."
         },
         "status": {
-          "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention",
-          "needs_attention_many": "{{count}} item needs attention",
+          "clean": "Nessun problema trovato",
+          "needs_attention": "L'oggetto {{count}} richiede attenzione",
           "needs_attention_one": "L'oggetto {{count}} richiede attenzione",
-          "needs_attention_other": "L'oggetto {{count}} richiede attenzione"
+          "needs_attention_other": "L'oggetto {{count}} richiede attenzione",
+          "needs_attention_many": "{{count}} item needs attention"
         },
         "counts": {
           "expected": "Expected",
@@ -1302,48 +1302,48 @@
         "sections": {
           "attention_limited": "Vengono mostrati {{shown}} dei {{total}} snapshot salvati che richiedono attenzione.",
           "missing_routes": "Route mancanti ({{count}})",
-          "attention": "Items needing attention"
+          "attention": "Articoli che necessitano di attenzione"
         },
-        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
-        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "empty": "Inserisci uno slug del tenant per controllarne il piano di percorso e le istantanee salvate.",
+        "empty_attention": "Questo tenant non presenta snapshot mancanti, obsoleti, danneggiati o imprevisti.",
         "columns": {
           "route": "Route",
           "source": "Source",
           "status": "Status",
-          "why": "Why it is here"
+          "why": "Perché è qui"
         },
         "tables": {
-          "attention_aria": "Tenant snapshot items needing attention"
+          "attention_aria": "Elementi dell'istantanea del tenant che richiedono attenzione"
         },
         "sources": {
-          "static": "Static route",
-          "sitemap": "Sitemap route",
+          "static": "Percorso statico",
+          "sitemap": "Percorso della mappa del sito",
           "unexpected": "Unexpected"
         },
         "badges": {
           "unexpected": "Unexpected",
-          "assets": "Asset issue",
-          "content": "Content stale"
+          "assets": "Problema patrimoniale",
+          "content": "Contenuto obsoleto"
         },
         "reasons": {
-          "sitemap": "Published by this tenant sitemap as public content.",
-          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
-          "always_public": "Always-public tenant route.",
-          "feature_enabled": "Enabled by the {{value}} tenant feature.",
-          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
-          "module_enabled": "Enabled by the {{value}} tenant module.",
-          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
-          "expected": "Expected for this tenant."
+          "sitemap": "Mappa del sito pubblicata da questo tenant come contenuto pubblico.",
+          "unexpected": "Salvato per questo tenant, ma non presente nel set di percorsi statici corrente o nel piano della mappa del sito.",
+          "always_public": "Percorso dell'inquilino sempre pubblico.",
+          "feature_enabled": "Abilitato dalla funzionalità tenant {{value}}.",
+          "feature_disabled": "Richiederebbe la funzionalità tenant {{value}}, che attualmente è disattivata.",
+          "module_enabled": "Abilitato dal modulo tenant {{value}}.",
+          "module_disabled": "Richiederebbe il modulo tenant {{value}}, che attualmente è disattivato.",
+          "expected": "Previsto per questo inquilino."
         },
         "help": {
-          "title": "How to read this",
-          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
-          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
-          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+          "title": "Come leggere questo",
+          "expected": "I percorsi previsti sono le pagine che il motore ritiene che questo tenant debba esporre pubblicamente.",
+          "unexpected": "Gli snapshot imprevisti sono file salvati che non corrispondono più al piano del tenant. Sono gli elementi a più alto rischio da ripulire.",
+          "next_step": "Utilizza prima la pulizia di sola anteprima. Elimina solo dopo che l'anteprima mostra il tenant e i percorsi previsti."
         },
         "cleanup": {
-          "title": "Cleanup available",
-          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+          "title": "Pulizia disponibile",
+          "body": "Gli snapshot imprevisti in genere possono essere rimossi con lo strumento di pulizia in Panoramica. Prima visualizza l'anteprima, quindi applica solo quando l'elenco degli inquilini è corretto."
         },
         "staleness": {
           "fresh": "Fresh",
@@ -1380,251 +1380,251 @@
     "top_matches_for_user_one": "Migliore corrispondenza{{count}}per{{name}}",
     "top_matches_for_user_other": "Le migliori partite{{count}}per{{name}}",
     "next_public": {
-      "title": "Next.js public frontend readiness",
-      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "title": "Disponibilità del frontend pubblico Next.js",
+      "description": "Stato della modalità shadow di sola lettura per il frontend pubblico Next.js. Questa pagina non abilita il routing pubblico né modifica il comportamento di prerendering.",
       "refresh": "Refresh",
-      "loading": "Loading Next.js public frontend readiness",
-      "error": "Next.js readiness could not be loaded.",
+      "loading": "Caricamento della disponibilità del frontend pubblico Next.js",
+      "error": "Non è stato possibile caricare la preparazione di Next.js.",
       "cards": {
         "mode": "Mode",
-        "production_routing": "Production routing",
-        "prerender": "Prerender fallback"
+        "production_routing": "Itinerario di produzione",
+        "prerender": "Prerendering fallback"
       },
       "values": {
-        "shadow_mode": "Shadow mode",
-        "public_traffic_next": "Public traffic is served by Next.js",
-        "public_traffic_not_next": "Public traffic is not served by Next.js",
-        "prerender_retained": "Prerender fallback retained",
-        "prerender_not_retained": "Prerender fallback not retained"
+        "shadow_mode": "Modalità ombra",
+        "public_traffic_next": "Il traffico pubblico è servito da Next.js",
+        "public_traffic_not_next": "Il traffico pubblico non è servito da Next.js",
+        "prerender_retained": "Mantenimento del fallback prerendering",
+        "prerender_not_retained": "Fallback prerendering non mantenuto"
       },
       "route_ownership": {
-        "title": "Route ownership manifest",
-        "next_public": "Next-owned public routes",
-        "vite_private": "Vite-owned private routes"
+        "title": "Manifesto della proprietà del percorso",
+        "next_public": "Vie pubbliche di proprietà successiva",
+        "vite_private": "Percorsi privati ​​di proprietà di Vite"
       },
       "safety": {
-        "title": "Safety checks"
+        "title": "Controlli di sicurezza"
       },
       "route_gates": {
-        "title": "Route cutover gates"
+        "title": "Cancelli di sezionamento del percorso"
       },
       "tenant_resolution": {
-        "title": "Tenant resolution contract",
-        "bootstrap_endpoint": "Bootstrap endpoint",
-        "source_of_truth": "Source of truth",
-        "slug_parameter": "Shared-host slug parameter",
-        "request_host": "Request host",
-        "request_path": "Request path",
-        "bootstrap_request": "Bootstrap request",
-        "origin_forwarding": "Custom-domain Origin forwarding enabled",
-        "no_next_database": "Next.js does not query the database",
-        "next_queries_database": "Next.js database queries detected"
+        "title": "Contratto di risoluzione dell'inquilino",
+        "bootstrap_endpoint": "Endpoint di bootstrap",
+        "source_of_truth": "Fonte della verità",
+        "slug_parameter": "Parametro slug dell'host condiviso",
+        "request_host": "Richiedi host",
+        "request_path": "Richiedi percorso",
+        "bootstrap_request": "Richiesta di bootstrap",
+        "origin_forwarding": "Inoltro origine dominio personalizzato abilitato",
+        "no_next_database": "Next.js non interroga il database",
+        "next_queries_database": "Rilevate query sul database Next.js"
       },
       "tenant_resolution_examples": {
-        "shared_host_slug": "Shared app host with tenant slug",
-        "custom_domain": "Custom tenant domain"
+        "shared_host_slug": "Host dell'app condivisa con slug tenant",
+        "custom_domain": "Dominio tenant personalizzato"
       },
       "tenant_resolution_route_statuses": {
-        "public": "Public Laravel GET route",
+        "public": "Percorso pubblico Laravel GET",
         "missing": "Laravel route is not registered",
         "auth": "Laravel route requires authentication"
       },
       "edge_canary": {
-        "title": "Edge canary preview",
-        "edge": "Production edge",
-        "routing_flag": "Routing flag",
-        "route_file_status": "Route file status",
-        "config_template": "Config template",
-        "template_exists": "Template exists",
-        "template_missing": "Template missing",
-        "example_only": "Example only",
-        "not_example_only": "Not example only",
-        "included_by_deploy": "Included by deploy",
-        "not_included_by_deploy": "Not included by deploy",
-        "route_audit_title": "Template route audit",
+        "title": "Anteprima del canarino Edge",
+        "edge": "Margine produttivo",
+        "routing_flag": "Flag di instradamento",
+        "route_file_status": "Stato del file di instradamento",
+        "config_template": "Modello di configurazione",
+        "template_exists": "Il modello esiste",
+        "template_missing": "Modello mancante",
+        "example_only": "Solo esempio",
+        "not_example_only": "Non solo esempio",
+        "included_by_deploy": "Incluso dalla distribuzione",
+        "not_included_by_deploy": "Non incluso dalla distribuzione",
+        "route_audit_title": "Audit del percorso del modello",
         "exact_path_count": "{{count}} exact paths",
-        "public_only": "Public routes only",
-        "not_public_only": "Not public routes only",
-        "no_private_collisions": "No private-route collisions",
-        "private_collisions": "Private-route collisions detected",
-        "unmatched_template_path": "Unmatched template path: {{path}}",
-        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
-        "routing_flag_on": "Routing flag is enabled",
-        "routing_flag_off": "Routing flag is disabled",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available",
-        "preview_only": "Preview only",
-        "not_preview_only": "Preview mode is not confirmed",
-        "reviewed_config_required": "Reviewed config required",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "public_only": "Solo percorsi pubblici",
+        "not_public_only": "Non solo percorsi pubblici",
+        "no_private_collisions": "Nessuna collisione su percorso privato",
+        "private_collisions": "Rilevate collisioni su percorso privato",
+        "unmatched_template_path": "Percorso del modello senza corrispondenza: {{path}}",
+        "unsupported_rule": "Regola di riscrittura non supportata: {{rule}}",
+        "routing_flag_on": "Il flag di routing è abilitato",
+        "routing_flag_off": "Il flag di routing è disabilitato",
+        "activation_available": "Sono disponibili i controlli di attivazione",
+        "no_activation_control": "Non sono disponibili controlli di attivazione",
+        "preview_only": "Solo anteprima",
+        "not_preview_only": "La modalità di anteprima non è confermata",
+        "reviewed_config_required": "È richiesta la configurazione rivista",
+        "explicit_instruction_required": "Sono necessarie istruzioni di taglio separate"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
       },
       "edge_canary_route_file_statuses": {
-        "not_configured": "No route file configured by this module"
+        "not_configured": "Nessun file di percorso configurato da questo modulo"
       },
       "edge_canary_review_steps": {
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "next_shadow_checks_required": "Next shadow checks required",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover",
+        "next_shadow_checks_required": "Sono necessari i prossimi controlli shadow",
         "react_private_regression_required": "React private-route regression required",
         "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Prerender fallback must remain"
+        "prerender_fallback_must_remain": "Il fallback prerendering deve rimanere"
       },
       "edge_canary_guardrails": {
-        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
-        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "do_not_edit_plesk_vhosts_directly": "Non modificare direttamente i vhost di Plesk",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Non abilitare il routing senza istruzioni di cutover esplicite",
+        "public_routes_only": "Solo percorsi pubblici",
+        "do_not_remove_prerender": "Non rimuovere il fallback del prerendering"
       },
       "route_batches": {
-        "title": "Route batch readiness",
+        "title": "Instradare la disponibilità del batch",
         "route_count": "{{count}} routes"
       },
       "remaining_route_work": {
-        "title": "Remaining public route work",
+        "title": "Lavori rimanenti sulla via pubblica",
         "route_count": "{{count}} routes",
         "public_routes": "{{count}} public route",
         "public_routes_plural": "{{count}} public routes",
-        "api_backed_routes": "{{count}} API-backed route",
-        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "api_backed_routes": "{{count}} Route supportata da API",
+        "api_backed_routes_plural": "{{count}} Route supportate da API",
         "remaining_routes": "{{count}} route remaining",
         "remaining_routes_plural": "{{count}} routes remaining",
         "unclassified_routes": "{{count}} unclassified route",
         "unclassified_routes_plural": "{{count}} unclassified routes",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls"
+        "activation_available": "Sono disponibili i controlli di attivazione",
+        "activation_unavailable": "Nessun controllo di attivazione"
       },
       "remaining_route_work_groups": {
-        "static_manual_review": "Static/manual-review routes",
-        "auth_only_backend": "Auth-only backend routes",
-        "backend_contract_missing": "Backend contract gaps",
-        "unclassified_manifest_only": "Unclassified manifest-only routes"
+        "static_manual_review": "Percorsi di revisione statica/manuale",
+        "auth_only_backend": "Percorsi di backend di sola autenticazione",
+        "backend_contract_missing": "Lacune contrattuali nel backend",
+        "unclassified_manifest_only": "Percorsi solo manifest non classificati"
       },
       "remaining_route_work_reasons": {
-        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
-        "authoritative_static_content_missing": "Authoritative static content source missing",
-        "existing_backend_requires_auth": "Existing backend requires authentication",
-        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
-        "route_params_do_not_match_public_api": "Route params do not match a public API",
-        "manifest_only_unclassified": "Manifest-only route not classified yet"
+        "static_or_tenant_bootstrap": "Contenuto statico o bootstrap del tenant",
+        "authoritative_static_content_missing": "Manca la fonte di contenuto statico autorevole",
+        "existing_backend_requires_auth": "Il backend esistente richiede l'autenticazione",
+        "public_api_would_expand_auth_scope": "L'API pubblica espanderebbe una superficie di contenuti di sola autenticazione",
+        "route_params_do_not_match_public_api": "I parametri della route non corrispondono a un'API pubblica",
+        "manifest_only_unclassified": "Percorso solo manifesto non ancora classificato"
       },
       "remaining_route_work_actions": {
-        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
-        "publish_authoritative_content_source": "Publish an authoritative content source",
-        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
-        "public_visibility_decision_required": "Decide what content is safe to make public",
-        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
-        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
-        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+        "manual_no_js_shadow_review": "Esegui la revisione shadow manuale senza JavaScript",
+        "publish_authoritative_content_source": "Pubblica una fonte di contenuto autorevole",
+        "keep_vite_or_prerender_until_public_contract": "Mantieni Vite o prerender finché non esiste un contratto pubblico",
+        "public_visibility_decision_required": "Decidi quali contenuti è sicuro rendere pubblici",
+        "privacy_review_required_before_public_api": "Completa la revisione della privacy prima di aggiungere un'API pubblica",
+        "add_public_laravel_api_with_tests": "Aggiungi un'API Laravel pubblica con test",
+        "classify_route_before_cutover": "Classificare la proprietà del percorso e il contratto di backend prima del cutover"
       },
       "remaining_route_work_guardrails": {
-        "route_status_has_no_production_effect": "Route status has no production effect",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+        "route_status_has_no_production_effect": "Lo stato del percorso non ha alcun effetto sulla produzione",
+        "do_not_promote_auth_only_routes": "Non promuovere percorsi di sola autenticazione"
       },
       "dry_runs": {
-        "title": "Pre-cutover dry-run checks",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "title": "Controlli a secco pre-taglio",
+        "activation_available": "Sono disponibili i controlli di attivazione",
+        "activation_unavailable": "Nessun controllo di attivazione",
+        "explicit_instruction_required": "Sono necessarie istruzioni di taglio separate"
       },
       "dry_run_items": {
-        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
-        "remaining_static_manual_review": "Platform legal content review",
-        "auth_only_public_contract_review": "Auth-only public contract review",
-        "private_vite_regression": "Private Vite regression",
-        "inertness_guard": "Production inertness guard"
+        "shadow_manifest_and_html": "Manifest shadow e HTML senza JS",
+        "remaining_static_manual_review": "Revisione legale dei contenuti della piattaforma",
+        "auth_only_public_contract_review": "Revisione dei contratti pubblici di sola autenticazione",
+        "private_vite_regression": "Regressione della vite privata",
+        "inertness_guard": "Protezione dall'inerzia della produzione"
       },
       "dry_run_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "authoritative_content_source_required": "Authoritative content source required",
-        "public_visibility_decision_required": "Public visibility decision required",
-        "privacy_review_required_before_public_api": "Privacy review required before public API",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manual_verification_required": "È richiesta la verifica manuale",
+        "route_parity_required": "Parità del percorso richiesta",
+        "authoritative_content_source_required": "È richiesta una fonte di contenuto autorevole",
+        "public_visibility_decision_required": "È necessaria una decisione sulla visibilità pubblica",
+        "privacy_review_required_before_public_api": "È richiesta la revisione della privacy prima dell'API pubblica",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover"
       },
       "dry_run_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "shadow_only": "Solo ombra",
+        "no_activation_control": "Nessun controllo di attivazione",
+        "do_not_promote_auth_only_routes": "Non promuovere percorsi di sola autenticazione",
+        "vite_private_routes_remain_primary": "Le rotte private Vite rimangono primarie",
+        "do_not_remove_prerender": "Non rimuovere il fallback del prerendering"
       },
       "artifacts": {
-        "title": "Cutover artifact inventory",
+        "title": "Inventario degli artefatti tagliati",
         "path": "Path",
         "present": "Present",
         "missing": "Missing",
-        "required_commands": "Required commands",
-        "required_before_cutover": "Required before cutover",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls"
+        "required_commands": "Comandi richiesti",
+        "required_before_cutover": "Richiesto prima del cutover",
+        "activation_available": "Sono disponibili i controlli di attivazione",
+        "no_activation_control": "Nessun controllo di attivazione"
       },
       "artifact_items": {
-        "route_ownership_manifest": "Route ownership manifest",
-        "content_sources_manifest": "Content sources manifest",
-        "apache_canary_template": "Edge canary template",
-        "shadow_compose_profile": "Shadow Compose profile",
-        "routing_flag_config": "Routing flag config",
-        "prerender_fallback": "Prerender fallback"
+        "route_ownership_manifest": "Manifesto della proprietà del percorso",
+        "content_sources_manifest": "Manifesto delle fonti di contenuto",
+        "apache_canary_template": "Modello canarino Edge",
+        "shadow_compose_profile": "Profilo Shadow Compose",
+        "routing_flag_config": "Configurazione flag di routing",
+        "prerender_fallback": "Prerendering fallback"
       },
       "artifact_categories": {
         "manifest": "Manifest",
-        "edge_config": "Edge config",
+        "edge_config": "Configurazione bordo",
         "runtime": "Runtime",
         "guard": "Guard",
         "fallback": "Fallback"
       },
       "production_effects": {
-        "none": "No production effect"
+        "none": "Nessun effetto sulla produzione"
       },
       "cutover_eligibility": {
-        "title": "Cutover eligibility",
-        "eligible": "Eligible for cutover",
-        "blocked": "Not eligible for cutover",
+        "title": "Idoneità al taglio",
+        "eligible": "Idoneo al cutover",
+        "blocked": "Non idoneo per il cutover",
         "public_routes": "{{count}} public routes",
-        "api_backed_public_routes": "{{count}} API-backed public routes",
-        "remaining_public_routes": "{{count}} remaining public routes",
-        "activation_available": "Activation controls available",
-        "activation_unavailable": "No activation controls",
+        "api_backed_public_routes": "{{count}} Route pubbliche supportate da API",
+        "remaining_public_routes": "{{count}} percorsi pubblici rimanenti",
+        "activation_available": "Controlli di attivazione disponibili",
+        "activation_unavailable": "Nessun controllo di attivazione",
         "blockers": "Blockers",
-        "required_actions": "Required actions"
+        "required_actions": "Azioni richieste"
       },
       "cutover_eligibility_blockers": {
-        "manifest_validation_blocked": "Manifest validation is blocked",
-        "remaining_public_route_work": "Remaining public route work is incomplete",
-        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "route_parity_required": "Route parity is still required",
-        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manifest_validation_blocked": "La convalida del manifest è bloccata",
+        "remaining_public_route_work": "I restanti lavori sulla strada pubblica sono incompleti",
+        "edge_canary_template_audit_blocked": "Il controllo del modello Edge Canary è bloccato",
+        "edge_routes_not_configured": "I percorsi del perimetro di produzione non sono configurati",
+        "route_parity_required": "La parità del percorso è ancora richiesta",
+        "routing_flag_enabled_before_cutover": "Il flag di routing è abilitato prima del cutover",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover"
       },
       "cutover_eligibility_actions": {
-        "complete_remaining_public_route_work": "Complete remaining public route work",
-        "run_shadow_verification": "Run shadow verification",
-        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
-        "keep_prerender_fallback": "Keep prerender fallback"
+        "complete_remaining_public_route_work": "Completare i restanti lavori sulla strada pubblica",
+        "run_shadow_verification": "Esegui la verifica dell'ombra",
+        "prepare_reviewed_edge_config_after_instruction": "Preparare la configurazione edge rivista solo dopo aver ricevuto istruzioni",
+        "keep_prerender_fallback": "Mantieni il fallback del prerendering"
       },
       "route_batch_names": {
-        "foundation_public_pages": "Foundation public pages",
-        "api_backed_public_content": "API-backed public content",
-        "vite_private_retained": "Vite private routes retained"
+        "foundation_public_pages": "Pagine pubbliche della Fondazione",
+        "api_backed_public_content": "Contenuti pubblici supportati da API",
+        "vite_private_retained": "Vite percorsi privati ​​mantenuti"
       },
       "route_batch_blockers": {
-        "manual_shadow_review_required": "Manual shadow review required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "public_api_parity_required": "Public API parity required"
+        "manual_shadow_review_required": "È richiesta la revisione manuale delle shadow",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover",
+        "public_api_parity_required": "È richiesta la parità dell'API pubblica"
       },
       "route_gate_blockers": {
-        "parity_test_required": "Parity test required"
+        "parity_test_required": "È richiesto il test di parità"
       },
       "safety_checks": {
-        "route_cutover_disabled": "Public route cutover remains disabled",
-        "prerender_retained": "Current prerender fallback remains retained",
-        "vite_private_routes_retained": "Private Vite route ownership remains retained",
-        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "route_cutover_disabled": "L'interruzione del percorso pubblico rimane disabilitata",
+        "prerender_retained": "L'attuale fallback prerendering rimane mantenuto",
+        "vite_private_routes_retained": "La proprietà del percorso Vite privato rimane mantenuta",
+        "public_edge_not_configured": "Per Next.js non è configurata alcuna route perimetrale di produzione",
         "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+        "parity_tests_required_before_cutover": "I test di parità sono ancora necessari prima di qualsiasi cutover"
       },
       "statuses": {
         "pass": "Pass",
@@ -1634,131 +1634,131 @@
         "blocked": "Blocked"
       },
       "runtime": {
-        "title": "Shadow runtime",
-        "compose_profile": "Compose profile",
-        "dev_command": "Dev command",
-        "build_command": "Build command",
-        "port_env": "Port environment variable"
+        "title": "Durata dell'ombra",
+        "compose_profile": "Componi il profilo",
+        "dev_command": "Comando sviluppatore",
+        "build_command": "Comando di costruzione",
+        "port_env": "Variabile di ambiente della porta"
       },
       "cutover": {
-        "title": "Remaining live cutover sequence",
-        "verification_commands": "Verification commands"
+        "title": "Sequenza di cutover live rimanente",
+        "verification_commands": "Comandi di verifica"
       },
       "cutover_steps": {
-        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
-        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
-        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
-        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
-        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
-        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+        "verify_next_shadow_build": "Verifica la build shadow di Next.js e il manifest del percorso.",
+        "verify_no_js_public_html": "Esegui controlli HTML senza JavaScript per ogni percorso pubblico.",
+        "verify_private_vite_regression": "Costruisci e controlla la regressione dell'applicazione privata Vite esistente.",
+        "prepare_apache_canary_routes": "Preparare il routing Apache Canary solo per i percorsi pubblici.",
+        "enable_canary_for_public_routes_only": "Abilita un percorso canary per le pagine pubbliche dopo l'approvazione esplicita.",
+        "monitor_and_keep_prerender_fallback": "Monitora le risposte e mantieni il prerender disponibile come fallback finché non viene dimostrata la parità."
       },
       "counts": {
         "public_routes": "{{count}} public routes",
         "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} private edit/create patterns"
+        "private_patterns": "{{count}} modifica/crea pattern privati"
       },
       "validation": {
-        "title": "Manifest validation",
-        "passed": "Manifest validation passed",
-        "blocked": "Manifest validation blocked",
-        "lockfile": "Lockfile pinned",
-        "package_scripts": "Package scripts present",
-        "compose_profile": "Shadow Compose profile present"
+        "title": "Convalida manifesta",
+        "passed": "Convalida del manifest superata",
+        "blocked": "Convalida manifest bloccata",
+        "lockfile": "File di blocco bloccato",
+        "package_scripts": "Script del pacchetto presenti",
+        "compose_profile": "Profilo Shadow Compose presente"
       },
       "validation_issues": {
-        "manifest_missing": "Route ownership manifest is missing.",
-        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
-        "public_route_invalid": "A public route entry is malformed.",
-        "public_route_missing_fields": "A public route is missing required fields.",
-        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
-        "public_route_duplicate_key": "A public route key is duplicated.",
-        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
-        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
-        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
-        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
-        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
-        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
-        "api_backed_route_invalid": "An API-backed route entry is malformed.",
-        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
-        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
-        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
-        "api_backed_route_not_get": "API-backed public routes must use GET.",
-        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
-        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
-        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
-        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
-        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
-        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
-        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+        "manifest_missing": "Manca il manifesto della proprietà della route.",
+        "manifest_not_shadow": "Il manifesto della proprietà della route non è in modalità shadow.",
+        "public_route_invalid": "Il formato di una voce di percorso pubblico non è corretto.",
+        "public_route_missing_fields": "In un percorso pubblico mancano i campi obbligatori.",
+        "public_route_duplicate_pattern": "Un modello di percorso pubblico è duplicato.",
+        "public_route_duplicate_key": "Una chiave di instradamento pubblica è duplicata.",
+        "public_route_collides_with_private_prefix": "Un percorso pubblico entra in collisione con un prefisso di percorso Vite privato.",
+        "public_route_collides_with_private_pattern": "Un percorso pubblico entra in collisione con un modello di percorso Vite privato.",
+        "vite_private_prefix_missing_required": "Manca il prefisso del percorso privato Vite obbligatorio.",
+        "vite_private_pattern_missing_required": "Manca il modello di percorso privato Vite obbligatorio.",
+        "content_sources_not_laravel_api": "Le origini di contenuto devono utilizzare le API pubbliche Laravel.",
+        "content_sources_allow_next_database_queries": "Le origini di contenuto Next.js non devono eseguire query sul database.",
+        "api_backed_route_invalid": "Una voce di route supportata da API non ha un formato corretto.",
+        "api_backed_route_missing_fields": "In una rotta supportata da API mancano i campi obbligatori.",
+        "api_backed_route_duplicate_key": "Una chiave di route supportata da API è duplicata.",
+        "api_backed_route_not_in_manifest": "Nel manifesto della route pubblica manca una route supportata da API.",
+        "api_backed_route_not_get": "Le rotte pubbliche supportate da API devono utilizzare GET.",
+        "api_backed_route_not_laravel_v2_endpoint": "Le rotte supportate da API devono utilizzare endpoint Laravel v2 relativi.",
+        "api_backed_route_private_endpoint": "Le rotte pubbliche supportate da API non devono utilizzare spazi dei nomi Laravel v2 privati.",
+        "api_backed_route_endpoint_not_plain_path": "Gli endpoint del percorso supportato dall'API devono essere percorsi semplici senza stringhe di query o frammenti.",
+        "api_backed_route_endpoint_has_path_traversal": "Gli endpoint della route supportata da API non devono contenere segmenti di attraversamento del percorso.",
+        "api_backed_route_param_mismatch": "I parametri dell'endpoint API devono corrispondere al modello di route pubblica.",
+        "api_backed_route_not_registered": "L'endpoint del percorso supportato da API non è registrato in Laravel.",
+        "api_backed_route_requires_auth": "L'endpoint della route supportata da API richiede l'autenticazione."
       },
       "cutover_gate_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "cutover_not_active": "Cutover is not active",
-        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+        "manual_verification_required": "È richiesta la verifica manuale",
+        "route_parity_required": "Parità del percorso richiesta",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover",
+        "edge_routes_not_configured": "I percorsi del perimetro di produzione non sono configurati",
+        "cutover_not_active": "Il cutover non è attivo",
+        "prerender_fallback_must_remain": "Il fallback del prerendering deve rimanere disponibile"
       },
       "playbook": {
-        "title": "Operator playbook",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available on this page.",
-        "explicit_instruction_required": "Separate cutover instruction required",
-        "no_production_effect": "No production routing change"
+        "title": "Manuale dell'operatore",
+        "activation_available": "Sono disponibili i controlli di attivazione",
+        "no_activation_control": "In questa pagina non sono disponibili controlli di attivazione.",
+        "explicit_instruction_required": "Sono necessarie istruzioni di taglio separate",
+        "no_production_effect": "Nessun cambiamento nel percorso di produzione"
       },
       "playbook_stages": {
-        "verify_shadow_module": "Verify the shadow module locally.",
-        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
-        "run_private_route_regression": "Re-check the existing Vite private application.",
-        "canary_public_routes_only": "Canary public routes only after approval.",
-        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+        "verify_shadow_module": "Verificare il modulo shadow localmente.",
+        "prepare_reviewed_edge_config": "Preparare il routing canary Apache come modifica di sola configurazione rivista.",
+        "run_private_route_regression": "Ricontrolla l'applicazione privata Vite esistente.",
+        "canary_public_routes_only": "Tratte pubbliche delle Canarie solo previa approvazione.",
+        "monitor_with_prerender_fallback": "Monitora le risposte in tempo reale preservando il fallback."
       },
       "playbook_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback.",
-        "rollback_path_required": "Rollback path required"
+        "shadow_only": "Solo ombra",
+        "no_activation_control": "Nessun controllo di attivazione",
+        "explicit_cutover_instruction_required": "Sono necessarie istruzioni esplicite di cutover",
+        "vite_private_routes_remain_primary": "Le rotte private Vite rimangono primarie",
+        "public_routes_only": "Solo percorsi pubblici",
+        "do_not_remove_prerender": "Non rimuovere il fallback del prerendering.",
+        "rollback_path_required": "È richiesto il percorso di rollback"
       }
     },
-    "health_meta_description_length_many": "Caratteri{{count}}(ideale: 150–160)",
     "health_meta_description_length_one": "Caratteri{{count}}(ideale: 150–160)",
     "health_meta_description_length_other": "Caratteri{{count}}(ideale: 150–160)",
-    "health_auto_sitemap_active_count_many": "Attivo: URL{{count}}indicizzati",
     "health_auto_sitemap_active_count_one": "Attivo: URL{{count}}indicizzati",
     "health_auto_sitemap_active_count_other": "Attivo: URL{{count}}indicizzati",
-    "pass_count_many": "{{count}} superato",
     "pass_count_one": "{{count}} superato",
     "pass_count_other": "{{count}} superato",
-    "warning_count_many": "{{count}} avviso",
     "warning_count_one": "{{count}} avviso",
     "warning_count_other": "{{count}} avviso",
-    "fail_count_many": "{{count}}fallisce",
     "fail_count_one": "{{count}}fallisce",
     "fail_count_other": "{{count}}fallisce",
-    "meta_description_count_many": "{{count}}/160 caratteri della meta descrizione",
     "meta_description_count_one": "{{count}}/160 caratteri della meta descrizione",
     "meta_description_count_other": "{{count}}/160 caratteri della meta descrizione",
-    "global_meta_description_count_many": "{{count}}/160 caratteri della meta descrizione globale",
     "global_meta_description_count_one": "{{count}}/160 caratteri della meta descrizione globale",
     "global_meta_description_count_other": "{{count}}/160 caratteri della meta descrizione globale",
-    "passed_count_with_value_many": "{{count}}superato",
     "passed_count_with_value_one": "{{count}}superato",
     "passed_count_with_value_other": "{{count}}superato",
-    "warnings_count_with_value_many": "Avvisi{{count}}",
     "warnings_count_with_value_one": "Avvisi{{count}}",
     "warnings_count_with_value_other": "Avvisi{{count}}",
-    "failed_count_with_value_many": "{{count}}non riuscito",
     "failed_count_with_value_one": "{{count}}non riuscito",
     "failed_count_with_value_other": "{{count}}non riuscito",
-    "match_count_many": "Corrispondenze{{count}}",
-    "top_matches_for_user_many": "Le migliori partite{{count}}per{{name}}",
-    "total_count_many": "Totale: {{count}}",
     "total_count_one": "Totale: {{count}}",
     "total_count_other": "Totale: {{count}}",
-    "score_out_of": "su {{maximum}}"
+    "score_out_of": "su {{maximum}}",
+    "health_meta_description_length_many": "Caratteri{{count}}(ideale: 150–160)",
+    "health_auto_sitemap_active_count_many": "Attivo: URL{{count}}indicizzati",
+    "pass_count_many": "{{count}} superato",
+    "warning_count_many": "{{count}} avviso",
+    "fail_count_many": "{{count}}fallisce",
+    "meta_description_count_many": "{{count}}/160 caratteri della meta descrizione",
+    "global_meta_description_count_many": "{{count}}/160 caratteri della meta descrizione globale",
+    "passed_count_with_value_many": "{{count}}superato",
+    "warnings_count_with_value_many": "Avvisi{{count}}",
+    "failed_count_with_value_many": "{{count}}non riuscito",
+    "match_count_many": "Corrispondenze{{count}}",
+    "top_matches_for_user_many": "Le migliori partite{{count}}per{{name}}",
+    "total_count_many": "Totale: {{count}}"
   },
   "email_deliverability": {
     "title": "Consegnabilità della posta elettronica",
@@ -1798,12 +1798,12 @@
       "unconfirmed": "{{count}} accettato ma non confermato",
       "webhook_confirmed": "Confermato dal webhook del provider",
       "window_days": "Finestra del giorno {{days}}",
-      "unconfirmed_many": "{{count}} accettato ma non confermato",
       "unconfirmed_one": "{{count}} accettato ma non confermato",
       "unconfirmed_other": "{{count}} accettato ma non confermato",
-      "bad_outcomes_many": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
       "bad_outcomes_one": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
-      "bad_outcomes_other": "{{count}} non è riuscito, è stato respinto o è stato soppresso"
+      "bad_outcomes_other": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
+      "unconfirmed_many": "{{count}} accettato ma non confermato",
+      "bad_outcomes_many": "{{count}} non è riuscito, è stato respinto o è stato soppresso"
     },
     "status": {
       "bounced": "Rimbalzato",
@@ -2166,8 +2166,8 @@
       "web": "Web consegnate",
       "recent_failures": "Errori recenti"
     },
-    "trigger_coverage_many": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
     "trigger_coverage_one": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
-    "trigger_coverage_other": "Problemi di {{issues}} nei flussi monitorati di {{count}}"
+    "trigger_coverage_other": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
+    "trigger_coverage_many": "Problemi di {{issues}} nei flussi monitorati di {{count}}"
   }
 }

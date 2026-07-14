@@ -41,6 +41,7 @@
   "page_meta": {
     "title": "AIチャット"
   },
+  "card_wallet_transactions_one": "過去 30 日間の {{count}} トランザクション",
   "card_wallet_transactions_other": "過去30日間の{{count}}件の取引",
   "limits_left_today_other": "{{count}}が今日残っています"
 }

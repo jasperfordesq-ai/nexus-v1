@@ -109,9 +109,9 @@
       "candidates": "Não foi possível carregar candidatos substitutos",
       "assign": "O substituto não pôde ser correspondido"
     },
-    "skill_matches_many": "Habilidades de correspondência{{count}}",
     "skill_matches_one": "Habilidades de correspondência{{count}}",
-    "skill_matches_other": "Habilidades de correspondência{{count}}"
+    "skill_matches_other": "Habilidades de correspondência{{count}}",
+    "skill_matches_many": "Habilidades de correspondência{{count}}"
   },
   "providers": {
     "title": "Diretório de prestadores de cuidados",
@@ -492,7 +492,7 @@
         "maximum_discount_description": "Limite de quanto do total do pedido pode ser pago em créditos de tempo.",
         "save": "Salvar configurações",
         "view_only": "Os usuários somente visualização não podem alterar as configurações de fidelidade.",
-        "per_hour_short": "/ h"
+        "per_hour_short": "/h"
       },
       "ledger": {
         "title": "Resgates recentes",

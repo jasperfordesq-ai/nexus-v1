@@ -125,6 +125,7 @@
       "purchase_error": "何か問題が発生しました。",
       "load_failed": "ロードに失敗しました",
       "load_failed_desc": "XP ショップをロードできませんでした。",
+      "stock_left_one": "{{count}} の在庫が残っています",
       "stock_left_other": "{{count}} の在庫が残っています"
     },
     "loading": "実績をロードしています",
@@ -164,6 +165,7 @@
       "save_failed": "保存に失敗しました",
       "save_failed_desc": "ショーケースを更新できませんでした。",
       "save_error": "何か問題が発生しました。",
+      "select_badges_one": "プロフィールに表示するバッジを最大 5 つ選択します。 ({{count}}/5 が選択されました)",
       "select_badges_other": "プロフィールに表示するバッジを最大 5 つ選択します。 ({{count}}/5 が選択されました)"
     },
     "load_error": "実績のロードに失敗しました。もう一度試してください。"
@@ -272,6 +274,7 @@
       "buddy_action_sent": "バディサポートを送信しました",
       "buddy_action_failed": "バディサポートを送信できませんでした"
     },
+    "streak_label_one": "{{count}} 連続チェックイン",
     "streak_label_other": "{{count}} 連続チェックイン"
   },
   "frequency": {

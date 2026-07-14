@@ -456,16 +456,16 @@
     "resend_queued_count": "Renvoi{{count}}en file d'attente",
     "resend_queued_count_plural": "Renvois{{count}}en file d'attente",
     "template_tabs_aria": "Filtre de catégorie de modèle de newsletter",
-    "subscriber_total_many": "Nombre total d'abonnés à{{count}}",
-    "import_rows_found_many": "Abonné{{count}}trouvé dans CSV",
-    "resend_queued_count_many": "Renvoi{{count}}en file d'attente",
-    "resend_queued_count_one": "Renvoi{{count}}en file d'attente",
-    "resend_queued_count_other": "Renvoi{{count}}en file d'attente",
     "your_average": "Votre moyenne",
     "industry_avg": "Moyenne du secteur",
     "above_benchmark": "Au-dessus de la référence",
     "below_benchmark": "En dessous de la référence",
-    "benchmark_difference": "{{pointSign}}{{pointValue}} points ({{percentSign}}{{percentValue}} %)"
+    "resend_queued_count_one": "Renvoi{{count}}en file d'attente",
+    "resend_queued_count_other": "Renvoi{{count}}en file d'attente",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} points ({{percentSign}}{{percentValue}} %)",
+    "subscriber_total_many": "Nombre total d'abonnés à{{count}}",
+    "import_rows_found_many": "Abonné{{count}}trouvé dans CSV",
+    "resend_queued_count_many": "Renvoi{{count}}en file d'attente"
   },
   "newsletter_form": {
     "ab_test_label": "Test abdominaux",
@@ -907,15 +907,15 @@
     "subject_override_placeholder": "Entrez un remplacement de sujet...",
     "subtitle": "Envoyez cette newsletter à un sous-ensemble ciblé de destinataires.",
     "total_sent": "Total envoyé",
-    "non_openers_count_many": "Destinataire{{count}}qui n'a pas ouvert",
     "non_openers_count_one": "Destinataire{{count}}qui n'a pas ouvert",
     "non_openers_count_other": "Destinataire{{count}}qui n'a pas ouvert",
-    "non_clickers_count_many": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
     "non_clickers_count_one": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
     "non_clickers_count_other": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
-    "preview_recipient_count_desc_many": "Ce renvoi sera envoyé au destinataire de{{count}}",
     "preview_recipient_count_desc_one": "Ce renvoi sera envoyé au destinataire de{{count}}",
-    "preview_recipient_count_desc_other": "Ce renvoi sera envoyé au destinataire de{{count}}"
+    "preview_recipient_count_desc_other": "Ce renvoi sera envoyé au destinataire de{{count}}",
+    "non_openers_count_many": "Destinataire{{count}}qui n'a pas ouvert",
+    "non_clickers_count_many": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
+    "preview_recipient_count_desc_many": "Ce renvoi sera envoyé au destinataire de{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "Ven",
@@ -940,9 +940,9 @@
     "time_period": "Période",
     "title": "Optimiseur de temps d'envoi",
     "top_recommended": "Top Recommended",
-    "days_many": "{{count}}jours",
     "days_one": "{{count}}jours",
     "days_other": "{{count}}jours",
+    "days_many": "{{count}}jours",
     "heatmap_cell_title_many": "{{day}}{{hour}}: Engagement{{count}}"
   },
   "segment_form": {

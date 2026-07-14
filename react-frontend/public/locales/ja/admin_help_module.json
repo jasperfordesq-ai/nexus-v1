@@ -85,6 +85,7 @@
       "caring_community": "思いやりのあるコミュニティ",
       "kiss_agoris": "キス＆アゴリス"
     },
+    "search_placeholder_one": "{{count}} のヘルプ記事を検索...",
     "search_placeholder_other": "{{count}}ヘルプ記事を検索..."
   },
   "help_faqs": {

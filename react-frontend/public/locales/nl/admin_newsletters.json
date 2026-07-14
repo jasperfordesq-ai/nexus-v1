@@ -456,12 +456,12 @@
     "resend_queued_count": "{{count}}opnieuw verzonden in wachtrij",
     "resend_queued_count_plural": "In de wachtrij geplaatste{{count}}wordt opnieuw verzonden",
     "template_tabs_aria": "Categoriefilter voor nieuwsbriefsjabloon",
-    "resend_queued_count_one": "{{count}}opnieuw verzonden in wachtrij",
-    "resend_queued_count_other": "{{count}}opnieuw verzonden in wachtrij",
     "your_average": "Jouw gemiddelde",
     "industry_avg": "Industriegemiddelde",
     "above_benchmark": "Boven de maatstaf",
     "below_benchmark": "Onder de maatstaf",
+    "resend_queued_count_one": "{{count}}opnieuw verzonden in wachtrij",
+    "resend_queued_count_other": "{{count}}opnieuw verzonden in wachtrij",
     "benchmark_difference": "{{pointSign}}{{pointValue}} procentpunt ({{percentSign}}{{percentValue}}%)"
   },
   "newsletter_form": {

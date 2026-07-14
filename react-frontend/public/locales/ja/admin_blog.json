@@ -159,8 +159,11 @@
       "publish": "発行する",
       "publish_confirm_message": "{{count}} が選択した投稿を公開しますか?",
       "publish_confirm_title": "選択した投稿を公開しますか?",
+      "publish_confirm_message_one": "{{count}} 個の選択した投稿を公開しますか?",
       "publish_confirm_message_other": "{{count}} が選択した投稿を公開しますか?",
+      "archive_confirm_message_one": "これにより、{{count}} の投稿が非公開になります。後で再公開することもできます。",
       "archive_confirm_message_other": "これにより、{{count}} 投稿が非公開になります。後で再公開することもできます。",
+      "delete_confirm_message_one": "{{count}} 個の選択した投稿を削除しますか?これを元に戻すことはできません。",
       "delete_confirm_message_other": "{{count}} の選択した投稿を削除しますか?これを元に戻すことはできません。"
     },
     "marketplace": {

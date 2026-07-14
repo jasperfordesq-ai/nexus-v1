@@ -456,11 +456,11 @@
     "resend_queued_count": "キューに登録された{{count}}の再送信",
     "resend_queued_count_plural": "キューに登録された{{count}}が再送信されます",
     "template_tabs_aria": "ニュースレター テンプレート カテゴリ フィルター",
-    "resend_queued_count_other": "キューに登録された{{count}}の再送信",
     "your_average": "あなたの平均",
     "industry_avg": "業界平均",
     "above_benchmark": "ベンチマークを上回る",
     "below_benchmark": "ベンチマークを下回る",
+    "resend_queued_count_other": "キューに登録された{{count}}の再送信",
     "benchmark_difference": "{{pointSign}}{{pointValue}}ポイント（{{percentSign}}{{percentValue}}%）"
   },
   "newsletter_form": {
@@ -902,8 +902,11 @@
     "subject_override_placeholder": "件名のオーバーライドを入力してください...",
     "subtitle": "このニュースレターを対象の受信者の一部に送信します。",
     "total_sent": "送信された合計",
+    "non_openers_count_one": "{{count}} 受信者が開いていませんでした",
     "non_openers_count_other": "開かなかった{{count}}受信者",
+    "non_clickers_count_one": "{{count}} 開封したがクリックしなかった受信者",
     "non_clickers_count_other": "開封したがクリックしなかった{{count}}受信者",
+    "preview_recipient_count_desc_one": "この再送信は {{count}} 受信者に送信されます",
     "preview_recipient_count_desc_other": "この再送信は{{count}}受信者に送信されます"
   },
   "newsletter_send_time": {

@@ -46,6 +46,7 @@
     "outcome": "成果",
     "team_links": "プロジェクトチーム",
     "ideas_count_other": "{{count}} アイデア",
+    "max_ideas_one": "1 人あたり最大 {{count}} 個のアイデア",
     "max_ideas_other": "1人あたり最大 {{count}} アイデア"
   },
   "challenges": {

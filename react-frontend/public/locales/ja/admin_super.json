@@ -795,12 +795,18 @@
     "tenant_list_tabs_aria": "テナントステータスフィルター",
     "tab_with_count_other": "{{label}} ({{count}})",
     "users_count_other": "{{count}} ユーザー",
+    "bulk_users_moved_count_one": "一括ユーザーが移動されました ({{count}})",
     "bulk_users_moved_count_other": "一括ユーザーが移動しました ({{count}})",
+    "bulk_tenants_updated_count_one": "一括テナントが更新されました ({{count}})",
     "bulk_tenants_updated_count_other": "一括テナントが更新されました ({{count}})",
     "move_n_users_other": "{{count}} 人のユーザーを移動する",
+    "apply_to_n_tenants_one": "{{count}} テナントに適用する",
     "apply_to_n_tenants_other": "{{count}} テナントに適用する",
+    "bulk_move_confirm_message_with_grant_one": "{{count}} ユーザーを移動し、テナントのスーパー管理者アクセスを許可します。",
     "bulk_move_confirm_message_with_grant_other": "{{count}} 人のユーザーを移動し、テナントにスーパー管理者アクセスを付与します。",
+    "bulk_move_confirm_message_one": "{{count}} ユーザーを移動します。",
     "bulk_move_confirm_message_other": "{{count}} 人のユーザーを移動します。",
+    "bulk_update_confirm_message_one": "この更新を {{count}} テナントに適用します。",
     "bulk_update_confirm_message_other": "この更新を {{count}} テナントに適用します。"
   },
   "tenant_form": {
@@ -1116,6 +1122,10 @@
     }
   },
   "events": "イベント",
+  "exchange_workflow": "交換ワークフロー",
+  "organisations": "組織",
+  "listings": "リスト",
+  "feed": "餌",
   "groups": "グループ",
   "gamification": "ゲーミフィケーション",
   "goals": "目標",
@@ -1125,9 +1135,5 @@
   "federation": "フェデレーション",
   "wallet": "財布",
   "messages": "メッセージ",
-  "dashboard": "ダッシュボード",
-  "exchange_workflow": "交換ワークフロー",
-  "organisations": "組織",
-  "listings": "リスト",
-  "feed": "餌"
+  "dashboard": "ダッシュボード"
 }

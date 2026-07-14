@@ -456,16 +456,16 @@
     "resend_queued_count": "{{count}}in coda rinviato",
     "resend_queued_count_plural": "{{count}}in coda invia nuovamente",
     "template_tabs_aria": "Filtro categoria modello newsletter",
-    "subscriber_total_many": "Totale iscritti{{count}}",
-    "import_rows_found_many": "Abbonato{{count}}trovato in CSV",
-    "resend_queued_count_many": "{{count}}in coda rinviato",
-    "resend_queued_count_one": "{{count}}in coda rinviato",
-    "resend_queued_count_other": "{{count}}in coda rinviato",
     "your_average": "La tua media",
     "industry_avg": "Media del settore",
     "above_benchmark": "Sopra il benchmark",
     "below_benchmark": "Sotto il punto di riferimento",
-    "benchmark_difference": "{{pointSign}}{{pointValue}} p.p. ({{percentSign}}{{percentValue}}%)"
+    "resend_queued_count_one": "{{count}}in coda rinviato",
+    "resend_queued_count_other": "{{count}}in coda rinviato",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} p.p. ({{percentSign}}{{percentValue}}%)",
+    "subscriber_total_many": "Totale iscritti{{count}}",
+    "import_rows_found_many": "Abbonato{{count}}trovato in CSV",
+    "resend_queued_count_many": "{{count}}in coda rinviato"
   },
   "newsletter_form": {
     "ab_test_label": "Prova addominali",
@@ -907,15 +907,15 @@
     "subject_override_placeholder": "Inserisci un oggetto da sostituire...",
     "subtitle": "Invia questa newsletter a un sottoinsieme mirato di destinatari.",
     "total_sent": "Totale inviato",
-    "non_openers_count_many": "Destinatario{{count}}che non ha aperto",
     "non_openers_count_one": "Destinatario{{count}}che non ha aperto",
     "non_openers_count_other": "Destinatario{{count}}che non ha aperto",
-    "non_clickers_count_many": "Destinatario{{count}}che ha aperto ma non ha fatto clic",
     "non_clickers_count_one": "Destinatario{{count}}che ha aperto ma non ha fatto clic",
     "non_clickers_count_other": "Destinatario{{count}}che ha aperto ma non ha fatto clic",
-    "preview_recipient_count_desc_many": "Questo nuovo invio verrà inviato al destinatario{{count}}",
     "preview_recipient_count_desc_one": "Questo nuovo invio verrà inviato al destinatario{{count}}",
-    "preview_recipient_count_desc_other": "Questo nuovo invio verrà inviato al destinatario{{count}}"
+    "preview_recipient_count_desc_other": "Questo nuovo invio verrà inviato al destinatario{{count}}",
+    "non_openers_count_many": "Destinatario{{count}}che non ha aperto",
+    "non_clickers_count_many": "Destinatario{{count}}che ha aperto ma non ha fatto clic",
+    "preview_recipient_count_desc_many": "Questo nuovo invio verrà inviato al destinatario{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "Ven",
@@ -940,9 +940,9 @@
     "time_period": "Periodo di tempo",
     "title": "Invia ottimizzatore di tempo",
     "top_recommended": "Top Recommended",
-    "days_many": "{{count}}giorni",
     "days_one": "{{count}}giorni",
     "days_other": "{{count}}giorni",
+    "days_many": "{{count}}giorni",
     "heatmap_cell_title_many": "{{day}}{{hour}}: impegno{{count}}"
   },
   "segment_form": {

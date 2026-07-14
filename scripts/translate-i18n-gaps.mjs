@@ -146,6 +146,49 @@ const SIMPLE_NO_TRANSLATE_PATTERNS = [
   /^[a-zA-Z0-9_]+$/,       // single words / identifiers (likely code values)
 ];
 
+// Some user-visible values are intentionally identical in every locale: product
+// names, protocol labels, currency codes, keyboard shortcuts, and other tokens.
+// Keep these explicit so the summary reports actionable translation debt rather
+// than repeatedly sending invariant values to a translation provider.
+const IDENTICAL_VALUE_ALLOWLIST = new Set([
+  '65+',
+  '% MRR',
+  'Ad hoc',
+  'A/B',
+  'AWS ECS / Fargate:',
+  'EUR (€)',
+  'EUR - Euro',
+  'EU (EEA)',
+  'GBP (£)',
+  'Heroku / Render / Fly.io:',
+  'Komunitin (JSON:API)',
+  'Linux / VPS',
+  'Ordnance Survey Places (UK, UPRN)',
+  'OS Places (PSGA)',
+  'Plesk / cPanel / IIS:',
+  'Stiftung für das Alter',
+  'Tandems <->',
+  'Twitter / X',
+  'USD ($)',
+  'application.created, shift.completed, hours.logged',
+  '⌘K',
+]);
+
+// Cognates and borrowed technical terms that are valid translations only in the
+// listed language. Do not broaden these to every locale.
+const LANGUAGE_IDENTICAL_VALUE_ALLOWLIST = {
+  de: new Set(['Status:']),
+  fr: new Set(['Article 9.', 'page.']),
+  nl: new Set([
+    'Ortsteil (district)',
+    'Payload (JSON)',
+    'Score (%)',
+    'Status:',
+    'Tip:',
+    'platform super-admin',
+  ]),
+};
+
 // ── CLI args ─────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
@@ -158,6 +201,7 @@ const USE_GOOGLE = args.includes('--google');
 const nsFilter = args.includes('--namespace') ? args[args.indexOf('--namespace') + 1] : null;
 const langFilter = args.includes('--lang') ? args[args.indexOf('--lang') + 1] : null;
 const SUMMARY_ONLY = args.includes('--summary');
+const SHOW_DETAILS = args.includes('--details');
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -196,6 +240,11 @@ function shouldSkipValue(val) {
   }
   if (SIMPLE_NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
   return false;
+}
+
+function isAllowedIdenticalValue(lang, val) {
+  return IDENTICAL_VALUE_ALLOWLIST.has(val)
+    || LANGUAGE_IDENTICAL_VALUE_ALLOWLIST[lang]?.has(val) === true;
 }
 
 function isTemplateFragment(val) {
@@ -486,7 +535,7 @@ async function main() {
           && !(TRANSLATE_SKIPPED_MISSING && langVal === undefined)) continue;
         const needsTranslation =
           langVal === undefined ||   // missing
-          (!MISSING_ONLY && langVal === enVal) ||       // English fallback (identical to source)
+          (!MISSING_ONLY && langVal === enVal && !isAllowedIdenticalValue(lang, enVal)) ||
           FORCE;                     // --force re-translates everything
 
         if (needsTranslation) {
@@ -500,6 +549,11 @@ async function main() {
 
       if (SUMMARY_ONLY) {
         console.log(`  ${lang}/${file}: ${keysToTranslate.length} gaps`);
+        if (SHOW_DETAILS) {
+          keysToTranslate.forEach(({ key, enVal }) => {
+            console.log(`    ${key}: ${JSON.stringify(enVal)}`);
+          });
+        }
         continue;
       }
 

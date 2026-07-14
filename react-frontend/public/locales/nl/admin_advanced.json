@@ -67,14 +67,14 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
   },
   "advanced": {
     "loading": "Loading",
-    "health_loading": "Loading algorithm health...",
+    "health_loading": "Algoritmestatus laden...",
     "404_entry_dismissed": "404-inzending afgewezen",
     "a_i_settings_saved_successfully": "AI-instellingen succesvol opgeslagen",
     "active_provider": "Actieve aanbieder",
@@ -483,48 +483,48 @@
       },
       "description": "Bot-only server-gerenderde snapshots. Bewaak de dekking, detecteer veroudering en forceer vernieuwingen.",
       "guide": {
-        "title": "Plain-English guide",
-        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "title": "Duidelijke Engelse gids",
+        "intro": "De prerender-engine maakt opgeslagen HTML-kopieën van openbare pagina's voor zoekmachines en sociale previews. Leden gebruiken de normale app; deze snapshots zijn alleen voor crawlers.",
         "bot_only": {
-          "title": "What gets rendered",
-          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+          "title": "Wat wordt weergegeven",
+          "body": "Openbare huurderpagina's, zoals informatiepagina's, vermeldingen, blogposts en openbare groepen. Privé-lidgebieden mogen niet worden weergegeven."
         },
         "tenant_scope": {
-          "title": "Tenant safety",
-          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+          "title": "Veiligheid van huurders",
+          "body": "Wanneer een pagina bij één tenant hoort, moeten acties die tenant-slug omvatten. De engine controleert nu het host- en tenantpad voordat er momentopnamen worden gemaakt."
         },
         "dry_run": {
-          "title": "Preview first",
-          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+          "title": "Eerst een voorbeeld",
+          "body": "Een proefrit laat zien wat er zou gebeuren zonder bestanden te verwijderen of werk in de wachtrij te zetten. Gebruik het vóór reinigings- of reparatieacties."
         },
         "repair": {
-          "title": "Repair stuck queue",
-          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+          "title": "Repareer vastgelopen wachtrij",
+          "body": "Dit is geen inhoudsreset. Er worden alleen taken vrijgegeven die er verlaten uitzien en de werknemer kan weer verdergaan na herhaalde mislukkingen."
         }
       },
       "workflows": {
-        "title": "What are you trying to do?",
-        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "title": "Wat probeer je te doen?",
+        "description": "Begin met de eenvoudige taak en gebruik vervolgens het tabblad dat wordt geopend. Dit houdt routinewerk buiten de risicovolle controles.",
         "open": "Open",
         "refresh_one_tenant": {
-          "title": "Refresh one tenant",
-          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+          "title": "Vernieuw één tenant",
+          "body": "Gebruiken wanneer openbare inhoud voor één community is gewijzigd. Voer de tenant-slug in voordat u het werk in de wachtrij zet."
         },
         "find_stale_pages": {
-          "title": "Find stale or missing pages",
-          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+          "title": "Vind verouderde of ontbrekende pagina's",
+          "body": "Controleer eerst de dekking om te zien welke tenants oude snapshots, ontbrekende pagina's of kapotte assets hebben."
         },
         "inspect_cache": {
-          "title": "Inspect saved pages",
-          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+          "title": "Inspecteer opgeslagen pagina's",
+          "body": "Doorzoek de cache, inspecteer SEO-tags en cache geselecteerde snapshots opnieuw met behulp van tenantveilige routes."
         },
         "investigate_failures": {
-          "title": "Investigate failed renders",
-          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+          "title": "Onderzoek mislukte renders",
+          "body": "Bekijk routes in het uitstelvenster voordat u de wachtrij opnieuw probeert, opschoont of repareert."
         },
         "check_tenant_safety": {
-          "title": "Check one tenant is safe",
-          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+          "title": "Controleer of één huurder veilig is",
+          "body": "Bekijk precies wat deze tenant moet hebben, wat er wordt opgeslagen en of eventuele snapshots ergens anders thuishoren."
         }
       },
       "analytics": {
@@ -704,20 +704,20 @@
           "reset_failed": "Resetten mislukt"
         },
         "checks": {
-          "cache_readable": "Cache can be read",
-          "cache_writable": "Cache can be written",
-          "cache_filesystem": "Cache storage",
-          "route_planner": "Tenant route planner",
-          "job_table": "Job queue table",
-          "circuit_breaker": "Circuit breaker",
-          "queue_age": "Queue age",
-          "recent_failures": "Recent failures",
-          "stuck_jobs": "Stuck jobs",
-          "last_successful_pass": "Last successful run",
-          "last_failed_pass": "Last failed run",
-          "sched_prerender-detect-drift": "Drift detector heartbeat",
-          "sched_prerender-auto-recache": "Auto-recache heartbeat",
-          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+          "cache_readable": "Cache kan worden gelezen",
+          "cache_writable": "Cache kan worden geschreven",
+          "cache_filesystem": "Cache-opslag",
+          "route_planner": "Routeplanner voor huurders",
+          "job_table": "Tabel met taakwachtrijen",
+          "circuit_breaker": "Stroomonderbreker",
+          "queue_age": "Wachtrij leeftijd",
+          "recent_failures": "Recente mislukkingen",
+          "stuck_jobs": "Vastgelopen banen",
+          "last_successful_pass": "Laatste succesvolle run",
+          "last_failed_pass": "Laatste mislukte run",
+          "sched_prerender-detect-drift": "Hartslag van driftdetector",
+          "sched_prerender-auto-recache": "Hartslag automatisch opnieuw ophalen",
+          "sched_prerender-reap-stale": "Hartslag bij het opruimen van verouderde banen"
         }
       },
       "inventory": {
@@ -968,14 +968,14 @@
         "actions": {
           "reset_all": "Alles resetten en opnieuw opbouwen",
           "auto_recache": "Auto-recache",
-          "cancel": "Cancel job",
-          "detect_drift": "Detect drift",
-          "enqueue": "Queue refresh",
-          "invalidate": "Invalidate route",
-          "purge": "Delete snapshots",
-          "purge_unexpected": "Clean unexpected snapshots",
-          "reset_breaker": "Reset safety breaker",
-          "reset_queue": "Repair stuck queue"
+          "cancel": "Taak annuleren",
+          "detect_drift": "Detecteer drift",
+          "enqueue": "Wachtrij vernieuwen",
+          "invalidate": "Route ongeldig maken",
+          "purge": "Verwijder momentopnamen",
+          "purge_unexpected": "Maak onverwachte momentopnamen schoon",
+          "reset_breaker": "Veiligheidsonderbreker resetten",
+          "reset_queue": "Repareer vastgelopen wachtrij"
         },
         "buttons": {
           "export_csv": "CSV exporteren",
@@ -1009,7 +1009,7 @@
           "denied": "Denied",
           "failed": "Failed"
         },
-        "details_empty": "No extra details"
+        "details_empty": "Geen extra details"
       },
       "overview": {
         "actions": {
@@ -1092,27 +1092,27 @@
           "dry_run": "Drooglopen",
           "preview_purge": "Voorbeeld van opschonen",
           "purge_now": "Nu opruimen",
-          "continue_to_delete": "Continue to live delete"
+          "continue_to_delete": "Ga door met live verwijderen"
         },
         "description_middle": "voor één padsegment,",
         "description_prefix": "Verwijder momentopnamen die overeenkomen met een glob-patroon. Gebruik",
         "description_suffix": "voor elke afstammeling. Voorbeelden:",
         "all_tenants_warning": {
-          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
-          "confirm": "I understand this delete applies to every tenant",
-          "title": "All-tenant delete"
+          "body": "Als u de tenant-slug leeg laat, worden overeenkomende momentopnamen voor elke tenant verwijderd. Dit is alleen bedoeld voor het opschonen van het hele platform nadat u een voorbeeld van de exacte bestanden hebt bekeken.",
+          "confirm": "Ik begrijp dat deze verwijdering op elke tenant van toepassing is",
+          "title": "Verwijderen van alle tenants"
         },
         "errors": {
-          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "confirm_all_tenants": "Bevestig het verwijderen van alle tenants voordat u doorgaat",
           "pattern_required": "Patroon is vereist (bijv. /blog/*)",
           "purge_failed": "Opschonen is mislukt",
-          "preview_required": "Run a matching preview before deleting snapshots.",
-          "confirm_text": "Type {{phrase}} to confirm this live delete."
+          "preview_required": "Voer een overeenkomend voorbeeld uit voordat u momentopnamen verwijdert.",
+          "confirm_text": "Typ {{phrase}} om deze live verwijdering te bevestigen."
         },
         "fields": {
           "pattern": "Patroon",
           "tenant_slug": "Huurderslak",
-          "confirm_text": "Type {{phrase}} to confirm"
+          "confirm_text": "Typ {{phrase}} om te bevestigen"
         },
         "messages": {
           "dry_run": "Testrun: {{count}}-snapshots zouden worden verwijderd",
@@ -1136,9 +1136,9 @@
         },
         "title": "Cache met jokertekens leegmaken",
         "preview_gate": {
-          "title": "Preview required before live delete",
-          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "title": "Voorbeeld vereist vóór live verwijderen",
+          "required": "Een live verwijdering is vergrendeld totdat u een voorbeeld van hetzelfde routepatroon en tenantbereik bekijkt.",
+          "ready": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven.",
           "ready_one": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven.",
           "ready_other": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven."
         }
@@ -1222,33 +1222,33 @@
         "inventory": "Inventaris",
         "jobs": "Banen",
         "overview": "Overzicht",
-        "tenant_safety": "Tenant safety"
+        "tenant_safety": "Veiligheid van huurders"
       },
       "tabs_aria": "Tabbladen vooraf renderen",
       "title": "Prerender-engine",
       "tenant_safety": {
-        "title": "Tenant safety inspector",
-        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "title": "Veiligheidsinspecteur huurder",
+        "description": "Controleer één community voordat u iets vernieuwt of verwijdert. In deze weergave wordt het tenantrouteplan vergeleken met de opgeslagen cache en wordt uitgelegd waarom elke momentopname bestaat.",
         "fields": {
-          "tenant_slug": "Tenant slug"
+          "tenant_slug": "Huurderslak"
         },
         "placeholders": {
           "tenant_slug": "hour-timebank"
         },
         "actions": {
-          "inspect": "Inspect tenant",
-          "open_inventory": "Open inventory"
+          "inspect": "Huurder controleren",
+          "open_inventory": "Inventaris openen"
         },
         "errors": {
-          "tenant_required": "Enter a tenant slug first.",
-          "load": "Failed to load tenant safety report."
+          "tenant_required": "Voer eerst een tenant-slug in.",
+          "load": "Kan het veiligheidsrapport van de huurder niet laden."
         },
         "messages": {
-          "loaded": "Loaded safety report for {{slug}}."
+          "loaded": "Geladen veiligheidsrapport voor {{slug}}."
         },
         "status": {
-          "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention",
+          "clean": "Geen problemen gevonden",
+          "needs_attention": "{{count}} item heeft aandacht nodig",
           "needs_attention_one": "{{count}} item heeft aandacht nodig",
           "needs_attention_other": "{{count}} item heeft aandacht nodig"
         },
@@ -1265,48 +1265,48 @@
         "sections": {
           "attention_limited": "Er worden {{shown}} van de {{total}} opgeslagen snapshots weergegeven die aandacht vereisen.",
           "missing_routes": "Ontbrekende routes ({{count}})",
-          "attention": "Items needing attention"
+          "attention": "Items die aandacht nodig hebben"
         },
-        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
-        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "empty": "Voer een tenant-slug in om het routeplan en de opgeslagen momentopnamen te inspecteren.",
+        "empty_attention": "Deze tenant heeft geen ontbrekende, verouderde, kapotte of onverwachte momentopnamen.",
         "columns": {
           "route": "Route",
           "source": "Source",
           "status": "Status",
-          "why": "Why it is here"
+          "why": "Waarom het hier is"
         },
         "tables": {
-          "attention_aria": "Tenant snapshot items needing attention"
+          "attention_aria": "Momentopname-items van de huurder die aandacht behoeven"
         },
         "sources": {
-          "static": "Static route",
-          "sitemap": "Sitemap route",
+          "static": "Statisch traject",
+          "sitemap": "Sitemap-route",
           "unexpected": "Unexpected"
         },
         "badges": {
           "unexpected": "Unexpected",
-          "assets": "Asset issue",
-          "content": "Content stale"
+          "assets": "Probleem met activa",
+          "content": "Inhoud verouderd"
         },
         "reasons": {
-          "sitemap": "Published by this tenant sitemap as public content.",
-          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
-          "always_public": "Always-public tenant route.",
-          "feature_enabled": "Enabled by the {{value}} tenant feature.",
-          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
-          "module_enabled": "Enabled by the {{value}} tenant module.",
-          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
-          "expected": "Expected for this tenant."
+          "sitemap": "Gepubliceerd door deze huurdersitemap als openbare inhoud.",
+          "unexpected": "Opgeslagen voor deze tenant, maar niet aanwezig in de huidige statische routeset of sitemapplan.",
+          "always_public": "Altijd-openbare tenantroute.",
+          "feature_enabled": "Ingeschakeld door de {{value}} tenantfunctie.",
+          "feature_disabled": "Hiervoor is de {{value}}-tenantfunctie vereist, die momenteel is uitgeschakeld.",
+          "module_enabled": "Ingeschakeld door de {{value}} tenantmodule.",
+          "module_disabled": "Hiervoor is de {{value}} tenantmodule vereist, die momenteel is uitgeschakeld.",
+          "expected": "Verwacht voor deze huurder."
         },
         "help": {
-          "title": "How to read this",
-          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
-          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
-          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+          "title": "Hoe dit te lezen",
+          "expected": "Verwachte routes zijn pagina's waarvan de engine vindt dat deze tenant openbaar moet worden gemaakt.",
+          "unexpected": "Onverwachte momentopnamen zijn opgeslagen bestanden die niet langer overeenkomen met het tenantplan. Het zijn de items met het hoogste risico om op te ruimen.",
+          "next_step": "Gebruik eerst het opschonen van alleen het voorbeeld. Verwijder pas nadat de preview de tenant en routes toont die u verwacht."
         },
         "cleanup": {
-          "title": "Cleanup available",
-          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+          "title": "Opruiming beschikbaar",
+          "body": "Onverwachte snapshots kunnen meestal worden verwijderd met de opruimtool in Overzicht. Eerst een voorbeeld bekijken en pas toepassen als de huurderslijst correct is."
         },
         "staleness": {
           "fresh": "Fresh",
@@ -1343,251 +1343,251 @@
     "top_matches_for_user_one": "Top{{count}}-match voor{{name}}",
     "top_matches_for_user_other": "Top{{count}}-wedstrijden voor{{name}}",
     "next_public": {
-      "title": "Next.js public frontend readiness",
-      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "title": "Next.js publieke frontend gereedheid",
+      "description": "Alleen-lezen schaduwmodusstatus voor de openbare frontend Next.js. Deze pagina schakelt geen openbare routering in en wijzigt het pre-rendergedrag niet.",
       "refresh": "Refresh",
-      "loading": "Loading Next.js public frontend readiness",
-      "error": "Next.js readiness could not be loaded.",
+      "loading": "Next.js publieke frontend-gereedheid laden",
+      "error": "De gereedheid voor Next.js kan niet worden geladen.",
       "cards": {
         "mode": "Mode",
-        "production_routing": "Production routing",
-        "prerender": "Prerender fallback"
+        "production_routing": "Productieroutering",
+        "prerender": "Terugval vooraf renderen"
       },
       "values": {
-        "shadow_mode": "Shadow mode",
-        "public_traffic_next": "Public traffic is served by Next.js",
-        "public_traffic_not_next": "Public traffic is not served by Next.js",
-        "prerender_retained": "Prerender fallback retained",
-        "prerender_not_retained": "Prerender fallback not retained"
+        "shadow_mode": "Schaduwmodus",
+        "public_traffic_next": "Openbaar verkeer wordt verzorgd door Next.js",
+        "public_traffic_not_next": "Openbaar verkeer wordt niet bediend door Next.js",
+        "prerender_retained": "Prerender fallback behouden",
+        "prerender_not_retained": "Prerender fallback wordt niet behouden"
       },
       "route_ownership": {
-        "title": "Route ownership manifest",
-        "next_public": "Next-owned public routes",
-        "vite_private": "Vite-owned private routes"
+        "title": "Eigendomsmanifest routeren",
+        "next_public": "Openbare routes van volgende eigenaar",
+        "vite_private": "Privéroutes die eigendom zijn van Vite"
       },
       "safety": {
-        "title": "Safety checks"
+        "title": "Veiligheidscontroles"
       },
       "route_gates": {
-        "title": "Route cutover gates"
+        "title": "Route-overgangspoorten"
       },
       "tenant_resolution": {
-        "title": "Tenant resolution contract",
-        "bootstrap_endpoint": "Bootstrap endpoint",
-        "source_of_truth": "Source of truth",
-        "slug_parameter": "Shared-host slug parameter",
-        "request_host": "Request host",
-        "request_path": "Request path",
-        "bootstrap_request": "Bootstrap request",
-        "origin_forwarding": "Custom-domain Origin forwarding enabled",
-        "no_next_database": "Next.js does not query the database",
-        "next_queries_database": "Next.js database queries detected"
+        "title": "Huurovereenkomst voor ontbinding",
+        "bootstrap_endpoint": "Bootstrap-eindpunt",
+        "source_of_truth": "Bron van waarheid",
+        "slug_parameter": "Slug-parameter voor gedeelde host",
+        "request_host": "Gastheer aanvragen",
+        "request_path": "Pad aanvragen",
+        "bootstrap_request": "Bootstrap-verzoek",
+        "origin_forwarding": "Origin-doorsturen naar aangepast domein ingeschakeld",
+        "no_next_database": "Next.js voert geen query uit op de database",
+        "next_queries_database": "Next.js-databasequery's gedetecteerd"
       },
       "tenant_resolution_examples": {
-        "shared_host_slug": "Shared app host with tenant slug",
-        "custom_domain": "Custom tenant domain"
+        "shared_host_slug": "Gedeelde app-host met tenant-slug",
+        "custom_domain": "Aangepast tenantdomein"
       },
       "tenant_resolution_route_statuses": {
-        "public": "Public Laravel GET route",
+        "public": "Openbare Laravel GET-route",
         "missing": "Laravel route is not registered",
         "auth": "Laravel route requires authentication"
       },
       "edge_canary": {
-        "title": "Edge canary preview",
-        "edge": "Production edge",
-        "routing_flag": "Routing flag",
-        "route_file_status": "Route file status",
-        "config_template": "Config template",
-        "template_exists": "Template exists",
-        "template_missing": "Template missing",
-        "example_only": "Example only",
-        "not_example_only": "Not example only",
-        "included_by_deploy": "Included by deploy",
-        "not_included_by_deploy": "Not included by deploy",
-        "route_audit_title": "Template route audit",
+        "title": "Edge kanarie voorbeeld",
+        "edge": "Productievoordeel",
+        "routing_flag": "Route vlag",
+        "route_file_status": "Status routebestand",
+        "config_template": "Configuratiesjabloon",
+        "template_exists": "Sjabloon bestaat",
+        "template_missing": "Sjabloon ontbreekt",
+        "example_only": "Alleen voorbeeld",
+        "not_example_only": "Niet alleen voorbeeld",
+        "included_by_deploy": "Inbegrepen bij implementatie",
+        "not_included_by_deploy": "Niet inbegrepen bij implementatie",
+        "route_audit_title": "Sjabloonroute-audit",
         "exact_path_count": "{{count}} exact paths",
-        "public_only": "Public routes only",
-        "not_public_only": "Not public routes only",
-        "no_private_collisions": "No private-route collisions",
-        "private_collisions": "Private-route collisions detected",
-        "unmatched_template_path": "Unmatched template path: {{path}}",
-        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
-        "routing_flag_on": "Routing flag is enabled",
-        "routing_flag_off": "Routing flag is disabled",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available",
-        "preview_only": "Preview only",
-        "not_preview_only": "Preview mode is not confirmed",
-        "reviewed_config_required": "Reviewed config required",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "public_only": "Alleen openbare routes",
+        "not_public_only": "Niet alleen openbare routes",
+        "no_private_collisions": "Geen botsingen op privéroutes",
+        "private_collisions": "Botsingen op privéroutes gedetecteerd",
+        "unmatched_template_path": "Ongeëvenaard sjabloonpad: {{path}}",
+        "unsupported_rule": "Niet-ondersteunde herschrijfregel: {{rule}}",
+        "routing_flag_on": "Routeringsvlag is ingeschakeld",
+        "routing_flag_off": "Routeringsvlag is uitgeschakeld",
+        "activation_available": "Er zijn activeringscontroles beschikbaar",
+        "no_activation_control": "Er zijn geen activeringsopties beschikbaar",
+        "preview_only": "Alleen voorbeeld",
+        "not_preview_only": "De voorbeeldmodus is niet bevestigd",
+        "reviewed_config_required": "Beoordeelde configuratie vereist",
+        "explicit_instruction_required": "Afzonderlijke cutover-instructie vereist"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
       },
       "edge_canary_route_file_statuses": {
-        "not_configured": "No route file configured by this module"
+        "not_configured": "Er is geen routebestand geconfigureerd door deze module"
       },
       "edge_canary_review_steps": {
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "next_shadow_checks_required": "Next shadow checks required",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist",
+        "next_shadow_checks_required": "Volgende schaduwcontroles vereist",
         "react_private_regression_required": "React private-route regression required",
         "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Prerender fallback must remain"
+        "prerender_fallback_must_remain": "Prerender fallback moet blijven bestaan"
       },
       "edge_canary_guardrails": {
-        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
-        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "do_not_edit_plesk_vhosts_directly": "Bewerk Plesk-vhosts niet rechtstreeks",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Schakel routering niet in zonder expliciete omschakelinstructie",
+        "public_routes_only": "Alleen openbare routes",
+        "do_not_remove_prerender": "Verwijder prerender fallback niet"
       },
       "route_batches": {
-        "title": "Route batch readiness",
+        "title": "Gereedheid van routebatch",
         "route_count": "{{count}} routes"
       },
       "remaining_route_work": {
-        "title": "Remaining public route work",
+        "title": "Resterende werkzaamheden op de openbare route",
         "route_count": "{{count}} routes",
         "public_routes": "{{count}} public route",
         "public_routes_plural": "{{count}} public routes",
-        "api_backed_routes": "{{count}} API-backed route",
-        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "api_backed_routes": "{{count}} API-ondersteunde route",
+        "api_backed_routes_plural": "{{count}} API-ondersteunde routes",
         "remaining_routes": "{{count}} route remaining",
         "remaining_routes_plural": "{{count}} routes remaining",
         "unclassified_routes": "{{count}} unclassified route",
         "unclassified_routes_plural": "{{count}} unclassified routes",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls"
+        "activation_available": "Er zijn activeringscontroles beschikbaar",
+        "activation_unavailable": "Geen activeringscontroles"
       },
       "remaining_route_work_groups": {
-        "static_manual_review": "Static/manual-review routes",
-        "auth_only_backend": "Auth-only backend routes",
-        "backend_contract_missing": "Backend contract gaps",
-        "unclassified_manifest_only": "Unclassified manifest-only routes"
+        "static_manual_review": "Statische/handmatige beoordelingsroutes",
+        "auth_only_backend": "Alleen-authenticatieroutes",
+        "backend_contract_missing": "Contracthiaten in de backend",
+        "unclassified_manifest_only": "Niet-geclassificeerde routes met alleen manifesten"
       },
       "remaining_route_work_reasons": {
-        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
-        "authoritative_static_content_missing": "Authoritative static content source missing",
-        "existing_backend_requires_auth": "Existing backend requires authentication",
-        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
-        "route_params_do_not_match_public_api": "Route params do not match a public API",
-        "manifest_only_unclassified": "Manifest-only route not classified yet"
+        "static_or_tenant_bootstrap": "Statische of tenant-bootstrap-inhoud",
+        "authoritative_static_content_missing": "Gezaghebbende statische inhoudsbron ontbreekt",
+        "existing_backend_requires_auth": "Voor de bestaande backend is authenticatie vereist",
+        "public_api_would_expand_auth_scope": "De openbare API zou een alleen-authenticatie-inhoudsoppervlak uitbreiden",
+        "route_params_do_not_match_public_api": "Routeparameters komen niet overeen met een openbare API",
+        "manifest_only_unclassified": "Manifest-only route nog niet geclassificeerd"
       },
       "remaining_route_work_actions": {
-        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
-        "publish_authoritative_content_source": "Publish an authoritative content source",
-        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
-        "public_visibility_decision_required": "Decide what content is safe to make public",
-        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
-        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
-        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+        "manual_no_js_shadow_review": "Voer handmatige schaduwcontrole zonder JavaScript uit",
+        "publish_authoritative_content_source": "Publiceer een gezaghebbende inhoudsbron",
+        "keep_vite_or_prerender_until_public_contract": "Bewaar Vite of prerender totdat er een overheidsopdracht bestaat",
+        "public_visibility_decision_required": "Bepaal welke inhoud veilig openbaar kan worden gemaakt",
+        "privacy_review_required_before_public_api": "Voltooi de privacybeoordeling voordat u een openbare API toevoegt",
+        "add_public_laravel_api_with_tests": "Voeg een openbare Laravel API met tests toe",
+        "classify_route_before_cutover": "Classificeer het eigendom van de route en het backend-contract vóór de overstap"
       },
       "remaining_route_work_guardrails": {
-        "route_status_has_no_production_effect": "Route status has no production effect",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+        "route_status_has_no_production_effect": "Routestatus heeft geen productie-effect",
+        "do_not_promote_auth_only_routes": "Maak geen reclame voor alleen-authenticatieroutes"
       },
       "dry_runs": {
-        "title": "Pre-cutover dry-run checks",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "title": "Droogloopcontroles vóór het snijden",
+        "activation_available": "Er zijn activeringscontroles beschikbaar",
+        "activation_unavailable": "Geen activeringscontroles",
+        "explicit_instruction_required": "Afzonderlijke cutover-instructie vereist"
       },
       "dry_run_items": {
-        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
-        "remaining_static_manual_review": "Platform legal content review",
-        "auth_only_public_contract_review": "Auth-only public contract review",
-        "private_vite_regression": "Private Vite regression",
-        "inertness_guard": "Production inertness guard"
+        "shadow_manifest_and_html": "Schaduwmanifest en HTML zonder JS",
+        "remaining_static_manual_review": "Beoordeling van juridische inhoud van het platform",
+        "auth_only_public_contract_review": "Auth-only beoordeling van overheidsopdrachten",
+        "private_vite_regression": "Private Vite-regressie",
+        "inertness_guard": "Bewaking van productie-inertheid"
       },
       "dry_run_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "authoritative_content_source_required": "Authoritative content source required",
-        "public_visibility_decision_required": "Public visibility decision required",
-        "privacy_review_required_before_public_api": "Privacy review required before public API",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manual_verification_required": "Handmatige verificatie vereist",
+        "route_parity_required": "Routepariteit vereist",
+        "authoritative_content_source_required": "Gezaghebbende inhoudsbron vereist",
+        "public_visibility_decision_required": "Besluit inzake publieke zichtbaarheid vereist",
+        "privacy_review_required_before_public_api": "Privacybeoordeling vereist vóór openbare API",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist"
       },
       "dry_run_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "shadow_only": "Alleen schaduw",
+        "no_activation_control": "Geen activeringscontrole",
+        "do_not_promote_auth_only_routes": "Maak geen reclame voor alleen-authenticatieroutes",
+        "vite_private_routes_remain_primary": "Privéroutes blijven primair",
+        "do_not_remove_prerender": "Verwijder prerender fallback niet"
       },
       "artifacts": {
-        "title": "Cutover artifact inventory",
+        "title": "Cutover-artefactinventaris",
         "path": "Path",
         "present": "Present",
         "missing": "Missing",
-        "required_commands": "Required commands",
-        "required_before_cutover": "Required before cutover",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls"
+        "required_commands": "Vereiste commando's",
+        "required_before_cutover": "Vereist vóór de omschakeling",
+        "activation_available": "Er zijn activeringscontroles beschikbaar",
+        "no_activation_control": "Geen activeringscontroles"
       },
       "artifact_items": {
-        "route_ownership_manifest": "Route ownership manifest",
-        "content_sources_manifest": "Content sources manifest",
-        "apache_canary_template": "Edge canary template",
-        "shadow_compose_profile": "Shadow Compose profile",
-        "routing_flag_config": "Routing flag config",
-        "prerender_fallback": "Prerender fallback"
+        "route_ownership_manifest": "Eigendomsmanifest routeren",
+        "content_sources_manifest": "Inhoudsbronnen manifesteren zich",
+        "apache_canary_template": "Rand kanarie sjabloon",
+        "shadow_compose_profile": "Schaduw Componeer profiel",
+        "routing_flag_config": "Configuratie van routeringsvlag",
+        "prerender_fallback": "Terugval vooraf renderen"
       },
       "artifact_categories": {
         "manifest": "Manifest",
-        "edge_config": "Edge config",
+        "edge_config": "Edge-configuratie",
         "runtime": "Runtime",
         "guard": "Guard",
         "fallback": "Fallback"
       },
       "production_effects": {
-        "none": "No production effect"
+        "none": "Geen productie-effect"
       },
       "cutover_eligibility": {
-        "title": "Cutover eligibility",
-        "eligible": "Eligible for cutover",
-        "blocked": "Not eligible for cutover",
+        "title": "Geschiktheid voor een overstap",
+        "eligible": "Komt in aanmerking voor een omschakeling",
+        "blocked": "Komt niet in aanmerking voor een omschakeling",
         "public_routes": "{{count}} public routes",
-        "api_backed_public_routes": "{{count}} API-backed public routes",
-        "remaining_public_routes": "{{count}} remaining public routes",
-        "activation_available": "Activation controls available",
-        "activation_unavailable": "No activation controls",
+        "api_backed_public_routes": "{{count}} API-ondersteunde openbare routes",
+        "remaining_public_routes": "{{count}} resterende openbare routes",
+        "activation_available": "Activeringsopties beschikbaar",
+        "activation_unavailable": "Geen activeringscontroles",
         "blockers": "Blockers",
-        "required_actions": "Required actions"
+        "required_actions": "Vereiste acties"
       },
       "cutover_eligibility_blockers": {
-        "manifest_validation_blocked": "Manifest validation is blocked",
-        "remaining_public_route_work": "Remaining public route work is incomplete",
-        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "route_parity_required": "Route parity is still required",
-        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manifest_validation_blocked": "Kennelijke validatie is geblokkeerd",
+        "remaining_public_route_work": "De resterende werkzaamheden aan de openbare route zijn onvolledig",
+        "edge_canary_template_audit_blocked": "Edge Canary-sjabloonaudit is geblokkeerd",
+        "edge_routes_not_configured": "Productierandroutes zijn niet geconfigureerd",
+        "route_parity_required": "Routepariteit is nog steeds vereist",
+        "routing_flag_enabled_before_cutover": "De routeringsvlag is ingeschakeld vóór de omschakeling",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist"
       },
       "cutover_eligibility_actions": {
-        "complete_remaining_public_route_work": "Complete remaining public route work",
-        "run_shadow_verification": "Run shadow verification",
-        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
-        "keep_prerender_fallback": "Keep prerender fallback"
+        "complete_remaining_public_route_work": "Voltooi de resterende werkzaamheden aan de openbare route",
+        "run_shadow_verification": "Voer schaduwverificatie uit",
+        "prepare_reviewed_edge_config_after_instruction": "Bereid de beoordeelde edge-configuratie pas voor na instructie",
+        "keep_prerender_fallback": "Houd de pre-rendering-fallback behouden"
       },
       "route_batch_names": {
-        "foundation_public_pages": "Foundation public pages",
-        "api_backed_public_content": "API-backed public content",
-        "vite_private_retained": "Vite private routes retained"
+        "foundation_public_pages": "Stichting openbare pagina's",
+        "api_backed_public_content": "Door API ondersteunde openbare inhoud",
+        "vite_private_retained": "Vite privéroutes behouden"
       },
       "route_batch_blockers": {
-        "manual_shadow_review_required": "Manual shadow review required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "public_api_parity_required": "Public API parity required"
+        "manual_shadow_review_required": "Handmatige schaduwbeoordeling vereist",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist",
+        "public_api_parity_required": "Openbare API-pariteit vereist"
       },
       "route_gate_blockers": {
-        "parity_test_required": "Parity test required"
+        "parity_test_required": "Pariteitstest vereist"
       },
       "safety_checks": {
-        "route_cutover_disabled": "Public route cutover remains disabled",
-        "prerender_retained": "Current prerender fallback remains retained",
-        "vite_private_routes_retained": "Private Vite route ownership remains retained",
-        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "route_cutover_disabled": "Het omschakelen van de openbare route blijft uitgeschakeld",
+        "prerender_retained": "De huidige pre-rendering fallback blijft behouden",
+        "vite_private_routes_retained": "Het eigendom van de Private Vite-route blijft behouden",
+        "public_edge_not_configured": "Er is geen productierandroute geconfigureerd voor Next.js",
         "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+        "parity_tests_required_before_cutover": "Pariteitstests zijn nog steeds vereist vóór elke omschakeling"
       },
       "statuses": {
         "pass": "Pass",
@@ -1597,93 +1597,93 @@
         "blocked": "Blocked"
       },
       "runtime": {
-        "title": "Shadow runtime",
-        "compose_profile": "Compose profile",
-        "dev_command": "Dev command",
-        "build_command": "Build command",
-        "port_env": "Port environment variable"
+        "title": "Schaduwlooptijd",
+        "compose_profile": "Profiel samenstellen",
+        "dev_command": "Dev-opdracht",
+        "build_command": "Bouw opdracht",
+        "port_env": "Omgevingsvariabele van poort"
       },
       "cutover": {
-        "title": "Remaining live cutover sequence",
-        "verification_commands": "Verification commands"
+        "title": "Resterende live-cutover-reeks",
+        "verification_commands": "Verificatieopdrachten"
       },
       "cutover_steps": {
-        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
-        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
-        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
-        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
-        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
-        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+        "verify_next_shadow_build": "Controleer het Next.js-schaduwbuild- en routemanifest.",
+        "verify_no_js_public_html": "Voer HTML-controles zonder JavaScript uit voor elke openbare route.",
+        "verify_private_vite_regression": "Bouw en regressiecontrole de bestaande privé-applicatie van Vite.",
+        "prepare_apache_canary_routes": "Bereid Apache-kanarieroutering alleen voor op openbare routes.",
+        "enable_canary_for_public_routes_only": "Schakel na expliciete goedkeuring een kanarieroute in voor openbare pagina's.",
+        "monitor_and_keep_prerender_fallback": "Bewaak de reacties en houd pre-render beschikbaar als fallback totdat de pariteit is bewezen."
       },
       "counts": {
         "public_routes": "{{count}} public routes",
         "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} private edit/create patterns"
+        "private_patterns": "{{count}} privé patronen bewerken/maken"
       },
       "validation": {
-        "title": "Manifest validation",
-        "passed": "Manifest validation passed",
-        "blocked": "Manifest validation blocked",
-        "lockfile": "Lockfile pinned",
-        "package_scripts": "Package scripts present",
-        "compose_profile": "Shadow Compose profile present"
+        "title": "Duidelijke validatie",
+        "passed": "Kennelijke validatie geslaagd",
+        "blocked": "Kennelijke validatie geblokkeerd",
+        "lockfile": "Vergrendelbestand vastgezet",
+        "package_scripts": "Pakketscripts aanwezig",
+        "compose_profile": "Shadow Compose-profiel aanwezig"
       },
       "validation_issues": {
-        "manifest_missing": "Route ownership manifest is missing.",
-        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
-        "public_route_invalid": "A public route entry is malformed.",
-        "public_route_missing_fields": "A public route is missing required fields.",
-        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
-        "public_route_duplicate_key": "A public route key is duplicated.",
-        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
-        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
-        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
-        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
-        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
-        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
-        "api_backed_route_invalid": "An API-backed route entry is malformed.",
-        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
-        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
-        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
-        "api_backed_route_not_get": "API-backed public routes must use GET.",
-        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
-        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
-        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
-        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
-        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
-        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
-        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+        "manifest_missing": "Het route-eigendomsmanifest ontbreekt.",
+        "manifest_not_shadow": "Het route-eigendomsmanifest bevindt zich niet in de schaduwmodus.",
+        "public_route_invalid": "Een openbare route-invoer heeft een onjuiste indeling.",
+        "public_route_missing_fields": "Bij een openbare route ontbreken verplichte velden.",
+        "public_route_duplicate_pattern": "Een openbaar routepatroon wordt gedupliceerd.",
+        "public_route_duplicate_key": "Een openbare routesleutel wordt gedupliceerd.",
+        "public_route_collides_with_private_prefix": "Een openbare route botst met een privé-Vite-routevoorvoegsel.",
+        "public_route_collides_with_private_pattern": "Een openbare route botst met een privé Vite-routepatroon.",
+        "vite_private_prefix_missing_required": "Het vereiste Vite-voorvoegsel voor de privéroute ontbreekt.",
+        "vite_private_pattern_missing_required": "Vereist Vite-privéroutepatroon ontbreekt.",
+        "content_sources_not_laravel_api": "Inhoudsbronnen moeten openbare Laravel-API's gebruiken.",
+        "content_sources_allow_next_database_queries": "Next.js-inhoudsbronnen mogen geen query's uitvoeren op de database.",
+        "api_backed_route_invalid": "Een door API ondersteunde route-invoer heeft een onjuiste indeling.",
+        "api_backed_route_missing_fields": "Voor een door API ondersteunde route ontbreken verplichte velden.",
+        "api_backed_route_duplicate_key": "Een door API ondersteunde routesleutel wordt gedupliceerd.",
+        "api_backed_route_not_in_manifest": "Er ontbreekt een door API ondersteunde route in het openbare routemanifest.",
+        "api_backed_route_not_get": "Door API ondersteunde openbare routes moeten GET gebruiken.",
+        "api_backed_route_not_laravel_v2_endpoint": "Door API ondersteunde routes moeten relatieve Laravel v2-eindpunten gebruiken.",
+        "api_backed_route_private_endpoint": "Door API ondersteunde openbare routes mogen geen privé Laravel v2-naamruimten gebruiken.",
+        "api_backed_route_endpoint_not_plain_path": "Door API ondersteunde route-eindpunten moeten gewone paden zijn, zonder queryreeksen of fragmenten.",
+        "api_backed_route_endpoint_has_path_traversal": "Door API ondersteunde route-eindpunten mogen geen trajecttrajectsegmenten bevatten.",
+        "api_backed_route_param_mismatch": "API-eindpuntparameters moeten overeenkomen met het openbare routepatroon.",
+        "api_backed_route_not_registered": "Door API ondersteund route-eindpunt is niet geregistreerd in Laravel.",
+        "api_backed_route_requires_auth": "Voor een door API ondersteund route-eindpunt is verificatie vereist."
       },
       "cutover_gate_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "cutover_not_active": "Cutover is not active",
-        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+        "manual_verification_required": "Handmatige verificatie vereist",
+        "route_parity_required": "Routepariteit vereist",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist",
+        "edge_routes_not_configured": "Productierandroutes zijn niet geconfigureerd",
+        "cutover_not_active": "Overschakeling is niet actief",
+        "prerender_fallback_must_remain": "Prerender fallback moet beschikbaar blijven"
       },
       "playbook": {
-        "title": "Operator playbook",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available on this page.",
-        "explicit_instruction_required": "Separate cutover instruction required",
-        "no_production_effect": "No production routing change"
+        "title": "Operator-draaiboek",
+        "activation_available": "Er zijn activeringscontroles beschikbaar",
+        "no_activation_control": "Er zijn geen activeringsopties beschikbaar op deze pagina.",
+        "explicit_instruction_required": "Afzonderlijke cutover-instructie vereist",
+        "no_production_effect": "Geen wijziging in de productierouting"
       },
       "playbook_stages": {
-        "verify_shadow_module": "Verify the shadow module locally.",
-        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
-        "run_private_route_regression": "Re-check the existing Vite private application.",
-        "canary_public_routes_only": "Canary public routes only after approval.",
-        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+        "verify_shadow_module": "Controleer de schaduwmodule lokaal.",
+        "prepare_reviewed_edge_config": "Bereid Apache-kanarieroutering voor als een beoordeelde alleen-configuratiewijziging.",
+        "run_private_route_regression": "Controleer de bestaande Vite-privéapplicatie opnieuw.",
+        "canary_public_routes_only": "Canarische openbare routes alleen na goedkeuring.",
+        "monitor_with_prerender_fallback": "Houd live reacties bij met behoud van terugval."
       },
       "playbook_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback.",
-        "rollback_path_required": "Rollback path required"
+        "shadow_only": "Alleen schaduw",
+        "no_activation_control": "Geen activeringscontrole",
+        "explicit_cutover_instruction_required": "Expliciete cutover-instructie vereist",
+        "vite_private_routes_remain_primary": "Privéroutes blijven primair",
+        "public_routes_only": "Alleen openbare routes",
+        "do_not_remove_prerender": "Verwijder prerender fallback niet.",
+        "rollback_path_required": "Terugdraaipad vereist"
       }
     },
     "health_meta_description_length_one": "{{count}}-tekens (ideaal: 150–160)",

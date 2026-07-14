@@ -160,7 +160,9 @@
     "external_profile_message": "このメンバーは外部パートナー プラットフォーム上にいます。プロフィールを直接表示することはできません。",
     "external_member": "外部会員",
     "member_fallback": "メンバー",
+    "external_source_note_external_only_one": "{{count}} の外部パートナーの結果を表示しています。",
     "external_source_note_external_only_other": "{{count}} 件の外部パートナー結果を表示しています。",
+    "external_source_note_one": "{{count}} の外部パートナーの結果が含まれます。続きを読み込む。内部パートナーの結果を継続します。",
     "external_source_note_other": "{{count}} 件の外部パートナー結果を含みます。さらに読み込むと内部パートナーの結果を続けます。",
     "more_skills_other": "+{{count}} 詳細"
   },
@@ -234,7 +236,9 @@
     "thread_aria_unread_plural": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
     "recipient_fallback": "受信者",
     "user_number": "ユーザー #{{id}}",
+    "thread_aria_unread_plural_one": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
     "thread_aria_unread_plural_other": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
+    "thread_aria_unread_one": "{{tenant}} からの {{name}} との会話、{{count}} の未読メッセージ",
     "thread_aria_unread_other": "{{tenant}} からの {{name}} との会話、{{count}} の未読メッセージ"
   },
   "listings": {
@@ -268,7 +272,9 @@
     "view_profile": "プロフィールを見る",
     "contact_author": "接触",
     "close": "近い",
+    "external_source_note_external_only_one": "{{count}} の外部パートナーのリストを表示しています。",
     "external_source_note_external_only_other": "{{count}} 件の外部パートナー掲載を表示しています。",
+    "external_source_note_one": "{{count}} の外部パートナーのリストが含まれます。続きを読み込む 社内パートナーのリストを続けます。",
     "external_source_note_other": "{{count}} 件の外部パートナー掲載を含みます。さらに読み込むと内部パートナーの掲載を続けます。"
   },
   "settings": {
@@ -557,9 +563,12 @@
     "tooltip_local": "このコミュニティの {{count}} レビューに基づく",
     "chip_label": "{{score}} ({{count}})",
     "aria_label": "{{count}} レビューからの {{score}} のフェデレーション評価",
+    "tooltip_federated_one": "{{count}} パートナー コミュニティ全体で集計された評判",
     "tooltip_federated_other": "{{count}} パートナー コミュニティ全体で集約された評判",
+    "tooltip_local_one": "このコミュニティの {{count}} レビューに基づく",
     "tooltip_local_other": "このコミュニティの {{count}} レビューに基づく",
     "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_one": "{{count}} レビューからのフェデレーション評価 {{score}}",
     "aria_label_other": "{{count}} レビューからの {{score}} のフェデレーション評価"
   },
   "reviews": {

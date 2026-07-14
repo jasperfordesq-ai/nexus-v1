@@ -204,8 +204,8 @@
     "over_limit_warning": "Você atingiu os limites do seu plano. Atualize para continuar.",
     "upgrade_modal_desc": "Atualize seu plano para desbloquear recursos e capacidade adicionais.",
     "upgrade_mailto_subject": "Pedido de upgrade do plano",
-    "user_count_label_many": "{{count}} / {{max}} utilizadores",
     "user_count_label_one": "{{count}} / {{max}} utilizadores",
-    "user_count_label_other": "{{count}} / {{max}} utilizadores"
+    "user_count_label_other": "{{count}} / {{max}} utilizadores",
+    "user_count_label_many": "{{count}} / {{max}} utilizadores"
   }
 }

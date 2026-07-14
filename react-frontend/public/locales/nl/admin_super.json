@@ -1128,6 +1128,10 @@
     }
   },
   "events": "Evenementen",
+  "exchange_workflow": "Uitwisselingsworkflow",
+  "organisations": "Organisaties",
+  "listings": "Advertenties",
+  "feed": "Voer",
   "groups": "Groepen",
   "gamification": "Gamificatie",
   "goals": "Doelen",
@@ -1137,9 +1141,5 @@
   "federation": "Federatie",
   "wallet": "Portemonnee",
   "messages": "Berichten",
-  "dashboard": "Dashboard",
-  "exchange_workflow": "Uitwisselingsworkflow",
-  "organisations": "Organisaties",
-  "listings": "Advertenties",
-  "feed": "Voer"
+  "dashboard": "Dashboard"
 }

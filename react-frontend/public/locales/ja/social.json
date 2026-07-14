@@ -3,6 +3,9 @@
   "comments": {
     "edit_label": "コメントの編集"
   },
+  "comment_delete_failed": "コメントを削除できませんでした。もう一度お試しください。",
+  "comment_edit_failed": "変更を保存できませんでした。もう一度お試しください。",
+  "comment_post_failed": "コメントを投稿できませんでした。もう一度お試しください。",
   "comments_title": "コメント",
   "copy_failed": "リンクのコピーに失敗しました",
   "copy_link": "リンクをコピー",
@@ -71,6 +74,7 @@
     "suggestions_aria": "メンションの提案、{{count}}件の結果",
     "no_users": "ユーザーが見つかりませんでした",
     "connected": "つながり済み",
+    "suggestions_aria_one": "提案、{{count}} の結果について言及する",
     "suggestions_aria_other": "メンションの提案、{{count}}件の結果"
   },
   "status": {
@@ -175,9 +179,6 @@
   },
   "reactions_tabs_aria": "反応型フィルター",
   "content_type_tabs_aria": "ブックマークコンテンツタイプフィルター",
-  "comment_delete_failed": "コメントを削除できませんでした。もう一度お試しください。",
-  "comment_edit_failed": "変更を保存できませんでした。もう一度お試しください。",
-  "comment_post_failed": "コメントを投稿できませんでした。もう一度お試しください。",
   "link_preview": {
     "image_alt_title": "{{title}}のプレビュー",
     "image_alt_domain": "{{domain}}のプレビュー",

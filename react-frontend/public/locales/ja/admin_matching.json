@@ -307,10 +307,13 @@
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "{{total}} 人のアクティブ ユーザー",
     "of_active_listings": "{{total}} 件のアクティブなリスト",
+    "cache_cleared_count_one": "{{count}} キャッシュ エントリをクリアしました",
     "cache_cleared_count_other": "{{count}}キャッシュ エントリをクリアしました",
+    "clear_cache_confirm_with_count_one": "{{count}} のキャッシュされた一致をクリアしてもよろしいですか?",
     "clear_cache_confirm_with_count_other": "{{count}}キャッシュされた一致をクリアしてもよろしいですか?",
     "distribution_aria_other": "{{label}}:{{count}}の一致 ({{percent}}%)",
     "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_one": "{{count}} の一致に基づく",
     "pillar_averages_sample_size_other": "{{count}} の一致に基づく"
   }
 }

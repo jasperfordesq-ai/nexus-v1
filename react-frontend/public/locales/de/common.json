@@ -2197,11 +2197,11 @@
       "reminder_failed": "Erinnerung konnte nicht gesendet werden.",
       "waive_failed": "Beiträge konnten nicht erlassen werden."
     },
+    "badge_none": "Keine Beiträge",
     "admin_bulk_reminder_sent_one": "{{count}} Erinnerungen gesendet.",
     "admin_bulk_reminder_sent_other": "{{count}} Erinnerungen gesendet.",
     "admin_overdue_count_one": "{{count}} Mitglied(er) haben überfällige Beiträge.",
-    "admin_overdue_count_other": "{{count}} Mitglied(er) haben überfällige Beiträge.",
-    "badge_none": "Keine Beiträge"
+    "admin_overdue_count_other": "{{count}} Mitglied(er) haben überfällige Beiträge."
   },
   "collections": {
     "save": "Speichern",
@@ -2369,22 +2369,49 @@
   "wellbeing": {
     "mood_struggling": "Kämpfend",
     "mood_low": "Niedrig",
-    "mood_okay": "In Ordnung",
     "mood_good": "Gut",
     "mood_great": "Grossartig",
-    "mood_unknown": "Unbekannt",
     "score_excellent": "Ausgezeichnet",
     "score_good": "Gut",
-    "score_critical": "Kritisch",
     "score_fair": "Gerecht",
-    "score_needs_attention": "Braucht Aufmerksamkeit"
+    "score_needs_attention": "Braucht Aufmerksamkeit",
+    "mood_okay": "In Ordnung",
+    "mood_unknown": "Unbekannt",
+    "score_critical": "Kritisch"
   },
   "credentials": {
     "status_pending": "Prüfung ausstehend",
+    "status_verified": "Verifiziert",
     "status_expired": "Abgelaufen",
-    "status_rejected": "Abgelehnt",
-    "status_verified": "Verifiziert"
+    "status_rejected": "Abgelehnt"
   },
+  "submit_error": "Konnte nicht übermittelt werden. Bitte versuchen Sie es erneut.",
+  "submitting": "Wird gesendet…",
+  "submit": "Einreichen",
+  "caregiver": {
+    "hours_short": "{{hours}}h",
+    "burnout_high": "Hohe Belastung: {{hours}} Stunden diese Woche",
+    "burnout_moderate": "Mittlere Belastung: {{hours}} Stunden diese Woche",
+    "burnout_warning": "Achtung: Überlastung — Sie haben diese Woche viele Stunden geleistet. Bitte sorgen Sie für Erholung.",
+    "upcoming_care": "Bevorstehende Begleitung",
+    "no_upcoming_care": "Noch keine geplante Begleitung",
+    "recent_care": "Letzte Begleitung",
+    "no_recent_care": "Noch keine Begleiteinträge",
+    "view_schedule": "Begleitplan anzeigen",
+    "request_on_behalf": "In ihrem Namen Hilfe anfragen"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Kein Interesse",
+    "too_far": "Zu weit weg",
+    "not_my_skills": "Nicht meine Fähigkeiten"
+  },
+  "under_25": "Unter 25",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Unbekannt",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2428,7 +2455,6 @@
   },
   "required_error": "Bitte beantworten Sie alle Pflichtfragen.",
   "already_responded": "Sie haben bereits an dieser Umfrage teilgenommen.",
-  "submitting": "Wird gesendet…",
   "time_ago_just_now": "Gerade eben",
   "time_ago_hours_one": "vor {{count}} Std.",
   "time_ago_hours_other": "vor {{count}} Std.",
@@ -2445,18 +2471,6 @@
     "email_aria": "E-Mail-Anbieter unter{{email}}",
     "website_aria": "Besuchen Sie die Website des Anbieters{{url}}",
     "website": "Webseite"
-  },
-  "caregiver": {
-    "burnout_high": "Hohe Belastung: {{hours}} Stunden diese Woche",
-    "burnout_moderate": "Mittlere Belastung: {{hours}} Stunden diese Woche",
-    "burnout_warning": "Achtung: Überlastung — Sie haben diese Woche viele Stunden geleistet. Bitte sorgen Sie für Erholung.",
-    "upcoming_care": "Bevorstehende Begleitung",
-    "no_upcoming_care": "Noch keine geplante Begleitung",
-    "recent_care": "Letzte Begleitung",
-    "no_recent_care": "Noch keine Begleiteinträge",
-    "view_schedule": "Begleitplan anzeigen",
-    "request_on_behalf": "In ihrem Namen Hilfe anfragen",
-    "hours_short": "{{hours}}h"
   },
   "cover": {
     "title": "Stellvertretende Begleitung"
@@ -2555,11 +2569,6 @@
     "preview_device_label": "Vorschaugerät",
     "preview_desktop": "Desktop",
     "preview_mobile": "Mobil"
-  },
-  "dismiss_reasons": {
-    "too_far": "Zu weit weg",
-    "not_my_skills": "Nicht meine Fähigkeiten",
-    "not_interested": "Kein Interesse"
   },
   "qa": {
     "upvote_aria": "Hochstimmen",
@@ -3046,7 +3055,6 @@
       "empty_value": "-"
     }
   },
-  "unknown": "Unbekannt",
   "advertising": {
     "push": {
       "no_daily_data": "Noch keine täglichen Daten.",
@@ -3059,13 +3067,5 @@
       "chart_opens_title_one": "{{count}} wird geöffnet",
       "chart_opens_title_other": "{{count}} wird geöffnet"
     }
-  },
-  "submit_error": "Konnte nicht übermittelt werden. Bitte versuchen Sie es erneut.",
-  "submit": "Einreichen",
-  "under_25": "Unter 25",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+"
+  }
 }

@@ -397,9 +397,9 @@
       "messages": {
         "recomputed": "Livelli di fiducia ricalcolati per {{count}} membri.",
         "saved": "Trust tier settings saved.",
-        "recomputed_many": "Livelli di fiducia ricalcolati per {{count}} membri.",
         "recomputed_one": "Livelli di fiducia ricalcolati per {{count}} membri.",
-        "recomputed_other": "Livelli di fiducia ricalcolati per {{count}} membri."
+        "recomputed_other": "Livelli di fiducia ricalcolati per {{count}} membri.",
+        "recomputed_many": "Livelli di fiducia ricalcolati per {{count}} membri."
       },
       "recompute_confirm": "Ricalcolare i livelli di fiducia per tutti i membri? L'operazione potrebbe richiedere alcuni minuti."
     },
@@ -745,18 +745,18 @@
       "approve_success": "Recensione approvata.",
       "decline_success": "Recensione rifiutata.",
       "decision_failed": "Impossibile registrare la decisione.",
-      "manual_escalation_note_many": "Riassegnato manualmente dopo {{count}} giorni in sospeso.",
       "manual_escalation_note_one": "Riassegnato manualmente dopo {{count}} giorni in sospeso.",
       "manual_escalation_note_other": "Riassegnato manualmente dopo {{count}} giorni in sospeso.",
-      "escalated_count_many": "{{count}} riassegnato",
       "escalated_count_one": "{{count}} riassegnato",
       "escalated_count_other": "{{count}} riassegnato",
-      "overdue_count_many": "{{count}} scaduto",
       "overdue_count_one": "{{count}} scaduto",
       "overdue_count_other": "{{count}} scaduto",
-      "age_days_many": "{{count}} giorno fa",
       "age_days_one": "{{count}} giorno fa",
-      "age_days_other": "{{count}} giorno fa"
+      "age_days_other": "{{count}} giorno fa",
+      "manual_escalation_note_many": "Riassegnato manualmente dopo {{count}} giorni in sospeso.",
+      "escalated_count_many": "{{count}} riassegnato",
+      "overdue_count_many": "{{count}} scaduto",
+      "age_days_many": "{{count}} giorno fa"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -834,12 +834,12 @@
         "resolved": "Risolto",
         "dismissed": "Licenziato"
       },
-      "age_hours_many": "{{count}}h",
       "age_hours_one": "{{count}}h",
       "age_hours_other": "{{count}}h",
-      "age_days_many": "{{count}}d",
       "age_days_one": "{{count}}d",
-      "age_days_other": "{{count}}d"
+      "age_days_other": "{{count}}d",
+      "age_hours_many": "{{count}}h",
+      "age_days_many": "{{count}}d"
     },
     "role_pack": {
       "title": "Preimpostazioni di ruolo",
@@ -879,9 +879,9 @@
           "description": "Approva rapidamente le ore con una supervisione leggera."
         }
       },
-      "available_count_many": "Sono disponibili preimpostazioni di ruolo {{count}}",
       "available_count_one": "Sono disponibili preimpostazioni di ruolo {{count}}",
-      "available_count_other": "Sono disponibili preimpostazioni di ruolo {{count}}"
+      "available_count_other": "Sono disponibili preimpostazioni di ruolo {{count}}",
+      "available_count_many": "Sono disponibili preimpostazioni di ruolo {{count}}"
     },
     "policy": {
       "title": "Politica del flusso di lavoro",
@@ -950,9 +950,9 @@
       "empty": "Nessun favore ancora registrato.",
       "anonymous": "Anonimo",
       "unknown": "Sconosciuto",
-      "total_recorded_many": "{{count}} totale registrato",
       "total_recorded_one": "{{count}} totale registrato",
-      "total_recorded_other": "{{count}} totale registrato"
+      "total_recorded_other": "{{count}} totale registrato",
+      "total_recorded_many": "{{count}} totale registrato"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1252,9 +1252,9 @@
       "exported": "Mappa dei confini esportata",
       "export_failed": "Impossibile esportare la mappa dei confini"
     },
-    "overrides_count_many": "{{count}} ignora",
     "overrides_count_one": "{{count}} ignora",
-    "overrides_count_other": "{{count}} ignora"
+    "overrides_count_other": "{{count}} ignora",
+    "overrides_count_many": "{{count}} ignora"
   },
   "data_quality": {
     "meta": {
@@ -1292,9 +1292,9 @@
       "count": "{{count}} {{label}}",
       "generated": "Generato {{date}}",
       "affected": "ricercato",
-      "count_many": "{{count}} {{label}}",
       "count_one": "{{count}} {{label}}",
-      "count_other": "{{count}} {{label}}"
+      "count_other": "{{count}} {{label}}",
+      "count_many": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "Fino a 50 righe interessate: risolvi o documenta prima del lancio.",
@@ -1658,21 +1658,21 @@
       "target_hours": "Obiettivo {{hours}}h",
       "over_by": "Passato entro {{duration}}",
       "left": "{{duration}} rimasto",
-      "subtitle_many": "{{count}} aperto: ordinato per primo in violazione",
       "subtitle_one": "{{count}} aperto: ordinato per primo in violazione",
       "subtitle_other": "{{count}} aperto: ordinato per primo in violazione",
-      "all_count_many": "Tutti ({{count}})",
       "all_count_one": "Tutti ({{count}})",
       "all_count_other": "Tutti ({{count}})",
-      "breached_count_many": "Violato ({{count}})",
       "breached_count_one": "Violato ({{count}})",
       "breached_count_other": "Violato ({{count}})",
-      "at_risk_count_many": "A rischio ({{count}})",
       "at_risk_count_one": "A rischio ({{count}})",
       "at_risk_count_other": "A rischio ({{count}})",
-      "on_track_count_many": "In pista ({{count}})",
       "on_track_count_one": "In pista ({{count}})",
-      "on_track_count_other": "In pista ({{count}})"
+      "on_track_count_other": "In pista ({{count}})",
+      "subtitle_many": "{{count}} aperto: ordinato per primo in violazione",
+      "all_count_many": "Tutti ({{count}})",
+      "breached_count_many": "Violato ({{count}})",
+      "at_risk_count_many": "A rischio ({{count}})",
+      "on_track_count_many": "In pista ({{count}})"
     },
     "resolved": {
       "title": "Risolto di recente (ultime 72 ore)",
@@ -1777,18 +1777,18 @@
       "in_progress": "In corso: {{count}}",
       "decided": "Deciso: {{count}}",
       "blocked": "Bloccato: {{count}}",
-      "pending_many": "In attesa: {{count}}",
       "pending_one": "In attesa: {{count}}",
       "pending_other": "In attesa: {{count}}",
-      "in_progress_many": "In corso: {{count}}",
       "in_progress_one": "In corso: {{count}}",
       "in_progress_other": "In corso: {{count}}",
-      "decided_many": "Deciso: {{count}}",
       "decided_one": "Deciso: {{count}}",
       "decided_other": "Deciso: {{count}}",
-      "blocked_many": "Bloccato: {{count}}",
       "blocked_one": "Bloccato: {{count}}",
-      "blocked_other": "Bloccato: {{count}}"
+      "blocked_other": "Bloccato: {{count}}",
+      "pending_many": "In attesa: {{count}}",
+      "in_progress_many": "In corso: {{count}}",
+      "decided_many": "Deciso: {{count}}",
+      "blocked_many": "Bloccato: {{count}}"
     },
     "gate": {
       "closed": "Cancello chiuso: pronto al lancio",
@@ -1796,9 +1796,9 @@
       "decided_count": "{{decided}} su {{total}} elementi decisi",
       "blocked_count": "- {{count}} bloccato",
       "progress_aria": "Progresso decisionale",
-      "blocked_count_many": "- {{count}} bloccato",
       "blocked_count_one": "- {{count}} bloccato",
-      "blocked_count_other": "- {{count}} bloccato"
+      "blocked_count_other": "- {{count}} bloccato",
+      "blocked_count_many": "- {{count}} bloccato"
     },
     "fields": {
       "value": "Valore",
@@ -1944,9 +1944,9 @@
       "title": "Contatti ({{count}})",
       "empty": "Nessun contatto corrisponde ai filtri attuali.",
       "table_aria": "Guidare i contatti",
-      "title_many": "Contatti ({{count}})",
       "title_one": "Contatti ({{count}})",
-      "title_other": "Contatti ({{count}})"
+      "title_other": "Contatti ({{count}})",
+      "title_many": "Contatti ({{count}})"
     },
     "table": {
       "name_email": "Nome/e-mail",
@@ -2034,9 +2034,9 @@
       "polished_text": "Testo lucido",
       "reason": "Motivo",
       "reason_placeholder": "Perché questa proposta viene respinta?",
-      "character_count_many": "{{count}}/4000 caratteri",
       "character_count_one": "{{count}}/4000 caratteri",
-      "character_count_other": "{{count}}/4000 caratteri"
+      "character_count_other": "{{count}}/4000 caratteri",
+      "character_count_many": "{{count}}/4000 caratteri"
     },
     "status": {
       "proposed": "Proposto",
@@ -2304,9 +2304,9 @@
       "blocked_title": "Impossibile avviare ancora: rimane il blocco {{count}}",
       "blocked_title_plural": "Impossibile avviare ancora: rimangono {{count}} blocchi",
       "blocked_body": "Risolvi tutte le sezioni seguenti prima che il pulsante di avvio sia abilitato.",
-      "blocked_title_many": "Impossibile avviare ancora: rimane il blocco {{count}}",
       "blocked_title_one": "Impossibile avviare ancora: rimane il blocco {{count}}",
-      "blocked_title_other": "Impossibile avviare ancora: rimane il blocco {{count}}"
+      "blocked_title_other": "Impossibile avviare ancora: rimane il blocco {{count}}",
+      "blocked_title_many": "Impossibile avviare ancora: rimane il blocco {{count}}"
     },
     "overall": {
       "ready": "Il pilota è pronto per il lancio",
@@ -2356,9 +2356,9 @@
       "unexpected_response": "Il rapporto sulla preparazione al lancio ha restituito una risposta inaspettata.",
       "unavailable_title": "Rapporto sulla preparazione non disponibile"
     },
-    "more_count_many": "+{{count}} altro",
     "more_count_one": "+{{count}} altro",
-    "more_count_other": "+{{count}} altro"
+    "more_count_other": "+{{count}} altro",
+    "more_count_many": "+{{count}} altro"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2501,10 +2501,10 @@
       "rendered_markdown": "Resi Markdown ({{count}} caratteri)",
       "missing_placeholder_count_one": "{{count}} segnaposto mancante",
       "missing_placeholder_count_other": "{{count}} segnaposto mancanti",
-      "placeholder_count_many": "{{count}} segnaposto",
-      "rendered_markdown_many": "Resi Markdown ({{count}} caratteri)",
       "rendered_markdown_one": "Resi Markdown ({{count}} caratteri)",
       "rendered_markdown_other": "Resi Markdown ({{count}} caratteri)",
+      "placeholder_count_many": "{{count}} segnaposto",
+      "rendered_markdown_many": "Resi Markdown ({{count}} caratteri)",
       "missing_placeholder_count_many": "{{count}} segnaposto mancanti"
     },
     "exports": {
@@ -2616,9 +2616,9 @@
       "candidates": "{{count}} candidati",
       "empty": "Nessun candidato idoneo in questo momento.",
       "table_aria": "Candidati nudge di prova",
-      "candidates_many": "{{count}} candidati",
       "candidates_one": "{{count}} candidati",
-      "candidates_other": "{{count}} candidati"
+      "candidates_other": "{{count}} candidati",
+      "candidates_many": "{{count}} candidati"
     },
     "recent": {
       "title": "Solleciti recenti",
@@ -2649,12 +2649,12 @@
       "dry_run": "Prova di prova: {{count}} candidati idonei",
       "dispatched": "{{count}} solleciti inviati",
       "dispatch_failed": "Invio non riuscito",
-      "dry_run_many": "Prova di prova: {{count}} candidati idonei",
       "dry_run_one": "Prova di prova: {{count}} candidati idonei",
       "dry_run_other": "Prova di prova: {{count}} candidati idonei",
-      "dispatched_many": "{{count}} solleciti inviati",
       "dispatched_one": "{{count}} solleciti inviati",
-      "dispatched_other": "{{count}} solleciti inviati"
+      "dispatched_other": "{{count}} solleciti inviati",
+      "dry_run_many": "Prova di prova: {{count}} candidati idonei",
+      "dispatched_many": "{{count}} solleciti inviati"
     }
   },
   "sub_regions": {

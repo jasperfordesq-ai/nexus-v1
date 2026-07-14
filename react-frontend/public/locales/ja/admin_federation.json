@@ -907,7 +907,9 @@
       "bulk_approved_count_plural": "承認された{{count}}パートナーシップ リクエスト",
       "bulk_rejected_count": "{{count}}パートナーシップ要求が拒否されました",
       "bulk_rejected_count_plural": "{{count}}パートナーシップ リクエストが拒否されました",
+      "bulk_approved_count_one": "{{count}} パートナーシップ リクエストが承認されました",
       "bulk_approved_count_other": "承認された{{count}}パートナーシップリクエスト",
+      "bulk_rejected_count_one": "{{count}} パートナーシップ要求が拒否されました",
       "bulk_rejected_count_other": "{{count}}パートナーシップ要求が拒否されました"
     },
     "api_docs_tabs_aria": "API サンプル言語セレクター",

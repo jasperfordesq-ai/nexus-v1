@@ -109,9 +109,9 @@
       "candidates": "Impossibile caricare i candidati sostituti",
       "assign": "Impossibile assegnare il sostituto"
     },
-    "skill_matches_many": "{{count}} competenze corrispondenti",
     "skill_matches_one": "{{count}} competenze corrispondenti",
-    "skill_matches_other": "{{count}} competenze corrispondenti"
+    "skill_matches_other": "{{count}} competenze corrispondenti",
+    "skill_matches_many": "{{count}} competenze corrispondenti"
   },
   "providers": {
     "title": "Elenco dei fornitori di cura",
@@ -492,7 +492,7 @@
         "maximum_discount_description": "Limite alla percentuale del totale dell'ordine che può essere pagata in crediti temporali.",
         "save": "Salva impostazioni",
         "view_only": "Gli utenti di sola visualizzazione non possono modificare le impostazioni di fedeltà.",
-        "per_hour_short": "/ h"
+        "per_hour_short": "/ H"
       },
       "ledger": {
         "title": "Rimborsi recenti",

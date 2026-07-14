@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -132,9 +132,9 @@
     "no_challenges_found": "No se encontraron desafíos encontrados",
     "no_matching_challenges": "No se encontraron desafíos coincidentes",
     "no_status_challenges": "No se encontraron desafíos de estado",
-    "tabs_aria": "Challenge status filter",
-    "total_count_many": "totales: {{count}}",
+    "tabs_aria": "Filtro de estado de desafío",
     "total_count_one": "totales: {{count}}",
-    "total_count_other": "totales: {{count}}"
+    "total_count_other": "totales: {{count}}",
+    "total_count_many": "totales: {{count}}"
   }
 }

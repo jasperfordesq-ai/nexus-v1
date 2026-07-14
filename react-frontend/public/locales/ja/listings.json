@@ -249,6 +249,7 @@
     "aria_add": "スキルタグを追加",
     "aria_add_count": "スキルタグを追加（{{current}} の {{max}}）",
     "aria_results": "{{count}} のスキル提案が利用可能",
+    "aria_results_one": "{{count}} のスキル提案が利用可能",
     "aria_results_other": "{{count}} のスキル提案が利用可能"
   },
   "more_filters": "さらにフィルター",

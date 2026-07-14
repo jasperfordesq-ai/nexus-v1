@@ -74,9 +74,9 @@
     "courses": "Cursos",
     "podcasts": "Podcasts",
     "switch_community": "Mudar comunidade",
-    "unread_notifications_many": "{{count}} notificações não lidas",
     "unread_notifications_one": "{{count}} notificações não lidas",
-    "unread_notifications_other": "{{count}} notificações não lidas"
+    "unread_notifications_other": "{{count}} notificações não lidas",
+    "unread_notifications_many": "{{count}} notificações não lidas"
   },
   "landing_links": {
     "title": "Explore esta comunidade",
@@ -372,15 +372,15 @@
     "load_more_failed": "Falha ao carregar mais membros",
     "my_profile": "Meu perfil",
     "load_more_count": "Carregar mais ({{remaining}} restantes)",
-    "results_count_many": "{{count}} membros apresentados",
     "results_count_one": "{{count}} membros apresentados",
     "results_count_other": "{{count}} membros apresentados",
-    "hours_exchanged_aria_many": "{{count}} horas trocadas",
     "hours_exchanged_aria_one": "{{count}} horas trocadas",
     "hours_exchanged_aria_other": "{{count}} horas trocadas",
-    "hours_short_many": "{{count}} h",
     "hours_short_one": "{{count}} h",
-    "hours_short_other": "{{count}} h"
+    "hours_short_other": "{{count}} h",
+    "results_count_many": "{{count}} membros apresentados",
+    "hours_exchanged_aria_many": "{{count}} horas trocadas",
+    "hours_short_many": "{{count}} h"
   },
   "error_boundary": {
     "title": "Algo correu mal",
@@ -893,12 +893,12 @@
     "feed_sidebar": "Barra lateral da comunidade",
     "filter_panel": "Painel de filtro",
     "remove": "Remove",
-    "location_results_many": "{{count}} sugestões de endereços disponíveis",
     "location_results_one": "{{count}} sugestões de endereços disponíveis",
     "location_results_other": "{{count}} sugestões de endereços disponíveis",
-    "search_results_many": "{{count}} results available",
     "search_results_one": "{{count}} resultados disponíveis",
-    "search_results_other": "{{count}} resultados disponíveis"
+    "search_results_other": "{{count}} resultados disponíveis",
+    "location_results_many": "{{count}} sugestões de endereços disponíveis",
+    "search_results_many": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Diretório de Competências da Comunidade",
@@ -949,9 +949,9 @@
     "aria_close_members_list": "Fechar lista de membros",
     "category_optional": "Categoria (opcional)",
     "proficiency_level": "Nível de proficiência",
-    "aria_results_many": "{{count}} sugestões de habilidades disponíveis",
     "aria_results_one": "{{count}} sugestões de habilidades disponíveis",
-    "aria_results_other": "{{count}} sugestões de habilidades disponíveis"
+    "aria_results_other": "{{count}} sugestões de habilidades disponíveis",
+    "aria_results_many": "{{count}} sugestões de habilidades disponíveis"
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
@@ -1131,9 +1131,9 @@
     "errors": {
       "load_failed": "Não foi possível carregar os clubes. Tenta novamente."
     },
-    "member_count_many": "{{count}} membros",
     "member_count_one": "{{count}} membros",
-    "member_count_other": "{{count}} membros"
+    "member_count_other": "{{count}} membros",
+    "member_count_many": "{{count}} membros"
   },
   "feed": {
     "personalisation": {
@@ -1217,9 +1217,9 @@
       "size": "Tamanho",
       "count": "{{count}} exportações",
       "empty": "Ainda não exportaste os teus dados.",
-      "count_many": "{{count}} exportações",
       "count_one": "{{count}} exportações",
-      "count_other": "{{count}} exportações"
+      "count_other": "{{count}} exportações",
+      "count_many": "{{count}} exportações"
     },
     "errors": {
       "rate_limit": "Podes pedir 5 exportações por dia. Tenta amanhã.",
@@ -1465,9 +1465,9 @@
     "create_error": "Não foi possível criar a campanha push. Tente novamente.",
     "submit_create": "Criar campanha",
     "feature_disabled": "As campanhas push não estão disponíveis para a sua conta.",
-    "estimate_result_many": "Alcance estimado: {{count}} membros",
     "estimate_result_one": "Alcance estimado: {{count}} membros",
-    "estimate_result_other": "Alcance estimado: {{count}} membros"
+    "estimate_result_other": "Alcance estimado: {{count}} membros",
+    "estimate_result_many": "Alcance estimado: {{count}} membros"
   },
   "push_campaign_opt_in": "Receber notificações push promovidas",
   "push_campaign_opt_in_description": "Permita que empresas e organizações locais lhe enviem notificações push direcionadas. Pode anular a subscrição em qualquer altura.",
@@ -1538,9 +1538,9 @@
       "usage_count": "Usado {{count}} vezes",
       "saved": "Cupão guardado",
       "deleted": "Cupão eliminado",
-      "usage_count_many": "Usado {{count}} vezes",
       "usage_count_one": "Usado {{count}} vezes",
-      "usage_count_other": "Usado {{count}} vezes"
+      "usage_count_other": "Usado {{count}} vezes",
+      "usage_count_many": "Usado {{count}} vezes"
     },
     "qr_code_alt": "Código QR"
   },
@@ -2102,9 +2102,9 @@
       "from_label": "De",
       "load_failed": "Não foi possível carregar o calendário."
     },
-    "char_count_many": "{{count}}/500",
     "char_count_one": "{{count}}/500",
-    "char_count_other": "{{count}}/500"
+    "char_count_other": "{{count}}/500",
+    "char_count_many": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Continuar com o Google",
@@ -2209,13 +2209,13 @@
       "reminder_failed": "Não foi possível enviar o lembrete.",
       "waive_failed": "Não foi possível dispensar as quotas."
     },
-    "admin_bulk_reminder_sent_many": "{{count}} lembretes enviados.",
+    "badge_none": "Sem taxas",
     "admin_bulk_reminder_sent_one": "{{count}} lembretes enviados.",
     "admin_bulk_reminder_sent_other": "{{count}} lembretes enviados.",
-    "admin_overdue_count_many": "{{count}} membro(s) têm quotas em atraso.",
     "admin_overdue_count_one": "{{count}} membro(s) têm quotas em atraso.",
     "admin_overdue_count_other": "{{count}} membro(s) têm quotas em atraso.",
-    "badge_none": "Sem taxas"
+    "admin_bulk_reminder_sent_many": "{{count}} lembretes enviados.",
+    "admin_overdue_count_many": "{{count}} membro(s) têm quotas em atraso."
   },
   "collections": {
     "save": "Guardar",
@@ -2360,9 +2360,9 @@
   "max_characters": "máx. {{count}} caracteres",
   "map": {
     "listings_here": "{{count}} anúncios aqui",
-    "listings_here_many": "{{count}} anúncios aqui",
     "listings_here_one": "{{count}} anúncios aqui",
-    "listings_here_other": "{{count}} anúncios aqui"
+    "listings_here_other": "{{count}} anúncios aqui",
+    "listings_here_many": "{{count}} anúncios aqui"
   },
   "time_credits_short": "{{count}}h de créditos",
   "level_plain": "Nível {{level}}",
@@ -2381,26 +2381,52 @@
     "scheme_system": "System"
   },
   "alpha_badge": "Alfa",
-  "hours_display_many": "{{count}} horas",
   "wellbeing": {
-    "mood_okay": "Razoável",
-    "mood_great": "Ótimo",
-    "mood_unknown": "Desconhecido",
-    "score_excellent": "Excelente",
-    "score_good": "Bom",
-    "score_fair": "Razoável",
-    "score_critical": "Crítico",
     "mood_struggling": "Lutando",
     "mood_low": "Baixo",
     "mood_good": "Bom",
-    "score_needs_attention": "Precisa de atenção"
+    "mood_great": "Ótimo",
+    "score_excellent": "Excelente",
+    "score_good": "Bom",
+    "score_fair": "Razoável",
+    "score_needs_attention": "Precisa de atenção",
+    "mood_okay": "Razoável",
+    "mood_unknown": "Desconhecido",
+    "score_critical": "Crítico"
   },
   "credentials": {
+    "status_pending": "Revisão pendente",
     "status_verified": "Verificado",
     "status_expired": "Expirado",
-    "status_rejected": "Rejeitado",
-    "status_pending": "Revisão pendente"
+    "status_rejected": "Rejeitado"
   },
+  "submit_error": "Não foi possível enviar. Por favor, tente novamente.",
+  "submitting": "Enviando…",
+  "submit": "Enviar",
+  "caregiver": {
+    "hours_short": "{{hours}}h",
+    "burnout_high": "Alta carga de cuidador: horas{{hours}}esta semana",
+    "burnout_moderate": "Carga moderada: horas{{hours}}esta semana",
+    "burnout_warning": "Você acumulou muitas horas esta semana. Por favor, descanse",
+    "upcoming_care": "Próximos cuidados",
+    "no_upcoming_care": "Ainda não há suporte agendado",
+    "recent_care": "Cuidados recentes",
+    "no_recent_care": "Ainda não há registros de cuidados recentes",
+    "view_schedule": "Ver cronograma de cuidados",
+    "request_on_behalf": "Solicite ajuda em nome deles"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Não estou interessado",
+    "too_far": "Muito longe",
+    "not_my_skills": "Não são minhas habilidades"
+  },
+  "under_25": "Menos de 25 anos",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Desconhecido",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2428,10 +2454,8 @@
     "action_goal": "definiu um novo objetivo",
     "action_post": "partilhou uma publicação"
   },
-  "hours_short_many": "{{count}} h",
   "hours_short_one": "{{count}} h",
   "hours_short_other": "{{count}} h",
-  "time_credits_short_many": "{{count}}h de créditos",
   "time_credits_short_one": "{{count}}h de créditos",
   "time_credits_short_other": "{{count}}h de créditos",
   "question_required": "Obrigatório",
@@ -2447,10 +2471,8 @@
   "required_error": "Por favor, responda a todas as perguntas obrigatórias.",
   "already_responded": "Já participou neste inquérito.",
   "time_ago_just_now": "Agora mesmo",
-  "time_ago_hours_many": "há {{count}}h",
   "time_ago_hours_one": "há {{count}}h",
   "time_ago_hours_other": "há {{count}}h",
-  "time_ago_days_many": "há {{count}}d",
   "time_ago_days_one": "há {{count}}d",
   "time_ago_days_other": "há {{count}}d",
   "providers": {
@@ -2465,32 +2487,20 @@
     "website_aria": "Visite o site do provedor{{url}}",
     "website": "Site"
   },
-  "caregiver": {
-    "burnout_high": "Alta carga de cuidador: horas{{hours}}esta semana",
-    "burnout_moderate": "Carga moderada: horas{{hours}}esta semana",
-    "burnout_warning": "Você acumulou muitas horas esta semana. Por favor, descanse",
-    "upcoming_care": "Próximos cuidados",
-    "no_upcoming_care": "Ainda não há suporte agendado",
-    "recent_care": "Cuidados recentes",
-    "no_recent_care": "Ainda não há registros de cuidados recentes",
-    "view_schedule": "Ver cronograma de cuidados",
-    "request_on_behalf": "Solicite ajuda em nome deles",
-    "hours_short": "{{hours}}h"
-  },
   "cover": {
     "title": "Cuidados com a capa"
   },
   "viewer": {
     "time_just_now": "Agora mesmo",
-    "time_minutes_ago_many": "há {{count}}m",
     "time_minutes_ago_one": "há {{count}}m",
     "time_minutes_ago_other": "há {{count}}m",
-    "time_hours_ago_many": "há {{count}}h",
     "time_hours_ago_one": "há {{count}}h",
     "time_hours_ago_other": "há {{count}}h",
-    "time_days_ago_many": "há {{count}}d",
     "time_days_ago_one": "há {{count}}d",
-    "time_days_ago_other": "há {{count}}d"
+    "time_days_ago_other": "há {{count}}d",
+    "time_minutes_ago_many": "há {{count}}m",
+    "time_hours_ago_many": "há {{count}}h",
+    "time_days_ago_many": "há {{count}}d"
   },
   "biometric": {
     "label_builtin": "Autenticador embutido",
@@ -2578,26 +2588,35 @@
     "preview_desktop": "Computador",
     "preview_mobile": "Telemóvel"
   },
-  "dismiss_reasons": {
-    "too_far": "Muito longe",
-    "not_my_skills": "Não são minhas habilidades",
-    "not_interested": "Não estou interessado"
-  },
   "qa": {
     "upvote_aria": "Voto positivo",
-    "vote_count_aria_many": "{{count}} votos",
     "vote_count_aria_one": "{{count}} votos",
     "vote_count_aria_other": "{{count}} votos",
-    "downvote_aria": "Voto negativo"
+    "downvote_aria": "Voto negativo",
+    "vote_count_aria_many": "{{count}} votos"
   },
   "challenges": {
     "time_ended": "Terminado",
     "time_remaining_days_hours": "Faltam {{days}}d {{hours}}h",
     "time_remaining_hours_minutes": "Faltam {{hours}}h {{minutes}}m"
   },
-  "max_characters_many": "máx. {{count}} caracteres",
   "max_characters_one": "máx. {{count}} caracteres",
   "max_characters_other": "máx. {{count}} caracteres",
+  "volunteering": {
+    "time_just_now": "Agora mesmo",
+    "time_minutes_ago_one": "{{count}}minuto atrás",
+    "time_minutes_ago_other": "{{count}}minuto atrás",
+    "time_hours_ago_one": "{{count}}uma hora atrás",
+    "time_hours_ago_other": "{{count}}uma hora atrás",
+    "time_days_ago_one": "{{count}}dia atrás",
+    "time_days_ago_other": "{{count}}dia atrás",
+    "wellbeing_user_number": "Voluntário n.º {{id}}",
+    "wellbeing_unknown_user": "Voluntário desconhecido",
+    "wellbeing_unknown_type": "Preocupação de bem-estar",
+    "time_minutes_ago_many": "{{count}}minuto atrás",
+    "time_hours_ago_many": "{{count}}uma hora atrás",
+    "time_days_ago_many": "{{count}}dia atrás"
+  },
   "users": {
     "action_edit": "Editar",
     "action_approve": "Aprovar",
@@ -2610,33 +2629,18 @@
     "action_delete": "Excluir",
     "actions_menu": "Menu Ações"
   },
-  "volunteering": {
-    "time_just_now": "Agora mesmo",
-    "time_minutes_ago_many": "{{count}}minuto atrás",
-    "time_minutes_ago_one": "{{count}}minuto atrás",
-    "time_minutes_ago_other": "{{count}}minuto atrás",
-    "time_hours_ago_many": "{{count}}uma hora atrás",
-    "time_hours_ago_one": "{{count}}uma hora atrás",
-    "time_hours_ago_other": "{{count}}uma hora atrás",
-    "time_days_ago_many": "{{count}}dia atrás",
-    "time_days_ago_one": "{{count}}dia atrás",
-    "time_days_ago_other": "{{count}}dia atrás",
-    "wellbeing_user_number": "Voluntário n.º {{id}}",
-    "wellbeing_unknown_user": "Voluntário desconhecido",
-    "wellbeing_unknown_type": "Preocupação de bem-estar"
-  },
   "system": {
     "never": "Nunca",
     "just_now": "Agora mesmo",
-    "minutes_ago_many": "{{count}}há um mês",
     "minutes_ago_one": "{{count}}há um mês",
     "minutes_ago_other": "{{count}}há um mês",
-    "hours_ago_many": "{{count}}horas atrás",
     "hours_ago_one": "{{count}}horas atrás",
     "hours_ago_other": "{{count}}horas atrás",
-    "days_ago_many": "{{count}}há alguns dias",
     "days_ago_one": "{{count}}há alguns dias",
-    "days_ago_other": "{{count}}há alguns dias"
+    "days_ago_other": "{{count}}há alguns dias",
+    "minutes_ago_many": "{{count}}há um mês",
+    "hours_ago_many": "{{count}}horas atrás",
+    "days_ago_many": "{{count}}há alguns dias"
   },
   "super": {
     "tenant_actions": "Ações do Locatário",
@@ -2762,24 +2766,24 @@
     "validation_min": "Deve ser {{value}} ou superior",
     "validation_max": "Deve ser {{value}} ou menos",
     "validation_format": "Formato inválido",
-    "gdpr_sla_overdue_many": "{{count}} dias de atraso",
     "gdpr_sla_overdue_one": "{{count}} dias de atraso",
     "gdpr_sla_overdue_other": "{{count}} dias de atraso",
-    "gdpr_sla_days_left_many": "{{count}} dias restantes",
     "gdpr_sla_days_left_one": "{{count}} dias restantes",
-    "gdpr_sla_days_left_other": "{{count}} dias restantes"
+    "gdpr_sla_days_left_other": "{{count}} dias restantes",
+    "gdpr_sla_overdue_many": "{{count}} dias de atraso",
+    "gdpr_sla_days_left_many": "{{count}} dias restantes"
   },
   "crm": {
     "just_now": "Just Now",
-    "minutes_ago_many": "há {{count}} minutos",
     "minutes_ago_one": "há {{count}} minutos",
     "minutes_ago_other": "há {{count}} minutos",
-    "hours_ago_many": "há {{count}} horas",
     "hours_ago_one": "há {{count}} horas",
     "hours_ago_other": "há {{count}} horas",
-    "days_ago_many": "há {{count}} dias",
     "days_ago_one": "há {{count}} dias",
-    "days_ago_other": "há {{count}} dias"
+    "days_ago_other": "há {{count}} dias",
+    "minutes_ago_many": "há {{count}} minutos",
+    "hours_ago_many": "há {{count}} horas",
+    "days_ago_many": "há {{count}} dias"
   },
   "config": {
     "module_name_dashboard": "Painel",
@@ -2834,11 +2838,11 @@
     "no_data": "Não há dados disponíveis",
     "drag_hint": "Arraste os itens para reordenar",
     "drag_to_reorder": "Arraste para reordenar",
-    "sub_items_many": "Subitem(s) {{count}}",
     "sub_items_one": "Subitem(s) {{count}}",
     "sub_items_other": "Subitem(s) {{count}}",
     "edit_item": "Editar item",
-    "delete_item": "Excluir item"
+    "delete_item": "Excluir item",
+    "sub_items_many": "Subitem(s) {{count}}"
   },
   "content": {
     "label_attribute_actions": "Ações de atributos",
@@ -2873,10 +2877,10 @@
     "surveys": {
       "analytics": {
         "total_responses": "Total de respostas",
-        "answer_count_many": "{{count}}responde",
         "answer_count_one": "Resposta{{count}}",
         "answer_count_other": "{{count}}responde",
-        "no_open_text": "Ainda não há respostas em texto aberto."
+        "no_open_text": "Ainda não há respostas em texto aberto.",
+        "answer_count_many": "{{count}}responde"
       }
     }
   },
@@ -2948,7 +2952,6 @@
       "active_members": "Membros ativos",
       "recipients_reached": "Destinatários alcançados",
       "sub_region_coverage": "Cobertura da sub-região (últimos dias {{days}})",
-      "under_supplied_count_many": "{{count}} subfornecido",
       "under_supplied_count_one": "{{count}} subfornecido",
       "under_supplied_count_other": "{{count}} subfornecido",
       "sub_region_coverage_aria": "Cobertura sub-regional",
@@ -2977,12 +2980,13 @@
       "helper_churn_note": "{{lapsed}} de {{prior}} auxiliares anteriormente ativos não registraram horas recentemente.",
       "helper_churn_aria": "Rotatividade de ajudantes por categoria",
       "coefficient_drift": "Desvio do coeficiente de categoria",
-      "drifting_count_many": "{{count}} à deriva",
       "drifting_count_one": "{{count}} à deriva",
       "drifting_count_other": "{{count}} à deriva",
       "coefficient_drift_note": "Categorias com desvio absoluto > {{threshold}}% são sinalizadas. Revise os coeficientes de linha de base no editor de coeficientes de categoria.",
       "coefficient_drift_aria": "Desvio do coeficiente de categoria",
-      "proactive_alerts": "Alertas proativos"
+      "proactive_alerts": "Alertas proativos",
+      "under_supplied_count_many": "{{count}} subfornecido",
+      "drifting_count_many": "{{count}} à deriva"
     },
     "empty": {
       "value": "-"
@@ -3079,14 +3083,13 @@
         "resolution_trend_6m": "Tendência de resolução, últimos 6 meses"
       },
       "units": {
-        "days_count_many": "{{count}} dias",
         "days_count_one": "{{count}} dias",
-        "days_count_other": "{{count}} dias"
+        "days_count_other": "{{count}} dias",
+        "days_count_many": "{{count}} dias"
       },
       "empty_value": "-"
     }
   },
-  "unknown": "Desconhecido",
   "advertising": {
     "push": {
       "no_daily_data": "Ainda não há dados diários.",
@@ -3094,21 +3097,18 @@
         "sends": "Envia",
         "opens": "Abre"
       },
-      "chart_sends_title_many": "{{count}} envia",
       "chart_sends_title_one": "{{count}} envia",
       "chart_sends_title_other": "{{count}} envia",
-      "chart_opens_title_many": "{{count}} abre",
       "chart_opens_title_one": "{{count}} abre",
-      "chart_opens_title_other": "{{count}} abre"
+      "chart_opens_title_other": "{{count}} abre",
+      "chart_sends_title_many": "{{count}} envia",
+      "chart_opens_title_many": "{{count}} abre"
     }
   },
-  "submit_error": "Não foi possível enviar. Por favor, tente novamente.",
-  "submitting": "Enviando…",
-  "submit": "Enviar",
-  "under_25": "Menos de 25 anos",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+"
+  "hours_display_many": "{{count}} horas",
+  "hours_short_many": "{{count}} h",
+  "time_credits_short_many": "{{count}}h de créditos",
+  "time_ago_hours_many": "há {{count}}h",
+  "time_ago_days_many": "há {{count}}d",
+  "max_characters_many": "máx. {{count}} caracteres"
 }

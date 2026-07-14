@@ -456,16 +456,16 @@
     "resend_queued_count": "Reenvio de{{count}}na fila",
     "resend_queued_count_plural": "{{count}}na fila reenvia",
     "template_tabs_aria": "Filtro de categoria de modelo de boletim informativo",
-    "subscriber_total_many": "Total de assinantes{{count}}",
-    "import_rows_found_many": "Assinante{{count}}encontrado em CSV",
-    "resend_queued_count_many": "Reenvio de{{count}}na fila",
-    "resend_queued_count_one": "Reenvio de{{count}}na fila",
-    "resend_queued_count_other": "Reenvio de{{count}}na fila",
     "your_average": "Sua média",
     "industry_avg": "Média da indústria",
     "above_benchmark": "Acima do benchmark",
     "below_benchmark": "Abaixo do benchmark",
-    "benchmark_difference": "{{pointSign}}{{pointValue}} p.p. ({{percentSign}}{{percentValue}}%)"
+    "resend_queued_count_one": "Reenvio de{{count}}na fila",
+    "resend_queued_count_other": "Reenvio de{{count}}na fila",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} p.p. ({{percentSign}}{{percentValue}}%)",
+    "subscriber_total_many": "Total de assinantes{{count}}",
+    "import_rows_found_many": "Assinante{{count}}encontrado em CSV",
+    "resend_queued_count_many": "Reenvio de{{count}}na fila"
   },
   "newsletter_form": {
     "ab_test_label": "Teste Ab",
@@ -907,15 +907,15 @@
     "subject_override_placeholder": "Insira uma substituição de assunto...",
     "subtitle": "Envie este boletim informativo para um subconjunto direcionado de destinatários.",
     "total_sent": "Total enviado",
-    "non_openers_count_many": "Destinatário{{count}}que não abriu",
     "non_openers_count_one": "Destinatário{{count}}que não abriu",
     "non_openers_count_other": "Destinatário{{count}}que não abriu",
-    "non_clickers_count_many": "Destinatário{{count}}que abriu, mas não clicou",
     "non_clickers_count_one": "Destinatário{{count}}que abriu, mas não clicou",
     "non_clickers_count_other": "Destinatário{{count}}que abriu, mas não clicou",
-    "preview_recipient_count_desc_many": "Este reenvio será enviado ao destinatário{{count}}",
     "preview_recipient_count_desc_one": "Este reenvio será enviado ao destinatário{{count}}",
-    "preview_recipient_count_desc_other": "Este reenvio será enviado ao destinatário{{count}}"
+    "preview_recipient_count_desc_other": "Este reenvio será enviado ao destinatário{{count}}",
+    "non_openers_count_many": "Destinatário{{count}}que não abriu",
+    "non_clickers_count_many": "Destinatário{{count}}que abriu, mas não clicou",
+    "preview_recipient_count_desc_many": "Este reenvio será enviado ao destinatário{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "sex",
@@ -940,9 +940,9 @@
     "time_period": "Período de tempo",
     "title": "Enviar otimizador de tempo",
     "top_recommended": "Top Recommended",
-    "days_many": "{{count}}dias",
     "days_one": "{{count}}dias",
     "days_other": "{{count}}dias",
+    "days_many": "{{count}}dias",
     "heatmap_cell_title_many": "{{day}}{{hour}}: engajamento{{count}}"
   },
   "segment_form": {

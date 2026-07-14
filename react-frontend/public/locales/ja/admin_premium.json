@@ -205,6 +205,7 @@
         "unknown": "ステータス不明"
       },
       "connect_fallback_active": "Stripe Connect アカウントは構成されていますが、まだライブ寄付を行う準備ができていません。オンボーディングが完了するまで、支払いにはプラットフォームのフォールバックが使用されます。",
+      "requirements_due_one": "注意が必要な Stripe アカウント要件: {{count}}。",
       "requirements_due_other": "注意が必要な Stripe アカウント要件: {{count}}。"
     },
     "finance": {

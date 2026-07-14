@@ -74,9 +74,9 @@
     "courses": "Corsi",
     "podcasts": "Podcast",
     "switch_community": "Cambia comunità",
-    "unread_notifications_many": "{{count}} notifiche non lette",
     "unread_notifications_one": "{{count}} notifiche non lette",
-    "unread_notifications_other": "{{count}} notifiche non lette"
+    "unread_notifications_other": "{{count}} notifiche non lette",
+    "unread_notifications_many": "{{count}} notifiche non lette"
   },
   "landing_links": {
     "title": "Esplora questa comunità",
@@ -372,15 +372,15 @@
     "load_more_failed": "Impossibile caricare altri membri",
     "my_profile": "Il mio profilo",
     "load_more_count": "Carica altro ({{remaining}} rimanenti)",
-    "results_count_many": "{{count}} membri mostrati",
     "results_count_one": "{{count}} membri mostrati",
     "results_count_other": "{{count}} membri mostrati",
-    "hours_exchanged_aria_many": "{{count}} ore scambiate",
     "hours_exchanged_aria_one": "{{count}} ore scambiate",
     "hours_exchanged_aria_other": "{{count}} ore scambiate",
-    "hours_short_many": "{{count}} h",
     "hours_short_one": "{{count}} h",
-    "hours_short_other": "{{count}} h"
+    "hours_short_other": "{{count}} h",
+    "results_count_many": "{{count}} membri mostrati",
+    "hours_exchanged_aria_many": "{{count}} ore scambiate",
+    "hours_short_many": "{{count}} h"
   },
   "error_boundary": {
     "title": "Qualcosa è andato storto",
@@ -893,12 +893,12 @@
     "feed_sidebar": "Barra laterale della comunità",
     "filter_panel": "Pannello filtro",
     "remove": "Remove",
-    "location_results_many": "{{count}} suggerimenti di indirizzi disponibili",
     "location_results_one": "{{count}} suggerimenti di indirizzi disponibili",
     "location_results_other": "{{count}} suggerimenti di indirizzi disponibili",
-    "search_results_many": "{{count}} results available",
     "search_results_one": "{{count}} risultati disponibili",
-    "search_results_other": "{{count}} risultati disponibili"
+    "search_results_other": "{{count}} risultati disponibili",
+    "location_results_many": "{{count}} suggerimenti di indirizzi disponibili",
+    "search_results_many": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Elenco Competenze della Comunità",
@@ -949,9 +949,9 @@
     "aria_close_members_list": "Chiudi elenco membri",
     "category_optional": "Categoria (opzionale)",
     "proficiency_level": "Livello di competenza",
-    "aria_results_many": "{{count}} suggerimenti di abilità disponibili",
     "aria_results_one": "{{count}} suggerimenti di abilità disponibili",
-    "aria_results_other": "{{count}} suggerimenti di abilità disponibili"
+    "aria_results_other": "{{count}} suggerimenti di abilità disponibili",
+    "aria_results_many": "{{count}} suggerimenti di abilità disponibili"
   },
   "hours_display_one": "{{count}} ora",
   "hours_display_other": "{{count}} ore",
@@ -1131,9 +1131,9 @@
     "errors": {
       "load_failed": "Impossibile caricare i club. Riprova."
     },
-    "member_count_many": "{{count}} membri",
     "member_count_one": "{{count}} membri",
-    "member_count_other": "{{count}} membri"
+    "member_count_other": "{{count}} membri",
+    "member_count_many": "{{count}} membri"
   },
   "feed": {
     "personalisation": {
@@ -1217,9 +1217,9 @@
       "size": "Dimensione",
       "count": "{{count}} esportazioni",
       "empty": "Non hai ancora esportato i tuoi dati.",
-      "count_many": "{{count}} esportazioni",
       "count_one": "{{count}} esportazioni",
-      "count_other": "{{count}} esportazioni"
+      "count_other": "{{count}} esportazioni",
+      "count_many": "{{count}} esportazioni"
     },
     "errors": {
       "rate_limit": "Puoi richiedere 5 export al giorno. Riprova domani.",
@@ -1465,9 +1465,9 @@
     "create_error": "Impossibile creare la campagna push. Riprova.",
     "submit_create": "Crea campagna",
     "feature_disabled": "Le campagne push non sono disponibili per il tuo account.",
-    "estimate_result_many": "Portata stimata: {{count}} membri",
     "estimate_result_one": "Portata stimata: {{count}} membri",
-    "estimate_result_other": "Portata stimata: {{count}} membri"
+    "estimate_result_other": "Portata stimata: {{count}} membri",
+    "estimate_result_many": "Portata stimata: {{count}} membri"
   },
   "push_campaign_opt_in": "Ricevere notifiche push promozionate",
   "push_campaign_opt_in_description": "Consenti alle attività e organizzazioni locali di inviarti notifiche push mirate. Puoi annullare l'iscrizione in qualsiasi momento.",
@@ -1538,9 +1538,9 @@
       "usage_count": "Utilizzato {{count}} volte",
       "saved": "Buono salvato",
       "deleted": "Buono eliminato",
-      "usage_count_many": "Utilizzato {{count}} volte",
       "usage_count_one": "Utilizzato {{count}} volte",
-      "usage_count_other": "Utilizzato {{count}} volte"
+      "usage_count_other": "Utilizzato {{count}} volte",
+      "usage_count_many": "Utilizzato {{count}} volte"
     },
     "qr_code_alt": "Codice QR"
   },
@@ -2102,9 +2102,9 @@
       "from_label": "Da",
       "load_failed": "Impossibile caricare il calendario."
     },
-    "char_count_many": "{{count}}/500",
     "char_count_one": "{{count}}/500",
-    "char_count_other": "{{count}}/500"
+    "char_count_other": "{{count}}/500",
+    "char_count_many": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Continua con Google",
@@ -2209,13 +2209,13 @@
       "reminder_failed": "Impossibile inviare il promemoria.",
       "waive_failed": "Impossibile esonerare le quote."
     },
-    "admin_bulk_reminder_sent_many": "{{count}} promemoria inviati.",
+    "badge_none": "Nessuna quota",
     "admin_bulk_reminder_sent_one": "{{count}} promemoria inviati.",
     "admin_bulk_reminder_sent_other": "{{count}} promemoria inviati.",
-    "admin_overdue_count_many": "{{count}} membro/i hanno quote scadute.",
     "admin_overdue_count_one": "{{count}} membro/i hanno quote scadute.",
     "admin_overdue_count_other": "{{count}} membro/i hanno quote scadute.",
-    "badge_none": "Nessuna quota"
+    "admin_bulk_reminder_sent_many": "{{count}} promemoria inviati.",
+    "admin_overdue_count_many": "{{count}} membro/i hanno quote scadute."
   },
   "collections": {
     "save": "Salva",
@@ -2360,9 +2360,9 @@
   "max_characters": "max {{count}} caratteri",
   "map": {
     "listings_here": "{{count}} annunci qui",
-    "listings_here_many": "{{count}} annunci qui",
     "listings_here_one": "{{count}} annunci qui",
-    "listings_here_other": "{{count}} annunci qui"
+    "listings_here_other": "{{count}} annunci qui",
+    "listings_here_many": "{{count}} annunci qui"
   },
   "time_credits_short": "{{count}}h di crediti",
   "level_plain": "Livello {{level}}",
@@ -2381,19 +2381,18 @@
     "scheme_system": "System"
   },
   "alpha_badge": "Alfa",
-  "hours_display_many": "{{count}} ore",
   "wellbeing": {
     "mood_struggling": "In difficoltà",
-    "mood_okay": "Così così",
-    "mood_good": "Bene",
-    "mood_unknown": "Sconosciuto",
-    "score_excellent": "Eccellente",
-    "score_critical": "Critico",
     "mood_low": "Basso",
+    "mood_good": "Bene",
     "mood_great": "Grande",
+    "score_excellent": "Eccellente",
     "score_good": "Bene",
     "score_fair": "Giusto",
-    "score_needs_attention": "Ha bisogno di attenzione"
+    "score_needs_attention": "Ha bisogno di attenzione",
+    "mood_okay": "Così così",
+    "mood_unknown": "Sconosciuto",
+    "score_critical": "Critico"
   },
   "credentials": {
     "status_pending": "In attesa di revisione",
@@ -2401,6 +2400,33 @@
     "status_expired": "Scaduto",
     "status_rejected": "Respinto"
   },
+  "submit_error": "Impossibile inviare. Per favore riprova.",
+  "submitting": "Invio…",
+  "submit": "Invia",
+  "caregiver": {
+    "hours_short": "{{hours}}h",
+    "burnout_high": "Carico elevato: {{hours}} ore questa settimana",
+    "burnout_moderate": "Carico moderato: {{hours}} ore questa settimana",
+    "burnout_warning": "Attenzione: sovraccarico — questa settimana hai svolto molte ore. Assicurati di riposare.",
+    "upcoming_care": "Prossimo accompagnamento",
+    "no_upcoming_care": "Nessun accompagnamento programmato",
+    "recent_care": "Accompagnamento recente",
+    "no_recent_care": "Nessun registro di accompagnamento recente",
+    "view_schedule": "Vedi il piano di accompagnamento",
+    "request_on_behalf": "Richiedi aiuto per suo conto"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Non interessato",
+    "too_far": "Troppo lontano",
+    "not_my_skills": "Non le mie capacità"
+  },
+  "under_25": "Sotto i 25 anni",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Sconosciuto",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2428,10 +2454,8 @@
     "action_goal": "ha fissato un nuovo obiettivo",
     "action_post": "ha condiviso un post"
   },
-  "hours_short_many": "{{count}}h",
   "hours_short_one": "{{count}}h",
   "hours_short_other": "{{count}}h",
-  "time_credits_short_many": "{{count}}h di crediti",
   "time_credits_short_one": "{{count}}h di crediti",
   "time_credits_short_other": "{{count}}h di crediti",
   "question_required": "Obbligatorio",
@@ -2447,10 +2471,8 @@
   "required_error": "Rispondi a tutte le domande obbligatorie.",
   "already_responded": "Hai già partecipato a questo sondaggio.",
   "time_ago_just_now": "Adesso",
-  "time_ago_hours_many": "{{count}} h fa",
   "time_ago_hours_one": "{{count}} h fa",
   "time_ago_hours_other": "{{count}} h fa",
-  "time_ago_days_many": "{{count}} g fa",
   "time_ago_days_one": "{{count}} g fa",
   "time_ago_days_other": "{{count}} g fa",
   "providers": {
@@ -2465,32 +2487,20 @@
     "website_aria": "Visita il sito web del fornitore{{url}}",
     "website": "Sito web"
   },
-  "caregiver": {
-    "burnout_high": "Carico elevato: {{hours}} ore questa settimana",
-    "burnout_moderate": "Carico moderato: {{hours}} ore questa settimana",
-    "burnout_warning": "Attenzione: sovraccarico — questa settimana hai svolto molte ore. Assicurati di riposare.",
-    "upcoming_care": "Prossimo accompagnamento",
-    "no_upcoming_care": "Nessun accompagnamento programmato",
-    "recent_care": "Accompagnamento recente",
-    "no_recent_care": "Nessun registro di accompagnamento recente",
-    "view_schedule": "Vedi il piano di accompagnamento",
-    "request_on_behalf": "Richiedi aiuto per suo conto",
-    "hours_short": "{{hours}}h"
-  },
   "cover": {
     "title": "Accompagnamento sostitutivo"
   },
   "viewer": {
     "time_just_now": "Adesso",
-    "time_minutes_ago_many": "{{count}}m fa",
     "time_minutes_ago_one": "{{count}}m fa",
     "time_minutes_ago_other": "{{count}}m fa",
-    "time_hours_ago_many": "{{count}}h fa",
     "time_hours_ago_one": "{{count}}h fa",
     "time_hours_ago_other": "{{count}}h fa",
-    "time_days_ago_many": "{{count}}g fa",
     "time_days_ago_one": "{{count}}g fa",
-    "time_days_ago_other": "{{count}}g fa"
+    "time_days_ago_other": "{{count}}g fa",
+    "time_minutes_ago_many": "{{count}}m fa",
+    "time_hours_ago_many": "{{count}}h fa",
+    "time_days_ago_many": "{{count}}g fa"
   },
   "biometric": {
     "label_builtin": "Autenticatore integrato",
@@ -2578,40 +2588,34 @@
     "preview_desktop": "Desktop",
     "preview_mobile": "Mobile"
   },
-  "dismiss_reasons": {
-    "too_far": "Troppo lontano",
-    "not_my_skills": "Non le mie capacità",
-    "not_interested": "Non interessato"
-  },
   "qa": {
     "upvote_aria": "Voto positivo",
-    "vote_count_aria_many": "{{count}} voti",
     "vote_count_aria_one": "{{count}} voti",
     "vote_count_aria_other": "{{count}} voti",
-    "downvote_aria": "Voto negativo"
+    "downvote_aria": "Voto negativo",
+    "vote_count_aria_many": "{{count}} voti"
   },
   "challenges": {
     "time_ended": "Terminata",
     "time_remaining_days_hours": "{{days}}g {{hours}}h rimanenti",
     "time_remaining_hours_minutes": "{{hours}}h {{minutes}}m rimanenti"
   },
-  "max_characters_many": "max {{count}} caratteri",
   "max_characters_one": "max {{count}} caratteri",
   "max_characters_other": "max {{count}} caratteri",
   "volunteering": {
     "time_just_now": "Proprio adesso",
-    "time_minutes_ago_many": "{{count}}minuto fa",
     "time_minutes_ago_one": "{{count}}minuto fa",
     "time_minutes_ago_other": "{{count}}minuto fa",
-    "time_hours_ago_many": "{{count}}un'ora fa",
     "time_hours_ago_one": "{{count}}un'ora fa",
     "time_hours_ago_other": "{{count}}un'ora fa",
-    "time_days_ago_many": "{{count}}giorno fa",
     "time_days_ago_one": "{{count}}giorno fa",
     "time_days_ago_other": "{{count}}giorno fa",
     "wellbeing_user_number": "Volontario n. {{id}}",
     "wellbeing_unknown_user": "Volontario sconosciuto",
-    "wellbeing_unknown_type": "Segnalazione sul benessere"
+    "wellbeing_unknown_type": "Segnalazione sul benessere",
+    "time_minutes_ago_many": "{{count}}minuto fa",
+    "time_hours_ago_many": "{{count}}un'ora fa",
+    "time_days_ago_many": "{{count}}giorno fa"
   },
   "users": {
     "action_edit": "Modifica",
@@ -2628,15 +2632,15 @@
   "system": {
     "never": "Mai",
     "just_now": "Proprio adesso",
-    "minutes_ago_many": "{{count}}m fa",
     "minutes_ago_one": "{{count}}m fa",
     "minutes_ago_other": "{{count}}m fa",
-    "hours_ago_many": "{{count}}h fa",
     "hours_ago_one": "{{count}}h fa",
     "hours_ago_other": "{{count}}h fa",
-    "days_ago_many": "{{count}}giorni fa",
     "days_ago_one": "{{count}}giorni fa",
-    "days_ago_other": "{{count}}giorni fa"
+    "days_ago_other": "{{count}}giorni fa",
+    "minutes_ago_many": "{{count}}m fa",
+    "hours_ago_many": "{{count}}h fa",
+    "days_ago_many": "{{count}}giorni fa"
   },
   "super": {
     "tenant_actions": "Azioni degli inquilini",
@@ -2762,24 +2766,24 @@
     "validation_min": "Deve essere {{value}} o superiore",
     "validation_max": "Deve essere {{value}} o inferiore",
     "validation_format": "Formato non valido",
-    "gdpr_sla_overdue_many": "{{count}} giorni di ritardo",
     "gdpr_sla_overdue_one": "{{count}} giorni di ritardo",
     "gdpr_sla_overdue_other": "{{count}} giorni di ritardo",
-    "gdpr_sla_days_left_many": "{{count}} giorni rimasti",
     "gdpr_sla_days_left_one": "{{count}} giorni rimasti",
-    "gdpr_sla_days_left_other": "{{count}} giorni rimasti"
+    "gdpr_sla_days_left_other": "{{count}} giorni rimasti",
+    "gdpr_sla_overdue_many": "{{count}} giorni di ritardo",
+    "gdpr_sla_days_left_many": "{{count}} giorni rimasti"
   },
   "crm": {
     "just_now": "Just Now",
-    "minutes_ago_many": "{{count}} minuti fa",
     "minutes_ago_one": "{{count}} minuti fa",
     "minutes_ago_other": "{{count}} minuti fa",
-    "hours_ago_many": "{{count}} ore fa",
     "hours_ago_one": "{{count}} ore fa",
     "hours_ago_other": "{{count}} ore fa",
-    "days_ago_many": "{{count}} giorni fa",
     "days_ago_one": "{{count}} giorni fa",
-    "days_ago_other": "{{count}} giorni fa"
+    "days_ago_other": "{{count}} giorni fa",
+    "minutes_ago_many": "{{count}} minuti fa",
+    "hours_ago_many": "{{count}} ore fa",
+    "days_ago_many": "{{count}} giorni fa"
   },
   "config": {
     "module_name_dashboard": "Cruscotto",
@@ -2834,11 +2838,11 @@
     "no_data": "Nessun dato disponibile",
     "drag_hint": "Trascina gli elementi per riordinarli",
     "drag_to_reorder": "Trascina per riordinare",
-    "sub_items_many": "Sotto-voci {{count}}",
     "sub_items_one": "Sotto-voci {{count}}",
     "sub_items_other": "Sotto-voci {{count}}",
     "edit_item": "Modifica elemento",
-    "delete_item": "Elimina elemento"
+    "delete_item": "Elimina elemento",
+    "sub_items_many": "Sotto-voci {{count}}"
   },
   "content": {
     "label_attribute_actions": "Azioni sugli attributi",
@@ -2873,10 +2877,10 @@
     "surveys": {
       "analytics": {
         "total_responses": "Risposte totali",
-        "answer_count_many": "{{count}}risponde",
         "answer_count_one": "{{count}}risposta",
         "answer_count_other": "{{count}}risponde",
-        "no_open_text": "Nessuna risposta a testo aperto ancora."
+        "no_open_text": "Nessuna risposta a testo aperto ancora.",
+        "answer_count_many": "{{count}}risponde"
       }
     }
   },
@@ -2948,7 +2952,6 @@
       "active_members": "Membri attivi",
       "recipients_reached": "Destinatari raggiunti",
       "sub_region_coverage": "Copertura sottoregione (ultimi giorni {{days}})",
-      "under_supplied_count_many": "{{count}} sottofornito",
       "under_supplied_count_one": "{{count}} sottofornito",
       "under_supplied_count_other": "{{count}} sottofornito",
       "sub_region_coverage_aria": "Copertura subregionale",
@@ -2977,12 +2980,13 @@
       "helper_churn_note": "{{lapsed}} di {{prior}} gli aiutanti precedentemente attivi non hanno registrato ore di recente.",
       "helper_churn_aria": "L'assistente varia per categoria",
       "coefficient_drift": "Deriva dei coefficienti di categoria",
-      "drifting_count_many": "{{count}} alla deriva",
       "drifting_count_one": "{{count}} alla deriva",
       "drifting_count_other": "{{count}} alla deriva",
       "coefficient_drift_note": "Le categorie con deriva assoluta > {{threshold}}% vengono contrassegnate. Esamina i coefficienti di base nell'editor dei coefficienti di categoria.",
       "coefficient_drift_aria": "Deriva dei coefficienti di categoria",
-      "proactive_alerts": "Avvisi proattivi"
+      "proactive_alerts": "Avvisi proattivi",
+      "under_supplied_count_many": "{{count}} sottofornito",
+      "drifting_count_many": "{{count}} alla deriva"
     },
     "empty": {
       "value": "-"
@@ -3079,14 +3083,13 @@
         "resolution_trend_6m": "Andamento della risoluzione, ultimi 6 mesi"
       },
       "units": {
-        "days_count_many": "{{count}} giorni",
         "days_count_one": "{{count}} giorni",
-        "days_count_other": "{{count}} giorni"
+        "days_count_other": "{{count}} giorni",
+        "days_count_many": "{{count}} giorni"
       },
       "empty_value": "-"
     }
   },
-  "unknown": "Sconosciuto",
   "advertising": {
     "push": {
       "no_daily_data": "Nessun dato giornaliero ancora.",
@@ -3094,21 +3097,18 @@
         "sends": "Invia",
         "opens": "Si apre"
       },
-      "chart_sends_title_many": "{{count}} invia",
       "chart_sends_title_one": "{{count}} invia",
       "chart_sends_title_other": "{{count}} invia",
-      "chart_opens_title_many": "Si apre {{count}}",
       "chart_opens_title_one": "Si apre {{count}}",
-      "chart_opens_title_other": "Si apre {{count}}"
+      "chart_opens_title_other": "Si apre {{count}}",
+      "chart_sends_title_many": "{{count}} invia",
+      "chart_opens_title_many": "Si apre {{count}}"
     }
   },
-  "submit_error": "Impossibile inviare. Per favore riprova.",
-  "submitting": "Invio…",
-  "submit": "Invia",
-  "under_25": "Sotto i 25 anni",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+"
+  "hours_display_many": "{{count}} ore",
+  "hours_short_many": "{{count}}h",
+  "time_credits_short_many": "{{count}}h di crediti",
+  "time_ago_hours_many": "{{count}} h fa",
+  "time_ago_days_many": "{{count}} g fa",
+  "max_characters_many": "max {{count}} caratteri"
 }

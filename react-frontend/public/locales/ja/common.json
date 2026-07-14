@@ -885,6 +885,7 @@
     "feed_sidebar": "コミュニティサイドバー",
     "filter_panel": "フィルターパネル",
     "remove": "Remove",
+    "location_results_one": "{{count}} アドレスの提案が利用可能",
     "location_results_other": "{{count}} アドレスの提案が利用可能",
     "search_results_other": "{{count}} の結果が利用可能"
   },
@@ -937,6 +938,7 @@
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
     "proficiency_level": "習熟度",
+    "aria_results_one": "{{count}} のスキル提案が利用可能",
     "aria_results_other": "{{count}} のスキル提案が利用可能"
   },
   "hours_display_one": "{{count}}時間",
@@ -1447,6 +1449,7 @@
     "create_error": "プッシュキャンペーンを作成できませんでした。もう一度お試しください。",
     "submit_create": "キャンペーンを作成",
     "feature_disabled": "このアカウントではプッシュキャンペーンは利用できません。",
+    "estimate_result_one": "推定リーチ: {{count}} メンバー",
     "estimate_result_other": "推定リーチ: {{count}} 人"
   },
   "push_campaign_opt_in": "プロモーションプッシュ通知を受け取る",
@@ -2185,9 +2188,10 @@
       "reminder_failed": "リマインダーを送信できませんでした。",
       "waive_failed": "会費を免除できませんでした。"
     },
+    "badge_none": "会費なし",
     "admin_bulk_reminder_sent_other": "{{count}} 件のリマインダーを送信しました。",
-    "admin_overdue_count_other": "{{count}} 名のメンバーが会費を延滞しています。",
-    "badge_none": "会費なし"
+    "admin_overdue_count_one": "{{count}} メンバーは会費を滞納しています。",
+    "admin_overdue_count_other": "{{count}} 名のメンバーが会費を延滞しています。"
   },
   "collections": {
     "save": "保存",
@@ -2354,14 +2358,14 @@
   "wellbeing": {
     "mood_struggling": "もがく",
     "mood_low": "低い",
-    "mood_okay": "わかった",
     "mood_good": "良い",
     "mood_great": "素晴らしい",
-    "mood_unknown": "未知",
     "score_excellent": "素晴らしい",
     "score_good": "良い",
     "score_fair": "公平",
     "score_needs_attention": "注意が必要です",
+    "mood_okay": "わかった",
+    "mood_unknown": "未知",
     "score_critical": "致命的"
   },
   "credentials": {
@@ -2370,6 +2374,33 @@
     "status_expired": "期限切れ",
     "status_rejected": "拒否されました"
   },
+  "submit_error": "提出できませんでした。もう一度試してください。",
+  "submitting": "送信中…",
+  "submit": "提出する",
+  "caregiver": {
+    "hours_short": "{{hours}}h",
+    "burnout_high": "介護者の負荷が高い: 今週の{{hours}}時間",
+    "burnout_moderate": "中程度の負荷: 今週の{{hours}}時間",
+    "burnout_warning": "今週は多くの時間を記録しました。必ず休んでください",
+    "upcoming_care": "今後のケア",
+    "no_upcoming_care": "まだサポート予定はありません",
+    "recent_care": "最近のケア",
+    "no_recent_care": "最近のケアログはまだありません",
+    "view_schedule": "ケアスケジュールを表示する",
+    "request_on_behalf": "彼らに代わって支援を要請する"
+  },
+  "dismiss_reasons": {
+    "not_interested": "興味がない",
+    "too_far": "遠すぎる",
+    "not_my_skills": "私のスキルではありません"
+  },
+  "under_25": "25歳未満",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65歳以上",
+  "unknown": "未知",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2411,7 +2442,6 @@
   },
   "required_error": "必須の質問すべてに回答してください。",
   "already_responded": "このアンケートにはすでに回答済みです。",
-  "submitting": "送信中…",
   "time_ago_just_now": "たった今",
   "time_ago_hours_other": "{{count}}時間前",
   "time_ago_days_other": "{{count}}日前",
@@ -2426,18 +2456,6 @@
     "email_aria": "電子メールプロバイダー（{{email}}）",
     "website_aria": "プロバイダーの Web サイトにアクセスする{{url}}",
     "website": "Webサイト"
-  },
-  "caregiver": {
-    "burnout_high": "介護者の負荷が高い: 今週の{{hours}}時間",
-    "burnout_moderate": "中程度の負荷: 今週の{{hours}}時間",
-    "burnout_warning": "今週は多くの時間を記録しました。必ず休んでください",
-    "upcoming_care": "今後のケア",
-    "no_upcoming_care": "まだサポート予定はありません",
-    "recent_care": "最近のケア",
-    "no_recent_care": "最近のケアログはまだありません",
-    "view_schedule": "ケアスケジュールを表示する",
-    "request_on_behalf": "彼らに代わって支援を要請する",
-    "hours_short": "{{hours}}h"
   },
   "cover": {
     "title": "カバーケア"
@@ -2534,11 +2552,6 @@
     "preview_desktop": "デスクトップ",
     "preview_mobile": "モバイル"
   },
-  "dismiss_reasons": {
-    "too_far": "遠すぎる",
-    "not_my_skills": "私のスキルではありません",
-    "not_interested": "興味がない"
-  },
   "qa": {
     "upvote_aria": "賛成投票",
     "vote_count_aria_other": "{{count}} 票",
@@ -2571,6 +2584,13 @@
     "action_delete": "削除",
     "actions_menu": "アクションメニュー"
   },
+  "system": {
+    "never": "決してしない",
+    "just_now": "たった今",
+    "minutes_ago_other": "{{count}}1 分前",
+    "hours_ago_other": "{{count}}1時間前",
+    "days_ago_other": "{{count}}日前"
+  },
   "super": {
     "tenant_actions": "テナントのアクション",
     "action_view": "見る",
@@ -2582,15 +2602,16 @@
     "status_inactive_label": "Inactive Label",
     "hub": "ハブ"
   },
-  "system": {
-    "never": "決してしない",
-    "just_now": "たった今",
-    "minutes_ago_other": "{{count}}1 分前",
-    "hours_ago_other": "{{count}}1時間前",
-    "days_ago_other": "{{count}}日前"
-  },
   "help_faqs": {
     "actions_aria": "FAQの操作"
+  },
+  "groups": {
+    "policy_features": "ポリシーの機能",
+    "policy_moderation": "ポリシーモデレーション",
+    "policy_membership": "ポリシーメンバーシップ",
+    "policy_creation": "ポリシーの作成",
+    "policy_content": "ポリシーの内容",
+    "policy_notifications": "ポリシー通知"
   },
   "gamification": {
     "label_campaign_actions": "キャンペーンアクション",
@@ -2614,14 +2635,6 @@
     "event_type_partnership_terminated": "パートナーシップが終了しました",
     "event_type_profile_viewed": "プロフィールを閲覧しました",
     "event_type_federated_search": "パートナー検索"
-  },
-  "groups": {
-    "policy_features": "ポリシーの機能",
-    "policy_moderation": "ポリシーモデレーション",
-    "policy_membership": "ポリシーメンバーシップ",
-    "policy_creation": "ポリシーの作成",
-    "policy_content": "ポリシーの内容",
-    "policy_notifications": "ポリシー通知"
   },
   "enterprise": {
     "config_group_general": "一般的な",
@@ -2764,6 +2777,7 @@
     "no_data": "利用可能なデータがありません",
     "drag_hint": "項目をドラッグして並べ替えます",
     "drag_to_reorder": "ドラッグして並べ替えます",
+    "sub_items_one": "{{count}} サブアイテム",
     "sub_items_other": "{{count}} サブアイテム",
     "edit_item": "項目を編集する",
     "delete_item": "項目の削除"
@@ -3016,14 +3030,5 @@
       "chart_sends_title_other": "{{count}} 件の送信",
       "chart_opens_title_other": "{{count}} 件の開封"
     }
-  },
-  "submit_error": "提出できませんでした。もう一度試してください。",
-  "submit": "提出する",
-  "under_25": "25歳未満",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+",
-  "unknown": "未知"
+  }
 }

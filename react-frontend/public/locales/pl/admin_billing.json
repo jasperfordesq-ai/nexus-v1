@@ -204,9 +204,9 @@
     "over_limit_warning": "Osiągnąłeś limity swojego planu. Uaktualnij, aby kontynuować.",
     "upgrade_modal_desc": "Uaktualnij swój plan, aby odblokować dodatkowe funkcje i pojemność.",
     "upgrade_mailto_subject": "Prośba o zmianę planu na wyższy",
-    "user_count_label_few": "{{count}} / {{max}} użytkowników",
-    "user_count_label_many": "{{count}} / {{max}} użytkowników",
     "user_count_label_one": "{{count}} / {{max}} użytkowników",
-    "user_count_label_other": "{{count}} / {{max}} użytkowników"
+    "user_count_label_other": "{{count}} / {{max}} użytkowników",
+    "user_count_label_few": "{{count}} / {{max}} użytkowników",
+    "user_count_label_many": "{{count}} / {{max}} użytkowników"
   }
 }

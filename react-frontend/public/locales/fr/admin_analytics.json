@@ -246,9 +246,9 @@
         "unknown": "Inconnu"
       }
     },
-    "location_marker_title_many": "{{area}}: Membres de{{count}}",
     "location_marker_title_one": "{{area}}: Membres de{{count}}",
     "location_marker_title_other": "{{area}}: Membres de{{count}}",
+    "location_marker_title_many": "{{area}}: Membres de{{count}}",
     "member_count_many": "Membres de{{count}}"
   },
   "search_analytics": {
@@ -275,8 +275,8 @@
     "empty_description": "Aucune recherche enregistrée sur la période sélectionnée.",
     "no_trending": "Aucune recherche populaire sur cette période.",
     "no_zero_results": "Aucune recherche sans résultat sur cette période — chaque recherche a abouti.",
-    "count_value_many": "{{count}}×",
     "count_value_one": "{{count}}×",
-    "count_value_other": "{{count}}×"
+    "count_value_other": "{{count}}×",
+    "count_value_many": "{{count}}×"
   }
 }

@@ -346,10 +346,6 @@
     "hours_ago": "{{count}} 時間前",
     "just_now": "Just Now",
     "minutes_ago": "{{count}} 分前",
-    "loss_between_stages_other": "{{count}}がステージ間で失われた",
-    "lost_since_previous_stage_other": "{{count}}は前のステージから負けました",
-    "members_lost_at_step_other": "{{count}}メンバーはこのステップで失われます。",
-    "tasks_total_count_other": "{{count}}タスクの合計",
     "activity_type_login": "ログイン",
     "activity_type_signup": "サインアップ",
     "activity_type_listing_created": "リストが作成されました",
@@ -357,6 +353,13 @@
     "activity_type_note_added": "注記を追加しました",
     "activity_type_task_created": "タスクが作成されました",
     "activity_type_profile_updated": "プロフィールを更新しました",
-    "activity_type_group_joined": "グループに参加しました"
+    "activity_type_group_joined": "グループに参加しました",
+    "loss_between_stages_one": "{{count}} がステージ間で失われました",
+    "loss_between_stages_other": "{{count}}がステージ間で失われた",
+    "lost_since_previous_stage_one": "{{count}} は前のステージから失われました",
+    "lost_since_previous_stage_other": "{{count}}は前のステージから負けました",
+    "members_lost_at_step_one": "{{count}} メンバーはこのステップで失われます。",
+    "members_lost_at_step_other": "{{count}}メンバーはこのステップで失われます。",
+    "tasks_total_count_other": "{{count}}タスクの合計"
   }
 }

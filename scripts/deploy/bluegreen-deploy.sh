@@ -750,6 +750,31 @@ wait_for_container_stopped() {
     return 1
 }
 
+terminate_horizon_container() {
+    local container="$1"
+    local output
+
+    # Horizon records the root-owned PID 1 in Redis and horizon:terminate uses
+    # posix_kill() against that PID from inside the container. Running this via
+    # docker_exec_app_user (www-data) cannot signal the root-owned process; the
+    # command prints "Failed to kill process" but still exits zero. Execute this
+    # one process-control command as the container's default/root user and treat
+    # Horizon's soft failure message as a real failure.
+    if ! output="$(docker exec "$container" php /var/www/html/artisan horizon:terminate 2>&1)"; then
+        log_warn "horizon:terminate command failed in $container"
+        [ -n "$output" ] && printf '%s\n' "$output" >&2
+        return 1
+    fi
+
+    if printf '%s\n' "$output" | grep -q 'Failed to kill process'; then
+        log_warn "Horizon could not signal its master process in $container"
+        printf '%s\n' "$output" >&2
+        return 1
+    fi
+
+    return 0
+}
+
 start_worker_services_for_color() {
     local color="$1"
     local release_dir="$2"
@@ -840,9 +865,12 @@ stop_queue_for_color() {
     docker update --restart=no "$queue" >/dev/null 2>&1 || true
     if docker ps --format '{{.Names}}' | grep -qx "$queue"; then
         log_info "Gracefully terminating Horizon in $queue"
-        docker_exec_app_user "$queue" php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || \
-            log_warn "horizon:terminate failed in $queue; falling back to docker stop"
-        wait_for_container_stopped "$queue" 180 || docker stop -t 120 "$queue" >/dev/null 2>&1 || true
+        if terminate_horizon_container "$queue"; then
+            wait_for_container_stopped "$queue" 120 || docker stop -t 120 "$queue" >/dev/null 2>&1 || true
+        else
+            log_warn "Falling back to Docker's graceful stop for $queue"
+            docker stop -t 120 "$queue" >/dev/null 2>&1 || true
+        fi
     fi
 }
 
@@ -870,8 +898,11 @@ stop_workers_for_color() {
     # Legacy single-color names from before blue/green
     docker update --restart=no nexus-php-queue nexus-php-scheduler >/dev/null 2>&1 || true
     if docker ps --format '{{.Names}}' | grep -qx "nexus-php-queue"; then
-        docker_exec_app_user nexus-php-queue php /var/www/html/artisan horizon:terminate >/dev/null 2>&1 || true
-        wait_for_container_stopped nexus-php-queue 180 || docker stop -t 120 nexus-php-queue >/dev/null 2>&1 || true
+        if terminate_horizon_container nexus-php-queue; then
+            wait_for_container_stopped nexus-php-queue 120 || docker stop -t 120 nexus-php-queue >/dev/null 2>&1 || true
+        else
+            docker stop -t 120 nexus-php-queue >/dev/null 2>&1 || true
+        fi
     fi
     if docker ps --format '{{.Names}}' | grep -qx "nexus-php-scheduler"; then
         docker_exec_app_user nexus-php-scheduler php /var/www/html/artisan schedule:interrupt >/dev/null 2>&1 || true

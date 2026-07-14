@@ -397,6 +397,7 @@
       "messages": {
         "recomputed": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
         "saved": "Trust tier settings saved.",
+        "recomputed_one": "{{count}} メンバーの信頼層が再計算されました。",
         "recomputed_other": "{{count}} 人のメンバーの信頼レベルを再計算しました。"
       },
       "recompute_confirm": "すべてのメンバーの信頼層を再計算しますか?これには数分かかる場合があります。"
@@ -743,6 +744,7 @@
       "approve_success": "レビューが承認されました。",
       "decline_success": "レビューは拒否されました。",
       "decision_failed": "決定を記録できませんでした。",
+      "manual_escalation_note_one": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
       "manual_escalation_note_other": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
       "escalated_count_other": "{{count}} がエスカレーションされました",
       "overdue_count_other": "{{count}} 期限切れ",
@@ -865,6 +867,7 @@
           "description": "軽いタッチで監視しながら時間をすばやく承認します。"
         }
       },
+      "available_count_one": "{{count}} ロールのプリセットが利用可能",
       "available_count_other": "{{count}} 件のロールプリセットが利用可能"
     },
     "policy": {
@@ -1636,6 +1639,7 @@
       "target_hours": "ターゲット {{hours}}h",
       "over_by": "{{duration}}までに終了",
       "left": "{{duration}} 左",
+      "subtitle_one": "{{count}} オープン - 最初にソート違反",
       "subtitle_other": "{{count}} オープン - 最初にソート違反",
       "all_count_other": "すべて ({{count}})",
       "breached_count_other": "侵害されました ({{count}})",
@@ -2258,6 +2262,7 @@
       "blocked_title": "まだ起動できません - {{count}} ブロッカーが残っています",
       "blocked_title_plural": "まだ起動できません - {{count}} ブロッカーが残っています",
       "blocked_body": "起動ボタンを有効にする前に、以下のすべてのセクションを解決してください。",
+      "blocked_title_one": "まだ起動できません - {{count}} ブロッカーが残っています",
       "blocked_title_other": "まだ起動できません - {{count}} ブロッカーが残っています"
     },
     "overall": {
@@ -2451,6 +2456,7 @@
       "rendered_markdown": "レンダリングされた Markdown ({{count}} 文字)",
       "missing_placeholder_count_one": "{{count}} プレースホルダーがありません",
       "missing_placeholder_count_other": "{{count}} プレースホルダーがありません",
+      "rendered_markdown_one": "レンダリングされたマークダウン ({{count}} 文字)",
       "rendered_markdown_other": "レンダリングされた Markdown ({{count}} 文字)"
     },
     "exports": {
@@ -2593,6 +2599,7 @@
       "dry_run": "予行演習: {{count}} 人の適格な候補者",
       "dispatched": "{{count}} ナッジをディスパッチしました",
       "dispatch_failed": "派遣失敗",
+      "dry_run_one": "予行演習: {{count}} の適格な候補者",
       "dry_run_other": "予行演習: {{count}} 人の適格な候補者",
       "dispatched_other": "{{count}} ナッジをディスパッチしました"
     }

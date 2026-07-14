@@ -233,6 +233,7 @@
     "review_success": "レビューが送信されました。",
     "review_error": "レビューを送信できません。",
     "rating_required": "送信する前に評価を選択してください。",
+    "meta_description_fallback_one": "このコミュニティ タイムバンクで {{name}} と {{count}} のアクティブなボランティアの機会を探してください。",
     "meta_description_fallback_other": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。",
     "review_count_other": "{{count}} のレビュー"
   },

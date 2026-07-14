@@ -74,10 +74,10 @@
     "courses": "Cúrsaí",
     "podcasts": "Podchraoltaí",
     "switch_community": "Athraigh pobal",
-    "unread_notifications_few": "{{count}} fógra gan léamh",
-    "unread_notifications_many": "{{count}} fógra gan léamh",
     "unread_notifications_one": "{{count}} fógra gan léamh",
     "unread_notifications_other": "{{count}} fógra gan léamh",
+    "unread_notifications_few": "{{count}} fógra gan léamh",
+    "unread_notifications_many": "{{count}} fógra gan léamh",
     "unread_notifications_two": "{{count}} fógra gan léamh"
   },
   "landing_links": {
@@ -374,20 +374,20 @@
     "load_more_failed": "Theip ar luchtú tuilleadh ball",
     "my_profile": "Mo Phróifíl",
     "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)",
-    "results_count_few": "{{count}} ball á dtaispeáint",
-    "results_count_many": "{{count}} ball á dtaispeáint",
     "results_count_one": "{{count}} ball á dtaispeáint",
     "results_count_other": "{{count}} ball á dtaispeáint",
+    "hours_exchanged_aria_one": "{{count}} uair malartaithe",
+    "hours_exchanged_aria_other": "{{count}} uair malartaithe",
+    "hours_short_one": "{{count}} u",
+    "hours_short_other": "{{count}} u",
+    "results_count_few": "{{count}} ball á dtaispeáint",
+    "results_count_many": "{{count}} ball á dtaispeáint",
     "results_count_two": "{{count}} ball á dtaispeáint",
     "hours_exchanged_aria_few": "{{count}} uair malartaithe",
     "hours_exchanged_aria_many": "{{count}} uair malartaithe",
-    "hours_exchanged_aria_one": "{{count}} uair malartaithe",
-    "hours_exchanged_aria_other": "{{count}} uair malartaithe",
     "hours_exchanged_aria_two": "{{count}} uair malartaithe",
     "hours_short_few": "{{count}} u",
     "hours_short_many": "{{count}} u",
-    "hours_short_one": "{{count}} u",
-    "hours_short_other": "{{count}} u",
     "hours_short_two": "{{count}} u"
   },
   "error_boundary": {
@@ -901,15 +901,15 @@
     "feed_sidebar": "Taobh-bharra pobail",
     "filter_panel": "Painéal scagaire",
     "remove": "Remove",
-    "location_results_few": "{{count}} moltaí seoltaí ar fáil",
-    "location_results_many": "{{count}} moltaí seoltaí ar fáil",
     "location_results_one": "{{count}} moltaí seoltaí ar fáil",
     "location_results_other": "{{count}} moltaí seoltaí ar fáil",
+    "search_results_one": "{{count}} torthaí ar fáil",
+    "search_results_other": "{{count}} torthaí ar fáil",
+    "location_results_few": "{{count}} moltaí seoltaí ar fáil",
+    "location_results_many": "{{count}} moltaí seoltaí ar fáil",
     "location_results_two": "{{count}} moltaí seoltaí ar fáil",
     "search_results_few": "{{count}} results available",
     "search_results_many": "{{count}} results available",
-    "search_results_one": "{{count}} torthaí ar fáil",
-    "search_results_other": "{{count}} torthaí ar fáil",
     "search_results_two": "{{count}} results available"
   },
   "skills": {
@@ -961,10 +961,10 @@
     "aria_close_members_list": "Dún liosta ball",
     "category_optional": "Catagóir (roghnach)",
     "proficiency_level": "Leibhéal Inniúlachta",
-    "aria_results_few": "{{count}} moltaí scile ar fáil",
-    "aria_results_many": "{{count}} moltaí scile ar fáil",
     "aria_results_one": "{{count}} moltaí scile ar fáil",
     "aria_results_other": "{{count}} moltaí scile ar fáil",
+    "aria_results_few": "{{count}} moltaí scile ar fáil",
+    "aria_results_many": "{{count}} moltaí scile ar fáil",
     "aria_results_two": "{{count}} moltaí scile ar fáil"
   },
   "hours_display_one": "{{count}} uair",
@@ -1145,10 +1145,10 @@
     "errors": {
       "load_failed": "Níorbh fhéidir clubanna a lódáil. Triail arís."
     },
-    "member_count_few": "{{count}} ball",
-    "member_count_many": "{{count}} ball",
     "member_count_one": "{{count}} ball",
     "member_count_other": "{{count}} ball",
+    "member_count_few": "{{count}} ball",
+    "member_count_many": "{{count}} ball",
     "member_count_two": "{{count}} ball"
   },
   "feed": {
@@ -1233,10 +1233,10 @@
       "size": "Méid",
       "count": "{{count}} easpórtáil",
       "empty": "Níor easpórtáil tú do shonraí fós.",
-      "count_few": "{{count}} easpórtáil",
-      "count_many": "{{count}} easpórtáil",
       "count_one": "{{count}} easpórtáil",
       "count_other": "{{count}} easpórtáil",
+      "count_few": "{{count}} easpórtáil",
+      "count_many": "{{count}} easpórtáil",
       "count_two": "{{count}} easpórtáil"
     },
     "errors": {
@@ -1483,10 +1483,10 @@
     "create_error": "Níorbh fhéidir an feachtas push a chruthú. Bain triail eile as.",
     "submit_create": "Cruthaigh feachtas",
     "feature_disabled": "Níl feachtais push ar fáil do do chuntas.",
-    "estimate_result_few": "Raon measta: {{count}} ball",
-    "estimate_result_many": "Raon measta: {{count}} ball",
     "estimate_result_one": "Raon measta: {{count}} ball",
     "estimate_result_other": "Raon measta: {{count}} ball",
+    "estimate_result_few": "Raon measta: {{count}} ball",
+    "estimate_result_many": "Raon measta: {{count}} ball",
     "estimate_result_two": "Raon measta: {{count}} ball"
   },
   "push_campaign_opt_in": "Faigh fógraí push á gcur chun cinn",
@@ -1558,10 +1558,10 @@
       "usage_count": "Úsáidte {{count}} uair",
       "saved": "Cúpón sábháilte",
       "deleted": "Cúpón scriosta",
-      "usage_count_few": "Úsáidte {{count}} uair",
-      "usage_count_many": "Úsáidte {{count}} uair",
       "usage_count_one": "Úsáidte {{count}} uair",
       "usage_count_other": "Úsáidte {{count}} uair",
+      "usage_count_few": "Úsáidte {{count}} uair",
+      "usage_count_many": "Úsáidte {{count}} uair",
       "usage_count_two": "Úsáidte {{count}} uair"
     },
     "qr_code_alt": "Cód QR"
@@ -2124,10 +2124,10 @@
       "from_label": "Ó",
       "load_failed": "Níorbh fhéidir an féilire a luchtú."
     },
-    "char_count_few": "{{count}}/500",
-    "char_count_many": "{{count}}/500",
     "char_count_one": "{{count}}/500",
     "char_count_other": "{{count}}/500",
+    "char_count_few": "{{count}}/500",
+    "char_count_many": "{{count}}/500",
     "char_count_two": "{{count}}/500"
   },
   "oauth": {
@@ -2233,17 +2233,17 @@
       "reminder_failed": "Níorbh fhéidir meabhrúchán a sheoladh.",
       "waive_failed": "Níorbh fhéidir táillí a tharscaoileadh."
     },
-    "admin_bulk_reminder_sent_few": "Seoladh {{count}} meabhrúchán.",
-    "admin_bulk_reminder_sent_many": "Seoladh {{count}} meabhrúchán.",
+    "badge_none": "Uimh dleachtanna",
     "admin_bulk_reminder_sent_one": "Seoladh {{count}} meabhrúchán.",
     "admin_bulk_reminder_sent_other": "Seoladh {{count}} meabhrúchán.",
+    "admin_overdue_count_one": "Tá táillí thar dáta ag {{count}} ball.",
+    "admin_overdue_count_other": "Tá táillí thar dáta ag {{count}} ball.",
+    "admin_bulk_reminder_sent_few": "Seoladh {{count}} meabhrúchán.",
+    "admin_bulk_reminder_sent_many": "Seoladh {{count}} meabhrúchán.",
     "admin_bulk_reminder_sent_two": "Seoladh {{count}} meabhrúchán.",
     "admin_overdue_count_few": "Tá táillí thar dáta ag {{count}} ball.",
     "admin_overdue_count_many": "Tá táillí thar dáta ag {{count}} ball.",
-    "admin_overdue_count_one": "Tá táillí thar dáta ag {{count}} ball.",
-    "admin_overdue_count_other": "Tá táillí thar dáta ag {{count}} ball.",
-    "admin_overdue_count_two": "Tá táillí thar dáta ag {{count}} ball.",
-    "badge_none": "Uimh dleachtanna"
+    "admin_overdue_count_two": "Tá táillí thar dáta ag {{count}} ball."
   },
   "collections": {
     "save": "Sábháil",
@@ -2388,10 +2388,10 @@
   "max_characters": "uas. {{count}} carachtar",
   "map": {
     "listings_here": "{{count}} liostú anseo",
-    "listings_here_few": "{{count}} liostú anseo",
-    "listings_here_many": "{{count}} liostú anseo",
     "listings_here_one": "{{count}} liostú anseo",
     "listings_here_other": "{{count}} liostú anseo",
+    "listings_here_few": "{{count}} liostú anseo",
+    "listings_here_many": "{{count}} liostú anseo",
     "listings_here_two": "{{count}} liostú anseo"
   },
   "time_credits_short": "{{count}}u creidmheasa",
@@ -2411,28 +2411,52 @@
     "scheme_system": "System"
   },
   "alpha_badge": "Alfa",
-  "hours_display_few": "{{count}} uair",
-  "hours_display_many": "{{count}} uair",
-  "hours_display_two": "{{count}} uair",
   "wellbeing": {
     "mood_struggling": "Ag Streachailt",
     "mood_low": "Íseal",
-    "mood_okay": "Ceart go leor",
-    "mood_unknown": "Anaithnid",
-    "score_critical": "Criticiúil",
     "mood_good": "Maith",
     "mood_great": "Go hiontach",
     "score_excellent": "Ar fheabhas",
     "score_good": "Maith",
     "score_fair": "Cóir",
-    "score_needs_attention": "Teastaíonn aird"
+    "score_needs_attention": "Teastaíonn aird",
+    "mood_okay": "Ceart go leor",
+    "mood_unknown": "Anaithnid",
+    "score_critical": "Criticiúil"
   },
   "credentials": {
-    "status_rejected": "Diúltaithe",
     "status_pending": "Athbhreithniú ar feitheamh",
     "status_verified": "Fíoraithe",
-    "status_expired": "imithe in éag"
+    "status_expired": "imithe in éag",
+    "status_rejected": "Diúltaithe"
   },
+  "submit_error": "Níorbh fhéidir a chur isteach. Bain triail eile as.",
+  "submitting": "Á chur isteach…",
+  "submit": "Cuir isteach",
+  "caregiver": {
+    "hours_short": "{{hours}}h",
+    "burnout_high": "Ualach cúramóra ard:{{hours}}uaireanta an tseachtain seo",
+    "burnout_moderate": "Ualach measartha:{{hours}}uaireanta an tseachtain seo",
+    "burnout_warning": "Tá go leor uaireanta an chloig logáilte agat an tseachtain seo - déan cinnte scíth a ligean",
+    "upcoming_care": "Cúram atá le teacht",
+    "no_upcoming_care": "Níl aon tacaíocht sceidealaithe fós",
+    "recent_care": "Cúram le déanaí",
+    "no_recent_care": "Níl aon logaí cúraim le déanaí fós",
+    "view_schedule": "Féach ar an sceideal cúraim",
+    "request_on_behalf": "Iarr cabhair ar a son"
+  },
+  "dismiss_reasons": {
+    "not_interested": "Níl suim acu ann",
+    "too_far": "I bhfad ar shiúl",
+    "not_my_skills": "Ní mo scileanna"
+  },
+  "under_25": "Faoi 25",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "Anaithnid",
   "nexus_score": {
     "tier_threshold": "{{tier}} ({{min}}+)"
   },
@@ -2460,16 +2484,10 @@
     "action_goal": "leag sprioc nua síos",
     "action_post": "roinnt postáil"
   },
-  "hours_short_few": "{{count}} u",
-  "hours_short_many": "{{count}} u",
   "hours_short_one": "{{count}} u",
   "hours_short_other": "{{count}} u",
-  "hours_short_two": "{{count}} u",
-  "time_credits_short_few": "{{count}}u creidmheasa",
-  "time_credits_short_many": "{{count}}u creidmheasa",
   "time_credits_short_one": "{{count}}u creidmheasa",
   "time_credits_short_other": "{{count}}u creidmheasa",
-  "time_credits_short_two": "{{count}}u creidmheasa",
   "question_required": "Riachtanach",
   "yes": "Tá",
   "no": "No",
@@ -2483,16 +2501,10 @@
   "required_error": "Freagair na ceisteanna riachtanacha go léir le do thoil.",
   "already_responded": "Tá páirt glactha agat cheana sa suirbhé seo.",
   "time_ago_just_now": "Díreach anois",
-  "time_ago_hours_few": "{{count}}u ó shin",
-  "time_ago_hours_many": "{{count}}u ó shin",
   "time_ago_hours_one": "{{count}}u ó shin",
   "time_ago_hours_other": "{{count}}u ó shin",
-  "time_ago_hours_two": "{{count}}u ó shin",
-  "time_ago_days_few": "{{count}}l ó shin",
-  "time_ago_days_many": "{{count}}l ó shin",
   "time_ago_days_one": "{{count}}l ó shin",
   "time_ago_days_other": "{{count}}l ó shin",
-  "time_ago_days_two": "{{count}}l ó shin",
   "providers": {
     "filter_spitex": "Spitex",
     "filter_tagesstte": "Ionaid Lae",
@@ -2505,37 +2517,25 @@
     "website_aria": "Tabhair cuairt ar láithreán gréasáin an tsoláthraí{{url}}",
     "website": "Suíomh Gréasáin"
   },
-  "caregiver": {
-    "burnout_high": "Ualach cúramóra ard:{{hours}}uaireanta an tseachtain seo",
-    "burnout_moderate": "Ualach measartha:{{hours}}uaireanta an tseachtain seo",
-    "burnout_warning": "Tá go leor uaireanta an chloig logáilte agat an tseachtain seo - déan cinnte scíth a ligean",
-    "upcoming_care": "Cúram atá le teacht",
-    "no_upcoming_care": "Níl aon tacaíocht sceidealaithe fós",
-    "recent_care": "Cúram le déanaí",
-    "no_recent_care": "Níl aon logaí cúraim le déanaí fós",
-    "view_schedule": "Féach ar an sceideal cúraim",
-    "request_on_behalf": "Iarr cabhair ar a son",
-    "hours_short": "{{hours}}h"
-  },
   "cover": {
     "title": "Clúdach Cúram"
   },
   "viewer": {
     "time_just_now": "Díreach anois",
-    "time_minutes_ago_few": "{{count}}n ó shin",
-    "time_minutes_ago_many": "{{count}}n ó shin",
     "time_minutes_ago_one": "{{count}}n ó shin",
     "time_minutes_ago_other": "{{count}}n ó shin",
+    "time_hours_ago_one": "{{count}}u ó shin",
+    "time_hours_ago_other": "{{count}}u ó shin",
+    "time_days_ago_one": "{{count}}l ó shin",
+    "time_days_ago_other": "{{count}}l ó shin",
+    "time_minutes_ago_few": "{{count}}n ó shin",
+    "time_minutes_ago_many": "{{count}}n ó shin",
     "time_minutes_ago_two": "{{count}}n ó shin",
     "time_hours_ago_few": "{{count}}u ó shin",
     "time_hours_ago_many": "{{count}}u ó shin",
-    "time_hours_ago_one": "{{count}}u ó shin",
-    "time_hours_ago_other": "{{count}}u ó shin",
     "time_hours_ago_two": "{{count}}u ó shin",
     "time_days_ago_few": "{{count}}l ó shin",
     "time_days_ago_many": "{{count}}l ó shin",
-    "time_days_ago_one": "{{count}}l ó shin",
-    "time_days_ago_other": "{{count}}l ó shin",
     "time_days_ago_two": "{{count}}l ó shin"
   },
   "biometric": {
@@ -2624,50 +2624,42 @@
     "preview_desktop": "Deasc",
     "preview_mobile": "Móibíleach"
   },
-  "dismiss_reasons": {
-    "too_far": "I bhfad ar shiúl",
-    "not_my_skills": "Ní mo scileanna",
-    "not_interested": "Níl suim acu ann"
-  },
   "qa": {
     "upvote_aria": "Vótáil suas",
-    "vote_count_aria_few": "{{count}} vóta",
-    "vote_count_aria_many": "{{count}} vóta",
     "vote_count_aria_one": "{{count}} vóta",
     "vote_count_aria_other": "{{count}} vóta",
-    "vote_count_aria_two": "{{count}} vóta",
-    "downvote_aria": "Vótáil síos"
+    "downvote_aria": "Vótáil síos",
+    "vote_count_aria_few": "{{count}} vóta",
+    "vote_count_aria_many": "{{count}} vóta",
+    "vote_count_aria_two": "{{count}} vóta"
   },
   "challenges": {
     "time_ended": "Tugtha chun críche",
     "time_remaining_days_hours": "{{days}}l {{hours}}u fágtha",
     "time_remaining_hours_minutes": "{{hours}}u {{minutes}}n fágtha"
   },
-  "max_characters_few": "uas. {{count}} carachtar",
-  "max_characters_many": "uas. {{count}} carachtar",
   "max_characters_one": "uas. {{count}} carachtar",
   "max_characters_other": "uas. {{count}} carachtar",
-  "max_characters_two": "uas. {{count}} carachtar",
   "volunteering": {
     "time_just_now": "Díreach anois",
-    "time_minutes_ago_few": "{{count}}nóiméad ó shin",
-    "time_minutes_ago_many": "{{count}}nóiméad ó shin",
     "time_minutes_ago_one": "{{count}}nóiméad ó shin",
     "time_minutes_ago_other": "{{count}}nóiméad ó shin",
+    "time_hours_ago_one": "{{count}}uair an chloig ó shin",
+    "time_hours_ago_other": "{{count}}uair an chloig ó shin",
+    "time_days_ago_one": "{{count}}lá ó shin",
+    "time_days_ago_other": "{{count}}lá ó shin",
+    "wellbeing_user_number": "Oibrí deonach #{{id}}",
+    "wellbeing_unknown_user": "Oibrí deonach anaithnid",
+    "wellbeing_unknown_type": "Ábhar imní folláine",
+    "time_minutes_ago_few": "{{count}}nóiméad ó shin",
+    "time_minutes_ago_many": "{{count}}nóiméad ó shin",
     "time_minutes_ago_two": "{{count}}nóiméad ó shin",
     "time_hours_ago_few": "{{count}}uair an chloig ó shin",
     "time_hours_ago_many": "{{count}}uair an chloig ó shin",
-    "time_hours_ago_one": "{{count}}uair an chloig ó shin",
-    "time_hours_ago_other": "{{count}}uair an chloig ó shin",
     "time_hours_ago_two": "{{count}}uair an chloig ó shin",
     "time_days_ago_few": "{{count}}lá ó shin",
     "time_days_ago_many": "{{count}}lá ó shin",
-    "time_days_ago_one": "{{count}}lá ó shin",
-    "time_days_ago_other": "{{count}}lá ó shin",
-    "time_days_ago_two": "{{count}}lá ó shin",
-    "wellbeing_user_number": "Oibrí deonach #{{id}}",
-    "wellbeing_unknown_user": "Oibrí deonach anaithnid",
-    "wellbeing_unknown_type": "Ábhar imní folláine"
+    "time_days_ago_two": "{{count}}lá ó shin"
   },
   "users": {
     "action_edit": "Cuir in eagar",
@@ -2684,20 +2676,20 @@
   "system": {
     "never": "Riamh",
     "just_now": "Díreach anois",
-    "minutes_ago_few": "{{count}}m ó shin",
-    "minutes_ago_many": "{{count}}m ó shin",
     "minutes_ago_one": "{{count}}m ó shin",
     "minutes_ago_other": "{{count}}m ó shin",
+    "hours_ago_one": "{{count}}h ó shin",
+    "hours_ago_other": "{{count}}h ó shin",
+    "days_ago_one": "{{count}}d ó shin",
+    "days_ago_other": "{{count}}d ó shin",
+    "minutes_ago_few": "{{count}}m ó shin",
+    "minutes_ago_many": "{{count}}m ó shin",
     "minutes_ago_two": "{{count}}m ó shin",
     "hours_ago_few": "{{count}}h ó shin",
     "hours_ago_many": "{{count}}h ó shin",
-    "hours_ago_one": "{{count}}h ó shin",
-    "hours_ago_other": "{{count}}h ó shin",
     "hours_ago_two": "{{count}}h ó shin",
     "days_ago_few": "{{count}}d ó shin",
     "days_ago_many": "{{count}}d ó shin",
-    "days_ago_one": "{{count}}d ó shin",
-    "days_ago_other": "{{count}}d ó shin",
     "days_ago_two": "{{count}}d ó shin"
   },
   "super": {
@@ -2824,33 +2816,33 @@
     "validation_min": "Caithfidh sé a bheith {{value}} nó níos mó",
     "validation_max": "Caithfidh sé a bheith {{value}} nó níos lú",
     "validation_format": "Formáid neamhbhailí",
-    "gdpr_sla_overdue_few": "{{count}} lá thar téarma",
-    "gdpr_sla_overdue_many": "{{count}} lá thar téarma",
     "gdpr_sla_overdue_one": "{{count}} lá thar téarma",
     "gdpr_sla_overdue_other": "{{count}} lá thar téarma",
+    "gdpr_sla_days_left_one": "{{count}} lá fágtha",
+    "gdpr_sla_days_left_other": "{{count}} lá fágtha",
+    "gdpr_sla_overdue_few": "{{count}} lá thar téarma",
+    "gdpr_sla_overdue_many": "{{count}} lá thar téarma",
     "gdpr_sla_overdue_two": "{{count}} lá thar téarma",
     "gdpr_sla_days_left_few": "{{count}} lá fágtha",
     "gdpr_sla_days_left_many": "{{count}} lá fágtha",
-    "gdpr_sla_days_left_one": "{{count}} lá fágtha",
-    "gdpr_sla_days_left_other": "{{count}} lá fágtha",
     "gdpr_sla_days_left_two": "{{count}} lá fágtha"
   },
   "crm": {
     "just_now": "Just Now",
-    "minutes_ago_few": "{{count}} nóiméad ó shin",
-    "minutes_ago_many": "{{count}} nóiméad ó shin",
     "minutes_ago_one": "{{count}} nóiméad ó shin",
     "minutes_ago_other": "{{count}} nóiméad ó shin",
+    "hours_ago_one": "{{count}} uair ó shin",
+    "hours_ago_other": "{{count}} uair ó shin",
+    "days_ago_one": "{{count}} lá ó shin",
+    "days_ago_other": "{{count}} lá ó shin",
+    "minutes_ago_few": "{{count}} nóiméad ó shin",
+    "minutes_ago_many": "{{count}} nóiméad ó shin",
     "minutes_ago_two": "{{count}} nóiméad ó shin",
     "hours_ago_few": "{{count}} uair ó shin",
     "hours_ago_many": "{{count}} uair ó shin",
-    "hours_ago_one": "{{count}} uair ó shin",
-    "hours_ago_other": "{{count}} uair ó shin",
     "hours_ago_two": "{{count}} uair ó shin",
     "days_ago_few": "{{count}} lá ó shin",
     "days_ago_many": "{{count}} lá ó shin",
-    "days_ago_one": "{{count}} lá ó shin",
-    "days_ago_other": "{{count}} lá ó shin",
     "days_ago_two": "{{count}} lá ó shin"
   },
   "config": {
@@ -2906,13 +2898,13 @@
     "no_data": "Níl aon sonraí ar fáil",
     "drag_hint": "Tarraing míreanna le hathordú",
     "drag_to_reorder": "Tarraing chun athordú",
-    "sub_items_few": "Fo-mhír(í) {{count}}",
-    "sub_items_many": "Fo-mhír(í) {{count}}",
     "sub_items_one": "Fo-mhír(í) {{count}}",
     "sub_items_other": "Fo-mhír(í) {{count}}",
-    "sub_items_two": "Fo-mhír(í) {{count}}",
     "edit_item": "Cuir mír in eagar",
-    "delete_item": "Scrios mír"
+    "delete_item": "Scrios mír",
+    "sub_items_few": "Fo-mhír(í) {{count}}",
+    "sub_items_many": "Fo-mhír(í) {{count}}",
+    "sub_items_two": "Fo-mhír(í) {{count}}"
   },
   "content": {
     "label_attribute_actions": "Gníomhartha Tréithe",
@@ -2947,12 +2939,12 @@
     "surveys": {
       "analytics": {
         "total_responses": "Freagraí iomlána",
-        "answer_count_few": "Freagraí{{count}}",
-        "answer_count_many": "Freagraí{{count}}",
         "answer_count_one": "Freagra{{count}}",
         "answer_count_other": "Freagraí{{count}}",
-        "answer_count_two": "Freagraí{{count}}",
-        "no_open_text": "Níl freagraí téacs oscailte ar bith fós."
+        "no_open_text": "Níl freagraí téacs oscailte ar bith fós.",
+        "answer_count_few": "Freagraí{{count}}",
+        "answer_count_many": "Freagraí{{count}}",
+        "answer_count_two": "Freagraí{{count}}"
       }
     }
   },
@@ -3024,11 +3016,8 @@
       "active_members": "Baill ghníomhacha",
       "recipients_reached": "Faighteoirí bainte amach",
       "sub_region_coverage": "Clúdach fo-réigiún (na laethanta {{days}} deiridh)",
-      "under_supplied_count_few": "{{count}} tearcsholáthar",
-      "under_supplied_count_many": "{{count}} tearcsholáthar",
       "under_supplied_count_one": "{{count}} tearcsholáthar",
       "under_supplied_count_other": "{{count}} tearcsholáthar",
-      "under_supplied_count_two": "{{count}} tearcsholáthar",
       "sub_region_coverage_aria": "Clúdach fo-réigiún",
       "columns": {
         "sub_region": "Fo-réigiún",
@@ -3055,14 +3044,17 @@
       "helper_churn_note": "{{lapsed}} ó {{prior}} Níor logáil cúntóirí a bhí gníomhach roimhe seo uaireanta le déanaí.",
       "helper_churn_aria": "Cúntóir churn de réir catagóire",
       "coefficient_drift": "Drift chomhéifeacht chatagóir",
-      "drifting_count_few": "{{count}} ag sruth",
-      "drifting_count_many": "{{count}} ag sruth",
       "drifting_count_one": "{{count}} ag sruth",
       "drifting_count_other": "{{count}} ag sruth",
-      "drifting_count_two": "{{count}} ag sruth",
       "coefficient_drift_note": "Catagóirí le sruth iomlán > {{threshold}}% atá bratach. Déan athbhreithniú ar chomhéifeachtaí bonnlíne san eagarthóir comhéifeacht chatagóir.",
       "coefficient_drift_aria": "Drift chomhéifeacht chatagóir",
-      "proactive_alerts": "Foláirimh réamhghníomhacha"
+      "proactive_alerts": "Foláirimh réamhghníomhacha",
+      "under_supplied_count_few": "{{count}} tearcsholáthar",
+      "under_supplied_count_many": "{{count}} tearcsholáthar",
+      "under_supplied_count_two": "{{count}} tearcsholáthar",
+      "drifting_count_few": "{{count}} ag sruth",
+      "drifting_count_many": "{{count}} ag sruth",
+      "drifting_count_two": "{{count}} ag sruth"
     },
     "empty": {
       "value": "-"
@@ -3159,16 +3151,15 @@
         "resolution_trend_6m": "Treocht réitigh, 6 mhí seo caite"
       },
       "units": {
-        "days_count_few": "Laethanta {{count}}",
-        "days_count_many": "Laethanta {{count}}",
         "days_count_one": "Laethanta {{count}}",
         "days_count_other": "Laethanta {{count}}",
+        "days_count_few": "Laethanta {{count}}",
+        "days_count_many": "Laethanta {{count}}",
         "days_count_two": "Laethanta {{count}}"
       },
       "empty_value": "-"
     }
   },
-  "unknown": "Anaithnid",
   "advertising": {
     "push": {
       "no_daily_data": "Níl aon sonraí laethúla fós.",
@@ -3176,25 +3167,34 @@
         "sends": "Seolann",
         "opens": "Osclaíonn"
       },
-      "chart_sends_title_few": "Seolann {{count}}",
-      "chart_sends_title_many": "Seolann {{count}}",
       "chart_sends_title_one": "Seolann {{count}}",
       "chart_sends_title_other": "Seolann {{count}}",
+      "chart_opens_title_one": "Osclaíonn {{count}}",
+      "chart_opens_title_other": "Osclaíonn {{count}}",
+      "chart_sends_title_few": "Seolann {{count}}",
+      "chart_sends_title_many": "Seolann {{count}}",
       "chart_sends_title_two": "Seolann {{count}}",
       "chart_opens_title_few": "Osclaíonn {{count}}",
       "chart_opens_title_many": "Osclaíonn {{count}}",
-      "chart_opens_title_one": "Osclaíonn {{count}}",
-      "chart_opens_title_other": "Osclaíonn {{count}}",
       "chart_opens_title_two": "Osclaíonn {{count}}"
     }
   },
-  "submit_error": "Níorbh fhéidir a chur isteach. Bain triail eile as.",
-  "submitting": "Á chur isteach…",
-  "submit": "Cuir isteach",
-  "under_25": "Faoi 25",
-  "25_34": "25–34",
-  "35_44": "35–44",
-  "45_54": "45–54",
-  "55_64": "55–64",
-  "65_plus": "65+"
+  "hours_display_few": "{{count}} uair",
+  "hours_display_many": "{{count}} uair",
+  "hours_display_two": "{{count}} uair",
+  "hours_short_few": "{{count}} u",
+  "hours_short_many": "{{count}} u",
+  "hours_short_two": "{{count}} u",
+  "time_credits_short_few": "{{count}}u creidmheasa",
+  "time_credits_short_many": "{{count}}u creidmheasa",
+  "time_credits_short_two": "{{count}}u creidmheasa",
+  "time_ago_hours_few": "{{count}}u ó shin",
+  "time_ago_hours_many": "{{count}}u ó shin",
+  "time_ago_hours_two": "{{count}}u ó shin",
+  "time_ago_days_few": "{{count}}l ó shin",
+  "time_ago_days_many": "{{count}}l ó shin",
+  "time_ago_days_two": "{{count}}l ó shin",
+  "max_characters_few": "uas. {{count}} carachtar",
+  "max_characters_many": "uas. {{count}} carachtar",
+  "max_characters_two": "uas. {{count}} carachtar"
 }

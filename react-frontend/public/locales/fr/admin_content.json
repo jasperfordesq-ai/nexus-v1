@@ -1344,12 +1344,12 @@
     "sync_to_stripe": "Synchroniser avec Stripe",
     "sync_stripe": "Synchroniser avec Stripe",
     "stripe_sync_description": "Crée ou met à jour le produit Stripe et les prix pour ce plan. Nécessite STRIPE_SECRET_KEY.",
-    "active_tenants_cannot_delete_many": "Locataire(s) actif(s){{count}}- impossible à supprimer",
     "active_tenants_cannot_delete_one": "Locataire(s) actif(s){{count}}- impossible à supprimer",
     "active_tenants_cannot_delete_other": "Locataire(s) actif(s){{count}}- impossible à supprimer",
-    "filter_all_many": "Tous ({{count}})",
     "filter_all_one": "Tous ({{count}})",
-    "filter_all_other": "Tous ({{count}})"
+    "filter_all_other": "Tous ({{count}})",
+    "active_tenants_cannot_delete_many": "Locataire(s) actif(s){{count}}- impossible à supprimer",
+    "filter_all_many": "Tous ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Données",
