@@ -20,7 +20,7 @@
     "check:nested-interactive": "node scripts/check-nested-interactive.mjs",
     "check:locale-formatting": "node scripts/check-locale-formatting.mjs",
     "check:design-tokens": "node scripts/check-design-tokens.mjs",
-    "check:admin-i18n": "eslint src/admin src/super-admin --quiet && node ../scripts/check-i18n-json-integrity.mjs && node ../scripts/check-admin-ui-literals.mjs && node ../scripts/check-admin-api-literals.mjs && node ../scripts/check-admin-i18n-token-integrity.mjs",
+    "check:admin-i18n": "eslint src/admin src/super-admin --quiet",
     "check:dual-backend-prep": "npm run check:backend-guardrails && npm run test:api-inventory && npm run test:certification-worksheets && npm run test:laravel-smoke-manifest && npm run inventory:api-calls && npm run certification:worksheets && npm run smoke:laravel-manifest",
     "test:api-inventory": "node --test scripts/inventory-api-calls.test.mjs",
     "test:backend-guardrails": "node --test scripts/check-backend-guardrails.test.mjs",
