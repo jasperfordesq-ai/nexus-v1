@@ -197,33 +197,72 @@ function flattenLocaleKeys(value, prefix = '', keys = new Set()) {
   return keys;
 }
 
+function flattenLocaleValues(value, prefix = '', values = new Map()) {
+  for (const [key, child] of Object.entries(value)) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (child && typeof child === 'object' && !Array.isArray(child)) {
+      flattenLocaleValues(child, fullKey, values);
+    } else {
+      values.set(fullKey, child);
+    }
+  }
+  return values;
+}
+
+function interpolationVariables(value) {
+  return [...String(value).matchAll(/\{\{\s*([^},\s]+)[^}]*\}\}/g)]
+    .map((match) => match[1])
+    .sort()
+    .join(',');
+}
+
 function snapshotMobileLocaleGaps() {
   const englishDirectory = path.join(MOBILE_LOCALES_ROOT, 'en');
   const namespaceFiles = fs.readdirSync(englishDirectory)
     .filter((file) => file.endsWith('.json'))
     .sort();
   let missingKeys = 0;
+  const files = {};
+  const interpolationErrors = [];
 
   for (const namespaceFile of namespaceFiles) {
-    const english = flattenLocaleKeys(
-      JSON.parse(fs.readFileSync(path.join(englishDirectory, namespaceFile), 'utf8')),
-    );
+    const englishPayload = JSON.parse(fs.readFileSync(path.join(englishDirectory, namespaceFile), 'utf8'));
+    const english = flattenLocaleKeys(englishPayload);
+    const englishValues = flattenLocaleValues(englishPayload);
     for (const language of MOBILE_LANGUAGES.filter((item) => item !== 'en')) {
       const localePath = path.join(MOBILE_LOCALES_ROOT, language, namespaceFile);
       if (!fs.existsSync(localePath)) {
         missingKeys += english.size;
+        files[`${language}/${namespaceFile}`] = english.size;
         continue;
       }
-      const translated = flattenLocaleKeys(JSON.parse(fs.readFileSync(localePath, 'utf8')));
+      const translatedPayload = JSON.parse(fs.readFileSync(localePath, 'utf8'));
+      const translated = flattenLocaleKeys(translatedPayload);
+      const translatedValues = flattenLocaleValues(translatedPayload);
+      let fileMissingKeys = 0;
       for (const key of english) {
         if (!translated.has(key)) {
           missingKeys += 1;
+          fileMissingKeys += 1;
+        }
+      }
+      if (fileMissingKeys > 0) {
+        files[`${language}/${namespaceFile}`] = fileMissingKeys;
+      }
+      for (const [key, englishValue] of englishValues) {
+        if (!translatedValues.has(key)) continue;
+        const expected = interpolationVariables(englishValue);
+        const actual = interpolationVariables(translatedValues.get(key));
+        if (expected !== actual) {
+          interpolationErrors.push(
+            `${language}/${namespaceFile}:${key} interpolation variables differ (${expected || 'none'} -> ${actual || 'none'})`,
+          );
         }
       }
     }
   }
 
-  return { missingKeys };
+  return { missingKeys, files, interpolationErrors };
 }
 
 function parseLiterals(output, scopePrefix = '') {
@@ -316,6 +355,7 @@ const parsedLint = parseLiterals(lintResult.output);
 const parsedMobileLint = parseLiterals(mobileLintResult.output, 'mobile/');
 const literals = [...parsedLint.literals, ...parsedMobileLint.literals];
 const mobileLocaleGapSnapshot = snapshotMobileLocaleGaps();
+nativeLocaleErrors.push(...mobileLocaleGapSnapshot.interpolationErrors);
 const byFile = summarizeByFile(literals);
 const interpolationDiagnostics = [
   ...parsedLint.interpolationDiagnostics,
@@ -392,6 +432,12 @@ console.log(`  Current UI literals:        ${literals.length}`);
 console.log(`  Baseline:                   ${baseline.count}`);
 console.log('  Scope:                      member/admin web + mobile (legal corpus separately governed)');
 console.log(`  Mobile locale-key gaps:     ${mobileLocaleGapSnapshot.missingKeys}`);
+console.log(`  Mobile interpolation gaps:  ${mobileLocaleGapSnapshot.interpolationErrors.length}`);
+if (args.includes('--details')) {
+  for (const [file, count] of Object.entries(mobileLocaleGapSnapshot.files)) {
+    console.log(`    ${file}: ${count}`);
+  }
+}
 
 if (literals.length > baseline.count || mobileLocaleGapsRegressed) {
   console.error('');

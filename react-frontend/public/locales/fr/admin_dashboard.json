@@ -3,6 +3,7 @@
   "subtitle": "Aperçu de la plateforme en temps réel et centre de commande",
   "tour_btn": "Tournée",
   "refresh": "Rafraîchir",
+  "loading": "Chargement",
   "view_all_activity": "Afficher toutes les activités",
   "tour": {
     "welcome_title": "Bienvenue dans Mission Control !",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Tendances des transactions",
-    "no_data": "Aucune donnée de tendance disponible",
-    "hours_suffix": "heures"
+    "hours_suffix": "heures",
+    "no_data": "Aucune donnée de tendance disponible"
   },
   "safeguarding_banner": {
     "title": "L'étape de sauvegarde est désactivée dans votre assistant d'intégration",
@@ -120,6 +121,5 @@
     "queue": "Emplois Cron",
     "api": "API de messagerie",
     "cache": "Cache"
-  },
-  "loading": "Chargement"
+  }
 }

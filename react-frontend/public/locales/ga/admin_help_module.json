@@ -57,6 +57,7 @@
     "no_history_available": "Níor aimsíodh aon stair le fáil",
     "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
     "no_members_found": "Níor aimsíodh aon bhall",
+    "loading": "Ag lódáil",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
     "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
@@ -67,10 +68,9 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "select_all_rows": "Roghnaigh gach sraith",
+    "select_row": "Roghnaigh sraith {{id}}",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán",
-    "loading": "Luchtú",
-    "select_row": "Roghnaigh sraith {{id}}"
+    "total_count": "{{count}}iomlán"
   },
   "admin_help": {
     "page_title": "Ionad Cabhrach",

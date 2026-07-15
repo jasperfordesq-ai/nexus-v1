@@ -23,19 +23,19 @@
     "national_dashboard": "Tableau de bord national"
   },
   "layout": {
-    "loading": "Chargement de l'administrateur principal",
+    "loading": "Chargement du super administrateur",
     "skip_to_main": "Passer au contenu principal",
-    "close_navigation": "Fermer la navigation de l'administrateur principal",
-    "navigation": "Navigation de l'administrateur principal"
+    "close_navigation": "Fermer la navigation du super-administrateur",
+    "navigation": "Navigation super-administrateur"
   },
   "header": {
-    "back_to_admin": "Retour à l'administration",
+    "back_to_admin": "Retour à l'administrateur",
     "toggle_sidebar": "Basculer la barre latérale",
     "notifications": "Notifications",
-    "my_profile": "Mon Profil",
-    "sign_out": "Se Déconnecter",
     "user_fallback": "Super Administrateur",
-    "user_menu": "Menu de l'administrateur principal"
+    "user_menu": "Menu super administrateur",
+    "my_profile": "Mon Profil",
+    "sign_out": "Se Déconnecter"
   },
   "sidebar": {
     "section_overview": "Aperçu",
@@ -44,7 +44,7 @@
     "section_commercial": "Commercial",
     "expand": "Développer la barre latérale",
     "collapse": "Réduire la barre latérale",
-    "nav_label": "Navigation de l'administrateur principal"
+    "nav_label": "Navigation super-administrateur"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Activité récente",
       "full_log_btn": "Journal complet",
       "no_federation_activity": "Aucune activité de la fédération pour l'instant",
+      "by_label": "par",
       "activity_title": "Activité de la Fédération (30 jours)",
       "stat_total_actions": "Actions totales",
       "stat_messages": "Messages",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Événements critiques",
       "most_active_partnerships": "Partenariats les plus actifs",
       "quick_nav_title": "Navigation rapide",
-      "tenant_whitelist_btn": "Liste blanche des locataires",
-      "by_label": "par"
+      "tenant_whitelist_btn": "Liste blanche des locataires"
     },
     "system_controls": {
       "title": "Contrôles du système de fédération",

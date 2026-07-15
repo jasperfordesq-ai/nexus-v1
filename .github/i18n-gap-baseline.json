@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T19:19:40.774Z",
+  "generatedAt": "2026-07-15T04:29:25.460Z",
   "source": "scripts/check-i18n-gap-regression.mjs",
   "localesDir": "react-frontend/public/locales",
   "languages": [

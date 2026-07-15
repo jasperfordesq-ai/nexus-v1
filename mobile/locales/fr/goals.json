@@ -1,8 +1,24 @@
 {
   "title": "Objectifs",
+  "subtitle": "Définissez des jalons personnels, suivez vos progrès et gardez votre élan visible.",
+  "heroEyebrow": "Progrès personnel",
   "confirmAbandon": "Êtes-vous sûr de vouloir abandonner cet objectif ?",
   "empty": "Aucun objectif pour le moment.",
   "addGoal": "Ajouter un objectif",
+  "percent": "{{percent}}%",
+  "momentumOn": "Construction",
+  "momentumEmpty": "Prêt",
+  "buddy": "Copain : {{name}}",
+  "visibility": {
+    "public": "Public"
+  },
+  "stats": {
+    "active": "Actif",
+    "completed": "Terminé",
+    "total": "Total Amount",
+    "momentum": "Momentum",
+    "averageProgress": "Progrès moyen"
+  },
   "status": {
     "active": "Actif",
     "completed": "Terminé",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Créez votre premier objectif pour commencer à suivre vos progrès.",
   "create": {
     "title": "Nouvel objectif",
+    "subtitle": "Donnez-vous un objectif clair sur lequel travailler.",
+    "close": "Formulaire d'objectif proche",
     "titleLabel": "Titre de l'objectif",
     "titlePlaceholder": "ex. Aider 5 voisins",
     "descriptionLabel": "Description (facultatif)",
+    "descriptionPlaceholder": "Ajoutez un peu de contexte ou une première étape.",
     "targetHoursLabel": "Heures cibles (facultatif)",
+    "targetPlaceholder": "par exemple. 10",
     "dueDateLabel": "Date d'échéance (facultatif)",
     "submit": "Créer l'objectif",
     "error": "Impossible de créer l'objectif."

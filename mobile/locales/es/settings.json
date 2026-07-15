@@ -1,6 +1,69 @@
 {
   "title": "Configuración",
+  "eyebrow": "Preferencias",
+  "subtitle": "Administre notificaciones, seguridad e información de aplicaciones.",
+  "appearance": {
+    "title": "Apariencia",
+    "hint": "Elige cómo se ve la app en este dispositivo.",
+    "mode": {
+      "system": "Sistema",
+      "systemHint": "Seguir los ajustes del dispositivo",
+      "light": "Claro",
+      "lightHint": "Usar siempre el tema claro",
+      "dark": "Oscuro",
+      "darkHint": "Usar siempre el tema oscuro"
+    }
+  },
   "changePasswordTitle": "Cambiar contraseña",
+  "pushNotifications": "Notificaciones automáticas",
+  "pushHint": "Elija qué actividad puede aparecer como notificaciones del dispositivo.",
+  "emailNotifications": "Notificaciones por correo electrónico",
+  "emailHint": "Elija qué actualizaciones también deberían llegar correo electrónico.",
+  "push": {
+    "messages": "Mensajes nuevos",
+    "transactions": "Transacciones de crédito de tiempo",
+    "social": "Actividad social"
+  },
+  "email": {
+    "messages": "Mensajes",
+    "connections": "Conexiones",
+    "transactions": "Transacciones de crédito de tiempo",
+    "reviews": "Reseñas"
+  },
+  "saveError": "No se pudo guardar la configuración. Inténtelo de nuevo.",
+  "about": "Acerca de",
+  "aboutHint": "Versión de la aplicación y licencia de código abierto.",
+  "version": "Versión",
+  "unknownVersion": "Desconocida",
+  "license": "Licencia",
+  "security": "Seguridad",
+  "securityHint": "Mantenga el acceso a su cuenta actualizado fecha.",
+  "changePassword": "Cambiar Contraseña",
+  "password": {
+    "eyebrow": "Seguridad de la cuenta",
+    "title": "Cambiar Contraseña",
+    "hint": "Ingrese su contraseña actual, luego elija una nueva.",
+    "currentLabel": "Contraseña actual",
+    "currentPlaceholder": "Ingrese la contraseña actual",
+    "newLabel": "Nueva contraseña",
+    "newPlaceholder": "Ingrese nueva contraseña",
+    "confirmLabel": "Confirmar nueva contraseña",
+    "confirmPlaceholder": "Vuelva a ingresar la nueva contraseña",
+    "newHint": "Utilice al menos 8 caracteres.",
+    "save": "Guardar contraseña",
+    "saving": "Guardando contraseña...",
+    "reviewTitle": "Listo para ¿actualizar?",
+    "reviewSubtitle": "Guarde solo cuando su nueva contraseña y su confirmación coincidan.",
+    "success": "Password cambiada",
+    "successMessage": "Su contraseña se ha actualizado correctamente.",
+    "validation": {
+      "currentRequired": "Ingrese su contraseña actual.",
+      "newRequired": "Ingrese una nueva contraseña.",
+      "mismatch": "Nueva contraseña y confirmación no coinciden.",
+      "tooShort": "La nueva contraseña debe tener al menos 12 caracteres."
+    },
+    "changeError": "No se pudo cambiar la contraseña. Inténtelo de nuevo."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Privacidad",
+    "hint": "Controle quién puede encontrarlo, verlo y comunicarse con usted.",
+    "profileVisibility": "Visibilidad del perfil",
+    "changeVisibility": "Cambiar",
+    "searchIndexing": "Aparecer en la búsqueda de miembros",
+    "saveError": "No se pudo guardar la configuración de privacidad. Inténtelo de nuevo.",
+    "visibility": {
+      "public": "Visible públicamente",
+      "members": "Visible para miembros que hayan iniciado sesión",
+      "connections": "Visible para sus conexiones"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Apariencia",
-    "hint": "Elige cómo se ve la app en este dispositivo.",
-    "mode": {
-      "system": "Sistema",
-      "systemHint": "Seguir los ajustes del dispositivo",
-      "light": "Claro",
-      "lightHint": "Usar siempre el tema claro",
-      "dark": "Oscuro",
-      "darkHint": "Usar siempre el tema oscuro"
-    }
   }
 }

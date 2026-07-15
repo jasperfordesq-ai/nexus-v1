@@ -57,6 +57,7 @@
     "no_history_available": "Nenhum histórico disponível encontrado",
     "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
     "no_members_found": "Nenhum membro encontrado encontrado",
+    "loading": "Carregando",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
     "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
@@ -67,10 +68,9 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "select_all_rows": "Selecione todas as linhas",
+    "select_row": "Selecionar linha {{id}}",
     "data_table": "Dados",
-    "total_count": "{{count}}total",
-    "loading": "Carregando",
-    "select_row": "Selecionar linha {{id}}"
+    "total_count": "{{count}}total"
   },
   "admin_help": {
     "page_title": "Central de Ajuda",
@@ -85,9 +85,9 @@
       "caring_community": "Comunidade atenciosa",
       "kiss_agoris": "BEIJO E Caring Community"
     },
-    "search_placeholder_many": "Pesquise artigos de ajuda do{{count}}...",
     "search_placeholder_one": "Pesquise artigos de ajuda do{{count}}...",
-    "search_placeholder_other": "Pesquise artigos de ajuda do{{count}}..."
+    "search_placeholder_other": "Pesquise artigos de ajuda do{{count}}...",
+    "search_placeholder_many": "Pesquise artigos de ajuda do{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQs de ajuda",

@@ -16,7 +16,7 @@
     "unexpected_error": "Erreur inattendue",
     "unknown": "Inconnu",
     "unfeature": "Inutilité",
-    "actions": "Actions",
+    "actions": "Actes",
     "active": "Actif",
     "all": "Tout",
     "approved": "Approuvé",
@@ -37,14 +37,14 @@
     "loading": "Chargement",
     "next": "Suivant",
     "no": "Non",
+    "ok": "OK",
     "pending": "En attente",
     "previous": "Précédent",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "select_all": "Sélectionner tout",
     "select_item": "Sélectionner un article",
-    "yes": "Oui",
-    "ok": "OK"
+    "yes": "Oui"
   },
   "shared": {
     "broker_actions": "Actions des courtiers",
@@ -57,6 +57,7 @@
     "no_history_available": "Aucun historique disponible trouvé",
     "no_legal_documents_found": "Aucun document juridique trouvé",
     "no_members_found": "Aucun membre trouvé trouvé",
+    "loading": "Chargement",
     "no_data": "Aucune donnée",
     "no_data_available": "Aucune donnée disponible",
     "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
@@ -67,10 +68,9 @@
     "refresh": "Rafraîchir",
     "search": "Recherche...",
     "select_all_rows": "Sélectionner toutes les lignes",
+    "select_row": "Sélectionner la ligne {{id}}",
     "data_table": "Données",
-    "total_count": "{{count}}total",
-    "loading": "Chargement",
-    "select_row": "Sélectionner la ligne {{id}}"
+    "total_count": "{{count}}total"
   },
   "admin_help": {
     "page_title": "Centre d'aide",
@@ -85,9 +85,9 @@
       "caring_community": "Communauté bienveillante",
       "kiss_agoris": "BAISER & Caring Community"
     },
-    "search_placeholder_many": "Rechercher les articles d'aide de{{count}}...",
     "search_placeholder_one": "Rechercher les articles d'aide de{{count}}...",
-    "search_placeholder_other": "Rechercher les articles d'aide de{{count}}..."
+    "search_placeholder_other": "Rechercher les articles d'aide de{{count}}...",
+    "search_placeholder_many": "Rechercher les articles d'aide de{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ d'aide",

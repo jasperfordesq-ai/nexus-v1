@@ -1,4 +1,7 @@
 {
+  "skip_to_main": "Passa al contenuto principale",
+  "admin_navigation": "Navigazione amministrativa",
+  "community_fund": "Fondo Comunitario",
   "dashboard": "Pannello di controllo",
   "users": "Utenti",
   "crm": "CRM",
@@ -8,6 +11,7 @@
   "matching": "Abbinamento e sicurezza",
   "moderation": "Moderazione",
   "community": "Comunità",
+  "alpha_badge": "Alfa",
   "caring_community": "Comunità premurosa",
   "caring_workflow": "Flusso di lavoro Caring Community",
   "caring_projects": "Progetti comunitari",
@@ -51,6 +55,7 @@
   "care_recipient_circle": "Circolo dei destinatari delle cure",
   "municipal_roi": "ROI comunale",
   "research_partnerships": "Partenariati di ricerca",
+  "marketing": "Marketing",
   "analytics_reporting": "Analisi e reporting",
   "advanced": "Avanzato",
   "financial": "Finanziario",
@@ -61,8 +66,10 @@
   "platform_operations": "Operazioni della piattaforma",
   "intelligence_diagnostics": "Intelligence e diagnostica",
   "integrations": "Integrazioni",
+  "partner_api_integrations": "API e integrazioni dei partner",
   "partner_timebanks": "Banche del tempo partner",
   "super_admin": "Super amministratore",
+  "super_admin_panel": "Pannello Super Admin",
   "transactions": "Transazioni",
   "events": "Eventi",
   "groups": "Gruppi",
@@ -71,6 +78,7 @@
   "messages": "Messaggi",
   "reviews": "Recensioni",
   "reports": "Rapporti",
+  "support_reports": "Rapporti di supporto",
   "blog": "Blog",
   "pages": "Pagine",
   "newsletters": "Newsletter",
@@ -81,6 +89,7 @@
   "back_to_site": "Torna al sito",
   "back_to_site_header": "Torna al sito",
   "toggle_sidebar": "Mostra/nascondi barra laterale",
+  "close_sidebar": "Chiudi la barra laterale",
   "notifications": "Notifiche",
   "support_requests": "Richieste di supporto",
   "support_requests_count": "{{count}} richieste di supporto aperte",
@@ -183,6 +192,7 @@
   "super_federation_system_controls": "Controlli di sistema",
   "super_federation_whitelist": "Lista bianca della Federazione",
   "billing": "Fatturazione",
+  "podcasts": "Podcast",
   "member_premium": "Premium membri",
   "premium_subscribers": "Abbonati premium",
   "operations": "Operazioni",
@@ -239,6 +249,10 @@
   "module_configuration": "Configurazione del modulo",
   "translation_config": "Impostazioni di traduzione",
   "federation_cc_config": "Configurazione carta di credito",
+  "federation_group_core_network": "Rete centrale",
+  "federation_group_trust_settlement": "Fiducia e transazione",
+  "federation_group_partner_protocols": "Protocolli partner",
+  "federation_group_monitoring_data": "Monitoraggio e dati",
   "expand_sidebar": "Espandi la barra laterale",
   "collapse_sidebar": "Comprimi la barra laterale",
   "search_nav": "Cerca amministratore...",
@@ -262,6 +276,7 @@
   "help_faqs": "FAQ di aiuto",
   "search_analytics": "Analisi delle ricerche",
   "donation_refunds": "Rimborsi donazioni",
+  "sso_providers": "Accesso unico",
   "breadcrumbs": {
     "activity_log": "Registro delle attività",
     "admin": "Ammin",
@@ -499,14 +514,17 @@
     "breadcrumbs": "Pangrattato"
   },
   "shared": {
+    "loading": "Caricamento",
     "help": "Aiuto",
     "open_page_help": "Apri la guida della pagina",
     "search": "Ricerca...",
     "refresh": "Aggiorna",
     "total_count": "{{count}}totale",
     "data_table": "Dati",
+    "select_all_rows": "Seleziona tutte le righe",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
+    "select_row": "Seleziona riga {{id}}",
     "total_count_many": "{{count}}totale",
     "total_count_one": "{{count}}totale",
     "total_count_other": "{{count}}totale",
@@ -546,10 +564,7 @@
       "planned": "Pianificato",
       "processing": "Elaborazione",
       "resolved": "Risolto"
-    },
-    "loading": "Caricamento",
-    "select_all_rows": "Seleziona tutte le righe",
-    "select_row": "Seleziona riga {{id}}"
+    }
   },
   "help_drawer": {
     "aria_label": "Aiuto: {{title}}",
@@ -567,12 +582,12 @@
     "destructive_warning": "Questa azione non può essere annullata.",
     "reason_label": "Motivo",
     "reason_placeholder": "Fornire una ragione per questa azione",
-    "selected_count_many": "{{count}} selezionato",
     "selected_count_one": "{{count}} selezionato",
     "selected_count_other": "{{count}} selezionato",
-    "confirm_message_many": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
     "confirm_message_one": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
-    "confirm_message_other": "Sei sicuro di volere gli articoli {{action}} {{count}}?"
+    "confirm_message_other": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
+    "selected_count_many": "{{count}} selezionato",
+    "confirm_message_many": "Sei sicuro di volere gli articoli {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Annulla"
@@ -713,20 +728,5 @@
     "support_reports": "bug|feedback|diagnostica|Sentry",
     "retention_policies": "conservazione|GDPR|smaltimento|purga|archiviazione",
     "sso_providers": "accesso unico|OpenID Connect|Entra|identità|login"
-  },
-  "admin_navigation": "Navigazione admin",
-  "community_fund": "Fondo Comunitario",
-  "super_admin_panel": "Pannello Super Admin",
-  "support_reports": "Rapporti di supporto",
-  "close_sidebar": "Chiudi barra laterale",
-  "podcasts": "Podcast",
-  "skip_to_main": "Vai al contenuto principale",
-  "alpha_badge": "Alfa",
-  "partner_api_integrations": "API dei partner e integrazioni",
-  "federation_group_core_network": "Rete principale",
-  "federation_group_trust_settlement": "Fiducia e regolamento",
-  "federation_group_partner_protocols": "Protocolli dei partner",
-  "federation_group_monitoring_data": "Monitoraggio e dati",
-  "sso_providers": "Accesso unico",
-  "marketing": "Marketing"
+  }
 }

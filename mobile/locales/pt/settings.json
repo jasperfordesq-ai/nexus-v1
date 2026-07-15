@@ -1,6 +1,69 @@
 {
   "title": "Definições",
+  "eyebrow": "Preferências",
+  "subtitle": "Gerencie notificações, segurança e informações de aplicativos.",
+  "appearance": {
+    "title": "Aparência",
+    "hint": "Escolha como a app aparece neste dispositivo.",
+    "mode": {
+      "system": "Sistema",
+      "systemHint": "Acompanhar as definições do dispositivo",
+      "light": "Claro",
+      "lightHint": "Usar sempre o tema claro",
+      "dark": "Escuro",
+      "darkHint": "Usar sempre o tema escuro"
+    }
+  },
   "changePasswordTitle": "Alterar palavra-passe",
+  "pushNotifications": "Notificações push",
+  "pushHint": "Escolha quais atividades podem aparecer como notificações do dispositivo.",
+  "emailNotifications": "Notificações por e-mail",
+  "emailHint": "Escolha quais atualizações também devem chegar até email.",
+  "push": {
+    "messages": "Novas mensagens",
+    "transactions": "Transações de crédito de tempo",
+    "social": "Atividade social"
+  },
+  "email": {
+    "messages": "Mensagens",
+    "connections": "Conexões",
+    "transactions": "Transações de crédito de tempo",
+    "reviews": "Avaliações"
+  },
+  "saveError": "Não foi possível salvar a configuração. Tente novamente.",
+  "about": "Sobre",
+  "aboutHint": "Versão do aplicativo e licenciamento de código aberto.",
+  "version": "Versão",
+  "unknownVersion": "Desconhecida",
+  "license": "Licença",
+  "security": "Segurança",
+  "securityHint": "Mantenha o acesso à sua conta até data.",
+  "changePassword": "Alterar Palavra-passe",
+  "password": {
+    "eyebrow": "Segurança da conta",
+    "title": "Alterar Palavra-passe",
+    "hint": "Digite sua senha atual e escolha uma nova.",
+    "currentLabel": "Palavra-passe atual",
+    "currentPlaceholder": "Digite a senha atual",
+    "newLabel": "Nova senha",
+    "newPlaceholder": "Digite a nova senha",
+    "confirmLabel": "Confirme a nova senha",
+    "confirmPlaceholder": "Digite novamente a nova senha",
+    "newHint": "Use pelo menos 8 caracteres.",
+    "save": "Salvar senha",
+    "saving": "Salvar senha...",
+    "reviewTitle": "Pronto para atualizar?",
+    "reviewSubtitle": "Salve somente quando sua nova senha e confirmação corresponderem.",
+    "success": "Senha alterada",
+    "successMessage": "Sua senha foi atualizada com sucesso.",
+    "validation": {
+      "currentRequired": "Insira sua senha atual.",
+      "newRequired": "Insira uma nova senha senha.",
+      "mismatch": "A nova senha e a confirmação não coincidem.",
+      "tooShort": "A nova senha deve ter pelo menos 12 caracteres."
+    },
+    "changeError": "Não foi possível alterar a senha. Tente novamente."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Privacidade",
+    "hint": "Controle quem pode encontrar, visualizar e entrar em contato com você.",
+    "profileVisibility": "Visibilidade do perfil",
+    "changeVisibility": "Alterar",
+    "searchIndexing": "Aparecer na pesquisa de membros",
+    "saveError": "Não foi possível salvar as configurações de privacidade. Tente novamente.",
+    "visibility": {
+      "public": "Visível publicamente",
+      "members": "Visível para membros conectados",
+      "connections": "Visível para suas conexões"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Aparência",
-    "hint": "Escolha como a app aparece neste dispositivo.",
-    "mode": {
-      "system": "Sistema",
-      "systemHint": "Acompanhar as definições do dispositivo",
-      "light": "Claro",
-      "lightHint": "Usar sempre o tema claro",
-      "dark": "Escuro",
-      "darkHint": "Usar sempre o tema escuro"
-    }
   }
 }

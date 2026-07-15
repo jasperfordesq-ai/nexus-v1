@@ -24,27 +24,27 @@
   },
   "layout": {
     "loading": "Caricamento super amministratore",
-    "skip_to_main": "Vai al contenuto principale",
-    "close_navigation": "Chiudi navigazione super amministratore",
-    "navigation": "Navigazione super amministratore"
+    "skip_to_main": "Passa al contenuto principale",
+    "close_navigation": "Chiudi la navigazione super amministratore",
+    "navigation": "Navigazione super amministrativa"
   },
   "header": {
     "back_to_admin": "Torna all'amministrazione",
-    "toggle_sidebar": "Attiva/disattiva barra laterale",
+    "toggle_sidebar": "Attiva/disattiva la barra laterale",
     "notifications": "Notifiche",
-    "my_profile": "Il Mio Profilo",
-    "sign_out": "Disconnettersi",
     "user_fallback": "Super Amministratore",
-    "user_menu": "Menu super amministratore"
+    "user_menu": "Menu super amministratore",
+    "my_profile": "Il Mio Profilo",
+    "sign_out": "Disconnettersi"
   },
   "sidebar": {
     "section_overview": "Panoramica",
     "section_tenants": "Inquilini",
     "section_federation": "Federazione",
     "section_commercial": "Commerciale",
-    "expand": "Espandi barra laterale",
-    "collapse": "Comprimi barra laterale",
-    "nav_label": "Navigazione super amministratore"
+    "expand": "Espandi la barra laterale",
+    "collapse": "Comprimi la barra laterale",
+    "nav_label": "Navigazione super amministrativa"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Attività recente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Nessuna attività della federazione ancora",
+      "by_label": "di",
       "activity_title": "Attività della Federazione (30 giorni)",
       "stat_total_actions": "Azioni totali",
       "stat_messages": "Messaggi",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Eventi critici",
       "most_active_partnerships": "Partenariati più attivi",
       "quick_nav_title": "Navigazione rapida",
-      "tenant_whitelist_btn": "Lista bianca degli inquilini",
-      "by_label": "da"
+      "tenant_whitelist_btn": "Lista bianca degli inquilini"
     },
     "system_controls": {
       "title": "Controlli del sistema federativo",

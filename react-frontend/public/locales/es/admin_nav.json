@@ -1,4 +1,7 @@
 {
+  "skip_to_main": "Saltar al contenido principal",
+  "admin_navigation": "Navegación de administrador",
+  "community_fund": "Fondo Comunitario",
   "dashboard": "Panel",
   "users": "Usuarios",
   "crm": "CRM",
@@ -8,6 +11,7 @@
   "matching": "Coincidencia y seguridad",
   "moderation": "Moderación",
   "community": "Comunidad",
+  "alpha_badge": "Alfa",
   "caring_community": "Comunidad solidaria",
   "caring_workflow": "Flujo de trabajo de BESO",
   "caring_projects": "Proyectos Comunitarios",
@@ -62,8 +66,10 @@
   "platform_operations": "Operaciones de la plataforma",
   "intelligence_diagnostics": "Inteligencia y diagnóstico",
   "integrations": "Integraciones",
+  "partner_api_integrations": "API e integraciones de socios",
   "partner_timebanks": "Bancos de tiempo asociados",
   "super_admin": "Súper administrador",
+  "super_admin_panel": "Panel de Super Administrador",
   "transactions": "Actas",
   "events": "Eventos",
   "groups": "Grupos",
@@ -72,6 +78,7 @@
   "messages": "Mensajes",
   "reviews": "Reseñas",
   "reports": "Informes",
+  "support_reports": "Informes de Soporte",
   "blog": "Blog",
   "pages": "paginas",
   "newsletters": "Boletines",
@@ -82,6 +89,7 @@
   "back_to_site": "Volver al sitio",
   "back_to_site_header": "Volver al sitio",
   "toggle_sidebar": "Alternar barra lateral",
+  "close_sidebar": "Cerrar barra lateral",
   "notifications": "Notificaciones",
   "support_requests": "Solicitudes de soporte",
   "support_requests_count": "{{count}} solicitudes de soporte abiertas",
@@ -184,6 +192,7 @@
   "super_federation_system_controls": "Controles del sistema",
   "super_federation_whitelist": "Lista blanca de federación",
   "billing": "Facturación",
+  "podcasts": "Podcasts",
   "member_premium": "Premium para miembros",
   "premium_subscribers": "Suscriptores premium",
   "operations": "Operaciones",
@@ -240,6 +249,10 @@
   "module_configuration": "Configuración del módulo",
   "translation_config": "Configuración de traducción",
   "federation_cc_config": "Configuración de tarjeta de crédito",
+  "federation_group_core_network": "Red central",
+  "federation_group_trust_settlement": "Confianza y liquidación",
+  "federation_group_partner_protocols": "Protocolos de socios",
+  "federation_group_monitoring_data": "Monitoreo y datos",
   "expand_sidebar": "Expandir barra lateral",
   "collapse_sidebar": "Contraer barra lateral",
   "search_nav": "Buscar administrador...",
@@ -263,6 +276,7 @@
   "help_faqs": "FAQ de ayuda",
   "search_analytics": "Analítica de búsquedas",
   "donation_refunds": "Reembolsos de donaciones",
+  "sso_providers": "Inicio de sesión único",
   "breadcrumbs": {
     "activity_log": "Registro de actividad",
     "admin": "administrador",
@@ -500,14 +514,17 @@
     "breadcrumbs": "Pan rallado"
   },
   "shared": {
+    "loading": "Cargando",
     "help": "Ayuda",
     "open_page_help": "Abrir ayuda de la p?gina",
     "search": "Buscar...",
     "refresh": "Refrescar",
     "total_count": "{{count}}total",
     "data_table": "Datos",
+    "select_all_rows": "Seleccionar todas las filas",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
+    "select_row": "Seleccionar fila {{id}}",
     "total_count_many": "{{count}}total",
     "total_count_one": "{{count}}total",
     "total_count_other": "{{count}}total",
@@ -547,10 +564,7 @@
       "planned": "Planificado",
       "processing": "Procesamiento",
       "resolved": "Resuelto"
-    },
-    "loading": "Cargando",
-    "select_all_rows": "Seleccionar todas las filas",
-    "select_row": "Seleccionar fila {{id}}"
+    }
   },
   "help_drawer": {
     "aria_label": "Ayuda: {{title}}",
@@ -568,12 +582,12 @@
     "destructive_warning": "Esta acción no se puede deshacer.",
     "reason_label": "Razón",
     "reason_placeholder": "Proporcione una razón para esta acción.",
-    "selected_count_many": "{{count}} seleccionado",
     "selected_count_one": "{{count}} seleccionado",
     "selected_count_other": "{{count}} seleccionado",
-    "confirm_message_many": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
     "confirm_message_one": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
-    "confirm_message_other": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?"
+    "confirm_message_other": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
+    "selected_count_many": "{{count}} seleccionado",
+    "confirm_message_many": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Cancelar"
@@ -714,19 +728,5 @@
     "support_reports": "errores|comentarios|diagnósticos|Sentry",
     "retention_policies": "retención|RGPD|eliminación|depuración|archivo",
     "sso_providers": "inicio de sesión único|OpenID Connect|Entra|identidad|iniciar sesión"
-  },
-  "admin_navigation": "Navegación de administrador",
-  "community_fund": "Fondo Comunitario",
-  "super_admin_panel": "Panel de Super Administrador",
-  "support_reports": "Informes de Soporte",
-  "close_sidebar": "Cerrar barra lateral",
-  "podcasts": "Podcasts",
-  "skip_to_main": "Saltar al contenido principal",
-  "alpha_badge": "Alfa",
-  "partner_api_integrations": "APIs e integraciones de socios",
-  "federation_group_core_network": "Red central",
-  "federation_group_trust_settlement": "Confianza y liquidación",
-  "federation_group_partner_protocols": "Protocolos de socios",
-  "federation_group_monitoring_data": "Monitoreo y datos",
-  "sso_providers": "Inicio de sesión único"
+  }
 }

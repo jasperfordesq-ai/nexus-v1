@@ -1,6 +1,9 @@
 {
   "title": "Empregos",
+  "eyebrow": "Funções da comunidade",
+  "subtitle": "Procure funções remuneradas, voluntárias e com crédito de tempo na comunidade.",
   "detailTitle": "Detalhes do emprego",
+  "createJob": "Criar vaga",
   "tabs": {
     "browse": "Explorar",
     "myApplications": "Minhas candidaturas",
@@ -8,7 +11,13 @@
     "alerts": "Alerts"
   },
   "search": {
-    "placeholder": "Pesquisar empregos..."
+    "placeholder": "Pesquisar empregos...",
+    "advanced": "Pesquisa Avançada",
+    "boolean_hint": "ex.: \"developer | engineer\", \"react -junior\"",
+    "salary_min": "Salário mínimo",
+    "salary_max": "Salário máximo",
+    "company_size_filter": "Dimensão da empresa",
+    "benefits_filter": "Palavra-chave de benefícios"
   },
   "filters": {
     "type": {
@@ -47,7 +56,10 @@
     "closesIn": "Encerra em {{count}} dias",
     "goBack": "Voltar",
     "notFound": "Emprego não encontrado.",
+    "notFoundHint": "Essa função pode ter sido removida, fechada ou movida.",
     "invalidId": "ID de emprego inválido.",
+    "invalidIdHint": "Não foi possível identificar qual função deveria ser open.",
+    "browseJobs": "Procurar vagas",
     "saveError": "Não foi possível atualizar o estado salvo.",
     "timeCredits": "{{count}} créditos de tempo",
     "salaryAnnual": "ano",
@@ -59,6 +71,9 @@
     "kanban_board": "Pipeline",
     "close_vacancy": "Fechar",
     "reopen_vacancy": "Reabrir",
+    "postedBy": "Publicado por",
+    "keyDetails": "Detalhes da função",
+    "views": "{{count}} visualizações",
     "closesIn_one": "Encerra em {{count}} dia",
     "timeCredits_one": "{{count}} crédito de tempo"
   },
@@ -119,11 +134,6 @@
     "successMessage": "Sua candidatura foi enviada. Boa sorte!",
     "error": "Falha ao enviar a candidatura"
   },
-  "saved_profile": {
-    "found": "Perfil de candidatura guardado encontrado",
-    "use": "Usar carta de apresentação guardada",
-    "start_fresh": "Começar de novo"
-  },
   "applications": {
     "empty": "Nenhuma candidatura ainda",
     "emptyHint": "Candidate-se a empregos para vê-los aqui",
@@ -140,6 +150,14 @@
       "rejected": "Rejeitada",
       "withdrawn": "Retirada"
     },
+    "interview_proposed": "Entrevista solicitada",
+    "accept_interview": "Aceitar",
+    "decline_interview": "Recusar",
+    "interview_confirmed": "Entrevista Confirmada",
+    "offer_received": "Você recebeu uma vaga oferta!",
+    "accept_offer": "Aceitar Oferta",
+    "decline_offer": "Recusar",
+    "offer_accepted": "Oferta aceita",
     "showMessage": "Show cover message",
     "hideMessage": "Hide cover message",
     "history": "History",
@@ -150,10 +168,6 @@
     "withdraw": "Withdraw",
     "withdrawSuccess": "Application withdrawn.",
     "withdrawError": "Could not withdraw this application."
-  },
-  "postings": {
-    "empty": "Ainda não há anúncios",
-    "emptyHint": "Crie um emprego para gerir as suas funções aqui."
   },
   "owner": {
     "toolsTitle": "Ferramentas do proprietário",
@@ -180,6 +194,27 @@
     "moveToInterview": "Entrevista",
     "updateError": "Não foi possível atualizar esta candidatura."
   },
+  "postings": {
+    "empty": "Ainda não há anúncios",
+    "emptyHint": "Crie um emprego para gerir as suas funções aqui."
+  },
+  "template": {
+    "start_from": "Começar a partir de modelo (opcional)",
+    "no_templates": "Ainda não há modelos",
+    "save_as": "Guardar como Modelo",
+    "template_name": "Nome do modelo",
+    "share_with_team": "Partilhar com a equipa (modelo público)",
+    "saving": "A guardar...",
+    "saved": "Modelo guardado!"
+  },
+  "benchmark": {
+    "market_rate": "Taxa de mercado para \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (mediana: {{currency}}{{median}})"
+  },
+  "saved_profile": {
+    "found": "Perfil de candidatura guardado encontrado",
+    "use": "Usar carta de apresentação guardada",
+    "start_fresh": "Começar de novo"
+  },
   "empty": "Nenhum emprego encontrado",
   "emptyHint": "Tente ajustar seus filtros ou volte mais tarde",
   "loadMore": "Carregar mais",
@@ -191,6 +226,7 @@
     "title": "Criar emprego",
     "editTitle": "Editar emprego",
     "subtitle": "Publique uma função remunerada, voluntária ou com créditos de tempo.",
+    "editSubtitle": "Atualize os detalhes da função, transparência salarial e configurações de inscrição.",
     "titleLabel": "Título",
     "titlePlaceholder": "Título da função",
     "descriptionLabel": "Descrição",
@@ -232,6 +268,14 @@
     "taglinePlaceholder": "O que torna esta equipa especial?",
     "videoUrlLabel": "URL de vídeo cultural",
     "videoUrlPlaceholder": "https://example.org/video",
+    "companySizeLabel": "Dimensão da empresa",
+    "companySize": {
+      "1-10": "1-10",
+      "11-50": "11-50",
+      "51-200": "51-200",
+      "201-500": "201-500",
+      "500+": "500+"
+    },
     "benefitsLabel": "Benefícios",
     "benefitsPlaceholder": "Benefícios separados por vírgulas",
     "deadlineLabel": "Prazo",
@@ -245,9 +289,14 @@
     "updateSubmit": "Atualizar emprego",
     "validationTitle": "Verificar detalhes",
     "validationRequired": "Adicione título e descrição.",
+    "deadlinePast": "O prazo deve ser uma data futura.",
+    "salaryRangeInvalid": "O salário mínimo não pode exceder o salário máximo.",
+    "salaryRequired": "Faixa salarial necessária. Você pode marcar o salário como negociável para omiti-lo.",
     "failedTitle": "Emprego não guardado",
     "loadFailed": "Não foi possível carregar este emprego para edição.",
-    "failedDescription": "Não foi possível guardar o emprego. Tente novamente."
+    "failedDescription": "Não foi possível guardar o emprego. Tente novamente.",
+    "editFailedTitle": "Trabalho não atualizado",
+    "editFailedDescription": "Não foi possível atualizar o cargo. Por favor, tente novamente."
   },
   "alerts": {
     "title": "Job alerts",

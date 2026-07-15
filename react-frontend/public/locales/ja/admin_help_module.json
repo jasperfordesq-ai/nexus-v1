@@ -57,6 +57,7 @@
     "no_history_available": "利用可能な履歴が見つかりません",
     "no_legal_documents_found": "法的文書が見つかりませんでした",
     "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "読み込み中",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
     "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
@@ -67,10 +68,9 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "select_all_rows": "すべての行を選択",
+    "select_row": "行を選択 {{id}}",
     "data_table": "データ",
-    "total_count": "{{count}}合計",
-    "loading": "読み込み中",
-    "select_row": "行を選択 {{id}}"
+    "total_count": "{{count}}合計"
   },
   "admin_help": {
     "page_title": "ヘルプセンター",

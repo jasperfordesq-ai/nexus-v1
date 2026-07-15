@@ -1,10 +1,10 @@
 {
   "count": 0,
-  "updated": "2026-07-13T19:26:53.697Z",
+  "updated": "2026-07-15T04:29:35.717Z",
   "source": "scripts/check-i18n-literals.mjs",
   "scope": "react-frontend/src (except lawyer-controlled platform legal pages) and mobile app/components/lib",
   "localeGaps": {
-    "mobileMissingKeys": 14904
+    "mobileMissingKeys": 0
   },
   "topFiles": []
 }

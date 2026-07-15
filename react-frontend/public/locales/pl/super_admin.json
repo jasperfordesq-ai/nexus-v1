@@ -23,19 +23,19 @@
     "national_dashboard": "Panel krajowy"
   },
   "layout": {
-    "loading": "Ładowanie super admina",
+    "loading": "Ładowanie superadministratora",
     "skip_to_main": "Przejdź do głównej treści",
-    "close_navigation": "Zamknij nawigację super admina",
-    "navigation": "Nawigacja super admina"
+    "close_navigation": "Zamknij nawigację superadministratora",
+    "navigation": "Nawigacja superadministracyjna"
   },
   "header": {
-    "back_to_admin": "Powrót do panelu administracyjnego",
+    "back_to_admin": "Powrót do administratora",
     "toggle_sidebar": "Przełącz pasek boczny",
     "notifications": "Powiadomienia",
-    "my_profile": "Mój profil",
-    "sign_out": "Wyloguj się",
     "user_fallback": "Super Administrator",
-    "user_menu": "Menu super admina"
+    "user_menu": "Menu superadministratora",
+    "my_profile": "Mój profil",
+    "sign_out": "Wyloguj się"
   },
   "sidebar": {
     "section_overview": "Przegląd",
@@ -44,7 +44,7 @@
     "section_commercial": "Handlowy",
     "expand": "Rozwiń pasek boczny",
     "collapse": "Zwiń pasek boczny",
-    "nav_label": "Nawigacja super admina"
+    "nav_label": "Nawigacja superadministracyjna"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Ostatnia aktywność",
       "full_log_btn": "Pełny dziennik",
       "no_federation_activity": "Nie ma jeszcze żadnej działalności federacyjnej",
+      "by_label": "przez",
       "activity_title": "Działalność Federacji (30 dni)",
       "stat_total_actions": "Łączna liczba działań",
       "stat_messages": "Wiadomości",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Wydarzenia krytyczne",
       "most_active_partnerships": "Najbardziej aktywne partnerstwa",
       "quick_nav_title": "Szybka nawigacja",
-      "tenant_whitelist_btn": "Biała lista najemców",
-      "by_label": "przez"
+      "tenant_whitelist_btn": "Biała lista najemców"
     },
     "system_controls": {
       "title": "Kontrole systemu federacyjnego",

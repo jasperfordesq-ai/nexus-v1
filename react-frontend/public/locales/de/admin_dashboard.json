@@ -3,6 +3,7 @@
   "subtitle": "Plattformübersicht und Kommandozentrale in Echtzeit",
   "tour_btn": "Rundgang",
   "refresh": "Aktualisieren",
+  "loading": "Lädt",
   "view_all_activity": "Alle Aktivitäten anzeigen",
   "tour": {
     "welcome_title": "Willkommen bei Mission Control!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Transaktionstrends",
-    "no_data": "Keine Trenddaten verfügbar",
-    "hours_suffix": "Std"
+    "hours_suffix": "Std",
+    "no_data": "Keine Trenddaten verfügbar"
   },
   "safeguarding_banner": {
     "title": "Der Schutzschritt ist in Ihrem Onboarding-Assistenten deaktiviert",
@@ -120,6 +121,5 @@
     "queue": "Cron-Jobs",
     "api": "E-Mail-API",
     "cache": "Cache"
-  },
-  "loading": "Lädt"
+  }
 }

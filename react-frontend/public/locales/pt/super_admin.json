@@ -23,19 +23,19 @@
     "national_dashboard": "Painel Nacional"
   },
   "layout": {
-    "loading": "Carregando super admin",
-    "skip_to_main": "Ir para o conteúdo principal",
-    "close_navigation": "Fechar navegação do super admin",
-    "navigation": "Navegação do super admin"
+    "loading": "Carregando superadministrador",
+    "skip_to_main": "Pular para o conteúdo principal",
+    "close_navigation": "Fechar navegação de superadministrador",
+    "navigation": "Navegação de superadministrador"
   },
   "header": {
-    "back_to_admin": "Voltar para o admin",
+    "back_to_admin": "Voltar ao administrador",
     "toggle_sidebar": "Alternar barra lateral",
     "notifications": "Notificações",
-    "my_profile": "Meu Perfil",
-    "sign_out": "Sair",
     "user_fallback": "Super Administrador",
-    "user_menu": "Menu do super admin"
+    "user_menu": "Menu de superadministrador",
+    "my_profile": "Meu Perfil",
+    "sign_out": "Sair"
   },
   "sidebar": {
     "section_overview": "Visão geral",
@@ -44,7 +44,7 @@
     "section_commercial": "Comercial",
     "expand": "Expandir barra lateral",
     "collapse": "Recolher barra lateral",
-    "nav_label": "Navegação do super admin"
+    "nav_label": "Navegação de superadministrador"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Atividade recente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Nenhuma atividade da federação ainda",
+      "by_label": "por",
       "activity_title": "Atividade da Federação (30 dias)",
       "stat_total_actions": "Total de ações",
       "stat_messages": "Mensagens",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Eventos Críticos",
       "most_active_partnerships": "Parcerias mais ativas",
       "quick_nav_title": "Navegação rápida",
-      "tenant_whitelist_btn": "Lista de permissões de inquilinos",
-      "by_label": "por"
+      "tenant_whitelist_btn": "Lista de permissões de inquilinos"
     },
     "system_controls": {
       "title": "Controles do sistema de federação",

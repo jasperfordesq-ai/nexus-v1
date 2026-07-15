@@ -23,28 +23,28 @@
     "national_dashboard": "لوحة التحكم الوطنية"
   },
   "layout": {
-    "loading": "جارٍ تحميل المسؤول الأعلى",
-    "skip_to_main": "تخطي إلى المحتوى الرئيسي",
-    "close_navigation": "إغلاق تنقل المسؤول الأعلى",
-    "navigation": "تنقل المسؤول الأعلى"
+    "loading": "تحميل المشرف المتميز",
+    "skip_to_main": "انتقل إلى المحتوى الرئيسي",
+    "close_navigation": "أغلق تنقل المشرف المتميز",
+    "navigation": "التنقل المشرف الفائق"
   },
   "header": {
-    "back_to_admin": "العودة إلى الإدارة",
+    "back_to_admin": "العودة إلى المشرف",
     "toggle_sidebar": "تبديل الشريط الجانبي",
     "notifications": "الإشعارات",
-    "my_profile": "ملفي الشخصي",
-    "sign_out": "تسجيل الخروج",
     "user_fallback": "المشرف الأعلى",
-    "user_menu": "قائمة المسؤول الأعلى"
+    "user_menu": "قائمة المشرف المتميز",
+    "my_profile": "ملفي الشخصي",
+    "sign_out": "تسجيل الخروج"
   },
   "sidebar": {
     "section_overview": "نظرة عامة",
     "section_tenants": "المستأجرون",
     "section_federation": "اتحاد",
     "section_commercial": "تجاري",
-    "expand": "توسيع الشريط الجانبي",
+    "expand": "قم بتوسيع الشريط الجانبي",
     "collapse": "طي الشريط الجانبي",
-    "nav_label": "تنقل المسؤول الأعلى"
+    "nav_label": "التنقل المشرف الفائق"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "النشاط الأخير",
       "full_log_btn": "سجل كامل",
       "no_federation_activity": "لا يوجد أي نشاط للاتحاد حتى الآن",
+      "by_label": "بواسطة",
       "activity_title": "نشاط الاتحاد (30 يومًا)",
       "stat_total_actions": "إجمالي الإجراءات",
       "stat_messages": "رسائل",
@@ -639,8 +640,7 @@
       "stat_critical_events": "الأحداث الحاسمة",
       "most_active_partnerships": "الشراكات الأكثر نشاطا",
       "quick_nav_title": "التنقل السريع",
-      "tenant_whitelist_btn": "القائمة البيضاء للمستأجر",
-      "by_label": "بواسطة"
+      "tenant_whitelist_btn": "القائمة البيضاء للمستأجر"
     },
     "system_controls": {
       "title": "ضوابط نظام الاتحاد",

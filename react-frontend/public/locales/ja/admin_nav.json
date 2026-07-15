@@ -1,4 +1,7 @@
 {
+  "skip_to_main": "メインコンテンツにスキップ",
+  "admin_navigation": "管理者のナビゲーション",
+  "community_fund": "コミュニティ基金",
   "dashboard": "ダッシュボード",
   "users": "ユーザー",
   "crm": "CRM",
@@ -8,6 +11,7 @@
   "matching": "マッチングと安全性",
   "moderation": "節度",
   "community": "コミュニティ",
+  "alpha_badge": "アルファ",
   "caring_community": "思いやりのあるコミュニティ",
   "caring_workflow": "Caring Communityのワークフロー",
   "caring_projects": "コミュニティプロジェクト",
@@ -62,8 +66,10 @@
   "platform_operations": "プラットフォーム運用",
   "intelligence_diagnostics": "インテリジェンスと診断",
   "integrations": "連携",
+  "partner_api_integrations": "パートナー API と統合",
   "partner_timebanks": "パートナータイムバンク",
   "super_admin": "スーパー管理者",
+  "super_admin_panel": "スーパ管理者パネル",
   "transactions": "取引",
   "events": "イベント",
   "groups": "グループ",
@@ -72,6 +78,7 @@
   "messages": "メッセージ",
   "reviews": "レビュー",
   "reports": "レポート",
+  "support_reports": "サポートレポート",
   "blog": "ブログ",
   "pages": "ページ",
   "newsletters": "ニュースレター",
@@ -82,6 +89,7 @@
   "back_to_site": "サイトに戻る",
   "back_to_site_header": "サイトに戻る",
   "toggle_sidebar": "サイドバーを切り替え",
+  "close_sidebar": "サイドバーを閉じる",
   "notifications": "通知",
   "support_requests": "サポートリクエスト",
   "support_requests_count": "未対応のサポートリクエスト {{count}} 件",
@@ -184,6 +192,7 @@
   "super_federation_system_controls": "システム制御",
   "super_federation_whitelist": "フェデレーション ホワイトリスト",
   "billing": "請求する",
+  "podcasts": "ポッドキャスト",
   "member_premium": "メンバープレミアム",
   "premium_subscribers": "プレミアム購読者",
   "operations": "運用",
@@ -240,6 +249,10 @@
   "module_configuration": "モジュール構成",
   "translation_config": "翻訳設定",
   "federation_cc_config": "クレジットカードの設定",
+  "federation_group_core_network": "コアネットワーク",
+  "federation_group_trust_settlement": "信託・決済",
+  "federation_group_partner_protocols": "パートナープロトコル",
+  "federation_group_monitoring_data": "モニタリングとデータ",
   "expand_sidebar": "サイドバーを展開する",
   "collapse_sidebar": "サイドバーを折りたたむ",
   "search_nav": "管理者を検索...",
@@ -263,6 +276,7 @@
   "help_faqs": "ヘルプFAQ",
   "search_analytics": "検索アナリティクス",
   "donation_refunds": "寄付の返金",
+  "sso_providers": "シングルサインオン",
   "breadcrumbs": {
     "activity_log": "アクティビティログ",
     "admin": "管理者",
@@ -500,14 +514,17 @@
     "breadcrumbs": "ブレッドクラム"
   },
   "shared": {
+    "loading": "読み込み中",
     "help": "???",
     "open_page_help": "??????????",
     "search": "検索...",
     "refresh": "リフレッシュ",
     "total_count": "{{count}}合計",
     "data_table": "データ",
+    "select_all_rows": "すべての行を選択",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
+    "select_row": "行を選択 {{id}}",
     "total_count_other": "{{count}}合計",
     "statuses": {
       "active": "有効",
@@ -546,10 +563,7 @@
       "processing": "処理中",
       "resolved": "解決済み"
     },
-    "total_count_one": "{{count}} 合計",
-    "loading": "読み込み中",
-    "select_all_rows": "すべての行を選択",
-    "select_row": "行を選択 {{id}}"
+    "total_count_one": "{{count}} 合計"
   },
   "help_drawer": {
     "aria_label": "ヘルプ: {{title}}",
@@ -570,7 +584,7 @@
     "selected_count_other": "{{count}} が選択されました",
     "confirm_message_other": "{{action}} {{count}} アイテムを取得してもよろしいですか?",
     "selected_count_one": "{{count}} 選択済み",
-    "confirm_message_one": "本当に {{action}} {{count}} 件のアイテムを実行しますか？"
+    "confirm_message_one": "{{action}} {{count}} アイテムを作成してもよろしいですか?"
   },
   "common": {
     "cancel": "キャンセル"
@@ -691,7 +705,7 @@
   },
   "support_requests_count_other": "未対応のサポートリクエスト {{count}} 件",
   "checking_permissions": "権限を確認中",
-  "support_requests_count_one": "{{count}} サポートリクエストを開く",
+  "support_requests_count_one": "{{count}} オープンサポートリクエスト",
   "search_keywords": {
     "groups": "クラブ|サークル|コミュニティ",
     "group_organization": "タグ|コレクション|自動割り当て|バンドル",
@@ -710,19 +724,5 @@
     "support_reports": "バグ|フィードバック|診断|Sentry",
     "retention_policies": "保持|GDPR|廃棄|削除|アーカイブ",
     "sso_providers": "シングルサインオン|OpenID Connect|Entra|ID|ログイン"
-  },
-  "admin_navigation": "管理者ナビゲーション",
-  "community_fund": "コミュニティ基金",
-  "super_admin_panel": "スーパ管理者パネル",
-  "support_reports": "サポートレポート",
-  "close_sidebar": "サイドバーを閉じる",
-  "podcasts": "ポッドキャスト",
-  "skip_to_main": "メインコンテンツにスキップ",
-  "alpha_badge": "アルファ",
-  "partner_api_integrations": "パートナーAPIと統合",
-  "federation_group_core_network": "コアネットワーク",
-  "federation_group_trust_settlement": "トラストと決済",
-  "federation_group_partner_protocols": "パートナープロトコル",
-  "federation_group_monitoring_data": "モニタリングとデータ",
-  "sso_providers": "シングルサインオン"
+  }
 }

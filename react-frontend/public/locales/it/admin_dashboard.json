@@ -3,6 +3,7 @@
   "subtitle": "Panoramica della piattaforma in tempo reale e centro di comando",
   "tour_btn": "Giro",
   "refresh": "Aggiorna",
+  "loading": "Caricamento",
   "view_all_activity": "Visualizza tutte le attività",
   "tour": {
     "welcome_title": "Benvenuti al Controllo Missione!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Tendenze delle transazioni",
-    "no_data": "Nessun dato di tendenza disponibile",
-    "hours_suffix": "ore"
+    "hours_suffix": "ore",
+    "no_data": "Nessun dato di tendenza disponibile"
   },
   "safeguarding_banner": {
     "title": "Il passaggio di salvaguardia è DISATTIVATO nella procedura guidata di onboarding",
@@ -120,6 +121,5 @@
     "queue": "Lavori Cron",
     "api": "API di posta elettronica",
     "cache": "Cache"
-  },
-  "loading": "Caricamento"
+  }
 }

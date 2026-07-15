@@ -57,6 +57,7 @@
     "no_history_available": "Nie znaleziono dostępnej historii",
     "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
     "no_members_found": "Nie znaleziono żadnych członków",
+    "loading": "Załadunek",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
     "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
@@ -67,10 +68,9 @@
     "refresh": "Odświeżać",
     "search": "Szukaj...",
     "select_all_rows": "Wybierz wszystkie wiersze",
+    "select_row": "Wybierz wiersz {{id}}",
     "data_table": "Dane",
-    "total_count": "Łącznie{{count}}",
-    "loading": "Ładowanie",
-    "select_row": "Wybierz wiersz {{id}}"
+    "total_count": "Łącznie{{count}}"
   },
   "admin_help": {
     "page_title": "Centrum pomocy",
@@ -85,10 +85,10 @@
       "caring_community": "Troskliwa społeczność",
       "kiss_agoris": "POCAŁUNEK I Caring Community"
     },
-    "search_placeholder_few": "Przeszukaj artykuły pomocy{{count}}...",
-    "search_placeholder_many": "Przeszukaj artykuły pomocy{{count}}...",
     "search_placeholder_one": "Przeszukaj artykuły pomocy{{count}}...",
-    "search_placeholder_other": "Przeszukaj artykuły pomocy{{count}}..."
+    "search_placeholder_other": "Przeszukaj artykuły pomocy{{count}}...",
+    "search_placeholder_few": "Przeszukaj artykuły pomocy{{count}}...",
+    "search_placeholder_many": "Przeszukaj artykuły pomocy{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ pomocy",

@@ -1,8 +1,16 @@
 {
   "title": "Suche",
+  "heroEyebrow": "Globale Suche",
+  "subtitle": "Mitglieder, Einträge, Veranstaltungen, Gruppen und Community-Geschichten an einem Ort finden.",
   "placeholder": "Personen, Angebote, Veranstaltungen suchen…",
+  "clearSearch": "Suche löschen",
   "empty": "Keine Ergebnisse gefunden.",
+  "emptyHint": "Keine Treffer für „{{query}}“. Versuchen Sie es mit einer umfassenderen Suche oder einem anderen Filter.",
+  "initialTitle": "Durchsuchen Sie Ihre Community",
   "startTyping": "Tippe, um zu suchen…",
+  "searching": "Suche...",
+  "resultsCount": "{{count}} Ergebnis",
+  "resultsCount_other": "{{count}} Ergebnisse",
   "types": {
     "user": "Personen",
     "listing": "Angebote",
@@ -11,6 +19,7 @@
     "blog_post": "Blog"
   },
   "filterAll": "Alle",
+  "errorTitle": "Suche fehlgeschlagen",
   "error": "Suche fehlgeschlagen. Bitte versuche es erneut.",
   "saved": {
     "title": "Saved searches",

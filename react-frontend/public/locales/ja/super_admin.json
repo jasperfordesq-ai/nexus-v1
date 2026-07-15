@@ -23,28 +23,28 @@
     "national_dashboard": "全国ダッシュボード"
   },
   "layout": {
-    "loading": "スーパ管理者を読み込み中",
+    "loading": "スーパー管理者の読み込み中",
     "skip_to_main": "メインコンテンツにスキップ",
-    "close_navigation": "スーパ管理者ナビゲーションを閉じる",
-    "navigation": "スーパ管理者ナビゲーション"
+    "close_navigation": "スーパー管理者のナビゲーションを閉じる",
+    "navigation": "スーパー管理者のナビゲーション"
   },
   "header": {
     "back_to_admin": "管理者に戻る",
-    "toggle_sidebar": "サイドバー切り替え",
+    "toggle_sidebar": "サイドバーの切り替え",
     "notifications": "通知",
-    "my_profile": "マイプロフィール",
-    "sign_out": "サインアウト",
     "user_fallback": "スーパー管理者",
-    "user_menu": "スーパ管理者メニュー"
+    "user_menu": "スーパー管理者メニュー",
+    "my_profile": "マイプロフィール",
+    "sign_out": "サインアウト"
   },
   "sidebar": {
     "section_overview": "概要",
     "section_tenants": "テナント",
     "section_federation": "連邦",
     "section_commercial": "商業",
-    "expand": "サイドバーを展開",
+    "expand": "サイドバーを展開する",
     "collapse": "サイドバーを折りたたむ",
-    "nav_label": "スーパ管理者ナビゲーション"
+    "nav_label": "スーパー管理者のナビゲーション"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "最近の活動",
       "full_log_btn": "完全なログ",
       "no_federation_activity": "連盟の活動はまだありません",
+      "by_label": "による",
       "activity_title": "連盟活動（30日間）",
       "stat_total_actions": "合計アクション数",
       "stat_messages": "メッセージ",
@@ -639,8 +640,7 @@
       "stat_critical_events": "重大なイベント",
       "most_active_partnerships": "最も活発なパートナーシップ",
       "quick_nav_title": "クイックナビゲーション",
-      "tenant_whitelist_btn": "テナントのホワイトリスト",
-      "by_label": "作成者"
+      "tenant_whitelist_btn": "テナントのホワイトリスト"
     },
     "system_controls": {
       "title": "フェデレーション システムの制御",

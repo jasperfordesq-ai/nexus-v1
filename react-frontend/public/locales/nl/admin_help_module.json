@@ -57,6 +57,7 @@
     "no_history_available": "Geen geschiedenis beschikbaar gevonden",
     "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
     "no_members_found": "Geen leden gevonden gevonden",
+    "loading": "Laden",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
     "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
@@ -67,10 +68,9 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "select_all_rows": "Selecteer alle rijen",
+    "select_row": "Selecteer rij {{id}}",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal",
-    "loading": "Laden",
-    "select_row": "Selecteer rij {{id}}"
+    "total_count": "{{count}}totaal"
   },
   "admin_help": {
     "page_title": "Helpcentrum",

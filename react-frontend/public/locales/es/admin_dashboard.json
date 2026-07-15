@@ -3,6 +3,7 @@
   "subtitle": "Descripción general de la plataforma en tiempo real y centro de comando",
   "tour_btn": "Recorrido",
   "refresh": "Refrescar",
+  "loading": "Cargando",
   "view_all_activity": "Ver toda la actividad",
   "tour": {
     "welcome_title": "¡Bienvenidos a Control de Misión!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Tendencias de transacciones",
-    "no_data": "No hay datos de tendencias disponibles",
-    "hours_suffix": "horas"
+    "hours_suffix": "horas",
+    "no_data": "No hay datos de tendencias disponibles"
   },
   "safeguarding_banner": {
     "title": "El paso de protección está desactivado en su asistente de incorporación",
@@ -120,6 +121,5 @@
     "cache": "caché",
     "queue": "Trabajos cronificados",
     "api": "API de correo electrónico"
-  },
-  "loading": "Cargando"
+  }
 }

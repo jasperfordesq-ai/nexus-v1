@@ -1,8 +1,16 @@
 {
   "title": "Cuardach",
+  "heroEyebrow": "Cuardach domhanda",
+  "subtitle": "Aimsigh baill, liostaí, imeachtaí, grúpaí agus scéalta pobail in aon áit amháin.",
   "placeholder": "Cuardach daoine, fógraí, imeachtaí…",
+  "clearSearch": "Glan an cuardach",
   "empty": "Níor aimsíodh aon toradh.",
+  "emptyHint": "Níl aon meaitseáil le haghaidh \"{{query}}\". Bain triail as cuardach níos leithne nó scagaire eile.",
+  "initialTitle": "Cuardaigh do phobal",
   "startTyping": "Tosaigh ag clóscríobh le cuardach…",
+  "searching": "Ag cuardach...",
+  "resultsCount": "{{count}} toradh",
+  "resultsCount_other": "{{count}} toradh",
   "types": {
     "user": "Daoine",
     "listing": "Fógraí",
@@ -11,6 +19,7 @@
     "blog_post": "Blag"
   },
   "filterAll": "Gach ceann",
+  "errorTitle": "Theip ar an gcuardach",
   "error": "Theip ar an gcuardach. Bain triail as arís.",
   "saved": {
     "title": "Saved searches",

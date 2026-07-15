@@ -1,6 +1,69 @@
 {
   "title": "Socruithe",
+  "eyebrow": "Sainroghanna",
+  "subtitle": "Bainistigh fógraí, slándáil, agus faisnéis aipe.",
+  "appearance": {
+    "title": "Cuma",
+    "hint": "Roghnaigh conas a bhreathnaíonn an aip ar an ngléas seo.",
+    "mode": {
+      "system": "Córas",
+      "systemHint": "Meaitseáil socruithe do ghléis",
+      "light": "Geal",
+      "lightHint": "Úsáid an téama geal i gcónaí",
+      "dark": "Dorcha",
+      "darkHint": "Úsáid an téama dorcha i gcónaí"
+    }
+  },
   "changePasswordTitle": "Athraigh pasfhocal",
+  "pushNotifications": "Brúigh Fógraí",
+  "pushHint": "Roghnaigh cén ghníomhaíocht ar féidir a thaispeáint mar fhógraí gléis.",
+  "emailNotifications": "Fógraí Ríomhphoist",
+  "emailHint": "Roghnaigh cé na nuashonruithe ar cheart dóibh teacht trí ríomhphost freisin.",
+  "push": {
+    "messages": "Teachtaireachtaí nua",
+    "transactions": "Idirbhearta creidmheasa ama",
+    "social": "Gníomhaíocht shóisialta"
+  },
+  "email": {
+    "messages": "Teachtaireachtaí",
+    "connections": "Naisc",
+    "transactions": "Idirbhearta creidmheasa ama",
+    "reviews": "Léirmheasanna"
+  },
+  "saveError": "Níorbh fhéidir an socrú a shábháil. Triail arís le do thoil.",
+  "about": "Faoi",
+  "aboutHint": "Leagan na haipe agus ceadúnú foinse oscailte.",
+  "version": "Leagan",
+  "unknownVersion": "Anaithnid",
+  "license": "Ceadúnas",
+  "security": "Slándáil",
+  "securityHint": "Coinnigh rochtain do chuntais cothrom le dáta.",
+  "changePassword": "Athraigh Pasfhocal",
+  "password": {
+    "eyebrow": "Slándáil cuntais",
+    "title": "Athraigh Pasfhocal",
+    "hint": "Cuir isteach do phasfhocal reatha, ansin roghnaigh ceann nua.",
+    "currentLabel": "Pasfhocal reatha",
+    "currentPlaceholder": "Cuir isteach an pasfhocal reatha",
+    "newLabel": "Pasfhocal nua",
+    "newPlaceholder": "Cuir isteach pasfhocal nua",
+    "confirmLabel": "Deimhnigh pasfhocal nua",
+    "confirmPlaceholder": "Cuir isteach pasfhocal nua arís",
+    "newHint": "Úsáid 8 gcarachtar ar a laghad.",
+    "save": "Nuair a dhearbhaigh tú do phasfhocal nua amháin agus nuair a dhearbhaigh tú id=\"2\"> mheaitseáil.",
+    "saving": "Pasfhocal á shábháil...",
+    "reviewTitle": "Réidh le nuashonrú?",
+    "reviewSubtitle": "Sábháil ach nuair a mheaitseálann do phasfhocal nua agus deimhniú.",
+    "success": "Pasfhocal athraithe",
+    "successMessage": "D'éirigh le nuashonrú do phasfhocal.",
+    "validation": {
+      "currentRequired": "Cuir isteach do phasfhocal reatha, le do thoil.",
+      "newRequired": "Cuir isteach pasfhocal nua, le do thoil.",
+      "mismatch": "Ní ionann an pasfhocal agus an deimhniú nua.",
+      "tooShort": "Ní mór go mbeadh 12 charachtar ar a laghad sa phasfhocal nua."
+    },
+    "changeError": "Níorbh fhéidir an pasfhocal a athrú. Bain triail eile as le do thoil."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "eyebrow": "Trust and safety",
@@ -48,6 +111,19 @@
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
   "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Príobháideachas",
+    "hint": "Rialaigh cé atá in ann tú a aimsiú, féachaint agus teagmháil a dhéanamh leat.",
+    "profileVisibility": "Infheictheacht próifíle",
+    "changeVisibility": "Athraigh",
+    "searchIndexing": "Feiceáil i gcuardach ball",
+    "saveError": "Níorbh fhéidir socruithe príobháideachais a shábháil. Bain triail eile as le do thoil.",
+    "visibility": {
+      "public": "Le feiceáil go poiblí",
+      "members": "Le feiceáil ag baill sínithe isteach",
+      "connections": "Le feiceáil ar do naisc"
+    }
+  },
   "blockedUsers": {
     "title": "Blocked users",
     "settingsHint": "Review members you have blocked and unblock them if needed.",
@@ -167,17 +243,5 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
-  },
-  "appearance": {
-    "title": "Cuma",
-    "hint": "Roghnaigh conas a bhreathnaíonn an aip ar an ngléas seo.",
-    "mode": {
-      "system": "Córas",
-      "systemHint": "Meaitseáil socruithe do ghléis",
-      "light": "Geal",
-      "lightHint": "Úsáid an téama geal i gcónaí",
-      "dark": "Dorcha",
-      "darkHint": "Úsáid an téama dorcha i gcónaí"
-    }
   }
 }

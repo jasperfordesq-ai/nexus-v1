@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "Nuevo desafío",
+    "title": "Nuevo desafío",
+    "subtitle": "Invita a los miembros a enviar ideas para una pregunta comunitaria enfocada.",
+    "titleLabel": "Título del reto",
+    "titlePlaceholder": "¿Qué debería resolver la comunidad?",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "Describe el problema, criterios y contexto útil",
+    "categoryLabel": "Categoría",
+    "categoryPlaceholder": "Tecnología, seguridad, medio ambiente...",
+    "statusLabel": "Modo de publicación",
+    "status": {
+      "open": "Abrir ahora",
+      "draft": "Guardar borrador"
+    },
+    "submissionDeadlineLabel": "Envío fecha límite",
+    "votingDeadlineLabel": "Fecha límite de votación",
+    "deadlinePlaceholder": "2026-06-30 17:00",
+    "maxIdeasLabel": "Máximo de ideas por miembro",
+    "maxIdeasPlaceholder": "Opcional",
+    "prizeLabel": "Premio o reconocimiento",
+    "prizePlaceholder": "Opcional",
+    "reviewTitle": "¿Listo para publicar?",
+    "reviewSubtitle": "Los miembros pueden enviar ideas una vez que el desafío esté abierto.",
+    "footerTitle": "Listo",
+    "footerSubtitle": "Abierto para ideas.",
+    "submit": "Crear desafío",
+    "saving": "Creando...",
+    "validationTitle": "Verificar los detalles del desafío",
+    "validationRequired": "Agregar un título y una descripción antes de continuar.",
+    "validationDates": "Utilice una fecha y hora válidas, como 2026-06-30 17:00.",
+    "validationMaxIdeas": "Usar un número entero entre 1 y 50.",
+    "failedTitle": "No se pudo crear el desafío",
+    "failedDescription": "Inténtalo de nuevo en un momento."
   }
 }

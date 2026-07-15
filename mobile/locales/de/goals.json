@@ -1,8 +1,24 @@
 {
   "title": "Ziele",
+  "subtitle": "Setzen Sie persönliche Meilensteine, verfolgen Sie den Fortschritt und halten Sie Ihre Dynamik sichtbar.",
+  "heroEyebrow": "Persönlicher Fortschritt",
   "confirmAbandon": "Bist du sicher, dass du dieses Ziel aufgeben möchtest?",
   "empty": "Noch keine Ziele vorhanden.",
   "addGoal": "Ziel hinzufügen",
+  "percent": "{{percent}}%",
+  "momentumOn": "Gebäude",
+  "momentumEmpty": "Bereit",
+  "buddy": "Kumpel: {{name}}",
+  "visibility": {
+    "public": "Öffentlich"
+  },
+  "stats": {
+    "active": "Aktiv",
+    "completed": "Abgeschlossen",
+    "total": "Gesamt",
+    "momentum": "Momentum",
+    "averageProgress": "Durchschnittlicher Fortschritt"
+  },
   "status": {
     "active": "Aktiv",
     "completed": "Abgeschlossen",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Erstelle dein erstes Ziel, um deinen Fortschritt zu verfolgen.",
   "create": {
     "title": "Neues Ziel",
+    "subtitle": "Geben Sie sich ein klares Ziel, auf das Sie hinarbeiten möchten.",
+    "close": "Zielform schließen",
     "titleLabel": "Zieltitel",
     "titlePlaceholder": "z. B. 5 Nachbarn helfen",
     "descriptionLabel": "Beschreibung (optional)",
+    "descriptionPlaceholder": "Fügen Sie einen kleinen Kontext oder eine erste hinzu Schritt.",
     "targetHoursLabel": "Zielstunden (optional)",
+    "targetPlaceholder": "z.B. 10",
     "dueDateLabel": "Fälligkeitsdatum (optional)",
     "submit": "Ziel erstellen",
     "error": "Ziel konnte nicht erstellt werden."

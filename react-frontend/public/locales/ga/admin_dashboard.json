@@ -3,6 +3,7 @@
   "subtitle": "Forbhreathnú ardán fíor-ama agus ionad ordaithe",
   "tour_btn": "Turas",
   "refresh": "Athnuaigh",
+  "loading": "Luchtú",
   "view_all_activity": "Féach ar Gach Gníomhaíocht",
   "tour": {
     "welcome_title": "Fáilte go dtí Rialú Misean!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Treochtaí Idirbheart",
-    "no_data": "Níl aon sonraí treochtaí ar fáil",
-    "hours_suffix": "uaireanta"
+    "hours_suffix": "uair",
+    "no_data": "Níl aon sonraí treochtaí ar fáil"
   },
   "safeguarding_banner": {
     "title": "Tá an chéim shlándála MACHTA i do dhraoi bordála",
@@ -120,6 +121,5 @@
     "cache": "Taisce",
     "queue": "Jabanna Cron",
     "api": "Ríomhphost API"
-  },
-  "loading": "Luchtú"
+  }
 }

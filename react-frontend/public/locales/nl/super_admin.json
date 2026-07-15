@@ -24,27 +24,27 @@
   },
   "layout": {
     "loading": "Superbeheerder laden",
-    "skip_to_main": "Sla over naar hoofdinhoud",
-    "close_navigation": "Sluit superadmin-navigatie",
-    "navigation": "Superadmin-navigatie"
+    "skip_to_main": "Ga naar de hoofdinhoud",
+    "close_navigation": "Sluit de hoofdbeheerdernavigatie",
+    "navigation": "Super admin-navigatie"
   },
   "header": {
-    "back_to_admin": "Terug naar beheer",
-    "toggle_sidebar": "Zijbalk wisselen",
+    "back_to_admin": "Terug naar beheerder",
+    "toggle_sidebar": "Zijbalk schakelen",
     "notifications": "Meldingen",
-    "my_profile": "Mijn Profiel",
-    "sign_out": "Afmelden",
     "user_fallback": "Superbeheerder",
-    "user_menu": "Superadmin-menu"
+    "user_menu": "Super beheerdersmenu",
+    "my_profile": "Mijn Profiel",
+    "sign_out": "Afmelden"
   },
   "sidebar": {
     "section_overview": "Overzicht",
     "section_tenants": "Huurders",
     "section_federation": "Federatie",
     "section_commercial": "Commercieel",
-    "expand": "Zijbalk uitklappen",
-    "collapse": "Zijbalk inklappen",
-    "nav_label": "Superadmin-navigatie"
+    "expand": "Zijbalk uitvouwen",
+    "collapse": "Zijbalk samenvouwen",
+    "nav_label": "Super admin-navigatie"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Recente activiteit",
       "full_log_btn": "Volledig logboek",
       "no_federation_activity": "Nog geen federatieactiviteit",
+      "by_label": "door",
       "activity_title": "Federatie-activiteit (30 dagen)",
       "stat_total_actions": "Totaal aantal acties",
       "stat_messages": "Berichten",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Kritieke gebeurtenissen",
       "most_active_partnerships": "Meest actieve partnerschappen",
       "quick_nav_title": "Snelle navigatie",
-      "tenant_whitelist_btn": "Witte lijst van huurders",
-      "by_label": "doorg"
+      "tenant_whitelist_btn": "Witte lijst van huurders"
     },
     "system_controls": {
       "title": "Systeemcontroles van de Federatie",

@@ -1,16 +1,32 @@
 {
   "title": "Blog",
   "postTitle": "Article de blog",
+  "heroEyebrow": "Journal communautaire",
+  "subtitle": "Histoires, guides et mises à jour de la communauté Timebank.",
   "searchPlaceholder": "Rechercher des articles…",
+  "searchAction": "Rechercher",
+  "clearSearch": "Effacer la recherche",
   "empty": "Aucun article pour le moment.",
+  "emptyHint": "Les histoires et mises à jour de la communauté apparaîtront ici.",
+  "emptyFiltered": "Aucune correspondance articles",
+  "emptyFilteredHint": "Essayez une autre recherche.",
+  "loadMore": "Charger plus",
+  "postsCount": "{{count}} post",
+  "postsCount_other": "{{count}} publications",
+  "publishedOn": "{{date}}",
   "readingTime": "{{minutes}} min de lecture",
   "by": "Par {{name}}",
   "detail": {
     "title": "Article",
     "notFound": "Article introuvable.",
+    "notFoundHint": "Cet article a peut-être été supprimé ou n'est plus disponible.",
     "invalidId": "Identifiant d'article invalide.",
+    "invalidIdHint": "Nous n'avons pas pu identifier l'article à ouvrir.",
     "goBack": "Retour",
+    "backToBlog": "Retour au blog",
     "readFull": "Lire l'article complet",
-    "share": "Partager la publication"
+    "share": "Partager la publication",
+    "tags": "Sujets",
+    "article": "Article"
   }
 }

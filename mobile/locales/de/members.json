@@ -1,6 +1,59 @@
 {
   "title": "Mitglieder",
+  "heroEyebrow": "Community-Verzeichnis",
+  "subtitle": "Nachbarn, Fähigkeiten, gemeinsame Interessen und vertrauenswürdige Timebank-Mitglieder finden.",
+  "directory": "Mitgliederverzeichnis",
+  "filtersIntro": "Nach Namen, Profiltext oder lokalen Mitgliedsdetails suchen.",
+  "resultsLoading": "Laden",
+  "memberCount": "{{count}}-Mitglied",
+  "memberCount_other": "{{count}}-Mitglieder",
+  "verifiedCount": "{{count}} verifiziert",
+  "hoursCount": "{{count}} Stunden ausgetauscht",
+  "loadedCount": "{{count}} geladen",
+  "clearSearch": "Suche löschen",
+  "back": "Zurück",
+  "share": "Profil teilen",
   "profileTitle": "Mitgliederprofil",
+  "connections": {
+    "title": "Verbindungen",
+    "eyebrow": "Mitglieder-Workflows",
+    "subtitle": "Verwalten Sie Ihre Mitgliederverbindungen, ausstehenden Anfragen und Direktnachrichtenrouten.",
+    "tabs": {
+      "accepted": "Verbunden",
+      "pending_received": "Empfangen",
+      "pending_sent": "Gesendet"
+    },
+    "empty": {
+      "accepted": {
+        "title": "Noch keine Verbindungen",
+        "description": "Mitglieder finden und Verbindungsanfragen senden."
+      },
+      "pending_received": {
+        "title": "Keine Anfragen zur Überprüfung",
+        "description": "Eingehende Verbindungsanfragen werden hier angezeigt."
+      },
+      "pending_sent": {
+        "title": "Keine gesendeten Anfragen",
+        "description": "Von Ihnen gesendete Verbindungsanfragen werden hier angezeigt, bis sie vorliegen akzeptiert."
+      }
+    },
+    "status": {
+      "accepted": "Verbunden",
+      "pending_received": "Empfangen",
+      "pending_sent": "Gesendet"
+    },
+    "browseMembers": "Mitglieder durchsuchen",
+    "viewProfile": "Profil anzeigen für {{name}}",
+    "connectedSince": "Verbunden {{date}}",
+    "message": "Nachricht",
+    "remove": "Entfernen",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen",
+    "cancel": "Anfrage abbrechen",
+    "unknownMember": "Unbekanntes Mitglied",
+    "actionFailedTitle": "Verbindungsaktualisierung fehlgeschlagen",
+    "actionFailedDescription": "Bitte versuchen Sie es erneut."
+  },
   "search": {
     "placeholder": "Mitglieder suchen…"
   },
@@ -13,7 +66,48 @@
   "profile": {
     "timeCredits": "{{count}} Zeitguthaben",
     "timeCredits_other": "{{count}} Zeitguthaben",
+    "hoursGiven": "Angegebene Stunden",
+    "hoursReceived": "Erhaltene Stunden",
+    "totalHours": "Gesamtstunden",
+    "about": "Über",
     "memberSince": "Mitglied seit {{date}}",
+    "lastActive": "Zuletzt aktiv {{date}}",
+    "shareMessage": "{{name}} — {{url}}",
+    "sendMessage": "Nachricht senden",
+    "myProfile": "Mein Profil",
+    "editProfile": "Profil bearbeiten",
+    "ownProfileHint": "Halten Sie Ihr Profil aktuell, damit andere Mitglieder wissen, was Sie anbieten können und was Sie interessiert in.",
+    "noBio": "Dieses Mitglied hat noch keine Biografie hinzugefügt.",
+    "noBioOwn": "Fügen Sie eine kurze Biografie hinzu, damit andere Mitglieder wissen, wie sie mit Ihnen in Kontakt treten können.",
+    "signInRequired": "Melden Sie sich an, um Ihr Profil anzuzeigen.",
+    "verified": "Verifiziert",
+    "federatedMember": "Verbundmitglied",
+    "federatedProfile": "Verbundprofil",
+    "federatedProfileHint": "Dieses Profil wird von {{community}} über das Verbundnetzwerk geteilt.",
+    "externalFederatedMember": "Externes Verbundmitglied",
+    "externalFederatedMemberDescription": "Dieses Mitglied wird von einem externen Verbundpartner geteilt. Sie können eine Verbundnachricht starten, aber das vollständige Profil bleibt auf dem Partnersystem.",
+    "externalFederatedTrustHint": "Vom Partner bereitgestellte Bewertungen werden hier angezeigt, wenn der Verbundpartner sie teilt.",
+    "backToFederatedMembers": "Zurück zu Verbundmitgliedern",
+    "federatedMessaging": "Messaging aktiviert",
+    "federatedExchanges": "Austausch aktiviert",
+    "sendCredits": "Credits senden",
+    "sendCreditsTo": "Credits an {{name}} senden",
+    "amountHours": "Betrag (Stunden)",
+    "amountPlaceholder": "1-100",
+    "transferDescription": "Beschreibung",
+    "transferDescriptionPlaceholder": "Wozu dienen diese Credits?",
+    "transferSummary": "Sende {{amount}} Stunde(n) an {{name}}.",
+    "transferValidationTitle": "Überweisung prüfen Details",
+    "transferAmountRequired": "Geben Sie einen ganzstündigen Betrag zwischen 1 und 100 ein.",
+    "transferDescriptionRequired": "Fügen Sie eine Beschreibung für diese Übertragung hinzu.",
+    "transferSuccessTitle": "Credits gesendet",
+    "transferSuccessMessage": "{{amount}} Stunde(n) gesendet an {{name}}.",
+    "transferFailedTitle": "Credits konnten nicht gesendet werden",
+    "transferFailedMessage": "Bitte überprüfen Sie, ob der Verbundaustausch aktiviert ist, und versuchen Sie es erneut.",
+    "cancelTransfer": "Übertragung abbrechen",
+    "sharedListings": "Geteilt Einträge",
+    "sharedListing": "Geteilter Eintrag",
+    "loadError": "Mitgliederprofil konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
     "connect": "Verbinden",
     "connected": "Verbunden",
     "pendingSent": "Anfrage gesendet",
@@ -127,7 +221,11 @@
     "noResults": "Keine Mitglieder gefunden für \"{{query}}\""
   },
   "memberCard": {
-    "accessibilityLabel": "Profil von {{name}} anzeigen"
+    "accessibilityLabel": "Profil von {{name}} anzeigen",
+    "noTagline": "Community-Mitglied"
   },
-  "loading": "Mitglieder werden geladen…"
+  "loading": "Mitglieder werden geladen…",
+  "hrsGiven": "Stunden gegeben",
+  "hoursGivenShort": "{{count}} gegeben",
+  "hoursTotalShort": "{{count}} gesamt"
 }

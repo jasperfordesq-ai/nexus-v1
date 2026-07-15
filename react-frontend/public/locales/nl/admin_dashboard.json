@@ -3,6 +3,7 @@
   "subtitle": "Realtime platformoverzicht en commandocentrum",
   "tour_btn": "Rondleiding",
   "refresh": "Vernieuwen",
+  "loading": "Laden",
   "view_all_activity": "Bekijk alle activiteiten",
   "tour": {
     "welcome_title": "Welkom bij MissionControl!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Transactietrends",
-    "no_data": "Geen trendgegevens beschikbaar",
-    "hours_suffix": "uren"
+    "hours_suffix": "uur",
+    "no_data": "Geen trendgegevens beschikbaar"
   },
   "safeguarding_banner": {
     "title": "De beveiligingsstap is UITGESCHAKELD in uw onboardingwizard",
@@ -120,6 +121,5 @@
     "api": "E-mail-API",
     "database": "Database",
     "cache": "Cache"
-  },
-  "loading": "Laden"
+  }
 }

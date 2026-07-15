@@ -23,28 +23,28 @@
     "national_dashboard": "Painéal Náisiúnta"
   },
   "layout": {
-    "loading": "Ag luchtú super riarthóir",
-    "skip_to_main": "Sleamhnaigh go dtí an príomhtheachtaireacht",
-    "close_navigation": "Dún nascleanúint super riarthóra",
-    "navigation": "Nascleanúint super riarthóra"
+    "loading": "Super admin íoslódáil",
+    "skip_to_main": "Téigh ar aghaidh chuig an bpríomhábhar",
+    "close_navigation": "Dún an sár-loingseoireachta admin",
+    "navigation": "Sár-loingseoireachta admin"
   },
   "header": {
-    "back_to_admin": "Ar ais chuig an riarthóir",
-    "toggle_sidebar": "Tógáil an barra taobh",
+    "back_to_admin": "Ar ais go admin",
+    "toggle_sidebar": "Scoránaigh barra taoibh",
     "notifications": "Fógraí",
-    "my_profile": "Mo Phróifíl",
-    "sign_out": "Sín Amach",
     "user_fallback": "Super Fheidhmeannach",
-    "user_menu": "Biachlár super riarthóra"
+    "user_menu": "Sár-roghchlár admin",
+    "my_profile": "Mo Phróifíl",
+    "sign_out": "Sín Amach"
   },
   "sidebar": {
     "section_overview": "Forbhreathnú",
     "section_tenants": "Tónaí",
     "section_federation": "Feis",
     "section_commercial": "Tráchtála",
-    "expand": "Leathnaigh barra taobh",
-    "collapse": "Dún barra taobh",
-    "nav_label": "Nascleanúint super riarthóra"
+    "expand": "Leathnaigh barra taoibh",
+    "collapse": "Laghdaigh an barra taoibh",
+    "nav_label": "Sár-loingseoireachta admin"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Gníomhaíocht le Déanaí",
       "full_log_btn": "Log Iomlán",
       "no_federation_activity": "Níl aon ghníomhaíocht chónaidhme fós",
+      "by_label": "le",
       "activity_title": "Gníomhaíocht Cónaidhme (30 lá)",
       "stat_total_actions": "Gníomhartha Iomlána",
       "stat_messages": "Teachtaireachtaí",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Imeachtaí Criticiúla",
       "most_active_partnerships": "Comhpháirtíochtaí is Gníomhaí",
       "quick_nav_title": "Nascleanúint Thapa",
-      "tenant_whitelist_btn": "Liosta Bán Tionóntaí",
-      "by_label": "le"
+      "tenant_whitelist_btn": "Liosta Bán Tionóntaí"
     },
     "system_controls": {
       "title": "Rialuithe Córais Cónaidhm",

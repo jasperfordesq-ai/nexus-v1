@@ -1,8 +1,24 @@
 {
   "title": "Spriocanna",
+  "subtitle": "Socraigh garspriocanna pearsanta, rianaigh an dul chun cinn agus coinnigh do mhóiminteam le feiceáil.",
+  "heroEyebrow": "Dul chun cinn pearsanta",
   "confirmAbandon": "An bhfuil tú cinnte gur mhaith leat an sprioc seo a thréigean?",
   "empty": "Níl aon sprioc agat fós.",
   "addGoal": "Cuir sprioc leis",
+  "percent": "{{percent}}%",
+  "momentumOn": "Foirgneamh",
+  "momentumEmpty": "Réidh",
+  "buddy": "Buddy: {{name}}",
+  "visibility": {
+    "public": "Poiblí"
+  },
+  "stats": {
+    "active": "Gníomhach",
+    "completed": "Críochnaithe",
+    "total": "Iomlán",
+    "momentum": "Móiminteam",
+    "averageProgress": "Meánach dul chun cinn"
+  },
   "status": {
     "active": "Gníomhach",
     "completed": "Críochnaithe",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Cruthaigh do chéad sprioc chun tosú ag rianú do dhul chun cinn.",
   "create": {
     "title": "Sprioc nua",
+    "subtitle": "Tabhair sprioc shoiléir duit féin le bheith ag obair chuige.",
+    "close": "Dún foirm sprice",
     "titleLabel": "Teideal na sprice",
     "titlePlaceholder": "m.sh. Cabhraigh le 5 chomharsa",
     "descriptionLabel": "Cur síos (roghnach)",
+    "descriptionPlaceholder": "Cuir comhthéacs beag nó an chéad chéim leis.",
     "targetHoursLabel": "Uaireanta sprice (roghnach)",
+    "targetPlaceholder": "m.sh. 10",
     "dueDateLabel": "Spriocdháta (roghnach)",
     "submit": "Cruthaigh sprioc",
     "error": "Níorbh fhéidir an sprioc a chruthú."

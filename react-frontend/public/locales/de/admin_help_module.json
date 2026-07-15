@@ -57,6 +57,7 @@
     "no_history_available": "Keine verfügbare Historie gefunden",
     "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
     "no_members_found": "Keine Mitglieder gefunden",
+    "loading": "Laden",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
     "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
@@ -67,10 +68,9 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "select_all_rows": "Wählen Sie alle Zeilen aus",
+    "select_row": "Zeile auswählen {{id}}",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt",
-    "loading": "Lädt",
-    "select_row": "Zeile auswählen {{id}}"
+    "total_count": "{{count}}insgesamt"
   },
   "admin_help": {
     "page_title": "Hilfecenter",

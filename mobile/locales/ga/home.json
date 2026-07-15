@@ -11,7 +11,52 @@
     "welcome": "Fáilte chuig do bhanc ama",
     "empty": "Níl aon rud i do shruth fós. Féach ar ais go luath!",
     "loading": "Ag luchtú sruth…",
-    "emptySubtitle": "Tosaigh ag nascadh le do phobal chun postálacha a fheiceáil anseo."
+    "greeting": " Dia duit, {{name}}",
+    "subtitle": "Seo cad atá ag tarlú i do bhanc ama",
+    "emptyTitle": "Níl aon ghníomhaíocht fós. Abair hello le do phobal!",
+    "emptySubtitle": "Tosaigh ag nascadh le do phobal chun postálacha a fheiceáil anseo.",
+    "currentView": "{{filter}} amharc"
+  },
+  "mode": {
+    "forYou": "Ar do shon",
+    "recent": "Le déanaí"
+  },
+  "filter": {
+    "all": " Gach",
+    "following": "I ndiaidh",
+    "saved": "Sábháilte",
+    "posts": "Postálacha",
+    "listings": "Malartuithe",
+    "events": "Imeachtaí",
+    "polls": " Pobalbhreith",
+    "goals": "Spriocanna",
+    "jobs": "Poist",
+    "challenges": "Dúshláin",
+    "volunteering": "Deonach",
+    "blogs": "Blaganna",
+    "discussions": "Plé",
+    "more": "Tuilleadh",
+    "clear": "Glan rialuithe fotha"
+  },
+  "subFilter": {
+    "offer": "Tairiscintí",
+    "request": "Iarratais"
+  },
+  "composer": {
+    "title": " Roinn rud éigin le do phobal",
+    "subtitle": "Cruthaigh malartán, brabhsáil pobalbhreitheanna nó cuir leis an bhfotha.",
+    "exchange": "Malartán nua",
+    "polls": " Pobalbhreitheanna",
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Iarmheid",
+    "hours": "{{count}} uair",
+    "upcomingEvents": "Imeachtai le teacht",
+    "openRequests": "Iarratais oscailte",
+    "notifications": "Fogra",
+    "unavailable": "-",
+    "openCard": "Oscail {{label}}"
   },
   "activity": {
     "title": "Activity",
@@ -35,17 +80,99 @@
     "title": "Liostaí",
     "offer": "Tairiscintí",
     "request": "Iarratais",
-    "empty": "Gan liostaí fós."
+    "empty": "Gan liostaí fós.",
+    "searchPlaceholder": "Cuardaigh liostaí...",
+    "newListing": "Liostú nua"
+  },
+  "events": {
+    "upcoming": "Le Teacht",
+    "past": "Caite",
+    "loadError": "Níorbh fhéidir imeachtaí a lódáil.",
+    "going": "Ag dul",
+    "interested": " Suim",
+    "full": "Iomlán",
+    "noUpcoming": "Níl aon imeachtaí le teacht.",
+    "noPast": "Gan imeacht san am a chuaigh thart.",
+    "noEvents": "Níl aon imeachtaí {{when}}.",
+    "attendees": "{{going}} ag dul · {{interested}} leasmhara",
+    "aboutEvent": "Maidir",
+    "organizer": "Eagraí",
+    "eventNotFound": "Ní bhfuarthas an t-imeacht.",
+    "onlineTapToJoin": "Ar Líne - tapáil chun páirt a ghlacadh",
+    "onlineEvent": "Imeacht ar líne",
+    "rsvpError": "Níorbh fhéidir RSVP a nuashonrú."
   },
   "notifications": {
     "newMessage": "Teachtaireacht nua ó {{name}}",
-    "newMatch": "Tá meaitseáil nua agat!"
+    "newMatch": "Tá meaitseáil nua agat!",
+    "title": "Fógraí",
+    "markAllRead": "Marcáil uile mar léite",
+    "marking": "Marcáil...",
+    "markError": "Níorbh fhéidir fógraí a mharcáil mar léite.",
+    "allCaughtUp": "Tá tú gafa suas!",
+    "justNow": "díreach anois"
+  },
+  "tenant": {
+    "logoLabel": "{{name}} lógó"
+  },
+  "stories": {
+    "you": "Tusa",
+    "member": " Ball",
+    "memberInitial": "?"
+  },
+  "feedTypes": {
+    "post": "Postáil",
+    "listing": "Malartú",
+    "event": "Imeacht",
+    "poll": "Poll",
+    "goal": "Sprioc",
+    "job": "Job",
+    "challenge": "Dúshlán",
+    "volunteer": "Oibrí Deonach",
+    "review": "Léirmheas",
+    "blog": "Blag",
+    "discussion": "Plé",
+    "resource": "Acmhainn",
+    "level_up": "Leibhéal suas",
+    "badge_earned": "Suaitheantas",
+    "unlike": "Ní Maith Liom",
+    "like": "Cosúil le"
   },
   "poll": {
     "totalVotes": "{{count}} vóta",
     "voted": "Vótáil tú",
     "closed": "Pobalbhreith dúnta",
     "vote": "Vótáil"
+  },
+  "pollsScreen": {
+    "title": " Pobalbhreith",
+    "heroEyebrow": "Guth pobail",
+    "subtitle": "Vóta ar cheisteanna oscailte agus féach cad a cheapann do phobal.",
+    "emptyTitle": "Gan pobalbhreitheanna fós",
+    "emptySubtitle": "Nuair a chruthaíonn baill pobalbhreith, beidh siad le feiceáil anseo.",
+    "errorTitle": "Níorbh fhéidir pobalbhreith a luchtú",
+    "feedItemTitle": "{{title}}",
+    "statusOpen": "Oscail",
+    "statusClosed": "Dúnta",
+    "totalVotes": "{{count}} vótaí",
+    "createPoll": "Create poll",
+    "createTitle": "Create a poll",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Ask a question",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Add context for voters",
+    "optionsLabel": "Options",
+    "optionPlaceholder": "Option {{number}}",
+    "addOption": "Add option",
+    "removeOption": "Remove option {{number}}",
+    "submitPoll": "Publish poll",
+    "creating": "Publishing",
+    "createMissingTitle": "Poll not ready",
+    "createQuestionRequired": "Add a question.",
+    "createOptionsRequired": "Add at least two options.",
+    "createdTitle": "Poll created",
+    "createdMessage": "Your poll is now open.",
+    "createError": "Could not create poll."
   },
   "imageViewer": {
     "close": "Dún",
@@ -54,17 +181,41 @@
   "likePost": "Is maith liom an phostáil seo",
   "unlikePost": "Ní maith liom an phostáil seo a thuilleadh",
   "readMore": "Léigh tuilleadh",
-  "composer": {
-    "hashtags": "Hashtags"
+  "moreOptions": "Tuilleadh roghanna",
+  "share": " Roinn",
+  "save": "Sábháil",
+  "unsave": "Díshábháil",
+  "comment": "Trácht",
+  "official": "Oifigiúil",
+  "detail": {
+    "post": "Féach ar an bpostáil",
+    "listing": "Féach ar an malartú",
+    "event": "Amharc ar imeacht",
+    "job": "Féach ar phost",
+    "volunteer": "Féach ar dheis",
+    "goal": "Féach ar an sprioc",
+    "profile": "Féach ar phróifíl",
+    "blog": "Léigh postáil"
   },
-  "dashboard": {
-    "balance": "Iarmheid",
-    "hours": "{{count}} uair",
-    "upcomingEvents": "Imeachtai le teacht",
-    "openRequests": "Iarratais oscailte",
-    "notifications": "Fogra",
-    "unavailable": "-",
-    "openCard": "Oscail {{label}}"
+  "stats": {
+    "reactions": "{{count}} freagairt",
+    "comments": "{{count}} nóta tráchta",
+    "views": "{{count}} amharc",
+    "shares": "{{count}} roinnt",
+    "reactions_other": "{{count}} freagairtí",
+    "comments_other": "{{count}} nótaí tráchta",
+    "views_other": "{{count}} amharc",
+    "shares_other": "{{count}} roinnt"
+  },
+  "milestone": {
+    "badgeUnlocked": "Suaitheantas díghlasáilte",
+    "levelReached": "Leibhéal bainte amach",
+    "badgeMessage": "{{name}} {{badge}}",
+    "levelMessage": "{{name}} {{level}}"
+  },
+  "media": {
+    "video": "Físeán",
+    "videoDescription": "Oscail an mhír seo chun an físeán a fheiceáil."
   },
   "hashtags": {
     "title": "Hashtags",
@@ -89,26 +240,6 @@
     "emptyTitle": "Gan phostail fos",
     "emptySubtitle": "Nil aon phostail srutha clibeailte #{{tag}} fos."
   },
-  "pollsScreen": {
-    "createPoll": "Create poll",
-    "createTitle": "Create a poll",
-    "questionLabel": "Question",
-    "questionPlaceholder": "Ask a question",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "Add context for voters",
-    "optionsLabel": "Options",
-    "optionPlaceholder": "Option {{number}}",
-    "addOption": "Add option",
-    "removeOption": "Remove option {{number}}",
-    "submitPoll": "Publish poll",
-    "creating": "Publishing",
-    "createMissingTitle": "Poll not ready",
-    "createQuestionRequired": "Add a question.",
-    "createOptionsRequired": "Add at least two options.",
-    "createdTitle": "Poll created",
-    "createdMessage": "Your poll is now open.",
-    "createError": "Could not create poll."
-  },
   "reaction": {
     "like": "Is maith liom",
     "love": "Grá",
@@ -127,16 +258,6 @@
     "viewReactors": "Féach cé a d’fhreagair",
     "reactorsTitle": "Freagairtí",
     "noReactors": "Níl aon fhreagairtí fós"
-  },
-  "stats": {
-    "reactions": "{{count}} freagairt",
-    "reactions_other": "{{count}} freagairtí",
-    "comments": "{{count}} nóta tráchta",
-    "comments_other": "{{count}} nótaí tráchta",
-    "views": "{{count}} amharc",
-    "views_other": "{{count}} amharc",
-    "shares": "{{count}} roinnt",
-    "shares_other": "{{count}} roinnt"
   },
   "saveFailed": "Níorbh fhéidir do mhíreanna sábháilte a nuashonrú. Bain triail eile as."
 }

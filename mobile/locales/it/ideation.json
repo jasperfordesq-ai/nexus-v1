@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "Nuova sfida",
+    "title": "Nuova sfida",
+    "subtitle": "Invita i membri a inviare idee per una domanda mirata della comunità.",
+    "titleLabel": "Titolo della sfida",
+    "titlePlaceholder": "Cosa dovrebbe risolvere la comunità?",
+    "descriptionLabel": "Descrizione",
+    "descriptionPlaceholder": "Descrivi il problema, i criteri e il contesto utile",
+    "categoryLabel": "Categoria",
+    "categoryPlaceholder": "Tecnologia, sicurezza, ambiente...",
+    "statusLabel": "Modalità di pubblicazione",
+    "status": {
+      "open": "Apri ora",
+      "draft": "Salva bozza"
+    },
+    "submissionDeadlineLabel": "Scadenza per l'invio",
+    "votingDeadlineLabel": "Scadenza per la votazione",
+    "deadlinePlaceholder": "30/06/2026 17:00",
+    "maxIdeasLabel": "Numero massimo di idee per membro",
+    "maxIdeasPlaceholder": "Facoltativo",
+    "prizeLabel": "Premio o riconoscimento",
+    "prizePlaceholder": "Facoltativo",
+    "reviewTitle": "Pronto per la pubblicazione?",
+    "reviewSubtitle": "I membri possono inviare idee una volta la sfida è aperta.",
+    "footerTitle": "Pronto",
+    "footerSubtitle": "Aperto alle idee.",
+    "submit": "Crea sfida",
+    "saving": "Creazione in corso...",
+    "validationTitle": "Controlla i dettagli della sfida",
+    "validationRequired": "Aggiungi un titolo e una descrizione prima di continuare.",
+    "validationDates": "Utilizza una data e un'ora valide, ad esempio 30/06/2026 17:00.",
+    "validationMaxIdeas": "Utilizza un numero intero compreso tra 1 e 50.",
+    "failedTitle": "Impossibile creare la sfida",
+    "failedDescription": "Riprova tra un attimo."
   }
 }

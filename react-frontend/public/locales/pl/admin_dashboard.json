@@ -3,6 +3,7 @@
   "subtitle": "Przegląd platformy i centrum dowodzenia w czasie rzeczywistym",
   "tour_btn": "Wycieczka",
   "refresh": "Odświeżać",
+  "loading": "Ładowanie",
   "view_all_activity": "Wyświetl całą aktywność",
   "tour": {
     "welcome_title": "Witamy w Kontroli Misji!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Trendy transakcyjne",
-    "no_data": "Brak dostępnych danych dotyczących trendów",
-    "hours_suffix": "godz"
+    "hours_suffix": "godz",
+    "no_data": "Brak dostępnych danych dotyczących trendów"
   },
   "safeguarding_banner": {
     "title": "Krok zabezpieczania jest WYŁĄCZONY w kreatorze dołączania",
@@ -120,6 +121,5 @@
     "cache": "Kryjówka",
     "queue": "Praca Crona",
     "api": "API poczty e-mail"
-  },
-  "loading": "Ładowanie"
+  }
 }

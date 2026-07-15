@@ -3,6 +3,7 @@
   "subtitle": "Visão geral da plataforma e centro de comando em tempo real",
   "tour_btn": "Percorrer",
   "refresh": "Atualizar",
+  "loading": "Carregando",
   "view_all_activity": "Ver todas as atividades",
   "tour": {
     "welcome_title": "Bem-vindo ao Controle da Missão!",
@@ -26,8 +27,8 @@
   },
   "trends": {
     "card_title": "Tendências de transações",
-    "no_data": "Não há dados de tendência disponíveis",
-    "hours_suffix": "hs"
+    "hours_suffix": "horas",
+    "no_data": "Não há dados de tendência disponíveis"
   },
   "safeguarding_banner": {
     "title": "A etapa de proteção está DESATIVADA no assistente de integração",
@@ -120,6 +121,5 @@
     "queue": "Tarefas cron",
     "api": "API de e-mail",
     "cache": "Cache"
-  },
-  "loading": "Carregando"
+  }
 }

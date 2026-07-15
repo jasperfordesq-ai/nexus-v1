@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "Nouveau défi",
+    "title": "Nouveau défi",
+    "subtitle": "Invitez les membres à soumettre des idées pour une question communautaire ciblée.",
+    "titleLabel": "Titre du défi",
+    "titlePlaceholder": "Que devrait résoudre la communauté ?",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Décrire le problème, les critères et le contexte utile",
+    "categoryLabel": "Catégorie",
+    "categoryPlaceholder": "Technologie, sécurité, environnement...",
+    "statusLabel": "Mode de publication",
+    "status": {
+      "open": "Ouvrir maintenant",
+      "draft": "Enregistrer le brouillon"
+    },
+    "submissionDeadlineLabel": "Date limite de soumission",
+    "votingDeadlineLabel": "Date limite de vote",
+    "deadlinePlaceholder": "30/06/2026 17h00",
+    "maxIdeasLabel": "Max d'idées par membre",
+    "maxIdeasPlaceholder": "Facultatif",
+    "prizeLabel": "Prix ou reconnaissance",
+    "prizePlaceholder": "Facultatif",
+    "reviewTitle": "Prêt à publier ?",
+    "reviewSubtitle": "Les membres peuvent soumettre des idées une fois le défi relevé est ouvert.",
+    "footerTitle": "Prêt",
+    "footerSubtitle": "Ouvert aux idées.",
+    "submit": "Créer un défi",
+    "saving": "Création...",
+    "validationTitle": "Vérifier les détails du défi",
+    "validationRequired": "Ajoutez un titre et une description avant de continuer.",
+    "validationDates": "Utilisez une date et une heure valides, telles que 2026-06-30 17:00.",
+    "validationMaxIdeas": "Utilisez un nombre entier compris entre 1 et 50.",
+    "failedTitle": "Impossible de créer le défi",
+    "failedDescription": "Réessayez dans un instant."
   }
 }

@@ -11,15 +11,399 @@
     "exchanges": "{{count}} échange inter-communautaire",
     "exchanges_other": "{{count}} échanges inter-communautaires"
   },
+  "hub": {
+    "eyebrow": "Communautés partenaires",
+    "heroTitle": "Federation Hub",
+    "heroDescription": "Connectez-vous avec des banques de temps fiables, découvrez des membres fédérés et partagez des échanges entre les communautés partenaires.",
+    "statusActive": "Fédération active",
+    "statusInactive": "Fédération inactive",
+    "shortActive": "Actif",
+    "shortInactive": "Inactif",
+    "statPartners": "Partenaires",
+    "statMessages": "Messages",
+    "statExchanges": "Échanges",
+    "statStatus": "Statut",
+    "exploreNetwork": "Explorer réseau",
+    "partnerCommunities": "Communautés partenaires",
+    "recentActivity": "Activité récente",
+    "noPartnersYet": "Aucune communauté partenaire pour l'instant",
+    "noPartnersDescription": "Les partenaires de fédération approuvés apparaîtront ici une fois votre communauté connectée.",
+    "noActivityYet": "Aucune activité pour l'instant",
+    "noActivityDescription": "Les messages, partenariats et échanges intercommunautaires apparaîtront ici.",
+    "memberCount": "{{count}} membre",
+    "memberCount_other": "{{count}} membres",
+    "viewCommunity": "Afficher la communauté",
+    "quick": {
+      "partners": {
+        "title": "Partenaires",
+        "description": "Parcourir les communautés connectées"
+      },
+      "members": {
+        "title": "Membres",
+        "description": "Trouver des membres fédérés"
+      },
+      "connections": {
+        "title": "Connexions",
+        "description": "Gérer les contacts intercommunautaires"
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Coordonner entre les banques de temps"
+      },
+      "listings": {
+        "title": "Annonces",
+        "description": "Voir les offres et demandes partagées"
+      },
+      "groups": {
+        "title": "Groupes",
+        "description": "Rejoindre la communauté des partenaires espaces"
+      },
+      "events": {
+        "title": "Événements",
+        "description": "Rejoindre les événements de la communauté partenaire"
+      },
+      "setup": {
+        "title": "Configuration",
+        "description": "Configurer l'accès à la fédération"
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Gérer la visibilité de la fédération"
+      }
+    }
+  },
   "partners": "Communautés partenaires",
   "connectedSince": "Connecté depuis {{date}}",
   "visitWebsite": "Visiter le site web",
   "empty": "Aucun partenaire fédéré pour le moment.",
+  "reviews": {
+    "fromPartner": "via {{partner}}",
+    "verified": "Vérifié"
+  },
+  "relative": {
+    "today": "aujourd'hui",
+    "daysAgo": "{{count}}il y a un jour",
+    "daysAgo_other": "{{count}} il y a jours",
+    "monthsAgo": "{{count}} il y a un mois",
+    "monthsAgo_other": "{{count}} il y a mois"
+  },
   "detail": {
     "title": "Communauté partenaire",
+    "eyebrow": "Banque de temps fédérée",
     "about": "À propos",
     "members": "membres",
+    "memberTotal": "Nombre de membres",
+    "memberCount": "{{count}} membre",
+    "memberCount_other": "{{count}} membres",
+    "partnerSince": "Partenaire depuis {{date}}",
+    "partnerSinceLabel": "Partenaire depuis",
+    "connectedDate": "Connecté {{date}}",
+    "level": "Niveau de la fédération",
+    "levelUnknown": "Partenaire de la fédération",
+    "levelDiscovery": "Découverte",
+    "levelSocial": "Sociale",
+    "levelEconomic": "Économique",
+    "levelIntegrated": "Intégré",
+    "availableFeatures": "Fonctionnalités disponibles",
+    "externalPartner": "Externe partenaire",
+    "integratedPartner": "Partenaire intégré",
+    "website": "Site Web",
+    "share": "Partager le partenaire",
+    "shareMessage": "{{name}} — {{url}}",
+    "noDescription": "Ce partenaire n'a pas été ajouté une description publique pour l'instant.",
+    "explorePartner": "Explorez ce partenaire",
+    "browseMembers": "Parcourir les membres",
+    "browseListings": "Parcourir les listes",
+    "browseGroups": "Parcourir les groupes",
+    "browseEvents": "Parcourir les événements",
+    "openMessages": "Ouvrir les messages",
+    "federationSettings": "Paramètres de la fédération",
+    "browseNetwork": "Retour à la fédération",
+    "retry": "Réessayer",
+    "permissionProfiles": "Profils",
+    "permissionMessaging": "Messagerie",
+    "permissionTransactions": "Opérations",
+    "permissionListings": "Annonces",
+    "permissionEvents": "Événements",
+    "permissionGroups": "Groupes",
     "notFound": "Partenaire introuvable.",
     "goBack": "Retour"
+  },
+  "directory": {
+    "tryAgain": "Réessayez",
+    "backToHub": "Retour au hub de la fédération",
+    "resultsCount": "{{count}} résultat",
+    "resultsCount_other": "{{count}} résultats",
+    "memberCount": "{{count}} membre",
+    "memberCount_other": "{{count}} membres",
+    "external": "Externe",
+    "unknownCommunity": "Communauté de partenaires",
+    "filters": {
+      "allCommunities": "Toutes les communautés"
+    },
+    "partners": {
+      "eyebrow": "Communautés partenaires",
+      "title": "Partenaires de la fédération",
+      "subtitle": "Parcourez les banques de temps connectées et ouvrez leurs profils de fédération.",
+      "emptyTitle": "Aucune communauté partenaire pour l'instant",
+      "emptyDescription": "Les partenaires de fédération approuvés apparaîtront ici.",
+      "loadMore": "Charger plus de partenaires"
+    },
+    "members": {
+      "eyebrow": "Annuaire fédéré",
+      "title": "Membres fédérés",
+      "subtitle": "Trouver des membres des communautés partenaires et démarrer des conversations intercommunautaires.",
+      "search": "Rechercher des membres...",
+      "skillsSearch": "Filtrer par compétences...",
+      "emptyTitle": "Non membres fédérés trouvés",
+      "emptyDescription": "Essayez une autre recherche ou revenez lorsque d'autres partenaires partagent leurs annuaires.",
+      "unavailableTitle": "L'annuaire des membres fédérés n'est pas activé",
+      "unavailableDescription": "La fédération est active pour ce locataire, mais la fonctionnalité de profils intercommunautaires est désactivée. Un administrateur de communauté doit activer les profils fédérés avant que les membres puissent être répertoriés.",
+      "memberFallback": "Membre",
+      "viewProfile": "Voir le profil",
+      "message": "Message",
+      "loadMore": "Charger plus de membres",
+      "reach": {
+        "all": "Tous les utilisateurs",
+        "local_only": "Local uniquement",
+        "remote_ok": "À distance ok",
+        "travel_ok": "Peut voyager"
+      }
+    },
+    "connections": {
+      "eyebrow": "Contacts intercommunautaires",
+      "title": "Connexions de la fédération",
+      "subtitle": "Gérez les membres avec lesquels vous êtes connecté dans les banques de temps des partenaires.",
+      "tabs": {
+        "accepted": "Connecté",
+        "pending_received": "Reçu",
+        "pending_sent": "Envoyé"
+      },
+      "empty": {
+        "accepted": {
+          "title": "Aucun membre connecté pour l'instant",
+          "description": "Parcourir les membres fédérés et envoyer des demandes de connexion."
+        },
+        "pending_received": {
+          "title": "Aucune demande en attente",
+          "description": "Les demandes de connexion entrantes à la fédération apparaîtront ici."
+        },
+        "pending_sent": {
+          "title": "Aucune demande envoyée",
+          "description": "Les demandes que vous envoyez aux membres partenaires apparaîtront ici."
+        }
+      },
+      "status": {
+        "pending": "En attente",
+        "accepted": "Connecté",
+        "rejected": "Rejeté"
+      },
+      "message": "Message",
+      "browseMembers": "Parcourir les membres fédérés",
+      "viewProfile": "Afficher le profil de {{name}}",
+      "remove": "Supprimer",
+      "accept": "Accepter",
+      "reject": "Rejeter",
+      "cancel": "Annuler la demande",
+      "actionFailedTitle": "Connexion non mise à jour",
+      "actionFailedDescription": "Veuillez vérifier que les profils de fédération sont activés et réessayer."
+    },
+    "messages": {
+      "eyebrow": "Boîte de réception intercommunautaire",
+      "title": "Messages fédérés",
+      "subtitle": "Examinez les conversations avec les membres du partenaire communautés.",
+      "emptyTitle": "Aucun message fédéré pour l'instant",
+      "emptyDescription": "Les messages avec les communautés partenaires apparaîtront ici.",
+      "emptyForPartnerTitle": "Aucun message avec ce partenaire pour l'instant",
+      "emptyForPartnerDescription": "Démarrez à partir d'un profil de membre fédéré ou effacez le filtre de communauté pour afficher tous conversation.",
+      "unavailableTitle": "La messagerie fédérée n'est pas activée",
+      "unavailableDescription": "La fédération est active pour ce locataire, mais la messagerie intercommunautaire est désactivée. Un administrateur de communauté doit activer la messagerie fédérée avant que les conversations puissent être utilisées.",
+      "unknownSender": "Membre de la communauté",
+      "delivered": "livré",
+      "composeEyebrow": "Nouveau message fédéré",
+      "loadingRecipient": "Chargement destinataire...",
+      "recipientFallback": "Membre fédéré",
+      "federated": "Fédéré",
+      "noRecipient": "Choisissez un membre fédéré avant d'envoyer un message.",
+      "recipientSearch": "Trouver un destinataire",
+      "recipientSearchPlaceholder": "Rechercher des membres fédérés...",
+      "selectRecipient": "Envoyer un message à {{name}}",
+      "changeRecipient": "Changer le destinataire",
+      "noRecipientsFound": "Aucun membre fédéré trouvé.",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Ajouter un court sujet",
+      "body": "Message",
+      "bodyPlaceholder": "Écrivez votre message...",
+      "send": "Envoyer un message",
+      "sentTitle": "Message envoyé",
+      "sentDescription": "Votre message à {{name}} a été envoyé.",
+      "sendFailedTitle": "Message non envoyé",
+      "sendFailedDescription": "Veuillez vérifier que la messagerie de la fédération est activée et réessayer.",
+      "openThread": "Ouvrir la conversation avec {{name}}",
+      "unreadCount": "{{count}} non lu(s)",
+      "threadEyebrow": "Conversation fédérée",
+      "backToInbox": "Retour à la boîte de réception",
+      "translate": "Traduire",
+      "showOriginal": "Afficher l'original",
+      "translatedLabel": "Traduit",
+      "translateFailed": "La traduction n'est pas disponible pour le moment.",
+      "reply": "Répondre",
+      "replyPlaceholder": "Écrire une réponse...",
+      "sendReply": "Envoyer la réponse"
+    },
+    "listings": {
+      "eyebrow": "Offres et demandes partagées",
+      "title": "Annonces fédérées",
+      "subtitle": "Parcourir les offres et demandes partagées dans des banques de temps fiables.",
+      "search": "Rechercher des annonces...",
+      "emptyTitle": "Aucune liste fédérée trouvé",
+      "emptyDescription": "Les listes de partenaires partagées apparaîtront ici.",
+      "unavailableTitle": "Les listes fédérées ne sont pas activées",
+      "unavailableDescription": "La fédération est active pour ce locataire, mais les offres et demandes partagées sont désactivées. Un administrateur de communauté doit activer les listes fédérées.",
+      "offer": "Offre",
+      "request": "Demande",
+      "hours": "{{hours}} heures",
+      "anonymousUser": "Membre de la communauté",
+      "viewDetails": "Afficher les détails",
+      "openDetails": "Ouvrir les détails de {{title}}",
+      "backToListings": "Retour aux listes",
+      "loadMore": "Charger plus d'annonces",
+      "noDescription": "Cette annonce partagée n'a pas encore de description.",
+      "details": "Détails de l'annonce",
+      "postedBy": "Publié par",
+      "viewProfile": "Voir le profil",
+      "contactAuthor": "Auteur du message",
+      "type": {
+        "all": "Toutes les annonces",
+        "offer": "Offres",
+        "request": "Demandes"
+      }
+    },
+    "groups": {
+      "eyebrow": "Groupes partenaires",
+      "title": "Groupes fédérés",
+      "subtitle": "Découvrez les espaces communautaires partagés des partenaires banques de temps.",
+      "search": "Rechercher des groupes...",
+      "emptyTitle": "Aucun groupe fédéré trouvé",
+      "emptyDescription": "Les groupes partenaires apparaîtront ici lorsque les communautés les partageront.",
+      "unavailableTitle": "Les groupes fédérés ne sont pas activés",
+      "unavailableDescription": "La fédération est active pour ce locataire, mais les groupes partenaires le sont désactivé. Un administrateur de communauté doit activer les groupes fédérés.",
+      "memberCount": "{{count}} membre",
+      "memberCount_other": "{{count}} membres",
+      "loadMore": "Charger plus de groupes",
+      "openDetails": "Ouvrir les détails de {{name}}",
+      "backToGroups": "Retour à groupes",
+      "detailEyebrow": "Groupe fédéré",
+      "noDescription": "Ce groupe partagé n'a pas encore de description.",
+      "privacy": {
+        "public": "Public",
+        "private": "Privé",
+        "closed": "Fermé"
+      }
+    },
+    "events": {
+      "eyebrow": "Calendrier des partenaires",
+      "title": "Événements fédérés",
+      "subtitle": "Découvrez les ateliers, les activités sociales et les rassemblements en ligne des partenaires.",
+      "search": "Rechercher des événements...",
+      "emptyTitle": "Aucun événement fédéré trouvé",
+      "emptyDescription": "Les événements partenaires à venir apparaîtront ici.",
+      "unavailableTitle": "Les événements fédérés ne sont pas activés",
+      "unavailableDescription": "La fédération est active pour ce locataire, mais les événements partenaires sont désactivés. Un administrateur de communauté doit activer les événements fédérés.",
+      "online": "En ligne",
+      "upcomingOnly": "À venir seulement",
+      "loadMore": "Charger plus d’événements",
+      "openDetails": "Ouvrir les détails de {{title}}",
+      "backToEvents": "Retour aux événements",
+      "detailEyebrow": "Événement fédéré",
+      "noDescription": "Cet événement partagé n'a pas de description encore.",
+      "organizer": "Organisé par",
+      "organizerFallback": "Organisateur de l'événement",
+      "ends": "Fin le {{date}}",
+      "attendeeCount": "{{count}} participant",
+      "attendeeCount_other": "{{count}} participants"
+    },
+    "onboarding": {
+      "eyebrow": "Fédération configuration",
+      "title": "Configuration de la fédération",
+      "subtitle": "Choisissez ce que vous partagez avec les communautés partenaires et activez la découverte entre banques de temps.",
+      "privacy": "Visibilité du profil",
+      "communication": "Communication",
+      "reach": "Portée du service",
+      "next": "Suivant",
+      "finish": "Activer fédération",
+      "review": "Vérifiez la configuration de votre fédération",
+      "reviewDescription": "Confirmez ce que les communautés partenaires peuvent voir et comment les membres peuvent vous contacter.",
+      "doLater": "Faites-le plus tard",
+      "ready": "Prêt à activer fédération",
+      "on": "Sur",
+      "off": "Désactivé",
+      "failedTitle": "Échec de la configuration",
+      "failedDescription": "Nous n'avons pas pu enregistrer la configuration de votre fédération. Veuillez réessayer.",
+      "benefits": {
+        "discover": {
+          "title": "Découvrez les membres partenaires",
+          "description": "Apparaître dans la recherche fédérée et trouver des personnes dans des banques de temps fiables."
+        },
+        "message": {
+          "title": "Coordonnez-vous en toute sécurité",
+          "description": "Utilisez la messagerie intercommunautaire sans quitter votre propre banque de temps. compte."
+        },
+        "exchange": {
+          "title": "Partager l'activité de crédit de temps",
+          "description": "Activez les échanges de partenaires là où votre communauté les autorise."
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": "Contrôles de la fédération",
+      "title": "Paramètres de la fédération",
+      "subtitle": "Contrôlez la visibilité de votre profil, votre messagerie et portée du service sur l'ensemble du réseau.",
+      "active": "Fédération active",
+      "inactive": "Fédération inactive",
+      "statusDescription": "Ces contrôles décident de ce que les communautés partenaires peuvent voir et utiliser.",
+      "enable": "Activer la fédération",
+      "disable": "Désactiver la fédération",
+      "statusFailedTitle": "Statut de la fédération non mis à jour",
+      "statusFailedDescription": "Veuillez vérifier votre connexion et réessayer.",
+      "save": "Enregistrer les paramètres",
+      "reach": {
+        "local_only": "Local uniquement",
+        "remote_ok": "À distance ok",
+        "travel_ok": "Peut voyager"
+      },
+      "profile_visible_federated": {
+        "label": "Afficher mon profil",
+        "description": "Permettre aux communautés partenaires de voir votre membre de base profil."
+      },
+      "appear_in_federated_search": {
+        "label": "Apparaître dans la recherche",
+        "description": "Autorisez les membres partenaires à vous découvrir dans la recherche fédérée."
+      },
+      "show_skills_federated": {
+        "label": "Partagez vos compétences",
+        "description": "Incluez vos compétences répertoriées dans les résultats de la fédération."
+      },
+      "show_location_federated": {
+        "label": "Partagez emplacement",
+        "description": "Affichez votre emplacement général aux communautés partenaires."
+      },
+      "show_reviews_federated": {
+        "label": "Partagez les avis",
+        "description": "Inclure la réputation et les avis dans les signaux de confiance de la fédération."
+      },
+      "messaging_enabled_federated": {
+        "label": "Autoriser la messagerie de la fédération",
+        "description": "Autoriser les membres partenaires à vous envoyer des messages intercommunautaires."
+      },
+      "transactions_enabled_federated": {
+        "label": "Autoriser les échanges de fédération",
+        "description": "Laissez les membres partenaires organiser des échanges de crédits de temps avec vous."
+      },
+      "email_notifications": {
+        "label": "Notifications par e-mail",
+        "description": "Recevez des mises à jour par e-mail sur l'activité de la fédération."
+      }
+    }
   }
 }

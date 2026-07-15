@@ -23,19 +23,19 @@
     "whitelist": "Weiße Liste"
   },
   "layout": {
-    "loading": "Super-Admin wird geladen",
+    "loading": "Super Admin wird geladen",
     "skip_to_main": "Zum Hauptinhalt springen",
-    "close_navigation": "Super-Admin-Navigation schließen",
-    "navigation": "Super-Admin-Navigation"
+    "close_navigation": "Schließen Sie die Super-Admin-Navigation",
+    "navigation": "Super Admin-Navigation"
   },
   "header": {
-    "back_to_admin": "Zurück zur Verwaltung",
+    "back_to_admin": "Zurück zum Admin",
     "toggle_sidebar": "Seitenleiste umschalten",
     "notifications": "Benachrichtigungen",
-    "my_profile": "Mein Profil",
-    "sign_out": "Abmelden",
     "user_fallback": "Super-Administrator",
-    "user_menu": "Super-Admin-Menü"
+    "user_menu": "Super-Admin-Menü",
+    "my_profile": "Mein Profil",
+    "sign_out": "Abmelden"
   },
   "sidebar": {
     "section_overview": "Überblick",
@@ -44,7 +44,7 @@
     "section_commercial": "Kommerziell",
     "expand": "Seitenleiste erweitern",
     "collapse": "Seitenleiste einklappen",
-    "nav_label": "Super-Admin-Navigation"
+    "nav_label": "Super Admin-Navigation"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Letzte Aktivität",
       "full_log_btn": "Vollständiges Protokoll",
       "no_federation_activity": "Noch keine Verbandsaktivität",
+      "by_label": "von",
       "activity_title": "Föderationsaktivität (30 Tage)",
       "stat_total_actions": "Gesamtaktionen",
       "stat_messages": "Nachrichten",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Kritische Ereignisse",
       "most_active_partnerships": "Die aktivsten Partnerschaften",
       "quick_nav_title": "Schnelle Navigation",
-      "tenant_whitelist_btn": "Mieter-Whitelist",
-      "by_label": "von"
+      "tenant_whitelist_btn": "Mieter-Whitelist"
     },
     "system_controls": {
       "title": "Föderationssystemkontrollen",

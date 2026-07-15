@@ -25,17 +25,17 @@
   "layout": {
     "loading": "Cargando superadministrador",
     "skip_to_main": "Saltar al contenido principal",
-    "close_navigation": "Cerrar navegación de superadministrador",
-    "navigation": "Navegación de super administrador"
+    "close_navigation": "Cerrar la navegación de superadministrador",
+    "navigation": "Navegación de superadministrador"
   },
   "header": {
     "back_to_admin": "Volver al administrador",
     "toggle_sidebar": "Alternar barra lateral",
     "notifications": "Notificaciones",
-    "my_profile": "Mi Perfil",
-    "sign_out": "Cerrar sesión",
     "user_fallback": "Súper Administrador",
-    "user_menu": "Menú de super administrador"
+    "user_menu": "Menú de superadministrador",
+    "my_profile": "Mi Perfil",
+    "sign_out": "Cerrar sesión"
   },
   "sidebar": {
     "section_overview": "Resumen",
@@ -43,8 +43,8 @@
     "section_federation": "Federación",
     "section_commercial": "Comercial",
     "expand": "Expandir barra lateral",
-    "collapse": "Colapsar barra lateral",
-    "nav_label": "Navegación de super administrador"
+    "collapse": "Contraer barra lateral",
+    "nav_label": "Navegación de superadministrador"
   },
   "breadcrumbs": {
     "kiss": "KISS",
@@ -631,6 +631,7 @@
       "recent_activity_title": "Actividad reciente",
       "full_log_btn": "Registro completo",
       "no_federation_activity": "Aún no hay actividad de la federación",
+      "by_label": "por",
       "activity_title": "Actividad de la Federación (30 días)",
       "stat_total_actions": "Acciones totales",
       "stat_messages": "Mensajes",
@@ -639,8 +640,7 @@
       "stat_critical_events": "Eventos críticos",
       "most_active_partnerships": "Asociaciones más activas",
       "quick_nav_title": "Navegación rápida",
-      "tenant_whitelist_btn": "Lista blanca de inquilinos",
-      "by_label": "por"
+      "tenant_whitelist_btn": "Lista blanca de inquilinos"
     },
     "system_controls": {
       "title": "Controles del sistema de federación",
