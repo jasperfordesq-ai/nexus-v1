@@ -1,6 +1,6 @@
 # Security Scanning
 
-Last reviewed: 2026-07-14
+Last reviewed: 2026-07-15
 
 Project NEXUS is a public AGPL repository. Security scanning must distinguish reachable production risk from development-tooling noise.
 
@@ -20,7 +20,7 @@ Do **not** open a public issue for an unpatched vulnerability. Use the private d
 | `owasp-suppressions.xml` | OWASP Dependency-Check suppressions with documented reasons. |
 | `.trivyignore` | Trivy suppressions with documented reasons. |
 | `.semgrepignore` | Semgrep path exclusions (dead/legacy code). |
-| `composer.lock`, `package-lock.json`, `react-frontend/package-lock.json` | Dependency state that scanners evaluate. |
+| `composer.lock`, `package-lock.json`, `react-frontend/package-lock.json`, `e2e/package-lock.json`, `mobile/package-lock.json` | Dependency state that scanners evaluate. |
 
 ---
 
@@ -36,11 +36,17 @@ The `security-scan.yml` workflow runs the following tools in order. The CI defin
 | Trivy filesystem (SARIF) | Same — uploads to GitHub Security tab | No (visibility only) |
 | Semgrep (SAST) | PHP injection, secret patterns, security anti-patterns | No (SARIF upload only) |
 | TruffleHog | Verified secrets in git history | Yes |
-| OWASP Dependency-Check | Transitive CVEs across PHP + npm, CVSS ≥ 7 | Yes, respects `owasp-suppressions.xml` |
-| `npm audit --omit=dev` | Production npm CVEs at high+ | Yes |
+| OWASP Dependency-Check | Transitive CVEs across PHP + npm manifests, CVSS ≥ 7 | Yes, respects `owasp-suppressions.xml` |
+| `npm audit --omit=dev` | Production npm CVEs at high+ across the root, React, E2E, and mobile lockfiles | Yes |
 | Trivy container scan | OS/library CVEs inside the built Docker image | Yes (push events only) |
 
 Full scan results land in the GitHub Security tab (SARIF uploads) and as workflow artifacts for the OWASP HTML report.
+
+Dependency-Check's network-dependent Node Audit Analyzer is disabled because it
+duplicates the explicit blocking `npm audit` commands and turns npm Audit API
+outages into false CI failures. Its separate Node Package Analyzer remains
+enabled, so Dependency-Check continues evaluating npm manifests and lockfiles
+against its CVE data while `npm audit` remains authoritative for npm advisories.
 
 ---
 
@@ -62,7 +68,9 @@ composer audit --locked --no-interaction
 
 ```bash
 npm audit --omit=dev --audit-level=high
-cd react-frontend && npm audit --omit=dev --audit-level=high
+npm --prefix react-frontend audit --omit=dev --audit-level=high
+npm --prefix e2e audit --omit=dev --audit-level=high
+npm --prefix mobile audit --omit=dev --audit-level=high
 ```
 
 - `--omit=dev` restricts the check to packages that ship in the production bundle. Build tools, dev servers, and test frameworks are excluded; their advisories are real noise against the production risk surface.
