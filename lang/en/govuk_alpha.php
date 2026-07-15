@@ -1438,7 +1438,6 @@ return [
             'checkin_failed' => 'Check-in could not be recorded. Try again.',
             'checkin_success' => 'Attendance marked.',
             'checkin_empty' => 'No RSVPs yet.',
-            'checkin_failed_status' => 'check-in-failed',
             // Share event
             'share_heading' => 'Share this event',
             'share_email_label' => 'Share by email',
@@ -4700,9 +4699,6 @@ return [
         'reply_posted_by' => 'Reply by :name',
         // groups.blade: create CTA
         'create_group_cta' => 'Create a group',
-        // group-manage: invite state keys
-        'states_invite_success' => 'group-invite-sent',
-        'states_invite_failed' => 'group-invite-failed',
     ],
     'polish_core_a' => [
         // search.blade.php — fieldset legend grouping the query + type inputs
