@@ -197,12 +197,16 @@ function TenantShellRuntime({
 
   if (isAuthRoute) {
     return (
-      <TenantRouteSurface
-        slugPrefix={slugPrefix}
-        appRoutes={appRoutes}
-        routeRegistryLoadFailed={routeRegistryLoadFailed}
-        onRetryRouteRegistry={onRetryRouteRegistry}
-      />
+      <Suspense fallback={<LoadingScreen />}>
+        <TenantPublicProviders>
+          <TenantRouteSurface
+            slugPrefix={slugPrefix}
+            appRoutes={appRoutes}
+            routeRegistryLoadFailed={routeRegistryLoadFailed}
+            onRetryRouteRegistry={onRetryRouteRegistry}
+          />
+        </TenantPublicProviders>
+      </Suspense>
     );
   }
 
