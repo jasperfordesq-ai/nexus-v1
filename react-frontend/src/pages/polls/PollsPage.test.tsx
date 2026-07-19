@@ -9,6 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 const mockApiGet = vi.fn();
@@ -123,5 +124,20 @@ describe('PollsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('My Polls')).toBeInTheDocument();
     });
+  });
+
+  it('keeps an option input mounted and focused while typing', async () => {
+    const user = userEvent.setup();
+    mockApiGet.mockResolvedValue({ success: true, data: { polls: [], has_more: false, next_cursor: null } });
+    render(<PollsPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Create a poll' }));
+    const optionInput = screen.getByRole('textbox', { name: 'Option 1' });
+
+    await user.type(optionInput, 'Community garden');
+
+    expect(screen.getByRole('textbox', { name: 'Option 1' })).toBe(optionInput);
+    expect(optionInput).toHaveValue('Community garden');
+    expect(optionInput).toHaveFocus();
   });
 });
