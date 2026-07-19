@@ -61,9 +61,9 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'Idempotency-Key', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Tenant-Slug', 'X-Trusted-Device', 'X-Request-Id', 'Cache-Control', 'Pragma'],
+    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'Idempotency-Key', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Tenant-Slug', 'X-Trusted-Device', 'X-Request-Id', 'X-Events-Contract', 'Cache-Control', 'Pragma'],
 
-    'exposed_headers' => ['X-Request-Id', 'X-Build'],
+    'exposed_headers' => ['X-Request-Id', 'X-Build', 'X-Events-Contract'],
 
     // 1 hour — avoids a full CORS preflight before every single request while
     // staying well short of Firefox's 24h / Chromium's 2h browser caps.

@@ -86,6 +86,15 @@ class EnsureCorsHeadersTest extends TestCase
         $this->assertContains('idempotency-key', $allowedHeaders);
     }
 
+    public function test_laravel_cors_config_allows_and_exposes_events_contract_header(): void
+    {
+        $allowedHeaders = array_map('strtolower', config('cors.allowed_headers', []));
+        $exposedHeaders = array_map('strtolower', config('cors.exposed_headers', []));
+
+        $this->assertContains('x-events-contract', $allowedHeaders);
+        $this->assertContains('x-events-contract', $exposedHeaders);
+    }
+
     public function test_wallet_transfer_fallback_cors_headers_allow_idempotency_key(): void
     {
         $request = Request::create('/api/v2/wallet/transfer', 'OPTIONS');
@@ -95,6 +104,19 @@ class EnsureCorsHeadersTest extends TestCase
         $allowedHeaders = strtolower((string) $response->headers->get('Access-Control-Allow-Headers'));
 
         $this->assertStringContainsString('idempotency-key', $allowedHeaders);
+    }
+
+    public function test_events_fallback_cors_headers_allow_and_expose_contract_header(): void
+    {
+        $request = Request::create('/api/v2/events', 'OPTIONS');
+        $request->headers->set('Origin', 'https://hour-timebank.ie');
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+        $allowedHeaders = strtolower((string) $response->headers->get('Access-Control-Allow-Headers'));
+        $exposedHeaders = strtolower((string) $response->headers->get('Access-Control-Expose-Headers'));
+
+        $this->assertStringContainsString('x-events-contract', $allowedHeaders);
+        $this->assertStringContainsString('x-events-contract', $exposedHeaders);
     }
 
     /** Disallowed (foreign) origin on normal API path → NO CORS headers set (blocked silently) */
