@@ -19,6 +19,8 @@ class ProductionFrontendApiProxyTest extends TestCase
         foreach (['nginx.conf', 'nginx.bluegreen.conf'] as $config) {
             $source = (string) file_get_contents($root . '/react-frontend/' . $config);
 
+            self::assertStringContainsString('location = /api/v2/pwa/manifest {', $source, $config);
+            self::assertStringContainsString('proxy_set_header Host $host;', $source, $config);
             self::assertStringContainsString('location ^~ /api/ {', $source, $config);
             self::assertStringContainsString('proxy_set_header Host api.project-nexus.ie;', $source, $config);
             self::assertStringContainsString('proxy_set_header X-Forwarded-Host $host;', $source, $config);
