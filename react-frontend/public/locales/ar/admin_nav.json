@@ -550,6 +550,7 @@
       "scheduled": "مجدول",
       "sent": "مُرسل",
       "suspended": "معلّق",
+      "terminated": "تم إنهاؤه",
       "tenant_created": "تم إنشاء المستأجر",
       "tenant_updated": "تم تحديث المستأجر",
       "user_created": "تم إنشاء المستخدم",

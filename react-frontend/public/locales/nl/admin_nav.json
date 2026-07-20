@@ -546,6 +546,7 @@
       "scheduled": "Ingepland",
       "sent": "Verzonden",
       "suspended": "Geschorst",
+      "terminated": "Beëindigd",
       "tenant_created": "Tenant aangemaakt",
       "tenant_updated": "Tenant bijgewerkt",
       "user_created": "Gebruiker aangemaakt",

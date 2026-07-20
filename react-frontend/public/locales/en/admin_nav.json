@@ -578,6 +578,7 @@
       "scheduled": "Scheduled",
       "sent": "Sent",
       "suspended": "Suspended",
+      "terminated": "Terminated",
       "tenant_created": "Tenant created",
       "tenant_updated": "Tenant updated",
       "user_created": "User created",

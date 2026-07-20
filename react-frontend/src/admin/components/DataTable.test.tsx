@@ -304,6 +304,20 @@ describe('StatusBadge', () => {
     expect(chip).toHaveAttribute('data-color', 'danger');
   });
 
+  it.each([
+    ['pending', 'Pending', 'warning'],
+    ['active', 'Active', 'success'],
+    ['suspended', 'Suspended', 'danger'],
+    ['rejected', 'Rejected', 'danger'],
+    ['terminated', 'Terminated', 'danger'],
+  ])('renders the partnership status %s as %s', async (status, label, color) => {
+    const { StatusBadge } = await import('./DataTable');
+    render(<StatusBadge status={status} />);
+    const chip = screen.getByTestId('chip');
+    expect(chip).toHaveTextContent(label);
+    expect(chip).toHaveAttribute('data-color', color);
+  });
+
   it('renders with default color for unknown status', async () => {
     const { StatusBadge } = await import('./DataTable');
     render(<StatusBadge status="unknown_xyz" />);

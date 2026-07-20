@@ -548,6 +548,7 @@
       "scheduled": "Zaplanowany",
       "sent": "Wysłany",
       "suspended": "Zawieszony",
+      "terminated": "Zakończony",
       "tenant_created": "Utworzono dzierżawcę",
       "tenant_updated": "Zaktualizowano dzierżawcę",
       "user_created": "Utworzono użytkownika",

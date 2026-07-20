@@ -546,6 +546,7 @@
       "scheduled": "Geplant",
       "sent": "Gesendet",
       "suspended": "Suspendiert",
+      "terminated": "Beendet",
       "tenant_created": "Mandant erstellt",
       "tenant_updated": "Mandant aktualisiert",
       "user_created": "Benutzer erstellt",

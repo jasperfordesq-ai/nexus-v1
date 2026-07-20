@@ -545,6 +545,7 @@
       "scheduled": "予定済み",
       "sent": "送信済み",
       "suspended": "停止中",
+      "terminated": "終了しました",
       "tenant_created": "テナントを作成済み",
       "tenant_updated": "テナントを更新済み",
       "user_created": "ユーザーを作成済み",
