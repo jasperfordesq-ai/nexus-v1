@@ -865,7 +865,6 @@
     "breadcrumb_edit": "Breadcrumb-Bearbeitung",
     "breadcrumb_tenants": "Breadcrumb-Mieter",
     "characters_count": "Anzahl der Zeichen",
-    "clear_all_use_defaults": "Alle Standardeinstellungen löschen",
     "contact_email_label": "Kontakt-E-Mail",
     "contact_phone_label": "Kontakttelefon",
     "country_label": "Land",
@@ -911,9 +910,6 @@
     "parent_edit_desc": "Übergeordnetes Bearbeiten.",
     "parent_tenant_label": "Hauptmieter",
     "parent_tenant_placeholder": "Obermieter eingeben...",
-    "privacy_override_description": "Datenschutz außer Kraft setzen.",
-    "privacy_override_label": "Datenschutz außer Kraft setzen",
-    "privacy_override_placeholder": "Datenschutzüberschreibung eingeben...",
     "robots": {
       "index_nofollow": "Index Nofollow",
       "noindex_follow": "Noindex Folgen",
@@ -940,9 +936,6 @@
     "tagline_placeholder": "Slogan eingeben...",
     "tenant_created": "Mieter erstellt",
     "tenant_updated": "Mieter aktualisiert",
-    "terms_override_description": "Bedingungen außer Kraft setzen.",
-    "terms_override_label": "Bedingungen außer Kraft setzen",
-    "terms_override_placeholder": "Geben Sie Begriffsüberschreibungen ein...",
     "title_create": "Erstellen",
     "title_edit": "Bearbeiten",
     "youtube_label": "Youtube",
@@ -988,9 +981,7 @@
     "accessible_domain_placeholder": "z.B. accessible.example.org",
     "organisation_type_description": "Steuert das Schema.org @type in strukturierten Daten. LocalBusiness ermöglicht areaServed Geo-Targeting.",
     "breadcrumb_super_admin": "Brotkrumen Super-Admin",
-    "legal_desc": "Rechtlich.",
     "slug_auto_desc": "Slug Auto.",
-    "tab_legal": "Rechtlich",
     "twitter_label": "Twitter"
   },
   "federation_whitelist": {

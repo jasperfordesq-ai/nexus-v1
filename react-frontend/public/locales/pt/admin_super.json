@@ -875,7 +875,6 @@
     "breadcrumb_super_admin": "Superadministrador da localização atual",
     "breadcrumb_tenants": "Inquilinos Breadcrumb",
     "characters_count": "Contagem de caracteres",
-    "clear_all_use_defaults": "Limpar todos os padrões de uso",
     "contact_email_label": "E-mail de contato",
     "contact_phone_label": "Telefone de contato",
     "country_label": "País",
@@ -921,9 +920,6 @@
     "parent_edit_desc": "Edição pai.",
     "parent_tenant_label": "Inquilino pai",
     "parent_tenant_placeholder": "Insira o inquilino pai...",
-    "privacy_override_description": "Substituição de privacidade.",
-    "privacy_override_label": "Substituição de privacidade",
-    "privacy_override_placeholder": "Insira a substituição de privacidade...",
     "robots": {
       "index_nofollow": "Índice Nofollow",
       "noindex_follow": "Seguir Noindex",
@@ -944,7 +940,6 @@
     "tab_contact": "Contato",
     "tab_details": "Detalhes",
     "tab_languages": "Idiomas",
-    "tab_legal": "Jurídico",
     "tab_location": "Localização",
     "tab_seo": "SEO",
     "tab_social": "Sociais",
@@ -952,9 +947,6 @@
     "tagline_placeholder": "Digite o slogan...",
     "tenant_created": "Inquilino criado",
     "tenant_updated": "Inquilino atualizado",
-    "terms_override_description": "Substituição de termos.",
-    "terms_override_label": "Substituição de termos",
-    "terms_override_placeholder": "Insira a substituição dos termos...",
     "title_create": "Criar",
     "title_edit": "Editar",
     "youtube_label": "YouTube",
@@ -999,7 +991,6 @@
     "accessible_domain_label": "Domínio front-end acessível",
     "accessible_domain_desc": "Opcional. Domínio personalizado para o frontend acessível (GOV.UK).",
     "accessible_domain_placeholder": "ex. accessible.example.org",
-    "legal_desc": "Legal.",
     "twitter_label": "Twitter"
   },
   "federation_whitelist": {

@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, S
 
 /**
  * Tenant Create/Edit Form
- * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Languages, Legal.
+ * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Languages.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -96,9 +96,6 @@ export function TenantForm() {
     // Languages
     default_language: 'en',
     supported_languages: ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as string[],
-    // Legal documents
-    privacy_text: '',
-    terms_text: '',
   });
   const [initialForm, setInitialForm] = useState<typeof form | null>(null);
 
@@ -161,8 +158,6 @@ export function TenantForm() {
           social_youtube: tenant.social_youtube || '',
           default_language: (tenant.configuration as Record<string, unknown>)?.default_language as string || 'en',
           supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
-          privacy_text: (tenant.configuration as Record<string, unknown>)?.privacy_text as string || '',
-          terms_text: (tenant.configuration as Record<string, unknown>)?.terms_text as string || '',
         };
         setForm(loadedForm);
         setInitialForm(loadedForm);
@@ -216,8 +211,6 @@ export function TenantForm() {
       const configurationFields = new Set([
         'default_language',
         'supported_languages',
-        'privacy_text',
-        'terms_text',
       ]);
       for (const [field, value] of Object.entries(form)) {
         if (configurationFields.has(field) || field === 'parent_id') {
@@ -232,23 +225,13 @@ export function TenantForm() {
         payload.parent_id = Number(form.parent_id);
       }
 
-      // Merge language + legal settings into configuration JSON, preserving all existing keys
+      // Merge language settings into configuration JSON, preserving all existing keys
       // (modules, federation, broker_controls, footer_text, etc.)
       const mergedConfig: Record<string, unknown> = {
         ...originalConfiguration,
         default_language: form.default_language,
         supported_languages: form.supported_languages,
       };
-      if (form.privacy_text.trim()) {
-        mergedConfig.privacy_text = form.privacy_text;
-      } else {
-        delete mergedConfig.privacy_text;
-      }
-      if (form.terms_text.trim()) {
-        mergedConfig.terms_text = form.terms_text;
-      } else {
-        delete mergedConfig.terms_text;
-      }
       if (!isEdit || JSON.stringify(mergedConfig) !== JSON.stringify(originalConfiguration)) {
         payload.configuration = mergedConfig;
       }
@@ -684,44 +667,6 @@ export function TenantForm() {
                   ))}
                 </div>
               </div>
-            </CardBody>
-          </Card>
-        </Tab>
-
-        <Tab key="legal" title={t('tenant_form.tab_legal')}>
-          <Card>
-            <CardBody className="space-y-4 p-6">
-              <p className="text-sm text-muted mb-2">
-                {t('tenant_form.legal_desc')}
-              </p>
-              <Textarea
-                label={t('tenant_form.privacy_override_label')}
-                placeholder={t('tenant_form.privacy_override_placeholder')}
-                value={form.privacy_text}
-                onValueChange={(v) => updateField('privacy_text', v)}
-                minRows={4}
-                description={t('tenant_form.privacy_override_description')}
-              />
-              <Textarea
-                label={t('tenant_form.terms_override_label')}
-                placeholder={t('tenant_form.terms_override_placeholder')}
-                value={form.terms_text}
-                onValueChange={(v) => updateField('terms_text', v)}
-                minRows={4}
-                description={t('tenant_form.terms_override_description')}
-              />
-              {(form.privacy_text.trim() || form.terms_text.trim()) && (
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  onPress={() => {
-                    updateField('privacy_text', '');
-                    updateField('terms_text', '');
-                  }}
-                >
-                  {t('tenant_form.clear_all_use_defaults')}
-                </Button>
-              )}
             </CardBody>
           </Card>
         </Tab>
