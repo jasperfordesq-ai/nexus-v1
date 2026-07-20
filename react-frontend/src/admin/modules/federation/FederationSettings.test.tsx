@@ -165,6 +165,33 @@ describe('FederationSettings — dirty state and save', () => {
     });
   });
 
+  it.each([
+    ['federation_enabled', 0],
+    ['allow_inbound_partnerships', 1],
+    ['auto_approve_partners', 2],
+  ] as const)('persists the %s toggle through the settings endpoint', async (field, switchIndex) => {
+    mockAdminFederation.updateSettings.mockResolvedValue({ success: true });
+    render(<FederationSettings />);
+    await waitFor(() => expect(screen.getAllByRole('switch')).toHaveLength(3));
+
+    await userEvent.click(screen.getAllByRole('switch')[switchIndex]);
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    const expected = {
+      federation_enabled: FED_DATA.federation_enabled,
+      settings: { ...FED_DATA.settings },
+    };
+    if (field === 'federation_enabled') {
+      expected.federation_enabled = false;
+    } else {
+      expected.settings[field] = !FED_DATA.settings[field];
+    }
+
+    await waitFor(() => {
+      expect(mockAdminFederation.updateSettings).toHaveBeenCalledWith(expected);
+    });
+  });
+
   it('shows error toast when save fails', async () => {
     mockAdminFederation.updateSettings.mockResolvedValue({ success: false, error: 'Server error' });
     render(<FederationSettings />);

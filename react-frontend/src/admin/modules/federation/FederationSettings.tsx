@@ -173,26 +173,14 @@ export function FederationSettings() {
         title={t('federation_settings_title')}
         description={t('federation_settings_desc')}
         actions={
-          <div className="flex items-center gap-2">
-            {dirty && <span className="text-xs text-warning">{t('unsaved_changes')}</span>}
-            <Button
-              variant="tertiary"
-              startContent={<RefreshCw aria-hidden="true" size={16} />}
-              onPress={loadData}
-              size="sm"
-            >
-              {t('refresh')}
-            </Button>
-            <Button
-              startContent={<Save aria-hidden="true" size={16} />}
-              onPress={handleSave}
-              isLoading={saving}
-              isDisabled={!dirty}
-              size="sm"
-            >
-              {t('save_changes')}
-            </Button>
-          </div>
+          <Button
+            variant="tertiary"
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
+            onPress={loadData}
+            size="sm"
+          >
+            {t('refresh')}
+          </Button>
         }
       />
 
@@ -284,6 +272,19 @@ export function FederationSettings() {
                 max={100}
                 aria-label={t('max_partnerships')}
               />
+            </div>
+            <Separator />
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {dirty && <span className="text-xs text-warning">{t('unsaved_changes')}</span>}
+              <Button
+                startContent={<Save aria-hidden="true" size={16} />}
+                onPress={handleSave}
+                isLoading={saving}
+                isDisabled={!dirty}
+                size="sm"
+              >
+                {t('save_changes')}
+              </Button>
             </div>
           </CardBody>
         </Card>

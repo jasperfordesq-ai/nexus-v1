@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Partner Timebanks settings now keep the save action beside the editable controls.** The settings page no longer hides its only Save button in the page header above the long guidance content; all three partnership toggles and the partnership limit now share a clearly visible save action at the bottom of the settings card, with regression coverage verifying that every toggle is included in the persisted API payload.
 - **Partner Directory requests now reflect existing relationships.** Communities with a pending or active partnership no longer appear to accept a duplicate request, and rejected request attempts display the API's specific reason instead of an unhelpful generic failure.
 
 - **Super-admin tenant edits can be saved again without unrelated 422 validation failures.** The tenant form now sends a partial update containing only changed fields, so unchanged legacy contact values and protected platform routing hosts do not block ordinary edits; the backend also accepts an already-assigned protected host while continuing to reject new assignments and avoids treating unchanged routing values as routing changes.
