@@ -136,6 +136,7 @@ export function TenantForm() {
     privacy_text: '',
     terms_text: '',
   });
+  const [initialForm, setInitialForm] = useState<typeof form | null>(null);
 
   const [slugAutoGen, setSlugAutoGen] = useState(!isEdit);
 
@@ -163,7 +164,7 @@ export function TenantForm() {
         // Preserve the full configuration so save merges rather than overwrites
         const fullConfig = (tenant.configuration ?? {}) as Record<string, unknown>;
         setOriginalConfiguration(fullConfig);
-        setForm({
+        const loadedForm = {
           name: tenant.name || '',
           slug: tenant.slug || '',
           domain: tenant.domain || '',
@@ -199,7 +200,9 @@ export function TenantForm() {
           supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
           privacy_text: (tenant.configuration as Record<string, unknown>)?.privacy_text as string || '',
           terms_text: (tenant.configuration as Record<string, unknown>)?.terms_text as string || '',
-        });
+        };
+        setForm(loadedForm);
+        setInitialForm(loadedForm);
       }
     } catch {
       toast.error(t('tenant_form.failed_to_load_tenant'));
@@ -246,11 +249,24 @@ export function TenantForm() {
 
     setSaving(true);
     try {
-      const payload: Record<string, unknown> = { ...form };
-      if (form.parent_id) {
+      const payload: Record<string, unknown> = {};
+      const configurationFields = new Set([
+        'default_language',
+        'supported_languages',
+        'privacy_text',
+        'terms_text',
+      ]);
+      for (const [field, value] of Object.entries(form)) {
+        if (configurationFields.has(field) || field === 'parent_id') {
+          continue;
+        }
+        const originalValue = initialForm?.[field as keyof typeof form];
+        if (!isEdit || initialForm === null || JSON.stringify(value) !== JSON.stringify(originalValue)) {
+          payload[field] = value;
+        }
+      }
+      if (!isEdit && form.parent_id) {
         payload.parent_id = Number(form.parent_id);
-      } else {
-        delete payload.parent_id;
       }
 
       // Merge language + legal settings into configuration JSON, preserving all existing keys
@@ -270,11 +286,16 @@ export function TenantForm() {
       } else {
         delete mergedConfig.terms_text;
       }
-      payload.configuration = mergedConfig;
-      delete payload.default_language;
-      delete payload.supported_languages;
-      delete payload.privacy_text;
-      delete payload.terms_text;
+      if (!isEdit || JSON.stringify(mergedConfig) !== JSON.stringify(originalConfiguration)) {
+        payload.configuration = mergedConfig;
+      }
+
+      // The update endpoint accepts partial payloads. Keep an unchanged save a
+      // valid operation without resubmitting legacy contact/routing values that
+      // may now be governed by stricter validation.
+      if (isEdit && Object.keys(payload).length === 0) {
+        payload.name = form.name;
+      }
 
       let res;
       if (isEdit) {

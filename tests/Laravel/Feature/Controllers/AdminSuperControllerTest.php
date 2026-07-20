@@ -140,6 +140,32 @@ class AdminSuperControllerTest extends TestCase
         );
     }
 
+    public function test_tenant_update_accepts_an_unchanged_reserved_platform_domain(): void
+    {
+        $admin = $this->createSuperAdmin();
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'domain' => 'app.project-nexus.ie',
+            'allows_subtenants' => 1,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPut(
+            "/v2/admin/super/tenants/{$this->testTenantId}",
+            [
+                'domain' => 'app.project-nexus.ie',
+                'tagline' => 'Updated without changing the routing boundary',
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.updated', true);
+        $this->assertSame(
+            'Updated without changing the routing boundary',
+            DB::table('tenants')->where('id', $this->testTenantId)->value('tagline')
+        );
+    }
+
     public function test_tenant_move_preserves_passkey_conflict_for_inherited_rp_subtree(): void
     {
         $admin = $this->createSuperAdmin();

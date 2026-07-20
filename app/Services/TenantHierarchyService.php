@@ -59,11 +59,12 @@ class TenantHierarchyService
         foreach (['domain', 'accessible_domain'] as $field) {
             if (!array_key_exists($field, $data)) continue;
             $host = strtolower(rtrim(trim((string) ($data[$field] ?? '')), '.'));
+            $currentHost = strtolower(rtrim(trim((string) ($tenant->{$field} ?? '')), '.'));
             if ($host !== ''
                 && !preg_match('/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/', $host)) {
                 return ['success' => false, 'error' => __('api.domain_format_invalid')];
             }
-            if ($host !== '' && self::isReservedPlatformHost($host)) {
+            if ($host !== '' && $host !== $currentHost && self::isReservedPlatformHost($host)) {
                 return ['success' => false, 'error' => __('api.domain_format_invalid')];
             }
             $normalized[$field] = $host === '' ? null : $host;
@@ -691,7 +692,28 @@ class TenantHierarchyService
 
             $update['updated_at'] = now();
             $routingFields = ['slug', 'domain', 'accessible_domain', 'is_active'];
-            $routingChanged = array_intersect(array_keys($update), $routingFields) !== [];
+            $routingChanged = false;
+            foreach ($routingFields as $routingField) {
+                if (!array_key_exists($routingField, $update)) {
+                    continue;
+                }
+
+                $oldRoutingValue = $tenant->{$routingField} ?? null;
+                if (in_array($routingField, ['domain', 'accessible_domain'], true)) {
+                    $oldRoutingValue = $oldRoutingValue === null || trim((string) $oldRoutingValue) === ''
+                        ? null
+                        : strtolower(rtrim(trim((string) $oldRoutingValue), '.'));
+                } elseif ($routingField === 'slug') {
+                    $oldRoutingValue = strtolower(trim((string) $oldRoutingValue));
+                } elseif ($routingField === 'is_active') {
+                    $oldRoutingValue = (int) (bool) $oldRoutingValue;
+                }
+
+                if ($update[$routingField] !== $oldRoutingValue) {
+                    $routingChanged = true;
+                    break;
+                }
+            }
             $purgeUnexpected = array_intersect(array_keys($update), ['features', 'configuration']) !== [];
 
             $transactionFailure = DB::transaction(function () use (

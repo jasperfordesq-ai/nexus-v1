@@ -10,7 +10,7 @@ import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
 
 // ─── Hoist mock data ─────────────────────────────────────────────────────────
-const { mockAdminSuper, mockToast, mockNavigate } = vi.hoisted(() => ({
+const { mockAdminSuper, mockToast, mockNavigate, mockRouteParams } = vi.hoisted(() => ({
   mockAdminSuper: {
     getTenant: vi.fn(),
     listTenants: vi.fn(),
@@ -19,6 +19,7 @@ const { mockAdminSuper, mockToast, mockNavigate } = vi.hoisted(() => ({
   },
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockNavigate: vi.fn(),
+  mockRouteParams: { current: {} as { id?: string } },
 }));
 
 // ─── Module mocks ────────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return {
     ...orig,
     useNavigate: () => mockNavigate,
-    useParams: () => ({}),          // default: create mode (no id)
+    useParams: () => mockRouteParams.current,
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
@@ -51,8 +52,12 @@ vi.mock('@/contexts', () =>
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
+beforeEach(() => {
+  mockRouteParams.current = {};
+});
+
 // Stub PageHeader and heavy admin sub-components
-vi.mock('../../components', () => ({
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title?: string; actions?: React.ReactNode }) => (
     <div data-testid="page-header">
       <span>{title}</span>
@@ -203,9 +208,57 @@ describe('TenantForm — create mode', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Edit mode tests: useParams is hoisted at module level so vi.doMock cannot
-// change it mid-file. Instead we verify the observable behaviors available in
-// the default create-mode mock that cover the same code paths.
+describe('TenantForm — edit mode', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockRouteParams.current = { id: '1' };
+    mockAdminSuper.listTenants.mockResolvedValue({ success: true, data: [] });
+    mockAdminSuper.getTenant.mockResolvedValue({
+      success: true,
+      data: {
+        id: 1,
+        name: 'Project NEXUS',
+        slug: 'nexus',
+        domain: 'app.project-nexus.ie',
+        accessible_domain: 'accessible.project-nexus.ie',
+        is_active: true,
+        allows_subtenants: true,
+        max_depth: 3,
+        features: {},
+        configuration: {
+          default_language: 'en',
+          supported_languages: ['en'],
+        },
+        children: [],
+        admins: [],
+        breadcrumb: [],
+      },
+    });
+    mockAdminSuper.updateTenant.mockResolvedValue({ success: true });
+  });
+
+  it('sends only changed fields instead of resubmitting protected routing values', async () => {
+    const { TenantForm } = await import('./TenantForm');
+    render(<TenantForm />);
+
+    const nameInput = await screen.findByRole('textbox', { name: /name/i });
+    await userEvent.clear(nameInput);
+    await userEvent.type(nameInput, 'Project NEXUS Updated');
+
+    const saveBtn = screen.getAllByRole('button').find(
+      (button) => button.textContent?.toLowerCase().includes('save')
+    );
+    expect(saveBtn).toBeDefined();
+    fireEvent.click(saveBtn!);
+
+    await waitFor(() => {
+      expect(mockAdminSuper.updateTenant).toHaveBeenCalledWith(1, {
+        name: 'Project NEXUS Updated',
+      });
+    });
+  });
+});
+
 describe('TenantForm — additional create-mode checks', () => {
   beforeEach(() => {
     vi.resetAllMocks();
