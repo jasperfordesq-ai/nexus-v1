@@ -9,6 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import { api } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
@@ -46,29 +47,29 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
+  };
+});
 
 vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
 // Mock hooks that use localStorage
-vi.mock('@/hooks', () => ({
-  useDraftPersistence: vi.fn((key: string, fallbackValue: unknown) => {
-    const state = { ...fallbackValue as Record<string, unknown> };
-    const setState = vi.fn((updater: ((s: typeof state) => typeof state) | typeof state) => {
-      if (typeof updater === 'function') {
-        Object.assign(state, updater(state));
-      } else {
-        Object.assign(state, updater);
-      }
-    });
-    const clearState = vi.fn();
-    return [state, setState, clearState];
-  }),
-}));
+vi.mock('@/hooks', async () => {
+  const React = await import('react');
+  return {
+    useDraftPersistence: vi.fn((_key: string, fallbackValue: unknown) => {
+      const [state, setState] = React.useState(fallbackValue);
+      const clearState = () => setState(fallbackValue);
+      return [state, setState, clearState];
+    }),
+  };
+});
 
 vi.mock('@/hooks/useMediaQuery', () => ({
   useMediaQuery: vi.fn(() => false), // desktop by default
@@ -121,6 +122,18 @@ describe('PollTab', () => {
     render(<PollTab {...defaultProps} />);
     const optionInputs = screen.getAllByRole('textbox', { name: /poll option/i });
     expect(optionInputs).toHaveLength(2);
+  });
+
+  it('keeps an option input mounted and focused while typing', async () => {
+    const user = userEvent.setup();
+    render(<PollTab {...defaultProps} />);
+    const optionInput = screen.getByRole('textbox', { name: 'Poll option 1' });
+
+    await user.type(optionInput, 'Community garden');
+
+    expect(screen.getByRole('textbox', { name: 'Poll option 1' })).toBe(optionInput);
+    expect(optionInput).toHaveValue('Community garden');
+    expect(optionInput).toHaveFocus();
   });
 
   it('renders Add Option button', () => {
