@@ -426,6 +426,7 @@
     "disable_hub_title": "Disable Hub capability?",
     "disable_hub_confirm": "This tenant will no longer be able to create sub-tenants. All tenant super-admin privileges assigned within this tenant will also be revoked.",
     "disable_hub_confirm_action": "Disable Hub",
+    "disable_hub_blocked_children": "Move or delete all child tenants before disabling Hub capability.",
     "disable_hub_desc": "Remove hub capability from the selected tenants.",
     "deselect_all": "Deselect All",
     "edit": "Edit",

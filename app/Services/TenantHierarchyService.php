@@ -818,7 +818,7 @@ class TenantHierarchyService
      * populated or permanent deletion belongs to the audited purge service.
      * Cannot delete the Master tenant (ID 1) or tenants with active children.
      *
-     * @return array{success: bool, error?: string}
+     * @return array{success: bool, error?: string, code?: string}
      */
     public static function deleteTenant(int $tenantId, bool $hardDelete = false): array
     {
@@ -1028,6 +1028,14 @@ class TenantHierarchyService
             }
 
             $oldValue = (bool) $tenant->allows_subtenants;
+
+            if (!$enable && DB::table('tenants')->where('parent_id', $tenantId)->exists()) {
+                return [
+                    'success' => false,
+                    'code' => 'HUB_HAS_CHILDREN',
+                    'error' => __('api.super_disable_hub_has_children'),
+                ];
+            }
 
             DB::table('tenants')->where('id', $tenantId)->update([
                 'allows_subtenants' => $enable ? 1 : 0,

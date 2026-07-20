@@ -391,4 +391,25 @@ describe('TenantShow', () => {
       expect(mockAdminSuper.toggleHub).toHaveBeenCalledWith(5, false);
     });
   });
+
+  it('blocks Hub deactivation while child tenants remain attached', async () => {
+    mockAdminSuper.getTenant.mockResolvedValue({
+      success: true,
+      data: makeTenant({
+        allows_subtenants: true,
+        max_depth: 2,
+        children: [makeTenant({ id: 6, name: 'Child Community', parent_id: 5 })],
+      }),
+    });
+    const { TenantShow } = await import('./TenantShow');
+    render(<TenantShow />);
+
+    const hubSwitch = await screen.findByRole('switch', { name: 'Toggle Hub Capability' });
+
+    expect(hubSwitch).toBeDisabled();
+    expect(screen.getByText('Move or delete all child tenants before disabling Hub capability.')).toBeInTheDocument();
+    fireEvent.click(hubSwitch);
+    expect(mockAdminSuper.toggleHub).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog', { name: 'Disable Hub capability?' })).not.toBeInTheDocument();
+  });
 });

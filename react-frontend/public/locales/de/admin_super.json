@@ -391,6 +391,7 @@
     "disable_hub_title": "Hub-Funktion deaktivieren?",
     "disable_hub_confirm": "Dieser Mandant kann keine Untermandanten mehr erstellen. Alle in diesem Mandanten vergebenen Mandanten-Superadminrechte werden ebenfalls widerrufen.",
     "disable_hub_confirm_action": "Hub deaktivieren",
+    "disable_hub_blocked_children": "Verschieben oder löschen Sie alle untergeordneten Mandanten, bevor Sie die Hub-Funktion deaktivieren.",
     "disable_hub_desc": "Entfernen Sie die Hub-Fähigkeit von den ausgewählten Mandanten.",
     "deselect_all": "Alle abwählen",
     "edit": "Bearbeiten",

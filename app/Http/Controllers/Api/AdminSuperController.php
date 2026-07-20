@@ -1236,10 +1236,24 @@ class AdminSuperController extends BaseApiController
                         DB::update("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tid]);
                         break;
                     case 'enable_hub':
-                        DB::update("UPDATE tenants SET allows_subtenants = 1, max_depth = 2 WHERE id = ?", [$tid]);
+                        $result = $this->tenantHierarchyService->toggleSubtenantCapability($tid, true);
+                        if (!$result['success']) {
+                            $errors[] = [
+                                'code' => $result['code'] ?? 'TENANT_UPDATE_FAILED',
+                                'params' => ['tenant_id' => $tid],
+                            ];
+                            continue 2;
+                        }
                         break;
                     case 'disable_hub':
-                        DB::update("UPDATE tenants SET allows_subtenants = 0, max_depth = 0 WHERE id = ?", [$tid]);
+                        $result = $this->tenantHierarchyService->toggleSubtenantCapability($tid, false);
+                        if (!$result['success']) {
+                            $errors[] = [
+                                'code' => $result['code'] ?? 'TENANT_UPDATE_FAILED',
+                                'params' => ['tenant_id' => $tid],
+                            ];
+                            continue 2;
+                        }
                         break;
                 }
                 $updatedCount++;

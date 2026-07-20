@@ -395,6 +395,7 @@
     "disable_hub_title": "Hubfunctie uitschakelen?",
     "disable_hub_confirm": "Deze tenant kan geen subtenants meer maken. Alle binnen deze tenant toegewezen tenant-superbeheerderrechten worden eveneens ingetrokken.",
     "disable_hub_confirm_action": "Hub uitschakelen",
+    "disable_hub_blocked_children": "Verplaats of verwijder alle onderliggende tenants voordat u de Hub-functionaliteit uitschakelt.",
     "disable_hub_desc": "Verwijder de hubmogelijkheden van de geselecteerde tenants.",
     "deselect_all": "Deselecteer Alles",
     "edit": "Bewerken",

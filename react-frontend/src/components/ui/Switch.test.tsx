@@ -47,13 +47,31 @@ describe('Switch — rendering', () => {
   });
 
   it('renders as checked when isSelected=true', () => {
-    render(<Switch isSelected={true} onChange={vi.fn()}>My toggle</Switch>);
+    const { container } = render(<Switch isSelected={true} onChange={vi.fn()}>My toggle</Switch>);
     expect(screen.getByRole('switch')).toBeChecked();
+    expect(container.querySelector('.switch__control')).toHaveAttribute('data-selected', 'true');
+    expect(container.querySelector('.switch__thumb')).toHaveAttribute('data-selected', 'true');
+    expect(container.querySelector('.switch__control')).toHaveClass('!bg-accent');
   });
 
   it('renders as unchecked when isSelected=false', () => {
-    render(<Switch isSelected={false} onChange={vi.fn()}>My toggle</Switch>);
+    const { container } = render(<Switch isSelected={false} onChange={vi.fn()}>My toggle</Switch>);
     expect(screen.getByRole('switch')).not.toBeChecked();
+    expect(container.querySelector('.switch__control')).toHaveAttribute('data-selected', 'false');
+    expect(container.querySelector('.switch__thumb')).toHaveAttribute('data-selected', 'false');
+    expect(container.querySelector('.switch__control')).not.toHaveClass('!bg-accent');
+  });
+
+  it('updates the visible control when a controlled value changes', () => {
+    const { container, rerender } = render(
+      <Switch isSelected={false} onChange={vi.fn()}>My toggle</Switch>
+    );
+
+    rerender(<Switch isSelected={true} onChange={vi.fn()}>My toggle</Switch>);
+
+    expect(screen.getByRole('switch')).toBeChecked();
+    expect(container.querySelector('.switch__control')).toHaveAttribute('data-selected', 'true');
+    expect(container.querySelector('.switch__thumb')).toHaveAttribute('data-selected', 'true');
   });
 
   it('is disabled when isDisabled prop is set', () => {

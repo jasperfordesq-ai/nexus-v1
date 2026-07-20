@@ -396,6 +396,7 @@
     "disable_hub_title": "Desativar a funcionalidade de hub?",
     "disable_hub_confirm": "Este locatário deixará de poder criar sublocatários. Todos os privilégios de superadministrador de locatário atribuídos neste locatário também serão revogados.",
     "disable_hub_confirm_action": "Desativar hub",
+    "disable_hub_blocked_children": "Mova ou elimine todos os inquilinos subordinados antes de desativar a funcionalidade de Hub.",
     "disable_hub_desc": "Remova a capacidade do hub dos locatários selecionados.",
     "deselect_all": "Desmarcar tudo",
     "edit": "Editar",

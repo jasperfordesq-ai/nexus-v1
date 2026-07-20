@@ -44,21 +44,33 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
-function colorClass(color?: SwitchColor) {
+function selectedControlClass(color?: SwitchColor) {
   switch (color) {
     case 'primary':
-      return 'data-[selected=true]:bg-accent';
+      return '!bg-accent';
     case 'secondary':
-      return 'data-[selected=true]:bg-accent-soft';
+      return '!bg-accent-soft';
     case 'success':
-      return 'data-[selected=true]:bg-success';
+      return '!bg-success';
     case 'warning':
-      return 'data-[selected=true]:bg-warning';
+      return '!bg-warning';
     case 'danger':
-      return 'data-[selected=true]:bg-danger';
+      return '!bg-danger';
     default:
-      return undefined;
+      return '!bg-accent';
   }
+}
+
+function selectedThumbClass(size: HeroUISwitchProps['size']) {
+  if (size === 'sm') {
+    return '!ms-[calc(100%-1.15625rem)] !bg-accent-foreground !text-accent';
+  }
+
+  if (size === 'lg') {
+    return '!ms-[calc(100%-1.84375rem)] !bg-accent-foreground !text-accent';
+  }
+
+  return '!ms-[calc(100%-1.5rem)] !bg-accent-foreground !text-accent';
 }
 
 export function Switch({
@@ -96,21 +108,37 @@ export function Switch({
       onChange={onChange ?? onValueChange}
       {...props}
     >
-      <HeroUISwitch.Content className={classNames?.content}>
-        <HeroUISwitch.Control className={combineClasses(classNames?.wrapper, colorClass(color))}>
-          {startContent ? <span className={classNames?.startContent}>{startContent}</span> : null}
-          <HeroUISwitch.Thumb className={classNames?.thumb}>
-            {thumbIcon ? (
-              <HeroUISwitch.Icon className={classNames?.thumbIcon}>
-                {thumbIcon}
-              </HeroUISwitch.Icon>
-            ) : null}
-          </HeroUISwitch.Thumb>
-          {endContent ? <span className={classNames?.endContent}>{endContent}</span> : null}
-        </HeroUISwitch.Control>
-        {children ? <Label className={classNames?.label}>{children}</Label> : null}
-      </HeroUISwitch.Content>
-      {description ? <Description>{description}</Description> : null}
+      {({ isSelected }) => (
+        <>
+          <HeroUISwitch.Content className={classNames?.content}>
+            <HeroUISwitch.Control
+              className={combineClasses(
+                classNames?.wrapper,
+                isSelected && selectedControlClass(color),
+              )}
+              data-selected={isSelected}
+            >
+              {startContent ? <span className={classNames?.startContent}>{startContent}</span> : null}
+              <HeroUISwitch.Thumb
+                className={combineClasses(
+                  classNames?.thumb,
+                  isSelected && selectedThumbClass(props.size),
+                )}
+                data-selected={isSelected}
+              >
+                {thumbIcon ? (
+                  <HeroUISwitch.Icon className={classNames?.thumbIcon}>
+                    {thumbIcon}
+                  </HeroUISwitch.Icon>
+                ) : null}
+              </HeroUISwitch.Thumb>
+              {endContent ? <span className={classNames?.endContent}>{endContent}</span> : null}
+            </HeroUISwitch.Control>
+            {children ? <Label className={classNames?.label}>{children}</Label> : null}
+          </HeroUISwitch.Content>
+          {description ? <Description>{description}</Description> : null}
+        </>
+      )}
     </HeroUISwitch>
   );
 }

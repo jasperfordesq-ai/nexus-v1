@@ -183,6 +183,28 @@ class TenantHierarchyServiceTest extends TestCase
         $this->assertFalse($result['success']);
     }
 
+    public function test_toggleSubtenantCapability_blocks_disabling_hub_with_children(): void
+    {
+        $tenant = (object) [
+            'id' => 5,
+            'name' => 'Parent Hub',
+            'allows_subtenants' => 1,
+            'max_depth' => 2,
+        ];
+
+        DB::shouldReceive('table')->with('tenants')->twice()->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->once()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($tenant);
+        DB::shouldReceive('where')->with('parent_id', 5)->once()->andReturnSelf();
+        DB::shouldReceive('exists')->once()->andReturnTrue();
+
+        $result = TenantHierarchyService::toggleSubtenantCapability(5, false);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('HUB_HAS_CHILDREN', $result['code']);
+        $this->assertSame(__('api.super_disable_hub_has_children'), $result['error']);
+    }
+
     public function test_gb_country_code_does_not_infer_england_and_wales_safeguarding(): void
     {
         $method = new \ReflectionMethod(TenantHierarchyService::class, 'mapCountryCodeToPreset');

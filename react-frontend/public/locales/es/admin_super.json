@@ -395,6 +395,7 @@
     "disable_hub_title": "¿Deshabilitar la función de concentrador?",
     "disable_hub_confirm": "Este inquilino ya no podrá crear subinquilinos. También se revocarán todos los privilegios de superadministrador de inquilino asignados dentro de este inquilino.",
     "disable_hub_confirm_action": "Deshabilitar concentrador",
+    "disable_hub_blocked_children": "Mueva o elimine todos los inquilinos secundarios antes de deshabilitar la función de concentrador.",
     "disable_hub_desc": "Elimine la capacidad del concentrador de los inquilinos seleccionados.",
     "deselect_all": "Deseleccionar todo",
     "edit": "Editar",

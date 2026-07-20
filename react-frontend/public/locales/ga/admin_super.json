@@ -395,6 +395,7 @@
     "disable_hub_title": "An cumas Moil a dhíchumasú?",
     "disable_hub_confirm": "Ní bheidh an tionónta seo in ann fo-thionóntaí a chruthú a thuilleadh. Cúlghairfear freisin gach pribhléid sár-riarthóra tionónta a sannadh laistigh den tionónta seo.",
     "disable_hub_confirm_action": "Díchumasaigh Mol",
+    "disable_hub_blocked_children": "Bog nó scrios gach tionónta linbh sula ndíchumasaítear cumas an Mhoil.",
     "disable_hub_desc": "Bain cumas moil ó na tionóntaí roghnaithe.",
     "deselect_all": "Díroghnaigh Uile",
     "edit": "Cuir in eagar",

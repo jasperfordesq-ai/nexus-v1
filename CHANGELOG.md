@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Tenant Hub capability is now managed from one guarded control.** Edit forms direct administrators to Hub Settings instead of submitting the protected capability field, disabling a Hub requires explicit confirmation and explains the sub-tenant and tenant-super-admin impact, maximum hierarchy depth is described consistently, and the shared HeroUI Switch wrapper now follows the v3 clickable-content anatomy so labels and controls behave as one accessible toggle.
+- **Tenant Hub capability is now managed from one guarded control.** Edit forms direct administrators to Hub Settings instead of submitting the protected capability field, Hub deactivation is blocked until all child tenants are moved or deleted, disabling an empty Hub requires explicit confirmation and explains the tenant-super-admin impact, maximum hierarchy depth is described consistently, and the shared HeroUI Switch wrapper now follows the v3 clickable-content anatomy while explicitly reflecting controlled on/off state in its visible track and thumb.
 
 - **Security scanning now distinguishes Symfony components instead of treating the framework as one monolithic CPE.** OWASP Dependency-Check no longer assigns component-specific Symfony advisories to unrelated packages such as Clock, UID, Translation, or VarDumper; the suppression is constrained to the exact false-positive package/CVE pairs while Composer Audit, the PHP security checker, and Trivy remain blocking package-aware gates.
 

@@ -395,6 +395,7 @@
     "disable_hub_title": "Disabilitare la funzionalità Hub?",
     "disable_hub_confirm": "Questo tenant non potrà più creare tenant secondari. Verranno revocati anche tutti i privilegi di super amministratore del tenant assegnati al suo interno.",
     "disable_hub_confirm_action": "Disabilita Hub",
+    "disable_hub_blocked_children": "Sposta o elimina tutti i tenant secondari prima di disabilitare la funzionalità Hub.",
     "disable_hub_desc": "Rimuovere la funzionalità dell'hub dai tenant selezionati.",
     "deselect_all": "Deseleziona tutto",
     "edit": "Modifica",

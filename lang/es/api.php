@@ -2401,6 +2401,7 @@ return [
     'super_tenant_not_found' => 'Tenant not found',
     'super_purge_requires_deactivation' => 'Deactivate the tenant before purging it. Purge is only permitted on a deactivated tenant.',
     'super_purge_has_children' => 'This tenant has sub-tenants. Move or delete them before purging.',
+    'super_disable_hub_has_children' => 'Mueva o elimine todos los inquilinos secundarios antes de deshabilitar la función de concentrador.',
     'super_hard_delete_disabled' => 'La eliminación definitiva de bajo nivel está desactivada. Usa el flujo de purga auditado para eliminar un tenant de forma permanente.',
     'job_interview_not_found'              => 'Interview not found',
     'job_interview_fallback_title'         => 'Job Interview',

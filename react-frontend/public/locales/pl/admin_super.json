@@ -395,6 +395,7 @@
     "disable_hub_title": "Wyłączyć funkcję koncentratora?",
     "disable_hub_confirm": "Ten dzierżawca nie będzie już mógł tworzyć dzierżawców podrzędnych. Wszystkie uprawnienia superadministratora dzierżawcy nadane w ramach tego dzierżawcy również zostaną odebrane.",
     "disable_hub_confirm_action": "Wyłącz koncentrator",
+    "disable_hub_blocked_children": "Przenieś lub usuń wszystkich podrzędnych dzierżawców przed wyłączeniem funkcji koncentratora.",
     "disable_hub_desc": "Usuń funkcję centrum z wybranych dzierżawców.",
     "deselect_all": "Odznacz wszystko",
     "edit": "Edytuj",

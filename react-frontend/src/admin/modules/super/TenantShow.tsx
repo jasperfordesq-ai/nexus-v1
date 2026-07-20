@@ -222,6 +222,10 @@ export function TenantShow() {
 
   const handleHubToggleRequest = (enable: boolean) => {
     if (!tenant || actionLoading || enable === tenant.allows_subtenants) return;
+    if (!enable && tenant.children.length > 0) {
+      toast.warning(t('super.disable_hub_blocked_children'));
+      return;
+    }
     if (!enable) {
       setHubDisablePending(true);
       return;
@@ -891,11 +895,19 @@ export function TenantShow() {
                 </div>
                 <Switch
                   isSelected={tenant.allows_subtenants}
-                  isDisabled={actionLoading}
+                  isDisabled={actionLoading || (tenant.allows_subtenants && tenant.children.length > 0)}
                   onValueChange={handleHubToggleRequest}
                   aria-label={t('super.label_toggle_hub_capability')}
+                  aria-describedby={tenant.allows_subtenants && tenant.children.length > 0
+                    ? 'hub-disable-blocked-description'
+                    : undefined}
                 />
               </div>
+              {tenant.allows_subtenants && tenant.children.length > 0 && (
+                <p id="hub-disable-blocked-description" className="text-xs text-warning">
+                  {t('super.disable_hub_blocked_children')}
+                </p>
+              )}
             </CardBody>
           </Card>
 

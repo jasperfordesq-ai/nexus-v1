@@ -2401,6 +2401,7 @@ return [
     'super_tenant_not_found' => 'Tenant not found',
     'super_purge_requires_deactivation' => 'Deactivate the tenant before purging it. Purge is only permitted on a deactivated tenant.',
     'super_purge_has_children' => 'This tenant has sub-tenants. Move or delete them before purging.',
+    'super_disable_hub_has_children' => 'Hub 機能を無効にする前に、すべての子テナントを移動または削除してください。',
     'super_hard_delete_disabled' => '低レベルの完全削除は無効です。テナントを完全に削除するには、監査対象のパージ手順を使用してください。',
     'job_interview_not_found'              => 'Interview not found',
     'job_interview_fallback_title'         => 'Job Interview',

@@ -166,6 +166,64 @@ class AdminSuperControllerTest extends TestCase
         );
     }
 
+    public function test_tenant_hub_cannot_be_disabled_while_children_are_attached(): void
+    {
+        $admin = $this->createGlobalSuperAdmin();
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'allows_subtenants' => 1,
+            'max_depth' => 2,
+        ]);
+        Tenant::factory()->create([
+            'parent_id' => $this->testTenantId,
+            'is_active' => 0,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost(
+            "/v2/admin/super/tenants/{$this->testTenantId}/toggle-hub",
+            ['enable' => false]
+        );
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.message', __('api.super_disable_hub_has_children'));
+        $this->assertDatabaseHas('tenants', [
+            'id' => $this->testTenantId,
+            'allows_subtenants' => 1,
+            'max_depth' => 2,
+        ]);
+    }
+
+    public function test_bulk_hub_disable_reports_tenants_with_children_without_changing_them(): void
+    {
+        $admin = $this->createGlobalSuperAdmin();
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'allows_subtenants' => 1,
+            'max_depth' => 2,
+        ]);
+        Tenant::factory()->create([
+            'parent_id' => $this->testTenantId,
+            'is_active' => 1,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/super/bulk/update-tenants', [
+            'tenant_ids' => [$this->testTenantId],
+            'action' => 'disable_hub',
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.updated_count', 0)
+            ->assertJsonPath('data.errors.0.code', 'HUB_HAS_CHILDREN')
+            ->assertJsonPath('data.errors.0.params.tenant_id', $this->testTenantId);
+        $this->assertDatabaseHas('tenants', [
+            'id' => $this->testTenantId,
+            'allows_subtenants' => 1,
+            'max_depth' => 2,
+        ]);
+    }
+
     public function test_tenant_move_preserves_passkey_conflict_for_inherited_rp_subtree(): void
     {
         $admin = $this->createSuperAdmin();

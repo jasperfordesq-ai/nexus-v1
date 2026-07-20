@@ -395,6 +395,7 @@
     "disable_hub_title": "ハブ機能を無効にしますか？",
     "disable_hub_confirm": "このテナントはサブテナントを作成できなくなります。このテナント内で付与されたすべてのテナントスーパー管理者権限も取り消されます。",
     "disable_hub_confirm_action": "ハブを無効にする",
+    "disable_hub_blocked_children": "Hub 機能を無効にする前に、すべての子テナントを移動または削除してください。",
     "disable_hub_desc": "選択したテナントからハブ機能を削除します。",
     "deselect_all": "すべての選択を解除",
     "edit": "編集",

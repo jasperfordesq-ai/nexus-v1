@@ -1053,6 +1053,7 @@ return [
     'super_tenant_not_found'               => 'Tenant not found',
     'super_purge_requires_deactivation'    => 'Deactivate the tenant before purging it. Purge is only permitted on a deactivated tenant.',
     'super_purge_has_children'             => 'This tenant has sub-tenants. Move or delete them before purging.',
+    'super_disable_hub_has_children'       => 'Move or delete all child tenants before disabling Hub capability.',
     'super_hard_delete_disabled'           => 'Low-level hard deletion is disabled. Use the audited purge workflow for permanent tenant deletion.',
     'tenant_id_is_required'                => 'tenant_id is required',
     'super_user_create_required_fields'    => 'first_name, email, and password are required',

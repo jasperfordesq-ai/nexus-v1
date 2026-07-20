@@ -2401,6 +2401,7 @@ return [
     'super_tenant_not_found' => 'Tenant not found',
     'super_purge_requires_deactivation' => 'Deactivate the tenant before purging it. Purge is only permitted on a deactivated tenant.',
     'super_purge_has_children' => 'This tenant has sub-tenants. Move or delete them before purging.',
+    'super_disable_hub_has_children' => 'Przenieś lub usuń wszystkich podrzędnych dzierżawców przed wyłączeniem funkcji koncentratora.',
     'super_hard_delete_disabled' => 'Niskopoziomowe trwałe usuwanie jest wyłączone. Aby trwale usunąć tenanta, użyj audytowanego procesu czyszczenia.',
     'job_interview_not_found'              => 'Interview not found',
     'job_interview_fallback_title'         => 'Job Interview',
