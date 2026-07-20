@@ -172,7 +172,7 @@ export function PartnerDirectory() {
         setRequestNotes('');
         loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered });
       } else {
-        toast.error(t('federation.failed_to_send_partnership_request'));
+        toast.error(res.error || t('federation.failed_to_send_partnership_request'));
       }
     } catch {
       toast.error(t('federation.failed_to_send_partnership_request'));

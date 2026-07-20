@@ -34,11 +34,14 @@ class FederationDirectoryService
                              fdp.country_code, fdp.region, fdp.city, fdp.member_count,
                              fdp.active_listings_count, fdp.total_hours_exchanged,
                              fdp.show_member_count, fdp.show_activity_stats, fdp.show_location,
+                             fp.id AS partnership_id, fp.status AS partnership_status,
                              (SELECT COUNT(*) FROM users u WHERE u.tenant_id = t.id AND u.status = 'active') as live_member_count
                       FROM tenants t
                       LEFT JOIN federation_directory_profiles fdp ON fdp.tenant_id = t.id
+                      LEFT JOIN federation_partnerships fp
+                        ON fp.canonical_pair = CONCAT(LEAST(t.id, ?), '-', GREATEST(t.id, ?))
                       WHERE t.is_active = 1 AND t.id != ?";
-            $params = [$currentTenantId];
+            $params = [$currentTenantId, $currentTenantId, $currentTenantId];
 
             // Check if tenant has opted into federation directory
             $query .= " AND fdp.tenant_id IS NOT NULL";
@@ -106,6 +109,8 @@ class FederationDirectoryService
                     'active_listings_count' => $showActivity ? (int) ($row->active_listings_count ?? 0) : null,
                     'total_hours_exchanged' => $showActivity ? (float) ($row->total_hours_exchanged ?? 0) : null,
                     'topics' => $topicsByTenant[$tid] ?? [],
+                    'partnership_id' => $row->partnership_id !== null ? (int) $row->partnership_id : null,
+                    'partnership_status' => $row->partnership_status ?? null,
                     'is_active' => (bool) $row->is_active,
                     'created_at' => $row->created_at,
                 ];

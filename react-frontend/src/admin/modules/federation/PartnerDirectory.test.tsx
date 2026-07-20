@@ -274,6 +274,40 @@ describe('PartnerDirectory', () => {
     }, { timeout: 2000 });
   });
 
+  it('shows the API reason when a partnership request is rejected', async () => {
+    mockAdminFederation.getDirectory.mockResolvedValue(makeDirectoryResponse([makeCommunity()]));
+    mockAdminFederation.requestPartnership.mockResolvedValue({
+      success: false,
+      error: 'A partnership request already exists between these two communities',
+    });
+
+    const { PartnerDirectory } = await import('./PartnerDirectory');
+    render(<PartnerDirectory />);
+
+    await waitFor(() => screen.getByText('Dublin Timebank'), { timeout: 2000 });
+    const requestButton = screen.queryAllByRole('button').find(
+      (button) => button.textContent === 'Request Partnership',
+    );
+    expect(requestButton).toBeDefined();
+    fireEvent.click(requestButton!);
+
+    let sendButton: HTMLElement | undefined;
+    await waitFor(() => {
+      sendButton = screen.queryAllByRole('button').find((button) =>
+        button.textContent?.toLowerCase().includes('send'),
+      );
+      expect(sendButton).toBeDefined();
+    }, { timeout: 2000 });
+
+    fireEvent.click(sendButton!);
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith(
+        'A partnership request already exists between these two communities',
+      );
+    });
+  });
+
   it('shows Active Partner button (disabled) for partnered community', async () => {
     mockAdminFederation.getDirectory.mockResolvedValue(
       makeDirectoryResponse([makeCommunity({ partnership_status: 'active' })]),

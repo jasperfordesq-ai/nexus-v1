@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -173,6 +175,35 @@ class AdminFederationControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/federation/api-keys');
 
         $response->assertStatus(403);
+    }
+
+    public function test_directory_includes_existing_partnership_status(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $partner = Tenant::factory()->create(['is_active' => true]);
+        Sanctum::actingAs($admin);
+
+        DB::table('federation_directory_profiles')->insert([
+            'tenant_id' => $partner->id,
+            'display_name' => 'Existing partner',
+        ]);
+
+        $partnershipId = DB::table('federation_partnerships')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'partner_tenant_id' => $partner->id,
+            'canonical_pair' => min($this->testTenantId, $partner->id) . '-' . max($this->testTenantId, $partner->id),
+            'status' => 'pending',
+            'federation_level' => 1,
+            'requested_by' => $admin->id,
+        ]);
+
+        $response = $this->apiGet('/v2/admin/federation/directory');
+
+        $response->assertStatus(200);
+        $community = collect($response->json('data.communities'))->firstWhere('id', $partner->id);
+        $this->assertNotNull($community);
+        $this->assertSame($partnershipId, $community['partnership_id']);
+        $this->assertSame('pending', $community['partnership_status']);
     }
 
     public function test_api_keys_returns_403_for_regular_member(): void
