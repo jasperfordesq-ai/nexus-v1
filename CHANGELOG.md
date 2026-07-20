@@ -49,6 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Security scanning now distinguishes Symfony components instead of treating the framework as one monolithic CPE.** OWASP Dependency-Check no longer assigns component-specific Symfony advisories to unrelated packages such as Clock, UID, Translation, or VarDumper; the suppression is constrained to the exact false-positive package/CVE pairs while Composer Audit, the PHP security checker, and Trivy remain blocking package-aware gates.
+
 - **Partner Timebanks settings now keep the save action beside the editable controls.** The settings page no longer hides its only Save button in the page header above the long guidance content; all three partnership toggles and the partnership limit now share a clearly visible save action at the bottom of the settings card, with regression coverage verifying that every toggle is included in the persisted API payload.
 - **Partner Directory requests now reflect existing relationships.** Communities with a pending or active partnership no longer appear to accept a duplicate request, and rejected request attempts display the API's specific reason instead of an unhelpful generic failure.
 

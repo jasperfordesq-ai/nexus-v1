@@ -408,6 +408,31 @@
   </suppress>
 
   <!--
+    FALSE POSITIVE: Symfony's monolithic sensiolabs:symfony CPE is applied to
+    unrelated component packages. Dependency-Check consequently assigns the
+    same component-specific 2026 advisory set to clock, error-handler,
+    event-dispatcher, filesystem, mailer, options-resolver,
+    psr-http-message-bridge, translation, uid, and var-dumper. The relevant
+    installed runtime components are already patched (for example Mailer
+    7.4.12 and Security HTTP/HttpKernel 7.4.13), and the package-aware blocking
+    Composer Audit, Enlightn security checker, and Trivy gates all pass.
+
+    Keep this suppression constrained to the exact falsely matched packages
+    and the exact CVEs observed on 2026-07-20. Any new Symfony advisory or any
+    finding against its actual component remains blocking and requires review.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      FP: OWASP maps separate symfony/* Composer components to the monolithic
+      sensiolabs:symfony CPE and applies advisories for components that are not
+      these packages. Package-aware Composer Audit and Trivy report the lockfile
+      clean; relevant installed runtime components are on patched releases.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:composer/symfony/(clock|error-handler|event-dispatcher|filesystem|mailer|options-resolver|psr-http-message-bridge|translation|uid|var-dumper)@.*$</packageUrl>
+    <vulnerabilityName regex="true">CVE-2026-(45063|45068|45069|45071|45073|45074|45075|45077|45133|45304|45305|45756|47767|48489|48736)</vulnerabilityName>
+  </suppress>
+
+  <!--
     FALSE POSITIVE: an incidental cygwin1.dll fingerprinted to
     cpe:2.3:a:redhat:cygwin:1.3.22. OWASP Dependency-Check finds a stray
     cygwin1.dll in the scanned workspace (NOT tracked in git — it ships inside a
