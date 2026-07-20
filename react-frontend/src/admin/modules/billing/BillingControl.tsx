@@ -11,6 +11,7 @@ import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
+import { BillingDevelopmentNotice } from './BillingDevelopmentNotice';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -277,11 +278,12 @@ export function BillingControl() {
 
   if (loading) {
     return (
-      <div>
+      <div className="space-y-6">
         <PageHeader
           title={t('billing.control_title')}
           description={t('billing.control_desc')}
         />
+        <BillingDevelopmentNotice />
         <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
@@ -294,7 +296,7 @@ export function BillingControl() {
   // ---------------------------------------------------------------------------
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title={t('billing.control_title')}
         description={t('billing.control_desc')}
@@ -313,6 +315,8 @@ export function BillingControl() {
           </Button>
         }
       />
+
+      <BillingDevelopmentNotice />
 
       <Card>
         <CardHeader className="flex items-center gap-2 pb-0">

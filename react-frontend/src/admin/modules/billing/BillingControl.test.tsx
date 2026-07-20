@@ -171,6 +171,14 @@ describe('BillingControl', () => {
     expect(busy).toBeDefined();
   });
 
+  it('shows the development notice while loading', async () => {
+    mockApi.get.mockImplementationOnce(() => new Promise(() => {}));
+    const { BillingControl } = await import('./BillingControl');
+    render(<BillingControl />);
+
+    expect(screen.getByTitle('Billing tools are under development')).toBeInTheDocument();
+  });
+
   it('renders tenant name in the table after load', async () => {
     const { BillingControl } = await import('./BillingControl');
     render(<BillingControl />);

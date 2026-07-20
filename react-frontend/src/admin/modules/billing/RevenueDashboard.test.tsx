@@ -90,6 +90,13 @@ describe('RevenueDashboard — god user', () => {
     expect(spinner).toBeTruthy();
   });
 
+  it('shows the development notice on the revenue page', () => {
+    mockApi.get.mockReturnValue(new Promise(() => {}));
+    render(<RevenueDashboard />);
+
+    expect(screen.getByText('Billing tools are under development')).toBeInTheDocument();
+  });
+
   // ── Error state ────────────────────────────────────────────────────────────
   it('shows error card when API returns failure', async () => {
     mockApi.get.mockResolvedValue({ success: false });
