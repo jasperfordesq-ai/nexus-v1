@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, S
 
 /**
  * Tenant Create/Edit Form
- * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Languages, Features, Legal.
+ * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Languages, Legal.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -15,21 +15,6 @@ import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import Building2 from 'lucide-react/icons/building-2';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Calendar from 'lucide-react/icons/calendar';
-import Users from 'lucide-react/icons/users';
-import Trophy from 'lucide-react/icons/trophy';
-import Target from 'lucide-react/icons/target';
-import BookOpen from 'lucide-react/icons/book-open';
-import Library from 'lucide-react/icons/library';
-import Heart from 'lucide-react/icons/heart';
-import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
-import Network from 'lucide-react/icons/network';
-import Building from 'lucide-react/icons/building';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
-import Wallet from 'lucide-react/icons/wallet';
-import MessageCircle from 'lucide-react/icons/message-circle';
-import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
-import Rss from 'lucide-react/icons/rss';
 import Eye from 'lucide-react/icons/eye';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -38,25 +23,6 @@ import { languageDisplayName } from '@/lib/languageDisplayName';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { SuperAdminTenant, SuperAdminTenantDetail, CreateTenantPayload } from '../../api/types';
-
-const FEATURE_META: { key: string; labelKey: string; descKey: string; icon: typeof Calendar }[] = [
-  { key: 'listings', labelKey: 'tenant_form.feature_listings', descKey: 'tenant_form.feature_listings_desc', icon: ShoppingBag },
-  { key: 'groups', labelKey: 'tenant_form.feature_groups', descKey: 'tenant_form.feature_groups_desc', icon: Users },
-  { key: 'wallet', labelKey: 'tenant_form.feature_wallet', descKey: 'tenant_form.feature_wallet_desc', icon: Wallet },
-  { key: 'events', labelKey: 'tenant_form.feature_events', descKey: 'tenant_form.feature_events_desc', icon: Calendar },
-  { key: 'volunteering', labelKey: 'tenant_form.feature_volunteering', descKey: 'tenant_form.feature_volunteering_desc', icon: Heart },
-  { key: 'resources', labelKey: 'tenant_form.feature_resources', descKey: 'tenant_form.feature_resources_desc', icon: Library },
-  { key: 'gamification', labelKey: 'tenant_form.feature_gamification', descKey: 'tenant_form.feature_gamification_desc', icon: Trophy },
-  { key: 'goals', labelKey: 'tenant_form.feature_goals', descKey: 'tenant_form.feature_goals_desc', icon: Target },
-  { key: 'blog', labelKey: 'tenant_form.feature_blog', descKey: 'tenant_form.feature_blog_desc', icon: BookOpen },
-  { key: 'exchange_workflow', labelKey: 'tenant_form.feature_exchange_workflow', descKey: 'tenant_form.feature_exchange_workflow_desc', icon: ArrowRightLeft },
-  { key: 'federation', labelKey: 'tenant_form.feature_federation', descKey: 'tenant_form.feature_federation_desc', icon: Network },
-  { key: 'organisations', labelKey: 'tenant_form.feature_organisations', descKey: 'tenant_form.feature_organisations_desc', icon: Building },
-  { key: 'messages', labelKey: 'tenant_form.feature_messages', descKey: 'tenant_form.feature_messages_desc', icon: MessageCircle },
-  { key: 'dashboard', labelKey: 'tenant_form.feature_dashboard', descKey: 'tenant_form.feature_dashboard_desc', icon: LayoutDashboard },
-  { key: 'feed', labelKey: 'tenant_form.feature_feed', descKey: 'tenant_form.feature_feed_desc', icon: Rss },
-  { key: 'marketplace', labelKey: 'tenant_form.feature_marketplace', descKey: 'tenant_form.feature_marketplace_desc', icon: ShoppingBag },
-];
 
 const COUNTRY_CODES = [
   'IE', 'GB', 'US', 'CA', 'AU', 'NZ', 'DE', 'FR', 'ES', 'IT',
@@ -127,8 +93,6 @@ export function TenantForm() {
     social_instagram: '',
     social_linkedin: '',
     social_youtube: '',
-    // Features
-    features: {} as Record<string, boolean>,
     // Languages
     default_language: 'en',
     supported_languages: ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as string[],
@@ -195,7 +159,6 @@ export function TenantForm() {
           social_instagram: tenant.social_instagram || '',
           social_linkedin: tenant.social_linkedin || '',
           social_youtube: tenant.social_youtube || '',
-          features: tenant.features || {},
           default_language: (tenant.configuration as Record<string, unknown>)?.default_language as string || 'en',
           supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
           privacy_text: (tenant.configuration as Record<string, unknown>)?.privacy_text as string || '',
@@ -725,44 +688,6 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="features" title={t('tenant_form.tab_features')}>
-          <Card>
-            <CardBody className="p-6">
-              <p className="text-sm text-muted mb-4">
-                {t('tenant_form.features_desc')}
-              </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {FEATURE_META.map(({ key, labelKey, descKey, icon: Icon }) => {
-                  const label = t(labelKey);
-                  const description = t(descKey);
-                  const enabled = form.features[key] ?? false;
-                  return (
-                    <div
-                      key={key}
-                      className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
-                        enabled ? 'border-success bg-success/10' : 'border-border'
-                      }`}
-                    >
-                      <Icon size={20} className={enabled ? 'text-success' : 'text-muted'} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{label}</p>
-                        <p className="text-xs text-muted truncate">{description}</p>
-                      </div>
-                      <Switch
-                        size="sm"
-                        isSelected={enabled}
-                        onValueChange={(v) =>
-                          updateField('features', { ...form.features, [key]: v })
-                        }
-                        aria-label={t('tenant_form.toggle_feature_aria', { label })}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </CardBody>
-          </Card>
-        </Tab>
         <Tab key="legal" title={t('tenant_form.tab_legal')}>
           <Card>
             <CardBody className="space-y-4 p-6">

@@ -116,6 +116,7 @@ describe('TenantForm — create mode', () => {
     const { TenantForm } = await import('./TenantForm');
     render(<TenantForm />);
     await waitFor(() => expect(screen.getByTestId('page-header')).toBeInTheDocument());
+    expect(screen.queryByRole('tab', { name: /features/i })).not.toBeInTheDocument();
   });
 
   it('shows error toast when name is empty and Save is clicked', async () => {
@@ -169,6 +170,7 @@ describe('TenantForm — create mode', () => {
         expect.objectContaining({ name: 'NewTimebank' })
       );
     });
+    expect(mockAdminSuper.createTenant.mock.calls[0]?.[0]).not.toHaveProperty('features');
   });
 
   it('navigates to tenant list on successful create', async () => {

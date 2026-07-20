@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Tenant feature and module controls now have one authoritative administration surface.** The misleading Features tab has been removed from the super-admin tenant create/edit form, including its stale core-module switches and raw-default display logic; tenant capabilities remain managed through the tenant-scoped Module Configuration page, while new tenants inherit the canonical platform defaults.
 - **Polls created from the Feed modal now save successfully.** The feed endpoint uses the saved poll's numeric ID when building its response and recording feed activity, preventing the post-save server error that previously returned HTTP 500.
 - **Terminated federation partnerships now display their real status.** The shared admin status badge recognises every partnership lifecycle state instead of falling back to "Unknown", with translated labels across all maintained React locales.
 - **Poll option fields now retain focus in both poll creation surfaces.** Typing in either the standalone Polls page or the Feed composer no longer remounts the active option input after each character, so complete option text can be entered normally.
