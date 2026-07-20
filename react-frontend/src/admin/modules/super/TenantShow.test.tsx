@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ── Hoisted mocks ────────────────────────────────────────────────────────────
@@ -72,13 +72,16 @@ vi.mock('../../components', () => ({
       {actions}
     </div>
   ),
-  ConfirmModal: ({ isOpen, onClose, onConfirm, title }: {
+}));
+
+vi.mock('../../components/ConfirmModal', () => ({
+  ConfirmModal: ({ isOpen, onClose, onConfirm, title, confirmLabel }: {
     isOpen: boolean; onClose: () => void; onConfirm: () => void; title: string;
     message?: string; confirmLabel?: string; confirmColor?: string; isLoading?: boolean;
   }) =>
     isOpen ? (
       <div role="dialog" aria-label={title}>
-        <button onClick={onConfirm}>confirm-action</button>
+        <button onClick={onConfirm}>{confirmLabel ?? 'confirm-action'}</button>
         <button onClick={onClose}>close-modal</button>
       </div>
     ) : null,
@@ -355,5 +358,37 @@ describe('TenantShow', () => {
       el.getAttribute('aria-label')?.toLowerCase().includes('hub')
     );
     expect(hubSwitch).toBeDefined();
+  });
+
+  it('enables Hub capability immediately through the dedicated endpoint', async () => {
+    const { TenantShow } = await import('./TenantShow');
+    render(<TenantShow />);
+
+    const hubSwitch = await screen.findByRole('switch', { name: 'Toggle Hub Capability' });
+    fireEvent.click(hubSwitch);
+
+    await waitFor(() => {
+      expect(mockAdminSuper.toggleHub).toHaveBeenCalledWith(5, true);
+    });
+  });
+
+  it('requires confirmation before disabling Hub capability', async () => {
+    mockAdminSuper.getTenant.mockResolvedValue({
+      success: true,
+      data: makeTenant({ allows_subtenants: true, max_depth: 2 }),
+    });
+    const { TenantShow } = await import('./TenantShow');
+    render(<TenantShow />);
+
+    const hubSwitch = await screen.findByRole('switch', { name: 'Toggle Hub Capability' });
+    fireEvent.click(hubSwitch);
+
+    expect(mockAdminSuper.toggleHub).not.toHaveBeenCalled();
+    const dialog = screen.getByRole('dialog', { name: 'Disable Hub capability?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Hub' }));
+
+    await waitFor(() => {
+      expect(mockAdminSuper.toggleHub).toHaveBeenCalledWith(5, false);
+    });
   });
 });

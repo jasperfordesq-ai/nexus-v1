@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Super-admin tenant hierarchy controls now have one clear, reliable workflow.** The shared HeroUI v3 switch uses the documented clickable compound structure, edit-time Hub capability changes route to the authoritative Hub Settings control, disabling a Hub warns that tenant-super-admin privileges will be revoked, and Parent/maximum-depth guidance now explains the separate move workflow and absolute hierarchy-depth semantics.
 - **Super-admin tenant editing no longer exposes obsolete legal overrides.** The inert Privacy Override and Terms Override tab has been removed; tenant administrators continue to manage published, versioned legal documents through the authoritative Legal Documents administration surface.
 - **Tenant feature and module controls now have one authoritative administration surface.** The misleading Features tab has been removed from the super-admin tenant create/edit form, including its stale core-module switches and raw-default display logic; tenant capabilities remain managed through the tenant-scoped Module Configuration page, while new tenants inherit the canonical platform defaults.
 - **Polls created from the Feed modal now save successfully.** The feed endpoint uses the saved poll's numeric ID when building its response and recording feed activity, preventing the post-save server error that previously returned HTTP 500.
@@ -48,6 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **PHP test isolation now takes effect before Laravel providers boot.** The PHPUnit cache driver forcibly uses the intended in-memory store even inside the Docker image, preserving named route-limiter registrations while preventing rate-limit counters from leaking across tests or runs. Accessible blog SEO coverage now verifies that its JSON-LD nonce matches the response CSP, proxy tests preserve the hardened Cloudflare-chain requirement and reject spoofed forwarding headers, and the message-service mock matches Eloquent's real collection contract.
 
 ### Fixed
+
+- **Tenant Hub capability is now managed from one guarded control.** Edit forms direct administrators to Hub Settings instead of submitting the protected capability field, disabling a Hub requires explicit confirmation and explains the sub-tenant and tenant-super-admin impact, maximum hierarchy depth is described consistently, and the shared HeroUI Switch wrapper now follows the v3 clickable-content anatomy so labels and controls behave as one accessible toggle.
 
 - **Security scanning now distinguishes Symfony components instead of treating the framework as one monolithic CPE.** OWASP Dependency-Check no longer assigns component-specific Symfony advisories to unrelated packages such as Clock, UID, Translation, or VarDumper; the suppression is constrained to the exact false-positive package/CVE pairs while Composer Audit, the PHP security checker, and Trivy remain blocking package-aware gates.
 

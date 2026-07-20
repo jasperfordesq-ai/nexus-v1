@@ -102,6 +102,7 @@ export function TenantShow() {
 
   // Guard ref to prevent Switch onValueChange re-entry (HeroUI fires on programmatic isSelected changes)
   const togglingHub = useRef(false);
+  const [hubDisablePending, setHubDisablePending] = useState(false);
 
   // Move Tenant modal
   const moveModal = useDisclosure();
@@ -195,17 +196,21 @@ export function TenantShow() {
     setPurging(false);
   };
 
-  const handleToggleHub = async () => {
-    if (!tenant || togglingHub.current) return;
+  const updateHubCapability = async (enable: boolean) => {
+    if (!tenant || togglingHub.current || tenant.allows_subtenants === enable) return;
     togglingHub.current = true;
     setActionLoading(true);
-    const newValue = !tenant.allows_subtenants;
     try {
-      const res = await adminSuper.toggleHub(tenant.id, newValue);
+      const res = await adminSuper.toggleHub(tenant.id, enable);
       if (res.success) {
-        toast.success(newValue ? t('super.hub_enabled') : t('super.hub_disabled'));
+        toast.success(enable ? t('super.hub_enabled') : t('super.hub_disabled'));
         // Optimistic update — avoids refetch which re-triggers Switch onValueChange
-        setTenant((prev) => prev ? { ...prev, allows_subtenants: newValue } : prev);
+        setTenant((prev) => prev ? {
+          ...prev,
+          allows_subtenants: enable,
+          max_depth: enable ? Math.max(prev.max_depth, 2) : 0,
+        } : prev);
+        setHubDisablePending(false);
       } else {
         toast.error(t('super.failed_to_toggle_hub'));
       }
@@ -213,6 +218,15 @@ export function TenantShow() {
     setActionLoading(false);
     // Release guard after a tick so the Switch settles
     requestAnimationFrame(() => { togglingHub.current = false; });
+  };
+
+  const handleHubToggleRequest = (enable: boolean) => {
+    if (!tenant || actionLoading || enable === tenant.allows_subtenants) return;
+    if (!enable) {
+      setHubDisablePending(true);
+      return;
+    }
+    void updateHubCapability(true);
   };
 
   const loadTenant = useCallback(async () => {
@@ -878,7 +892,7 @@ export function TenantShow() {
                 <Switch
                   isSelected={tenant.allows_subtenants}
                   isDisabled={actionLoading}
-                  onValueChange={handleToggleHub}
+                  onValueChange={handleHubToggleRequest}
                   aria-label={t('super.label_toggle_hub_capability')}
                 />
               </div>
@@ -1000,6 +1014,19 @@ export function TenantShow() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <ConfirmModal
+        isOpen={hubDisablePending}
+        onClose={() => {
+          if (!actionLoading) setHubDisablePending(false);
+        }}
+        onConfirm={() => { void updateHubCapability(false); }}
+        title={t('super.disable_hub_title')}
+        message={t('super.disable_hub_confirm')}
+        confirmLabel={t('super.disable_hub_confirm_action')}
+        confirmColor="danger"
+        isLoading={actionLoading}
+      />
 
       {/* Permanent Purge Modal (god-only, irreversible) */}
       <Modal

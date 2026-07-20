@@ -30,6 +30,17 @@ describe('Switch — rendering', () => {
     expect(screen.getByText('This affects all alerts')).toBeInTheDocument();
   });
 
+  it('uses the HeroUI v3 compound anatomy for the clickable control', () => {
+    const { container } = render(<Switch description="Help text">Toggle me</Switch>);
+    const control = container.querySelector('.switch__control');
+    const content = container.querySelector('.switch__content');
+
+    expect(control).not.toBeNull();
+    expect(content).not.toBeNull();
+    expect(content).toContainElement(control as HTMLElement);
+    expect(content).not.toContainElement(screen.getByText('Help text'));
+  });
+
   it('is unchecked by default (no isSelected prop)', () => {
     render(<Switch>My toggle</Switch>);
     expect(screen.getByRole('switch')).not.toBeChecked();
@@ -74,6 +85,16 @@ describe('Switch — onChange / onValueChange callbacks', () => {
     render(<Switch onValueChange={onValueChange}>Toggle me</Switch>);
     fireEvent.click(screen.getByRole('switch'));
     expect(onValueChange).toHaveBeenCalled();
+  });
+
+  it('toggles when the visible control is clicked', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(<Switch onValueChange={onValueChange}>Toggle me</Switch>);
+    const control = container.querySelector('.switch__control');
+
+    expect(control).not.toBeNull();
+    fireEvent.click(control as HTMLElement);
+    expect(onValueChange).toHaveBeenCalledWith(true);
   });
 
   it('prefers onChange over onValueChange when both provided', () => {

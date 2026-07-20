@@ -213,7 +213,11 @@ export function TenantForm() {
         'supported_languages',
       ]);
       for (const [field, value] of Object.entries(form)) {
-        if (configurationFields.has(field) || field === 'parent_id') {
+        if (
+          configurationFields.has(field)
+          || field === 'parent_id'
+          || (isEdit && field === 'allows_subtenants')
+        ) {
           continue;
         }
         const originalValue = initialForm?.[field as keyof typeof form];
@@ -382,17 +386,31 @@ export function TenantForm() {
                 >
                   {t('tenant_form.active')}
                 </Switch>
-                <Switch
-                  isSelected={form.allows_subtenants}
-                  onValueChange={(v) => updateField('allows_subtenants', v)}
-                >
-                  {t('tenant_form.allows_subtenants')}
-                </Switch>
+                {!isEdit && (
+                  <Switch
+                    isSelected={form.allows_subtenants}
+                    onValueChange={(v) => updateField('allows_subtenants', v)}
+                  >
+                    {t('tenant_form.allows_subtenants')}
+                  </Switch>
+                )}
               </div>
+              {isEdit && (
+                <p className="text-sm text-muted">
+                  {t('tenant_form.hub_capability_managed_desc')}{' '}
+                  <Link
+                    to={tenantPath(`/super-admin/tenants/${id}`)}
+                    className="font-medium text-accent hover:underline"
+                  >
+                    {t('tenant_form.open_hub_settings')}
+                  </Link>
+                </p>
+              )}
               {form.allows_subtenants && (
                 <Input
                   type="number"
                   label={t('tenant_form.max_depth_label')}
+                  description={t('tenant_form.max_depth_desc')}
                   value={String(form.max_depth)}
                   onValueChange={(v) => updateField('max_depth', Number(v) || 3)}
                   className="max-w-xs"

@@ -20,6 +20,7 @@ export type SwitchProps = Omit<HeroUISwitchProps, 'children' | 'className' | 'co
   className?: string;
   classNames?: {
     base?: string;
+    content?: string;
     wrapper?: string;
     thumb?: string;
     thumbIcon?: string;
@@ -95,23 +96,21 @@ export function Switch({
       onChange={onChange ?? onValueChange}
       {...props}
     >
-      <HeroUISwitch.Control className={combineClasses(classNames?.wrapper, colorClass(color))}>
-        {startContent ? <span className={classNames?.startContent}>{startContent}</span> : null}
-        <HeroUISwitch.Thumb className={classNames?.thumb}>
-          {thumbIcon ? (
-            <HeroUISwitch.Icon className={classNames?.thumbIcon}>
-              {thumbIcon}
-            </HeroUISwitch.Icon>
-          ) : null}
-        </HeroUISwitch.Thumb>
-        {endContent ? <span className={classNames?.endContent}>{endContent}</span> : null}
-      </HeroUISwitch.Control>
-      {children || description ? (
-        <HeroUISwitch.Content>
-          {children ? <Label className={classNames?.label}>{children}</Label> : null}
-          {description ? <Description>{description}</Description> : null}
-        </HeroUISwitch.Content>
-      ) : null}
+      <HeroUISwitch.Content className={classNames?.content}>
+        <HeroUISwitch.Control className={combineClasses(classNames?.wrapper, colorClass(color))}>
+          {startContent ? <span className={classNames?.startContent}>{startContent}</span> : null}
+          <HeroUISwitch.Thumb className={classNames?.thumb}>
+            {thumbIcon ? (
+              <HeroUISwitch.Icon className={classNames?.thumbIcon}>
+                {thumbIcon}
+              </HeroUISwitch.Icon>
+            ) : null}
+          </HeroUISwitch.Thumb>
+          {endContent ? <span className={classNames?.endContent}>{endContent}</span> : null}
+        </HeroUISwitch.Control>
+        {children ? <Label className={classNames?.label}>{children}</Label> : null}
+      </HeroUISwitch.Content>
+      {description ? <Description>{description}</Description> : null}
     </HeroUISwitch>
   );
 }

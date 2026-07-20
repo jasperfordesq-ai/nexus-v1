@@ -117,6 +117,7 @@ describe('TenantForm — create mode', () => {
     render(<TenantForm />);
     await waitFor(() => expect(screen.getByTestId('page-header')).toBeInTheDocument());
     expect(screen.queryByRole('tab', { name: /features/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Allows Subtenants')).toBeInTheDocument();
   });
 
   it('shows error toast when name is empty and Save is clicked', async () => {
@@ -258,6 +259,20 @@ describe('TenantForm — edit mode', () => {
         name: 'Project NEXUS Updated',
       });
     });
+  });
+
+  it('routes Hub capability changes to the tenant Hub Settings surface', async () => {
+    const { TenantForm } = await import('./TenantForm');
+    render(<TenantForm />);
+
+    await screen.findByRole('textbox', { name: /name/i });
+
+    expect(screen.queryByText('Allows Subtenants')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open Hub Settings' })).toHaveAttribute(
+      'href',
+      '/test/super-admin/tenants/1'
+    );
+    expect(screen.getByText('Maximum hierarchy depth')).toBeInTheDocument();
   });
 });
 
