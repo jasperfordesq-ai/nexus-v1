@@ -330,18 +330,16 @@ class AdminSuperControllerTest extends TestCase
             ->assertJsonPath('data.moved_count', 0)
             ->assertJsonPath('data.total_requested', 1)
             ->assertJsonPath(
-                'data.errors.0',
-                __('api.super_move_user_passkey_recovery_required')
+                'data.errors.0.code',
+                'USER_MOVE_PASSKEY_RECOVERY_REQUIRED'
             )
+            ->assertJsonPath('data.errors.0.params.user_id', $member->id)
             ->assertJsonPath('data.failures.0.user_id', $member->id)
             ->assertJsonPath(
                 'data.failures.0.code',
                 'USER_MOVE_PASSKEY_RECOVERY_REQUIRED'
             )
-            ->assertJsonPath(
-                'data.failures.0.message',
-                __('api.super_move_user_passkey_recovery_required')
-            );
+            ->assertJsonPath('data.failures.0.params.user_id', $member->id);
         $this->assertDatabaseHas('users', [
             'id' => $member->id,
             'tenant_id' => $this->testTenantId,
