@@ -187,7 +187,9 @@ class AdminCrmControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
-        $response = $this->apiGet('/v2/admin/crm/timeline');
+        // Disable the date window so this response-contract assertion does not
+        // depend on a Carbon test clock leaked by an earlier test in the shard.
+        $response = $this->apiGet('/v2/admin/crm/timeline?days=0');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data' => ['*' => [

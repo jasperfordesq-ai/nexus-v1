@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Laravel CI contract tests no longer fail from translated response fields or leaked test clocks.** Pilot launch-readiness coverage now asserts the localized `summary_code`/`summary_params` contract, while the CRM timeline contract test disables its date window so unrelated frozen-clock state cannot hide the signup fixture.
 - **Super-admin billing pages now clearly identify their development status.** The billing controls and revenue dashboard display a persistent translated warning that the React replacement and Stripe-connected workflows are still being validated and that displayed figures must not be treated as financial records.
 - **Super-admin tenant hierarchy controls now have one clear, reliable workflow.** The shared HeroUI v3 switch uses the documented clickable compound structure, edit-time Hub capability changes route to the authoritative Hub Settings control, disabling a Hub warns that tenant-super-admin privileges will be revoked, and Parent/maximum-depth guidance now explains the separate move workflow and absolute hierarchy-depth semantics.
 - **Super-admin tenant editing no longer exposes obsolete legal overrides.** The inert Privacy Override and Terms Override tab has been removed; tenant administrators continue to manage published, versioned legal documents through the authoritative Legal Documents administration surface.
