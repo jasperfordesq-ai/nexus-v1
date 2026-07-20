@@ -834,13 +834,8 @@ class SocialController extends BaseApiController
             'visibility' => $data['visibility'] ?? 'public',
         ];
 
-        $pollId = $this->pollService->create($userId, $pollData);
-
-        if ($pollId === null) {
-            $errors = $this->pollService->getErrors();
-            return $this->respondWithErrors($errors, 422);
-        }
-
+        $createdPoll = $this->pollService->create($userId, $pollData);
+        $pollId = (int) $createdPoll->id;
         $poll = $this->pollService->getById($pollId, $userId);
 
         try {

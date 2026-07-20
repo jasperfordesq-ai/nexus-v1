@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Polls created from the Feed modal now save successfully.** The feed endpoint uses the saved poll's numeric ID when building its response and recording feed activity, preventing the post-save server error that previously returned HTTP 500.
 - **Terminated federation partnerships now display their real status.** The shared admin status badge recognises every partnership lifecycle state instead of falling back to "Unknown", with translated labels across all maintained React locales.
 - **Poll option fields now retain focus in both poll creation surfaces.** Typing in either the standalone Polls page or the Feed composer no longer remounts the active option input after each character, so complete option text can be entered normally.
 - **Security CI no longer treats npm Audit API availability or vendored mobile build templates as OWASP Dependency-Check failures.** Blocking production-dependency audits explicitly cover the root, React, E2E, and mobile lockfiles, while Dependency-Check retains installed package/CVE analysis with its redundant network-dependent Node Audit Analyzer disabled. Mobile remains lockfile-audited instead of materializing third-party CocoaPods/Gem templates and native binaries for broad CPE matching, its transitive `shell-quote` dependency is updated to the patched 1.9.0 release, and the unpatched Metro-only `image-size` advisory is documented as a time-bounded build-tool risk pending an Expo/Metro update.

@@ -114,6 +114,44 @@ class SocialControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_authenticated_user_can_create_feed_poll(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/feed/polls', [
+            'question' => 'Which project should we support?',
+            'options' => ['Community garden', 'Repair cafe'],
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.question', 'Which project should we support?');
+
+        $pollId = (int) $response->json('data.id');
+        $this->assertGreaterThan(0, $pollId);
+
+        $this->assertDatabaseHas('polls', [
+            'id' => $pollId,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+        ]);
+        $this->assertDatabaseHas('poll_options', [
+            'poll_id' => $pollId,
+            'tenant_id' => $this->testTenantId,
+            'label' => 'Community garden',
+        ]);
+        $this->assertDatabaseHas('poll_options', [
+            'poll_id' => $pollId,
+            'tenant_id' => $this->testTenantId,
+            'label' => 'Repair cafe',
+        ]);
+        $this->assertDatabaseHas('feed_activity', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'source_type' => 'poll',
+            'source_id' => $pollId,
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  POST /v2/feed/posts/{id}/hide
     // ------------------------------------------------------------------
