@@ -89,6 +89,11 @@ describe('Footer', () => {
     setupDefaultMocks();
   });
 
+  it('is a desktop-only surface so mobile uses the app navigation instead', () => {
+    const { container } = render(<Footer />);
+    expect(container.querySelector('footer')).toHaveClass('hidden', 'md:block');
+  });
+
   describe('Copyright / Footer text', () => {
     it('renders default copyright text with tenant branding name', () => {
       render(<Footer />);

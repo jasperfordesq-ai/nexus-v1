@@ -5,15 +5,24 @@
 
 /**
  * BottomSheet — Reusable component that renders as a bottom sheet on mobile
- * and a centered modal on desktop.
+ * and preserves the same native sheet interaction on larger touch screens.
  *
- * Uses HeroUI Modal with placement="bottom" on mobile, Framer Motion for
- * slide-up animation and drag-to-dismiss.
+ * Uses the HeroUI v3 Drawer primitive for focus management, scroll locking,
+ * safe-area layout, and built-in drag-to-dismiss behaviour.
  */
 
-import { useCallback } from 'react';
-import { motion } from '@/lib/motion';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
+import X from 'lucide-react/icons/x';
+import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components/ui/Button';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHandle,
+  DrawerHeader,
+  DrawerHeading,
+} from '@/components/ui/Drawer';
 
 
 export interface BottomSheetProps {
@@ -26,9 +35,6 @@ export interface BottomSheetProps {
   className?: string;
 }
 
-/** Threshold in pixels — drag down past this to dismiss */
-const DRAG_DISMISS_THRESHOLD = 100;
-
 export function BottomSheet({
   isOpen,
   onClose,
@@ -37,6 +43,7 @@ export function BottomSheet({
   snapPoints,
   className = '',
 }: BottomSheetProps) {
+  const { t } = useTranslation('common');
   // Determine max height class from first snap point
   const maxHeightClass = snapPoints?.[0] === 'full'
     ? 'max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom))]'
@@ -44,60 +51,42 @@ export function BottomSheet({
       ? 'max-h-[50dvh]'
       : 'max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-1rem)]';
 
-  const handleDragEnd = useCallback(
-    (_: unknown, info: { offset: { y: number }; velocity: { y: number } }) => {
-      if (info.offset.y > DRAG_DISMISS_THRESHOLD || info.velocity.y > 500) {
-        onClose();
-      }
-    },
-    [onClose],
-  );
-
   return (
-    <Modal
+    <Drawer
       isOpen={isOpen}
       onClose={onClose}
       placement="bottom"
       backdrop="blur"
       hideCloseButton
       classNames={{
-        base: `bg-[var(--surface-dropdown)] border border-[var(--border-default)] rounded-t-2xl sm:rounded-2xl ${maxHeightClass} overflow-hidden ${className}`,
+        base: `w-full max-w-none bg-[var(--surface-dropdown)] border border-[var(--border-default)] rounded-t-3xl ${maxHeightClass} overflow-hidden ${className}`,
         backdrop: 'bg-black/60 backdrop-blur-sm',
-        wrapper: 'sm:items-center items-end',
-      }}
-      motionProps={{
-        variants: {
-          enter: { y: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
-          exit: { y: '100%', opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } },
-        },
-        initial: { y: '100%', opacity: 0 },
+        wrapper: 'items-end',
+        header: 'p-0',
+        body: 'p-0',
       }}
     >
-      <ModalContent>
-        {() => (
-          <motion.div
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            onDragEnd={handleDragEnd}
-            className="flex max-h-[inherit] touch-none flex-col"
+      <DrawerContent aria-label={title} className="flex min-h-0 flex-col">
+        <DrawerHandle className="shrink-0" />
+        <DrawerHeader className="flex shrink-0 items-center justify-between border-b border-theme-default px-5 py-3">
+          <DrawerHeading className="text-base font-semibold text-theme-primary">
+            {title}
+          </DrawerHeading>
+          <Button
+            isIconOnly
+            variant="light"
+            onPress={onClose}
+            aria-label={t('accessibility.close')}
+            className="min-h-[44px] min-w-[44px] text-theme-muted hover:text-theme-primary"
           >
-            {/* Drag handle bar (mobile only) */}
-            <div className="flex justify-center pt-3 pb-1 sm:hidden cursor-grab active:cursor-grabbing">
-              <div className="w-10 h-1 rounded-full bg-[var(--text-subtle)]/40" />
-            </div>
-
-            <ModalHeader className="text-[var(--text-primary)] text-base font-semibold px-5 pt-2 pb-3">
-              {title}
-            </ModalHeader>
-
-            <ModalBody className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-[calc(var(--safe-area-bottom)+1.25rem)] pt-0">
-              {children}
-            </ModalBody>
-          </motion.div>
-        )}
-      </ModalContent>
-    </Modal>
+            <X className="h-5 w-5" aria-hidden="true" />
+          </Button>
+        </DrawerHeader>
+        <DrawerBody className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-[calc(var(--safe-area-bottom)+1.25rem)] pt-4">
+          {children}
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

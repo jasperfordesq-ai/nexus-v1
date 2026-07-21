@@ -254,6 +254,19 @@ describe('MobileDrawer', () => {
       expect(screen.getByLabelText('Close menu')).toBeInTheDocument();
     });
 
+    it('opens the navigation as a mobile bottom sheet', () => {
+      render(<MobileDrawer {...defaultProps} />);
+      const dialog = screen.getByRole('dialog', { name: 'Mobile navigation' });
+      expect(dialog).toHaveAttribute('data-placement', 'bottom');
+      expect(dialog).toHaveClass('nexus-mobile-navigation-sheet');
+      expect(document.querySelector('[data-slot="drawer-backdrop"]')).toHaveClass(
+        'z-[var(--z-modal-backdrop)]',
+      );
+      expect(document.querySelector('.drawer__content--bottom')).toHaveClass(
+        'z-[var(--z-modal)]',
+      );
+    });
+
     it('renders the brand name', () => {
       render(<MobileDrawer {...defaultProps} />);
       expect(screen.getByText('Test Community')).toBeInTheDocument();
@@ -267,8 +280,36 @@ describe('MobileDrawer', () => {
     it('uses readable semantic text colors for the install affordance', () => {
       render(<MobileDrawer {...defaultProps} />);
 
-      expect(screen.getByRole('button', { name: /Install app/i })).toHaveClass('text-theme-primary');
+      const installButton = screen.getByRole('button', { name: /Install app/i });
+      expect(installButton).toHaveClass('h-auto', 'text-theme-primary');
       expect(screen.getByText('Faster access, works offline')).toHaveClass('text-theme-secondary');
+      expect(
+        screen.getByRole('button', { name: 'Sign Up' }).compareDocumentPosition(installButton)
+        & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('renders full-width account stat cards without clipping their labels', () => {
+      setupDefaultMocks({
+        auth: {
+          user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', balance: 12 },
+          isAuthenticated: true,
+          logout: vi.fn(),
+        },
+      });
+      render(<MobileDrawer {...defaultProps} />);
+
+      const stats = screen.getByTestId('mobile-account-stats');
+      expect(stats).toHaveClass('w-full', 'grid-cols-3');
+
+      const statButtons = Array.from(stats.querySelectorAll('button'));
+      expect(statButtons).toHaveLength(3);
+      for (const [index, label] of ['Credits', 'Messages', 'Alerts'].entries()) {
+        const button = statButtons[index];
+        const labelNode = Array.from(button.querySelectorAll('span')).find((node) => node.textContent === label);
+        expect(labelNode).toHaveClass('whitespace-normal', 'text-sm', 'text-theme-secondary');
+        expect(button).toHaveClass('h-auto', 'min-h-[76px]', 'w-full');
+      }
     });
   });
 

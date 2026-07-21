@@ -85,12 +85,21 @@ describe("Modal — open/closed gate", () => {
     expect(backdrop).toHaveClass("z-[var(--z-modal-backdrop)]");
     expect(container).toHaveClass(
       "z-[var(--z-modal)]",
+      "nexus-responsive-modal-container",
       "box-border",
       "pt-[calc(var(--safe-area-top)+1rem)]",
       "pb-[calc(var(--safe-area-bottom)+1rem)]",
       "sm:pt-[calc(var(--safe-area-top)+2.5rem)]",
       "sm:pb-[calc(var(--safe-area-bottom)+2.5rem)]",
     );
+    expect(screen.getByRole("dialog", { name: "Layered modal" })).toHaveClass(
+      "nexus-responsive-modal-dialog",
+    );
+    expect(
+      screen.getByRole("dialog", { name: "Layered modal" }).querySelector(
+        ".nexus-mobile-sheet-handle",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("preserves HeroUI's edge-to-edge viewport contract for full-size dialogs", () => {
@@ -111,6 +120,26 @@ describe("Modal — open/closed gate", () => {
     expect(container).not.toHaveClass(
       "pt-[calc(var(--safe-area-top)+1rem)]",
     );
+    expect(container).not.toHaveClass("nexus-responsive-modal-container");
+    expect(screen.getByRole("dialog", { name: "Full viewport modal" })).not.toHaveClass(
+      "nexus-responsive-modal-dialog",
+    );
+  });
+
+  it("allows custom bottom sheets to suppress the shared grabber", () => {
+    render(
+      <Modal isOpen mobileSheetHandle={false}>
+        <ModalContent aria-label="Custom sheet chrome">
+          <ModalBody>body</ModalBody>
+        </ModalContent>
+      </Modal>,
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "Custom sheet chrome" }).querySelector(
+        ".nexus-mobile-sheet-handle",
+      ),
+    ).not.toBeInTheDocument();
   });
 });
 

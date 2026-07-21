@@ -16,14 +16,13 @@
 
 import { useState, useEffect, useCallback, useRef, type Key } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from '@/lib/motion';
-
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { Autocomplete } from '@/components/ui/Autocomplete';
 import { Button } from '@/components/ui/Button';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -39,7 +38,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { normalizeMarketplaceListing } from '@/lib/marketplaceNumbers';
-import { usePageTitle } from '@/hooks';
+import { useMediaQuery, usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,6 +108,7 @@ export function MarketplaceSearchPage() {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [postedWithin, setPostedWithin] = useState(searchParams.get('posted_within') || '');
   const [showFilters, setShowFilters] = useState(false);
+  const usesFilterSheet = useMediaQuery('(max-width: 1023px)');
 
   const getPostedWithinLabel = useCallback((value: string) => {
     const option = POSTED_WITHIN_OPTIONS.find((opt) => opt.value === value);
@@ -568,19 +568,14 @@ export function MarketplaceSearchPage() {
           )}
         </div>
 
-        {/* Mobile filters (collapsible) */}
-        {showFilters && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden"
-          >
-            <GlassCard className="p-5">
-              {filterContent}
-            </GlassCard>
-          </motion.div>
-        )}
+        <BottomSheet
+          isOpen={showFilters && usesFilterSheet}
+          onClose={() => setShowFilters(false)}
+          title={t('search.filters_title')}
+          snapPoints={['full']}
+        >
+          {filterContent}
+        </BottomSheet>
 
         {/* Main layout */}
         <div className="flex gap-6">

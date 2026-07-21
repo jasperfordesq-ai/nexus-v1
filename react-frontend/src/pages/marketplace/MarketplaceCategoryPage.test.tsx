@@ -17,7 +17,7 @@ const { mockApi } = vi.hoisted(() => ({
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
-vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn(), useMediaQuery: vi.fn(() => false) }));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

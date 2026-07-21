@@ -24,7 +24,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
 
 // ── stubs ─────────────────────────────────────────────────────────────────────
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
-vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn(), useMediaQuery: vi.fn(() => false) }));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

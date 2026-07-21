@@ -132,6 +132,7 @@ export function Textarea({
       className={combineClasses(
         classNames?.inputWrapper,
         classNames?.input,
+        'text-base sm:text-sm',
         sizeClass(size),
         radiusClass(radius),
       )}
@@ -173,6 +174,7 @@ export function Textarea({
           classNames?.base,
           classNames?.inputWrapper,
           classNames?.input,
+          'text-base sm:text-sm',
           sizeClass(size),
           radiusClass(radius),
           className,

@@ -102,6 +102,7 @@ vi.mock('@/components/ui/Popover', () => ({
   ),
   PopoverTrigger: ({ children }: { children: React.ReactNode }) => <div data-testid="popover-trigger">{children}</div>,
   PopoverContent: ({ children }: { children: React.ReactNode }) => <div data-testid="popover-content">{children}</div>,
+  PopoverHeading: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
 }));
 
 vi.mock('@/components/ui/Button', () => ({

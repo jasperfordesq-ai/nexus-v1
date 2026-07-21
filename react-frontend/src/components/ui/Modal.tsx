@@ -53,6 +53,7 @@ type ModalContextValue = {
   scrollBehavior?: ModalScrollBehavior;
   shouldBlockScroll?: boolean;
   size?: ModalSize;
+  mobileSheetHandle?: boolean;
 };
 
 export interface ModalProps
@@ -66,6 +67,8 @@ export interface ModalProps
   className?: string;
   defaultOpen?: boolean;
   disableAnimation?: boolean;
+  /** Show the mobile bottom-sheet grabber. Disable for custom sheet chrome. */
+  mobileSheetHandle?: boolean;
   motionProps?: unknown;
 }
 
@@ -164,6 +167,7 @@ export function Modal({
   scrollBehavior,
   shouldBlockScroll,
   size,
+  mobileSheetHandle = true,
   ...dialogProps
 }: ModalProps) {
   const value = useMemo<ModalContextValue>(
@@ -186,6 +190,7 @@ export function Modal({
       scrollBehavior,
       shouldBlockScroll,
       size,
+      mobileSheetHandle,
     }),
     [
       backdrop,
@@ -205,6 +210,7 @@ export function Modal({
       scrollBehavior,
       shouldBlockScroll,
       size,
+      mobileSheetHandle,
     ],
   );
 
@@ -235,6 +241,7 @@ export function ModalContent({
     portalContainer,
     scrollBehavior,
     size,
+    mobileSheetHandle,
   } = use(ModalContext);
 
   const handleOpenChange = useCallback(
@@ -261,6 +268,7 @@ export function ModalContent({
         className={cn(
           "z-[var(--z-modal)]",
           size === "full" ? undefined : modalContainerClassName,
+          size === "full" ? undefined : "nexus-responsive-modal-container",
           classNames?.wrapper,
         )}
         placement={normalizePlacement(placement)}
@@ -271,6 +279,7 @@ export function ModalContent({
           ref={ref}
           className={cn(
             size ? sizeClassName[size] : undefined,
+            size === "full" ? undefined : "nexus-responsive-modal-dialog",
             classNames?.base,
             className,
           )}
@@ -279,6 +288,11 @@ export function ModalContent({
         >
           {(renderProps: ModalDialogRenderProps) => (
             <>
+              {size !== "full" && mobileSheetHandle && (
+                <div aria-hidden="true" className="nexus-mobile-sheet-handle">
+                  <span />
+                </div>
+              )}
               {!hideCloseButton && (
                 <HeroUIModal.CloseTrigger
                   aria-label={closeLabel ?? t("accessibility.close")}

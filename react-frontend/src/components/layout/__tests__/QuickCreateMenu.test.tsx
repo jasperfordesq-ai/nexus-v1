@@ -118,6 +118,35 @@ describe('QuickCreateMenu', () => {
     expect(screen.getByText('New Goal')).toBeTruthy();
   });
 
+  it('renders an opaque, scrollable bottom sheet with unclipped action cards', () => {
+    render(
+      <W>
+        <QuickCreateMenu isOpen={true} onClose={vi.fn()} />
+      </W>
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Create New' });
+    expect(dialog).toHaveAttribute('data-placement', 'bottom');
+    expect(dialog).toHaveClass('bg-[var(--surface-dropdown)]', 'overflow-hidden');
+
+    const options = screen.getByTestId('quick-create-options');
+    expect(options).toHaveClass('grid-cols-2');
+
+    for (const label of ['New Listing', 'New Event', 'New Group', 'New Goal']) {
+      expect(screen.getByText(label).closest('button')).toHaveClass(
+        'h-auto',
+        'min-h-[116px]',
+        'w-full',
+        'overflow-visible',
+      );
+    }
+
+    expect(screen.getByText('Offer or request a service')).toHaveClass(
+      'text-sm',
+      'text-theme-muted',
+    );
+  });
+
   it('hides event option when events feature disabled', () => {
     mockHasFeature.mockImplementation((feature: string) => feature !== 'events');
     render(

@@ -17,9 +17,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from '@/lib/motion';
-
 import { Button } from '@/components/ui/Button';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -40,7 +39,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { usePageTitle } from '@/hooks';
+import { useMediaQuery, usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,6 +116,7 @@ export function MarketplaceCategoryPage() {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [templateFilterValues, setTemplateFilterValues] = useState<Record<string, string>>({});
   const [showFilters, setShowFilters] = useState(false);
+  const usesFilterSheet = useMediaQuery('(max-width: 1023px)');
 
   // Listings state
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
@@ -535,19 +535,14 @@ export function MarketplaceCategoryPage() {
           </Button>
         </div>
 
-        {/* Mobile filters */}
-        {showFilters && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden"
-          >
-            <GlassCard className="p-5">
-              {filterContent}
-            </GlassCard>
-          </motion.div>
-        )}
+        <BottomSheet
+          isOpen={showFilters && usesFilterSheet}
+          onClose={() => setShowFilters(false)}
+          title={t('category.filters_title')}
+          snapPoints={['full']}
+        >
+          {filterContent}
+        </BottomSheet>
 
         {/* Main layout */}
         <div className="flex gap-6">

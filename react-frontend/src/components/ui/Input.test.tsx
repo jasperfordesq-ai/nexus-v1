@@ -15,6 +15,11 @@ describe('Input — basic render', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
+  it('uses the mobile no-zoom font baseline', () => {
+    render(<Input />);
+    expect(screen.getByRole('textbox')).toHaveClass('text-base', 'sm:text-sm');
+  });
+
   it('renders with a label when label prop provided', () => {
     render(<Input label="Email address" />);
     expect(screen.getByLabelText('Email address')).toBeInTheDocument();

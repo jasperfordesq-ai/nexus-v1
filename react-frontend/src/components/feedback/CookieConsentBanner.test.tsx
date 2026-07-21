@@ -50,6 +50,18 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenantPath: (path: string) => `/test-tenant${path}`,
+    branding: { name: 'Test Community' },
+    tenant: { id: 1, slug: 'test-tenant' },
+  }),
+}));
+
+vi.mock('@/lib/cookieConsentStorage', () => ({
+  readStoredConsent: () => null,
+}));
+
 // Mock i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -149,5 +161,13 @@ describe('CookieConsentBanner', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Cookie consent' });
     expect(dialog).toHaveAttribute('aria-modal', 'false');
+    expect(dialog).toHaveAttribute('data-mobile-tabbar-cover');
+  });
+
+  it('uses full-size mobile touch targets', () => {
+    renderBanner();
+
+    expect(screen.getByRole('button', { name: 'Accept all' })).toHaveClass('min-h-[44px]');
+    expect(screen.getByRole('button', { name: 'Essential only' })).toHaveClass('min-h-[44px]');
   });
 });

@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Drawer as HeroUIDrawer } from '@heroui/react/drawer';
 
 import { cn } from '@/lib/helpers';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 type DrawerPlacement = 'top' | 'bottom' | 'left' | 'right';
 type DrawerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'full';
@@ -156,6 +157,7 @@ export function DrawerContent(
   { children, className, ref, ...props }: DrawerContentProps & { ref?: Ref<HTMLDivElement> },
 ) {
   const { t } = useTranslation('common');
+  const isMobile = useMediaQuery('(max-width: 639px)');
   const {
     backdrop,
     classNames,
@@ -170,6 +172,10 @@ export function DrawerContent(
     portalContainer,
     size,
   } = use(DrawerContext);
+  const requestedPlacement = placement ?? 'right';
+  const convertsSideDrawerToSheet = isMobile
+    && (requestedPlacement === 'left' || requestedPlacement === 'right');
+  const effectivePlacement = convertsSideDrawerToSheet ? 'bottom' : requestedPlacement;
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     onOpenChange?.(nextOpen);
@@ -184,7 +190,7 @@ export function DrawerContent(
 
   return (
     <HeroUIDrawer.Backdrop
-      className={classNames?.backdrop}
+      className={cn('z-[var(--z-modal-backdrop)]', classNames?.backdrop)}
       isDismissable={isDismissable}
       isKeyboardDismissDisabled={isKeyboardDismissDisabled}
       isOpen={isOpen}
@@ -193,14 +199,22 @@ export function DrawerContent(
       UNSTABLE_portalContainer={portalContainer}
     >
       <HeroUIDrawer.Content
-        className={classNames?.wrapper}
-        placement={placement ?? 'right'}
+        className={cn('z-[var(--z-modal)]', classNames?.wrapper)}
+        placement={effectivePlacement}
       >
         <DrawerDialog
           ref={ref}
-          className={cn(size ? sizeClassName[size] : undefined, classNames?.base, className)}
+          className={cn(
+            size ? sizeClassName[size] : undefined,
+            convertsSideDrawerToSheet ? 'nexus-responsive-side-drawer-sheet' : undefined,
+            classNames?.base,
+            className,
+          )}
           {...props}
         >
+          {convertsSideDrawerToSheet && (
+            <HeroUIDrawer.Handle className="nexus-responsive-drawer-handle" />
+          )}
           {!hideCloseButton && (
             <HeroUIDrawer.CloseTrigger
               aria-label={closeLabel ?? t('accessibility.close')}
@@ -234,6 +248,10 @@ export function DrawerHeader(
 
 export function DrawerHeading(props: ComponentProps<typeof HeroUIDrawer.Heading>) {
   return <HeroUIDrawer.Heading {...props} />;
+}
+
+export function DrawerHandle(props: ComponentProps<typeof HeroUIDrawer.Handle>) {
+  return <HeroUIDrawer.Handle {...props} />;
 }
 
 export function DrawerBody(

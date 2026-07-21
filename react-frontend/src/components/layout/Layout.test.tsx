@@ -56,6 +56,12 @@ vi.mock('@/components/feedback/SessionExpiredModal', () => ({
 vi.mock('@/components/feedback/AppUpdateModal', () => ({
   AppUpdateModal: () => null,
 }));
+vi.mock('@/components/pwa/InstallBanner', () => ({
+  InstallBanner: () => null,
+}));
+vi.mock('@/components/pwa/InstallModalHost', () => ({
+  InstallModalHost: () => null,
+}));
 vi.mock('@/components/seo/SeoHead', () => ({
   SeoHead: () => null,
 }));
@@ -169,7 +175,7 @@ describe('Layout', () => {
   it('adds padding class when showNavbar and withNavbarPadding are true', () => {
     const { container } = render(<Layout showNavbar={true} withNavbarPadding={true} />);
     const main = container.querySelector('main');
-    expect(main?.className).toContain('pt-[calc(var(--safe-area-top)+5rem)]');
+    expect(main?.className).toContain('pt-[calc(var(--safe-area-top)+3.5rem)]');
   });
 
   it('does not add padding class when withNavbarPadding is false', () => {

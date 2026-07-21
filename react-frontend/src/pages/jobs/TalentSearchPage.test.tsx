@@ -61,12 +61,14 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
-vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn(), useMediaQuery: vi.fn(() => false) }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url || '/default-avatar.png'),
+  getFormattingLocale: vi.fn(() => 'en-IE'),
 }));
 
 vi.mock('@/components/ui', () => {
@@ -183,7 +185,7 @@ describe('TalentSearchPage', () => {
 
   it('renders the search input', () => {
     render(<TalentSearchPage />);
-    const searchInput = screen.getByRole('textbox');
+    const searchInput = screen.getByRole('searchbox');
     expect(searchInput).toBeInTheDocument();
   });
 

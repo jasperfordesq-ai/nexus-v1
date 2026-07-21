@@ -99,7 +99,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
 
 function decoratedInputClass(className?: string): string | undefined {
   return combineClasses(
-    'h-full min-h-7 w-full min-w-0 flex-1 self-stretch rounded-none border-0 bg-transparent px-0 py-0 leading-7 shadow-none outline-none',
+    'h-full min-h-7 w-full min-w-0 flex-1 self-stretch rounded-none border-0 bg-transparent px-0 py-0 text-base leading-7 shadow-none outline-none sm:text-sm',
     'focus-visible:border-transparent focus-visible:ring-0',
     className,
   );
@@ -192,6 +192,7 @@ export function Input({
         !startContent && !endContent && classNames?.inputWrapper,
         !(startContent || trailingContent) && sizeClass(size),
         !startContent && !endContent && radiusClass(radius),
+        'text-base sm:text-sm',
       )}
       disabled={isDisabled}
       fullWidth={fullWidth}
@@ -262,6 +263,7 @@ export function Input({
           classNames?.input,
           sizeClass(size),
           radiusClass(radius),
+          'text-base sm:text-sm',
           className,
         )}
         disabled={isDisabled}

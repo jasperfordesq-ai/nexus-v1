@@ -215,16 +215,21 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     <Drawer
       isOpen={isOpen}
       onClose={onClose}
-      placement="right"
+      placement="bottom"
       size="md"
       hideCloseButton
       classNames={{
-        base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl w-[min(28rem,100dvw)] max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))]',
+        base: 'nexus-mobile-navigation-sheet bg-[var(--surface-dropdown)] border-t border-[var(--border-default)] shadow-2xl w-full max-w-none max-h-[calc(100dvh-var(--safe-area-top)-0.5rem)] rounded-t-3xl',
+        backdrop: 'z-[var(--z-modal-backdrop)]',
+        wrapper: 'z-[var(--z-modal)]',
         header: 'border-b border-[var(--border-default)] p-3',
         body: 'p-0',
       }}
     >
-      <DrawerContent id="mobile-drawer" aria-label={t('aria.mobile_navigation')} className="pt-[var(--safe-area-top)] pr-[var(--safe-area-right)] pb-[var(--safe-area-bottom)]">
+      <DrawerContent id="mobile-drawer" aria-label={t('aria.mobile_navigation')} className="ps-[var(--safe-area-left)] pe-[var(--safe-area-right)] pb-[var(--safe-area-bottom)]">
+        <div aria-hidden="true" className="flex shrink-0 justify-center pb-1 pt-2">
+          <span className="h-1 w-10 rounded-full bg-[var(--text-subtle)]/40" />
+        </div>
         {/* Header */}
         <DrawerHeader className="flex-row items-center justify-between gap-3">
           <TenantLogo size="md" showName collapseLogoOnMobile className="min-w-0 flex-1" />
@@ -240,26 +245,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         </DrawerHeader>
 
         <DrawerBody>
-          {/* Install app row — only renders when an install path exists */}
-          <InstallAppButton>
-            {({ onClick, label, sublabel }) => (
-              <div className="px-4 pt-3 pb-1 min-w-0">
-                <Button
-                  variant="flat"
-                  fullWidth
-                  className="flex min-h-9 min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-theme-primary hover:bg-accent/20"
-                  onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
-                >
-                  <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
-                  <div className="min-w-0 flex-1 text-start">
-                    <div className="text-base font-semibold truncate">{label}</div>
-                    <div className="text-sm text-theme-secondary truncate">{sublabel}</div>
-                  </div>
-                </Button>
-              </div>
-            )}
-          </InstallAppButton>
-
           {/* Search Button */}
           {onSearchOpen && (
             <div className="px-4 pt-3 pb-1 min-w-0">
@@ -306,41 +291,50 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               )}
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-2 mt-3 min-w-0">
+              <div
+                className="mt-3 grid w-full min-w-0 grid-cols-3 gap-2"
+                data-testid="mobile-account-stats"
+              >
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/wallet')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors min-h-9 flex-col min-w-0"
+                  className="h-auto min-h-[76px] w-full min-w-0 flex-col justify-center gap-1 overflow-visible rounded-xl border border-theme-default bg-theme-elevated px-2 py-3 text-center transition-colors hover:bg-theme-hover"
                 >
-                  <p className="text-lg font-bold text-theme-primary">
+                  <span className="block text-xl font-bold leading-none text-theme-primary">
                     {user.balance ?? 0}
-                  </p>
-                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.credits')}</p>
+                  </span>
+                  <span className="block w-full whitespace-normal text-center text-sm font-medium leading-tight text-theme-secondary">
+                    {t('stats.credits')}
+                  </span>
                 </Button>
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/messages')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative min-h-9 flex-col min-w-0"
+                  className="relative h-auto min-h-[76px] w-full min-w-0 flex-col justify-center gap-1 overflow-visible rounded-xl border border-theme-default bg-theme-elevated px-2 py-3 text-center transition-colors hover:bg-theme-hover"
                 >
-                  <p className="text-lg font-bold text-theme-primary">
+                  <span className="block text-xl font-bold leading-none text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
-                  </p>
-                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.messages')}</p>
+                  </span>
+                  <span className="block w-full whitespace-normal text-center text-sm font-medium leading-tight text-theme-secondary">
+                    {t('stats.messages')}
+                  </span>
                   {counts.messages > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
+                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" aria-hidden="true" />
                   )}
                 </Button>
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/notifications')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative min-h-9 flex-col min-w-0"
+                  className="relative h-auto min-h-[76px] w-full min-w-0 flex-col justify-center gap-1 overflow-visible rounded-xl border border-theme-default bg-theme-elevated px-2 py-3 text-center transition-colors hover:bg-theme-hover"
                 >
-                  <p className="text-lg font-bold text-theme-primary">
+                  <span className="block text-xl font-bold leading-none text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
-                  </p>
-                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.alerts')}</p>
+                  </span>
+                  <span className="block w-full whitespace-normal text-center text-sm font-medium leading-tight text-theme-secondary">
+                    {t('stats.alerts')}
+                  </span>
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
+                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" aria-hidden="true" />
                   )}
                 </Button>
               </div>
@@ -566,6 +560,29 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </Button>
               </div>
             )}
+
+            {/* Install app is a secondary action, kept near the bottom of the menu. */}
+            <InstallAppButton>
+              {({ onClick, label, sublabel }) => (
+                <div
+                  className="min-w-0 border-t border-[var(--border-default)] px-4 py-3"
+                  data-testid="mobile-install-app"
+                >
+                  <Button
+                    variant="flat"
+                    fullWidth
+                    className="h-auto min-h-[52px] min-w-0 justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-theme-primary hover:bg-accent/20"
+                    onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
+                  >
+                    <Download className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span className="min-w-0 flex-1 text-start">
+                      <span className="block truncate text-sm font-semibold">{label}</span>
+                      <span className="block truncate text-sm text-theme-secondary">{sublabel}</span>
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </InstallAppButton>
 
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
             <div className="pt-4 pb-4 px-4">

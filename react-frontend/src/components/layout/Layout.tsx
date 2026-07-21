@@ -195,7 +195,7 @@ export function Layout({
         style={{
           '--logo-extra': branding.logoShape === 'square' ? '1.75rem' : '0rem',
           '--app-header-mobile-offset': withNavbarPadding && showNavbar
-            ? 'calc(var(--safe-area-top) + 5rem)'
+            ? 'calc(var(--safe-area-top) + 3.5rem)'
             : '0px',
           '--app-header-desktop-offset': withNavbarPadding && showNavbar
             ? isUtilityBarVisible
@@ -206,8 +206,8 @@ export function Layout({
         className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible
-              ? 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+7.5rem+var(--logo-extra,0rem))]'
-              : 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem+var(--logo-extra,0rem))]'
+              ? 'pt-[calc(var(--safe-area-top)+3.5rem)] sm:pt-[calc(var(--safe-area-top)+7.5rem+var(--logo-extra,0rem))]'
+              : 'pt-[calc(var(--safe-area-top)+3.5rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem+var(--logo-extra,0rem))]'
             : ''
         }`}
       >

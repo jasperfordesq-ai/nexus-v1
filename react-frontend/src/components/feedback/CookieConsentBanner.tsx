@@ -63,16 +63,20 @@ export function CookieConsentBanner() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed bottom-0 inset-x-0 z-[700] p-2 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:p-4"
+        className="fixed inset-x-0 bottom-0 z-[700] p-0 sm:p-4"
         role="dialog"
         aria-label={t('cookie_consent.banner_label')}
         aria-modal="false"
+        data-mobile-tabbar-cover
         data-nosnippet
       >
         <Card
-          className="mx-auto max-h-[calc(100dvh-1.5rem)] max-w-3xl overflow-y-auto rounded-lg border border-[var(--border-strong)] bg-[var(--surface-overlay)] shadow-2xl shadow-black/20 supports-[backdrop-filter]:bg-[var(--glass-bg)]"
+          className="mx-auto max-h-[calc(100dvh-var(--safe-area-top)-0.5rem)] max-w-3xl overflow-y-auto rounded-t-3xl rounded-b-none border border-[var(--border-strong)] bg-[var(--surface-dropdown)] pb-[var(--safe-area-bottom)] shadow-2xl shadow-black/20 sm:rounded-lg sm:pb-0"
         >
-          <Card.Content className="p-3 sm:p-5">
+          <div aria-hidden="true" className="flex justify-center pb-1 pt-2 sm:hidden">
+            <span className="h-1 w-10 rounded-full bg-[var(--text-subtle)]/40" />
+          </div>
+          <Card.Content className="p-4 pt-2 sm:p-5">
             {/* Header row */}
             <div className="flex items-start gap-2.5 sm:gap-3">
               <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-amber-400/20 bg-amber-500/15 shadow-sm sm:h-10 sm:w-10 sm:rounded-xl">
@@ -82,7 +86,7 @@ export function CookieConsentBanner() {
                 <h2 className="text-sm sm:text-base font-semibold text-[var(--text-primary)]">
                   {t('cookie_consent.title')}
                 </h2>
-                <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 leading-snug sm:leading-relaxed">
+                <p className="mt-1 text-sm leading-relaxed text-[var(--text-muted)]">
                   {t('cookie_consent.description')}{' '}
                   <Link
                     to={tenantPath('/cookies')}
@@ -114,7 +118,7 @@ export function CookieConsentBanner() {
                           <p className="text-sm font-medium text-[var(--text-primary)]">
                             {t('cookie_consent.essential')}
                           </p>
-                          <p className="text-xs text-[var(--text-subtle)]">
+                          <p className="text-sm text-[var(--text-muted)]">
                             {t('cookie_consent.essential_desc')}
                           </p>
                         </div>
@@ -132,7 +136,7 @@ export function CookieConsentBanner() {
                           <p className="text-sm font-medium text-[var(--text-primary)]">
                             {t('cookie_consent.analytics')}
                           </p>
-                          <p className="text-xs text-[var(--text-subtle)]">
+                          <p className="text-sm text-[var(--text-muted)]">
                             {t('cookie_consent.analytics_desc')}
                           </p>
                         </div>
@@ -153,7 +157,7 @@ export function CookieConsentBanner() {
                           <p className="text-sm font-medium text-[var(--text-primary)]">
                             {t('cookie_consent.preferences')}
                           </p>
-                          <p className="text-xs text-[var(--text-subtle)]">
+                          <p className="text-sm text-[var(--text-muted)]">
                             {t('cookie_consent.preferences_desc')}
                           </p>
                         </div>
@@ -175,7 +179,7 @@ export function CookieConsentBanner() {
               <Button
                 size="sm"
                 variant="light"
-                className="col-span-2 text-xs text-[var(--text-muted)] sm:order-1 sm:col-span-1"
+                className="col-span-2 min-h-[44px] text-sm text-[var(--text-muted)] sm:order-1 sm:col-span-1"
                 onPress={() => setShowDetails((prev) => !prev)}
                 endContent={
                   showDetails
@@ -195,7 +199,7 @@ export function CookieConsentBanner() {
                 <Button
                   size="sm"
                   color="primary"
-                  className="col-span-2 sm:order-3 sm:col-span-1"
+                  className="col-span-2 min-h-[44px] sm:order-3 sm:col-span-1"
                   onPress={handleSavePreferences}
                 >
                   {t('cookie_consent.save')}
@@ -205,7 +209,7 @@ export function CookieConsentBanner() {
                   <Button
                     size="sm"
                     variant="flat"
-                    className="bg-[var(--surface-elevated)] text-[var(--text-primary)] sm:order-3"
+                    className="min-h-[44px] bg-[var(--surface-elevated)] text-[var(--text-primary)] sm:order-3"
                     onPress={acceptEssentialOnly}
                   >
                     {t('cookie_consent.essential_only')}
@@ -213,7 +217,7 @@ export function CookieConsentBanner() {
                   <Button
                     size="sm"
                     color="primary"
-                    className="sm:order-4"
+                    className="min-h-[44px] sm:order-4"
                     onPress={acceptAll}
                   >
                     {t('cookie_consent.accept_all')}

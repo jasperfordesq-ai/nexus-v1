@@ -142,7 +142,7 @@ export function NotificationFlyout() {
           <Button
             variant="light"
             size="sm"
-            className="text-xs text-accent dark:text-accent h-7 min-w-0 px-2 gap-1"
+            className="min-h-[44px] min-w-0 gap-1 px-2 text-sm text-accent dark:text-accent"
             onPress={handleMarkAllRead}
           >
             <CheckCheck className="w-3.5 h-3.5" aria-hidden="true" />
@@ -154,7 +154,7 @@ export function NotificationFlyout() {
             isIconOnly
             variant="light"
             size="sm"
-            className="text-theme-muted hover:text-theme-primary h-7 w-7 min-w-0"
+            className="min-h-[44px] min-w-[44px] text-theme-muted hover:text-theme-primary"
             onPress={() => setIsOpen(false)}
             aria-label={t('flyout.close')}
           >
@@ -258,7 +258,7 @@ export function NotificationFlyout() {
         variant="light"
         fullWidth
         size="sm"
-        className="text-sm text-accent dark:text-accent h-8 gap-1.5"
+        className="min-h-[44px] gap-1.5 text-sm text-accent dark:text-accent"
         onPress={handleViewAll}
       >
         {t('flyout.view_all')}

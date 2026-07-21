@@ -31,7 +31,8 @@ export interface FooterProps {
 /**
  * Footer - Glass-styled footer component
  * Shows tenant branding, contact info, and footer_text from bootstrap API.
- * Desktop footer carries full navigation; mobile keeps a compact attribution strip.
+ * Desktop footer carries full navigation. Mobile attribution and legal links live
+ * in MobileDrawer so the responsive website keeps an app-like content surface.
  */
 export function Footer({ children, copyright }: FooterProps) {
   const { t } = useTranslation('common');
@@ -68,8 +69,8 @@ export function Footer({ children, copyright }: FooterProps) {
   const contact = tenant?.contact;
 
   return (
-    <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
-      <div className="md:hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
+    <footer className="relative z-10 hidden border-t border-theme-default mt-auto glass-surface backdrop-blur-sm md:block" data-nosnippet>
+      <div className="hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
         <div className="flex flex-col items-center gap-4">
           {/* Powered-by banner — always shown; defaults to NEXUS branding, overridable by God */}
           <a

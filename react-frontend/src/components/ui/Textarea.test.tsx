@@ -26,6 +26,11 @@ describe('Textarea — basic rendering', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
+  it('uses the mobile no-zoom font baseline', () => {
+    render(<Textarea />);
+    expect(screen.getByRole('textbox')).toHaveClass('text-base', 'sm:text-sm');
+  });
+
   it('renders with placeholder text', () => {
     render(<Textarea placeholder="Type here…" />);
     expect(screen.getByPlaceholderText('Type here…')).toBeInTheDocument();

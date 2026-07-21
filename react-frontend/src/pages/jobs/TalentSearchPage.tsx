@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Avatar } from '@/components/ui/Avatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { CloseButton } from '@/components/ui/CloseButton';
@@ -35,7 +36,7 @@ import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
-import { usePageTitle } from '@/hooks';
+import { useMediaQuery, usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 
 interface Candidate {
@@ -78,6 +79,7 @@ export function TalentSearchPage() {
   const [skillsInput, setSkillsInput] = useState(searchParams.get('skills') || '');
   const [locationInput, setLocationInput] = useState(searchParams.get('location') || '');
   const [showFilters, setShowFilters] = useState(false);
+  const usesFilterSheet = useMediaQuery('(max-width: 639px)');
 
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -194,6 +196,33 @@ export function TalentSearchPage() {
     return date.toLocaleDateString(getFormattingLocale());
   };
 
+  const filterFields = (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Input
+        label={t('talent_search.skills_filter')}
+        placeholder={t('talent_search.skills_placeholder')}
+        value={skillsInput}
+        onChange={(e) => setSkillsInput(e.target.value)}
+        description={t('talent_search.skills_description')}
+        classNames={{
+          input: 'bg-transparent text-theme-primary',
+          inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+        }}
+      />
+      <Input
+        label={t('talent_search.location_filter')}
+        placeholder={t('talent_search.location_placeholder')}
+        value={locationInput}
+        onChange={(e) => setLocationInput(e.target.value)}
+        startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+        classNames={{
+          input: 'bg-transparent text-theme-primary',
+          inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+        }}
+      />
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <PageMeta title={t('page_meta.talent_search.title')} noIndex />
@@ -246,36 +275,24 @@ export function TalentSearchPage() {
             </Button>
           </div>
 
-          {/* Expandable filters */}
-          {showFilters && (
+          <BottomSheet
+            isOpen={showFilters && usesFilterSheet}
+            onClose={() => setShowFilters(false)}
+            title={t('talent_search.skills_filter')}
+            snapPoints={['auto']}
+          >
+            {filterFields}
+          </BottomSheet>
+
+          {/* Larger screens retain the compact inline filter row. */}
+          {showFilters && !usesFilterSheet && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+              className="hidden sm:block"
             >
-              <Input
-                label={t('talent_search.skills_filter')}
-                placeholder={t('talent_search.skills_placeholder')}
-                value={skillsInput}
-                onChange={(e) => setSkillsInput(e.target.value)}
-                description={t('talent_search.skills_description')}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                }}
-              />
-              <Input
-                label={t('talent_search.location_filter')}
-                placeholder={t('talent_search.location_placeholder')}
-                value={locationInput}
-                onChange={(e) => setLocationInput(e.target.value)}
-                startContent={<MapPin className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary',
-                  inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                }}
-              />
+              {filterFields}
             </motion.div>
           )}
 

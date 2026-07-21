@@ -332,19 +332,22 @@ export function MatchPreferencesPage() {
 
       {/* Sticky save bar */}
       {isDirty && (
-        <div className="fixed bottom-0 inset-x-0 z-30 border-t border-theme-default bg-surface/95 backdrop-blur px-4 py-3 sm:sticky sm:bottom-4 sm:inset-x-auto sm:rounded-xl sm:border sm:shadow-lg">
-          <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
-            <p className="text-sm text-theme-subtle">{t('preferences.unsaved_changes')}</p>
-            <Button
-              onPress={handleSave}
-              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
-              startContent={<Save className="w-4 h-4" aria-hidden="true" />}
-              isLoading={isSaving}
-            >
-              {t('preferences.save')}
-            </Button>
+        <>
+          <div aria-hidden="true" className="h-20 sm:hidden" />
+          <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+4rem)] z-[290] rounded-t-xl border-t border-theme-default bg-surface/95 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur sm:sticky sm:bottom-4 sm:inset-x-auto sm:rounded-xl sm:border sm:shadow-lg">
+            <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
+              <p className="text-sm text-theme-muted">{t('preferences.unsaved_changes')}</p>
+              <Button
+                onPress={handleSave}
+                className="min-h-[44px] bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                startContent={<Save className="w-4 h-4" aria-hidden="true" />}
+                isLoading={isSaving}
+              >
+                {t('preferences.save')}
+              </Button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -55,6 +55,22 @@ describe('BottomSheet', () => {
     expect(screen.getByRole('heading', { name: 'Required sheet title' })).toBeInTheDocument();
   });
 
+  it('uses the HeroUI bottom drawer anatomy with a visible close target', () => {
+    render(
+      <BottomSheet isOpen onClose={onClose} title="Native sheet">
+        <p>Content</p>
+      </BottomSheet>,
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Native sheet' });
+    expect(dialog).toHaveAttribute('data-placement', 'bottom');
+    expect(dialog.querySelector('[data-slot="drawer-handle"]')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(
+      'min-h-[44px]',
+      'min-w-[44px]',
+    );
+  });
+
   it('renders with snapPoints="half" without crashing', () => {
     render(
       <BottomSheet isOpen onClose={onClose} title="Half sheet title" snapPoints={['half']}>

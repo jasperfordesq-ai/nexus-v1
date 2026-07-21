@@ -155,3 +155,36 @@ describe('Drawer — localized close trigger', () => {
     expect(screen.getByRole('button', { name: 'Close notifications' })).toBeInTheDocument();
   });
 });
+
+describe('Drawer responsive mobile placement', () => {
+  it('converts a side drawer into a handled bottom sheet on phones', () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(max-width: 639px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    try {
+      render(
+        <Drawer isOpen placement="right">
+          <DrawerContent aria-label="Responsive drawer">
+            <DrawerBody>Mobile content</DrawerBody>
+          </DrawerContent>
+        </Drawer>,
+      );
+
+      const dialog = screen.getByRole('dialog', { name: 'Responsive drawer' });
+      expect(dialog).toHaveAttribute('data-placement', 'bottom');
+      expect(dialog).toHaveClass('nexus-responsive-side-drawer-sheet');
+      expect(dialog.querySelector('[data-slot="drawer-handle"]')).not.toBeNull();
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+});

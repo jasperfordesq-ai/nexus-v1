@@ -596,7 +596,85 @@
    Slide it off-screen whenever a HeroUI overlay is open so dialog footers,
    close affordances, and bottom-anchored sheets are fully visible.
    Matches the existing isMenuOpen transform so the motion is consistent. */
+/* Shared responsive-web application surfaces. HeroUI modals become
+   edge-attached bottom sheets on phones while full-screen modals retain their
+   normal viewport contract. */
+.nexus-mobile-sheet-handle {
+  display: none;
+}
+
+.nexus-mobile-navigation-sheet[data-placement="bottom"] {
+  border-top-left-radius: 1.5rem !important;
+  border-top-right-radius: 1.5rem !important;
+  padding-top: 0 !important;
+}
+
+/* Side drawers become native-style bottom sheets on phones. The shared
+   Drawer wrapper changes the HeroUI placement so its motion and drag
+   behaviour remain native rather than being visually faked with CSS. */
+.nexus-responsive-drawer-handle {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .nexus-responsive-side-drawer-sheet[data-placement="bottom"] {
+    width: 100% !important;
+    max-width: none !important;
+    max-height: calc(100dvh - var(--safe-area-top) - 0.5rem) !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    padding-bottom: var(--safe-area-bottom) !important;
+    overflow: hidden !important;
+  }
+
+  .nexus-responsive-drawer-handle {
+    display: flex;
+    flex: 0 0 auto;
+  }
+
+  .nexus-responsive-modal-container {
+    align-items: flex-end !important;
+    padding: max(0.5rem, var(--safe-area-top)) 0 0 !important;
+    width: 100% !important;
+  }
+
+  .nexus-responsive-modal-dialog {
+    margin: auto 0 0 !important;
+    max-height: calc(100dvh - var(--safe-area-top) - 0.5rem) !important;
+    max-width: none !important;
+    width: 100% !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    padding: 0.5rem 1rem calc(var(--safe-area-bottom) + 1rem) !important;
+  }
+
+  .nexus-mobile-sheet-handle {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    padding: 0.25rem 0 0.5rem;
+  }
+
+  .nexus-mobile-sheet-handle > span {
+    width: 2.5rem;
+    height: 0.25rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
+  }
+}
+
+/* Keep every text-entry surface at the iOS no-zoom baseline and move the
+   fixed navigation out of the way while the software keyboard has focus. */
 @media (max-width: 767px) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+
+  body:has(input:focus, textarea:focus, select:focus, [contenteditable="true"]:focus) [data-mobile-tabbar],
+  body:has([data-slot="modal-backdrop"]) [data-mobile-tabbar],
+  body:has([data-slot="drawer-backdrop"]) [data-mobile-tabbar],
+  body:has([data-mobile-tabbar-cover]) [data-mobile-tabbar],
   body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar] {
     transform: translateY(calc(100% + 12px));
     pointer-events: none;
