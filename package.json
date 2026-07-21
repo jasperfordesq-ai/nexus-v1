@@ -58,22 +58,22 @@
     "test:e2e:codegen": "npx playwright codegen http://localhost:5173/hour-timebank"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
-    "@playwright/test": "^1.59.1",
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "dotenv": "^17.4.2",
-    "govuk-frontend": "^6.1.0",
+    "govuk-frontend": "^6.4.0",
     "pa11y": "^9.1.1",
     "picocolors": "^1.1.1",
-    "prisma": "^5.22.0",
-    "sass": "^1.99.0",
-    "sharp": "^0.34.5",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.6"
+    "prisma": "^7.9.0",
+    "sass": "^1.101.3",
+    "sharp": "^0.35.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
   },
   "dependencies": {
-    "@capacitor/cli": "^8.3.2",
-    "@capacitor/core": "^8.3.2",
-    "@prisma/client": "^5.22.0",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@prisma/client": "^7.9.0",
     "accessible-autocomplete": "^3.0.1"
   },
   "overrides": {
