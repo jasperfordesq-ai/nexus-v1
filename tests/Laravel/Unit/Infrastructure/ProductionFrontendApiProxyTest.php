@@ -12,6 +12,21 @@ use PHPUnit\Framework\TestCase;
 
 class ProductionFrontendApiProxyTest extends TestCase
 {
+    public function test_every_react_nginx_config_serves_modern_image_formats_as_static_assets(): void
+    {
+        $root = dirname(__DIR__, 4);
+
+        foreach (['nginx.conf', 'nginx.bluegreen.conf'] as $config) {
+            $source = (string) file_get_contents($root . '/react-frontend/' . $config);
+
+            self::assertMatchesRegularExpression(
+                '/location ~\* [^\r\n]*\|webp\|avif\|[^\r\n]*\{/',
+                $source,
+                $config . ' must not route WebP or AVIF image requests to the SPA shell.',
+            );
+        }
+    }
+
     public function test_every_react_nginx_config_proxies_same_origin_api_resources(): void
     {
         $root = dirname(__DIR__, 4);
