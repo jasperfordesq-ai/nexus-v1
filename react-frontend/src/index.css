@@ -78,16 +78,11 @@
    EDGE-TO-EDGE SAFE AREA INSETS
    Required for Capacitor on Android 15 (API 35) and iOS.
    WindowCompat.setDecorFitsSystemWindows(false) lets the WebView
-   draw behind the status bar and navigation bar. These CSS variables
-   expose the safe zone so layout can avoid those areas.
+   draw behind the status bar and navigation bar.
    viewport-fit=cover must be set in index.html (already present).
+   The --safe-area-* CSS variables are defined ONCE in
+   styles/tokens.css (imported above) — do not redefine them here.
    ───────────────────────────────────────────── */
-:root {
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
-}
 
 /* Ensure the very bottom of the page (e.g. the mobile tab bar) is never
    hidden behind the Android navigation bar. Any fixed bottom element should
@@ -666,7 +661,8 @@
      the positioning never sets. The huge box-shadow spread dims the page —
      popovers have no backdrop element of their own. */
   .nexus-responsive-dropdown-popover,
-  .nexus-responsive-select-popover {
+  .nexus-responsive-select-popover,
+  .nexus-responsive-datepicker-popover {
     position: fixed !important;
     top: auto !important;
     left: 0 !important;
@@ -684,8 +680,16 @@
       0 0 0 100vmax rgb(0 0 0 / 0.45);
   }
 
+  /* Calendar sheets center their fixed-width grid in the full-width sheet */
+  .nexus-responsive-datepicker-popover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .nexus-responsive-dropdown-popover::before,
-  .nexus-responsive-select-popover::before {
+  .nexus-responsive-select-popover::before,
+  .nexus-responsive-datepicker-popover::before {
     content: "";
     display: block;
     width: 2.5rem;
@@ -696,12 +700,14 @@
   }
 
   .nexus-responsive-dropdown-popover[data-entering],
-  .nexus-responsive-select-popover[data-entering] {
+  .nexus-responsive-select-popover[data-entering],
+  .nexus-responsive-datepicker-popover[data-entering] {
     animation: nexus-sheet-slide-in 200ms ease-out;
   }
 
   .nexus-responsive-dropdown-popover[data-exiting],
-  .nexus-responsive-select-popover[data-exiting] {
+  .nexus-responsive-select-popover[data-exiting],
+  .nexus-responsive-datepicker-popover[data-exiting] {
     animation: nexus-sheet-slide-out 150ms ease-in;
   }
 
@@ -725,6 +731,33 @@
   to { transform: translateY(100%); }
 }
 
+/* ─────────────────────────────────────────────
+   PAGE TRANSITIONS (mobile route navigation)
+   Material "shared axis X": forward navigations
+   slide in from the right, back (POP) from the
+   left. Phone-only and disabled for users who
+   prefer reduced motion. See PageTransition.tsx.
+   ───────────────────────────────────────────── */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .nexus-page-enter-forward {
+    animation: nexus-page-forward 240ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .nexus-page-enter-back {
+    animation: nexus-page-back 240ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+@keyframes nexus-page-forward {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes nexus-page-back {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Keep every text-entry surface at the iOS no-zoom baseline and move the
    fixed navigation out of the way while the software keyboard has focus. */
 @media (max-width: 767px) {
@@ -741,6 +774,7 @@
   body:has([data-mobile-tabbar-cover]) [data-mobile-tabbar],
   body:has(.nexus-responsive-dropdown-popover) [data-mobile-tabbar],
   body:has(.nexus-responsive-select-popover) [data-mobile-tabbar],
+  body:has(.nexus-responsive-datepicker-popover) [data-mobile-tabbar],
   body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar] {
     transform: translateY(calc(100% + 12px));
     pointer-events: none;

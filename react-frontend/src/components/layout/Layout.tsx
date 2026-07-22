@@ -19,6 +19,7 @@ import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
+import { PageTransition } from '@/components/layout/PageTransition';
 import { InstallModalHost } from '@/components/pwa/InstallModalHost';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
 import { SessionTimeoutWarning } from '@/components/feedback/SessionTimeoutWarning';
@@ -229,7 +230,9 @@ export function Layout({
         <InstallBanner />
 
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 min-w-0">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </div>
       </main>
 

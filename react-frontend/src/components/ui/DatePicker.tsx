@@ -137,7 +137,7 @@ export function DatePicker({
             description && <Description className={classNames?.description}>{description}</Description>
           )}
           <HeroUIDatePicker.Popover
-            className={combineClasses(classNames?.popoverContent, popoverProps?.className)}
+            className={combineClasses('nexus-responsive-datepicker-popover', classNames?.popoverContent, popoverProps?.className)}
             {...popoverProps}
           >
             <Calendar

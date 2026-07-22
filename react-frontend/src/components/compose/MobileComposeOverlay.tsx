@@ -7,8 +7,8 @@
  * MobileComposeOverlay — Full-screen compose overlay for mobile.
  *
  * Rendered via createPortal to document.body at z-[400] so it sits above
- * the Navbar (z-300) and MobileTabBar (z-300). Uses Framer Motion slide-up
- * animation for a native-app feel.
+ * the Navbar (z-300) and MobileTabBar (z-300). Uses the local @/lib/motion
+ * shim (CSS-transition-backed) for the slide-up animation.
  */
 
 import { useEffect } from 'react';
