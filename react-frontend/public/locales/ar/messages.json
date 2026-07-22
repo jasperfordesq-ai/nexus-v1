@@ -50,6 +50,8 @@
   "aria_prev_result": "نتيجة سابقة",
   "aria_next_result": "نتيجة التالية",
   "aria_close_search": "إغلاق البحث",
+  "aria_scroll_to_bottom": "قم بالتمرير إلى أحدث الرسائل",
+  "aria_scroll_to_bottom_unread": "الانتقال إلى أحدث الرسائل ({{count}} جديدة)",
   "safeguarding_notice": "قد يتم مراجعة هذه المحادثة من قبل منسق لأغراض الحماية.",
   "aria_dismiss_safeguarding": "تجاهل إشعار الحماية",
   "regarding_context": "بخصوص هذا {{type}}:",
@@ -271,5 +273,7 @@
   "selected_members_few": "المحدد ({{count}})",
   "selected_members_many": "المحدد ({{count}})",
   "selected_members_two": "المحدد ({{count}})",
-  "selected_members_zero": "المحدد ({{count}})"
+  "selected_members_zero": "المحدد ({{count}})",
+  "date_today": "اليوم",
+  "date_yesterday": "أمس"
 }

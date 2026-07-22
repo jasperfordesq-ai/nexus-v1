@@ -109,7 +109,7 @@ export function ReactionPicker({
     longPressTimeoutRef.current = setTimeout(() => {
       isLongPressRef.current = true;
       setIsPickerOpen(true);
-    }, 500);
+    }, 350);
   }, [isAuthenticated, isDisabled]);
 
   const handleTouchEnd = useCallback(() => {

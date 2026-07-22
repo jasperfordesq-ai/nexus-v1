@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Avatar } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
@@ -23,7 +24,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
  * - Typing indicators (when Pusher is available)
  */
 
-import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
+import { Fragment, useState, useEffect, useRef, useCallback, type ChangeEvent, type CSSProperties, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence } from '@/lib/motion';
@@ -38,17 +39,19 @@ import FileText from 'lucide-react/icons/file-text';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useNotifications, useToast } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, useTenant } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { usePusherOptional, type NewMessageEvent, type TypingEvent } from '@/contexts/PusherContext';
 import { usePageTitle } from '@/hooks';
+import { useVisualViewport } from '@/hooks/useVisualViewport';
 import { PageMeta } from '@/components/seo';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { api, type ApiErrorDetail, type ApiResponse } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatDate, resolveAvatarUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import type { Message, User } from '@/types/api';
 import { MessageContextCard } from '@/components/messages/MessageContextCard';
@@ -236,6 +239,26 @@ function evaluateSafeguardingMeta(
 }
 
 /**
+ * Parse a message timestamp defensively (backend may send "YYYY-MM-DD HH:MM:SS",
+ * which Safari's Date constructor rejects without the T separator).
+ */
+function toMessageDate(dateString: string | undefined): Date | null {
+  if (!dateString) return null;
+  const normalized = dateString.includes(' ') && !dateString.includes('T')
+    ? dateString.replace(' ', 'T')
+    : dateString;
+  const date = new Date(normalized);
+  return isNaN(date.getTime()) ? null : date;
+}
+
+/** Whether two dates fall on the same local calendar day. */
+function isSameCalendarDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+/**
  * Scroll to a specific message by ID
  */
 function scrollToMessage(messageId: number) {
@@ -267,6 +290,14 @@ export function ConversationPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<number | null>(null);
+  // Scroll-position tracking for auto-scroll, the scroll-to-bottom button and
+  // keyboard handling. isNearBottomRef mirrors the 100px auto-scroll rule.
+  const isNearBottomRef = useRef(true);
+  const prevNewestMessageIdRef = useRef<number | null>(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [unseenCount, setUnseenCount] = useState(0);
+  // Soft-keyboard inset (iOS Safari doesn't shrink 100dvh when it opens).
+  const keyboardOffset = useVisualViewport();
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMountedRef = useRef(true);
@@ -555,8 +586,12 @@ export function ConversationPage() {
           });
         }
 
-        // Scroll to bottom for new messages
-        requestAnimationFrame(() => scrollToBottom());
+        // Scroll to bottom for new messages — but only when the user is
+        // already reading the latest ones. When scrolled up into history the
+        // scroll-to-bottom button badges the new message instead.
+        requestAnimationFrame(() => {
+          if (isNearBottomRef.current) scrollToBottom();
+        });
       }
     });
 
@@ -996,17 +1031,47 @@ export function ConversationPage() {
     };
   }, [targetId, isNewConversation, isLoading, pusher?.isConnected, isDocumentVisible, pollForNewMessages]);
 
-  // Scroll to bottom when messages change (only for new messages, not history)
+  // Scroll to bottom when messages change (only for new messages, not history).
+  // When the user has scrolled up, count newly-arrived incoming messages so the
+  // scroll-to-bottom button can badge them instead of yanking the view down.
   useEffect(() => {
-    // Only auto-scroll if we're near the bottom already
+    const messagesList = conversation?.messages;
+    const newest = messagesList && messagesList.length > 0 ? messagesList[messagesList.length - 1] : null;
+    const prevNewestId = prevNewestMessageIdRef.current;
+    prevNewestMessageIdRef.current = newest?.id ?? null;
+
     const container = messagesContainerRef.current;
-    if (container) {
-      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-      if (isNearBottom) {
-        scrollToBottom();
+    if (!container || !newest) return;
+
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    if (isNearBottom) {
+      scrollToBottom();
+    } else if (
+      prevNewestId !== null
+      && newest.id !== prevNewestId
+      && messagesList
+    ) {
+      // Appended (not prepended-history) messages from the other user while scrolled up
+      const incoming = messagesList.filter(
+        (m) => m.id > prevNewestId && m.sender_id !== user?.id
+      ).length;
+      if (incoming > 0) {
+        setUnseenCount((count) => count + incoming);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to message-list changes
   }, [conversation?.messages.length]);
+
+  // Keyboard-aware thread: when the soft keyboard opens (offset grows) and the
+  // user was reading the latest messages, keep the newest message in view as
+  // the container shrinks.
+  useEffect(() => {
+    if (keyboardOffset > 0 && isNearBottomRef.current) {
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ block: 'end' });
+      });
+    }
+  }, [keyboardOffset]);
 
   // Fetch listing details if listing ID is provided
   useEffect(() => {
@@ -1087,7 +1152,8 @@ export function ConversationPage() {
     }
   }, [targetId, pagination.hasOlderMessages, pagination.olderCursor, isLoadingOlder]);
 
-  // Handle scroll to detect when user wants to load older messages
+  // Handle scroll: load older messages near the top, and track distance from
+  // the bottom for the scroll-to-bottom button + auto-scroll bookkeeping.
   const handleScroll = useCallback(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -1096,10 +1162,43 @@ export function ConversationPage() {
     if (container.scrollTop < 50 && pagination.hasOlderMessages && !isLoadingOlder) {
       loadOlderMessages();
     }
+
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    isNearBottomRef.current = distanceFromBottom < 100;
+    setShowScrollToBottom(distanceFromBottom > 300);
+    if (distanceFromBottom < 100) {
+      setUnseenCount(0);
+    }
   }, [pagination.hasOlderMessages, isLoadingOlder, loadOlderMessages]);
 
   function scrollToBottom() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /**
+   * Localized date-separator label between messages from different calendar
+   * days: "Today", "Yesterday", else an Intl-formatted date. Returns null when
+   * the message is on the same day as the previous one (no separator).
+   */
+  function getDateSeparatorLabel(message: Message, prevMessage: Message | null): string | null {
+    const date = toMessageDate(message.created_at || message.sent_at);
+    if (!date) return null;
+
+    const prevDate = prevMessage ? toMessageDate(prevMessage.created_at || prevMessage.sent_at) : null;
+    if (prevDate && isSameCalendarDay(date, prevDate)) return null;
+
+    const now = new Date();
+    if (isSameCalendarDay(date, now)) return t('date_today');
+
+    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    if (isSameCalendarDay(date, yesterday)) return t('date_yesterday');
+
+    return formatDate(message.created_at || message.sent_at || '', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric',
+    });
   }
 
   /**
@@ -1753,7 +1852,19 @@ export function ConversationPage() {
     : effectiveOnline ? t('online_status') : t('offline_status');
 
   return (
-    <div className="-my-6 mx-auto flex h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-7rem)] min-h-0 w-full max-w-4xl flex-col gap-3 sm:-my-8 sm:gap-4 md:h-[calc(100dvh-var(--safe-area-top)-4rem)]">
+    <div
+      // --keyboard-offset is genuinely dynamic (visualViewport-driven): iOS
+      // Safari does not shrink 100dvh when the soft keyboard opens, so the
+      // thread must subtract the keyboard inset itself to keep the composer
+      // visible. 0px on desktop / when the keyboard is closed.
+      //
+      // Mobile height reclaims the space of the bottom tab bar, which is
+      // route-hidden on conversation threads (see MobileTabBar
+      // hiddenRoutePatterns): only the navbar (3rem incl. page paddings)
+      // remains above; the composer handles safe-area-bottom itself.
+      style={{ '--keyboard-offset': `${keyboardOffset}px` } as CSSProperties}
+      className="-my-6 mx-auto flex h-[calc(100dvh-var(--safe-area-top)-3rem-var(--keyboard-offset,0px))] min-h-0 w-full max-w-4xl flex-col gap-3 sm:-my-8 sm:gap-4 md:h-[calc(100dvh-var(--safe-area-top)-4rem-var(--keyboard-offset,0px))]"
+    >
       <PageMeta title={t('page_meta.conversation.title')} noIndex />
       {/* Header */}
       <GlassCard className="shrink-0 overflow-hidden p-3 sm:p-4">
@@ -2131,6 +2242,7 @@ export function ConversationPage() {
 
       {/* Messages */}
       <GlassCard className="flex min-h-0 flex-1 overflow-hidden flex-col bg-[var(--color-surface)]/90">
+        <div className="relative flex min-h-0 flex-1 flex-col">
         <div
           ref={messagesContainerRef}
           className="min-h-0 flex-1 scroll-pb-6 space-y-4 overflow-y-auto p-3 [scrollbar-gutter:stable] sm:p-5"
@@ -2185,32 +2297,75 @@ export function ConversationPage() {
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
-              {messages.map((message, index) => (
-                <MessageBubble
-                  key={message.id}
-                  id={`message-${message.id}`}
-                  message={message}
-                  isOwn={message.sender_id === user?.id}
-                  showAvatar={
-                    index === 0 ||
-                    messages[index - 1]?.sender_id !== message.sender_id
-                  }
-                  otherUser={other_user}
-                  onReact={handleReaction}
-                  isHighlighted={searchResults.includes(message.id)}
-                  highlightQuery={searchQuery}
-                  onEdit={startEditing}
-                  onDelete={(id) => setPendingDeleteId(id)}
-                  isEditing={editingMessageId === message.id}
-                  editingText={editingMessageId === message.id ? editingText : ''}
-                  onEditingTextChange={setEditingText}
-                  onSaveEdit={saveEdit}
-                  onCancelEdit={cancelEditing}
-                  autoTranslatedText={autoTranslations.get(message.id) ?? null} />
-              ))}
+              {messages.map((message, index) => {
+                const prevMessage = index > 0 ? messages[index - 1] ?? null : null;
+                const dateSeparatorLabel = getDateSeparatorLabel(message, prevMessage);
+
+                return (
+                  <Fragment key={message.id}>
+                    {dateSeparatorLabel && (
+                      <div className="flex justify-center py-1" role="separator" aria-label={dateSeparatorLabel}>
+                        <span className="rounded-full bg-theme-elevated px-3 py-1 text-xs font-medium text-theme-subtle">
+                          {dateSeparatorLabel}
+                        </span>
+                      </div>
+                    )}
+                    <MessageBubble
+                      id={`message-${message.id}`}
+                      message={message}
+                      isOwn={message.sender_id === user?.id}
+                      showAvatar={
+                        index === 0 ||
+                        messages[index - 1]?.sender_id !== message.sender_id
+                      }
+                      otherUser={other_user}
+                      onReact={handleReaction}
+                      isHighlighted={searchResults.includes(message.id)}
+                      highlightQuery={searchQuery}
+                      onEdit={startEditing}
+                      onDelete={(id) => setPendingDeleteId(id)}
+                      isEditing={editingMessageId === message.id}
+                      editingText={editingMessageId === message.id ? editingText : ''}
+                      onEditingTextChange={setEditingText}
+                      onSaveEdit={saveEdit}
+                      onCancelEdit={cancelEditing}
+                      autoTranslatedText={autoTranslations.get(message.id) ?? null} />
+                  </Fragment>
+                );
+              })}
             </AnimatePresence>
           )}
           <div ref={messagesEndRef} />
+        </div>
+
+        {/* Scroll-to-bottom button — floats above the composer when the user
+            has scrolled up into history; badges messages that arrive meanwhile */}
+        {showScrollToBottom && (
+          <div className="absolute bottom-3 end-3 z-20">
+            <Badge
+              content={unseenCount > 99 ? '99+' : unseenCount}
+              color="danger"
+              size="sm"
+              placement="top-right"
+              isInvisible={unseenCount === 0}
+            >
+              <Button
+                isIconOnly
+                radius="full"
+                className="h-11 w-11 min-w-0 border border-theme-default bg-theme-elevated text-theme-primary shadow-lg backdrop-blur"
+                onPress={() => {
+                  setUnseenCount(0);
+                  scrollToBottom();
+                }}
+                aria-label={unseenCount > 0
+                  ? t('aria_scroll_to_bottom_unread', { count: unseenCount })
+                  : t('aria_scroll_to_bottom')}
+              >
+                <ChevronDown className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            </Badge>
+          </div>
+        )}
         </div>
 
         {/* Typing Indicator */}

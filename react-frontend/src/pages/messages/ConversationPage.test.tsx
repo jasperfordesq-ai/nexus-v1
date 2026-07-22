@@ -34,6 +34,7 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string) => url,
+  formatDate: (value: string) => new Date(value).toDateString(),
 }));
 
 vi.mock('@/contexts', () => ({

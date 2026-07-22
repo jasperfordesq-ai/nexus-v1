@@ -48,6 +48,12 @@ export interface CommentsSectionProps {
   currentUserAvatar?: string;
   currentUserName?: string;
   searchMentions?: (query: string) => Promise<MentionUser[]>;
+  /**
+   * 'sheet' renders for a mobile BottomSheet: no internal header (the sheet
+   * header names the dialog), the comment list first, and the composer pinned
+   * to the bottom of the sheet — matching native social apps.
+   */
+  variant?: 'inline' | 'sheet';
 }
 
 /* ─── Single Comment ────────────────────────────────────────── */
@@ -467,6 +473,8 @@ interface MentionInputProps {
   endContent?: React.ReactNode;
   autoFocus?: boolean;
   searchMentions?: (query: string) => Promise<MentionUser[]>;
+  /** Where the mention suggestions open. 'above' for composers pinned to a sheet bottom. */
+  menuPlacement?: 'below' | 'above';
 }
 
 function MentionInput({
@@ -480,6 +488,7 @@ function MentionInput({
   endContent,
   autoFocus,
   searchMentions,
+  menuPlacement = 'below',
 }: MentionInputProps) {
   const { t } = useTranslation('social');
   const tr = useCallback((key: string, fallback: string) => {
@@ -585,7 +594,9 @@ function MentionInput({
 
       {/* Mention dropdown */}
       {showMentions && mentionResults.length > 0 && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden">
+        <div className={`absolute left-0 right-0 z-50 bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden ${
+          menuPlacement === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
+        }`}>
           {mentionResults.map((user, idx) => (
             <Button
               key={user.id}
@@ -636,6 +647,7 @@ export function CommentsSection({
   currentUserAvatar,
   currentUserName,
   searchMentions,
+  variant = 'inline',
 }: CommentsSectionProps) {
   const { t } = useTranslation('social');
   const toast = useToast();
@@ -741,51 +753,58 @@ export function CommentsSection({
     }
   }, []);
 
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
-        <MessageCircle className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
-        {tr('comments_title', 'Comments')} {commentsCount > 0 && `(${commentsCount})`}
-      </h3>
+  const isSheet = variant === 'sheet';
 
-      {/* New comment input */}
-      {isAuthenticated && (
-        <div className="flex items-start gap-2.5">
-          <Avatar
-            name={currentUserName || tr('you', 'You')}
-            src={resolveAvatarUrl(currentUserAvatar)}
+  const composer = isAuthenticated ? (
+    <div className="flex items-start gap-2.5">
+      <Avatar
+        name={currentUserName || tr('you', 'You')}
+        src={resolveAvatarUrl(currentUserAvatar)}
+        size="sm"
+        className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
+      />
+      <MentionInput
+        placeholder={tr('write_comment', 'Write a comment...')}
+        value={newComment}
+        onChange={setNewComment}
+        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmit(); } }}
+        size="sm"
+        radius="full"
+        classNames={{
+          input: 'bg-transparent text-[var(--text-primary)] text-sm',
+          inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40 h-9',
+        }}
+        searchMentions={searchMentions}
+        menuPlacement={isSheet ? 'above' : 'below'}
+        endContent={
+          <Button
+            isIconOnly
             size="sm"
-            className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
-          />
-          <MentionInput
-            placeholder={tr('write_comment', 'Write a comment...')}
-            value={newComment}
-            onChange={setNewComment}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmit(); } }}
-            size="sm"
-            radius="full"
-            classNames={{
-              input: 'bg-transparent text-[var(--text-primary)] text-sm',
-              inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40 h-9',
-            }}
-            searchMentions={searchMentions}
-            endContent={
-              <Button
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                className="min-h-[28px] w-auto px-0 py-0 text-[var(--color-primary)] disabled:opacity-30"
-                onPress={handleSubmit}
-                isDisabled={!newComment.trim() || isSubmitting}
-                aria-label={tr('send_comment', 'Send comment')}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            }
-          />
-        </div>
+            variant="ghost"
+            className="min-h-[28px] w-auto px-0 py-0 text-[var(--color-primary)] disabled:opacity-30"
+            onPress={handleSubmit}
+            isDisabled={!newComment.trim() || isSubmitting}
+            aria-label={tr('send_comment', 'Send comment')}
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        }
+      />
+    </div>
+  ) : null;
+
+  return (
+    <div className={isSheet ? 'flex min-h-full flex-col gap-4' : 'space-y-4'}>
+      {/* Header — omitted in sheet mode where the sheet chrome names the dialog */}
+      {!isSheet && (
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
+          <MessageCircle className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
+          {tr('comments_title', 'Comments')} {commentsCount > 0 && `(${commentsCount})`}
+        </h3>
       )}
+
+      {/* New comment input — inline mode keeps it above the list */}
+      {!isSheet && composer}
 
       {/* Comments list */}
       {commentsLoading ? (
@@ -801,7 +820,7 @@ export function CommentsSection({
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <p className="text-xs text-[var(--text-subtle)] text-center py-3 italic">
+        <p className={`text-xs text-[var(--text-subtle)] text-center py-3 italic ${isSheet ? 'flex flex-1 items-center justify-center' : ''}`}>
           {tr('no_comments', 'No comments yet. Be the first to comment!')}
         </p>
       ) : (
@@ -828,6 +847,18 @@ export function CommentsSection({
               />
             </div>
           ))}
+        </div>
+      )}
+
+      {/*
+        Sheet mode pins the composer to the bottom like native social apps.
+        sticky keeps it visible while the list scrolls behind it; mt-auto
+        anchors it to the sheet bottom when the list is short. The negative
+        margins span the BottomSheet body's px-5 padding edge-to-edge.
+      */}
+      {isSheet && composer && (
+        <div className="sticky bottom-0 z-10 mt-auto -mx-5 border-t border-[var(--border-default)] bg-[var(--surface-dropdown)] px-5 py-3">
+          {composer}
         </div>
       )}
     </div>

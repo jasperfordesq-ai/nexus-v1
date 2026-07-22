@@ -50,6 +50,8 @@
   "aria_prev_result": "Toradh roimhe",
   "aria_next_result": "An chéad toradh eile",
   "aria_close_search": "Dún cuardach",
+  "aria_scroll_to_bottom": "Scrollaigh go dtí na teachtaireachtaí is déanaí",
+  "aria_scroll_to_bottom_unread": "Téigh go dtí na teachtaireachtaí is déanaí ({{count}} nua)",
   "safeguarding_notice": "D'fhéadfadh comhordaitheoir an comhrá seo a athbhreithniú ar mhaithe le cosaint.",
   "aria_dismiss_safeguarding": "Díbir fógra cosanta",
   "regarding_context": "Maidir leis an {{type}} seo:",
@@ -269,5 +271,7 @@
   "aria_conversation_unread_two": "Comhrá le {{name}}, {{count}} neamhléite",
   "selected_members_few": "Roghnaithe ({{count}})",
   "selected_members_many": "Roghnaithe ({{count}})",
-  "selected_members_two": "Roghnaithe ({{count}})"
+  "selected_members_two": "Roghnaithe ({{count}})",
+  "date_today": "Inniu",
+  "date_yesterday": "Inné"
 }

@@ -50,6 +50,8 @@
   "aria_prev_result": "Poprzedni wynik",
   "aria_next_result": "Następny wynik",
   "aria_close_search": "Zamknij wyszukiwanie",
+  "aria_scroll_to_bottom": "Przewiń do najnowszych wiadomości",
+  "aria_scroll_to_bottom_unread": "Przejdź do najnowszych wiadomości ({{count}} nowych)",
   "safeguarding_notice": "Ta rozmowa może być przeglądana przez koordynatora w celach ochrony.",
   "aria_dismiss_safeguarding": "Odrzuć powiadomienie o ochronie",
   "regarding_context": "W odniesieniu do {{type}}:",
@@ -267,5 +269,7 @@
   "aria_conversation_unread_few": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
   "aria_conversation_unread_many": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
   "selected_members_few": "Wybrani ({{count}})",
-  "selected_members_many": "Wybrani ({{count}})"
+  "selected_members_many": "Wybrani ({{count}})",
+  "date_today": "Dzisiaj",
+  "date_yesterday": "Wczoraj"
 }

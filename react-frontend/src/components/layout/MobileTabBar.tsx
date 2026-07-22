@@ -37,6 +37,18 @@ interface MobileTabBarProps {
 const hiddenRoutes = ['/login', '/register', '/password/forgot', '/password/reset', '/onboarding'];
 
 /**
+ * Route patterns where the tab bar is hidden so the page can own the full
+ * viewport height (native-messenger style). Routes are tenant-prefixed
+ * (`/:tenantSlug/messages/123`) or root-level (`/messages/123`), so match on
+ * pattern rather than literal prefixes. Conversation threads
+ * (`/messages/:id`, `/messages/new/:userId`) hide the bar; the `/messages`
+ * list itself keeps it.
+ */
+const hiddenRoutePatterns: RegExp[] = [
+  /^\/(?:[^/]+\/)?messages\/(?:new\/)?\d+\/?$/,
+];
+
+/**
  * Whether the mobile tab bar renders on the current route/auth state.
  * Shared with components that stack above it (e.g. the podcast mini-player)
  * so their bottom offsets can never drift from the tab bar's own rules.
@@ -46,7 +58,11 @@ export function useMobileTabBarVisible(): boolean {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
-  return isAuthenticated && !hiddenRoutes.some((route) => location.pathname.includes(route));
+  return (
+    isAuthenticated
+    && !hiddenRoutes.some((route) => location.pathname.includes(route))
+    && !hiddenRoutePatterns.some((pattern) => pattern.test(location.pathname))
+  );
 }
 
 export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {

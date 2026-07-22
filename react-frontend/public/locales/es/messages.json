@@ -50,6 +50,8 @@
   "aria_prev_result": "Resultado anterior",
   "aria_next_result": "Siguiente resultado",
   "aria_close_search": "Cerrar búsqueda",
+  "aria_scroll_to_bottom": "Desplázate hasta los últimos mensajes",
+  "aria_scroll_to_bottom_unread": "Ir a los últimos mensajes ({{count}} nuevos)",
   "safeguarding_notice": "Esta conversación puede ser revisada por un coordinador con fines de protección.",
   "aria_dismiss_safeguarding": "Descartar aviso de protección",
   "regarding_context": "Respecto a este {{type}}:",
@@ -265,5 +267,7 @@
   "selected_members_one": "Seleccionados ({{count}})",
   "selected_members_other": "Seleccionados ({{count}})",
   "aria_conversation_unread_many": "Conversación con {{name}}, {{count}} sin leer",
-  "selected_members_many": "Seleccionados ({{count}})"
+  "selected_members_many": "Seleccionados ({{count}})",
+  "date_today": "Hoy",
+  "date_yesterday": "Ayer"
 }

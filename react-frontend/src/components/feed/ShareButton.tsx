@@ -26,11 +26,13 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
 import { useToast,
   useTenant } from '@/contexts';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FeedItem } from './types';
 import { getItemDetailPath } from './types';
 
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 
@@ -83,6 +85,9 @@ export function ShareButton({
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showExternalShareModal, setShowExternalShareModal] = useState(false);
   const [showDMModal, setShowDMModal] = useState(false);
+  // Phones open a native-style bottom sheet instead of the dropdown menu
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
 
   useEffect(() => {
     setLocalCount(shareCount);
@@ -226,61 +231,126 @@ export function ShareButton({
     return null;
   }
 
+  // Shared trigger renderer — the Dropdown injects its own press handling on
+  // desktop; the mobile instance opens the BottomSheet via onPress.
+  const renderTrigger = (onPress?: () => void) => compact ? (
+    <Button
+      isIconOnly
+      size="sm"
+      variant="light"
+      aria-label={localCount > 0
+        ? t('share.button_label_count', { count: localCount })
+        : t('share.button_label')}
+      className={`${
+        localIsShared
+          ? 'text-emerald-500'
+          : 'text-[var(--text-muted)] hover:text-emerald-500'
+      } transition-colors min-w-0`}
+      isDisabled={!isAuthenticated || isLoading}
+      onPress={onPress}
+    >
+      <span className="relative inline-flex items-center">
+        <Repeat2
+          className={`w-[18px] h-[18px] transition-all ${
+            localIsShared ? 'text-emerald-500' : ''
+          }`}
+          aria-hidden="true"
+        />
+        {localCount > 0 && (
+          <span className="absolute -top-1 -right-2 text-[10px] font-semibold tabular-nums bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-1 min-w-[16px] h-4 flex items-center justify-center leading-none">
+            {localCount}
+          </span>
+        )}
+      </span>
+    </Button>
+  ) : (
+    <Button
+      size="sm"
+      variant="light"
+      className={`flex-1 max-w-[140px] ${
+        localIsShared
+          ? 'text-emerald-500 font-medium'
+          : 'text-[var(--text-muted)] hover:text-emerald-500'
+      } transition-colors`}
+      startContent={
+        <Repeat2
+          className={`w-[18px] h-[18px] transition-all ${
+            localIsShared ? 'text-emerald-500' : ''
+          }`}
+          aria-hidden="true"
+        />
+      }
+      isDisabled={!isAuthenticated || isLoading}
+      onPress={onPress}
+    >
+      {localCount > 0 ? t('share.button_label_count', { count: localCount }) : t('share.button_label')}
+    </Button>
+  );
+
+  const handleSheetAction = (key: string) => {
+    setIsShareSheetOpen(false);
+    handleDropdownAction(key);
+  };
+
+  const sheetRow = (
+    key: string,
+    icon: React.ReactNode,
+    label: string,
+    description?: string,
+  ) => (
+    <Button
+      variant="light"
+      className="h-auto min-h-11 justify-start py-2 text-theme-primary"
+      startContent={icon}
+      onPress={() => handleSheetAction(key)}
+    >
+      <span className="flex min-w-0 flex-col items-start text-start">
+        <span>{label}</span>
+        {description && (
+          <span className="text-xs font-normal text-[var(--text-subtle)]">{description}</span>
+        )}
+      </span>
+    </Button>
+  );
+
   return (
     <>
+      {/* Phones: trigger opens a native-style bottom action sheet */}
+      {isPhone && (
+        <>
+          {renderTrigger(() => setIsShareSheetOpen(true))}
+          <BottomSheet
+            isOpen={isShareSheetOpen}
+            onClose={() => setIsShareSheetOpen(false)}
+            title={t('share.menu_label')}
+            snapPoints={['auto']}
+          >
+            <div className="flex flex-col gap-1">
+              {sheetRow(
+                'repost',
+                <Repeat2 className="w-4 h-4" aria-hidden="true" />,
+                localIsShared ? t('share.repost_remove') : t('share.repost'),
+                localIsShared ? t('share.repost_remove_desc') : t('share.repost_desc'),
+              )}
+              {isNativePost && post && sheetRow(
+                'quote',
+                <Quote className="w-4 h-4" aria-hidden="true" />,
+                t('share.quote'),
+                t('share.quote_desc'),
+              )}
+              {sheetRow('copy', <Copy className="w-4 h-4" aria-hidden="true" />, t('share.copy_link'))}
+              {sheetRow('external', <Share2 className="w-4 h-4" aria-hidden="true" />, t('share.external'))}
+              {sheetRow('dm', <MessageSquare className="w-4 h-4" aria-hidden="true" />, t('share.send_dm'))}
+            </div>
+          </BottomSheet>
+        </>
+      )}
+
+      {/* Desktop / larger: HeroUI Dropdown */}
+      {!isPhone && (
       <Dropdown placement="bottom">
         <DropdownTrigger>
-          {compact ? (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              aria-label={localCount > 0
-                ? t('share.button_label_count', { count: localCount })
-                : t('share.button_label')}
-              className={`${
-                localIsShared
-                  ? 'text-emerald-500'
-                  : 'text-[var(--text-muted)] hover:text-emerald-500'
-              } transition-colors min-w-0`}
-              isDisabled={!isAuthenticated || isLoading}
-            >
-              <span className="relative inline-flex items-center">
-                <Repeat2
-                  className={`w-[18px] h-[18px] transition-all ${
-                    localIsShared ? 'text-emerald-500' : ''
-                  }`}
-                  aria-hidden="true"
-                />
-                {localCount > 0 && (
-                  <span className="absolute -top-1 -right-2 text-[10px] font-semibold tabular-nums bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-full px-1 min-w-[16px] h-4 flex items-center justify-center leading-none">
-                    {localCount}
-                  </span>
-                )}
-              </span>
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="light"
-              className={`flex-1 max-w-[140px] ${
-                localIsShared
-                  ? 'text-emerald-500 font-medium'
-                  : 'text-[var(--text-muted)] hover:text-emerald-500'
-              } transition-colors`}
-              startContent={
-                <Repeat2
-                  className={`w-[18px] h-[18px] transition-all ${
-                    localIsShared ? 'text-emerald-500' : ''
-                  }`}
-                  aria-hidden="true"
-                />
-              }
-              isDisabled={!isAuthenticated || isLoading}
-            >
-              {localCount > 0 ? t('share.button_label_count', { count: localCount }) : t('share.button_label')}
-            </Button>
-          )}
+          {renderTrigger()}
         </DropdownTrigger>
         <DropdownMenu
           aria-label={t('share.menu_label')}
@@ -330,6 +400,7 @@ export function ShareButton({
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
+      )}
 
       {/* Quote Post Modal */}
       {post && showQuoteModal && (

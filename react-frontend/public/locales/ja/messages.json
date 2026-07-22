@@ -50,6 +50,8 @@
   "aria_prev_result": "前の結果",
   "aria_next_result": "次の結果",
   "aria_close_search": "検索を閉じる",
+  "aria_scroll_to_bottom": "最新のメッセージまでスクロールします",
+  "aria_scroll_to_bottom_unread": "最新のメッセージへ移動（新着{{count}}件）",
   "safeguarding_notice": "この会話は、安全確保のためにコーディネーターによってレビューされる場合があります。",
   "aria_dismiss_safeguarding": "安全確保通知を閉じる",
   "regarding_context": "{{type}}に関して:",
@@ -263,5 +265,7 @@
   "aria_conversation_unread_one": "{{name}}、{{count}} との会話が未読",
   "aria_conversation_unread_other": "会話 {{name}} と {{count}} は未読です",
   "selected_members_one": "選択済み ({{count}})",
-  "selected_members_other": "選択済み ({{count}})"
+  "selected_members_other": "選択済み ({{count}})",
+  "date_today": "今日",
+  "date_yesterday": "昨日"
 }

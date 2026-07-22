@@ -60,6 +60,7 @@ import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime, formatDate, 
 import { useFeedTracking } from '@/hooks/useFeedTracking';
 import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 import { useLongPress } from '@/hooks/useLongPress';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import type { FeedItem, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
@@ -403,9 +404,16 @@ const FeedCard = React.memo(function FeedCard({
   defaultShowComments = false,
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
+  const { t: tSocial } = useTranslation('social');
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [showComments, setShowComments] = useState(defaultShowComments);
+  // Native-app comments: phones open a bottom sheet instead of expanding the
+  // card inline. Detail pages (defaultShowComments) keep the inline section so
+  // comments stay visible without an extra tap.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const useSheetForComments = isPhone && !defaultShowComments;
+  const [isCommentsSheetOpen, setIsCommentsSheetOpen] = useState(false);
   const social = useSocialInteractions({
     targetType: item.type,
     targetId: item.id,
@@ -568,7 +576,11 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   const toggleComments = () => {
-    setShowComments(!showComments);
+    if (useSheetForComments) {
+      setIsCommentsSheetOpen(true);
+    } else {
+      setShowComments(!showComments);
+    }
   };
 
   return (
@@ -1707,9 +1719,42 @@ const FeedCard = React.memo(function FeedCard({
           </Suspense>
         )}
 
+        {/* Comments — phones get a native-style bottom sheet with the composer
+            pinned at the bottom; desktop keeps the inline expansion. */}
+        {useSheetForComments && isCommentable && (
+          <BottomSheet
+            isOpen={isCommentsSheetOpen}
+            onClose={() => setIsCommentsSheetOpen(false)}
+            title={social.commentsCount > 0
+              ? `${tSocial('comments_title')} (${social.commentsCount})`
+              : tSocial('comments_title')}
+            snapPoints={['full']}
+          >
+            <Suspense fallback={null}>
+              <CommentsSection
+                variant="sheet"
+                comments={social.comments}
+                commentsCount={social.commentsCount}
+                commentsLoading={social.commentsLoading}
+                commentsLoaded={social.commentsLoaded}
+                loadComments={social.loadComments}
+                submitComment={social.submitComment}
+                editComment={social.editComment}
+                deleteComment={social.deleteComment}
+                toggleReaction={social.toggleReaction}
+                searchMentions={social.searchMentions}
+                isAuthenticated={isAuthenticated}
+                currentUserId={currentUserId}
+                currentUserAvatar={currentUserAvatar ?? undefined}
+                currentUserName={currentUserName ?? undefined}
+              />
+            </Suspense>
+          </BottomSheet>
+        )}
+
         {/* Comments Section */}
         <AnimatePresence>
-          {showComments && isCommentable && (
+          {showComments && isCommentable && !useSheetForComments && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
