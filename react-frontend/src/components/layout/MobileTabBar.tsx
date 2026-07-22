@@ -23,6 +23,7 @@ import Menu from 'lucide-react/icons/menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { useNotificationsOptional } from '@/contexts/NotificationsContext';
+import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { QuickCreateMenu } from './QuickCreateMenu';
 import { Button } from '@/components/ui/Button';
 
@@ -59,6 +60,11 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const handleCreateOpen = useCallback(() => setIsCreateOpen(true), []);
   const handleCreateClose = useCallback(() => setIsCreateOpen(false), []);
+
+  // Native-app chrome behavior: slide away on scroll-down, return on
+  // scroll-up or near the top. Shares the top navbar's scroll semantics.
+  const { isUtilityBarVisible } = useHeaderScroll(64);
+  const isHidden = isMenuOpen || isCreateOpen || !isUtilityBarVisible;
 
   // Don't render for unauthenticated users or on auth/onboarding pages
   if (!visible) return null;
@@ -103,7 +109,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
 
       <nav
         data-mobile-tabbar
-        className={`fixed bottom-0 left-0 right-0 z-300 pb-[env(safe-area-inset-bottom,0px)] md:hidden transition-all duration-200 ${isMenuOpen ? 'translate-y-[calc(100%+12px)] pointer-events-none' : ''}`}
+        className={`fixed bottom-0 left-0 right-0 z-300 pb-[env(safe-area-inset-bottom,0px)] md:hidden transition-all duration-200 ${isHidden ? 'translate-y-[calc(100%+12px)] pointer-events-none' : ''}`}
         aria-label={t('aria.mobile_navigation')}
       >
         {/* Glass surface */}

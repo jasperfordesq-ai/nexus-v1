@@ -168,7 +168,7 @@ export function Select<T extends object = object>({
       <HeroSelect.Popover
         {...popoverProps}
         className={cn(
-          'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-lg',
+          'nexus-responsive-select-popover bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-lg',
           classNames?.popoverContent,
           popoverProps?.className as string | undefined,
         )}
