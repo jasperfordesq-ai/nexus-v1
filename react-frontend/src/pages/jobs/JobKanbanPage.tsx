@@ -16,7 +16,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Tabs, Tab } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 /**
  * Job Kanban Pipeline Page
  *
@@ -210,6 +210,7 @@ function AppKanbanCard({ application, onDragStart, onStageChange, onDownloadCv, 
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+                    <PopoverHeading className="sr-only">{t('kanban.ai_score', { score: aiRanking.score })}</PopoverHeading>
                     {aiRanking.reason}
                   </PopoverContent>
                 </Popover>

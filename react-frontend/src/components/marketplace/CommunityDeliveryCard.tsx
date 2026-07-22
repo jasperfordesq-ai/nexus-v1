@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Textarea } from '@/components/ui/Textarea';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * CommunityDeliveryCard - Community-powered delivery option for marketplace.
@@ -208,6 +208,7 @@ export function CommunityDeliveryCard({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+                <PopoverHeading className="sr-only">{t('community_delivery.title')}</PopoverHeading>
                 {t('community_delivery.tooltip')}
               </PopoverContent>
             </Popover>

@@ -80,7 +80,7 @@ describe('HeroUI accessible-name production contracts', () => {
       visit(file);
     }
 
-    expect(popoverCount).toBe(13);
+    expect(popoverCount).toBe(18);
     expect(unnamed).toEqual([]);
   });
 

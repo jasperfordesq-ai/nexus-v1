@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 
 import Cpu from 'lucide-react/icons/cpu';
 import { api } from '@/lib/api';
-import { Chip, Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Chip, Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 
 interface AlgorithmInfo {
@@ -105,6 +105,7 @@ export function AlgorithmLabel({ area }: AlgorithmLabelProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+        <PopoverHeading className="sr-only">{info.name}</PopoverHeading>
         {info.description}
       </PopoverContent>
     </Popover>

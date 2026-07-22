@@ -525,7 +525,7 @@ export const MessageBubble = memo(function MessageBubble({
                     key={emoji}
                     isIconOnly
                     variant="tertiary"
-                    className="size-12 min-h-12 min-w-12 rounded-full text-2xl"
+                    className="size-11 min-h-11 min-w-11 rounded-full text-2xl"
                     onPress={() => {
                       onReact?.(message.id, emoji);
                       setShowActionSheet(false);

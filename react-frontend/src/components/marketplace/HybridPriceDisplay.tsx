@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 
 interface HybridPriceDisplayProps {
   /** Cash price amount */
@@ -98,6 +98,7 @@ export function HybridPriceDisplay({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+            <PopoverHeading className="sr-only">{t('hybrid_pricing.label')}</PopoverHeading>
             {t('hybrid_pricing.tooltip')}
           </PopoverContent>
         </Popover>
@@ -127,6 +128,7 @@ export function HybridPriceDisplay({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+            <PopoverHeading className="sr-only">{t('hybrid_pricing.label')}</PopoverHeading>
             {t('hybrid_pricing.explanation')}
           </PopoverContent>
         </Popover>
