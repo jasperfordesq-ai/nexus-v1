@@ -71,6 +71,8 @@
   "message_edited_indicator": "(تم التعديل)",
   "message_edit": "تعديل",
   "message_delete": "حذف",
+  "message_copy": "نسخ النص",
+  "message_copied": "تم نسخ الرسالة",
   "error": "خطأ",
   "error_title": "خطأ",
   "save": "حفظ",

@@ -143,7 +143,7 @@ export function DropdownMenu<T extends object = object>({
   return (
     <DropdownSelectionContext.Provider value={selectionMode}>
       <HeroDropdown.Popover
-        className={classNames?.base}
+        className={cn('nexus-responsive-dropdown-popover', classNames?.base)}
         placement={normalizePlacement(placement)}
         {...popoverProps}
       >

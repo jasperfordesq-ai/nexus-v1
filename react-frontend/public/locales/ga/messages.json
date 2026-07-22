@@ -71,6 +71,8 @@
   "message_edited_indicator": "(curtha in eagar)",
   "message_edit": "Cuir in Eagar",
   "message_delete": "Scrios",
+  "message_copy": "Cóipeáil téacs",
+  "message_copied": "Cóipeáladh an teachtaireacht",
   "error": "Earráid",
   "error_title": "Earráid",
   "save": "Sábháil",

@@ -71,6 +71,8 @@
   "message_edited_indicator": "(bearbeitet)",
   "message_edit": "Bearbeiten",
   "message_delete": "Löschen",
+  "message_copy": "Text kopieren",
+  "message_copied": "Nachricht kopiert",
   "error": "Fehler",
   "error_title": "Fehler",
   "save": "Speichern",

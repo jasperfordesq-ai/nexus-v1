@@ -4,14 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Avatar } from '@/components/ui/Avatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLongPress } from '@react-aria/interactions';
 import { motion } from '@/lib/motion';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useToast } from '@/contexts';
 
 import SmilePlus from 'lucide-react/icons/smile-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import Copy from 'lucide-react/icons/copy';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Check from 'lucide-react/icons/check';
@@ -113,7 +118,12 @@ export const MessageBubble = memo(function MessageBubble({
 }: MessageBubbleProps) {
   const { t, i18n } = useTranslation('messages');
   const { hasFeature } = useTenant();
+  const { showToast } = useToast();
   const translationEnabled = hasFeature('message_translation');
+  // Phones get one unified bottom action sheet (long-press or the ⋮ button)
+  // instead of the desktop hover buttons + floating pickers.
+  const isMobileSheet = useMediaQuery('(max-width: 639px)');
+  const [showActionSheet, setShowActionSheet] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [translatedText, setTranslatedText] = useState<string | null>(null);
@@ -133,6 +143,14 @@ export const MessageBubble = memo(function MessageBubble({
   }, [autoTranslatedText]);
   const isVoiceMessage = message.is_voice || message.audio_url;
   const isDeleted = message.is_deleted;
+  const canUseActions = !isEditing && !isDeleted;
+
+  // Long-press opens the mobile action sheet (native messaging pattern).
+  const { longPressProps } = useLongPress({
+    isDisabled: !isMobileSheet || !canUseActions,
+    accessibilityDescription: t('aria_message_options'),
+    onLongPress: () => setShowActionSheet(true),
+  });
 
   // Close popups when clicking outside
   useEffect(() => {
@@ -229,8 +247,10 @@ export const MessageBubble = memo(function MessageBubble({
 
       <div className={`min-w-0 max-w-[85%] sm:max-w-[70%] ${isOwn ? 'text-right' : ''} relative`}>
         <div
+          {...(isMobileSheet && canUseActions ? longPressProps : {})}
           className={`
             inline-block max-w-full break-words px-3 py-2 sm:px-4 rounded-2xl relative [overflow-wrap:anywhere]
+            ${isMobileSheet && canUseActions ? 'select-none [-webkit-touch-callout:none]' : ''}
             ${isOwn
               ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white rounded-br-md'
               : 'bg-theme-elevated text-theme-primary rounded-bl-md'
@@ -372,8 +392,24 @@ export const MessageBubble = memo(function MessageBubble({
             </>
           )}
 
-          {/* Action buttons - shows on hover (only when not editing) */}
-          {!isEditing && !isDeleted && (
+          {/* Mobile: one compact button opens the unified action sheet
+              (long-press on the bubble does the same). */}
+          {canUseActions && isMobileSheet && (
+            <div className={`absolute -bottom-2 ${isOwn ? '-left-12' : '-right-12'} flex`}>
+              <Button
+                isIconOnly
+                variant="tertiary"
+                className="size-11 min-h-11 min-w-11 p-0 bg-theme-elevated rounded-full border border-theme-default"
+                onPress={() => setShowActionSheet(true)}
+                aria-label={t('aria_message_options')}
+              >
+                <MoreVertical className="size-4 text-theme-muted" aria-hidden="true" />
+              </Button>
+            </div>
+          )}
+
+          {/* Desktop: action buttons shown on hover (only when not editing) */}
+          {canUseActions && !isMobileSheet && (
             <div className={`absolute -bottom-2 ${isOwn ? '-left-24' : '-right-24'} flex gap-1 opacity-100 pointer-coarse:opacity-100 any-pointer-coarse:opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100 transition-opacity`}>
               {/* Reaction button */}
               <Button
@@ -472,6 +508,81 @@ export const MessageBubble = memo(function MessageBubble({
                 {t('message_delete')}
               </Button>
             </div>
+          )}
+
+          {/* Mobile action sheet — reactions + message actions in one native
+              bottom sheet (opened by long-press or the ⋮ button). */}
+          {isMobileSheet && canUseActions && (
+            <BottomSheet
+              isOpen={showActionSheet}
+              onClose={() => setShowActionSheet(false)}
+              title={t('aria_message_options')}
+              snapPoints={['auto']}
+            >
+              <div className="flex items-center justify-between gap-1 pb-4">
+                {REACTION_EMOJIS.map((emoji) => (
+                  <Button
+                    key={emoji}
+                    isIconOnly
+                    variant="tertiary"
+                    className="size-12 min-h-12 min-w-12 rounded-full text-2xl"
+                    onPress={() => {
+                      onReact?.(message.id, emoji);
+                      setShowActionSheet(false);
+                    }}
+                    aria-label={t('aria_react_with', { emoji })}
+                  >
+                    {emoji}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex flex-col gap-1 border-t border-theme-default pt-2">
+                {!isVoiceMessage && messageText && (
+                  <Button
+                    variant="tertiary"
+                    className="min-h-12 justify-start gap-3 text-theme-primary"
+                    startContent={<Copy className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+                    onPress={async () => {
+                      try {
+                        await navigator.clipboard.writeText(messageText);
+                        showToast(t('message_copied'), 'success');
+                      } catch {
+                        // Clipboard unavailable (permissions/insecure context) — sheet still closes
+                      }
+                      setShowActionSheet(false);
+                    }}
+                  >
+                    {t('message_copy')}
+                  </Button>
+                )}
+                {isOwn && !isVoiceMessage && (
+                  <Button
+                    variant="tertiary"
+                    className="min-h-12 justify-start gap-3 text-theme-primary"
+                    startContent={<Pencil className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+                    onPress={() => {
+                      onEdit?.(message);
+                      setShowActionSheet(false);
+                    }}
+                  >
+                    {t('message_edit')}
+                  </Button>
+                )}
+                {!isVoiceMessage && (
+                  <Button
+                    variant="danger-soft"
+                    className="min-h-12 justify-start gap-3 text-red-600 dark:text-red-400"
+                    startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => {
+                      onDelete?.(message.id);
+                      setShowActionSheet(false);
+                    }}
+                  >
+                    {t('message_delete')}
+                  </Button>
+                )}
+              </div>
+            </BottomSheet>
           )}
         </div>
 

@@ -71,6 +71,8 @@
   "message_edited_indicator": "(editado)",
   "message_edit": "Editar",
   "message_delete": "Eliminar",
+  "message_copy": "Copiar texto",
+  "message_copied": "Mensagem copiada",
   "error": "Erro",
   "error_title": "Erro",
   "save": "Guardar",

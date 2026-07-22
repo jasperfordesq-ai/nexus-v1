@@ -659,6 +659,65 @@
     border-radius: 9999px;
     background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
   }
+
+  /* Dropdown menus become bottom action sheets on phones. React Aria
+     positions the popover with inline top/left/maxHeight, so the overrides
+     need !important; the slide-up motion animates transform, which the
+     positioning never sets. The huge box-shadow spread dims the page —
+     popovers have no backdrop element of their own. */
+  .nexus-responsive-dropdown-popover {
+    position: fixed !important;
+    top: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100dvw !important;
+    max-width: none !important;
+    max-height: min(70dvh, calc(100dvh - var(--safe-area-top) - 0.5rem)) !important;
+    margin: 0 !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    padding-bottom: calc(var(--safe-area-bottom) + 0.5rem) !important;
+    overflow-y: auto;
+    box-shadow:
+      0 -12px 40px rgb(0 0 0 / 0.25),
+      0 0 0 100vmax rgb(0 0 0 / 0.45);
+  }
+
+  .nexus-responsive-dropdown-popover::before {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 0.25rem;
+    margin: 0.375rem auto 0.5rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
+  }
+
+  .nexus-responsive-dropdown-popover[data-entering] {
+    animation: nexus-sheet-slide-in 200ms ease-out;
+  }
+
+  .nexus-responsive-dropdown-popover[data-exiting] {
+    animation: nexus-sheet-slide-out 150ms ease-in;
+  }
+
+  /* Comfortable touch rows inside the sheet */
+  .nexus-responsive-dropdown-popover [role="menuitem"],
+  .nexus-responsive-dropdown-popover [role="menuitemradio"],
+  .nexus-responsive-dropdown-popover [role="menuitemcheckbox"] {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+}
+
+@keyframes nexus-sheet-slide-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes nexus-sheet-slide-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
 }
 
 /* Keep every text-entry surface at the iOS no-zoom baseline and move the
@@ -675,6 +734,7 @@
   body:has([data-slot="modal-backdrop"]) [data-mobile-tabbar],
   body:has([data-slot="drawer-backdrop"]) [data-mobile-tabbar],
   body:has([data-mobile-tabbar-cover]) [data-mobile-tabbar],
+  body:has(.nexus-responsive-dropdown-popover) [data-mobile-tabbar],
   body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar] {
     transform: translateY(calc(100% + 12px));
     pointer-events: none;

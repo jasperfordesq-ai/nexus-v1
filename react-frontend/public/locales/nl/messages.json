@@ -71,6 +71,8 @@
   "message_edited_indicator": "(bewerkt)",
   "message_edit": "Bewerken",
   "message_delete": "Verwijderen",
+  "message_copy": "Kopieer tekst",
+  "message_copied": "Bericht gekopieerd",
   "error": "Fout",
   "error_title": "Fout",
   "save": "Opslaan",
