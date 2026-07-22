@@ -79,6 +79,7 @@
   "search_result_count": "{{current}} von {{total}}",
   "archive_confirm_prompt": "Möchten Sie das Gespräch mit {{name}} wirklich archivieren?",
   "aria_add_attachment": "Anhang hinzufügen",
+  "aria_show_compose_tools": "Anhangsoptionen anzeigen",
   "aria_message_input": "Nachrichteneingabe",
   "aria_record_voice": "Sprachnachricht aufnehmen",
   "aria_add_reaction": "Reaktion hinzufügen",

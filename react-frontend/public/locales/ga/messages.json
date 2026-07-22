@@ -79,6 +79,7 @@
   "search_result_count": "{{current}} as {{total}}",
   "archive_confirm_prompt": "An bhfuil tú cinnte gur mhaith leat an comhrá le {{name}} a chartlannú?",
   "aria_add_attachment": "Cuir ceangaltán leis",
+  "aria_show_compose_tools": "Taispeáin roghanna ceangaltáin",
   "aria_message_input": "Ionchur teachtaireachta",
   "aria_record_voice": "Taifead teachtaireacht ghutha",
   "aria_add_reaction": "Cuir imoibriú leis",

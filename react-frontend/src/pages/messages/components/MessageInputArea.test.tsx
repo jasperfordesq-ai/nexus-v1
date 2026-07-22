@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { render, screen } from '@/test/test-utils';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MessageInputArea } from './MessageInputArea';
 import type { MessageInputAreaProps } from './MessageInputArea';
 import { createRef } from 'react';
@@ -168,5 +168,58 @@ describe('MessageInputArea', () => {
     render(<MessageInputArea {...defaultProps} safeguardingPolicyStatus="unavailable" />);
     expect(screen.getByText('composer_blocked_safeguarding_unavailable')).toBeDefined();
     expect(screen.queryByRole('textbox')).toBeNull();
+  });
+});
+
+describe('MessageInputArea — mobile compose-tools collapse (<640px)', () => {
+  function mockViewport(matchesMobile: boolean) {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (query: string) => ({
+        matches: matchesMobile && query.includes('max-width: 639px'),
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockViewport(true);
+  });
+
+  afterEach(() => {
+    mockViewport(false);
+  });
+
+  it('collapses attach tools into a chevron on focus and restores them on empty blur', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup();
+    render(<MessageInputArea {...defaultProps} />);
+    // Tools visible initially
+    expect(screen.getByLabelText('aria_add_attachment')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('textbox'));
+    // Focus collapses tools to the expand chevron
+    expect(screen.queryByLabelText('aria_add_attachment')).toBeNull();
+    expect(screen.getByLabelText('aria_show_compose_tools')).toBeInTheDocument();
+
+    // Blur with empty input restores tools
+    await user.click(document.body);
+    expect(screen.getByLabelText('aria_add_attachment')).toBeInTheDocument();
+  });
+
+  it('re-expands the tools when the chevron is pressed', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup();
+    render(<MessageInputArea {...defaultProps} newMessage="draft text" />);
+    await user.click(screen.getByRole('textbox'));
+    expect(screen.getByLabelText('aria_show_compose_tools')).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('aria_show_compose_tools'));
+    expect(screen.getByLabelText('aria_add_attachment')).toBeInTheDocument();
   });
 });

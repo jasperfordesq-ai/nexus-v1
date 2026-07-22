@@ -79,6 +79,7 @@
   "search_result_count": "{{current}} di {{total}}",
   "archive_confirm_prompt": "È sicuro/a di voler archiviare questa conversazione con {{name}}?",
   "aria_add_attachment": "Aggiungi allegato",
+  "aria_show_compose_tools": "Mostra le opzioni per gli allegati",
   "aria_message_input": "Campo messaggio",
   "aria_record_voice": "Registra messaggio vocale",
   "aria_add_reaction": "Aggiungi reazione",

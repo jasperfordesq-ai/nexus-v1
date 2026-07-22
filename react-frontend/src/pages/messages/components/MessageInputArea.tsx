@@ -5,16 +5,18 @@
 
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
-import type { RefObject, ChangeEvent, FormEvent } from 'react';
+import { useState, type RefObject, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';import Send from 'lucide-react/icons/send';
 import Mic from 'lucide-react/icons/mic';
 import Square from 'lucide-react/icons/square';
 import Paperclip from 'lucide-react/icons/paperclip';
+import ChevronRight from 'lucide-react/icons/chevron-right';
 import X from 'lucide-react/icons/x';
 import FileText from 'lucide-react/icons/file-text';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { GifPicker } from '@/components/compose/GifPicker';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 
@@ -101,6 +103,16 @@ export function MessageInputArea({
   const { tenantPath } = useTenant();
   const isSafeguardingBlocked = safeguardingPolicyStatus !== 'allow';
   const isComposerBlocked = !!messagingRestriction?.messaging_disabled || isSafeguardingBlocked;
+
+  // Messenger-style collapse on phones: while the user is composing, the
+  // attach/GIF buttons fold into a single chevron so the input gets the full
+  // row width. Desktop always shows the full toolbar.
+  const isMobile = useMediaQuery('(max-width: 639px)');
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(true);
+  const showComposeTools = !isMobile || mobileToolsOpen;
+  const collapseTools = () => {
+    if (isMobile) setMobileToolsOpen(false);
+  };
 
   return (
     <div className="border-t border-theme-default p-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:p-4">
@@ -248,21 +260,37 @@ export function MessageInputArea({
             aria-hidden="true"
             tabIndex={-1}
           />
-          {/* Attachment button */}
-          <Button
-            type="button"
-            isIconOnly
-            variant="secondary"
-            className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
-            onPress={() => fileInputRef.current?.click()}
-            aria-label={t('aria_add_attachment')}
-            isDisabled={attachments.length >= 5}
-          >
-            <Paperclip className="w-4 h-4" />
-          </Button>
-          {/* GIF picker */}
-          {onGifSelect && (
-            <GifPicker onSelect={onGifSelect} />
+          {showComposeTools ? (
+            <>
+              {/* Attachment button */}
+              <Button
+                type="button"
+                isIconOnly
+                variant="secondary"
+                className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
+                onPress={() => fileInputRef.current?.click()}
+                aria-label={t('aria_add_attachment')}
+                isDisabled={attachments.length >= 5}
+              >
+                <Paperclip className="w-4 h-4" />
+              </Button>
+              {/* GIF picker */}
+              {onGifSelect && (
+                <GifPicker onSelect={onGifSelect} />
+              )}
+            </>
+          ) : (
+            /* Collapsed compose tools (mobile, while typing) — chevron re-expands */
+            <Button
+              type="button"
+              isIconOnly
+              variant="secondary"
+              className="shrink-0 bg-theme-elevated text-theme-muted"
+              onPress={() => setMobileToolsOpen(true)}
+              aria-label={t('aria_show_compose_tools')}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           )}
           <div className="min-w-0 flex-1 flex flex-col">
             <Textarea
@@ -272,8 +300,13 @@ export function MessageInputArea({
               onChange={(e) => {
                 onNewMessageChange(e.target.value);
                 onTypingIndicator(e.target.value);
+                if (e.target.value) collapseTools();
               }}
-              onBlur={onBlurTypingStop}
+              onFocus={collapseTools}
+              onBlur={() => {
+                onBlurTypingStop();
+                if (!newMessage.trim()) setMobileToolsOpen(true);
+              }}
               onKeyDown={(e) => {
                 // Enter sends message, Shift+Enter adds newline
                 if (e.key === 'Enter' && !e.shiftKey) {

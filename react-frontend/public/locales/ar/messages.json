@@ -79,6 +79,7 @@
   "search_result_count": "{{current}} من {{total}}",
   "archive_confirm_prompt": "هل أنت متأكد أنك تريد أرشفة هذه المحادثة مع {{name}}؟",
   "aria_add_attachment": "إضافة مرفق",
+  "aria_show_compose_tools": "إظهار خيارات المرفقات",
   "aria_message_input": "إدخال الرسالة",
   "aria_record_voice": "تسجيل رسالة صوتية",
   "aria_add_reaction": "إضافة رد فعل",

@@ -79,6 +79,7 @@
   "search_result_count": "{{current}} van {{total}}",
   "archive_confirm_prompt": "Weet je zeker dat je dit gesprek met {{name}} wilt archiveren?",
   "aria_add_attachment": "Voeg bijlage toe",
+  "aria_show_compose_tools": "Bijlageopties tonen",
   "aria_message_input": "Berichtinvoer",
   "aria_record_voice": "Neem spraakbericht op",
   "aria_add_reaction": "Voeg reactie toe",
