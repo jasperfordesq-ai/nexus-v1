@@ -118,6 +118,15 @@ CVE-2026-2229
 # and validate the Expo tree. (added 2026-06-24)
 CVE-2026-12151
 CVE-2026-48779
+# fast-uri Unicode-hostname / security-policy-bypass CVEs (CVE-2026-13676 fix
+# 3.1.3, CVE-2026-16221 fix 3.1.4). fast-uri arrives only through the mobile
+# app's Fastify/ajv-based Expo/Metro dev tooling (mobile/) — it is not in the
+# compiled APK/IPA nor on any server, and the mobile app is not part of the
+# web (PHP/React) deploy. Bumping fast-uri to >=3.1.4 is deferred to a
+# mobile-only change that can build and validate the on-hold Expo tree so it
+# does not activate the Android release gate prematurely. (added 2026-07-22)
+CVE-2026-13676
+CVE-2026-16221
 
 # ── urllib3 CVE-2026-44431 (HIGH) — vendor/mockery/mockery/docs/requirements.txt ──
 # Newly-disclosed urllib3 CVE in the same Python requirements.txt inside the
