@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { render, screen } from '@/test/test-utils';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MessageBubble } from './MessageBubble';
 import type { MessageBubbleProps } from './MessageBubble';
 import type { Message } from '@/types/api';
@@ -33,6 +33,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
   formatNumber: (value: number) => String(value),
   getFormattingLocale: () => 'en-US',
+  cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/contexts/TenantContext', () => ({
@@ -73,6 +74,22 @@ const defaultProps: MessageBubbleProps = {
   onEdit: vi.fn(),
   onDelete: vi.fn(),
 };
+
+function mockViewport(matchesMobile: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: matchesMobile && query.includes('max-width: 639px'),
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}
 
 describe('MessageBubble', () => {
   beforeEach(() => {
@@ -193,5 +210,40 @@ describe('MessageBubble', () => {
 
     expect(screen.queryByRole('button', { name: 'aria_toggle_reaction' })).toBeNull();
     expect(screen.queryByText('51')).toBeNull();
+  });
+});
+
+describe('MessageBubble — mobile action sheet (<640px)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockViewport(true);
+  });
+
+  afterEach(() => {
+    mockViewport(false);
+  });
+
+  it('renders the single ⋮ options button instead of the desktop hover pair', () => {
+    render(<MessageBubble {...defaultProps} />);
+    expect(screen.getByRole('button', { name: 'aria_message_options' })).toBeInTheDocument();
+    // Desktop-only reaction hover button must NOT render on mobile
+    expect(screen.queryByRole('button', { name: 'aria_add_reaction' })).toBeNull();
+  });
+
+  it('opens the bottom action sheet with reactions and actions from the ⋮ button', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup();
+    render(<MessageBubble {...defaultProps} />);
+    await user.click(screen.getByRole('button', { name: 'aria_message_options' }));
+    // Sheet content: reaction row (6 emojis) + copy/edit/delete actions
+    expect(screen.getAllByRole('button', { name: 'aria_react_with' })).toHaveLength(6);
+    expect(screen.getByText('message_copy')).toBeInTheDocument();
+    expect(screen.getByText('message_edit')).toBeInTheDocument();
+    expect(screen.getByText('message_delete')).toBeInTheDocument();
+  });
+
+  it('does not render the ⋮ button for deleted messages', () => {
+    const deletedMsg = { ...mockMessage, is_deleted: true } as Message;
+    render(<MessageBubble {...defaultProps} message={deletedMsg} />);
+    expect(screen.queryByRole('button', { name: 'aria_message_options' })).toBeNull();
   });
 });
