@@ -108,6 +108,13 @@ const inlineStyleExceptionGroups = [
     },
   },
   {
+    reason: 'Viewport-measured geometry (soft-keyboard inset, edge-clamping shift) is computed at runtime and forwarded as CSS custom properties.',
+    files: {
+      'src/components/social/ReactionPickerMenu.tsx': 1,
+      'src/pages/messages/ConversationPage.tsx': 1,
+    },
+  },
+  {
     reason: 'The fatal bootstrap fallback must remain readable before React and the application stylesheet are available.',
     files: {
       'src/main.tsx': 4,
