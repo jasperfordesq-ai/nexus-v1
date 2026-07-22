@@ -17,8 +17,9 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts';
+import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
-import { Tooltip } from '@/components/ui/Tooltip';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 
 interface HybridPriceDisplayProps {
   /** Cash price amount */
@@ -79,17 +80,27 @@ export function HybridPriceDisplay({
         {/* Separator */}
         <span className={`${classes.tc} font-medium text-theme-muted`}>+</span>
 
-        {/* Time credit portion */}
-        <Tooltip
-          content={t('hybrid_pricing.tooltip')}
-        >
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
-            <Clock className={`${classes.icon} text-accent`} aria-hidden="true" />
-            <span className={`${classes.tc} font-bold text-accent`}>
-              {t('community_delivery.time_credits_value', { count: timeCreditPrice })}
-            </span>
-          </div>
-        </Tooltip>
+        {/* Time credit portion — tap/click opens the explanation (reachable on touch) */}
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button
+              variant="light"
+              size="sm"
+              className="h-auto min-h-0 min-w-0 p-0 rounded-full"
+              aria-label={t('hybrid_pricing.label')}
+            >
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
+                <Clock className={`${classes.icon} text-accent`} aria-hidden="true" />
+                <span className={`${classes.tc} font-bold text-accent`}>
+                  {t('community_delivery.time_credits_value', { count: timeCreditPrice })}
+                </span>
+              </div>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+            {t('hybrid_pricing.tooltip')}
+          </PopoverContent>
+        </Popover>
 
         {/* Negotiable badge */}
         {priceType === 'negotiable' && (
@@ -101,14 +112,24 @@ export function HybridPriceDisplay({
 
       {/* Explainer row */}
       <div className="flex items-center gap-1.5">
-        <Tooltip
-          content={t('hybrid_pricing.explanation')}
-        >
-          <span className="inline-flex items-center gap-1 text-xs text-theme-muted cursor-help">
-            <HelpCircle className="w-3 h-3" aria-hidden="true" />
-            {t('hybrid_pricing.label')}
-          </span>
-        </Tooltip>
+        <Popover placement="bottom-start">
+          <PopoverTrigger>
+            <Button
+              variant="light"
+              size="sm"
+              className="h-auto min-h-0 min-w-0 p-0"
+              aria-label={t('hybrid_pricing.label')}
+            >
+              <span className="inline-flex items-center gap-1 text-xs text-theme-muted">
+                <HelpCircle className="w-3 h-3" aria-hidden="true" />
+                {t('hybrid_pricing.label')}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+            {t('hybrid_pricing.explanation')}
+          </PopoverContent>
+        </Popover>
         <span className="text-xs text-theme-muted" aria-hidden="true">|</span>
         <Link
           to={tenantPath('/help')}

@@ -241,6 +241,12 @@ export function FederationMemberProfilePage() {
               {t('member_profile.back_to_members')}
             </Button>
           </div>
+          {/* Disabled-action reason — visible on phones where tooltips can't be hovered */}
+          {userOptedIn === false && (
+            <p className="sm:hidden mt-3 text-xs text-theme-muted">
+              {t('member_profile.optin_required_tooltip')}
+            </p>
+          )}
         </GlassCard>
       </div>
     );
@@ -461,6 +467,15 @@ export function FederationMemberProfilePage() {
                   {t('member_profile.back_to_members')}
                 </Button>
               </div>
+
+              {/* Disabled-action reasons — tooltips don't exist on touch, so
+                  surface them as visible helper text on phones */}
+              {isAuthenticated && userOptedIn === false && actionDisabledTooltip && (
+                <p className="sm:hidden mt-2 text-xs text-theme-muted">{actionDisabledTooltip}</p>
+              )}
+              {isAuthenticated && !canTransactWithMember && transactionTooltip && (
+                <p className="sm:hidden mt-2 text-xs text-theme-muted">{transactionTooltip}</p>
+              )}
             </div>
           </div>
         </GlassCard>

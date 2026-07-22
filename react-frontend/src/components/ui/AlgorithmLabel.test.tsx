@@ -119,13 +119,15 @@ describe('AlgorithmLabel', () => {
     });
   });
 
-  it('wraps the chip in a Tooltip with the algorithm description', async () => {
+  it('opens a popover with the algorithm description on press (touch-reachable)', async () => {
     mockApi.get.mockResolvedValueOnce(makeAlgorithmsResponse());
     const { AlgorithmLabel } = await importFresh();
+    const user = (await import('@testing-library/user-event')).default.setup();
     render(<AlgorithmLabel area="feed" />);
+    const trigger = await screen.findByRole('button', { name: 'Smart Feed' });
+    await user.click(trigger);
     await waitFor(() => {
-      const tooltip = screen.getByTestId('tooltip');
-      expect(tooltip).toHaveAttribute('data-content', 'Personalised feed algorithm');
+      expect(screen.getByText('Personalised feed algorithm')).toBeInTheDocument();
     });
   });
 

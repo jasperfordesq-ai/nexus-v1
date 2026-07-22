@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Textarea } from '@/components/ui/Textarea';
-import { Tooltip } from '@/components/ui/Tooltip';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * CommunityDeliveryCard - Community-powered delivery option for marketplace.
@@ -194,11 +194,23 @@ export function CommunityDeliveryCard({
                 {t('community_delivery.description')}
               </p>
             </div>
-            <Tooltip
-              content={t('community_delivery.tooltip')}
-            >
-              <HelpCircle className="w-4 h-4 text-theme-muted cursor-help flex-shrink-0" />
-            </Tooltip>
+            {/* Tap/click-opened so the explanation is reachable on touch */}
+            <Popover placement="bottom-end">
+              <PopoverTrigger>
+                <Button
+                  isIconOnly
+                  variant="light"
+                  size="sm"
+                  className="h-auto min-h-0 min-w-0 shrink-0 p-1"
+                  aria-label={t('community_delivery.title')}
+                >
+                  <HelpCircle className="w-4 h-4 text-theme-muted" aria-hidden="true" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+                {t('community_delivery.tooltip')}
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* How it works (informational mode) */}

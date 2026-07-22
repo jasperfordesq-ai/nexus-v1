@@ -76,9 +76,19 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
-  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
-  resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: vi.fn((url: string | null) => url || '/default-avatar.png'),
+    getFormattingLocale: () => 'en-US',
+  };
+});
+
+vi.mock('@/components/ui/Popover', () => ({
+  Popover: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  PopoverTrigger: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  PopoverContent: ({ children }: React.PropsWithChildren) => <div data-testid="popover-content">{children}</div>,
 }));
 
 vi.mock('@/components/ui', () => {

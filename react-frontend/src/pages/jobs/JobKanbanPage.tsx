@@ -16,7 +16,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Tabs, Tab } from '@/components/ui/Tabs';
 import { Textarea } from '@/components/ui/Textarea';
-import { Tooltip } from '@/components/ui/Tooltip';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 /**
  * Job Kanban Pipeline Page
  *
@@ -197,9 +197,22 @@ function AppKanbanCard({ application, onDragStart, onStageChange, onDownloadCv, 
                 <Chip size="sm" variant="tertiary" color={aiRanking.score >= 70 ? 'success' : aiRanking.score >= 40 ? 'warning' : 'default'}>
                   {t('kanban.ai_score', { score: aiRanking.score })}
                 </Chip>
-                <Tooltip content={aiRanking.reason}>
-                  <span className="text-[10px] text-muted cursor-help">#{aiRanking.rank}</span>
-                </Tooltip>
+                {/* Tap/click opens the AI ranking reason (hover doesn't exist on touch) */}
+                <Popover placement="bottom-start">
+                  <PopoverTrigger>
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="h-auto min-h-0 min-w-0 p-0.5"
+                      aria-label={t('kanban.ai_score', { score: aiRanking.score })}
+                    >
+                      <span className="text-[10px] text-muted">#{aiRanking.rank}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+                    {aiRanking.reason}
+                  </PopoverContent>
+                </Popover>
               </div>
             )}
           </div>

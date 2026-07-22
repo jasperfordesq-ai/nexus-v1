@@ -12,7 +12,8 @@ import { useState, useEffect } from 'react';
 
 import Cpu from 'lucide-react/icons/cpu';
 import { api } from '@/lib/api';
-import { Chip, Tooltip } from '@/components/ui';
+import { Chip, Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 interface AlgorithmInfo {
   name: string;
@@ -82,16 +83,30 @@ export function AlgorithmLabel({ area }: AlgorithmLabelProps) {
 
   if (!info || DEFAULT_KEYS.has(info.key)) return null;
 
+  // Tap/click-opened popover rather than a hover tooltip: the description is
+  // the only place the ranking is explained, and hover does not exist on touch.
   return (
-    <Tooltip content={info.description} placement="bottom" delay={300}>
-      <Chip
-        variant="flat"
-        size="sm"
-        startContent={<Cpu className="w-3 h-3" aria-hidden="true" />}
-        className="bg-[var(--surface-elevated)] text-[var(--text-subtle)] border border-[var(--border-default)] cursor-help text-[11px] h-6"
-      >
-        {info.name}
-      </Chip>
-    </Tooltip>
+    <Popover placement="bottom">
+      <PopoverTrigger>
+        <Button
+          variant="light"
+          size="sm"
+          className="h-auto min-h-0 min-w-0 p-0 rounded-full"
+          aria-label={info.name}
+        >
+          <Chip
+            variant="flat"
+            size="sm"
+            startContent={<Cpu className="w-3 h-3" aria-hidden="true" />}
+            className="bg-[var(--surface-elevated)] text-[var(--text-subtle)] border border-[var(--border-default)] cursor-help text-[11px] h-6"
+          >
+            {info.name}
+          </Chip>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="max-w-[18rem] px-3 py-2 text-xs text-theme-muted">
+        {info.description}
+      </PopoverContent>
+    </Popover>
   );
 }

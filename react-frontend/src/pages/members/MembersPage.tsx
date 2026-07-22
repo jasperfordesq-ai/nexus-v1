@@ -831,6 +831,8 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-violet-600 dark:text-violet-400 cursor-default">
                       <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>{Math.round(member.community_rank_score * 100)}%</span>
+                      {/* Tooltips don't exist on touch — show the label inline on phones */}
+                      <span className="sm:hidden">{t('members.community_rank_score_tooltip')}</span>
                     </span>
                   </Tooltip>
                 )}
@@ -905,6 +907,8 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-medium cursor-default">
                   <TrendingUp className="w-3 h-3" aria-hidden="true" />
                   {Math.round(member.community_rank_score * 100)}%
+                  {/* Tooltips don't exist on touch — show the label inline on phones */}
+                  <span className="sm:hidden">{t('members.community_rank_score_tooltip')}</span>
                 </span>
               </Tooltip>
             )}
