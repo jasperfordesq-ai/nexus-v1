@@ -4,6 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  useCallback,
+  useEffect,
+  useRef,
   type ChangeEvent,
   type CSSProperties,
   type ReactNode,
@@ -122,9 +125,53 @@ export function Textarea({
   ref,
   ...props
 }: TextareaProps & { ref?: Ref<HTMLTextAreaElement> }) {
+  // Auto-grow: when maxRows is set, the textarea grows with its content from
+  // minRows up to maxRows, then scrolls — matching what these props promise.
+  // (HeroUI v3 TextArea itself has no autosize; it only accepts a fixed `rows`.)
+  const isAutoGrow = typeof maxRows === 'number' && maxRows > 0;
+  const localRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const resizeToContent = useCallback(() => {
+    const el = localRef.current;
+    if (!el || !isAutoGrow) return;
+    const cs = getComputedStyle(el);
+    const lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.5 || 24;
+    const chrome =
+      (parseFloat(cs.paddingTop) || 0) +
+      (parseFloat(cs.paddingBottom) || 0) +
+      (parseFloat(cs.borderTopWidth) || 0) +
+      (parseFloat(cs.borderBottomWidth) || 0);
+    const maxHeight = Math.ceil((maxRows as number) * lineHeight + chrome);
+    el.style.height = 'auto';
+    const contentHeight = el.scrollHeight
+      + (parseFloat(cs.borderTopWidth) || 0)
+      + (parseFloat(cs.borderBottomWidth) || 0);
+    el.style.height = `${Math.min(contentHeight, maxHeight)}px`;
+    el.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden';
+  }, [isAutoGrow, maxRows]);
+
+  const mergedRef = useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      localRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        (ref as { current: HTMLTextAreaElement | null }).current = node;
+      }
+      if (node) resizeToContent();
+    },
+    [ref, resizeToContent],
+  );
+
+  // Controlled value changes (including programmatic clears after send)
+  useEffect(() => {
+    resizeToContent();
+  }, [props.value, resizeToContent]);
+
   const handleTextareaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(event);
     onValueChange?.(event.target.value);
+    resizeToContent();
   };
 
   const textArea = (
@@ -140,10 +187,10 @@ export function Textarea({
       fullWidth={fullWidth}
       readOnly={isReadOnly}
       required={isRequired}
-      ref={ref}
+      ref={mergedRef}
       rows={rows ?? minRows}
       style={{
-        ...(maxRows ? { maxHeight: `${maxRows * 1.5}rem` } : {}),
+        ...(isAutoGrow ? { resize: 'none' } : maxRows ? { maxHeight: `${maxRows * 1.5}rem` } : {}),
       }}
       variant={mapVariant(variant)}
       onChange={handleTextareaChange}
@@ -183,11 +230,11 @@ export function Textarea({
         fullWidth={fullWidth}
         readOnly={isReadOnly}
         required={isRequired}
-        ref={ref}
+        ref={mergedRef}
         rows={rows ?? minRows}
         style={{
           ...(fieldStyle ?? {}),
-          ...(maxRows ? { maxHeight: `${maxRows * 1.5}rem` } : {}),
+          ...(isAutoGrow ? { resize: 'none' } : maxRows ? { maxHeight: `${maxRows * 1.5}rem` } : {}),
         }}
         variant={mapVariant(variant)}
         onChange={handleTextareaChange}

@@ -236,7 +236,7 @@ export function MessageInputArea({
 
       {/* Text input form */}
       {isDirectMessagingEnabled && !isComposerBlocked && !isRecording && !audioBlob && (
-        <form onSubmit={onSendMessage} className="flex min-w-0 gap-2 sm:gap-3">
+        <form onSubmit={onSendMessage} className="flex min-w-0 items-end gap-2 sm:gap-3">
           {/* Hidden file input — triggered programmatically via the labelled Button; hidden from AT */}
           <input
             ref={fileInputRef}
@@ -285,9 +285,9 @@ export function MessageInputArea({
                 }
               }}
               minRows={1}
-              maxRows={4}
+              maxRows={6}
               classNames={{
-                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle rounded-2xl px-4 py-2.5 leading-6',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
               aria-label={t('aria_message_input')}

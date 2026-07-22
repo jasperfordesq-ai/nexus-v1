@@ -115,6 +115,52 @@ describe('Textarea — disabled / read-only', () => {
   });
 });
 
+// ─── Auto-grow (maxRows) ─────────────────────────────────────────────────────
+
+describe('Textarea — auto-grow with maxRows', () => {
+  function mockScrollHeight(el: HTMLElement, value: number) {
+    Object.defineProperty(el, 'scrollHeight', { configurable: true, value });
+  }
+
+  it('grows to fit content below the maxRows cap and hides overflow', () => {
+    render(<Textarea minRows={1} maxRows={6} onChange={vi.fn()} />);
+    const el = screen.getByRole('textbox') as HTMLTextAreaElement;
+    // jsdom has no layout: line-height resolves to the 24px fallback → cap ≈ 6 × 24 = 144px
+    // (+ a few px of default padding/border chrome). Assert behaviour, not exact pixels.
+    mockScrollHeight(el, 96);
+    fireEvent.change(el, { target: { value: 'four\nlines\nof\ntext' } });
+    const grown = parseFloat(el.style.height);
+    expect(grown).toBeGreaterThanOrEqual(96);
+    expect(grown).toBeLessThan(120);
+    expect(el.style.overflowY).toBe('hidden');
+  });
+
+  it('clamps at the maxRows cap and scrolls beyond it', () => {
+    render(<Textarea minRows={1} maxRows={6} onChange={vi.fn()} />);
+    const el = screen.getByRole('textbox') as HTMLTextAreaElement;
+    mockScrollHeight(el, 400);
+    fireEvent.change(el, { target: { value: 'lots\nof\ntext'.repeat(20) } });
+    const clamped = parseFloat(el.style.height);
+    expect(clamped).toBeGreaterThanOrEqual(144);
+    expect(clamped).toBeLessThan(170); // cap = 6 lines + chrome — far below the 400px content
+    expect(el.style.overflowY).toBe('auto');
+  });
+
+  it('disables manual resize when auto-growing', () => {
+    render(<Textarea minRows={1} maxRows={6} />);
+    expect((screen.getByRole('textbox') as HTMLTextAreaElement).style.resize).toBe('none');
+  });
+
+  it('does not set an inline height without maxRows (static path)', () => {
+    render(<Textarea minRows={4} onChange={vi.fn()} />);
+    const el = screen.getByRole('textbox') as HTMLTextAreaElement;
+    fireEvent.change(el, { target: { value: 'some\ncontent' } });
+    expect(el.rows).toBe(4);
+    // height 'auto' is only ever set transiently inside the auto-grow measurer
+    expect(el.style.height).toBe('');
+  });
+});
+
 // ─── startContent / endContent ───────────────────────────────────────────────
 
 describe('Textarea — startContent / endContent', () => {

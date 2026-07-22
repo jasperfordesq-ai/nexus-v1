@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Multiline text boxes now grow with their content, so the message composer no longer hides what you type.** The shared HeroUI v3 textarea wrapper implements the auto-grow behaviour its `minRows`/`maxRows` props always promised: the field expands line by line up to its configured maximum, then scrolls internally. The mobile conversation composer starts as a single rounded line and grows to six lines like a native messaging app, with its attachment, voice, and send controls anchored to the bottom edge as it grows; the same fix applies to every compose, review, transfer, broker, and admin form that sets those props.
+
 - **The Android native release gate now uses the Expo SDK 54 patch versions required by Expo Doctor.** Expo 54.0.36 and Expo Updates 29.0.19 replace the immediately preceding patches, keeping the SDK dependency contract current while preserving the passing mobile type-check and 1,427-test suite.
 - **The root and mobile npm lockfiles now use patched `brace-expansion` releases across every installed major line.** Versions 1.1.16, 2.1.2, and 5.0.7 close the newly published exponential-expansion denial-of-service advisory without changing the parent Expo, Capacitor, ESLint, or build-tool packages.
 - **Guzzle is updated to 7.15.1 following newly published upstream security advisories.** The patched HTTP client preserves host-only cookie scope, bounds cookie processing, prevents redirect-generated referrers from disclosing URI fragments, and retains the proxy-authorization isolation introduced in 7.14.2; the accompanying promises, PSR-7, and Symfony deprecation-contract lockfile updates remain within existing dependency constraints.
