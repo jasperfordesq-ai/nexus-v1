@@ -22,7 +22,9 @@ import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useToast } from '@/contexts';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { FeedComment } from '@/components/feed/types';
 import { AVAILABLE_REACTIONS, COMMENT_REACTION_EMOJI_MAP } from '@/hooks/useSocialInteractions';
 import type { MentionUser } from '@/hooks/useSocialInteractions';
@@ -54,6 +56,9 @@ export interface CommentsSectionProps {
    * to the bottom of the sheet — matching native social apps.
    */
   variant?: 'inline' | 'sheet';
+  /** Focus the composer on mount (used by the phone composer sheet so the
+      keyboard opens with it). */
+  autoFocusComposer?: boolean;
 }
 
 /* ─── Single Comment ────────────────────────────────────────── */
@@ -650,6 +655,7 @@ export function CommentsSection({
   currentUserName,
   searchMentions,
   variant = 'inline',
+  autoFocusComposer = false,
 }: CommentsSectionProps) {
   const { t } = useTranslation('social');
   const toast = useToast();
@@ -660,6 +666,12 @@ export function CommentsSection({
 
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Native-app composer: on phones the inline variant shows a pill that opens
+  // the full sheet variant (composer pinned to the sheet bottom, keyboard up)
+  // instead of typing into a cramped inline field. Desktop keeps the inline
+  // composer, and the comment list itself stays visible in place either way.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const [isComposerSheetOpen, setIsComposerSheetOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
@@ -770,6 +782,7 @@ export function CommentsSection({
         value={newComment}
         onChange={setNewComment}
         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSubmit(); } }}
+        autoFocus={autoFocusComposer}
         size="sm"
         radius="full"
         classNames={{
@@ -805,8 +818,26 @@ export function CommentsSection({
         </h3>
       )}
 
-      {/* New comment input — inline mode keeps it above the list */}
-      {!isSheet && composer}
+      {/* New comment input — inline mode keeps it above the list. Phones show
+          a pill that opens the composer sheet instead of a cramped inline field. */}
+      {!isSheet && (isPhone && isAuthenticated ? (
+        <div className="flex items-center gap-2.5">
+          <Avatar
+            name={currentUserName || tr('you', 'You')}
+            src={resolveAvatarUrl(currentUserAvatar)}
+            size="sm"
+            className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
+          />
+          <Button
+            variant="flat"
+            onPress={() => setIsComposerSheetOpen(true)}
+            aria-label={tr('write_comment', 'Write a comment...')}
+            className="min-h-11 flex-1 justify-start rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] px-4 py-2 text-left text-sm font-normal text-[var(--text-subtle)]"
+          >
+            <span className="line-clamp-1">{tr('write_comment', 'Write a comment...')}</span>
+          </Button>
+        </div>
+      ) : composer)}
 
       {/* Comments list */}
       {commentsLoading ? (
@@ -862,6 +893,40 @@ export function CommentsSection({
         <div className="sticky bottom-0 z-10 mt-auto -mx-5 border-t border-[var(--border-default)] bg-[var(--surface-dropdown)] px-5 py-3">
           {composer}
         </div>
+      )}
+
+      {/* Phone composer sheet — the full sheet-variant thread with the
+          composer pinned to the bottom and focused, like native social apps.
+          The inline list above stays in place; both render from the same
+          props so state is shared. */}
+      {!isSheet && isPhone && isAuthenticated && (
+        <BottomSheet
+          isOpen={isComposerSheetOpen}
+          onClose={() => setIsComposerSheetOpen(false)}
+          title={commentsCount > 0
+            ? `${tr('comments_title', 'Comments')} (${commentsCount})`
+            : tr('comments_title', 'Comments')}
+          snapPoints={['full']}
+        >
+          <CommentsSection
+            variant="sheet"
+            autoFocusComposer
+            comments={comments}
+            commentsCount={commentsCount}
+            commentsLoading={commentsLoading}
+            commentsLoaded={commentsLoaded}
+            loadComments={loadComments}
+            submitComment={submitComment}
+            editComment={editComment}
+            deleteComment={deleteComment}
+            toggleReaction={toggleReaction}
+            searchMentions={searchMentions}
+            isAuthenticated={isAuthenticated}
+            currentUserId={currentUserId}
+            currentUserAvatar={currentUserAvatar}
+            currentUserName={currentUserName}
+          />
+        </BottomSheet>
       )}
     </div>
   );
