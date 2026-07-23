@@ -14,7 +14,7 @@ import { Button, Textarea, Card, CardBody, Chip, Avatar } from '@/components/ui'
  * Feature-gated by 'ai_chat'.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { ScrollShadow } from '@/components/ui';
@@ -30,6 +30,7 @@ import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
+import { useVisualViewport } from '@/hooks/useVisualViewport';
 import { PageMeta } from '@/components/seo';
 import { Link } from 'react-router-dom';
 import { ToolResultCards, isInternalUrl, type ToolInvocation } from './ToolResultCards';
@@ -528,6 +529,16 @@ export default function AiChatPage() {
     }
   };
 
+  // iOS Safari does not shrink 100dvh for the soft keyboard (Android does,
+  // via interactive-widget=resizes-content), so subtract the visual-viewport
+  // inset and keep the latest message in view while the keyboard is up.
+  const keyboardOffset = useVisualViewport();
+  useEffect(() => {
+    if (keyboardOffset > 0) {
+      messagesEndRef.current?.scrollIntoView({ block: 'end' });
+    }
+  }, [keyboardOffset]);
+
   const handleNewConversation = () => {
     setMessages([]);
     setConversationId(null);
@@ -551,7 +562,10 @@ export default function AiChatPage() {
 
   return (
     <div
-      className="flex flex-col h-[calc(100dvh-4rem)]"
+      // --keyboard-offset is genuinely dynamic (visualViewport-driven); see
+      // the identical exception for ConversationPage in check-design-tokens.
+      style={{ '--keyboard-offset': `${keyboardOffset}px` } as CSSProperties}
+      className="flex flex-col h-[calc(100dvh-4rem-var(--keyboard-offset,0px))]"
       role="region"
       aria-label={t('aria_chat')}
     >
@@ -644,6 +658,7 @@ export default function AiChatPage() {
                   aria-label={t('input_aria')}
                   placeholder={t('input_placeholder')}
                   value={input}
+                  enterKeyHint="send"
                   onValueChange={setInput}
                   onKeyDown={handleKeyDown}
                   minRows={1}

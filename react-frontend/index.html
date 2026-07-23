@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- interactive-widget=resizes-content: Android Chrome resizes the layout
+         viewport (and 100dvh) when the soft keyboard opens, so fixed-bottom
+         composers and sheets stay visible above it instead of being overlaid.
+         iOS Safari ignores the property; useVisualViewport keeps compensating
+         there (its offset self-corrects to ~0 wherever the layout resizes). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/api/v2/pwa/manifest?path=%2F" />
     <meta name="theme-color" content="#0f172a" />

@@ -12,8 +12,10 @@
  * viewport (and therefore `100dvh`) does NOT shrink when the on-screen
  * keyboard opens — only the visual viewport does — so fixed-height chat
  * layouts must subtract this offset to keep the composer visible above the
- * keyboard. Modern Android Chrome (interactive-widget: resizes-visual)
- * behaves the same way.
+ * keyboard. Android Chrome resizes the layout viewport with the keyboard
+ * (index.html sets interactive-widget=resizes-content), so innerHeight and
+ * visualViewport.height shrink together there and this offset self-corrects
+ * to ~0 — no double compensation.
  *
  * Zero-cost when it doesn't matter: returns 0 when the VisualViewport API is
  * unsupported, and on desktop the value stays 0 so no re-renders occur.

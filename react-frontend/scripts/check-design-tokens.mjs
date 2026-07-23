@@ -111,6 +111,7 @@ const inlineStyleExceptionGroups = [
     reason: 'Viewport-measured geometry (soft-keyboard inset, edge-clamping shift) is computed at runtime and forwarded as CSS custom properties.',
     files: {
       'src/components/social/ReactionPickerMenu.tsx': 1,
+      'src/pages/chat/AiChatPage.tsx': 1,
       'src/pages/messages/ConversationPage.tsx': 1,
     },
   },
