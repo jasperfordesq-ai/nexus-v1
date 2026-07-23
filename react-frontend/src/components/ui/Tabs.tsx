@@ -53,10 +53,12 @@ export type TabsProps = Omit<
   placement?: string;
   radius?: string;
   /**
-   * When true, an overflowing horizontal tab strip gets edge chevron buttons
-   * (shown only when there is more to scroll) plus keeps the selected tab in
-   * view. Fixes the "can't reach tabs past the visible ones on mobile" trap —
-   * a hidden-scrollbar strip that only scrolls by an easily-missed swipe.
+   * An overflowing horizontal tab strip gets touch panning, edge chevron
+   * buttons (shown only when there is more to scroll), and keeps the selected
+   * tab in view. Fixes the "can't reach tabs past the visible ones on mobile"
+   * trap — a hidden-scrollbar strip that only scrolls by an easily-missed
+   * swipe. Default ON for horizontal strips; pass false for a strip that
+   * manages its own overflow.
    */
   scrollAffordance?: boolean;
   size?: string;
@@ -224,18 +226,23 @@ export function Tabs({
   orientation,
   placement: _placement,
   radius: _radius,
-  scrollAffordance,
+  scrollAffordance = true,
   size: _size,
   variant,
   ...props
 }: TabsProps) {
   const tabChildren = Children.toArray(children).filter(isValidElement) as Array<ReactElement<TabProps>>;
+  const isHorizontal = !isVertical && orientation !== 'vertical';
 
   const listRegion = (
     <HeroUITabs.ListContainer
       className={combineClasses(
         'max-w-full overflow-x-auto',
-        scrollAffordance && 'scrollbar-hide scroll-smooth overscroll-x-contain',
+        // touch-pan-x keeps horizontal finger-drags panning the strip even when
+        // a tab's own press handling would otherwise capture the gesture. It
+        // must not apply to vertical lists, where it would block vertical pans.
+        isHorizontal && 'touch-pan-x',
+        scrollAffordance && isHorizontal && 'scrollbar-hide scroll-smooth overscroll-x-contain',
       )}
     >
       <HeroUITabs.List
@@ -275,9 +282,11 @@ export function Tabs({
       variant={mapVariant(variant)}
       {...props}
     >
-      {scrollAffordance && !isVertical
-        ? <ScrollAffordance selectedKey={props.selectedKey as Key | null | undefined}>{listRegion}</ScrollAffordance>
-        : listRegion}
+      {scrollAffordance && isHorizontal ? (
+        <ScrollAffordance selectedKey={props.selectedKey as Key | null | undefined}>{listRegion}</ScrollAffordance>
+      ) : (
+        listRegion
+      )}
       {tabChildren.map((child, index) => {
         const id = normalizeKey(child.key, index);
 

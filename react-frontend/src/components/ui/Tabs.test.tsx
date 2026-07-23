@@ -190,9 +190,29 @@ describe('Tabs scrollAffordance', () => {
   const scrollButtons = (container: HTMLElement) =>
     container.querySelectorAll('button[aria-hidden="true"][tabindex="-1"]');
 
-  it('does NOT render scroll buttons by default', () => {
+  it('renders scroll buttons by default (affordance is default-on for horizontal strips)', () => {
     const { container } = render(
       <Tabs aria-label="Test tabs">
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    expect(scrollButtons(container)).toHaveLength(2);
+  });
+
+  it('does NOT render scroll buttons when scrollAffordance is disabled', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs" scrollAffordance={false}>
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    expect(scrollButtons(container)).toHaveLength(0);
+  });
+
+  it('does NOT render scroll buttons for vertical tabs', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs" isVertical>
         <Tab title="Alpha">Content A</Tab>
         <Tab title="Beta">Content B</Tab>
       </Tabs>,
