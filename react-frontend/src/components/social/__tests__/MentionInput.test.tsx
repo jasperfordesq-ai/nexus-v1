@@ -58,6 +58,7 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null | undefined) => url || '/default-avatar.png',
+  resolveThumbnailUrl: (url: string | null | undefined) => url || '/default-avatar.png',
   formatRelativeTime: vi.fn(() => '1 hour ago'),
 }));
 
@@ -98,7 +99,7 @@ describe('MentionInput', () => {
 
   it('renders a textarea element', () => {
     render(<W><MentionInput {...defaultProps} /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toBeInTheDocument();
   });
 
@@ -117,7 +118,7 @@ describe('MentionInput', () => {
   it('calls onChange when text is typed', () => {
     const onChange = vi.fn();
     render(<W><MentionInput {...defaultProps} onChange={onChange} /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
 
     // HeroUI Textarea uses onValueChange, which is triggered through native input events
     fireEvent.change(textarea, { target: { value: 'Hello' } });
@@ -126,19 +127,19 @@ describe('MentionInput', () => {
 
   it('sets aria-haspopup="listbox" on textarea', () => {
     render(<W><MentionInput {...defaultProps} /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toHaveAttribute('aria-haspopup', 'listbox');
   });
 
   it('sets aria-autocomplete="list" on textarea', () => {
     render(<W><MentionInput {...defaultProps} /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toHaveAttribute('aria-autocomplete', 'list');
   });
 
   it('renders as disabled when isDisabled is true', () => {
     render(<W><MentionInput {...defaultProps} isDisabled={true} /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toBeDisabled();
   });
 
@@ -159,7 +160,7 @@ describe('MentionInput', () => {
       </W>,
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
 
     // HeroUI Textarea uses onValueChange which fires on native input events
     fireEvent.input(textarea, { target: { value: 'Hello @alice' } });
@@ -209,7 +210,7 @@ describe('MentionInput', () => {
       </W>,
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@al' } });
 
     await act(async () => {
@@ -226,7 +227,7 @@ describe('MentionInput', () => {
   it('does not show dropdown when query is shorter than 2 chars', () => {
     const onChange = vi.fn();
     render(<W><MentionInput {...defaultProps} onChange={onChange} value="@a" /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@a' } });
 
     // No listbox should appear for single char after @
@@ -236,7 +237,7 @@ describe('MentionInput', () => {
   it('hides dropdown when text no longer matches @mention pattern', () => {
     const onChange = vi.fn();
     render(<W><MentionInput {...defaultProps} onChange={onChange} value="hello" /></W>);
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: 'hello' } });
 
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
@@ -259,7 +260,7 @@ describe('MentionInput', () => {
       </W>,
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@al' } });
 
     await act(async () => {
@@ -312,7 +313,7 @@ describe('MentionInput', () => {
       </W>,
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@al' } });
 
     await act(async () => {

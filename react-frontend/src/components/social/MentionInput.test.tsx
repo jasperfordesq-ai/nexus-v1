@@ -119,7 +119,7 @@ describe('MentionInput', () => {
       />
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toHaveValue('Hello world');
   });
 
@@ -128,7 +128,7 @@ describe('MentionInput', () => {
     const { MentionInput } = await import('./MentionInput');
     render(<MentionInput value="" onChange={onChange} />);
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     await userEvent.type(textarea, 'Hi');
 
     expect(onChange).toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe('MentionInput', () => {
       <MentionInput value="" onChange={onChangeMock} searchMentions={searchFn} />
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     // HeroUI Textarea's onValueChange fires from the native input event
     fireEvent.input(textarea, { target: { value: '@ali' } });
     fireEvent.change(textarea, { target: { value: '@ali' } });
@@ -175,7 +175,7 @@ describe('MentionInput', () => {
       <MentionInput value="" onChange={onChangeMock} searchMentions={customSearch} />
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.input(textarea, { target: { value: '@custom' } });
     fireEvent.change(textarea, { target: { value: '@custom' } });
 
@@ -208,7 +208,7 @@ describe('MentionInput', () => {
     );
 
     // Fire change to trigger mention detection
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@ali' } });
     fireEvent.input(textarea, { target: { value: '@ali' } });
 
@@ -250,7 +250,7 @@ describe('MentionInput', () => {
       <MentionInput value="" onChange={onChangeMock} searchMentions={searchFn} />
     );
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     fireEvent.change(textarea, { target: { value: '@ali' } });
     fireEvent.input(textarea, { target: { value: '@ali' } });
     rerender(<MentionInput value="@ali" onChange={onChangeMock} searchMentions={searchFn} />);
@@ -273,7 +273,7 @@ describe('MentionInput', () => {
     const { MentionInput } = await import('./MentionInput');
     render(<MentionInput value="" onChange={vi.fn()} />);
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toHaveAttribute('aria-haspopup', 'listbox');
     expect(textarea).toHaveAttribute('aria-autocomplete', 'list');
   });
@@ -282,7 +282,7 @@ describe('MentionInput', () => {
     const { MentionInput } = await import('./MentionInput');
     render(<MentionInput value="" onChange={vi.fn()} isDisabled />);
 
-    const textarea = screen.getByRole('textbox');
+    const textarea = screen.getByRole('combobox');
     expect(textarea).toBeDisabled();
   });
 
