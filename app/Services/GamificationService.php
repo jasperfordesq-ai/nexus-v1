@@ -895,32 +895,75 @@ class GamificationService
         }
     }
 
+    /**
+     * Transaction types that are system-issued grants rather than member
+     * exchanges. Signup welcome credits and admin wallet grants must never
+     * count towards transaction-based badges — otherwise every new member
+     * gets "First Exchange"/"First Earn" from their signup credits before
+     * they have exchanged anything.
+     */
+    public const SYSTEM_GRANT_TYPES = ['starting_balance', 'admin_grant'];
+
+    /**
+     * Constrain a transactions query to real member-to-member exchanges.
+     *
+     * Excludes system grant types, system-sent rows (sender NULL/0),
+     * self-transactions, and legacy '[Welcome Bonus]' rows that were written
+     * with the default 'transfer' type before grants had their own
+     * transaction_type (AdminUsersController::grantWelcomeCredits).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder $query
+     * @param string $t Column prefix when the query joins other tables (e.g. 'transactions.').
+     */
+    public static function realExchangesOnly($query, string $t = '')
+    {
+        return $query
+            ->whereNotIn($t . 'transaction_type', self::SYSTEM_GRANT_TYPES)
+            ->where($t . 'sender_id', '>', 0)
+            ->whereColumn($t . 'sender_id', '!=', $t . 'receiver_id')
+            ->where(function ($q) use ($t) {
+                $q->whereNull($t . 'description')
+                  ->orWhere($t . 'description', 'NOT LIKE', '[Welcome Bonus]%');
+            });
+    }
+
+    /**
+     * Corrected timebanking counts for a user — real member exchanges only
+     * (see realExchangesOnly()). Shared by checkTimebankingBadges() and the
+     * gamification:revoke-grant-badges cleanup command so both use identical
+     * qualification maths.
+     *
+     * @return array{earn: int, spend: int, transaction: int, diversity: int}
+     */
+    public static function getRealExchangeCounts(int $userId): array
+    {
+        return [
+            'earn' => (int) self::realExchangesOnly(Transaction::where('receiver_id', $userId))
+                ->where('status', 'completed')
+                ->sum('amount'),
+            'spend' => (int) self::realExchangesOnly(Transaction::where('sender_id', $userId))
+                ->where('deleted_for_sender', false)
+                ->sum('amount'),
+            'transaction' => (int) self::realExchangesOnly(
+                Transaction::where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+            )->count(),
+            'diversity' => (int) self::realExchangesOnly(Transaction::where('sender_id', $userId))
+                ->distinct('receiver_id')
+                ->count('receiver_id'),
+        ];
+    }
+
     private static function checkTimebankingBadges(int $userId): void
     {
-        $creditsEarned = (int) Transaction::where('receiver_id', $userId)
-            ->where('status', 'completed')
-            ->sum('amount');
-
-        $creditsSpent = (int) Transaction::where('sender_id', $userId)
-            ->where('deleted_for_sender', false)
-            ->sum('amount');
-
-        $totalTransactions = (int) Transaction::where(function ($q) use ($userId) {
-            $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-        })->count();
-
-        $uniqueReceivers = (int) Transaction::where('sender_id', $userId)
-            ->distinct('receiver_id')
-            ->count('receiver_id');
+        $counts = self::getRealExchangeCounts($userId);
 
         foreach (self::getBadgeDefinitions() as $def) {
-            $qualifies = false;
-            switch ($def['type']) {
-                case 'earn':        $qualifies = $creditsEarned >= $def['threshold']; break;
-                case 'spend':       $qualifies = $creditsSpent >= $def['threshold']; break;
-                case 'transaction': $qualifies = $totalTransactions >= $def['threshold']; break;
-                case 'diversity':   $qualifies = $uniqueReceivers >= $def['threshold']; break;
-            }
+            $qualifies = match ($def['type']) {
+                'earn', 'spend', 'transaction', 'diversity' => $counts[$def['type']] >= $def['threshold'],
+                default => false,
+            };
             if ($qualifies) {
                 self::awardBadge($userId, $def);
             }
@@ -1104,17 +1147,21 @@ class GamificationService
     private static function checkReliabilityBadges(int $userId): void
     {
         try {
-            $completed = (int) Transaction::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })->where('status', 'completed')->count();
+            $completed = (int) self::realExchangesOnly(
+                Transaction::where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+            )->where('status', 'completed')->count();
 
             if ($completed === 0) {
                 return;
             }
 
-            $cancelled = (int) Transaction::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })->where('status', 'cancelled')->count();
+            $cancelled = (int) self::realExchangesOnly(
+                Transaction::where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+            )->where('status', 'cancelled')->count();
 
             $total = $completed + $cancelled;
             $cancellationRate = $total > 0 ? ($cancelled / $total) : 0;
@@ -1144,14 +1191,17 @@ class GamificationService
         try {
             // Count distinct listing categories the user has transacted in
             // (tenant-scoped — raw join bypasses HasTenantScope)
-            $categoryCount = (int) DB::table('transactions')
-                ->join('listings', 'transactions.listing_id', '=', 'listings.id')
-                ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
-                ->where(function ($q) use ($userId) {
-                    $q->where('transactions.sender_id', $userId)
-                      ->orWhere('transactions.receiver_id', $userId);
-                })
-                ->where('transactions.status', 'completed')
+            $categoryCount = (int) self::realExchangesOnly(
+                DB::table('transactions')
+                    ->join('listings', 'transactions.listing_id', '=', 'listings.id')
+                    ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
+                    ->where(function ($q) use ($userId) {
+                        $q->where('transactions.sender_id', $userId)
+                          ->orWhere('transactions.receiver_id', $userId);
+                    })
+                    ->where('transactions.status', 'completed'),
+                'transactions.'
+            )
                 ->distinct()
                 ->count('listings.category_id');
 
@@ -1184,50 +1234,26 @@ class GamificationService
     private static function checkMentorBadges(int $userId): void
     {
         try {
-            // Find transactions where this user traded with someone whose first-ever
-            // completed transaction was with this user
-            $mentored = DB::select("
-                SELECT COUNT(DISTINCT t.receiver_id) + COUNT(DISTINCT t.sender_id) - COUNT(DISTINCT ?) AS mentored_count
-                FROM transactions t
-                WHERE t.status = 'completed'
-                  AND (t.sender_id = ? OR t.receiver_id = ?)
-                  AND (
-                    -- The other party's first completed transaction is this one
-                    (t.sender_id = ? AND NOT EXISTS (
-                        SELECT 1 FROM transactions t2
-                        WHERE t2.status = 'completed'
-                          AND (t2.sender_id = t.receiver_id OR t2.receiver_id = t.receiver_id)
-                          AND t2.id < t.id
-                          AND t2.id != t.id
-                    ))
-                    OR
-                    (t.receiver_id = ? AND NOT EXISTS (
-                        SELECT 1 FROM transactions t2
-                        WHERE t2.status = 'completed'
-                          AND (t2.sender_id = t.sender_id OR t2.receiver_id = t.sender_id)
-                          AND t2.id < t.id
-                          AND t2.id != t.id
-                    ))
-                  )
-                  AND t.tenant_id = ?
-            ", [$userId, $userId, $userId, $userId, $userId, TenantContext::getId()]);
-
-            // Simpler fallback: count users who had their first transaction with this user
+            // Count users who had their first real exchange with this user
             $mentoredCount = 0;
-            $partners = Transaction::where('status', 'completed')
-                ->where(function ($q) use ($userId) {
-                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-                })
+            $partners = self::realExchangesOnly(
+                Transaction::where('status', 'completed')
+                    ->where(function ($q) use ($userId) {
+                        $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                    })
+            )
                 ->get(['id', 'sender_id', 'receiver_id', 'created_at']);
 
             foreach ($partners as $tx) {
                 $partnerId = $tx->sender_id === $userId ? $tx->receiver_id : $tx->sender_id;
 
-                // Check if this was the partner's first completed transaction
-                $earlierTx = Transaction::where('status', 'completed')
-                    ->where(function ($q) use ($partnerId) {
-                        $q->where('sender_id', $partnerId)->orWhere('receiver_id', $partnerId);
-                    })
+                // Check if this was the partner's first completed real exchange
+                $earlierTx = self::realExchangesOnly(
+                    Transaction::where('status', 'completed')
+                        ->where(function ($q) use ($partnerId) {
+                            $q->where('sender_id', $partnerId)->orWhere('receiver_id', $partnerId);
+                        })
+                )
                     ->where('created_at', '<', $tx->created_at)
                     ->exists();
 
@@ -1262,17 +1288,19 @@ class GamificationService
     private static function checkReciprocityBadges(int $userId): void
     {
         try {
-            $earned = (int) Transaction::where('receiver_id', $userId)
+            $earned = (int) self::realExchangesOnly(Transaction::where('receiver_id', $userId))
                 ->where('status', 'completed')
                 ->sum('amount');
 
-            $spent = (int) Transaction::where('sender_id', $userId)
+            $spent = (int) self::realExchangesOnly(Transaction::where('sender_id', $userId))
                 ->where('status', 'completed')
                 ->sum('amount');
 
-            $totalTx = (int) Transaction::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })->where('status', 'completed')->count();
+            $totalTx = (int) self::realExchangesOnly(
+                Transaction::where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+            )->where('status', 'completed')->count();
 
             if ($totalTx === 0 || ($earned === 0 && $spent === 0)) {
                 return;
@@ -1327,22 +1355,27 @@ class GamificationService
                     $monthEnd = now()->subMonths($i)->endOfMonth();
 
                     // Count distinct activity categories this month
-                    $categories = DB::table('transactions')
-                        ->leftJoin('listings', 'transactions.listing_id', '=', 'listings.id')
-                        ->where('transactions.tenant_id', $tenantId)
-                        ->where(function ($q) use ($userId) {
-                            $q->where('transactions.sender_id', $userId)
-                              ->orWhere('transactions.receiver_id', $userId);
-                        })
-                        ->where('transactions.status', 'completed')
-                        ->whereBetween('transactions.created_at', [$monthStart, $monthEnd])
+                    $categories = self::realExchangesOnly(
+                        DB::table('transactions')
+                            ->leftJoin('listings', 'transactions.listing_id', '=', 'listings.id')
+                            ->where('transactions.tenant_id', $tenantId)
+                            ->where(function ($q) use ($userId) {
+                                $q->where('transactions.sender_id', $userId)
+                                  ->orWhere('transactions.receiver_id', $userId);
+                            })
+                            ->where('transactions.status', 'completed')
+                            ->whereBetween('transactions.created_at', [$monthStart, $monthEnd]),
+                        'transactions.'
+                    )
                         ->distinct()
                         ->count('listings.category_id');
 
                     // Count total activities this month
-                    $activityCount = Transaction::where(function ($q) use ($userId) {
-                        $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-                    })
+                    $activityCount = self::realExchangesOnly(
+                        Transaction::where(function ($q) use ($userId) {
+                            $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                        })
+                    )
                         ->where('status', 'completed')
                         ->whereBetween('created_at', [$monthStart, $monthEnd])
                         ->count();
@@ -1394,16 +1427,18 @@ class GamificationService
 
         // Batch: transactions table (4 → 2 queries)
         try {
-            $txRow = DB::table('transactions')
-                ->where('tenant_id', \App\Core\TenantContext::getId())
-                ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
+            $txRow = self::realExchangesOnly(
+                DB::table('transactions')
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
+            )
                 ->selectRaw('COUNT(*) as total, SUM(CASE WHEN receiver_id = ? AND status = ? THEN amount ELSE 0 END) as earned, SUM(CASE WHEN sender_id = ? AND deleted_for_sender = 0 THEN amount ELSE 0 END) as spent', [$userId, 'completed', $userId])
                 ->first();
             $stats['transaction'] = (int) ($txRow->total ?? 0);
             $stats['earn']        = (int) ($txRow->earned ?? 0);
             $stats['spend']       = (int) ($txRow->spent ?? 0);
         } catch (\Throwable $e) { \Log::warning('GamificationService: stats[transactions] failed', ['error' => $e->getMessage()]); }
-        try { $stats['diversity'] = (int) Transaction::where('sender_id', $userId)->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[diversity] failed', ['error' => $e->getMessage()]); }
+        try { $stats['diversity'] = (int) self::realExchangesOnly(Transaction::where('sender_id', $userId))->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[diversity] failed', ['error' => $e->getMessage()]); }
 
         // Batch: reviews table (2 → 1 query)
         try {
@@ -1430,20 +1465,25 @@ class GamificationService
 
         // Quality badge stats
         try {
-            $completed = (int) Transaction::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })->where('status', 'completed')->count();
+            $completed = (int) self::realExchangesOnly(
+                Transaction::where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+            )->where('status', 'completed')->count();
             $stats['reliability'] = $completed; // Simplified — actual check uses cancellation rate
         } catch (\Throwable $e) {
             \Log::warning('GamificationService: stats[reliability] failed', ['error' => $e->getMessage()]);
         }
         try {
-            $stats['bridge_builder'] = (int) DB::table('transactions')
-                ->join('listings', 'transactions.listing_id', '=', 'listings.id')
-                ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
-                ->where(function ($q) use ($userId) {
-                    $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId);
-                })->where('transactions.status', 'completed')
+            $stats['bridge_builder'] = (int) self::realExchangesOnly(
+                DB::table('transactions')
+                    ->join('listings', 'transactions.listing_id', '=', 'listings.id')
+                    ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
+                    ->where(function ($q) use ($userId) {
+                        $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId);
+                    })->where('transactions.status', 'completed'),
+                'transactions.'
+            )
                 ->distinct()->count('listings.category_id');
         } catch (\Throwable $e) {
             \Log::warning('GamificationService: stats[bridge_builder] failed', ['error' => $e->getMessage()]);

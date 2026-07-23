@@ -211,6 +211,16 @@ class LeaderboardService
 
     // ─── Private helpers ─────────────────────────────────────────────
 
+    /**
+     * Real member exchanges only — mirrors GamificationService::realExchangesOnly().
+     * System grants (starting balance, admin grants, legacy '[Welcome Bonus]'
+     * self-transfers) must not score on the credit leaderboards, otherwise
+     * every new member ranks from their signup credits.
+     */
+    private const REAL_EXCHANGE_SQL = "AND t.sender_id > 0 AND t.sender_id <> t.receiver_id
+                              AND t.transaction_type NOT IN ('starting_balance', 'admin_grant')
+                              AND (t.description IS NULL OR t.description NOT LIKE '[Welcome Bonus]%')";
+
     private function buildLeaderboardQuery(string $type, string $period, int $tenantId, int $limit): ?array
     {
         $dateFilter = $this->getDateFilter($period);
@@ -223,7 +233,7 @@ class LeaderboardService
                     'sql' => "SELECT u.id as user_id, u.name, u.first_name, u.last_name, u.avatar_url,
                               COALESCE(SUM(t.amount), 0) as score
                               FROM users u
-                              LEFT JOIN transactions t ON u.id = t.receiver_id AND t.deleted_for_receiver = 0 {$dateFilterWithTable}
+                              LEFT JOIN transactions t ON u.id = t.receiver_id AND t.deleted_for_receiver = 0 " . self::REAL_EXCHANGE_SQL . " {$dateFilterWithTable}
                               WHERE u.tenant_id = ? AND u.is_approved = 1 AND COALESCE(u.show_on_leaderboard, 1) = 1
                               GROUP BY u.id
                               HAVING score > 0
@@ -238,7 +248,7 @@ class LeaderboardService
                     'sql' => "SELECT u.id as user_id, u.name, u.first_name, u.last_name, u.avatar_url,
                               COALESCE(SUM(t.amount), 0) as score
                               FROM users u
-                              LEFT JOIN transactions t ON u.id = t.sender_id AND t.deleted_for_sender = 0 {$dateFilterWithTable}
+                              LEFT JOIN transactions t ON u.id = t.sender_id AND t.deleted_for_sender = 0 " . self::REAL_EXCHANGE_SQL . " {$dateFilterWithTable}
                               WHERE u.tenant_id = ? AND u.is_approved = 1 AND COALESCE(u.show_on_leaderboard, 1) = 1
                               GROUP BY u.id
                               HAVING score > 0

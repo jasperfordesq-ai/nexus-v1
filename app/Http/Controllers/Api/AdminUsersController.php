@@ -2195,11 +2195,15 @@ class AdminUsersController extends BaseApiController
                     [$creditAmount, $userId, $userTenantId]
                 );
 
-                // Create transaction record for audit trail
+                // Create transaction record for audit trail. sender_id=0 (system)
+                // and transaction_type='starting_balance' — welcome credits are a
+                // system grant, not a member exchange, and must never be written
+                // as a self-'transfer' (that made gamification count them as the
+                // member's first exchange/earn/spend).
                 DB::insert(
-                    "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
-                     VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
-                    [$userTenantId, $userId, $userId, $creditAmount, "[Welcome Bonus] New member welcome credits (approved by admin #{$adminId})"]
+                    "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, transaction_type, created_at)
+                     VALUES (?, 0, ?, ?, ?, 'completed', 'starting_balance', NOW())",
+                    [$userTenantId, $userId, $creditAmount, "[Welcome Bonus] New member welcome credits (approved by admin #{$adminId})"]
                 );
 
                 DB::commit();
