@@ -9,9 +9,12 @@
  * Activates only when the page is scrolled to the very top.
  * Returns pull distance for rendering a visual indicator.
  * No-op on desktop (only binds touch events).
+ * Fires a light haptic tick when a release commits a refresh (no-op on iOS).
  */
 
 import { useState, useRef, useEffect } from 'react';
+
+import { triggerHaptic } from '@/lib/haptics';
 
 interface UsePullToRefreshOptions {
   /** Callback fired when the user pulls past the threshold and releases */
@@ -81,6 +84,7 @@ export function usePullToRefresh({
       pullDistanceRef.current = 0;
 
       if (currentPull >= threshold) {
+        triggerHaptic('light');
         isRefreshingRef.current = true;
         setIsRefreshing(true);
         setPullDistance(0);

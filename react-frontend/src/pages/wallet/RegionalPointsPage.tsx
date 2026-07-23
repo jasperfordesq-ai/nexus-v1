@@ -363,7 +363,7 @@ export default function RegionalPointsPage() {
               {t('regional_points.history.empty')}
             </div>
           ) : (
-            <Table aria-label={t('regional_points.history.table_aria')} removeWrapper>
+            <Table aria-label={t('regional_points.history.table_aria')} mobileCards removeWrapper>
               <TableHeader>
                 <TableColumn>{t('regional_points.history.date')}</TableColumn>
                 <TableColumn>{t('regional_points.history.type')}</TableColumn>

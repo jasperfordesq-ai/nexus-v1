@@ -76,6 +76,28 @@ describe('useLongPress', () => {
     expect(onLongPress).toHaveBeenCalledTimes(1);
   });
 
+  // ── Haptic feedback on activation ──────────────────────────────────────
+
+  it('fires a medium haptic pulse when the long-press activates', () => {
+    const vibrate = vi.fn();
+    (navigator as { vibrate?: unknown }).vibrate = vibrate;
+
+    try {
+      const onLongPress = vi.fn();
+      const { result } = renderHook(() => useLongPress({ onLongPress }));
+
+      act(() => {
+        result.current.onTouchStart(makeTouchEvent(0, 0) as unknown as React.TouchEvent);
+      });
+      act(() => { vi.advanceTimersByTime(500); });
+
+      expect(onLongPress).toHaveBeenCalledTimes(1);
+      expect(vibrate).toHaveBeenCalledWith(20);
+    } finally {
+      delete (navigator as { vibrate?: unknown }).vibrate;
+    }
+  });
+
   // ── Cancellation via touchEnd ───────────────────────────────────────────
 
   it('does NOT fire if touchEnd occurs before the delay elapses', () => {

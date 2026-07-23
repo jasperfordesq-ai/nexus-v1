@@ -261,7 +261,7 @@ export function MyPushCampaignsPage() {
             </Button>
           </div>
         ) : (
-          <Table aria-label={t('push_campaign.table_aria')} removeWrapper>
+          <Table aria-label={t('push_campaign.table_aria')} mobileCards removeWrapper>
             <TableHeader>
               <TableColumn>{t('push_campaign.col_name')}</TableColumn>
               <TableColumn>{t('push_campaign.col_title')}</TableColumn>

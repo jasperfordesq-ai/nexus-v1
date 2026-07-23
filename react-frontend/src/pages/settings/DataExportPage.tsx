@@ -226,7 +226,7 @@ export function DataExportPage(): ReactNode {
           <p className="text-theme-muted text-sm">{t('data_export.history.empty')}</p>
         ) : (
           <div className="responsive-table-wrap">
-            <Table aria-label={t('data_export.history.title')} removeWrapper classNames={{ table: 'min-w-max' }}>
+            <Table aria-label={t('data_export.history.title')} mobileCards removeWrapper classNames={{ table: 'min-w-max' }}>
               <TableHeader>
                 <TableColumn>{t('data_export.history.date')}</TableColumn>
                 <TableColumn>{t('data_export.history.format')}</TableColumn>

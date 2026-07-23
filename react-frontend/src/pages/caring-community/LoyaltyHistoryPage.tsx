@@ -151,7 +151,7 @@ export function LoyaltyHistoryPage() {
 
       {!loading && items && items.length > 0 && (
         <GlassCard className="overflow-hidden">
-          <Table aria-label={t('loyalty.history.table.aria')} removeWrapper>
+          <Table aria-label={t('loyalty.history.table.aria')} mobileCards removeWrapper>
             <TableHeader>
               <TableColumn>{t('loyalty.history.table.date')}</TableColumn>
               <TableColumn>{t('loyalty.history.table.merchant')}</TableColumn>

@@ -9,9 +9,12 @@
  * Returns event handlers to attach to a target element.
  * Cancels if the finger moves more than the move threshold (prevents
  * false triggers during scrolling). Desktop-safe: only binds touch events.
+ * Fires a medium haptic pulse when the press activates (no-op on iOS).
  */
 
 import { useRef, useCallback } from 'react';
+
+import { triggerHaptic } from '@/lib/haptics';
 
 interface UseLongPressOptions {
   /** Callback fired on long-press */
@@ -52,6 +55,7 @@ export function useLongPress({
     startPos.current = { x: touch.clientX, y: touch.clientY };
     clear();
     timerRef.current = setTimeout(() => {
+      triggerHaptic('medium');
       onLongPressRef.current();
       timerRef.current = null;
     }, delay);

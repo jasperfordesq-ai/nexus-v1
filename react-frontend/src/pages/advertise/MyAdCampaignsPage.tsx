@@ -247,7 +247,7 @@ export function MyAdCampaignsPage() {
             </Button>
           </div>
         ) : (
-          <Table aria-label={t('advertise.table_aria')} removeWrapper>
+          <Table aria-label={t('advertise.table_aria')} mobileCards removeWrapper>
             <TableHeader>
               <TableColumn>{t('advertise.col_name')}</TableColumn>
               <TableColumn>{t('advertise.col_type')}</TableColumn>

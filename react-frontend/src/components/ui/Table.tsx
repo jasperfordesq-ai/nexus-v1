@@ -13,6 +13,8 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
   useContext,
+  useEffect,
+  useRef,
 } from 'react';
 import { Table as HeroUITable } from '@heroui/react/table';
 
@@ -62,6 +64,13 @@ export type TableProps = Omit<
   isKeyboardNavigationDisabled?: boolean;
   isStriped?: boolean;
   layout?: TableLayout;
+  /**
+   * Collapse rows into stacked cards on phones (<640px), each cell prefixed
+   * with its column header. Opt-in per table: suits record-per-row data
+   * (transactions, campaigns); keep the default horizontal scroll for dense
+   * comparison grids. Desktop rendering is unchanged.
+   */
+  mobileCards?: boolean;
   onKeyDownCapture?: (event: ReactKeyboardEvent<HTMLDivElement>) => void;
   onRowAction?: HeroUITableContentProps['onRowAction'];
   onSelectionChange?: HeroUITableContentProps['onSelectionChange'];
@@ -183,6 +192,64 @@ const tableNavigationKeys = new Set([
   'PageUp',
 ]);
 
+/**
+ * Stamps each body cell with its column header text as `data-label`, which the
+ * `.nexus-table-cards` phone CSS renders as the cell's leading label. Reads the
+ * DOM (rather than threading React context through header/body) so it works
+ * for both static children and `items`-driven collection rendering. Rows whose
+ * cell count differs from the header count (e.g. a spanning empty-state cell)
+ * are left unstamped.
+ */
+function useMobileCardLabels(enabled: boolean) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!enabled || !container || typeof MutationObserver === 'undefined') {
+      return;
+    }
+
+    const stampLabels = () => {
+      const table = container.querySelector('table');
+
+      if (!table) {
+        return;
+      }
+
+      const headers = Array.from(table.querySelectorAll('thead th')).map(
+        (header) => header.textContent?.trim() ?? ''
+      );
+
+      table.querySelectorAll('tbody tr').forEach((row) => {
+        const cells = Array.from(row.children).filter(
+          (cell): cell is HTMLElement => cell instanceof HTMLElement
+        );
+        const rowMatchesColumns = cells.length === headers.length;
+
+        cells.forEach((cell, index) => {
+          const label = rowMatchesColumns ? headers[index] : undefined;
+
+          if (label) {
+            cell.setAttribute('data-label', label);
+          } else {
+            cell.removeAttribute('data-label');
+          }
+        });
+      });
+    };
+
+    stampLabels();
+
+    const observer = new MutationObserver(stampLabels);
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [enabled]);
+
+  return containerRef;
+}
+
 function preventTableKeyboardNavigation(event: ReactKeyboardEvent<HTMLElement>) {
   if (!tableNavigationKeys.has(event.key)) {
     return;
@@ -220,6 +287,7 @@ export function Table({
   isKeyboardNavigationDisabled = false,
   isStriped = false,
   layout,
+  mobileCards = false,
   onKeyDownCapture,
   onRowAction,
   onSelectionChange,
@@ -236,6 +304,7 @@ export function Table({
   variant,
   ...props
 }: TableProps) {
+  const mobileCardLabelsRef = useMobileCardLabels(mobileCards);
   const compatibilityValue: TableCompatibilityContextValue = {
     classNames,
     hideHeader,
@@ -280,7 +349,7 @@ export function Table({
     </>
   );
 
-  return (
+  const table = (
     <HeroUITable
       className={combineClasses(
         fullWidth ? '!w-full' : '!w-fit max-w-full',
@@ -322,6 +391,18 @@ export function Table({
         ) : null}
       </TableCompatibilityContext.Provider>
     </HeroUITable>
+  );
+
+  if (!mobileCards) {
+    return table;
+  }
+
+  // display:contents keeps this label-stamping anchor out of the layout, so
+  // opting in cannot shift desktop rendering.
+  return (
+    <div className="contents nexus-table-cards" ref={mobileCardLabelsRef}>
+      {table}
+    </div>
   );
 }
 

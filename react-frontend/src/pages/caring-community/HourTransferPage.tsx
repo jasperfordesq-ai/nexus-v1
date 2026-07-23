@@ -353,7 +353,7 @@ export function HourTransferPage() {
           ) : history.length === 0 ? (
             <p className="text-sm text-theme-muted">{t('hour_transfer.history.empty')}</p>
           ) : (
-            <Table aria-label={t('hour_transfer.history.aria')} removeWrapper>
+            <Table aria-label={t('hour_transfer.history.aria')} mobileCards removeWrapper>
               <TableHeader>
                 <TableColumn>{t('hour_transfer.history.date')}</TableColumn>
                 <TableColumn>{t('hour_transfer.history.destination')}</TableColumn>

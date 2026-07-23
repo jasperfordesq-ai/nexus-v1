@@ -127,7 +127,7 @@ export default function SellerCouponsPage() {
       ) : (
         <Card>
           <CardBody>
-            <Table aria-label={t('coupon.seller.table_aria')}>
+            <Table aria-label={t('coupon.seller.table_aria')} mobileCards>
               <TableHeader>
                 <TableColumn>{t('coupon.code')}</TableColumn>
                 <TableColumn>{t('coupon.title')}</TableColumn>

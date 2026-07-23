@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import {
   Table,
@@ -38,6 +38,33 @@ function ExampleTable(props: TableProps) {
 }
 
 describe('Table', () => {
+  it('stamps column headers onto body cells when mobileCards is set', async () => {
+    const { container } = render(<ExampleTable mobileCards />);
+
+    const wrapper = container.querySelector('.nexus-table-cards');
+    expect(wrapper).toHaveClass('contents');
+
+    // Collection rows land in a later React Aria commit; the MutationObserver
+    // stamps them asynchronously.
+    await waitFor(() => {
+      expect(screen.getByRole('rowheader', { name: 'Alice' })).toHaveAttribute(
+        'data-label',
+        'Name'
+      );
+    });
+    expect(screen.getByRole('rowheader', { name: 'Bob' }).nextElementSibling).toHaveAttribute(
+      'data-label',
+      'Status'
+    );
+  });
+
+  it('adds no card wrapper or labels by default', () => {
+    const { container } = render(<ExampleTable />);
+
+    expect(container.querySelector('.nexus-table-cards')).toBeNull();
+    expect(container.querySelector('[data-label]')).toBeNull();
+  });
+
   it('marks the first static column as a row header when none is provided', () => {
     render(<ExampleTable />);
 
