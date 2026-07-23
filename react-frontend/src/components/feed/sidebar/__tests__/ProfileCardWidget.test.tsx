@@ -50,7 +50,8 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
 }));
 

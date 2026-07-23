@@ -66,7 +66,8 @@ vi.mock('@/contexts', () =>
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string | null) => url ?? '',
 }));

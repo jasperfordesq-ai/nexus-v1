@@ -71,7 +71,8 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url || '/default-avatar.png',
   resolveThumbnailUrl: (url: string | null | undefined) => url || '/default-avatar.png',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

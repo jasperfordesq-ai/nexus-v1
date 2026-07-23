@@ -83,7 +83,8 @@ vi.mock('@/hooks/useSocialInteractions', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || null),

@@ -25,7 +25,8 @@ const { mockApi } = vi.hoisted(() => ({
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveThumbnailUrl: (url: string | null) => url ?? '',
   formatRelativeTime: () => '2 hours ago',

@@ -49,7 +49,8 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url: string | undefined) => url || ''),
 }));

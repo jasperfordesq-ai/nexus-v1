@@ -7,7 +7,8 @@ import { render, screen } from '@/test/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string) => url,
 }));
 

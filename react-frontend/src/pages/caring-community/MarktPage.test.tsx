@@ -75,7 +75,8 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url?: string) => url ?? null,
   resolveAssetUrl: (url: string) => url,
   resolveThumbnailUrl: (url: string) => url,

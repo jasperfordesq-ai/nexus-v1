@@ -29,7 +29,8 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn((url: string | null) => url ?? ''),
   formatNumber: vi.fn((n: number, opts?: Intl.NumberFormatOptions) => n.toLocaleString('en-US', opts)),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

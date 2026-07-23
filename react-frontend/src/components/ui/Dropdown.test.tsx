@@ -26,7 +26,8 @@ import { Button } from './Button';
 vi.mock('@/contexts', () => createMockContexts());
 
 // cn helper used internally — no external deps to mock
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   cn: (...args: (string | undefined | false)[]) => args.filter(Boolean).join(' '),
 }));
 

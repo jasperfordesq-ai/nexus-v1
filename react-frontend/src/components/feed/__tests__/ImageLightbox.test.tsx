@@ -14,6 +14,7 @@ import type { PostMedia } from '../types';
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -33,8 +34,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string | null) => url || '',
+  resolveThumbnailUrl: (url: string | null) => url || '',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
@@ -237,9 +240,10 @@ describe('ImageLightbox', () => {
     const media = makeMedia(1);
     render(<ImageLightbox media={media} onClose={onClose} />);
 
-    // The close-on-click handler sits on the ModalBody backdrop, which carries
-    // the lightbox aria-label (not on the dialog landmark element itself).
-    const backdrop = screen.getByLabelText('Image viewer');
+    // The close-on-click handler sits on the ModalBody backdrop; both it and
+    // the outer ModalContent carry the lightbox aria-label, so take the
+    // innermost match (clicks bubble up to the ModalBody handler).
+    const backdrop = screen.getAllByLabelText('Image viewer').at(-1)!;
     fireEvent.click(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
   });

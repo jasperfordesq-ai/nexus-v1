@@ -31,7 +31,8 @@ vi.mock('@/contexts', () =>
 );
 
 // Stub helpers to return predictable values
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
   resolveAssetUrl: (url: string | null | undefined) => url ?? '',
   resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',

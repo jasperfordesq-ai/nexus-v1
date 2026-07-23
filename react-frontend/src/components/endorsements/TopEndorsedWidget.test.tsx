@@ -53,7 +53,8 @@ vi.mock('@/components/ui', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
   formatDateTime: (_date: Date, _opts?: object) => '10:00 AM',
   formatMonthShort: (_date: Date, _upper?: boolean) => 'JAN',

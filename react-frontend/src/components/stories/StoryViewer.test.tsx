@@ -61,7 +61,8 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── Stub lib/helpers ───────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string) => url,
   formatRelativeTime: () => '1 hour ago',

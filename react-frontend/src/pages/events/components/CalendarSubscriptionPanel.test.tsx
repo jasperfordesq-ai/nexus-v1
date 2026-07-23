@@ -51,7 +51,7 @@ vi.mock('@/components/ui/ConfirmDialog', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ formatDateTime: () => '11 July 2026, 10:00' }));
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({ ...(await importOriginal()), formatDateTime: () => '11 July 2026, 10:00' }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, values?: Record<string, unknown>) => (

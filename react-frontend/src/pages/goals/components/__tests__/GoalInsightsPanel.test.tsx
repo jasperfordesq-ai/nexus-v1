@@ -31,7 +31,7 @@ vi.mock('@/contexts', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ formatRelativeTime: vi.fn(() => 'today'), cn: (...classes: unknown[]) => classes.filter(Boolean).join(' ') }));
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({ ...(await importOriginal()), formatRelativeTime: vi.fn(() => 'today'), cn: (...classes: unknown[]) => classes.filter(Boolean).join(' ') }));
 
 import { api } from '@/lib/api';
 import { GoalInsightsPanel } from '../GoalInsightsPanel';

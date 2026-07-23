@@ -68,7 +68,8 @@ vi.mock('react-i18next', () => ({
 }));
 
 // ── helpers / api ─────────────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | undefined) => url ?? '/default-avatar.png',
   resolveAssetUrl: (url: string | null | undefined) => url ?? null,
   cn: (...classes: Array<string | false | null | undefined>) =>

@@ -15,7 +15,7 @@ const { mockApi } = vi.hoisted(() => ({
 
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ formatRelativeTime: (d: string) => d }));
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({ ...(await importOriginal()), formatRelativeTime: (d: string) => d }));
 
 // ─── Toast / Auth / Tenant ───────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn(), showToast: vi.fn() };

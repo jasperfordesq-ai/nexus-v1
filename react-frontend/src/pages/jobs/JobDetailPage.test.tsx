@@ -1,4 +1,4 @@
-﻿// Copyright © 2024–2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -118,7 +118,8 @@ vi.mock('@/lib/motion', () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>({children as ReactNode})</>,
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   formatDateValue: vi.fn((value) => String(value ?? '')),

@@ -44,7 +44,8 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string) => url || '/default.png',
   resolveThumbnailUrl: (url: string) => url || '/default.png',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

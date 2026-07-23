@@ -15,7 +15,8 @@ import type { CommentsSectionProps } from './CommentsSection';
 const toastErrorSpy = vi.hoisted(() => vi.fn());
 
 // ─── Stubs for imports ───────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   formatRelativeTime: () => '5 minutes ago',
 }));

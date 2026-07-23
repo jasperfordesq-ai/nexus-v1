@@ -35,7 +35,8 @@ vi.mock('@/contexts', () =>
 
 // Stub helpers used by QuotedPostEmbed (child component).
 // Must also export cn since HeroUI/UI components import it from @/lib/helpers.
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
   resolveAssetUrl: (url: string | null | undefined) => url ?? '',
   formatRelativeTime: () => '10m ago',

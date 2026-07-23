@@ -137,7 +137,8 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   formatRelativeTime: vi.fn(() => '5 minutes ago'),
   resolveAvatarUrl: vi.fn((url: string | null | undefined) => url ?? null),
 }));

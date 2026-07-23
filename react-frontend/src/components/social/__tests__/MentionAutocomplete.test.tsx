@@ -55,8 +55,10 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url || '/default-avatar.png',
+  resolveThumbnailUrl: (url: string | null | undefined) => url || '/default-avatar.png',
   formatRelativeTime: vi.fn(() => '1 hour ago'),
 }));
 

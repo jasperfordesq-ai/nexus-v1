@@ -39,7 +39,8 @@ vi.mock('@/contexts', () =>
 );
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (u: string | null) => u ?? '',
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));

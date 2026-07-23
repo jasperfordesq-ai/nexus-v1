@@ -21,7 +21,7 @@ vi.mock('@/admin/api/adminApi', () => ({
   adminSettings: { getAiConfig: vi.fn(), updateAiConfig: vi.fn() },
 }));
 
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (u: string | null) => u ?? '' }));
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({ ...(await importOriginal()), resolveAvatarUrl: (u: string | null) => u ?? '' }));
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };

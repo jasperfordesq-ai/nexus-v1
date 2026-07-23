@@ -78,7 +78,8 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string | null) => url ?? '',
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveThumbnailUrl: (url: string | null) => url ?? '',

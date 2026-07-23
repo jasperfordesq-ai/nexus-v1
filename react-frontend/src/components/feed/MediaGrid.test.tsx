@@ -50,7 +50,8 @@ vi.mock('./ImageLightbox', () => ({
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string | null) => url ?? '',
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveThumbnailUrl: (url: string | null) => url ?? '',

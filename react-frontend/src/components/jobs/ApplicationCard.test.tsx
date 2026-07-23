@@ -23,7 +23,8 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/contexts', () => createMockContexts());
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   formatDateTime: vi.fn((dt: string) => dt),
   formatDateValue: vi.fn((dt: string) => dt),
   resolveAvatarUrl: vi.fn((url: string | null) => url ?? ''),

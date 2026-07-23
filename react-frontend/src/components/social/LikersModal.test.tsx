@@ -47,8 +47,10 @@ vi.mock('./UserHoverCard', () => ({
 }));
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
   formatRelativeTime: () => '2 hours ago',
 }));
 

@@ -39,7 +39,8 @@ vi.mock('@/contexts', () =>
   }),
 );
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn(() => null),
   resolveAssetUrl: vi.fn(() => null),
   cn: (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(' '),

@@ -58,7 +58,8 @@ vi.mock('@/lib/motion', async () => {
   };
 });
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string) => url ?? '',
 }));
 

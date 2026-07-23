@@ -35,7 +35,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (u: string | null) => u ?? '' }));
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({ ...(await importOriginal()), resolveAvatarUrl: (u: string | null) => u ?? '' }));
 
 import OrgHoursReviewTab from './OrgHoursReviewTab';
 import { api } from '@/lib/api';

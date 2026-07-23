@@ -152,6 +152,7 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
       const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : key;
@@ -163,7 +164,8 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url || '',
   resolveAssetUrl: (url: string | null) => url || '',
 }));

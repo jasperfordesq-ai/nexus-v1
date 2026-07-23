@@ -20,7 +20,8 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null | undefined) => url || '',
 }));
 

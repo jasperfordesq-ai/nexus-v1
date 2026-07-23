@@ -25,7 +25,8 @@ vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAssetUrl: (url: string) => url,
   resolveAvatarUrl: () => null,
 }));

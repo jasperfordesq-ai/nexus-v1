@@ -29,7 +29,8 @@ vi.mock('@/lib/motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   formatNumber: (value: number) => String(value),
   getFormattingLocale: () => 'en-US',

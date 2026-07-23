@@ -65,7 +65,8 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn((url: string | null) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url: string) => url),
   formatRelativeTime: vi.fn(() => '5 min ago'),

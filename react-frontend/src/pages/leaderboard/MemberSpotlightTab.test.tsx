@@ -38,7 +38,8 @@ vi.mock('@/contexts', () =>
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (v: string | null) => v ?? '',
   formatDateTime: (v: string) => v,
 }));

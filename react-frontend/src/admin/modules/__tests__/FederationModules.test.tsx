@@ -61,7 +61,8 @@ vi.mock('@/contexts/ToastContext', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: vi.fn((url: string) => url || '/default.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   resolveAssetUrl: vi.fn((url: string) => url || ''),

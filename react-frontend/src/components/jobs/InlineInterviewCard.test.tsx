@@ -32,7 +32,8 @@ vi.mock('@/contexts', () => createMockContexts());
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // formatDateTime is used to display the scheduled_at time; mock to make assertions stable
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   formatDateTime: (v: string) => `Formatted(${v})`,
   resolveAvatarUrl: (v: string | null) => v ?? '',
 }));

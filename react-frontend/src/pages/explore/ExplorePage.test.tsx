@@ -96,7 +96,8 @@ vi.mock('@/components/explore', () => ({
   HorizontalScroll: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock(import('@/lib/helpers'), async (importOriginal) => ({
+  ...(await importOriginal()),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string | null) => url ?? '',
 }));
