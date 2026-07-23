@@ -21,6 +21,8 @@ import { SearchField } from '@/components/ui/SearchField';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { ListingSkeleton, MediaRowsSkeleton } from '@/components/ui/Skeletons';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { MobileSearchOverlay } from '@/components/search/MobileSearchOverlay';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from '@/lib/motion';
 
 const listingContainerVariants = {
@@ -103,6 +105,10 @@ export function ListingsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  // Native-app search: phones open a full-screen overlay with recents instead
+  // of typing into the inline filter field. Desktop keeps the inline field.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
 
   const [selectedType, setSelectedType] = useState<ListingType>(() => {
     const v = searchParams.get('type');
@@ -475,26 +481,42 @@ export function ListingsPage() {
         {/* Row 1: Search + primary filters */}
         <form onSubmit={handleSearch} aria-label={t('filter_form_label')} className="flex flex-col gap-3 xl:flex-row">
           <div className="flex min-w-0 flex-1 gap-2">
-            <SearchField
-              size="lg"
-              placeholder={t('search_placeholder')}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              aria-label={t('search_label')}
-              classNames={{
-                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover shadow-sm',
-              }}
-            />
-            <Button
-              isIconOnly
-              type="submit"
-              variant="primary"
-              className="min-h-[48px] min-w-[48px] shrink-0"
-              aria-label={t('search_action')}
-            >
-              <Search className="h-4 w-4" aria-hidden="true" />
-            </Button>
+            {isPhone ? (
+              <Button
+                variant="flat"
+                onPress={() => setIsSearchOverlayOpen(true)}
+                aria-label={t('search_label')}
+                className="min-h-12 flex-1 justify-start gap-2 rounded-xl border border-theme-default bg-theme-elevated px-4 text-left text-sm font-normal shadow-sm"
+              >
+                <Search className="h-4 w-4 shrink-0 text-theme-subtle" aria-hidden="true" />
+                <span className={`line-clamp-1 ${searchInput ? 'text-theme-primary' : 'text-theme-subtle'}`}>
+                  {searchInput || t('search_placeholder')}
+                </span>
+              </Button>
+            ) : (
+              <>
+                <SearchField
+                  size="lg"
+                  placeholder={t('search_placeholder')}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  aria-label={t('search_label')}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover shadow-sm',
+                  }}
+                />
+                <Button
+                  isIconOnly
+                  type="submit"
+                  variant="primary"
+                  className="min-h-[48px] min-w-[48px] shrink-0"
+                  aria-label={t('search_action')}
+                >
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:flex xl:items-center">
@@ -623,6 +645,18 @@ export function ListingsPage() {
             </ToggleButtonGroup>
           </div>
         </form>
+
+        {isPhone && (
+          <MobileSearchOverlay
+            isOpen={isSearchOverlayOpen}
+            onClose={() => setIsSearchOverlayOpen(false)}
+            value={searchInput}
+            onValueChange={setSearchInput}
+            onSubmit={(value) => setSearchQuery(value)}
+            placeholder={t('search_placeholder')}
+            recentKey="listings"
+          />
+        )}
 
         {/* Row 2: Advanced filters (toggled) */}
         {showAdvancedFilters && (

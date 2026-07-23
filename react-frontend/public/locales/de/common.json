@@ -169,6 +169,8 @@
     "suggestions": "Vorschläge",
     "quick_links": "Schnelllinks",
     "clear": "Suche löschen",
+    "clear_recent": "Letzte Suchanfragen löschen",
+    "close_search": "Suche schließen",
     "type_listing": "Inserat",
     "type_member": "Mitglied",
     "type_event": "Veranstaltung",

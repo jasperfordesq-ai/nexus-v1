@@ -1372,6 +1372,7 @@ export function CreateEventPage() {
                     <div>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         label={t('form.recurrence_count')}
                         placeholder={t('form.recurrence_count_placeholder')}
                         value={formData.recurrenceCount}
@@ -1478,6 +1479,7 @@ export function CreateEventPage() {
             <div>
               <Input
                 type="number"
+                inputMode="numeric"
                 label={t('form.max_attendees_label')}
                 placeholder={t('form.max_attendees_placeholder')}
                 value={formData.max_attendees}

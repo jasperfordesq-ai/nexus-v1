@@ -6,6 +6,9 @@
 import { AlgorithmLabel, useAlgorithmInfo } from '@/components/ui/AlgorithmLabel';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import Search from 'lucide-react/icons/search';
+import { MobileSearchOverlay } from '@/components/search/MobileSearchOverlay';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { SearchField } from '@/components/ui/SearchField';
@@ -100,6 +103,10 @@ export function MembersPage() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  // Native-app search: phones open a full-screen overlay with recents instead
+  // of typing into the inline filter field. Desktop keeps the inline field.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const rawSort = searchParams.get('sort');
   const initialSort: SortOption | null = rawSort && (VALID_SORTS as string[]).includes(rawSort) ? rawSort as SortOption : null;
   const [sortBy, setSortBy] = useState<SortOption | null>(initialSort);
@@ -407,19 +414,44 @@ export function MembersPage() {
       <GlassCard className="p-4">
         <div className="flex flex-col gap-4 xl:flex-row">
           <div className="min-w-0 flex-1">
-            <SearchField
-              placeholder={t('members.search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              isClearable
-              onClear={resetSearch}
-              aria-label={t('members.search_placeholder')}
-              classNames={{
-                input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              }}
-            />
+            {isPhone ? (
+              <Button
+                variant="flat"
+                onPress={() => setIsSearchOverlayOpen(true)}
+                aria-label={t('members.search_placeholder')}
+                className="min-h-12 w-full justify-start gap-2 rounded-xl border border-theme-default bg-theme-elevated px-4 text-left text-sm font-normal"
+              >
+                <Search className="h-4 w-4 shrink-0 text-theme-subtle" aria-hidden="true" />
+                <span className={`line-clamp-1 ${searchQuery ? 'text-theme-primary' : 'text-theme-subtle'}`}>
+                  {searchQuery || t('members.search_placeholder')}
+                </span>
+              </Button>
+            ) : (
+              <SearchField
+                placeholder={t('members.search_placeholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                isClearable
+                onClear={resetSearch}
+                aria-label={t('members.search_placeholder')}
+                classNames={{
+                  input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
+                  inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                }}
+              />
+            )}
           </div>
+
+          {isPhone && (
+            <MobileSearchOverlay
+              isOpen={isSearchOverlayOpen}
+              onClose={() => setIsSearchOverlayOpen(false)}
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+              placeholder={t('members.search_placeholder')}
+              recentKey="members"
+            />
+          )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap xl:flex-nowrap">
             <Select

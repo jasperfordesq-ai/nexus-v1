@@ -170,6 +170,8 @@
     "suggestions": "Suggerimenti",
     "quick_links": "Link Rapidi",
     "clear": "Cancella ricerca",
+    "clear_recent": "Cancella le ricerche recenti",
+    "close_search": "Chiudi la ricerca",
     "type_listing": "Annuncio",
     "type_member": "Membro",
     "type_event": "Evento",

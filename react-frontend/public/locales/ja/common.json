@@ -74,8 +74,8 @@
     "courses": "コース",
     "podcasts": "ポッドキャスト",
     "switch_community": "コミュニティを切り替え",
-    "unread_notifications_other": "未読通知 {{count}}件",
-    "unread_notifications_one": "{{count}} 未読の通知"
+    "unread_notifications_one": "{{count}} 未読の通知",
+    "unread_notifications_other": "未読通知 {{count}}件"
   },
   "landing_links": {
     "title": "このコミュニティを探索",
@@ -169,6 +169,8 @@
     "suggestions": "候補",
     "quick_links": "クイックリンク",
     "clear": "検索をクリア",
+    "clear_recent": "最近の検索をクリア",
+    "close_search": "検索を閉じる",
     "type_listing": "リスティング",
     "type_member": "メンバー",
     "type_event": "イベント",
@@ -371,12 +373,12 @@
     "load_more_failed": "追加のメンバーの読み込みに失敗しました",
     "my_profile": "マイプロフィール",
     "load_more_count": "さらに読み込む (残り {{remaining}} 件)",
-    "results_count_other": "{{count}}人のメンバーを表示",
-    "hours_exchanged_aria_other": "{{count}}時間交換",
-    "hours_short_other": "{{count}}時間",
     "results_count_one": "{{count}} 表示されたメンバー",
+    "results_count_other": "{{count}}人のメンバーを表示",
     "hours_exchanged_aria_one": "{{count}} 交換された時間",
-    "hours_short_one": "{{count}}h"
+    "hours_exchanged_aria_other": "{{count}}時間交換",
+    "hours_short_one": "{{count}}h",
+    "hours_short_other": "{{count}}時間"
   },
   "error_boundary": {
     "title": "問題が発生しました",
@@ -891,8 +893,8 @@
     "remove": "Remove",
     "location_results_one": "{{count}} アドレスの提案が利用可能",
     "location_results_other": "{{count}} アドレスの提案が利用可能",
-    "search_results_other": "{{count}} の結果が利用可能",
-    "search_results_one": "{{count}} 件の結果が利用可能"
+    "search_results_one": "{{count}} 件の結果が利用可能",
+    "search_results_other": "{{count}} の結果が利用可能"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",
@@ -1124,8 +1126,8 @@
     "errors": {
       "load_failed": "クラブを読み込めませんでした。もう一度お試しください。"
     },
-    "member_count_other": "{{count}}人のメンバー",
-    "member_count_one": "{{count}} メンバーたち"
+    "member_count_one": "{{count}} メンバーたち",
+    "member_count_other": "{{count}}人のメンバー"
   },
   "feed": {
     "personalisation": {
@@ -1209,8 +1211,8 @@
       "size": "サイズ",
       "count": "{{count}}件のエクスポート",
       "empty": "データをまだエクスポートしていません。",
-      "count_other": "{{count}}件のエクスポート",
-      "count_one": "{{count}} 件のエクスポート"
+      "count_one": "{{count}} 件のエクスポート",
+      "count_other": "{{count}}件のエクスポート"
     },
     "errors": {
       "rate_limit": "エクスポートは1日5回まで可能です。明日もう一度お試しください。",
@@ -1528,8 +1530,8 @@
       "usage_count": "{{count}}回使用",
       "saved": "クーポンを保存しました",
       "deleted": "クーポンを削除しました",
-      "usage_count_other": "{{count}}回使用",
-      "usage_count_one": "{{count}} 回使用済み"
+      "usage_count_one": "{{count}} 回使用済み",
+      "usage_count_other": "{{count}}回使用"
     },
     "qr_code_alt": "QR コード"
   },
@@ -2091,8 +2093,8 @@
       "from_label": "差出人",
       "load_failed": "カレンダーを読み込めませんでした。"
     },
-    "char_count_other": "{{count}}/500",
-    "char_count_one": "{{count}}/500"
+    "char_count_one": "{{count}}/500",
+    "char_count_other": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Googleで続ける",
@@ -2198,10 +2200,10 @@
       "waive_failed": "会費を免除できませんでした。"
     },
     "badge_none": "会費なし",
+    "admin_bulk_reminder_sent_one": "{{count}} 件のリマインダーが送信されました。",
     "admin_bulk_reminder_sent_other": "{{count}} 件のリマインダーを送信しました。",
     "admin_overdue_count_one": "{{count}} メンバーは会費を滞納しています。",
-    "admin_overdue_count_other": "{{count}} 名のメンバーが会費を延滞しています。",
-    "admin_bulk_reminder_sent_one": "{{count}} 件のリマインダーが送信されました。"
+    "admin_overdue_count_other": "{{count}} 名のメンバーが会費を延滞しています。"
   },
   "collections": {
     "save": "保存",
@@ -2346,8 +2348,8 @@
   "max_characters": "最大{{count}}文字",
   "map": {
     "listings_here": "ここに{{count}}件の投稿",
-    "listings_here_other": "ここに{{count}}件の投稿",
-    "listings_here_one": "{{count}} 件のリストがここにあります"
+    "listings_here_one": "{{count}} 件のリストがここにあります",
+    "listings_here_other": "ここに{{count}}件の投稿"
   },
   "time_credits_short": "{{count}}h クレジット",
   "level_plain": "レベル{{level}}",
@@ -2439,7 +2441,9 @@
     "action_goal": "新しい目標を設定しました",
     "action_post": "投稿を共有しました"
   },
+  "hours_short_one": "{{count}}h",
   "hours_short_other": "{{count}}時間",
+  "time_credits_short_one": "{{count}} クレジット",
   "time_credits_short_other": "{{count}}h クレジット",
   "question_required": "必須",
   "yes": "はい",
@@ -2454,7 +2458,9 @@
   "required_error": "必須の質問すべてに回答してください。",
   "already_responded": "このアンケートにはすでに回答済みです。",
   "time_ago_just_now": "たった今",
+  "time_ago_hours_one": "{{count}}前",
   "time_ago_hours_other": "{{count}}時間前",
+  "time_ago_days_one": "{{count}}日前",
   "time_ago_days_other": "{{count}}日前",
   "providers": {
     "filter_spitex": "スパイテックス",
@@ -2473,12 +2479,12 @@
   },
   "viewer": {
     "time_just_now": "たった今",
-    "time_minutes_ago_other": "{{count}}分前",
-    "time_hours_ago_other": "{{count}}時間前",
-    "time_days_ago_other": "{{count}}日前",
     "time_minutes_ago_one": "{{count}} 分前",
+    "time_minutes_ago_other": "{{count}}分前",
     "time_hours_ago_one": "{{count}}前",
-    "time_days_ago_one": "{{count}}日前"
+    "time_hours_ago_other": "{{count}}時間前",
+    "time_days_ago_one": "{{count}}日前",
+    "time_days_ago_other": "{{count}}日前"
   },
   "biometric": {
     "label_builtin": "内蔵認証",
@@ -2568,27 +2574,28 @@
   },
   "qa": {
     "upvote_aria": "賛成投票",
+    "vote_count_aria_one": "{{count}} 投票",
     "vote_count_aria_other": "{{count}} 票",
-    "downvote_aria": "反対投票",
-    "vote_count_aria_one": "{{count}} 投票"
+    "downvote_aria": "反対投票"
   },
   "challenges": {
     "time_ended": "終了",
     "time_remaining_days_hours": "残り {{days}}日 {{hours}}時間",
     "time_remaining_hours_minutes": "残り {{hours}}時間 {{minutes}}分"
   },
+  "max_characters_one": "最大 {{count}} 文字",
   "max_characters_other": "最大{{count}}文字",
   "volunteering": {
     "time_just_now": "たった今",
+    "time_minutes_ago_one": "{{count}} 分前",
     "time_minutes_ago_other": "{{count}}分前",
+    "time_hours_ago_one": "{{count}} 時間前",
     "time_hours_ago_other": "{{count}}1時間前",
+    "time_days_ago_one": "{{count}} 日前",
     "time_days_ago_other": "{{count}}1 日前",
     "wellbeing_user_number": "ボランティア #{{id}}",
     "wellbeing_unknown_user": "不明なボランティア",
-    "wellbeing_unknown_type": "ウェルビーイングに関する懸念",
-    "time_minutes_ago_one": "{{count}} 分前",
-    "time_hours_ago_one": "{{count}} 時間前",
-    "time_days_ago_one": "{{count}} 日前"
+    "wellbeing_unknown_type": "ウェルビーイングに関する懸念"
   },
   "users": {
     "action_edit": "編集",
@@ -2605,12 +2612,12 @@
   "system": {
     "never": "決してしない",
     "just_now": "たった今",
-    "minutes_ago_other": "{{count}}1 分前",
-    "hours_ago_other": "{{count}}1時間前",
-    "days_ago_other": "{{count}}日前",
     "minutes_ago_one": "{{count}} 分前",
+    "minutes_ago_other": "{{count}}1 分前",
     "hours_ago_one": "{{count}}前",
-    "days_ago_one": "{{count}}日前"
+    "hours_ago_other": "{{count}}1時間前",
+    "days_ago_one": "{{count}}日前",
+    "days_ago_other": "{{count}}日前"
   },
   "super": {
     "tenant_actions": "テナントのアクション",
@@ -2736,19 +2743,19 @@
     "validation_min": "{{value}} 以上である必要があります",
     "validation_max": "{{value}} 以下である必要があります",
     "validation_format": "無効な形式",
-    "gdpr_sla_overdue_other": "{{count}} 日遅れています",
-    "gdpr_sla_days_left_other": "残り {{count}} 日",
     "gdpr_sla_overdue_one": "{{count}} 日遅れ",
-    "gdpr_sla_days_left_one": "{{count}} 日残り"
+    "gdpr_sla_overdue_other": "{{count}} 日遅れています",
+    "gdpr_sla_days_left_one": "{{count}} 日残り",
+    "gdpr_sla_days_left_other": "残り {{count}} 日"
   },
   "crm": {
     "just_now": "Just Now",
-    "minutes_ago_other": "{{count}} 分前",
-    "hours_ago_other": "{{count}} 時間前",
-    "days_ago_other": "{{count}} 日前",
     "minutes_ago_one": "{{count}} 分前",
+    "minutes_ago_other": "{{count}} 分前",
     "hours_ago_one": "{{count}} 時間前",
-    "days_ago_one": "{{count}} 日前"
+    "hours_ago_other": "{{count}} 時間前",
+    "days_ago_one": "{{count}} 日前",
+    "days_ago_other": "{{count}} 日前"
   },
   "config": {
     "module_name_dashboard": "ダッシュボード",
@@ -2841,9 +2848,9 @@
     "surveys": {
       "analytics": {
         "total_responses": "総回答数",
+        "answer_count_one": "{{count}} 回答",
         "answer_count_other": "{{count}}の回答",
-        "no_open_text": "公開文による回答はまだありません。",
-        "answer_count_one": "{{count}} 回答"
+        "no_open_text": "公開文による回答はまだありません。"
       }
     }
   },
@@ -2915,6 +2922,7 @@
       "active_members": "アクティブなメンバー",
       "recipients_reached": "受信者に到達しました",
       "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
+      "under_supplied_count_one": "{{count}} 不足",
       "under_supplied_count_other": "{{count}}の供給が不足しています",
       "sub_region_coverage_aria": "サブリージョンのカバー範囲",
       "columns": {
@@ -2942,12 +2950,11 @@
       "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
       "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
       "coefficient_drift": "カテゴリ係数ドリフト",
+      "drifting_count_one": "{{count}} 流動",
       "drifting_count_other": "{{count}} 人が離れつつあります",
       "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
       "coefficient_drift_aria": "カテゴリ係数ドリフト",
-      "proactive_alerts": "プロアクティブなアラート",
-      "under_supplied_count_one": "{{count}} 不足",
-      "drifting_count_one": "{{count}} 流動"
+      "proactive_alerts": "プロアクティブなアラート"
     },
     "empty": {
       "value": "-"
@@ -3044,8 +3051,8 @@
         "resolution_trend_6m": "過去 6 か月間の解決傾向"
       },
       "units": {
-        "days_count_other": "{{count}} 日",
-        "days_count_one": "{{count}}日"
+        "days_count_one": "{{count}}日",
+        "days_count_other": "{{count}} 日"
       },
       "empty_value": "-"
     }
@@ -3057,15 +3064,10 @@
         "sends": "送信します",
         "opens": "開く"
       },
-      "chart_sends_title_other": "{{count}} 件の送信",
-      "chart_opens_title_other": "{{count}} 件の開封",
       "chart_sends_title_one": "{{count}} 送信する",
-      "chart_opens_title_one": "{{count}} 開く"
+      "chart_sends_title_other": "{{count}} 件の送信",
+      "chart_opens_title_one": "{{count}} 開く",
+      "chart_opens_title_other": "{{count}} 件の開封"
     }
-  },
-  "hours_short_one": "{{count}}h",
-  "time_credits_short_one": "{{count}} クレジット",
-  "time_ago_hours_one": "{{count}}前",
-  "time_ago_days_one": "{{count}}日前",
-  "max_characters_one": "最大 {{count}} 文字"
+  }
 }

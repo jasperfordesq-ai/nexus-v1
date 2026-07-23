@@ -4,7 +4,9 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { MobileFieldEditorOverlay } from '@/components/ui/MobileFieldEditorOverlay';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -93,6 +95,10 @@ export function ProfileTab({
   const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  // Native-app field editing: phones open the bio in a full-screen editor
+  // (Instagram edit-profile pattern) instead of a small inline textarea.
+  const isPhone = useMediaQuery('(max-width: 639px)');
+  const [isBioEditorOpen, setIsBioEditorOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -249,18 +255,42 @@ export function ProfileTab({
             classNames={inputClassNames}
           />
 
-          <Textarea
-            label={t('profile.bio')}
-            placeholder={t('profile.bio_placeholder')}
-            value={profileData.bio}
-            onChange={(e) => onProfileDataChange((prev) => ({ ...prev, bio: e.target.value }))}
-            minRows={4}
-            classNames={{
-              input: 'bg-transparent text-theme-primary',
-              inputWrapper: 'bg-theme-elevated border-theme-default',
-              label: 'text-theme-muted',
-            }}
-          />
+          {isPhone ? (
+            <div>
+              <span className="mb-1 block text-sm text-theme-muted">{t('profile.bio')}</span>
+              <Button
+                variant="flat"
+                onPress={() => setIsBioEditorOpen(true)}
+                aria-label={t('profile.bio')}
+                className="min-h-[72px] w-full items-start justify-start whitespace-normal rounded-xl border border-theme-default bg-theme-elevated px-3 py-2.5 text-left text-sm font-normal"
+              >
+                <span className={`line-clamp-3 ${profileData.bio ? 'text-theme-primary' : 'text-theme-subtle'}`}>
+                  {profileData.bio || t('profile.bio_placeholder')}
+                </span>
+              </Button>
+              <MobileFieldEditorOverlay
+                isOpen={isBioEditorOpen}
+                onClose={() => setIsBioEditorOpen(false)}
+                title={t('profile.bio')}
+                placeholder={t('profile.bio_placeholder')}
+                value={profileData.bio}
+                onSave={(bio) => onProfileDataChange((prev) => ({ ...prev, bio }))}
+              />
+            </div>
+          ) : (
+            <Textarea
+              label={t('profile.bio')}
+              placeholder={t('profile.bio_placeholder')}
+              value={profileData.bio}
+              onChange={(e) => onProfileDataChange((prev) => ({ ...prev, bio: e.target.value }))}
+              minRows={4}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
+              }}
+            />
+          )}
 
           <PlaceAutocompleteInput
             label={t('profile.location')}

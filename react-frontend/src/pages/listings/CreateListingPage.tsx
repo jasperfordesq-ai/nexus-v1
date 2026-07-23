@@ -764,6 +764,7 @@ export function CreateListingPage() {
             <div>
               <Input
                 type="number"
+                inputMode="decimal"
                 label={t('form.hours_estimated_label')}
                 placeholder={t('form.hours_placeholder')}
                 value={formData.hours_estimate}

@@ -169,6 +169,8 @@
     "suggestions": "Suggestions",
     "quick_links": "Quick Links",
     "clear": "Clear search",
+    "clear_recent": "Clear recent searches",
+    "close_search": "Close search",
     "type_listing": "Listing",
     "type_member": "Member",
     "type_event": "Event",
