@@ -986,11 +986,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </>
               ) : (
                 <>
-                  {/* Secondary guest controls live in the drawer at narrow widths. */}
-                  <Button as={Link} to={tenantPath('/login')} variant="light" size="sm" className="hidden min-[480px]:inline-flex text-theme-secondary hover:text-theme-primary min-w-0 px-2 sm:px-3">
+                  {/* Both guest actions stay visible at every width — the brand
+                      section truncates first (min-w-0 flex-1), so Log in must
+                      not disappear on portrait phones. */}
+                  <Button as={Link} to={tenantPath('/login')} variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary min-w-0 shrink-0 whitespace-nowrap px-2 sm:px-3">
                     {t('auth.log_in')}
                   </Button>
-                  <Button as={Link} to={tenantPath('/register')} size="sm" color="primary" className="font-medium min-w-0 px-2 sm:px-3">
+                  <Button as={Link} to={tenantPath('/register')} size="sm" color="primary" className="font-medium min-w-0 shrink-0 whitespace-nowrap px-2 sm:px-3">
                     {t('auth.sign_up')}
                   </Button>
                 </>
