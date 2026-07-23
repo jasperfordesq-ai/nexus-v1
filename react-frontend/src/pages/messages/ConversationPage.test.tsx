@@ -226,8 +226,9 @@ const mockConversationResponse = {
 describe('ConversationPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // jsdom doesn't provide scrollIntoView — stub it so the component doesn't crash
+    // jsdom doesn't provide scrollIntoView/scrollTo — stub them so the component doesn't crash
     Element.prototype.scrollIntoView = vi.fn();
+    Element.prototype.scrollTo = vi.fn();
   });
 
   afterEach(() => {
@@ -314,6 +315,21 @@ describe('ConversationPage', () => {
     // Compact verified treatment: icon beside the name plus a labeled status line
     expect(screen.getByLabelText('common:verification.badge.id_verified')).toBeDefined();
     expect(screen.getByText(/common:verification\.badge\.id_verified/)).toBeDefined();
+  });
+
+  it('dismisses both safeguarding notices from the phone pill X', async () => {
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('safeguarding_notice_compact')).toBeDefined());
+
+    // Two dismiss controls exist (phone pill X + sm:+ banner X); either clears the shared state
+    fireEvent.click(screen.getAllByLabelText('aria_dismiss_safeguarding')[0]!);
+
+    await waitFor(() => expect(screen.queryByText('safeguarding_notice_compact')).toBeNull());
+    expect(screen.queryByText('safeguarding_notice')).toBeNull();
   });
 
   it('renders message input area', async () => {

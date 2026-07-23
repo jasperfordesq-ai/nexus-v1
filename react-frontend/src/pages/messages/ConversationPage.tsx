@@ -10,7 +10,7 @@ import { Chip } from '@/components/ui/Chip';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import { SearchField } from '@/components/ui/SearchField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Spinner } from '@/components/ui/Spinner';
@@ -1080,7 +1080,8 @@ export function ConversationPage() {
   useEffect(() => {
     if (keyboardOffset > 0 && isNearBottomRef.current) {
       requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({ block: 'end' });
+        const container = messagesContainerRef.current;
+        container?.scrollTo({ top: container.scrollHeight });
       });
     }
   }, [keyboardOffset]);
@@ -1184,7 +1185,13 @@ export function ConversationPage() {
   }, [pagination.hasOlderMessages, isLoadingOlder, loadOlderMessages]);
 
   function scrollToBottom() {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroll the messages container directly rather than scrollIntoView:
+    // scrollIntoView also scrolls every scrollable ancestor, and on phones the
+    // page body scrolls too (the footer sits below the full-viewport thread),
+    // which dragged the thread's app bar off-screen.
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }
 
   /**
@@ -2149,25 +2156,42 @@ export function ConversationPage() {
           sm: and up keep the dismissible full banner. */}
       {!isSafeguardingDismissed && messagingRestriction?.review_notice_required !== false && (
         <>
-          <div className="flex shrink-0 justify-center sm:hidden">
-            <Popover>
-              <PopoverTrigger>
-                <Button
-                  size="sm"
-                  variant="tertiary"
-                  className="h-7 min-h-7 gap-1.5 rounded-full bg-amber-500/10 px-3 text-xs font-medium text-amber-700 dark:text-amber-300"
-                >
-                  <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-                  {t('safeguarding_notice_compact')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <div className="flex max-w-md items-start gap-3 p-4" role="alert">
-                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-warning)]" aria-hidden="true" />
-                  <p className="text-sm text-theme-primary">{t('safeguarding_notice')}</p>
-                </div>
-              </PopoverContent>
-            </Popover>
+          <div className="flex shrink-0 items-center justify-center sm:hidden">
+            <div className="flex items-center gap-0.5 rounded-full bg-amber-500/10 pr-1">
+              <Popover>
+                <PopoverTrigger>
+                  <Button
+                    size="sm"
+                    variant="tertiary"
+                    className="h-7 min-h-7 gap-1.5 rounded-full px-3 text-xs font-medium text-amber-700 dark:text-amber-300"
+                  >
+                    <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t('safeguarding_notice_compact')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <div className="flex max-w-md items-start gap-3 p-4" role="alert">
+                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-warning)]" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <PopoverHeading className="text-sm font-semibold text-theme-primary">
+                        {t('safeguarding_notice_compact')}
+                      </PopoverHeading>
+                      <p className="mt-1 text-sm text-theme-primary">{t('safeguarding_notice')}</p>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="tertiary"
+                className="h-7 min-h-7 w-7 min-w-7 rounded-full text-amber-700 dark:text-amber-300"
+                onPress={() => setIsSafeguardingDismissed(true)}
+                aria-label={t('aria_dismiss_safeguarding')}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
           <div className="hidden shrink-0 items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 sm:flex" role="alert">
             <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />

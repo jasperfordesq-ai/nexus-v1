@@ -840,6 +840,13 @@
     display: none;
   }
 
+  /* The footer below the full-viewport thread would otherwise make the page
+     body scrollable — any body scroll drags the thread's app bar off-screen.
+     Messages scroll inside their own container. */
+  body:has([data-immersive-thread]) {
+    overflow: hidden;
+  }
+
   /* The layout's main pads for the fixed navbar; with the navbar gone only
      the safe-area notch inset remains. */
   body:has([data-immersive-thread]) main {
