@@ -4,13 +4,25 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { SearchField as HeroUISearchField, type SearchFieldProps as HeroUISearchFieldProps } from '@heroui/react/search-field';
-import type { ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUISearchFieldProps['variant']>;
+type InputAttributes = InputHTMLAttributes<HTMLInputElement>;
 
-export type SearchFieldProps = Omit<HeroUISearchFieldProps, 'children' | 'onChange' | 'variant' | 'className'> & {
+export type SearchFieldProps = Omit<
+  HeroUISearchFieldProps,
+  'children' | 'onChange' | 'variant' | 'className' | 'autoCapitalize' | 'autoComplete' | 'autoCorrect' | 'enterKeyHint' | 'spellCheck'
+> & {
+  /** Mobile keyboard hints. Defaults suppress Gboard's autocorrect/prediction
+      strip and label the enter key "search" — override per call site if a
+      search box genuinely wants corrections. */
+  autoCapitalize?: InputAttributes['autoCapitalize'];
+  autoComplete?: InputAttributes['autoComplete'];
+  autoCorrect?: InputAttributes['autoCorrect'];
+  enterKeyHint?: InputAttributes['enterKeyHint'];
+  spellCheck?: InputAttributes['spellCheck'];
   className?: string;
   classNames?: {
     base?: string;
@@ -52,15 +64,20 @@ function sizeClass(size?: SearchFieldProps['size']): string | undefined {
 }
 
 export function SearchField({
+  autoCapitalize = 'none',
+  autoComplete = 'off',
+  autoCorrect = 'off',
   className,
   classNames,
   clearButtonLabel,
   endContent,
+  enterKeyHint = 'search',
   isClearable = true,
   onChange,
   onValueChange,
   placeholder,
   size,
+  spellCheck = false,
   startContent,
   variant,
   ...props
@@ -79,7 +96,15 @@ export function SearchField({
     >
       <HeroUISearchField.Group className={combineClasses(sizeClass(size), classNames?.inputWrapper)}>
         <HeroUISearchField.SearchIcon>{startContent}</HeroUISearchField.SearchIcon>
-        <HeroUISearchField.Input className={classNames?.input} placeholder={placeholder} />
+        <HeroUISearchField.Input
+          autoCapitalize={autoCapitalize}
+          autoComplete={autoComplete}
+          autoCorrect={autoCorrect}
+          className={classNames?.input}
+          enterKeyHint={enterKeyHint}
+          placeholder={placeholder}
+          spellCheck={spellCheck}
+        />
         {endContent}
         {isClearable && (
           <HeroUISearchField.ClearButton

@@ -258,6 +258,41 @@ describe('Popover', () => {
     warn.mockRestore();
   });
 
+  it('applies the responsive bottom-sheet class to the popover content by default', () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>
+          <button>Sheet trigger</button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Sheet popover</PopoverHeading>
+          <p>Sheet content</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    const sheet = document.querySelector('.nexus-responsive-popover');
+    expect(sheet).not.toBeNull();
+    expect(sheet).toContainElement(screen.getByText('Sheet content'));
+  });
+
+  it('omits the responsive bottom-sheet class when disableMobileSheet is set', () => {
+    render(
+      <Popover defaultOpen disableMobileSheet>
+        <PopoverTrigger>
+          <button>Anchored trigger</button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Anchored popover</PopoverHeading>
+          <p>Anchored content</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    expect(screen.getByText('Anchored content')).toBeInTheDocument();
+    expect(document.querySelector('.nexus-responsive-popover')).toBeNull();
+  });
+
   it('uses a project Button directly as the documented pressable trigger', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(

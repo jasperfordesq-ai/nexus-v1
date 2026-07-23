@@ -33,6 +33,7 @@ type LegacyPopoverClassNames = {
 type PopoverContextValue = {
   classNames?: LegacyPopoverClassNames;
   containerPadding?: HeroUIPopoverContentProps['containerPadding'];
+  disableMobileSheet?: boolean;
   offset?: HeroUIPopoverContentProps['offset'];
   placement?: LegacyPlacement;
   portalContainer?: HTMLElement;
@@ -49,6 +50,8 @@ export type PopoverProps = Omit<HeroUIPopoverProps, 'children'> & {
   className?: string;
   classNames?: LegacyPopoverClassNames;
   containerPadding?: HeroUIPopoverContentProps['containerPadding'];
+  /** Opt out of the phone bottom-sheet conversion and keep an anchored popover at every width. */
+  disableMobileSheet?: boolean;
   motionProps?: unknown;
   offset?: HeroUIPopoverContentProps['offset'];
   placement?: LegacyPlacement;
@@ -69,6 +72,7 @@ export type PopoverContentProps = Omit<HeroUIPopoverContentProps, 'children' | '
   children?: ReactNode;
   className?: string;
   classNames?: Pick<LegacyPopoverClassNames, 'content' | 'arrow' | 'dialog'>;
+  disableMobileSheet?: boolean;
   shouldBlockScroll?: boolean;
   showArrow?: boolean;
 };
@@ -104,6 +108,7 @@ export function Popover({
   className,
   classNames,
   containerPadding,
+  disableMobileSheet,
   motionProps: _motionProps,
   offset,
   placement,
@@ -124,6 +129,7 @@ export function Popover({
           base: combineClasses(classNames?.base, className),
         },
         containerPadding,
+        disableMobileSheet,
         offset,
         placement: normalizePlacement(placement),
         portalContainer,
@@ -174,6 +180,7 @@ export function PopoverContent({
   className,
   classNames,
   containerPadding,
+  disableMobileSheet,
   offset,
   placement,
   shouldBlockScroll,
@@ -185,6 +192,7 @@ export function PopoverContent({
   const context = use(PopoverContext);
   const shouldRenderArrow = showArrow ?? context.showArrow;
   const effectiveShouldBlockScroll = shouldBlockScroll ?? context.shouldBlockScroll;
+  const sheetDisabled = disableMobileSheet ?? context.disableMobileSheet;
 
   // React Aria's modal Popover owns scroll locking and exposes the inverse
   // contract through `isNonModal`. HeroUI 3.1.0 does not consume the legacy
@@ -194,7 +202,13 @@ export function PopoverContent({
 
   return (
     <HeroUIPopover.Content
-      className={combineClasses(context.classNames?.base, context.classNames?.content, classNames?.content, className)}
+      className={combineClasses(
+        !sheetDisabled && 'nexus-responsive-popover',
+        context.classNames?.base,
+        context.classNames?.content,
+        classNames?.content,
+        className,
+      )}
       containerPadding={containerPadding ?? context.containerPadding}
       offset={offset ?? context.offset}
       placement={(normalizePlacement(placement) ?? context.placement) as HeroUIPopoverContentProps['placement']}

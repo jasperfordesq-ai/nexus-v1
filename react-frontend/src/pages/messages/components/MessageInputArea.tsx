@@ -297,6 +297,7 @@ export function MessageInputArea({
               placeholder={t('type_placeholder')}
               value={newMessage}
               maxLength={10000}
+              enterKeyHint="send"
               onChange={(e) => {
                 onNewMessageChange(e.target.value);
                 onTypingIndicator(e.target.value);

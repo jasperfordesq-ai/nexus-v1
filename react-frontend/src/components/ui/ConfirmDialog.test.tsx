@@ -3,9 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 import { ConfirmDialogProvider, useConfirm } from './ConfirmDialog';
+
+// Warm the lazy ConfirmDialogSurface chunk once: whichever test opens the
+// dialog first otherwise races waitFor's 1s default against the first dynamic
+// import, which can exceed it on a cold vitest transform cache.
+beforeAll(async () => {
+  await import('./ConfirmDialogSurface');
+});
 
 // ---------------------------------------------------------------------------
 // Helper — a consumer component that calls useConfirm() and triggers the dialog

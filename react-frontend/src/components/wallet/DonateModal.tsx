@@ -330,6 +330,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             type="number"
+            inputMode="decimal"
             min="0.25"
             step="0.25"
             endContent={<span className="text-theme-muted text-sm">{t('hours')}</span>}

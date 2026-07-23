@@ -445,6 +445,7 @@ export function TransferModal({
               <div className="space-y-2">
                 <Input
                   type="number"
+                  inputMode="decimal"
                   placeholder="0"
                   label={t('amount_hours')}
                   aria-label={t('amount_in_hours')}

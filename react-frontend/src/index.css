@@ -655,14 +655,15 @@
     background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
   }
 
-  /* Dropdown menus and select pickers become bottom action sheets on phones.
-     React Aria positions the popover with inline top/left/maxHeight, so the
-     overrides need !important; the slide-up motion animates transform, which
-     the positioning never sets. The huge box-shadow spread dims the page —
-     popovers have no backdrop element of their own. */
+  /* Dropdown menus, select pickers, and generic popovers become bottom action
+     sheets on phones. React Aria positions the popover with inline
+     top/left/maxHeight, so the overrides need !important; the slide-up motion
+     animates transform, which the positioning never sets. The huge box-shadow
+     spread dims the page — popovers have no backdrop element of their own. */
   .nexus-responsive-dropdown-popover,
   .nexus-responsive-select-popover,
-  .nexus-responsive-datepicker-popover {
+  .nexus-responsive-datepicker-popover,
+  .nexus-responsive-popover {
     position: fixed !important;
     top: auto !important;
     left: 0 !important;
@@ -687,9 +688,15 @@
     align-items: center;
   }
 
+  /* Anchor arrows make no sense on an edge-attached sheet */
+  .nexus-responsive-popover .popover__arrow {
+    display: none;
+  }
+
   .nexus-responsive-dropdown-popover::before,
   .nexus-responsive-select-popover::before,
-  .nexus-responsive-datepicker-popover::before {
+  .nexus-responsive-datepicker-popover::before,
+  .nexus-responsive-popover::before {
     content: "";
     display: block;
     width: 2.5rem;
@@ -701,13 +708,15 @@
 
   .nexus-responsive-dropdown-popover[data-entering],
   .nexus-responsive-select-popover[data-entering],
-  .nexus-responsive-datepicker-popover[data-entering] {
+  .nexus-responsive-datepicker-popover[data-entering],
+  .nexus-responsive-popover[data-entering] {
     animation: nexus-sheet-slide-in 200ms ease-out;
   }
 
   .nexus-responsive-dropdown-popover[data-exiting],
   .nexus-responsive-select-popover[data-exiting],
-  .nexus-responsive-datepicker-popover[data-exiting] {
+  .nexus-responsive-datepicker-popover[data-exiting],
+  .nexus-responsive-popover[data-exiting] {
     animation: nexus-sheet-slide-out 150ms ease-in;
   }
 
@@ -718,6 +727,25 @@
   .nexus-responsive-select-popover [role="option"] {
     min-height: 2.75rem;
     font-size: 1rem;
+  }
+
+  /* Confirmation AlertDialogs become bottom action sheets on phones, matching
+     the responsive Modal treatment above. No grabber: AlertDialog defaults to
+     non-dismissable, so a drag affordance would promise a gesture that does
+     not exist. Classes applied by ui/AlertDialog.tsx. */
+  .nexus-responsive-alertdialog-container {
+    align-items: flex-end !important;
+    padding: max(0.5rem, var(--safe-area-top)) 0 0 !important;
+    width: 100% !important;
+  }
+
+  .nexus-responsive-alertdialog-dialog {
+    margin: auto 0 0 !important;
+    max-height: calc(100dvh - var(--safe-area-top) - 0.5rem) !important;
+    max-width: none !important;
+    width: 100% !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    padding-bottom: calc(var(--safe-area-bottom) + 1rem) !important;
   }
 }
 
@@ -775,7 +803,9 @@
   body:has(.nexus-responsive-dropdown-popover) [data-mobile-tabbar],
   body:has(.nexus-responsive-select-popover) [data-mobile-tabbar],
   body:has(.nexus-responsive-datepicker-popover) [data-mobile-tabbar],
-  body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar] {
+  body:has(.nexus-responsive-popover) [data-mobile-tabbar],
+  body:has([role="dialog"][aria-modal="true"]) [data-mobile-tabbar],
+  body:has([role="alertdialog"][aria-modal="true"]) [data-mobile-tabbar] {
     transform: translateY(calc(100% + 12px));
     pointer-events: none;
   }

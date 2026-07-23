@@ -579,6 +579,8 @@ function MentionInput({
         placeholder={placeholder}
         aria-label={placeholder || tr('write_comment', 'Write a comment...')}
         value={value}
+        enterKeyHint="send"
+        autoCapitalize="sentences"
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => {
