@@ -52,7 +52,10 @@
   "aria_close_search": "Zamknij wyszukiwanie",
   "aria_scroll_to_bottom": "Przewiń do najnowszych wiadomości",
   "aria_scroll_to_bottom_unread": "Przejdź do najnowszych wiadomości ({{count}} nowych)",
+  "date_today": "Dzisiaj",
+  "date_yesterday": "Wczoraj",
   "safeguarding_notice": "Ta rozmowa może być przeglądana przez koordynatora w celach ochrony.",
+  "safeguarding_notice_compact": "Zabezpieczona rozmowa",
   "aria_dismiss_safeguarding": "Odrzuć powiadomienie o ochronie",
   "regarding_context": "W odniesieniu do {{type}}:",
   "context_offer": "oferta",
@@ -167,7 +170,9 @@
     "tooltip_off": "Automatycznie tłumacz wszystkie wiadomości",
     "tooltip_on": "Automatyczne tłumaczenie jest włączone — kliknij, aby wyłączyć",
     "active_banner": "Wiadomości w tej rozmowie są automatycznie tłumaczone na Twój język.",
-    "turn_off": "Wyłącz"
+    "turn_off": "Wyłącz",
+    "menu_enable": "Tłumacz wiadomości automatycznie",
+    "menu_disable": "Wyłącz automatyczne tłumaczenie"
   },
   "translate_hint": {
     "title": "Tłumaczenie jest dostępne",
@@ -269,7 +274,5 @@
   "aria_conversation_unread_few": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
   "aria_conversation_unread_many": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
   "selected_members_few": "Wybrani ({{count}})",
-  "selected_members_many": "Wybrani ({{count}})",
-  "date_today": "Dzisiaj",
-  "date_yesterday": "Wczoraj"
+  "selected_members_many": "Wybrani ({{count}})"
 }

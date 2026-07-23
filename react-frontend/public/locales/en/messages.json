@@ -55,6 +55,7 @@
   "date_today": "Today",
   "date_yesterday": "Yesterday",
   "safeguarding_notice": "This conversation may be reviewed by a coordinator for safeguarding purposes.",
+  "safeguarding_notice_compact": "Safeguarded conversation",
   "aria_dismiss_safeguarding": "Dismiss safeguarding notice",
   "regarding_context": "Regarding this {{type}}:",
   "context_offer": "offer",
@@ -169,7 +170,9 @@
     "tooltip_off": "Translate all messages automatically",
     "tooltip_on": "Auto-translate is on — click to turn off",
     "active_banner": "Messages in this conversation are being automatically translated into your language.",
-    "turn_off": "Turn off"
+    "turn_off": "Turn off",
+    "menu_enable": "Translate messages automatically",
+    "menu_disable": "Turn off auto-translate"
   },
   "translate_hint": {
     "title": "Translation is available",
@@ -181,6 +184,8 @@
   "translate_hint.dismiss": "Dismiss translation hint",
   "auto_translate.tooltip_off": "Translate all messages automatically",
   "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
+  "auto_translate.menu_enable": "Translate messages automatically",
+  "auto_translate.menu_disable": "Turn off auto-translate",
   "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
   "auto_translate.turn_off": "Turn off",
   "new_group": "New Group",

@@ -113,6 +113,44 @@ const sizeClasses = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Shared badge loading — one fetch per consumer, reusable outside the row
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function useVerificationBadges(
+  userId?: number,
+  propBadges?: VerificationBadgeData[]
+): { badges: VerificationBadgeData[]; isLoaded: boolean } {
+  const [badges, setBadges] = useState<VerificationBadgeData[]>(normalizeBadges(propBadges || []));
+  const [isLoaded, setIsLoaded] = useState(!!propBadges);
+
+  useEffect(() => {
+    if (propBadges) {
+      setBadges(normalizeBadges(propBadges));
+      setIsLoaded(true);
+      return;
+    }
+
+    if (!userId) return;
+
+    const loadBadges = async () => {
+      try {
+        const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
+        if (response?.success && response.data) {
+          setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
+        }
+      } catch (err) {
+        logError('Failed to load verification badges', err);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    loadBadges();
+  }, [userId, propBadges]);
+
+  return { badges, isLoaded };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Single Badge Icon (for tooltip-only compact spaces)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -163,32 +201,7 @@ export function VerificationBadgeRow({
 }) {
   const { t } = useTranslation('common');
   const badgeConfig = getBadgeConfig(t);
-  const [badges, setBadges] = useState<VerificationBadgeData[]>(normalizeBadges(propBadges || []));
-  const [isLoaded, setIsLoaded] = useState(!!propBadges);
-
-  useEffect(() => {
-    if (propBadges) {
-      setBadges(normalizeBadges(propBadges));
-      setIsLoaded(true);
-      return;
-    }
-
-    if (!userId) return;
-
-    const loadBadges = async () => {
-      try {
-        const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
-        if (response?.success && response.data) {
-          setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
-        }
-      } catch (err) {
-        logError('Failed to load verification badges', err);
-      } finally {
-        setIsLoaded(true);
-      }
-    };
-    loadBadges();
-  }, [userId, propBadges]);
+  const { badges, isLoaded } = useVerificationBadges(userId, propBadges);
 
   if (!isLoaded) return null;
 

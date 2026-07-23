@@ -52,7 +52,10 @@
   "aria_close_search": "إغلاق البحث",
   "aria_scroll_to_bottom": "قم بالتمرير إلى أحدث الرسائل",
   "aria_scroll_to_bottom_unread": "الانتقال إلى أحدث الرسائل ({{count}} جديدة)",
+  "date_today": "اليوم",
+  "date_yesterday": "أمس",
   "safeguarding_notice": "قد يتم مراجعة هذه المحادثة من قبل منسق لأغراض الحماية.",
+  "safeguarding_notice_compact": "محادثة محمية",
   "aria_dismiss_safeguarding": "تجاهل إشعار الحماية",
   "regarding_context": "بخصوص هذا {{type}}:",
   "context_offer": "عرض",
@@ -167,7 +170,9 @@
     "tooltip_off": "ترجمة جميع الرسائل تلقائيًا",
     "tooltip_on": "الترجمة التلقائية مفعّلة — انقر لإيقافها",
     "active_banner": "تتم ترجمة الرسائل في هذه المحادثة تلقائيًا إلى لغتك.",
-    "turn_off": "إيقاف"
+    "turn_off": "إيقاف",
+    "menu_enable": "ترجمة الرسائل تلقائيا",
+    "menu_disable": "قم بإيقاف تشغيل الترجمة التلقائية"
   },
   "translate_hint": {
     "title": "الترجمة متاحة",
@@ -273,7 +278,5 @@
   "selected_members_few": "المحدد ({{count}})",
   "selected_members_many": "المحدد ({{count}})",
   "selected_members_two": "المحدد ({{count}})",
-  "selected_members_zero": "المحدد ({{count}})",
-  "date_today": "اليوم",
-  "date_yesterday": "أمس"
+  "selected_members_zero": "المحدد ({{count}})"
 }

@@ -52,7 +52,10 @@
   "aria_close_search": "Suche schliessen",
   "aria_scroll_to_bottom": "Scrollen Sie zu den neuesten Nachrichten",
   "aria_scroll_to_bottom_unread": "Zu den neuesten Nachrichten springen ({{count}} neu)",
+  "date_today": "Heute",
+  "date_yesterday": "Gestern",
   "safeguarding_notice": "Dieses Gespräch kann zu Schutzzwecken von einer Koordinationsperson überprüft werden.",
+  "safeguarding_notice_compact": "Geschütztes Gespräch",
   "aria_dismiss_safeguarding": "Schutzhinweis ausblenden",
   "regarding_context": "Bezüglich dieses {{type}}:",
   "context_offer": "Angebot",
@@ -167,7 +170,9 @@
     "tooltip_off": "Alle Nachrichten automatisch übersetzen",
     "tooltip_on": "Automatische Übersetzung ist aktiv — zum Ausschalten klicken",
     "active_banner": "Nachrichten in dieser Unterhaltung werden automatisch in deine Sprache übersetzt.",
-    "turn_off": "Ausschalten"
+    "turn_off": "Ausschalten",
+    "menu_enable": "Nachrichten automatisch übersetzen",
+    "menu_disable": "Deaktivieren Sie die automatische Übersetzung"
   },
   "translate_hint": {
     "title": "Übersetzung verfügbar",
@@ -265,7 +270,5 @@
   "aria_conversation_unread_one": "Gespräch mit {{name}}, {{count}} ungelesen",
   "aria_conversation_unread_other": "Gespräch mit {{name}}, {{count}} ungelesen",
   "selected_members_one": "Ausgewählt ({{count}})",
-  "selected_members_other": "Ausgewählt ({{count}})",
-  "date_today": "Heute",
-  "date_yesterday": "Gestern"
+  "selected_members_other": "Ausgewählt ({{count}})"
 }

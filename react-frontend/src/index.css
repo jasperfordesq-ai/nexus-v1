@@ -828,6 +828,40 @@
 }
 
 /* ─────────────────────────────────────────────
+   IMMERSIVE CONVERSATION THREAD (phones/tablets)
+   Inside a messenger thread the site header steps
+   aside — like the bottom tab bar already does —
+   so the thread owns the full viewport with a
+   single slim app bar. Marker attribute set by
+   ConversationPage; desktop (md:+) unaffected.
+   ───────────────────────────────────────────── */
+@media (max-width: 767px) {
+  body:has([data-immersive-thread]) [data-site-header] {
+    display: none;
+  }
+
+  /* The layout's main pads for the fixed navbar; with the navbar gone only
+     the safe-area notch inset remains. */
+  body:has([data-immersive-thread]) main {
+    padding-top: var(--safe-area-top);
+  }
+
+  body:has([data-immersive-thread]) [data-immersive-thread] {
+    height: calc(100dvh - var(--safe-area-top) - var(--keyboard-offset, 0px));
+  }
+}
+
+/* The page wrapper's vertical padding is 1rem below sm (1.5rem above, which
+   the thread's -my-6 already cancels) — rebalance so the thread starts flush
+   at the top of the viewport. */
+@media (max-width: 639px) {
+  body:has([data-immersive-thread]) [data-immersive-thread] {
+    margin-top: -1rem;
+    margin-bottom: -1rem;
+  }
+}
+
+/* ─────────────────────────────────────────────
    PAGE TRANSITIONS (mobile route navigation)
    Material "shared axis X": forward navigations
    slide in from the right, back (POP) from the

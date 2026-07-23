@@ -10,6 +10,7 @@ import { Chip } from '@/components/ui/Chip';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 import { SearchField } from '@/components/ui/SearchField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Spinner } from '@/components/ui/Spinner';
@@ -40,6 +41,8 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import ChevronDown from 'lucide-react/icons/chevron-down';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShieldOff from 'lucide-react/icons/shield-off';
 import { useNotifications, useToast } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, useTenant } from '@/contexts';
@@ -48,7 +51,7 @@ import { usePusherOptional, type NewMessageEvent, type TypingEvent } from '@/con
 import { usePageTitle } from '@/hooks';
 import { useVisualViewport } from '@/hooks/useVisualViewport';
 import { PageMeta } from '@/components/seo';
-import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
+import { useVerificationBadges, VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { api, type ApiErrorDetail, type ApiResponse } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatDate, resolveAvatarUrl } from '@/lib/helpers';
@@ -660,6 +663,15 @@ export function ConversationPage() {
    * Poll for new messages using cursor-based pagination
    * Only fetches messages newer than the last known message
    */
+  // Verification badges for the other participant. The phone header renders a
+  // compact check icon beside the name plus a labeled status line; desktop
+  // keeps the labeled chip row. One fetch feeds both (VerificationBadgeRow
+  // receives these as props instead of refetching).
+  const { badges: otherUserBadges, isLoaded: otherUserBadgesLoaded } = useVerificationBadges(
+    conversation?.meta.other_user?.id
+  );
+  const otherUserIdVerified = otherUserBadges.some((badge) => badge.type === 'id_verified');
+
   const applySafeguardingMeta = useCallback((safeguarding: SafeguardingMeta | null | undefined) => {
     const evaluation = evaluateSafeguardingMeta(safeguarding);
     setSafeguardingPolicyStatus(evaluation.status);
@@ -1860,8 +1872,12 @@ export function ConversationPage() {
       //
       // Mobile height reclaims the space of the bottom tab bar, which is
       // route-hidden on conversation threads (see MobileTabBar
-      // hiddenRoutePatterns): only the navbar (3rem incl. page paddings)
-      // remains above; the composer handles safe-area-bottom itself.
+      // hiddenRoutePatterns). On phones/tablets (<768px) the site header is
+      // hidden too — data-immersive-thread drives body:has() CSS in index.css
+      // that removes the navbar and gives the thread the full viewport; the
+      // 3rem/4rem terms below only apply from md: up where the navbar stays.
+      // The composer handles safe-area-bottom itself.
+      data-immersive-thread=""
       style={{ '--keyboard-offset': `${keyboardOffset}px` } as CSSProperties}
       className="-my-6 mx-auto flex h-[calc(100dvh-var(--safe-area-top)-3rem-var(--keyboard-offset,0px))] min-h-0 w-full max-w-4xl flex-col gap-3 sm:-my-8 sm:gap-4 md:h-[calc(100dvh-var(--safe-area-top)-4rem-var(--keyboard-offset,0px))]"
     >
@@ -1908,14 +1924,51 @@ export function ConversationPage() {
                       <div className="h-4 w-32 rounded-md bg-surface-tertiary" />
                     </Skeleton>
                   )}
-                  <VerificationBadgeRow userId={other_user.id} size="sm" />
+                  {/* Phones get a compact icon so the name never wraps; the
+                      trust label moves to the status line below. Desktop keeps
+                      the labeled chip row (badge design rule: never icon-only
+                      without an adjacent text label). */}
+                  {otherUserBadgesLoaded && (
+                    otherUserIdVerified ? (
+                      <ShieldCheck
+                        className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400 sm:hidden"
+                        role="img"
+                        aria-label={t('common:verification.badge.id_verified')}
+                      />
+                    ) : (
+                      <ShieldOff
+                        className="h-3.5 w-3.5 shrink-0 text-theme-muted sm:hidden"
+                        role="img"
+                        aria-label={t('common:verification.not_id_verified')}
+                      />
+                    )
+                  )}
+                  {otherUserBadgesLoaded && (
+                    <span className="hidden min-w-0 sm:block">
+                      <VerificationBadgeRow badges={otherUserBadges} size="sm" />
+                    </span>
+                  )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-2">
                   {statusLabel && (
                     <span className="shrink-0 text-xs font-medium text-theme-subtle">{statusLabel}</span>
                   )}
+                  {otherUserBadgesLoaded && (
+                    <span
+                      className={`shrink-0 text-xs font-medium sm:hidden ${
+                        otherUserIdVerified
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-theme-muted'
+                      }`}
+                    >
+                      {statusLabel ? '· ' : ''}
+                      {otherUserIdVerified
+                        ? t('common:verification.badge.id_verified')
+                        : t('common:verification.not_id_verified')}
+                    </span>
+                  )}
                   {other_user.tagline && (
-                    <p className="min-w-0 truncate text-xs text-theme-subtle">{other_user.tagline}</p>
+                    <p className="hidden min-w-0 truncate text-xs text-theme-subtle sm:block">{other_user.tagline}</p>
                   )}
                 </div>
               </div>
@@ -1927,7 +1980,7 @@ export function ConversationPage() {
               isIconOnly
               variant="secondary"
               size="sm"
-              className={`bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-accent/40 text-accent' : ''}`}
+              className={`hidden sm:flex bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-accent/40 text-accent' : ''}`}
               aria-label={t('aria_search_messages')}
               aria-expanded={showSearch}
               onPress={() => setShowSearch(!showSearch)}
@@ -1943,8 +1996,8 @@ export function ConversationPage() {
                   variant="secondary"
                   size="sm"
                   className={autoTranslateOn
-                    ? 'bg-accent/20 text-accent ring-1 ring-accent/30'
-                    : 'bg-theme-elevated text-theme-muted'
+                    ? 'hidden sm:flex bg-accent/20 text-accent ring-1 ring-accent/30'
+                    : 'hidden sm:flex bg-theme-elevated text-theme-muted'
                   }
                   aria-label={autoTranslateOn ? t('auto_translate.tooltip_on') : t('auto_translate.tooltip_off')}
                   onPress={handleAutoTranslateToggle}
@@ -1978,6 +2031,35 @@ export function ConversationPage() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label={t('aria_conversation_actions')}>
+                {/* Phone-only rows: these actions live as header buttons from
+                    sm: up; on phones they fold into this sheet to keep the
+                    thread bar to a single ⋮ affordance. */}
+                <DropdownItem
+                  key="search_messages" id="search_messages"
+                  className="sm:hidden"
+                  startContent={<Search className="w-4 h-4" />}
+                  onPress={() => setShowSearch(!showSearch)}
+                >
+                  {t('aria_search_messages')}
+                </DropdownItem>
+                {translationFeatureEnabled ? (
+                  <DropdownItem
+                    key="auto_translate" id="auto_translate"
+                    className="sm:hidden"
+                    startContent={<Languages className={`w-4 h-4 ${autoTranslateOn ? 'text-accent' : ''}`} />}
+                    onPress={handleAutoTranslateToggle}
+                  >
+                    {autoTranslateOn ? t('auto_translate.menu_disable') : t('auto_translate.menu_enable')}
+                  </DropdownItem>
+                ) : null}
+                <DropdownItem
+                  key="view_profile" id="view_profile"
+                  className="sm:hidden"
+                  startContent={<Info className="w-4 h-4" />}
+                  onPress={() => navigate(tenantPath(`/profile/${other_user.id}`))}
+                >
+                  {t('aria_view_profile')}
+                </DropdownItem>
                 <DropdownItem
                   key="delete_self" id="delete_self"
                   startContent={<Trash2 className="w-4 h-4" />}
@@ -2061,24 +2143,49 @@ export function ConversationPage() {
         </GlassCard>
       )}
 
-      {/* Safeguarding / Broker Monitoring Notice */}
+      {/* Safeguarding / Broker Monitoring Notice. Phones get a one-line pill
+          that opens the full wording in a popover (a bottom sheet at that
+          width) so the notice stays visible without spending two text lines;
+          sm: and up keep the dismissible full banner. */}
       {!isSafeguardingDismissed && messagingRestriction?.review_notice_required !== false && (
-        <div className="flex shrink-0 items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3" role="alert">
-          <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
-            {t('safeguarding_notice')}
-          </p>
-          <Button
-            isIconOnly
-            size="sm"
-            variant="tertiary"
-            className="text-[var(--color-warning)] hover:text-amber-700 dark:hover:text-amber-300 flex-shrink-0 -mt-0.5"
-            onPress={() => setIsSafeguardingDismissed(true)}
-            aria-label={t('aria_dismiss_safeguarding')}
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+        <>
+          <div className="flex shrink-0 justify-center sm:hidden">
+            <Popover>
+              <PopoverTrigger>
+                <Button
+                  size="sm"
+                  variant="tertiary"
+                  className="h-7 min-h-7 gap-1.5 rounded-full bg-amber-500/10 px-3 text-xs font-medium text-amber-700 dark:text-amber-300"
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t('safeguarding_notice_compact')}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className="flex max-w-md items-start gap-3 p-4" role="alert">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-warning)]" aria-hidden="true" />
+                  <p className="text-sm text-theme-primary">{t('safeguarding_notice')}</p>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="hidden shrink-0 items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 sm:flex" role="alert">
+            <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
+              {t('safeguarding_notice')}
+            </p>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              className="text-[var(--color-warning)] hover:text-amber-700 dark:hover:text-amber-300 flex-shrink-0 -mt-0.5"
+              onPress={() => setIsSafeguardingDismissed(true)}
+              aria-label={t('aria_dismiss_safeguarding')}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </>
       )}
 
       {safeguardingBlockNotice && (

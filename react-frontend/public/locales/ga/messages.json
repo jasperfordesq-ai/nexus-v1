@@ -52,7 +52,10 @@
   "aria_close_search": "Dún cuardach",
   "aria_scroll_to_bottom": "Scrollaigh go dtí na teachtaireachtaí is déanaí",
   "aria_scroll_to_bottom_unread": "Téigh go dtí na teachtaireachtaí is déanaí ({{count}} nua)",
+  "date_today": "Inniu",
+  "date_yesterday": "Inné",
   "safeguarding_notice": "D'fhéadfadh comhordaitheoir an comhrá seo a athbhreithniú ar mhaithe le cosaint.",
+  "safeguarding_notice_compact": "Comhrá cosanta",
   "aria_dismiss_safeguarding": "Díbir fógra cosanta",
   "regarding_context": "Maidir leis an {{type}} seo:",
   "context_offer": "tairiscint",
@@ -167,7 +170,9 @@
     "tooltip_off": "Aistrigh gach teachtaireacht go huathoibríoch",
     "tooltip_on": "Tá uathaistriú ar siúl — cliceáil chun é a mhúchadh",
     "active_banner": "Tá teachtaireachtaí sa chomhrá seo á n-aistriú go huathoibríoch go do theanga.",
-    "turn_off": "Múch"
+    "turn_off": "Múch",
+    "menu_enable": "Aistrigh teachtaireachtaí go huathoibríoch",
+    "menu_disable": "Múch uathaistriúchán"
   },
   "translate_hint": {
     "title": "Tá aistriúchán ar fáil",
@@ -271,7 +276,5 @@
   "aria_conversation_unread_two": "Comhrá le {{name}}, {{count}} neamhléite",
   "selected_members_few": "Roghnaithe ({{count}})",
   "selected_members_many": "Roghnaithe ({{count}})",
-  "selected_members_two": "Roghnaithe ({{count}})",
-  "date_today": "Inniu",
-  "date_yesterday": "Inné"
+  "selected_members_two": "Roghnaithe ({{count}})"
 }

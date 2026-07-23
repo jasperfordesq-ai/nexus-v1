@@ -52,7 +52,10 @@
   "aria_close_search": "Sluit zoekopdracht",
   "aria_scroll_to_bottom": "Scroll naar de laatste berichten",
   "aria_scroll_to_bottom_unread": "Naar de nieuwste berichten ({{count}} nieuw)",
+  "date_today": "Vandaag",
+  "date_yesterday": "Gisteren",
   "safeguarding_notice": "Dit gesprek kan door een coördinator worden beoordeeld voor veiligheidsdoeleinden.",
+  "safeguarding_notice_compact": "Veilig gesprek",
   "aria_dismiss_safeguarding": "Veiligheidsmelding negeren",
   "regarding_context": "Betreffende deze {{type}}:",
   "context_offer": "aanbod",
@@ -167,7 +170,9 @@
     "tooltip_off": "Alle berichten automatisch vertalen",
     "tooltip_on": "Automatisch vertalen staat aan — klik om uit te schakelen",
     "active_banner": "Berichten in dit gesprek worden automatisch naar jouw taal vertaald.",
-    "turn_off": "Uitschakelen"
+    "turn_off": "Uitschakelen",
+    "menu_enable": "Vertaal berichten automatisch",
+    "menu_disable": "Schakel automatisch vertalen uit"
   },
   "translate_hint": {
     "title": "Vertaling beschikbaar",
@@ -265,7 +270,5 @@
   "aria_conversation_unread_one": "Gesprek met {{name}}, {{count}} ongelezen",
   "aria_conversation_unread_other": "Gesprek met {{name}}, {{count}} ongelezen",
   "selected_members_one": "Geselecteerd ({{count}})",
-  "selected_members_other": "Geselecteerd ({{count}})",
-  "date_today": "Vandaag",
-  "date_yesterday": "Gisteren"
+  "selected_members_other": "Geselecteerd ({{count}})"
 }

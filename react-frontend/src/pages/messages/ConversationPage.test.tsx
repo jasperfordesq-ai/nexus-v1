@@ -127,6 +127,9 @@ vi.mock('@/components/ui', () => {
     DropdownTrigger: passthrough('div'),
     DropdownMenu: passthrough('div'),
     DropdownItem: passthrough('button'),
+    Popover: passthrough('div'),
+    PopoverTrigger: passthrough('div'),
+    PopoverContent: passthrough('div'),
     Input: input,
     Tooltip: passthrough('span'),
     Skeleton: passthrough('div'),
@@ -144,6 +147,10 @@ vi.mock('@/components/messages/MessageContextCard', () => ({
 
 vi.mock('@/components/verification/VerificationBadge', () => ({
   VerificationBadgeRow: () => <div data-testid="verification-badge-row" />,
+  useVerificationBadges: () => ({
+    badges: [{ type: 'id_verified', label: 'ID Verified' }],
+    isLoaded: true,
+  }),
 }));
 
 vi.mock('./components/MessageBubble', () => ({
@@ -280,7 +287,33 @@ describe('ConversationPage', () => {
 
     render(<ConversationPage />);
 
-    await waitFor(() => expect(screen.getByText('safeguarding_notice')).toBeDefined());
+    // The notice renders twice — the phone pill's popover body and the sm:+
+    // banner — CSS decides which is visible at a given width.
+    await waitFor(() => expect(screen.getAllByText('safeguarding_notice').length).toBeGreaterThan(0));
+    expect(screen.getByText('safeguarding_notice_compact')).toBeDefined();
+  });
+
+  it('marks the thread immersive and folds header actions into the overflow menu on phones', async () => {
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('Bob')).toBeDefined());
+
+    // Marker drives the body:has() CSS that hides the site header <768px
+    expect(document.querySelector('[data-immersive-thread]')).toBeTruthy();
+
+    // Phone-only overflow rows (visibility is CSS-gated via sm:hidden) —
+    // the real dropdown only mounts its items once opened
+    fireEvent.click(screen.getByLabelText('aria_more_options'));
+    await waitFor(() => expect(screen.getByText('aria_search_messages')).toBeDefined());
+    expect(screen.getByText('auto_translate.menu_enable')).toBeDefined();
+    expect(screen.getByText('aria_view_profile')).toBeDefined();
+
+    // Compact verified treatment: icon beside the name plus a labeled status line
+    expect(screen.getByLabelText('common:verification.badge.id_verified')).toBeDefined();
+    expect(screen.getByText(/common:verification\.badge\.id_verified/)).toBeDefined();
   });
 
   it('renders message input area', async () => {

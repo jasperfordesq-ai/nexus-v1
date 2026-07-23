@@ -52,7 +52,10 @@
   "aria_close_search": "Cerrar búsqueda",
   "aria_scroll_to_bottom": "Desplázate hasta los últimos mensajes",
   "aria_scroll_to_bottom_unread": "Ir a los últimos mensajes ({{count}} nuevos)",
+  "date_today": "Hoy",
+  "date_yesterday": "Ayer",
   "safeguarding_notice": "Esta conversación puede ser revisada por un coordinador con fines de protección.",
+  "safeguarding_notice_compact": "Conversación segura",
   "aria_dismiss_safeguarding": "Descartar aviso de protección",
   "regarding_context": "Respecto a este {{type}}:",
   "context_offer": "oferta",
@@ -167,7 +170,9 @@
     "tooltip_off": "Traducir todos los mensajes automáticamente",
     "tooltip_on": "La traducción automática está activada — haz clic para desactivarla",
     "active_banner": "Los mensajes de esta conversación se están traduciendo automáticamente a tu idioma.",
-    "turn_off": "Desactivar"
+    "turn_off": "Desactivar",
+    "menu_enable": "Traducir mensajes automáticamente",
+    "menu_disable": "Desactivar la traducción automática"
   },
   "translate_hint": {
     "title": "Hay una traducción disponible",
@@ -267,7 +272,5 @@
   "selected_members_one": "Seleccionados ({{count}})",
   "selected_members_other": "Seleccionados ({{count}})",
   "aria_conversation_unread_many": "Conversación con {{name}}, {{count}} sin leer",
-  "selected_members_many": "Seleccionados ({{count}})",
-  "date_today": "Hoy",
-  "date_yesterday": "Ayer"
+  "selected_members_many": "Seleccionados ({{count}})"
 }
