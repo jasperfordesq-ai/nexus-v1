@@ -22,10 +22,40 @@ use Illuminate\Support\Facades\Log;
  */
 class WalletService
 {
+    /**
+     * Hard platform ceiling on a single transfer (anti-abuse safety cap). A
+     * tenant setting may lower the effective cap but never raise it above this.
+     */
+    private const PLATFORM_MAX_TRANSFER = 1000;
+
     public function __construct(
         private readonly Transaction $transaction,
         private readonly User $user,
     ) {}
+
+    /**
+     * The effective single-transfer cap (in time credits) for a tenant.
+     *
+     * Resolves the tenant's configured `wallet.max_transfer` setting when it is
+     * set to a positive number, clamped to the platform safety ceiling — a
+     * tenant setting can only make the cap STRICTER, never raise a transfer
+     * above the anti-abuse ceiling. This is the SINGLE source of truth for the
+     * limit: both transfer() (enforcement) and WalletController::config() (what
+     * the UI advertises) call it, so the two can no longer diverge (previously
+     * config() read the tenant setting while transfer() hardcoded the ceiling,
+     * so a stricter tenant cap was advertised but silently not enforced).
+     */
+    public function maxTransferAmount(?int $tenantId = null): float
+    {
+        $tenantId ??= TenantContext::getId();
+
+        $configured = app(TenantSettingsService::class)->get((int) $tenantId, 'wallet.max_transfer');
+        if ($configured === null || ! is_numeric($configured) || (float) $configured <= 0) {
+            return (float) self::PLATFORM_MAX_TRANSFER;
+        }
+
+        return min((float) $configured, (float) self::PLATFORM_MAX_TRANSFER);
+    }
 
     /**
      * Get wallet balance and summary for a user.
@@ -436,10 +466,13 @@ class WalletService
             throw new \InvalidArgumentException(__('api.wallet_transfer_amount_positive'));
         }
 
-        // Cap maximum transfer amount to prevent accidental or malicious large transfers
-        $maxTransferAmount = 1000;
+        // Cap the transfer amount. The effective cap is the tenant's configured
+        // wallet.max_transfer (clamped to the platform ceiling), resolved via the
+        // single source of truth so the enforced limit matches what
+        // WalletController::config() advertises to the UI.
+        $maxTransferAmount = $this->maxTransferAmount();
         if ($amount > $maxTransferAmount) {
-            throw new \InvalidArgumentException(__('api.wallet_transfer_amount_max', ['max' => $maxTransferAmount]));
+            throw new \InvalidArgumentException(__('api.wallet_transfer_amount_max', ['max' => (int) $maxTransferAmount]));
         }
 
         // Enforce reasonable decimal precision (max 2 decimal places)
@@ -500,8 +533,15 @@ class WalletService
         // block a legitimate transfer on cache flakiness.
         $explicitKey = trim((string) ($data['idempotency_key'] ?? ''));
         $hasExplicitKey = $explicitKey !== '';
+        // Bind the fingerprint to the request content in BOTH branches. An
+        // explicit key that omitted recipient/amount would collapse two
+        // genuinely-different transfers that (wrongly) reuse one key: the second
+        // would replay the first's transaction and return success while moving no
+        // credits to the real recipient. Folding content in means an identical
+        // retry still dedups (double-submit protection intact) while a different
+        // recipient/amount is treated as the distinct transfer it is.
         $fingerprint = $hasExplicitKey
-            ? sha1('key:' . $explicitKey)
+            ? sha1('key:' . $explicitKey . '|' . $receiver->id . '|' . $amount . '|' . $description)
             : sha1('content:' . $receiver->id . '|' . $amount . '|' . $description);
         $idemCacheKey = "wallettx:idem:{$tenantId}:{$senderId}:{$fingerprint}";
         $idemTtl = $hasExplicitKey ? 86400 : 120;

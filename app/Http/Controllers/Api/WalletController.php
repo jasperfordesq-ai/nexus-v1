@@ -7,7 +7,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SafeguardingPolicyException;
-use App\Services\TenantSettingsService;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 
@@ -30,7 +29,6 @@ class WalletController extends BaseApiController
 
     public function __construct(
         private readonly WalletService $walletService,
-        private readonly TenantSettingsService $tenantSettingsService,
     ) {}
 
     // -----------------------------------------------------------------
@@ -45,10 +43,10 @@ class WalletController extends BaseApiController
         $this->requireAuth();
         $this->rateLimit('wallet_config', 60, 60);
 
-        $maxTransfer = $this->tenantSettingsService->get($this->getTenantId(), 'wallet.max_transfer', null);
-
+        // Single source of truth: the same effective cap transfer() enforces, so
+        // the UI never advertises a limit the server does not apply.
         return $this->respondWithData([
-            'max_transfer' => $maxTransfer !== null ? (int) $maxTransfer : null,
+            'max_transfer' => (int) $this->walletService->maxTransferAmount($this->getTenantId()),
         ]);
     }
 

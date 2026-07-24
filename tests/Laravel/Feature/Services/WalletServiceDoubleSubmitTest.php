@@ -226,6 +226,53 @@ class WalletServiceDoubleSubmitTest extends TestCase
         ]);
     }
 
+    public function test_reused_key_with_different_params_is_not_silently_replayed(): void
+    {
+        // A client that (wrongly) reuses ONE Idempotency-Key for two genuinely
+        // different transfers must not have the second collapsed into the first —
+        // that would return HTTP success while moving no credits to the real
+        // second recipient. The explicit-key fingerprint now folds in
+        // recipient/amount/description, so a different request is treated as the
+        // distinct transfer it is (while an identical retry still dedups).
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['balance' => 25]);
+        $recipientB = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $recipientC = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+
+        TenantContext::setById($this->testTenantId);
+        $first = $this->service->transfer($sender->id, [
+            'recipient'       => $recipientB->id,
+            'amount'          => 10,
+            'description'     => 'to B',
+            'idempotency_key' => 'reused-key',
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $second = $this->service->transfer($sender->id, [
+            'recipient'       => $recipientC->id,
+            'amount'          => 6,
+            'description'     => 'to C',
+            'idempotency_key' => 'reused-key',
+        ]);
+
+        $this->assertNotSame(
+            $first['id'],
+            $second['id'],
+            'A reused key with different parameters must not replay the first transfer'
+        );
+
+        // Re-pin: post-commit listeners can drift the active tenant.
+        TenantContext::setById($this->testTenantId);
+        $sender->refresh();
+        $recipientB->refresh();
+        $recipientC->refresh();
+        $this->assertEquals(9.0, (float) $sender->balance, 'Both transfers must debit the sender (25-10-6)');
+        $this->assertEquals(10.0, (float) $recipientB->balance);
+        $this->assertEquals(6.0, (float) $recipientC->balance, 'The second recipient must actually receive credits');
+        $this->assertSame(2, Transaction::query()
+            ->where('sender_id', $sender->id)
+            ->count(), 'Two distinct transfers must both create a ledger row');
+    }
+
     /**
      * @return array{0: User, 1: User}
      */
