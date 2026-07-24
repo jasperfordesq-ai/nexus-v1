@@ -27,16 +27,15 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Flag from 'lucide-react/icons/flag';
 import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
-import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
 import { AlgorithmLabel } from '@/components/ui/AlgorithmLabel';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { ScrollShadow } from '@/components/ui/ScrollShadow';
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
@@ -894,10 +893,6 @@ export function FeedPage() {
     }
   }, [filter, filterOptionsKey, handleFilterChange]);
 
-  const mobilePrimaryFilters = new Set<FeedFilter>(['all', 'following', 'saved', 'posts']);
-  const mobilePrimaryFilterOptions = filterOptions.filter((opt) => mobilePrimaryFilters.has(opt.key));
-  const mobileOverflowFilterOptions = filterOptions.filter((opt) => !mobilePrimaryFilters.has(opt.key));
-  const activeOverflowFilter = mobileOverflowFilterOptions.find((opt) => opt.key === filter);
   const hasActiveFeedView = filter !== 'all' || subFilter !== null;
   const activeFilterLabel = filterOptions.find((opt) => opt.key === filter)?.label ?? t('filter.all');
   const emptyDescription = filter !== 'all'
@@ -926,21 +921,17 @@ export function FeedPage() {
         </div>
       )}
 
-      {/* Compact page header */}
+      {/* Compact page header — single slim row on phones, full hero on ≥sm */}
       <section className="overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)] shadow-sm">
-        <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div className="min-w-0">
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/15">
-                <Newspaper className="w-5 h-5" aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <h1 className="text-balance text-2xl font-semibold leading-tight text-theme-primary sm:text-3xl">{t('title')}</h1>
-                <p className="mt-1 max-w-xl text-sm leading-6 text-theme-muted">{t('subtitle')}</p>
-              </div>
-            </div>
+        <div className="flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4">
+          <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/15 sm:flex">
+            <Newspaper className="w-5 h-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-lg font-semibold leading-tight text-theme-primary sm:whitespace-normal sm:text-balance sm:text-3xl">{t('title')}</h1>
+            <p className="mt-1 hidden max-w-xl text-sm leading-6 text-theme-muted sm:block">{t('subtitle')}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          <div className="flex shrink-0 items-center gap-2">
             {!isLoading && items.length > 0 && (
               <Chip size="sm" variant="flat" className="bg-accent/10 text-accent">
                 {t('items_loaded', { count: items.length })}
@@ -958,7 +949,7 @@ export function FeedPage() {
             )}
           </div>
         </div>
-        <div className="border-t border-theme-default bg-theme-elevated/45 px-4 py-2.5 sm:px-5">
+        <div className="hidden border-t border-theme-default bg-theme-elevated/45 px-4 py-2.5 sm:block sm:px-5">
           <p className="text-xs font-medium uppercase tracking-wide text-theme-muted">
             {t('feed.current_view', { filter: activeFilterLabel })}
           </p>
@@ -967,14 +958,14 @@ export function FeedPage() {
 
       {/* Feed controls */}
       <section data-testid="feed-controls" aria-label={t('controls_region_label')} className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="hidden min-w-0 items-center justify-between gap-3 sm:flex">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
             <Button
               isIconOnly
               size="sm"
               variant="light"
-              className="self-end text-theme-muted hover:text-accent sm:self-auto"
+              className="text-theme-muted hover:text-accent"
               onPress={clearFeedControls}
               aria-label={t('filter.clear')}
             >
@@ -1015,58 +1006,40 @@ export function FeedPage() {
           </ToggleButtonGroup>
 
           {/*
-            Mobile: primary filters in a 2-col grid + an overflow Dropdown. A single
-            ToggleButtonGroup can't express the primary/overflow split, so the compact
-            layout keeps Button pills (still HeroUI v3) plus the v3 Dropdown.
+            Mobile: the mode toggle and every filter share one horizontally
+            scrollable rail (ScrollShadow fades the clipped edge to hint at
+            overflow), so no primary/overflow split or Dropdown is needed.
           */}
-          <div className="grid grid-cols-2 gap-2 min-[390px]:flex min-[390px]:items-center sm:hidden">
-            {mobilePrimaryFilterOptions.map((opt) => (
-              <Button
-                key={opt.key}
-                size="sm"
-                variant={filter === opt.key ? 'solid' : 'flat'}
-                radius="full"
-                aria-pressed={filter === opt.key}
-                className={`min-w-0 px-3 ${
-                  filter === opt.key
-                    ? 'bg-accent text-white shadow-sm'
-                    : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
-                }`}
-                onPress={() => handleFilterChange(opt.key)}
-              >
-                <span className="truncate">{opt.label}</span>
-              </Button>
-            ))}
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Button
-                  size="sm"
-                  variant={activeOverflowFilter ? 'solid' : 'flat'}
-                  radius="full"
-                  className={`min-w-0 px-3 ${
-                    activeOverflowFilter
-                      ? 'bg-accent text-white shadow-sm'
-                      : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
-                  }`}
-                  startContent={<ListFilter className="h-4 w-4 shrink-0" aria-hidden="true" />}
-                >
-                  <span className="truncate">{activeOverflowFilter?.label ?? t('filter.more')}</span>
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
+          <ScrollShadow orientation="horizontal" hideScrollBar size={32} className="-mx-3 px-3 sm:hidden">
+            <div className="flex w-max items-center gap-2">
+              <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
+              <span aria-hidden="true" className="mx-1 h-5 w-0 shrink-0 border-l border-theme-default" />
+              <ToggleButtonGroup
                 aria-label={t('filter.select')}
-                selectedKeys={new Set([filter])}
                 selectionMode="single"
-                onAction={(key) => handleFilterChange(key as FeedFilter)}
+                disallowEmptySelection
+                isDetached
+                size="sm"
+                selectedKeys={new Set<Key>([filter])}
+                onSelectionChange={(keys) => {
+                  const [key] = Array.from(keys);
+                  if (key) handleFilterChange(key as FeedFilter);
+                }}
+                className="flex flex-nowrap items-center gap-2 p-0"
               >
-                {mobileOverflowFilterOptions.map((opt) => (
-                  <DropdownItem key={opt.key} id={opt.key}>
+                {filterOptions.map((opt) => (
+                  <ToggleButton
+                    key={opt.key}
+                    id={opt.key}
+                    variant="ghost"
+                    className="shrink-0 rounded-full border border-theme-default bg-theme-elevated px-3 text-theme-muted transition-colors hover:bg-accent/5 hover:text-accent data-[selected=true]:border-transparent data-[selected=true]:bg-accent data-[selected=true]:text-white data-[selected=true]:shadow-sm"
+                  >
                     {opt.label}
-                  </DropdownItem>
+                  </ToggleButton>
                 ))}
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              </ToggleButtonGroup>
+            </div>
+          </ScrollShadow>
         </div>
 
         {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
