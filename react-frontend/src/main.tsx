@@ -12,11 +12,27 @@ import type { ErrorInfo, ReactNode } from 'react';
 import { queueSentryBreadcrumb } from '@/lib/telemetryQueue';
 import { configureTenantManifestLink } from '@/lib/pwaManifest';
 import { installServiceWorkerLifecycle } from '@/lib/serviceWorkerLifecycle';
+import { requestStaleChunkRecovery } from '@/routes/lazyWithRetry';
 
 configureTenantManifestLink();
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
+
+// Catch-all for stale dynamic-import chunks after a deploy. Vite dispatches
+// `vite:preloadError` when a hashed chunk 404s (a client still on an old
+// index.html requests a filename a newer build re-hashed). Route it through the
+// same one-time reload-to-fresh-index recovery lazyWithRetry uses, so every raw
+// React.lazy() call site that does NOT wrap its import (broker/caring/admin
+// route bundles, etc.) is covered too. preventDefault() suppresses Vite's
+// re-throw once we've scheduled the reload; unmatched errors fall through
+// untouched to the error boundary.
+window.addEventListener('vite:preloadError', (event) => {
+  const payload = (event as Event & { payload?: unknown }).payload;
+  if (requestStaleChunkRecovery(payload)) {
+    event.preventDefault();
+  }
+});
 
 // Initialize telemetry after first paint/idle. The local error boundary stays
 // active immediately, but Sentry must not compete with login/register startup.

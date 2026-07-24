@@ -236,4 +236,83 @@ class AuthenticateTest extends TestCase
         $data = $response->getData(true);
         $this->assertEquals('auth_required', $data['errors'][0]['code']);
     }
+
+    /**
+     * A JWT bearer token minted for one tenant must NOT authenticate against a
+     * different tenant. This is the PRODUCTION auth path — real clients send an
+     * HS256 JWT via Authorization: Bearer, handled by validateLegacyToken — and
+     * its cross-tenant comparison (Authenticate::validateLegacyToken, the
+     * `$eloquentUser->tenant_id !== $tenantId` guard) is the SOLE line enforcing
+     * tenant isolation for it; TokenService::validateToken does no tenant check.
+     * The two pre-existing wrong-tenant tests exercise only the Sanctum guard
+     * path (actingAs, no bearer token), so without this a regression that dropped
+     * the JWT tenant guard would reach main with a green suite.
+     */
+    public function test_handle_legacy_jwt_from_other_tenant_returns_401(): void
+    {
+        \Illuminate\Support\Facades\DB::table('tenants')->insertOrIgnore([
+            'id' => 99,
+            'name' => 'Other Tenant',
+            'slug' => 'other-tenant',
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $user = User::factory()->forTenant(99)->create([
+            'status' => 'active',
+            'is_super_admin' => false,
+            'is_god' => false,
+        ]);
+
+        // Mint a real JWT for the tenant-99 user, then resolve the request to the
+        // test tenant (2) — the mismatch the middleware must reject.
+        $token = app(TokenService::class)->generateToken((int) $user->id, 99);
+        TenantContext::setById($this->testTenantId);
+
+        $request = Request::create('/api/v2/feed', 'GET');
+        $request->headers->set('Authorization', 'Bearer ' . $token);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertSame('auth_required', $response->getData(true)['errors'][0]['code']);
+    }
+
+    /**
+     * Platform super-admins are the one exemption: a super_admin JWT is allowed
+     * to cross tenants (validateLegacyToken lets is_super_admin / is_god / the
+     * super_admin|god roles through). Locks the exemption so tightening the
+     * cross-tenant guard cannot accidentally lock platform admins out.
+     */
+    public function test_handle_legacy_jwt_platform_super_admin_crosses_tenant(): void
+    {
+        \Illuminate\Support\Facades\DB::table('tenants')->insertOrIgnore([
+            'id' => 99,
+            'name' => 'Other Tenant',
+            'slug' => 'other-tenant',
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $user = User::factory()->forTenant(99)->create([
+            'status' => 'active',
+            'is_super_admin' => true,
+        ]);
+
+        $token = app(TokenService::class)->generateToken((int) $user->id, 99);
+        TenantContext::setById($this->testTenantId);
+
+        $request = Request::create('/api/v2/feed', 'GET');
+        $request->headers->set('Authorization', 'Bearer ' . $token);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

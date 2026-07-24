@@ -54,10 +54,22 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // SLO watch (docs/SLO.md): evaluate the exchange-completion success rate
         // daily and alert (log → Sentry → Slack) + exit non-zero when breached,
         // so a money-path regression is VISIBLE before users complain.
+        // NB: the four monitors below (slo-check, stripe-check-stuck-webhooks,
+        // gdpr-check-overdue-requests, backup-verify) intentionally exit non-zero
+        // when they DETECT a problem — that exit code is a signal for a human
+        // running them by hand. They MUST run in the background: a *foreground*
+        // scheduled command with a non-zero exit makes Laravel's ScheduleRunCommand
+        // throw "Scheduled command [...] failed with exit code [1]" and report THAT
+        // to Sentry, a second context-free error on top of the real captureMessage
+        // alert (Sentry issue 128022136, which fired daily off the GDPR pager).
+        // runInBackground() bypasses that throw (vendor guard is `&& ! $event->
+        // runInBackground`) while preserving both the real alert and the manual-run
+        // exit code. Guarded by PagerCommandsRunInBackgroundTest — keep it.
         $schedule->command('slo:check')
             ->dailyAt('07:30')
             ->withoutOverlapping()
             ->onOneServer()
+            ->runInBackground()
             ->name('slo-check');
 
         // Stuck-Stripe-webhook pager (B3): a webhook event left in 'failed'
@@ -67,6 +79,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->dailyAt('07:45')
             ->withoutOverlapping()
             ->onOneServer()
+            ->runInBackground()
             ->name('stripe-check-stuck-webhooks');
 
         // Overdue-GDPR-request pager: data-subject requests are created as
@@ -78,6 +91,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->dailyAt('07:50')
             ->withoutOverlapping()
             ->onOneServer()
+            ->runInBackground()
             ->name('gdpr-check-overdue-requests');
 
         // Alarm delivery heartbeat (watcher-of-the-watcher): the three breach
@@ -101,6 +115,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->dailyAt('09:30')
             ->withoutOverlapping()
             ->onOneServer()
+            ->runInBackground()
             ->name('backup-verify');
 
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass

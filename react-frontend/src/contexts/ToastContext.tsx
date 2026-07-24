@@ -10,7 +10,6 @@
 
 import {
   createContext,
-  lazy,
   Suspense,
   use,
   useCallback,
@@ -19,6 +18,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { lazyWithRetry } from '@/routes/lazyWithRetry';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -43,7 +43,12 @@ interface ToastContextType {
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
-const ToastViewport = lazy(() => import('@/components/feedback/ToastViewport'));
+// Route the ToastViewport chunk through the shared stale-chunk recovery wrapper
+// (not bare React.lazy): a toast can fire on a page that has been open across a
+// deploy, and its hashed chunk may have been re-hashed and 404. lazyWithRetry
+// triggers the one-time reload-to-fresh-index recovery instead of crashing the
+// subtree to the root error boundary. See routes/lazyWithRetry.ts.
+const ToastViewport = lazyWithRetry(() => import('@/components/feedback/ToastViewport'));
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
