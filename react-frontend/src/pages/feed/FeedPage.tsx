@@ -191,8 +191,8 @@ export function FeedPage() {
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
-  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('post');
-  const openCompose = (tab: ComposeTab = 'post') => { setComposeDefaultTab(tab); onCreateOpen(); };
+  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('listing');
+  const openCompose = (tab: ComposeTab = 'listing') => { setComposeDefaultTab(tab); onCreateOpen(); };
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -1085,7 +1085,7 @@ export function FeedPage() {
               />
               <Button
                 variant="flat"
-                onPress={() => openCompose('post')}
+                onPress={() => openCompose('listing')}
                 aria-label={t('whats_on_your_mind')}
                 className="min-h-11 flex-1 justify-start rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-left text-sm font-normal text-theme-subtle transition-colors hover:border-accent/30 hover:bg-theme-elevated"
               >
@@ -1412,7 +1412,7 @@ export function FeedPage() {
       )}
     </div>
 
-    {isAuthenticated && <MobileFAB onPress={() => openCompose('post')} />}
+    {isAuthenticated && <MobileFAB onPress={() => openCompose('listing')} />}
 </>
   );
 }

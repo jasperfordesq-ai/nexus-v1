@@ -21,7 +21,6 @@ import { eventsApi } from '@/lib/events-api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { AiAssistButton } from '../shared/AiAssistButton';
-import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';
 import { EmojiPicker } from '../shared/EmojiPicker';
 import { useComposeSubmit } from '../ComposeSubmitContext';
@@ -70,7 +69,6 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
-  const [sdgGoals, setSdgGoals] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Apply template data when selected from TemplatePicker
@@ -124,7 +122,6 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
       if (latitude != null) payload.latitude = latitude;
       if (longitude != null) payload.longitude = longitude;
       if (groupId) payload.group_id = groupId;
-      if (sdgGoals.length > 0) payload.sdg_goals = sdgGoals;
 
       const res = await eventsApi.create(payload);
       if (res.success) {
@@ -253,8 +250,6 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
           setLocation(value);
         }}
       />
-
-      <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />
 
       <div className={`flex items-center justify-between pt-1 ${isMobile ? 'sticky bottom-0 bg-[var(--surface-base)] py-3 border-t border-[var(--border-default)]' : ''}`}>
         <div className="flex items-center gap-1">

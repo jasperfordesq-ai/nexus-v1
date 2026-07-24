@@ -98,6 +98,16 @@ export function ComposeHub({
     });
   }, [hasFeature, hasModule]);
 
+  // If the requested tab is feature/module-gated off for this tenant (e.g. a
+  // caller defaults to 'listing' but the listings module is disabled), fall
+  // back to the first available tab instead of rendering a hidden tab's form.
+  useEffect(() => {
+    const firstTab = tabs[0];
+    if (firstTab && !tabs.some((tc) => tc.key === activeTab)) {
+      setActiveTab(firstTab.key);
+    }
+  }, [tabs, activeTab]);
+
   const handleClose = () => {
     setActiveTab(defaultTab);
     setSharedGroupId(groupId ?? null);

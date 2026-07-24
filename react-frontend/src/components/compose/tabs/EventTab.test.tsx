@@ -87,10 +87,6 @@ vi.mock('@/components/compose/shared/AiAssistButton', () => ({
   AiAssistButton: () => <button type="button">AI Assist</button>,
 }));
 
-vi.mock('@/components/compose/shared/SdgGoalsPicker', () => ({
-  SdgGoalsPicker: () => <section aria-label="Sustainable Development Goals" />,
-}));
-
 vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
   PlaceAutocompleteInput: ({
     label,
@@ -163,12 +159,6 @@ describe('EventTab', () => {
     renderEventComponent(<EventTab {...defaultProps} />);
 
     expect(screen.getByRole('button', { name: 'AI Assist' })).toBeInTheDocument();
-  });
-
-  it('renders the Sustainable Development Goals picker', () => {
-    renderEventComponent(<EventTab {...defaultProps} />);
-
-    expect(screen.getByRole('region', { name: 'Sustainable Development Goals' })).toBeInTheDocument();
   });
 
   it('renders an accessible location input', () => {
