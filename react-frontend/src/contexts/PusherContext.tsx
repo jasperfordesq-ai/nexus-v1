@@ -20,7 +20,7 @@ import type Pusher from 'pusher-js';
 import type { Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
 import { api, tokenManager } from '@/lib/api';
-import { logError } from '@/lib/logger';
+import { logError, logWarn } from '@/lib/logger';
 import type { Notification } from '@/types';
 
 interface PusherConfig {
@@ -241,7 +241,18 @@ export function PusherProvider({ children }: PusherProviderProps) {
     });
 
     pusher.connection.bind('error', (err: unknown) => {
-      logError('Pusher connection error', err);
+      // Pusher's connection 'error' fires for transient, auto-recovered transport
+      // drops (network switch, laptop sleep/wake, mobile handoff, socket close
+      // 1006) as well as permanent failures. Only the non-recoverable 4000-4099
+      // class (app-not-found / unauthorized / over-quota) warrants an error-level
+      // Sentry event; routine drops are dev-only warnings so flaky connections
+      // don't fill Sentry / page on-call (Sentry React 130296692).
+      const code = (err as { data?: { code?: number } } | null)?.data?.code;
+      if (typeof code === 'number' && code >= 4000 && code <= 4099) {
+        logError('Pusher connection error', err);
+      } else {
+        logWarn('Pusher connection dropped (transient)', err);
+      }
       setIsConnected(false);
       setIsNotificationChannelReady(false);
 

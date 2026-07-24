@@ -136,6 +136,22 @@ const SAFEGUARDING_BLOCK_CODES = new Set([
   'SAFEGUARDING_POLICY_UNAVAILABLE',
 ]);
 
+// Expected business-rule refusals that handleSendFailure already surfaces to the
+// user (safeguarding panel or a toast). Reporting these to Sentry at error level
+// is noise that also dilutes/masks genuine 5xx send failures under the same
+// fingerprint, so only unexpected failures (5xx / unknown code) are logged.
+const EXPECTED_SEND_FAILURE_CODES = new Set([
+  ...SAFEGUARDING_BLOCK_CODES,
+  'BLOCKED',
+  'MESSAGING_DISABLED',
+  'VALIDATION_ERROR',
+  'ONBOARDING_REQUIRED',
+  'NOT_FOUND',
+  'FORBIDDEN',
+  'MAINTENANCE_MODE',
+  'SERVICE_UNAVAILABLE',
+]);
+
 const SAFEGUARDING_RECHECK_INTERVAL_MS = 5000;
 
 const CONTROLLED_VETTING_TRANSLATION_KEYS: Record<string, string> = {
@@ -1645,7 +1661,9 @@ export function ConversationPage() {
 
           setTimeout(() => scrollToBottom(), 50);
         } else {
-          logError('Message send failed', response);
+          if (!response.code || !EXPECTED_SEND_FAILURE_CODES.has(response.code)) {
+            logError('Message send failed', response);
+          }
           handleSendFailure(response, 'send_error');
         }
       }
@@ -1705,7 +1723,9 @@ export function ConversationPage() {
 
         setTimeout(() => scrollToBottom(), 50);
       } else {
-        logError('GIF message send failed', response);
+        if (!response.code || !EXPECTED_SEND_FAILURE_CODES.has(response.code)) {
+          logError('GIF message send failed', response);
+        }
         handleSendFailure(response, 'send_error');
       }
     } catch (error) {

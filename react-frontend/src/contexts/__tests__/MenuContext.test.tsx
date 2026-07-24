@@ -109,12 +109,15 @@ describe('MenuContext', () => {
     expect(screen.getByTestId('refresh-btn')).toBeInTheDocument();
   });
 
-  it('throws when useMenuContext is used outside MenuProvider', () => {
+  it('returns an empty menu context (does not throw) when used outside MenuProvider', () => {
+    // useMenuContext no longer throws without a provider — it returns
+    // emptyMenuContext so Navbar / MobileDrawer can safely render on public and
+    // auth routes that sit above the MenuProvider (Sentry React 132897505).
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     expect(() => {
       render(<TestConsumer />);
-    }).toThrow('useMenuContext must be used within a MenuProvider');
+    }).not.toThrow();
 
     consoleSpy.mockRestore();
   });

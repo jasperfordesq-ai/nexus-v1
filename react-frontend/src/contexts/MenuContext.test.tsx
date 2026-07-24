@@ -270,14 +270,15 @@ describe('MenuContext / MenuProvider / useMenuContext', () => {
     expect(screen.getByTestId('has-custom').textContent).toBe('no');
   });
 
-  it('throws when useMenuContext is used outside a MenuProvider', async () => {
+  it('returns an empty menu context (does not throw) when used outside a MenuProvider', async () => {
     const { useMenuContext } = await import('./MenuContext');
     function BareConsumer() {
       useMenuContext();
       return null;
     }
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<BareConsumer />)).toThrow(/MenuProvider/);
+    // Non-throwing fallback (emptyMenuContext) — see Sentry React 132897505.
+    expect(() => render(<BareConsumer />)).not.toThrow();
     spy.mockRestore();
   });
 

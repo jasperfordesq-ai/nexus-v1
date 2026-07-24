@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 
 interface Group {
@@ -30,12 +30,19 @@ interface GroupSelectorProps {
 export function GroupSelector({ value, onChange }: GroupSelectorProps) {
   const { t } = useTranslation('feed');
   const { user } = useAuth();
+  const { hasFeature } = useTenant();
   const toast = useToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // The composer renders on surfaces with no feature gate, so on a tenant that
+  // has groups disabled this selector would otherwise fetch /v2/groups, get a
+  // 403 FEATURE_DISABLED, and pop a spurious "couldn't load groups" error toast
+  // on every composer open. Mirror the server's feature:groups gate here.
+  const groupsEnabled = hasFeature('groups');
+
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !groupsEnabled) return;
     let cancelled = false;
 
     async function loadGroups() {
@@ -46,7 +53,9 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
         if (!cancelled) {
           if (res.success && res.data) {
             setGroups(Array.isArray(res.data) ? res.data : []);
-          } else if (!res.success) {
+          } else if (!res.success && res.code !== 'FEATURE_DISABLED') {
+            // FEATURE_DISABLED (groups off / toggled mid-session) is expected —
+            // render nothing quietly rather than logging + toasting an "error".
             logError('Failed to load groups for selector', res.error);
             toast.error(t('compose.groups_load_error'));
           }
@@ -61,7 +70,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
 
     loadGroups();
     return () => { cancelled = true; };
-  }, [user?.id, toast, t]);
+  }, [user?.id, groupsEnabled, toast, t]);
 
   if (groups.length === 0 && !isLoading) return null;
 

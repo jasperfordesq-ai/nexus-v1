@@ -172,6 +172,14 @@ async function loadAndInitializeSentry(): Promise<void> {
     replaysOnErrorSampleRate: replayOnErrorSampleRate,
     maxBreadcrumbs: 50,
     sendDefaultPii: false,
+    ignoreErrors: [
+      // Capacitor Android WebView bridge teardown race: the native
+      // @JavascriptInterface object is garbage-collected mid-call when the
+      // Activity/WebView is destroyed (app backgrounded, deep-link navigation).
+      // Benign platform noise, not our code (Sentry React 127174715).
+      /Java object is gone/,
+      /Error invoking postMessage/,
+    ],
     integrations: integrations as Parameters<SentryModule['init']>[0]['integrations'],
     beforeSend(event) {
       if (event.request?.data && typeof event.request.data === 'object') {
