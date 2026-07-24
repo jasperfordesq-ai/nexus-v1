@@ -40,10 +40,10 @@ describe('avatarUpload', () => {
     expect(isSupportedAvatarFile(file('PROFILE.PNG'))).toBe(true);
   });
 
-  it('keeps the file-picker accept list aligned with the allowed formats', () => {
-    expect(AVATAR_UPLOAD_ACCEPT).toContain('image/jpeg');
-    expect(AVATAR_UPLOAD_ACCEPT).toContain('.webp');
-    expect(AVATAR_UPLOAD_ACCEPT).not.toContain('image/*');
+  it('keeps the file-picker accept wildcard so mobile browsers offer the camera option', () => {
+    // A concrete MIME/extension list makes mobile pickers drop "Take Photo".
+    // Format enforcement lives in isSupportedAvatarFile + the backend.
+    expect(AVATAR_UPLOAD_ACCEPT).toBe('image/*');
   });
 
   it('flags avatars larger than the frontend limit', () => {

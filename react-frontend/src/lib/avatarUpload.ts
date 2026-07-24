@@ -20,17 +20,10 @@ const ALLOWED_AVATAR_EXTENSIONS = new Set([
 
 export const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 
-export const AVATAR_UPLOAD_ACCEPT = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  '.jpg',
-  '.jpeg',
-  '.png',
-  '.gif',
-  '.webp',
-].join(',');
+// Must stay the bare wildcard: a concrete MIME/extension list makes mobile
+// browsers open a document picker WITHOUT the "Take Photo" camera option.
+// Type enforcement happens in isSupportedAvatarFile() and server-side.
+export const AVATAR_UPLOAD_ACCEPT = 'image/*';
 
 function getExtension(name: string): string {
   const lastDot = name.lastIndexOf('.');
