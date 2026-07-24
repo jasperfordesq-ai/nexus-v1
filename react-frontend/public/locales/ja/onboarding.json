@@ -69,6 +69,9 @@
   "complete_welcome_to": "{{name}} へようこそ",
   "complete_redirecting": "ダッシュボードに移動しています...",
   "aria_upload_photo": "プロフィール写真をアップロード",
+  "aria_take_photo": "カメラでプロフィール写真を撮ります",
+  "take_photo": "写真を撮る",
+  "choose_from_library": "ライブラリから選ぶ",
   "aria_step": "ステップ {{step}}: {{label}}{{status}}",
   "aria_step_progress": "Step {{step}} of {{total}}",
   "aria_completed": "（完了）",
@@ -133,12 +136,12 @@
   "page_meta": {
     "title": "オンボーディング"
   },
+  "bio_char_count_one": "{{count}} 文字",
   "bio_char_count_other": "{{count}}文字",
+  "count_selected_one": "{{count}} 選択済み",
   "count_selected_other": "{{count}} が選択されました",
   "skills_to_offer_count_one": "{{count}} が提供するスキル",
   "skills_to_offer_count_other": "{{count}} のスキルを提供",
   "skills_needed_count_one": "{{count}} 必要なスキル",
-  "skills_needed_count_other": "{{count}} のスキルが必要",
-  "bio_char_count_one": "{{count}} 文字",
-  "count_selected_one": "{{count}} 選択済み"
+  "skills_needed_count_other": "{{count}} のスキルが必要"
 }

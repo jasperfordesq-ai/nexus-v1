@@ -69,7 +69,11 @@
   "complete_welcome_to": "Bienvenue sur {{name}}",
   "complete_redirecting": "Redirection vers votre tableau de bord...",
   "aria_upload_photo": "Téléverser une photo de profil",
+  "aria_take_photo": "Prenez une photo de profil avec votre appareil photo",
+  "take_photo": "Prendre une photo",
+  "choose_from_library": "Choisissez dans la bibliothèque",
   "aria_step": "Étape {{step}} : {{label}}{{status}}",
+  "aria_step_progress": "Step {{step}} of {{total}}",
   "aria_completed": " (terminée)",
   "aria_current": " (en cours)",
   "toast_invalid_file_type": "Type de fichier invalide",
@@ -132,17 +136,16 @@
   "page_meta": {
     "title": "Intégration"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}",
-  "bio_char_count_many": "{{count}} caractères",
   "bio_char_count_one": "{{count}} caractères",
   "bio_char_count_other": "{{count}} caractères",
-  "count_selected_many": "{{count}} sélectionnée(s)",
   "count_selected_one": "{{count}} sélectionnée(s)",
   "count_selected_other": "{{count}} sélectionnée(s)",
-  "skills_to_offer_count_many": "{{count}} compétence(s) à offrir",
   "skills_to_offer_count_one": "{{count}} compétence(s) à offrir",
   "skills_to_offer_count_other": "{{count}} compétence(s) à offrir",
-  "skills_needed_count_many": "{{count}} compétence(s) recherchée(s)",
   "skills_needed_count_one": "{{count}} compétence(s) recherchée(s)",
-  "skills_needed_count_other": "{{count}} compétence(s) recherchée(s)"
+  "skills_needed_count_other": "{{count}} compétence(s) recherchée(s)",
+  "bio_char_count_many": "{{count}} caractères",
+  "count_selected_many": "{{count}} sélectionnée(s)",
+  "skills_to_offer_count_many": "{{count}} compétence(s) à offrir",
+  "skills_needed_count_many": "{{count}} compétence(s) recherchée(s)"
 }

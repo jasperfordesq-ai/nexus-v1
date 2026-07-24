@@ -225,10 +225,27 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     setIsRecording(false);
   }, [cameraStream]);
 
+  // The <video> only mounts after cameraActive flips true, so startCamera's
+  // synchronous ref assignment misses it — attach the stream once it exists.
+  useEffect(() => {
+    const video = cameraVideoRef.current;
+    if (cameraActive && cameraStream && video && video.srcObject !== cameraStream) {
+      video.srcObject = cameraStream;
+      video.play().catch(() => {
+        // Autoplay is already requested via the autoPlay attribute; a rejected
+        // play() here (e.g. transient AbortError) resolves on user interaction.
+      });
+    }
+  }, [cameraActive, cameraStream, mode]);
+
   const flipCamera = useCallback(() => {
-    stopCamera();
+    // Keep cameraActive true so the facing-change effect restarts the stream.
+    if (cameraStream) {
+      cameraStream.getTracks().forEach((t) => t.stop());
+      setCameraStream(null);
+    }
     setCameraFacing((prev) => (prev === 'user' ? 'environment' : 'user'));
-  }, [stopCamera]);
+  }, [cameraStream]);
 
   // Restart camera when facing changes
   useEffect(() => {
@@ -293,15 +310,28 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     if (!cameraStream) return;
 
     recordedChunksRef.current = [];
-    const recorder = new MediaRecorder(cameraStream, { mimeType: 'video/webm;codecs=vp9' });
+    // iOS Safari records mp4 and throws on webm mime types — probe for the
+    // first container the browser actually supports.
+    const supportedMimeType = [
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      'video/mp4',
+    ].find((m) => MediaRecorder.isTypeSupported(m));
+    const recorder = supportedMimeType
+      ? new MediaRecorder(cameraStream, { mimeType: supportedMimeType })
+      : new MediaRecorder(cameraStream);
+    const isMp4 = (supportedMimeType ?? recorder.mimeType).includes('mp4');
+    const containerType = isMp4 ? 'video/mp4' : 'video/webm';
+    const containerExt = isMp4 ? 'mp4' : 'webm';
 
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) recordedChunksRef.current.push(e.data);
     };
 
     recorder.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-      const file = new File([blob], `recording_${Date.now()}.webm`, { type: 'video/webm' });
+      const blob = new Blob(recordedChunksRef.current, { type: containerType });
+      const file = new File([blob], `recording_${Date.now()}.${containerExt}`, { type: containerType });
       setSelectedVideo(file);
       setVideoPreview(URL.createObjectURL(blob));
 

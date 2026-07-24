@@ -237,6 +237,9 @@
     "location_placeholder": "市、国",
     "upload_photo_aria": "プロフィール写真をアップロード",
     "change_photo_aria": "プロフィール写真を変更",
+    "take_photo_aria": "カメラでプロフィール写真を撮ります",
+    "take_photo": "写真を撮る",
+    "choose_from_library": "ライブラリから選ぶ",
     "identity_verified_lock": "本人確認が完了しているため、お名前はロックされています。",
     "phone_invalid": "電話番号は国際形式で入力してください（例: +1 555 123 4567）",
     "date_of_birth": "生年月日",
@@ -651,8 +654,8 @@
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
     "link": "ブロックされたユーザー",
-    "count_other": "{{count}} 件ブロック中",
-    "count_one": "{{count}} がブロックされました"
+    "count_one": "{{count}} がブロックされました",
+    "count_other": "{{count}} 件ブロック中"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",

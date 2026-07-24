@@ -69,7 +69,11 @@
   "complete_welcome_to": "Welkom bij {{name}}",
   "complete_redirecting": "Je wordt naar je dashboard gebracht...",
   "aria_upload_photo": "Upload profielfoto",
+  "aria_take_photo": "Maak een profielfoto met uw camera",
+  "take_photo": "Maak een foto",
+  "choose_from_library": "Keuze uit bibliotheek",
   "aria_step": "Stap {{step}}: {{label}}{{status}}",
+  "aria_step_progress": "Step {{step}} of {{total}}",
   "aria_completed": " (voltooid)",
   "aria_current": " (huidig)",
   "toast_invalid_file_type": "Ongeldig bestandstype",
@@ -132,7 +136,6 @@
   "page_meta": {
     "title": "Aan boord"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}",
   "bio_char_count_one": "{{count}} tekens",
   "bio_char_count_other": "{{count}} tekens",
   "count_selected_one": "{{count}} geselecteerd",

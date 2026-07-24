@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectItem } from '@/components/ui/Select';
@@ -94,6 +95,7 @@ export function ProfileTab({
   const { t } = useTranslation('settings');
   const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   // Native-app field editing: phones open the bio in a full-screen editor
   // (Instagram edit-profile pattern) instead of a small inline textarea.
@@ -123,17 +125,42 @@ export function ProfileTab({
               disabled={isUploading}
               aria-label={t('profile.upload_photo_aria')}
             />
-            <Button
-              isIconOnly
-              size="md"
-              className="absolute bottom-0 right-0 h-10 min-w-10 rounded-full shadow-lg"
-              onPress={() => fileInputRef.current?.click()}
-              isDisabled={isUploading}
-              isLoading={isUploading}
-              aria-label={t('profile.change_photo_aria')}
-            >
-              <Camera className="w-4 h-4" aria-hidden="true" />
-            </Button>
+            {/* capture forces the OS camera — the plain picker no longer offers
+                one on modern Android (system photo picker has no camera). */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept={AVATAR_UPLOAD_ACCEPT}
+              capture="user"
+              onChange={onAvatarUpload}
+              className="hidden"
+              disabled={isUploading}
+              aria-label={t('profile.take_photo_aria')}
+            />
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  size="md"
+                  className="absolute bottom-0 right-0 h-10 min-w-10 rounded-full shadow-lg"
+                  isDisabled={isUploading}
+                  isLoading={isUploading}
+                  aria-label={t('profile.change_photo_aria')}
+                >
+                  <Camera className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label={t('profile.change_photo_aria')}
+                onAction={(key) => {
+                  if (key === 'camera') cameraInputRef.current?.click();
+                  if (key === 'library') fileInputRef.current?.click();
+                }}
+              >
+                <DropdownItem id="camera">{t('profile.take_photo')}</DropdownItem>
+                <DropdownItem id="library">{t('profile.choose_from_library')}</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
           <div>
             <p className="text-theme-primary font-medium">{t('profile.photo_label')}</p>

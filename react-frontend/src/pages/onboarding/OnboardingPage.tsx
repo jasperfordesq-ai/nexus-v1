@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Spinner } from '@/components/ui/Spinner';
 import { TagGroup, Tag } from '@/components/ui/TagGroup';
@@ -115,6 +116,7 @@ export function OnboardingPage() {
 
   // Step 2: Profile photo + bio
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [bio, setBio] = useState('');
@@ -775,21 +777,45 @@ export function OnboardingPage() {
                       className="hidden"
                       aria-label={t('aria_upload_photo')}
                     />
-                    <Button
-                      isIconOnly
-                      size="sm"
-                      className="absolute bottom-1 right-1 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg min-w-0 w-9 h-9"
-                      onPress={() => fileInputRef.current?.click()}
-                      isDisabled={isUploadingAvatar}
-                      isLoading={isUploadingAvatar}
-                      aria-label={t('aria_upload_photo')}
-                    >
-                      {hasAvatar ? (
-                        <Camera className="w-4 h-4" aria-hidden="true" />
-                      ) : (
-                        <ImagePlus className="w-4 h-4" aria-hidden="true" />
-                      )}
-                    </Button>
+                    {/* capture forces the OS camera — the plain picker no longer
+                        offers one on modern Android (system photo picker). */}
+                    <input
+                      ref={cameraInputRef}
+                      type="file"
+                      accept={AVATAR_UPLOAD_ACCEPT}
+                      capture="user"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                      aria-label={t('aria_take_photo')}
+                    />
+                    <Dropdown placement="bottom-end">
+                      <DropdownTrigger>
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          className="absolute bottom-1 right-1 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg min-w-0 w-9 h-9"
+                          isDisabled={isUploadingAvatar}
+                          isLoading={isUploadingAvatar}
+                          aria-label={t('aria_upload_photo')}
+                        >
+                          {hasAvatar ? (
+                            <Camera className="w-4 h-4" aria-hidden="true" />
+                          ) : (
+                            <ImagePlus className="w-4 h-4" aria-hidden="true" />
+                          )}
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        aria-label={t('aria_upload_photo')}
+                        onAction={(key) => {
+                          if (key === 'camera') cameraInputRef.current?.click();
+                          if (key === 'library') fileInputRef.current?.click();
+                        }}
+                      >
+                        <DropdownItem id="camera">{t('take_photo')}</DropdownItem>
+                        <DropdownItem id="library">{t('choose_from_library')}</DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
                   </div>
 
                   {isUploadingAvatar ? (
