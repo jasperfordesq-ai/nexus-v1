@@ -949,9 +949,9 @@ export function FeedPage() {
               <Button
                 className="bg-accent text-white shadow-sm"
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => openCompose('post')}
+                onPress={() => openCompose('listing')}
               >
-                {t('new_post')}
+                {t('create')}
               </Button>
             )}
           </div>
@@ -1204,9 +1204,9 @@ export function FeedPage() {
                 <Button
                   className="bg-accent text-white shadow-lg shadow-accent/20"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => openCompose('post')}
+                  onPress={() => openCompose('listing')}
                 >
-                  {t('create_post')}
+                  {t('create')}
                 </Button>
               )}
               </div>

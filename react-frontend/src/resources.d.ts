@@ -44783,8 +44783,8 @@ export default interface Resources {
       "delete_post": "Delete this post? This cannot be undone."
     },
     "controls_region_label": "Feed controls",
+    "create": "Create",
     "create_poll_aria": "Create poll",
-    "create_post": "Create Post",
     "empty_desc": "Be the first to share something with your community!",
     "empty_filtered": "Nothing matches this view right now. Try a different filter.",
     "empty_filtered_with_filter": "There are no {{filter}} updates right now. Try all posts or start a new conversation.",
@@ -44877,7 +44877,6 @@ export default interface Resources {
     "moderation": {
       "unauthorized": "You do not have permission to perform this action."
     },
-    "new_post": "New Post",
     "new_posts_available": "New posts available",
     "page_title": "Feed",
     "poll": {

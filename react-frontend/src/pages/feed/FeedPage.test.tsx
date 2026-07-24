@@ -112,9 +112,9 @@ describe('FeedPage', () => {
     expect(screen.getByText(/what's happening in your community/i)).toBeInTheDocument();
   });
 
-  it('shows New Post button for authenticated users', () => {
+  it('shows the create button for authenticated users', () => {
     render(<FeedPage />);
-    expect(screen.getAllByText('New Post').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Create').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows filter options', () => {
