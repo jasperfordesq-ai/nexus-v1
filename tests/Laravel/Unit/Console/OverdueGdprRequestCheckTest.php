@@ -10,6 +10,7 @@ namespace Tests\Laravel\Unit\Console;
 
 use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Tests\Laravel\TestCase;
@@ -198,13 +199,26 @@ class OverdueGdprRequestCheckTest extends TestCase
     public function test_succeeds_when_request_is_exactly_at_threshold_boundary(): void
     {
         // requested_at = exactly --days ago: the WHERE uses `<` so this is NOT caught.
-        $this->seedGdprRequest(
-            now()->subDays(25)->toDateTimeString(),
-            status: 'pending'
-        );
+        //
+        // Freeze the clock so the seeded `requested_at` and the command's
+        // `Carbon::now()->subDays(25)` cutoff resolve to the SAME instant. Without
+        // this, real wall-clock time elapses between the seed and the command run,
+        // so the row drifts just past the strict `<` cutoff and is flagged as
+        // overdue → exit 1 (the intermittent CI flake). try/finally guarantees the
+        // frozen clock is reset even if the assertion throws.
+        Carbon::setTestNow(Carbon::now());
 
-        $this->artisan('gdpr:check-overdue-requests', ['--days' => 25])
-            ->assertExitCode(0);
+        try {
+            $this->seedGdprRequest(
+                now()->subDays(25)->toDateTimeString(),
+                status: 'pending'
+            );
+
+            $this->artisan('gdpr:check-overdue-requests', ['--days' => 25])
+                ->assertExitCode(0);
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     // -------------------------------------------------------------------------
