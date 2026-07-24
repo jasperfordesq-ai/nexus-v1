@@ -29,7 +29,6 @@ interface MobileComposeOverlayProps {
   onTabChange: (tab: ComposeTab) => void;
   tabs: ComposeTabConfig[];
   headerTitle: string;
-  templatePicker: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -40,7 +39,6 @@ export function MobileComposeOverlay({
   onTabChange,
   tabs,
   headerTitle,
-  templatePicker,
   children,
 }: MobileComposeOverlayProps) {
   const { t } = useTranslation('feed');
@@ -87,12 +85,11 @@ export function MobileComposeOverlay({
               <X className="w-5 h-5" aria-hidden="true" />
             </Button>
 
-            {/* Title + Template */}
+            {/* Title */}
             <div className="flex-1 flex items-center gap-2 min-w-0">
               <span className="font-semibold text-[var(--text-primary)] truncate">
                 {headerTitle}
               </span>
-              {templatePicker}
             </div>
 
             {/* Submit */}

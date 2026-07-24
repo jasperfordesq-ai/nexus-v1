@@ -142,7 +142,6 @@ function renderOverlay(props: Partial<React.ComponentProps<typeof import('./Mobi
     onTabChange: vi.fn(),
     tabs: mockTabs,
     headerTitle: 'Create Post',
-    templatePicker: null,
     children: <div data-testid="body-content">Body</div>,
   };
   return { ...defaults, ...props };
@@ -250,18 +249,6 @@ describe('MobileComposeOverlay', () => {
     });
   });
 
-  it('renders template picker slot when provided', async () => {
-    const props = renderOverlay({
-      templatePicker: <div data-testid="template-picker">Templates</div>,
-    });
-    const { MobileComposeOverlay } = await import('./MobileComposeOverlay');
-    render(<MobileComposeOverlay {...props} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('template-picker')).toBeInTheDocument();
-    });
-  });
-
   it('renders submit button when registration is provided via ComposeSubmitProvider', async () => {
     const { MobileComposeOverlay } = await import('./MobileComposeOverlay');
     const { ComposeSubmitProvider, useComposeSubmit } = await import('./ComposeSubmitContext');
@@ -291,7 +278,6 @@ describe('MobileComposeOverlay', () => {
           onTabChange={vi.fn()}
           tabs={mockTabs}
           headerTitle="Test"
-          templatePicker={null}
         >
           <div />
         </MobileComposeOverlay>

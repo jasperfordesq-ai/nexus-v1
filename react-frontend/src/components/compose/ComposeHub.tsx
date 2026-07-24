@@ -13,7 +13,7 @@
  * Desktop: HeroUI Modal with underlined tabs and glass background.
  */
 
-import { lazy, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useMemo, useEffect } from 'react';
 
 import { Separator } from '@/components/ui/Separator';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -27,7 +27,6 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ComposeSubmitProvider } from './ComposeSubmitContext';
 import { MobileComposeOverlay } from './MobileComposeOverlay';
 import { GroupSelector } from './shared/GroupSelector';
-import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
 import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
@@ -62,7 +61,6 @@ export function ComposeHub({
   const { hasFeature, hasModule } = useTenant();
   const [activeTab, setActiveTab] = useState<ComposeTab>(defaultTab);
   const [sharedGroupId, setSharedGroupId] = useState<number | null>(groupId ?? null);
-  const [templateData, setTemplateData] = useState<{ title?: string; content: string } | null>(null);
   // Sync activeTab when defaultTab prop changes (e.g. user clicks different quick-action)
   useEffect(() => {
     setActiveTab(defaultTab);
@@ -83,12 +81,6 @@ export function ComposeHub({
   }, [isOpen, hasChildContent]);
 
   const isMobile = useMediaQuery('(max-width: 639px)');
-
-  const handleTemplateSelect = useCallback((data: { title?: string; content: string }) => {
-    setTemplateData(data);
-    // Clear after a tick so tabs can consume it
-    setTimeout(() => setTemplateData(null), 0);
-  }, []);
 
   const tabs = useMemo(() => {
     return ALL_TABS.filter((tab) => {
@@ -127,7 +119,6 @@ export function ComposeHub({
     onClose: handleClose,
     isOpen,
     groupId: sharedGroupId,
-    templateData,
     onContentChange: setHasChildContent,
   };
 
@@ -170,7 +161,6 @@ export function ComposeHub({
           onTabChange={editItem ? () => {} : setActiveTab}
           tabs={editItem ? [] : tabs}
           headerTitle={editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
-          templatePicker={editItem ? undefined : <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
         >
           {bodyContent}
         </MobileComposeOverlay>
@@ -202,7 +192,6 @@ export function ComposeHub({
             <ModalHeading className="font-semibold">
               {editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
             </ModalHeading>
-            {!editItem && <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
 
             {/* Underlined tabs — hidden in edit mode (locked to Post tab) */}
             {!editItem && (
