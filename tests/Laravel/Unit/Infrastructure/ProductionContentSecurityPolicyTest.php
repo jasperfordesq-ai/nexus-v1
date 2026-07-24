@@ -66,7 +66,7 @@ class ProductionContentSecurityPolicyTest extends TestCase
                     'https://player.twitch.tv',
                     'https://clips.twitch.tv',
                 ],
-                'media-src' => ["'self'", 'https:'],
+                'media-src' => ["'self'", 'https:', 'blob:'],
                 'worker-src' => ["'self'", 'blob:'],
                 'frame-ancestors' => ["'self'"],
                 'report-uri' => ['https://api.project-nexus.ie/api/csp-report'],

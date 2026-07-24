@@ -131,7 +131,7 @@ class SecurityHeaders
             . "img-src 'self' https: data: blob:; "
             . "font-src 'self' https://fonts.gstatic.com data:; "
             . "frame-src 'self' https://*.google.com https://challenges.cloudflare.com https://www.openstreetmap.org; "
-            . "media-src 'self' https:; "
+            . "media-src 'self' https: blob:; "
             . "worker-src 'self' blob:; "
             . "frame-ancestors 'self'; "
             . "form-action 'self'; "
