@@ -39,6 +39,7 @@
     "clear": "Clear feed filters",
     "show_all": "Show all posts",
     "more": "More",
+    "filters": "Filters",
     "select": "Select feed filter"
   },
   "report": {

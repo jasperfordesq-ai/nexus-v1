@@ -56,6 +56,7 @@ import { DesktopNavPanel, type DesktopNavPanelSection } from '@/components/layou
 import { ThemePicker } from '@/components/layout/ThemePicker';
 import { TenantLogo } from '@/components/branding';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
+import { useAppBarTitle } from '@/hooks/useAppBarTitle';
 import {
   getNavigationItems,
   type DesktopNavigationSection,
@@ -138,6 +139,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { headerMenus, hasCustomMenus } = useMenuContext();
   const installState = useInstallPrompt();
   const canShowInstall = shouldOfferInstall(installState);
+  // Page-provided title shown next to the brand on phones (pages that hide
+  // their own header for vertical space publish it via useSetAppBarTitle).
+  const appBarTitle = useAppBarTitle();
 
   // Scroll behavior for utility bar auto-hide + logo shrink
   const { isScrolled, isUtilityBarVisible } = useHeaderScroll(48);
@@ -647,6 +651,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               {/* Brand — shrinks when scrolled; collapses to a compact icon on
                   mobile so a large custom logo can't bleed past the header. */}
               <TenantLogo size="md" showName compact={isScrolled} collapseLogoOnMobile />
+              {appBarTitle && (
+                <span className="min-w-0 flex-1 truncate text-base font-semibold text-theme-primary sm:hidden">
+                  {appBarTitle}
+                </span>
+              )}
             </div>
 
             {/* Desktop Navigation — uses ResizeObserver for smart collapsing */}

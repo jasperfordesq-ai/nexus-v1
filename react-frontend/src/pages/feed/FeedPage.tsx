@@ -27,6 +27,7 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Flag from 'lucide-react/icons/flag';
 import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
+import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
 import { AlgorithmLabel } from '@/components/ui/AlgorithmLabel';
 import { Avatar } from '@/components/ui/Avatar';
@@ -35,7 +36,6 @@ import { Chip } from '@/components/ui/Chip';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
-import { ScrollShadow } from '@/components/ui/ScrollShadow';
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
@@ -43,6 +43,7 @@ import type { Key } from '@heroui/react/rac';
 import { PageMeta } from '@/components/seo';
 import type { ComposeTab } from '@/components/compose/types';
 import { StoriesBar } from '@/components/feed/StoriesBar';
+import { FeedFilterSheet } from '@/components/feed/FeedFilterSheet';
 import { FeedModeToggle } from '@/components/feed/FeedModeToggle';
 import { SubFilterChips } from '@/components/feed/SubFilterChips';
 import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggestionsWidget';
@@ -55,6 +56,8 @@ import { isAdminTier } from '@/lib/roles';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
+import { useSetAppBarTitle } from '@/hooks/useAppBarTitle';
+import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -140,6 +143,9 @@ export function FeedPage() {
   const { t } = useTranslation(['feed', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('page_title'));
+  // On phones the page hides its own hero card; the title lives in the app bar.
+  useSetAppBarTitle(t('title'));
+  const { isUtilityBarVisible: showMobileControls } = useHeaderScroll(64);
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
@@ -191,6 +197,7 @@ export function FeedPage() {
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
   const [reportTarget, setReportTarget] = useState<FeedItem | null>(null);
+  const { isOpen: isFilterSheetOpen, onOpen: onFilterSheetOpen, onClose: onFilterSheetClose } = useDisclosure();
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
 
@@ -921,15 +928,15 @@ export function FeedPage() {
         </div>
       )}
 
-      {/* Compact page header — single slim row on phones, full hero on ≥sm */}
-      <section className="overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)] shadow-sm">
-        <div className="flex items-center gap-3 px-4 py-3 sm:px-5 sm:py-4">
-          <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/15 sm:flex">
+      {/* Page header — hidden on phones (title lives in the app bar), full hero on ≥sm */}
+      <section className="hidden overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)] shadow-sm sm:block">
+        <div className="flex items-center gap-3 px-5 py-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/15">
             <Newspaper className="w-5 h-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg font-semibold leading-tight text-theme-primary sm:whitespace-normal sm:text-balance sm:text-3xl">{t('title')}</h1>
-            <p className="mt-1 hidden max-w-xl text-sm leading-6 text-theme-muted sm:block">{t('subtitle')}</p>
+            <h1 className="text-balance text-3xl font-semibold leading-tight text-theme-primary">{t('title')}</h1>
+            <p className="mt-1 max-w-xl text-sm leading-6 text-theme-muted">{t('subtitle')}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {!isLoading && items.length > 0 && (
@@ -940,7 +947,7 @@ export function FeedPage() {
             <AlgorithmLabel area="feed" />
             {isAuthenticated && (
               <Button
-                className="hidden bg-accent text-white shadow-sm sm:flex"
+                className="bg-accent text-white shadow-sm"
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => openCompose('post')}
               >
@@ -949,7 +956,7 @@ export function FeedPage() {
             )}
           </div>
         </div>
-        <div className="hidden border-t border-theme-default bg-theme-elevated/45 px-4 py-2.5 sm:block sm:px-5">
+        <div className="border-t border-theme-default bg-theme-elevated/45 px-5 py-2.5">
           <p className="text-xs font-medium uppercase tracking-wide text-theme-muted">
             {t('feed.current_view', { filter: activeFilterLabel })}
           </p>
@@ -957,7 +964,34 @@ export function FeedPage() {
       </section>
 
       {/* Feed controls */}
-      <section data-testid="feed-controls" aria-label={t('controls_region_label')} className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
+      <section
+        data-testid="feed-controls"
+        aria-label={t('controls_region_label')}
+        className={`sticky top-[calc(var(--safe-area-top)+3.5rem)] z-20 w-full min-w-0 max-w-full space-y-3 overflow-hidden border-y border-theme-default bg-[var(--surface-base)]/95 px-3 py-2.5 shadow-sm backdrop-blur-md transition-[transform,opacity] duration-200 ${
+          showMobileControls ? '' : 'pointer-events-none -translate-y-3 opacity-0'
+        } sm:pointer-events-auto sm:static sm:z-auto sm:translate-y-0 sm:rounded-xl sm:border sm:px-4 sm:py-3 sm:opacity-100 sm:backdrop-blur-none`}
+      >
+        {/* Phone: mode toggle + filter-sheet trigger in one slim bar */}
+        <div className="flex min-w-0 items-center gap-2 sm:hidden">
+          <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
+          <div className="flex-1" />
+          <AlgorithmLabel area="feed" />
+          <Button
+            size="sm"
+            variant="flat"
+            radius="full"
+            onPress={onFilterSheetOpen}
+            startContent={<ListFilter className="h-4 w-4 shrink-0" aria-hidden="true" />}
+            className={`min-w-0 px-3 ${
+              hasActiveFeedView
+                ? 'bg-accent text-white shadow-sm'
+                : 'border border-theme-default bg-theme-elevated text-theme-muted transition-colors hover:bg-accent/5 hover:text-accent'
+            }`}
+          >
+            <span className="truncate">{hasActiveFeedView ? activeFilterLabel : t('filter.filters')}</span>
+          </Button>
+        </div>
+
         <div className="hidden min-w-0 items-center justify-between gap-3 sm:flex">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
@@ -974,11 +1008,11 @@ export function FeedPage() {
           )}
         </div>
 
-        <div className="min-w-0" role="group" aria-label={t('filter.select')}>
+        <div className="hidden min-w-0 sm:block" role="group" aria-label={t('filter.select')}>
           {/*
             Desktop & up: a single-select ToggleButtonGroup is the idiomatic HeroUI v3
             component for a mutually-exclusive filter set. disallowEmptySelection keeps
-            exactly one filter active (the group always renders every option on ≥sm).
+            exactly one filter active. Phones use the FeedFilterSheet instead.
           */}
           <ToggleButtonGroup
             aria-label={t('filter.select')}
@@ -991,7 +1025,7 @@ export function FeedPage() {
               const [key] = Array.from(keys);
               if (key) handleFilterChange(key as FeedFilter);
             }}
-            className="hidden flex-wrap items-center gap-2 sm:flex"
+            className="flex flex-wrap items-center gap-2"
           >
             {filterOptions.map((opt) => (
               <ToggleButton
@@ -1004,47 +1038,27 @@ export function FeedPage() {
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
-
-          {/*
-            Mobile: the mode toggle and every filter share one horizontally
-            scrollable rail (ScrollShadow fades the clipped edge to hint at
-            overflow), so no primary/overflow split or Dropdown is needed.
-          */}
-          <ScrollShadow orientation="horizontal" hideScrollBar size={32} className="-mx-3 px-3 sm:hidden">
-            <div className="flex w-max items-center gap-2">
-              <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
-              <span aria-hidden="true" className="mx-1 h-5 w-0 shrink-0 border-l border-theme-default" />
-              <ToggleButtonGroup
-                aria-label={t('filter.select')}
-                selectionMode="single"
-                disallowEmptySelection
-                isDetached
-                size="sm"
-                selectedKeys={new Set<Key>([filter])}
-                onSelectionChange={(keys) => {
-                  const [key] = Array.from(keys);
-                  if (key) handleFilterChange(key as FeedFilter);
-                }}
-                className="flex flex-nowrap items-center gap-2 p-0"
-              >
-                {filterOptions.map((opt) => (
-                  <ToggleButton
-                    key={opt.key}
-                    id={opt.key}
-                    variant="ghost"
-                    className="shrink-0 rounded-full border border-theme-default bg-theme-elevated px-3 text-theme-muted transition-colors hover:bg-accent/5 hover:text-accent data-[selected=true]:border-transparent data-[selected=true]:bg-accent data-[selected=true]:text-white data-[selected=true]:shadow-sm"
-                  >
-                    {opt.label}
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </div>
-          </ScrollShadow>
         </div>
 
-        {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
-        <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
+        {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests); in the sheet on phones */}
+        {FILTERS_WITH_SUBFILTERS.has(filter) && (
+          <div className="hidden sm:block">
+            <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }} />
+          </div>
+        )}
       </section>
+
+      {/* Phone filter sheet — all filters + contextual sub-filters */}
+      <FeedFilterSheet
+        isOpen={isFilterSheetOpen}
+        onClose={onFilterSheetClose}
+        options={filterOptions}
+        filter={filter}
+        onFilterChange={handleFilterChange}
+        filtersWithSubFilters={FILTERS_WITH_SUBFILTERS}
+        subFilter={subFilter}
+        onSubFilterChange={(sf) => { setSubFilter(sf); syncToUrl({ subFilter: sf }); }}
+      />
 
       {/* Stories Bar — loads its own data from /v2/stories */}
       {isAuthenticated && (

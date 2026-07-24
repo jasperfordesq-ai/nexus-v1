@@ -98,7 +98,10 @@ describe('FeedPage', () => {
     const feedControls = screen.getByTestId('feed-controls');
     const sidebarPanel = screen.getByTestId('feed-sidebar-panel');
 
-    expect(feedControls.className).not.toMatch(/\b(sticky|fixed)\b/);
+    // Phones deliberately pin the controls bar below the app bar (sticky with
+    // scroll-away hiding); desktop must remain in normal document flow.
+    expect(feedControls.className).not.toMatch(/\bfixed\b/);
+    expect(feedControls.className).toMatch(/\bsm:static\b/);
     expect(sidebarPanel.className).not.toMatch(/\b(sticky|fixed)\b/);
     expect(sidebarPanel).toHaveClass('static');
     expect(sidebarPanel).toHaveClass('self-start');

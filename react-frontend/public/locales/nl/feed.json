@@ -39,6 +39,7 @@
     "clear": "Feedfilters wissen",
     "show_all": "Alle berichten tonen",
     "more": "Meer",
+    "filters": "Filters",
     "select": "Selecteer feedfilter"
   },
   "report": {

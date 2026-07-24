@@ -39,6 +39,7 @@
     "clear": "Effacer les filtres du fil",
     "show_all": "Afficher toutes les publications",
     "more": "Plus",
+    "filters": "Filtres",
     "select": "Sélectionner un filtre"
   },
   "report": {
