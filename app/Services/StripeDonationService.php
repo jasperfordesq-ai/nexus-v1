@@ -118,9 +118,15 @@ class StripeDonationService
             );
         }
 
+        // Resolve the ACTING user by global id only. $userId is requireAuth()
+        // (the caller themselves) and users.id is the global PK, so there is no
+        // IDOR. Do NOT tenant-scope this self-lookup: a platform super-admin /
+        // cross-tenant actor whose home tenant differs from the request tenant
+        // would otherwise be invisible here and get a spurious 'User not found'
+        // 500 on a perfectly valid donation. All donation/record writes below stay
+        // tenant-scoped.
         $user = DB::table('users')
             ->where('id', $userId)
-            ->where('tenant_id', $tenantId)
             ->first(['id', 'first_name', 'last_name', 'email', 'stripe_customer_id']);
 
         if (!$user) {
@@ -148,9 +154,12 @@ class StripeDonationService
                 ]);
                 $stripeCustomerId = $customer->id;
 
+                // Persist against the same global actor row the SELECT resolved.
+                // Tenant-scoping this UPDATE would match 0 rows for a cross-tenant
+                // actor, so the new Stripe customer id would never save and every
+                // donation would mint a fresh orphan customer.
                 DB::table('users')
                     ->where('id', $userId)
-                    ->where('tenant_id', $tenantId)
                     ->update(['stripe_customer_id' => $stripeCustomerId]);
             } catch (\Exception $e) {
                 Log::error('Stripe: failed to create customer', [

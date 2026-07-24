@@ -446,12 +446,16 @@ class MemberPremiumService
             );
         }
 
+        // Resolve the acting user by global id only (same reasoning as
+        // StripeDonationService): $userId is the authenticated caller and users.id
+        // is the global PK, so tenant-scoping this self-lookup would 500 a
+        // platform super-admin / cross-tenant actor starting a subscription.
         $user = DB::selectOne(
-            "SELECT id, email, name, first_name, stripe_customer_id FROM users WHERE id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
+            "SELECT id, email, name, first_name, stripe_customer_id FROM users WHERE id = ?",
+            [$userId]
         );
         if (! $user) {
-            throw new RuntimeException("User {$userId} not found in tenant {$tenantId}");
+            throw new RuntimeException("User {$userId} not found");
         }
 
         $client = StripeService::client();

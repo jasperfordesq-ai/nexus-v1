@@ -31,8 +31,17 @@ if (!defined('NEWSLETTER_EMAIL_DELAY_MICROSECONDS')) {
  */
 class NewsletterService
 {
-    /** Rate limiting: microseconds between each email (250ms = max 4 emails/sec) */
-    private const EMAIL_DELAY_MICROSECONDS = NEWSLETTER_EMAIL_DELAY_MICROSECONDS;
+    /**
+     * Rate limiting: microseconds between each email (250ms = max 4 emails/sec).
+     *
+     * A LITERAL, not the global NEWSLETTER_EMAIL_DELAY_MICROSECONDS, so the class
+     * const is opcache-preload-safe. Under opcache.preload the top-level define()
+     * (above) is compiled but never executed, so on the HTTP send path (where the
+     * class is served from the preloaded image and the file is never require'd)
+     * referencing the global constant threw a fatal "Undefined constant
+     * App\Services\NEWSLETTER_EMAIL_DELAY_MICROSECONDS". Keep the two in sync.
+     */
+    private const EMAIL_DELAY_MICROSECONDS = 250000;
 
     /**
      * Maximum delivery attempts before a queue row is abandoned as permanently failed.

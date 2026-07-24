@@ -28,7 +28,25 @@ class InjectHostTenantSlug
         $route = $request->route();
 
         if (is_string($slug) && $slug !== '' && $route !== null) {
+            // setParameter() APPENDS, but Laravel binds scalar route params to
+            // controller arguments POSITIONALLY (array_values order), not by name.
+            // On a slug-less host route (e.g. /listings/{id}) appending would
+            // yield ['id' => '42', 'tenantSlug' => slug], so the controller's
+            // (string $tenantSlug, int $id) receives them swapped — the int-typed
+            // $id gets the slug string and PHP throws a TypeError -> HTTP 500.
+            // Rebuild the parameter bag with tenantSlug FIRST so host-mode order
+            // matches the slug-based routes.
+            $original = $route->parameters();
+            foreach (array_keys($original) as $name) {
+                $route->forgetParameter($name);
+            }
             $route->setParameter('tenantSlug', $slug);
+            foreach ($original as $name => $value) {
+                if ($name === 'tenantSlug') {
+                    continue;
+                }
+                $route->setParameter($name, $value);
+            }
         }
 
         return $next($request);

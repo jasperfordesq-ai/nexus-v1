@@ -117,6 +117,54 @@ class DonationPaymentControllerTest extends TestCase
         $this->assertNotContains($response->status(), [401, 403]);
     }
 
+    public function test_create_payment_intent_resolves_cross_tenant_actor(): void
+    {
+        // Regression: the actor self-lookup must resolve by GLOBAL user id, not
+        // tenant-scoped. A platform super-admin / cross-tenant actor (home tenant
+        // != request tenant) previously 500'd with 'User not found' on a valid
+        // donation because StripeDonationService scoped the self-lookup by
+        // tenant_id (Sentry PHP 131343236 / React 131343241). We assert the actor
+        // now gets PAST the lookup; a later Stripe-config error in the test env is
+        // expected and fine — what must never recur is the 'User not found' throw.
+        $foreignTenantId = (int) \Illuminate\Support\Facades\DB::table('tenants')->insertGetId([
+            'name' => 'Donation Foreign Tenant',
+            'slug' => 'donation-foreign-' . strtolower(\Illuminate\Support\Str::random(8)),
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $actor = User::factory()->forTenant($foreignTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        \App\Core\TenantContext::setById($this->testTenantId);
+        $currency = (string) \App\Core\TenantContext::runForTenant(
+            $this->testTenantId,
+            fn () => \App\Core\TenantContext::getCurrency()
+        );
+        if (strlen(trim($currency)) !== 3) {
+            $currency = 'EUR';
+        }
+
+        try {
+            \App\Services\StripeDonationService::createPaymentIntent($actor->id, $this->testTenantId, [
+                'amount' => 5,
+                'currency' => strtoupper(trim($currency)),
+            ]);
+            // Reached Stripe (or succeeded) — the actor lookup passed either way.
+            $this->addToAssertionCount(1);
+        } catch (\Throwable $e) {
+            $this->assertStringNotContainsString(
+                'User not found',
+                $e->getMessage(),
+                'Cross-tenant actor must pass the de-scoped actor self-lookup (a later Stripe-config error is expected in tests).'
+            );
+        }
+    }
+
     public function test_member_support_invalid_interval_uses_translated_api_error(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
