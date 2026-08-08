@@ -30,7 +30,7 @@ jobs:
         # removing continue-on-error after enabling Dependency Graph at
         # https://github.com/jasperfordesq-ai/nexus-v1/settings/security_analysis
         continue-on-error: true
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
